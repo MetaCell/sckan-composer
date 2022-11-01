@@ -1,0 +1,21 @@
+harness:
+  dependencies:
+    build: [cloudharness-django]
+    hard: [common, accounts, events]
+    soft: [pgadmin]
+  deployment: {auto: true, port: 8080}
+  livenessProbe: {path: /api/live}
+  readinessProbe: {path: /api/ready}
+  secured: true
+  service: {auto: true, port: 8080}
+  subdomain: portal
+  uri_role_mapping:
+  - require-any-role: true
+    roles: ['portal:portal-administrator', 'portal:portal-manager',
+      'portal:portal-user']
+    uri: /*
+  use_services:
+  - {name: common}
+  database:
+    auto: true
+    type: postgres
