@@ -1,0 +1,43 @@
+version: "3.9"
+services:
+  cloudharness-base-debian:
+    build:
+      context: cloud-harness
+      dockerfile: infrastructure/base-images/cloudharness-base-debian/Dockerfile
+    image: cloudharness-base-debian
+  cloudharness-django:
+    build:
+      context: cloud-harness/infrastructure/common-images/cloudharness-django
+      args:
+        CLOUDHARNESS_BASE_DEBIAN: cloudharness-base-debian
+    image: cloudharness-django
+  portal:
+    build:
+      context: applications/portal
+      args:
+        CLOUDHARNESS_DJANGO: cloudharness-django
+    image: portal
+    ports:
+      - "8080:8080"
+    depends_on:
+      - portal-db
+    volumes:
+      - ./deployment/helm/values.yaml:/opt/cloudharness/resources/allvalues.yaml
+      - ./secrets:/opt/cloudharness/resources/secrets
+      - portal-data:/usr/src/app/persistent 
+    environment:
+      CH_CURRENT_APP_NAME: portal
+  portal-db:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: mnp
+      POSTGRES_PASSWORD: metacell
+      POSTGRES_DB: cloudharness
+
+volumes:
+  db-data:
+  portal-data:
