@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  composer:
+    build:
+      context: .
+    env_file:
+      - .env
+    image: composer
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/usr/src/app
