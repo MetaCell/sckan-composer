@@ -1,4 +1,4 @@
 .idea
 .vscode
-cloud-harness
-skaffold.yaml
+**/__pycache__
+**/*.pyc
