@@ -10,6 +10,7 @@ if [ -z "${PRODUCTION}" ]; then
     chmod go+w persistent/db.sqlite3
 fi
 
+python3 manage.py collectstatic --noinput
 python3 manage.py migrate
 
 if [ -z "${PRODUCTION}" ]; then

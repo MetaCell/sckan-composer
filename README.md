@@ -36,7 +36,7 @@ This step is an optional step
 
 ## Development setup
 
-Running locally
+### Running locally
 ```bash
 cd backend
 # make sure your virtual env is activated
@@ -48,20 +48,24 @@ python3 manage.py migrate
 python3 manage.py runserver
 ```
 
-Running on docker with docker-compose
+### Running on docker with docker-compose
 the command below will start a docker container that maps/uses the backend folder
 into the container. It will also start the Django development server with DEBUG=True
 
-there will be a superuser created with username=admin, password=admin
 ```bash
-BUILDKIT_PROGRESS=plain docker-compose -f docker-compose-dev.yaml up
+BUILDKIT_PROGRESS=plain docker-compose -f docker-compose-dev.yaml up --build
 ```
-Open Django the [admin](http://127.0.0.1:8000/admin/) interface
 
 to stop:
 ```bash
 docker-compose -f docker-compose-dev.yaml down
 ```
+
+### Open the admin page
+there will be a superuser created with username/password: `admin/admin`
+
+browse the Django [admin](http://127.0.0.1:8000/admin/) interface
+
 
 ## Production setup
 
@@ -70,12 +74,16 @@ the command below will start two docker containers: backend server and database 
 the backend server has a persistent disk connected for it's media files
 the database server has a persistent disk connected for the data
 
-there will be a superuser created with username=admin, password=admin
 ```bash
-BUILDKIT_PROGRESS=plain docker-compose up
+docker-compose up --build
 ```
 
 to stop:
 ```bash
 docker-compose down
 ```
+
+### Open the admin page
+there will be a superuser created with username/password: `admin/admin`
+
+browse the Django [admin](http://127.0.0.1:8000/admin/) interface

@@ -30,6 +30,7 @@ DEBUG = not PRODUCTION
 ALLOWED_HOSTS = [
     "*",
 ]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8000",]
 
 # Application definition
 
@@ -46,7 +47,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
