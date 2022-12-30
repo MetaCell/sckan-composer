@@ -24,13 +24,13 @@ class CircuitType(models.TextChoices):
 # Create your models here.
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    isTriageOperator = models.BooleanField(default=False)
-    isCurator = models.BooleanField(default=False)
-    isReviewer = models.BooleanField(default=False)
+    is_triageOperator = models.BooleanField(default=False)
+    is_curator = models.BooleanField(default=False)
+    is_reviewer = models.BooleanField(default=False)
 
 
 class AnsDivision(models.Model):
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200, db_index=True, unique=True)
 
     def __str__(self):
         return self.name
@@ -41,7 +41,7 @@ class AnsDivision(models.Model):
 
 
 class Specie(models.Model):
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200, db_index=True, unique=True)
 
     def __str__(self):
         return self.name
@@ -51,11 +51,23 @@ class Specie(models.Model):
         verbose_name_plural = "Species"
 
 
+class AnatomicalEntity(models.Model):
+    name = models.CharField(max_length=200, db_index=True, unique=True)
+    ontology_uri = models.URLField()
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Anatomical Entities"
+
+
 class Provenance(models.Model):
-    title = models.CharField(max_length=200)
-    description = models.TextField()
-    pmid = models.BigIntegerField()
-    pmcid = models.BigIntegerField()
+    title = models.CharField(max_length=200, db_index=True)
+    description = models.TextField(db_index=True)
+    pmid = models.BigIntegerField(db_index=True)
+    pmcid = models.BigIntegerField(db_index=True)
     uri = models.URLField()
     laterality = models.CharField(max_length=1, default=Laterality.UNKNOWN, choices=Laterality.choices)
     circuit_type = models.CharField(max_length=1, default=CircuitType.UNKNOWN, choices=CircuitType.choices)
@@ -88,12 +100,19 @@ class ConnectivityStatement(models.Model):
         APPROVED           = "approved"
 
     provenance = models.ForeignKey(Provenance, verbose_name="Provenance", on_delete=models.DO_NOTHING)
-    knowledge_statement = models.TextField()
+    knowledge_statement = models.TextField(db_index=True)
     uri = models.URLField()
     state = FSMField(default=STATE.OPEN, protected=True)
+    origin = models.ForeignKey(AnatomicalEntity, verbose_name="Origin", on_delete=models.DO_NOTHING, related_name="origin", null=True)
+    destination = models.ForeignKey(AnatomicalEntity, verbose_name="Destination", on_delete=models.DO_NOTHING, related_name="destination", null=True)
+    curator = models.ForeignKey(User, verbose_name="Curator", on_delete=models.DO_NOTHING, null=True, blank=True)
+    path = models.ManyToManyField(AnatomicalEntity, verbose_name="Path", through="Via")
 
     def __str__(self):
-        return self.knowledge_statement
+        suffix = ""
+        if len(self.knowledge_statement) > 49:
+            suffix = "..."
+        return f"{self.knowledge_statement[:50]}{suffix}"
     
     # states
     @transition(field=state, source=[STATE.OPEN, STATE.COMPOSE_LATER], target=STATE.COMPOSE_NOW)
@@ -124,3 +143,20 @@ class ConnectivityStatement(models.Model):
     class Meta:
         ordering = ["knowledge_statement"]
         verbose_name_plural = "Connectivity Statements"
+
+
+class Via(models.Model):
+    connectivity_statement = models.ForeignKey(ConnectivityStatement, verbose_name="Connectivity Statement", on_delete=models.CASCADE)
+    anatomical_entity = models.ForeignKey(AnatomicalEntity, verbose_name="Anatomical Entity", on_delete=models.DO_NOTHING)
+    ordering = models.PositiveIntegerField(
+        default=0,
+        blank=False,
+        null=False,
+    )
+
+    def __str__(self):
+        return f"{self.connectivity_statement} - {self.anatomical_entity}"
+    
+    class Meta:
+        ordering = ["ordering"]
+        verbose_name_plural = "Via"
