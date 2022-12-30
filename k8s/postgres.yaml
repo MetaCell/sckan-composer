@@ -42,11 +42,13 @@ spec:
           value: "{{DB_NAME}}"
         - name: PGPORT
           value: "{{DB_PORT}}"
+        - name: PGDATA
+          value: /opt/db/data
         ports:
         - containerPort: {{DB_PORT}}
         volumeMounts:
         - name: composer-db
-          mountPath: /var/lib/postgresql/data
+          mountPath: /opt/db
       affinity:
         podAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
