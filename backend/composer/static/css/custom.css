@@ -1,0 +1,13 @@
+h2, h3 {
+    font-size: 1rem;
+}
+
+fieldset.sortable :is(.inline-related, td.original) span.sort {
+    float: left !important;
+    margin-right: 24px !important;
+}
+
+.delete {
+    margin-left: 100px;
+    float: right;
+}
