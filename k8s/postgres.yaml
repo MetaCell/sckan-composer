@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: composer-db
+  labels:
+    app: composer-db
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1G
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: composer-db
+  labels:
+    app: composer-db
+    usesvolume: composer-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sckan-composer
+  template:
+    metadata:
+      labels:
+        app: sckan-composer
+        usesvolume: composer-db
+    spec:
+      containers:
+      - name: composer-db
+        image: postgres:13
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: POSTGRES_USER
+          value: ${DB_USER}
+        - name: POSTGRES_PASSWORD
+          value: ${DB_PASSWORD}
+        - name: POSTGRES_DB
+          value: ${DB_NAME}
+        - name: PGPORT
+          value: ${DB_PORT}
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: composer-db
+          mountPath: /var/lib/postgresql/data
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: usesvolume
+                    operator: In
+                    values:
+                      - composer-db
+              topologyKey: "kubernetes.io/hostname"
+      volumes:
+      - name: composer-db
+        persistentVolumeClaim:
+          claimName: composer-db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: composer-db
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: composer-db
