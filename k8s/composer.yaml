@@ -32,13 +32,15 @@ spec:
         image: us.gcr.io/metacellllc/composer:{{CF_BUILD_ID}}
         imagePullPolicy: IfNotPresent
         env:
-        - name: POSTGRES_USER
+        - name: DB_USER
           value: "{{DB_USER}}"
-        - name: POSTGRES_PASSWORD
+        - name: DB_PASSWORD
           value: "{{DB_PASSWORD}}"
-        - name: POSTGRES_DB
+        - name: DB_HOST
+          value: "{{DB_HOST}}"
+        - name: DB_NAME
           value: "{{DB_NAME}}"
-        - name: PGPORT
+        - name: DB_PORT
           value: "{{DB_PORT}}"
         - name: PRODUCTION
           value: "True"
