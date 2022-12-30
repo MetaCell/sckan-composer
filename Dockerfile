@@ -38,5 +38,6 @@ RUN python3 manage.py collectstatic --noinput
 # COPY --from=frontend /app/dist ${APP_DIR}/static/www
 
 EXPOSE ${PORT}
-COPY --chmod=0755 scripts/runserver.sh /usr/local/bin
+COPY scripts/runserver.sh /usr/local/bin
+RUN chmod 0755 /usr/local/bin/runserver.sh
 ENTRYPOINT /usr/local/bin/runserver.sh
