@@ -22,11 +22,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: sckan-composer
+      app: composer-db
   template:
     metadata:
       labels:
-        app: sckan-composer
+        app: composer-db
         usesvolume: composer-db
     spec:
       containers:
@@ -71,7 +71,8 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: {{DB_PORT}}
+  - name: postgres
+    port: {{DB_PORT}}
     targetPort: {{DB_PORT}}
   selector:
     app: composer-db
