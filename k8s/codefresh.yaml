@@ -16,7 +16,7 @@ steps:
     title: "Building SCKAN Composer Docker Image"
     type: build
     stage: build
-    image_name: "scidash"
+    image_name: "composer"
     tag: "${{CF_BUILD_ID}}"
     dockerfile: "Dockerfile"
     # no_cache: true
