@@ -19,12 +19,12 @@ FROM ${PARENT}
 ENV MODULE_NAME=backend
 ENV PORT=8000
 ENV WORKERS=2
-ENV APP_DIR=/usr/src/app
+ENV APP_DIR=/usr/src/app/
 
 RUN apt update
 
 WORKDIR ${APP_DIR}
-RUN mkdir -p ${APP_DIR}/static/www
+RUN mkdir -p ${APP_DIR}static/www
 
 COPY backend/requirements.txt ${APP_DIR}
 RUN pip3 install --no-cache-dir --upgrade -r requirements.txt
