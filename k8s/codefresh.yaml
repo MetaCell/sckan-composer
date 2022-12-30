@@ -1,24 +1,23 @@
 version: "1.0"
 stages:
-  - "clone"
-  - "build"
-  - "push"
-  - "deploy"
+  - clone
+  - build
+  - push
+  - deploy
 steps:
   main_clone:
     title: Clone main repository
     type: git-clone
-    stage: prepare
+    stage: clone
     repo: '${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}'
     revision: '${{CF_BRANCH}}'
     git: github
   buildComposer:
     title: "Building SCKAN Composer Docker Image"
-    type: "build"
+    type: build
     image_name: "scidash"
     tag: "${{CF_BUILD_ID}}"
     dockerfile: "Dockerfile"
-    stage: "build"
     # no_cache: true
     # no_cf_cache: true    
     registry: ${{REGISTRY}}

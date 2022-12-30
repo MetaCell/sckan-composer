@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
       - name: composer
-        image: us.gcr.io/metacellllc/composer:{{TAG}}
+        image: us.gcr.io/metacellllc/composer:{{CF_BUILD_ID}}
         imagePullPolicy: IfNotPresent
         env:
         - name: POSTGRES_USER
