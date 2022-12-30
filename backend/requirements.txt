@@ -7,3 +7,4 @@ django-fsm==2.8.1
 #django-fsm-admin==1.2.5
 django-fsm-admin@git+https://github.com/gadventures/django-fsm-admin@master
 django-admin-sortable2==2.1.4
+django-jazzmin==2.6.0

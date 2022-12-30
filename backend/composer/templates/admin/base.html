@@ -1,0 +1,15 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block footer %}
+    {% if not is_popup %}
+        <footer class="main-footer {{ jazzmin_ui.footer_classes }}">
+            {% autoescape off %}
+                <strong>{% trans 'Copyright' %} &copy; {% now 'Y' %} {{ jazzmin_settings.copyright }}.</strong> {% trans 'All rights reserved.' %}
+            {% endautoescape %}
+        </footer>
+        {% if jazzmin_settings.show_ui_builder %}
+            {% include 'jazzmin/includes/ui_builder_panel.html' %}
+        {% endif %}
+    {% endif %}
+{% endblock %}

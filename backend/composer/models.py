@@ -63,6 +63,17 @@ class AnatomicalEntity(models.Model):
         verbose_name_plural = "Anatomical Entities"
 
 
+class NoteTag(models.Model):
+    tag = models.CharField(max_length=200, db_index=True, unique=True)
+
+    def __str__(self):
+        return self.tag
+
+    class Meta:
+        ordering = ["tag"]
+        verbose_name_plural = "Note Tags"
+
+
 class Provenance(models.Model):
     title = models.CharField(max_length=200, db_index=True)
     description = models.TextField(db_index=True)
@@ -86,6 +97,7 @@ class Provenance(models.Model):
             models.CheckConstraint(check=models.Q(laterality__in=[l[0] for l in Laterality.choices]), name="laterality_valid"),
             models.CheckConstraint(check=models.Q(circuit_type__in=[c[0] for c in CircuitType.choices]), name="circuit_type_valid"),
         ]
+
 
 
 class ConnectivityStatement(models.Model):
@@ -160,3 +172,29 @@ class Via(models.Model):
     class Meta:
         ordering = ["ordering"]
         verbose_name_plural = "Via"
+
+
+class Note(models.Model):
+    note = models.TextField()
+    tags = models.ManyToManyField(NoteTag, verbose_name="Tags")
+    user = models.ForeignKey(User, verbose_name="User", on_delete=models.DO_NOTHING)
+    provenance = models.ForeignKey(Provenance, verbose_name="Provenance", on_delete=models.DO_NOTHING, null=True, blank=True)
+    connectivity_statement = models.ForeignKey(ConnectivityStatement, verbose_name="Connectivity Statement", on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return self.note
+
+    class Meta:
+        ordering = ["note"]
+        verbose_name_plural = "Notes"
+        constraints = [
+            models.CheckConstraint(check=
+                models.Q(
+                    provenance__isnull=False,
+                    connectivity_statement__isnull=True,
+                )
+                | models.Q(
+                    provenance__isnull=True,
+                    connectivity_statement__isnull=False,
+                ), name="only_provenance_or_connectivity_statement"),
+        ]
