@@ -6,11 +6,12 @@ stages:
   - "deploy"
 steps:
   main_clone:
-    type: "git-clone"
-    description: "Cloning main repository..."
-    repo: "metacell/sckan-composer"
-    revision: "${{CF_BRANCH}}"
-    stage: "clone"
+    title: Clone main repository
+    type: git-clone
+    stage: prepare
+    repo: '${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}'
+    revision: '${{CF_BRANCH}}'
+    git: github
   buildComposer:
     title: "Building SCKAN Composer Docker Image"
     type: "build"
