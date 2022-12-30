@@ -9,28 +9,26 @@ steps:
     title: Clone main repository
     type: git-clone
     stage: clone
-    repo: '${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}'
-    revision: '${{CF_BRANCH}}'
+    repo: ${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}
+    revision: ${{CF_BRANCH}}
     git: github
   buildComposer:
-    title: "Building SCKAN Composer Docker Image"
+    title: Building SCKAN Composer Docker Image
     type: build
     stage: build
-    image_name: "composer"
-    tag: "${{CF_BUILD_ID}}"
-    dockerfile: "Dockerfile"
+    image_name: composer
+    tag: ${{CF_BUILD_ID}}
+    dockerfile: Dockerfile
     # no_cache: true
     # no_cf_cache: true    
     registry: ${{REGISTRY}}
   deployComposer:
     title: Deploying SCKAN Composer
+    image: codefresh/cf-deploy-kubernetes
+    tag: ${{CF_BUILD_ID}}
     stage: deploy
-    image: codefresh/kubectl
     working_directory: ./k8s
     commands:
-      - kubectl config get-contexts
-      - kubectl config use-context $CLUSTER
-      - kubectl config set-context $CLUSTER --namespace=$NAMESPACE
-      - envsubst < postgres.yaml | kubectl apply -f -
-      - envsubst < composer.yaml | kubectl apply -f -
-      - envsubst < ingress.yaml | kubectl apply -f -
+      - /cf-deploy-kubernetes postgres.yaml
+      - /cf-deploy-kubernetes composer.yaml
+      - /cf-deploy-kubernetes ingress.yaml
