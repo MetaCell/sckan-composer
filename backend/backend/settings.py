@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'fsm_admin',
+    'adminsortable2',
     
     'composer',
 ]
