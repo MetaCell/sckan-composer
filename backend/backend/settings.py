@@ -30,7 +30,7 @@ DEBUG = not PRODUCTION
 ALLOWED_HOSTS = [
     "*",
 ]
-CSRF_TRUSTED_ORIGINS = ["http://localhost:8000",]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "https://*.metacell.us",]
 
 # Application definition
 
