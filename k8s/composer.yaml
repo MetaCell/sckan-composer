@@ -41,7 +41,7 @@ spec:
         - name: PGPORT
           value: "{{DB_PORT}}"
         - name: PRODUCTION
-          value: True
+          value: "True"
         ports:
         - containerPort: 8000
         # volumeMounts:
