@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: us.gcr.io/metacellllc/sckan/nginx:{{CF_BUILD_ID}}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: composer-static
+          mountPath: /usr/share/nginx/html/static/
+          readOnly: true
+        - name: composer-media
+          mountPath: /usr/share/nginx/html/media/
+          readOnly: true
+      volumes:
+      - name: composer-static
+        persistentVolumeClaim:
+          claimName: composer-static
+      - name: composer-media
+        persistentVolumeClaim:
+          claimName: composer-media
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: nginx

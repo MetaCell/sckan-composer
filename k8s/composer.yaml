@@ -1,15 +1,28 @@
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: composer
-# type: Opaque
-# stringData:
-#   SOCIAL_AUTH_GOOGLE_OAUTH2_KEY: {{OAUTH_GOOGLE_KEY}}
-#   SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET: {{OAUTH_GOOGLE_SECRET}}
-#   SOCIAL_AUTH_TWITTER_KEY: {{OAUTH_TWITTER_KEY}}
-#   SOCIAL_AUTH_TWITTER_SECRET: {{OAUTH_TWITTER_SECRET}}
-#   SOCIAL_AUTH_GITHUB_KEY: {{OAUTH_GITHUB_KEY}}
-#   SOCIAL_AUTH_GITHUB_SECRET: {{OAUTH_GITHUB_SECRET}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: composer-media
+  labels:
+    app: composer-media
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1G
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: composer-static
+  labels:
+    app: composer-static
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1G
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -29,7 +42,7 @@ spec:
     spec:
       containers:
       - name: composer
-        image: us.gcr.io/metacellllc/composer:{{CF_BUILD_ID}}
+        image: us.gcr.io/metacellllc/sckan/composer:{{CF_BUILD_ID}}
         imagePullPolicy: IfNotPresent
         env:
         - name: DB_USER
@@ -46,14 +59,28 @@ spec:
           value: "True"
         ports:
         - containerPort: 8000
-        # volumeMounts:
-        # - name: secrets
-        #   mountPath: "/etc/secrets"
-        #   readOnly: true
-      # volumes:
-      # - name: secrets
-      #   secret:
-      #     secretName: composer
+        volumeMounts:
+        - name: composer-static
+          mountPath: /usr/src/app/static
+        - name: composer-media
+          mountPath: /usr/src/app/persistent
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: usesvolume
+                    operator: In
+                    values:
+                      - composer-static
+              topologyKey: "kubernetes.io/hostname"
+      volumes:
+      - name: composer-media
+        persistentVolumeClaim:
+          claimName: composer-media
+      - name: composer-static
+        persistentVolumeClaim:
+          claimName: composer-static
 ---
 apiVersion: v1
 kind: Service

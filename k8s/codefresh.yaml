@@ -12,13 +12,24 @@ steps:
     repo: '${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}'
     revision: '${{CF_BRANCH}}'
     git: github
+  buildNginx:
+    title: "Building SCKAN nginx Docker Image"
+    type: build
+    stage: build
+    image_name: "sckan/nginx"
+    tag: "${{CF_BUILD_ID}}"
+    working_directory: ./nginx
+    dockerfile: Dockerfile
+    # no_cache: true
+    # no_cf_cache: true    
+    registry: ${{REGISTRY}}
   buildComposer:
     title: "Building SCKAN Composer Docker Image"
     type: build
     stage: build
-    image_name: "composer"
+    image_name: "sckan/composer"
     tag: "${{CF_BUILD_ID}}"
-    dockerfile: "Dockerfile"
+    dockerfile: Dockerfile
     # no_cache: true
     # no_cf_cache: true    
     registry: ${{REGISTRY}}
@@ -30,6 +41,7 @@ steps:
     commands:
       - /cf-deploy-kubernetes postgres.yaml
       - /cf-deploy-kubernetes composer.yaml
+      - /cf-deploy-kubernetes nginx.yaml
       - /cf-deploy-kubernetes ingress.yaml
     environment:
       - KUBECONTEXT=${{CLUSTER}}
