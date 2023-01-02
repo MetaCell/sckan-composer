@@ -1,4 +1,4 @@
-ARG COMPOSER=latest
+ARG COMPOSER=composer:latest
 FROM ${COMPOSER} as composer
 
 FROM nginx:1.19.8-alpine

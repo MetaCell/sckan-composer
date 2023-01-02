@@ -26,6 +26,7 @@ spec:
     metadata:
       labels:
         app: composer
+        usesvolume: composer-db
     spec:
       containers:
       - name: composer
@@ -47,8 +48,6 @@ spec:
         ports:
         - containerPort: 8000
         volumeMounts:
-        - name: composer-static
-          mountPath: /usr/src/app/static
         - name: composer-media
           mountPath: /usr/src/app/persistent
       affinity:

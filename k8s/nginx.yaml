@@ -21,16 +21,10 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts:
-        - name: composer-static
-          mountPath: /usr/share/nginx/html/static/
-          readOnly: true
         - name: composer-media
           mountPath: /usr/share/nginx/html/media/
           readOnly: true
       volumes:
-      - name: composer-static
-        persistentVolumeClaim:
-          claimName: composer-static
       - name: composer-media
         persistentVolumeClaim:
           claimName: composer-media

@@ -27,7 +27,7 @@ steps:
     stage: buildNginx
     buildkit: true
     build_arguments:
-    - COMPOSER=${{REGISTRY}}/sckan/composer:${{CF_BUILD_ID}}
+    - COMPOSER=us.gcr.io/metacellllc/sckan/composer:${{CF_BUILD_ID}}
     image_name: "sckan/nginx"
     tag: "${{CF_BUILD_ID}}"
     dockerfile: ./nginx/Dockerfile
