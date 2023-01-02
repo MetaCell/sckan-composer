@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: ./nginx/Dockerfile
       args:
-      - TAG=latest
+      - COMPOSER=composer:latest
     restart: "on-failure"
     ports:
       - "8000:80" # change the 8000 to whatever port you want to use

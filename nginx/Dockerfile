@@ -1,5 +1,5 @@
-ARG TAG=latest
-FROM composer:${TAG} as composer
+ARG COMPOSER=latest
+FROM ${COMPOSER} as composer
 
 FROM nginx:1.19.8-alpine
 
