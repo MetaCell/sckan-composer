@@ -21,6 +21,13 @@ class CircuitType(models.TextChoices):
     UNKNOWN    = "6", "Not specified"
     
 
+class DestinationType(models.TextChoices):
+    # axon sensory ending, axon terminal, axon sensory terminal
+    AXON_SE = "1", "Axon sensory ending"
+    AXON_T  = "2", "Axon terminal"
+    AXON_ST = "3", "Axon sensory terminal"
+
+
 # Create your models here.
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -117,6 +124,7 @@ class ConnectivityStatement(models.Model):
     state = FSMField(default=STATE.OPEN, protected=True)
     origin = models.ForeignKey(AnatomicalEntity, verbose_name="Origin", on_delete=models.DO_NOTHING, related_name="origin", null=True)
     destination = models.ForeignKey(AnatomicalEntity, verbose_name="Destination", on_delete=models.DO_NOTHING, related_name="destination", null=True)
+    destination_type = models.CharField(max_length=1, default=DestinationType.AXON_SE, choices=DestinationType.choices, null=True)
     curator = models.ForeignKey(User, verbose_name="Curator", on_delete=models.DO_NOTHING, null=True, blank=True)
     path = models.ManyToManyField(AnatomicalEntity, verbose_name="Path", through="Via")
 
