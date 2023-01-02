@@ -2,14 +2,15 @@ version: "3.9"
 services:
   nginx:
     build:
-      context: nginx
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./nginx/Dockerfile
+      args:
+      - TAG=latest
     restart: "on-failure"
     ports:
       - "8000:80" # change the 8000 to whatever port you want to use
     volumes:
       - composer-data:/usr/share/nginx/html/media
-      - static-volume:/usr/share/nginx/html/static
     depends_on:
       - composer
   composer:
@@ -25,7 +26,6 @@ services:
       - composer-db
     volumes:
       - composer-data:/usr/src/app/persistent
-      - static-volume:/usr/src/app/static
   composer-db:
     image: postgres:13
     restart: "on-failure"
@@ -40,5 +40,3 @@ services:
 volumes:
   composer-db-data:
   composer-data:
-  static-volume:
-  media-volume:

@@ -1,8 +1,8 @@
 version: "1.0"
 stages:
   - clone
-  - build
-  - push
+  - buildComposer
+  - buildNginx
   - deploy
 steps:
   main_clone:
@@ -12,26 +12,25 @@ steps:
     repo: '${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}'
     revision: '${{CF_BRANCH}}'
     git: github
-  buildNginx:
-    title: "Building SCKAN nginx Docker Image"
-    type: build
-    stage: build
-    image_name: "sckan/nginx"
-    tag: "${{CF_BUILD_ID}}"
-    working_directory: ./nginx
-    dockerfile: Dockerfile
-    # no_cache: true
-    # no_cf_cache: true    
-    registry: ${{REGISTRY}}
   buildComposer:
     title: "Building SCKAN Composer Docker Image"
     type: build
-    stage: build
+    stage: buildComposer
+    buildkit: true
     image_name: "sckan/composer"
     tag: "${{CF_BUILD_ID}}"
     dockerfile: Dockerfile
-    # no_cache: true
-    # no_cf_cache: true    
+    registry: ${{REGISTRY}}
+  buildNginx:
+    title: "Building SCKAN nginx Docker Image"
+    type: build
+    stage: buildNginx
+    buildkit: true
+    build_arguments:
+    - TAG=${{CF_BUILD_ID}}
+    image_name: "sckan/nginx"
+    tag: "${{CF_BUILD_ID}}"
+    dockerfile: ./nginx/Dockerfile
     registry: ${{REGISTRY}}
   deploy-to-kubernetes:
     image: codefresh/cf-deploy-kubernetes

@@ -11,19 +11,6 @@ spec:
     requests:
       storage: 1G
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: composer-static
-  labels:
-    app: composer-static
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1G
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -64,27 +51,20 @@ spec:
           mountPath: /usr/src/app/static
         - name: composer-media
           mountPath: /usr/src/app/persistent
-      # affinity:
-      #   podAffinity:
-      #     requiredDuringSchedulingIgnoredDuringExecution:
-      #       - labelSelector:
-      #           matchExpressions:
-      #             - key: usesvolume
-      #               operator: In
-      #               values:
-      #                 - composer-media
-      #             - key: usesvolume
-      #               operator: In
-      #               values:
-      #                 - composer-static
-      #         topologyKey: "kubernetes.io/hostname"
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: usesvolume
+                    operator: In
+                    values:
+                      - composer-media
+              topologyKey: "kubernetes.io/hostname"
       volumes:
       - name: composer-media
         persistentVolumeClaim:
           claimName: composer-media
-      - name: composer-static
-        persistentVolumeClaim:
-          claimName: composer-static
 ---
 apiVersion: v1
 kind: Service
