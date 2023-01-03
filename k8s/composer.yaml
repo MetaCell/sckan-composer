@@ -52,14 +52,14 @@ spec:
           mountPath: /usr/src/app/persistent
       affinity:
         podAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: usesvolume
-                    operator: In
-                    values:
-                      - composer-media
-              topologyKey: "kubernetes.io/hostname"
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: usesvolume
+                  operator: In
+                  values:
+                    - composer-media
+            topologyKey: "kubernetes.io/hostname"
       volumes:
       - name: composer-media
         persistentVolumeClaim:
