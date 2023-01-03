@@ -6,26 +6,26 @@ from django_fsm import FSMField, transition
 
 # Create your enums here.
 class Laterality(models.TextChoices):
-    IPSI    = "1", "Ipsi"
-    CONTRAT = "2", "Contrat"
-    BI      = "3", "Bilateral"
-    UNKNOWN = "4", "Not specified"
+    IPSI    = "Ipsi"
+    CONTRAT = "Contrat"
+    BI      = "Bilateral"
+    UNKNOWN = "Not specified"
 
 
 class CircuitType(models.TextChoices):
-    SENSORY    = "1", "Sensory"
-    MOTOR      = "2", "Motor"
-    INTRINSIC  = "3", "Instrinsic"
-    PROJECTION = "4", "Projection"
-    ANAXONIC   = "5", "Anaxonic"
-    UNKNOWN    = "6", "Not specified"
+    SENSORY    = "Sensory"
+    MOTOR      = "Motor"
+    INTRINSIC  = "Instrinsic"
+    PROJECTION = "Projection"
+    ANAXONIC   = "Anaxonic"
+    UNKNOWN    = "Not specified"
     
 
 class DestinationType(models.TextChoices):
     # axon sensory ending, axon terminal, axon sensory terminal
-    AXON_SE = "1", "Axon sensory ending"
-    AXON_T  = "2", "Axon terminal"
-    AXON_ST = "3", "Axon sensory terminal"
+    AXON_SE = "Axon sensory ending"
+    AXON_T  = "Axon terminal"
+    AXON_ST = "Axon sensory terminal"
 
 
 # Create your models here.
@@ -37,6 +37,7 @@ class Profile(models.Model):
 
 
 class AnsDivision(models.Model):
+    """ANS Division"""
     name = models.CharField(max_length=200, db_index=True, unique=True)
 
     def __str__(self):
@@ -48,6 +49,7 @@ class AnsDivision(models.Model):
 
 
 class Specie(models.Model):
+    """Specie"""
     name = models.CharField(max_length=200, db_index=True, unique=True)
 
     def __str__(self):
@@ -59,6 +61,7 @@ class Specie(models.Model):
 
 
 class AnatomicalEntity(models.Model):
+    """Anatomical Entity"""
     name = models.CharField(max_length=200, db_index=True, unique=True)
     ontology_uri = models.URLField()
 
@@ -71,6 +74,7 @@ class AnatomicalEntity(models.Model):
 
 
 class NoteTag(models.Model):
+    """Note Tag"""
     tag = models.CharField(max_length=200, db_index=True, unique=True)
 
     def __str__(self):
@@ -82,13 +86,14 @@ class NoteTag(models.Model):
 
 
 class Provenance(models.Model):
+    """Provenance"""
     title = models.CharField(max_length=200, db_index=True)
     description = models.TextField(db_index=True)
     pmid = models.BigIntegerField(db_index=True)
     pmcid = models.BigIntegerField(db_index=True)
     uri = models.URLField()
-    laterality = models.CharField(max_length=1, default=Laterality.UNKNOWN, choices=Laterality.choices)
-    circuit_type = models.CharField(max_length=1, default=CircuitType.UNKNOWN, choices=CircuitType.choices)
+    laterality = models.CharField(max_length=20, default=Laterality.UNKNOWN, choices=Laterality.choices)
+    circuit_type = models.CharField(max_length=20, default=CircuitType.UNKNOWN, choices=CircuitType.choices)
     ans_division = models.ForeignKey(AnsDivision, verbose_name="ANS Division", on_delete=models.DO_NOTHING)
     species = models.ManyToManyField(Specie, verbose_name="Species")
     biological_sex = models.CharField(max_length=200, null=True)
@@ -108,6 +113,7 @@ class Provenance(models.Model):
 
 
 class ConnectivityStatement(models.Model):
+    """Connectivity Statement"""
     class STATE:
         OPEN               = "open"
         COMPOSE_LATER      = "compose_later"
@@ -124,7 +130,7 @@ class ConnectivityStatement(models.Model):
     state = FSMField(default=STATE.OPEN, protected=True)
     origin = models.ForeignKey(AnatomicalEntity, verbose_name="Origin", on_delete=models.DO_NOTHING, related_name="origin", null=True)
     destination = models.ForeignKey(AnatomicalEntity, verbose_name="Destination", on_delete=models.DO_NOTHING, related_name="destination", null=True)
-    destination_type = models.CharField(max_length=1, default=DestinationType.AXON_SE, choices=DestinationType.choices, null=True)
+    destination_type = models.CharField(max_length=25, default=DestinationType.AXON_SE, choices=DestinationType.choices, null=True)
     curator = models.ForeignKey(User, verbose_name="Curator", on_delete=models.DO_NOTHING, null=True, blank=True)
     path = models.ManyToManyField(AnatomicalEntity, verbose_name="Path", through="Via")
 
@@ -166,7 +172,8 @@ class ConnectivityStatement(models.Model):
 
 
 class Via(models.Model):
-    connectivity_statement = models.ForeignKey(ConnectivityStatement, verbose_name="Connectivity Statement", on_delete=models.CASCADE)
+    """Via"""
+    connectivity_statement = models.ForeignKey(ConnectivityStatement, verbose_name="Connectivity Statement", on_delete=models.CASCADE, related_name="path_set")
     anatomical_entity = models.ForeignKey(AnatomicalEntity, verbose_name="Anatomical Entity", on_delete=models.DO_NOTHING)
     ordering = models.PositiveIntegerField(
         default=0,
@@ -183,11 +190,12 @@ class Via(models.Model):
 
 
 class Note(models.Model):
+    """Note"""
     note = models.TextField()
     tags = models.ManyToManyField(NoteTag, verbose_name="Tags")
     user = models.ForeignKey(User, verbose_name="User", on_delete=models.DO_NOTHING)
-    provenance = models.ForeignKey(Provenance, verbose_name="Provenance", on_delete=models.DO_NOTHING, null=True, blank=True)
-    connectivity_statement = models.ForeignKey(ConnectivityStatement, verbose_name="Connectivity Statement", on_delete=models.CASCADE, null=True, blank=True)
+    provenance = models.ForeignKey(Provenance, verbose_name="Provenance", on_delete=models.DO_NOTHING, null=True, blank=True, related_name="notes")
+    connectivity_statement = models.ForeignKey(ConnectivityStatement, verbose_name="Connectivity Statement", on_delete=models.CASCADE, null=True, blank=True, related_name="notes")
 
     def __str__(self):
         return self.note
