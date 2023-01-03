@@ -41,9 +41,9 @@ class UserAdmin(BaseUserAdmin):
 
 
 class ProvenanceAdmin(admin.ModelAdmin):
-    list_display = ("title", "pmid", "pmcid", "uri")
-    list_display_links = ("title", "pmid", "pmcid", "uri")
-    search_fields = ("title", "description", "pmid", "pmcid", "uri")
+    list_display = ("title", "pmid", "uri")
+    list_display_links = ("title", "pmid", "uri")
+    search_fields = ("title", "description", "pmid",)
     
     inlines = (NoteProvenanceInline,)
 
@@ -51,7 +51,7 @@ class ProvenanceAdmin(admin.ModelAdmin):
 class AnatomicalEntityAdmin(admin.ModelAdmin):
     list_display = ("name", "ontology_uri")
     list_display_links = ("name", "ontology_uri")
-    search_fields = ("name", "ontology_uri")
+    search_fields = ("name",)  # or ("^name",) for search to start with
 
 
 class ConnectivityStatementAdmin(SortableAdminBase, FSMTransitionMixin, admin.ModelAdmin):
@@ -59,18 +59,22 @@ class ConnectivityStatementAdmin(SortableAdminBase, FSMTransitionMixin, admin.Mo
     fsm_field = ("state",)
     readonly_fields = ("state",)
     autocomplete_fields = ("provenance", "origin", "destination")
-    list_display = ("provenance", "short_ks", "origin", "destination", "state")
+    list_display = ("provenance", "pmid", "short_ks", "origin", "destination", "state", "curator")
     list_display_links = ("provenance", "short_ks", "state")
     list_select_related = ("provenance", "origin", "destination")
-    search_fields = ("provenance__title", "provenance__description", "knowledge_statement", "origin__name", "destination__name")
+    search_fields = ("provenance__title", "provenance__description", "provenance__pmid", "knowledge_statement", "origin__name", "destination__name")
     
     fieldsets = ()
 
     inlines = (PathInline, NoteConnectivityStatementInline)
 
-    @admin.display(description='Knowledge Statement')    
+    @admin.display(description='Knowledge Statement')
     def short_ks(self, obj):
         return str(obj)
+
+    @admin.display(description='PMID')
+    def pmid(self, obj):
+        return obj.provenance.pmid
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "curator":

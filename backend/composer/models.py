@@ -6,27 +6,27 @@ from django_fsm import FSMField, transition
 
 # Create your enums here.
 class Laterality(models.TextChoices):
-    IPSI    = "Ipsi"
-    CONTRAT = "Contrat"
-    BI      = "Bilateral"
-    UNKNOWN = "Not specified"
+    IPSI    = "IPSI", "Ipsi"
+    CONTRAT = "ONTRAT", "Contrat"
+    BI      = "BI", "Bilateral"
+    UNKNOWN = "UNKNOWN", "Not specified"
 
 
 class CircuitType(models.TextChoices):
-    SENSORY    = "Sensory"
-    MOTOR      = "Motor"
-    INTRINSIC  = "Instrinsic"
-    PROJECTION = "Projection"
-    ANAXONIC   = "Anaxonic"
-    UNKNOWN    = "Not specified"
+    SENSORY    = "SENSORY", "Sensory"
+    MOTOR      = "MOTOR", "Motor"
+    INTRINSIC  = "INTRINSIC", "Intrinsic"
+    PROJECTION = "PROJECTION", "Projection"
+    ANAXONIC   = "ANAXONIC", "Anaxonic"
+    UNKNOWN    = "UNKNOWN", "Not specified"
     
 
 class DestinationType(models.TextChoices):
     # axon sensory ending, axon terminal, axon sensory terminal
-    AXON_SE = "Axon sensory ending"
-    AXON_T  = "Axon terminal"
-    AXON_ST = "Axon sensory terminal"
-
+    AXON_SE = "AXON-SE", "Axon sensory ending"
+    AXON_T  = "AXON-T", "Axon terminal"
+    AXON_ST = "AXON-ST", "Axon sensory terminal"
+    UNKNOWN = "UNKNOW", "Not specified"
 
 # Create your models here.
 class Profile(models.Model):
@@ -90,14 +90,7 @@ class Provenance(models.Model):
     title = models.CharField(max_length=200, db_index=True)
     description = models.TextField(db_index=True)
     pmid = models.BigIntegerField(db_index=True)
-    pmcid = models.BigIntegerField(db_index=True)
     uri = models.URLField()
-    laterality = models.CharField(max_length=20, default=Laterality.UNKNOWN, choices=Laterality.choices)
-    circuit_type = models.CharField(max_length=20, default=CircuitType.UNKNOWN, choices=CircuitType.choices)
-    ans_division = models.ForeignKey(AnsDivision, verbose_name="ANS Division", on_delete=models.DO_NOTHING)
-    species = models.ManyToManyField(Specie, verbose_name="Species")
-    biological_sex = models.CharField(max_length=200, null=True)
-    apinatomy_model = models.CharField(max_length=200, null=True)
 
     def __str__(self):
         return self.title
@@ -105,11 +98,6 @@ class Provenance(models.Model):
     class Meta:
         ordering = ["title"]
         verbose_name_plural = "Provenances"
-        constraints = [
-            models.CheckConstraint(check=models.Q(laterality__in=[l[0] for l in Laterality.choices]), name="laterality_valid"),
-            models.CheckConstraint(check=models.Q(circuit_type__in=[c[0] for c in CircuitType.choices]), name="circuit_type_valid"),
-        ]
-
 
 
 class ConnectivityStatement(models.Model):
@@ -128,11 +116,17 @@ class ConnectivityStatement(models.Model):
     knowledge_statement = models.TextField(db_index=True)
     uri = models.URLField()
     state = FSMField(default=STATE.OPEN, protected=True)
-    origin = models.ForeignKey(AnatomicalEntity, verbose_name="Origin", on_delete=models.DO_NOTHING, related_name="origin", null=True)
-    destination = models.ForeignKey(AnatomicalEntity, verbose_name="Destination", on_delete=models.DO_NOTHING, related_name="destination", null=True)
-    destination_type = models.CharField(max_length=25, default=DestinationType.AXON_SE, choices=DestinationType.choices, null=True)
+    origin = models.ForeignKey(AnatomicalEntity, verbose_name="Origin", on_delete=models.DO_NOTHING, related_name="origin", null=True, blank=True)
+    destination = models.ForeignKey(AnatomicalEntity, verbose_name="Destination", on_delete=models.DO_NOTHING, related_name="destination", null=True, blank=True)
+    destination_type = models.CharField(max_length=10, default=DestinationType.UNKNOWN, choices=DestinationType.choices)
     curator = models.ForeignKey(User, verbose_name="Curator", on_delete=models.DO_NOTHING, null=True, blank=True)
-    path = models.ManyToManyField(AnatomicalEntity, verbose_name="Path", through="Via")
+    path = models.ManyToManyField(AnatomicalEntity, verbose_name="Path", through="Via",blank=True)
+    laterality = models.CharField(max_length=20, default=Laterality.UNKNOWN, choices=Laterality.choices)
+    circuit_type = models.CharField(max_length=20, default=CircuitType.UNKNOWN, choices=CircuitType.choices)
+    ans_division = models.ForeignKey(AnsDivision, verbose_name="ANS Division", on_delete=models.DO_NOTHING, null=True, blank=True)
+    species = models.ManyToManyField(Specie, verbose_name="Species", blank=True)
+    biological_sex = models.CharField(max_length=200, null=True, blank=True)
+    apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
 
     def __str__(self):
         suffix = ""
@@ -169,6 +163,10 @@ class ConnectivityStatement(models.Model):
     class Meta:
         ordering = ["knowledge_statement"]
         verbose_name_plural = "Connectivity Statements"
+        constraints = [
+            models.CheckConstraint(check=models.Q(laterality__in=[l[0] for l in Laterality.choices]), name="laterality_valid"),
+            models.CheckConstraint(check=models.Q(circuit_type__in=[c[0] for c in CircuitType.choices]), name="circuit_type_valid"),
+        ]
 
 
 class Via(models.Model):

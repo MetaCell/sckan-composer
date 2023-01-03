@@ -59,8 +59,6 @@ class SpecieSerializer(serializers.ModelSerializer):
 
 class ProvenanceSerializer(serializers.ModelSerializer):
     """Provenance"""
-    ans_division = AnsDivisionSerializer(many=False, read_only=True)
-    species = SpecieSerializer(many=True, read_only=True)
     notes = NoteSerializer(many=True, read_only=True)
     class Meta:
         model = Provenance
@@ -79,13 +77,15 @@ class ConnectivityStatementSerializer(WritableNestedModelSerializer):
     """Connectivity Statement"""
     notes = NoteSerializer(many=True, read_only=False)
     via = ViaFromConnectivityStatementSerializer(source='path_set', many=True, read_only=False)
+    ans_division = AnsDivisionSerializer(many=False, read_only=True)
+    species = SpecieSerializer(many=True, read_only=True)
     # next_states = serializers.SerializerMethodField()
     class Meta:
         model = ConnectivityStatement
-        fields = ('id', 'knowledge_statement', 'uri', 'state', 'origin', 'destination', 'destination_type', 'path', 'via', 'notes', 'provenance', 'curator',)
+        fields = ('id', 'knowledge_statement', 'uri', 'state', 'origin', 'destination', 'destination_type', 'path', 'via', 'notes', 'provenance', 'curator', 'ans_division', 'species', 'biological_sex', 'apinatomy_model', 'laterality', 'circuit_type')
         #   fields = '__all__'
         depth = 2
-        read_only_fields = ('state',)
+        read_only_fields = ('state', 'provenance')
 
 
 class ViaSerializer(serializers.ModelSerializer):
