@@ -7,7 +7,7 @@ class ConnectivityStatementService:
         """
         Checks if the requested transition is available
         """
-        if user:
+        if not user:
             available_transitions = self.connectivity_statement.get_available_state_transitions()
         else:
             available_transitions = self.connectivity_statement.get_available_user_state_transitions(user)
