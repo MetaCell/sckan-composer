@@ -28,6 +28,17 @@ class DestinationType(models.TextChoices):
     AXON_ST = "AXON-ST", "Axon sensory terminal"
     UNKNOWN = "UNKNOW", "Not specified"
 
+class CSState(models.TextChoices):
+    # Connectivity Statement States
+    DRAFT              = "draft"
+    COMPOSE_NOW        = "compose_now"
+    CURATED            = "curated"
+    EXCLUDED           = "excluded"
+    REVIEWED           = "reviewed"
+    CONNECTION_MISSING = "connection_missing"
+    NPO_APPROVED       = "npo_approved"
+    APPROVED           = "approved"
+
 # Create your models here.
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -102,20 +113,10 @@ class Provenance(models.Model):
 
 class ConnectivityStatement(models.Model):
     """Connectivity Statement"""
-    class STATE:
-        OPEN               = "open"
-        COMPOSE_LATER      = "compose_later"
-        COMPOSE_NOW        = "compose_now"
-        CURATED            = "curated"
-        EXCLUDED           = "excluded"
-        REVIEWED           = "reviewed"
-        CONNECTION_MISSING = "connection_missing"
-        APPROVED           = "approved"
-
     provenance = models.ForeignKey(Provenance, verbose_name="Provenance", on_delete=models.DO_NOTHING)
     knowledge_statement = models.TextField(db_index=True)
     uri = models.URLField()
-    state = FSMField(default=STATE.OPEN, protected=True)
+    state = FSMField(default=CSState.DRAFT, protected=True)
     origin = models.ForeignKey(AnatomicalEntity, verbose_name="Origin", on_delete=models.DO_NOTHING, related_name="origin", null=True, blank=True)
     destination = models.ForeignKey(AnatomicalEntity, verbose_name="Destination", on_delete=models.DO_NOTHING, related_name="destination", null=True, blank=True)
     destination_type = models.CharField(max_length=10, default=DestinationType.UNKNOWN, choices=DestinationType.choices)
@@ -135,28 +136,25 @@ class ConnectivityStatement(models.Model):
         return f"{self.knowledge_statement[:50]}{suffix}"
     
     # states
-    @transition(field=state, source=[STATE.OPEN, STATE.COMPOSE_LATER], target=STATE.COMPOSE_NOW)
+    @transition(field=state, source=CSState.DRAFT, target=CSState.COMPOSE_NOW)
     def compose_now(self):
         pass
-    @transition(field=state, source=STATE.OPEN, target=STATE.COMPOSE_LATER)
-    def compose_later(self):
-        pass
-    @transition(field=state, source=[STATE.OPEN, STATE.CURATED], target=STATE.EXCLUDED)
-    def excluded(self):
-        pass
-    @transition(field=state, source=STATE.COMPOSE_NOW, target=STATE.CURATED)
+    @transition(field=state, source=CSState.COMPOSE_NOW, target=CSState.CURATED)
     def curated(self):
         pass
-    @transition(field=state, source=STATE.CURATED, target=STATE.REVIEWED)
+    @transition(field=state, source=CSState.CURATED, target=CSState.REVIEWED)
     def reviewed(self):
         pass
-    @transition(field=state, source=STATE.CURATED, target=STATE.CONNECTION_MISSING)
+    @transition(field=state, source=CSState.REVIEWED, target=CSState.EXCLUDED)
+    def excluded(self):
+        pass
+    @transition(field=state, source=CSState.REVIEWED, target=CSState.CONNECTION_MISSING)
     def connection_missing(self):
         pass
-    @transition(field=state, source=STATE.CONNECTION_MISSING, target=STATE.REVIEWED)
-    def connection_solved(self):
+    @transition(field=state, source=[CSState.CONNECTION_MISSING, CSState.REVIEWED], target=CSState.NPO_APPROVED)
+    def npo_approved(self):
         pass
-    @transition(field=state, source=STATE.REVIEWED, target=STATE.APPROVED)
+    @transition(field=state, source=CSState.NPO_APPROVED, target=CSState.APPROVED)
     def approved(self):
         pass
         
@@ -165,6 +163,7 @@ class ConnectivityStatement(models.Model):
         ordering = ["knowledge_statement"]
         verbose_name_plural = "Connectivity Statements"
         constraints = [
+            models.CheckConstraint(check=models.Q(state__in=[l[0] for l in CSState.choices]), name="state_valid"),
             models.CheckConstraint(check=models.Q(laterality__in=[l[0] for l in Laterality.choices]), name="laterality_valid"),
             models.CheckConstraint(check=models.Q(circuit_type__in=[c[0] for c in CircuitType.choices]), name="circuit_type_valid"),
         ]
