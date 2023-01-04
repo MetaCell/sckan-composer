@@ -26,7 +26,7 @@ spec:
     metadata:
       labels:
         app: composer
-        usesvolume: composer-db
+        usesvolume: composer-media
     spec:
       containers:
       - name: composer
