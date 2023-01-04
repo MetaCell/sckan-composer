@@ -53,7 +53,7 @@ class ConnectivityStatementViewSet(ModelNoDeleteViewSet):
 
     @action(detail=True, methods=['post'],  url_path='do_transition/(?P<transition>\w+)')
     def transition(self, request, pk=None, transition=None):
-        cs = ConnectivityStatementService(self.get_object()).do_transition(transition, request.user)
+        cs = ConnectivityStatementService(self.get_object()).do_transition(transition, user=request.user, request=request)
         cs.save()
         return Response(self.get_serializer(cs).data)
 
