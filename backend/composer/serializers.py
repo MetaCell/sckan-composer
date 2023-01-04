@@ -79,13 +79,20 @@ class ConnectivityStatementSerializer(WritableNestedModelSerializer):
     via = ViaFromConnectivityStatementSerializer(source='path_set', many=True, read_only=False)
     ans_division = AnsDivisionSerializer(many=False, read_only=True)
     species = SpecieSerializer(many=True, read_only=True)
-    # next_states = serializers.SerializerMethodField()
+    available_transitions = serializers.SerializerMethodField()
+
+    def get_available_transitions(self, instance):
+        transitions = []
+        for transition in instance.get_available_state_transitions():
+            transitions.append(transition.name)
+        return transitions
+
     class Meta:
         model = ConnectivityStatement
-        fields = ('id', 'knowledge_statement', 'uri', 'state', 'origin', 'destination', 'destination_type', 'path', 'via', 'notes', 'provenance', 'curator', 'ans_division', 'species', 'biological_sex', 'apinatomy_model', 'laterality', 'circuit_type')
+        fields = ('id', 'knowledge_statement', 'uri', 'state', 'origin', 'destination', 'destination_type', 'path', 'via', 'notes', 'provenance', 'curator', 'ans_division', 'species', 'biological_sex', 'apinatomy_model', 'laterality', 'circuit_type', 'available_transitions')
         #   fields = '__all__'
         depth = 2
-        read_only_fields = ('state', 'provenance')
+        read_only_fields = ('state', 'provenance', 'available_transitions')
 
 
 class ViaSerializer(serializers.ModelSerializer):
