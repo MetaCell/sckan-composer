@@ -159,6 +159,7 @@ class ConnectivityStatement(models.Model):
     @transition(field=state, source=STATE.REVIEWED, target=STATE.APPROVED)
     def approved(self):
         pass
+        
 
     class Meta:
         ordering = ["knowledge_statement"]

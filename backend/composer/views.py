@@ -1,9 +1,11 @@
 from rest_framework import viewsets, mixins
 from rest_framework import permissions
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from .models import AnatomicalEntity, AnsDivision, ConnectivityStatement, NoteTag, Provenance, Specie, Profile
 from .serializers import AnatomicalEntitySerializer, AnsDivisionSerializer, ConnectivityStatementSerializer, NoteTagSerializer, ProvenanceSerializer, SpecieSerializer, ProfileSerializer
-
+from .services import ConnectivityStatementService
 
 class ModelCreateRetrieveViewSet(mixins.CreateModelMixin, 
                                  mixins.RetrieveModelMixin, 
@@ -48,6 +50,12 @@ class ConnectivityStatementViewSet(ModelNoDeleteViewSet):
     queryset = ConnectivityStatement.objects.all()
     serializer_class = ConnectivityStatementSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
+
+    @action(detail=True, methods=['post'],  url_path='do_transition/(?P<transition>\w+)')
+    def transition(self, request, pk=None, transition=None):
+        cs = ConnectivityStatementService(self.get_object()).do_transition(transition, user=request.user, request=request)
+        cs.save()
+        return Response(self.get_serializer(cs).data)
 
 
 class NoteTagViewSet(ModelCreateRetrieveViewSet):
