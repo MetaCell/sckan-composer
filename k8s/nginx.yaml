@@ -28,6 +28,16 @@ spec:
       - name: composer-media
         persistentVolumeClaim:
           claimName: composer-media
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: usesvolume
+                  operator: In
+                  values:
+                    - composer-media
+            topologyKey: "kubernetes.io/hostname"
 ---
 apiVersion: v1
 kind: Service
