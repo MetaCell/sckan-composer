@@ -82,10 +82,7 @@ class ConnectivityStatementSerializer(WritableNestedModelSerializer):
     available_transitions = serializers.SerializerMethodField()
 
     def get_available_transitions(self, instance):
-        transitions = []
-        for transition in instance.get_available_state_transitions():
-            transitions.append(transition.name)
-        return transitions
+        return [t.name for t in instance.get_available_state_transitions()]
 
     class Meta:
         model = ConnectivityStatement
