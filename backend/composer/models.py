@@ -46,7 +46,8 @@ class CSState(models.TextChoices):
     COMPOSE_NOW        = "compose_now"
     CURATED            = "curated"
     EXCLUDED           = "excluded"
-    REVIEWED           = "reviewed"
+    REJECTED           = "rejected"
+    TO_BE_REVIEWED     = "to_be_reviewed"
     CONNECTION_MISSING = "connection_missing"
     NPO_APPROVED       = "npo_approved"
     APPROVED           = "approved"
@@ -172,22 +173,25 @@ class ConnectivityStatement(models.Model):
         return f"{self.knowledge_statement[:50]}{suffix}"
     
     # states
-    @transition(field=state, source=CSState.DRAFT, target=CSState.COMPOSE_NOW)
+    @transition(field=state, source=[CSState.DRAFT, CSState.REJECTED], target=CSState.COMPOSE_NOW)
     def compose_now(self):
         pass
-    @transition(field=state, source=CSState.COMPOSE_NOW, target=CSState.CURATED)
+    @transition(field=state, source=[CSState.COMPOSE_NOW, CSState.CONNECTION_MISSING], target=CSState.CURATED)
     def curated(self):
         pass
-    @transition(field=state, source=CSState.CURATED, target=CSState.REVIEWED)
-    def reviewed(self):
-        pass
-    @transition(field=state, source=CSState.REVIEWED, target=CSState.EXCLUDED)
-    def excluded(self):
-        pass
-    @transition(field=state, source=CSState.REVIEWED, target=CSState.CONNECTION_MISSING)
+    @transition(field=state, source=CSState.COMPOSE_NOW, target=CSState.CONNECTION_MISSING)
     def connection_missing(self):
         pass
-    @transition(field=state, source=[CSState.CONNECTION_MISSING, CSState.REVIEWED], target=CSState.NPO_APPROVED)
+    @transition(field=state, source=CSState.CURATED, target=CSState.TO_BE_REVIEWED)
+    def to_be_reviewed(self):
+        pass
+    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.EXCLUDED)
+    def excluded(self):
+        pass
+    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.REJECTED)
+    def rejected(self):
+        pass
+    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.NPO_APPROVED)
     def npo_approved(self):
         pass
     @transition(field=state, source=CSState.NPO_APPROVED, target=CSState.APPROVED)
