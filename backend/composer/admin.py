@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
+from django.utils.html import format_html
 
 from adminsortable2.admin import SortableAdminBase, SortableStackedInline
 from fsm_admin.mixins import FSMTransitionMixin
@@ -48,11 +49,19 @@ class UserAdmin(BaseUserAdmin):
 class ProvenanceAdmin(FSMTransitionMixin, admin.ModelAdmin):
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
-    readonly_fields = ("state",)
-    list_display = ("title", "pmid", "uri")
-    list_display_links = ("title", "pmid", "uri")
-    search_fields = ("title", "description", "pmid",)
-    
+    readonly_fields = ("pmid_uri", "pmcid_uri", "state")
+    list_display = ("title", "pmid", "pmcid")
+    list_display_links = ("title", "pmid", "pmcid")
+    search_fields = ("title", "description", "pmid", "pmcid")
+
+    @admin.display(description='PMID')
+    def pmid_uri(self, obj):
+        return format_html("<a href='{url}' target='blank'>{url}</a>", url=obj.pmid_uri) if obj.pmid_uri else ""
+
+    @admin.display(description='PMCID')
+    def pmcid_uri(self, obj):
+        return format_html("<a href='{url}' target='blank'>{url}</a>", url=obj.pmcid_uri) if obj.pmcid_uri else ""
+  
     inlines = (ConnectivityStatementInline, NoteProvenanceInline,)
 
 
@@ -67,10 +76,10 @@ class ConnectivityStatementAdmin(SortableAdminBase, FSMTransitionMixin, admin.Mo
     fsm_field = ("state",)
     readonly_fields = ("state",)
     autocomplete_fields = ("provenance", "origin", "destination")
-    list_display = ("provenance", "pmid", "short_ks", "origin", "destination", "state", "curator")
-    list_display_links = ("provenance", "short_ks", "state")
+    list_display = ("provenance", "pmid", "pmcid", "short_ks", "origin", "destination", "state", "curator")
+    list_display_links = ("provenance", "pmid", "pmcid", "short_ks", "state")
     list_select_related = ("provenance", "origin", "destination")
-    search_fields = ("provenance__title", "provenance__description", "provenance__pmid", "knowledge_statement", "origin__name", "destination__name")
+    search_fields = ("provenance__title", "provenance__description", "provenance__pmid", "provenance__pmcid", "knowledge_statement", "origin__name", "destination__name")
     
     fieldsets = ()
 
@@ -83,6 +92,10 @@ class ConnectivityStatementAdmin(SortableAdminBase, FSMTransitionMixin, admin.Mo
     @admin.display(description='PMID')
     def pmid(self, obj):
         return obj.provenance.pmid
+
+    @admin.display(description='PMCID')
+    def pmcid(self, obj):
+        return obj.provenance.pmcid
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "curator":
