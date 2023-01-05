@@ -3,6 +3,8 @@ from django.db import models
 
 from django_fsm import FSMField, transition
 
+from .services import ProvenanceStatementService
+
 
 # Create your enums here.
 class Laterality(models.TextChoices):
@@ -27,6 +29,16 @@ class DestinationType(models.TextChoices):
     AXON_T  = "AXON-T", "Axon terminal"
     AXON_ST = "AXON-ST", "Axon sensory terminal"
     UNKNOWN = "UNKNOW", "Not specified"
+
+
+class ProvenanceState(models.TextChoices):
+    OPEN           = "open"
+    TO_BE_REVIEWED = "to_be_reviewed"
+    COMPOSE_LATER  = "compose_later"
+    COMPOSE_NOW    = "compose_now"
+    EXCLUDED       = "excluded"
+    DUPLICATE      = "duplicate"
+
 
 class CSState(models.TextChoices):
     # Connectivity Statement States
@@ -102,13 +114,37 @@ class Provenance(models.Model):
     description = models.TextField(db_index=True)
     pmid = models.BigIntegerField(db_index=True)
     uri = models.URLField()
+    state = FSMField(default=ProvenanceState.OPEN, protected=True)
 
     def __str__(self):
         return self.title
 
+    # states
+    @transition(field=state, source=[ProvenanceState.TO_BE_REVIEWED, ProvenanceState.COMPOSE_LATER], target=ProvenanceState.OPEN)
+    def open(self):
+        ...
+    @transition(field=state, source=ProvenanceState.OPEN, target=ProvenanceState.TO_BE_REVIEWED)
+    def to_be_reviewed(self):
+        ...
+    @transition(field=state, source=ProvenanceState.OPEN, target=ProvenanceState.COMPOSE_LATER)
+    def compose_later(self):
+        ...
+    @transition(field=state, source=ProvenanceState.TO_BE_REVIEWED, target=ProvenanceState.COMPOSE_NOW)
+    def compose_now(self):
+        ProvenanceStatementService(self).do_transition_compose_now()
+    @transition(field=state, source=ProvenanceState.OPEN, target=ProvenanceState.EXCLUDED)
+    def excluded(self):
+        ...
+    @transition(field=state, source=ProvenanceState.OPEN, target=ProvenanceState.DUPLICATE)
+    def duplicate(self):
+        ...
+
     class Meta:
         ordering = ["title"]
         verbose_name_plural = "Provenances"
+        constraints = [
+            models.CheckConstraint(check=models.Q(state__in=[l[0] for l in ProvenanceState.choices]), name="provenance_state_valid"),
+        ]
 
 
 class ConnectivityStatement(models.Model):

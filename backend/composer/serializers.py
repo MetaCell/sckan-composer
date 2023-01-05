@@ -60,9 +60,15 @@ class SpecieSerializer(serializers.ModelSerializer):
 class ProvenanceSerializer(serializers.ModelSerializer):
     """Provenance"""
     notes = NoteSerializer(many=True, read_only=True)
+    available_transitions = serializers.SerializerMethodField()
+
+    def get_available_transitions(self, instance):
+        return [t.name for t in instance.get_available_state_transitions()]
+
     class Meta:
         model = Provenance
         fields = '__all__'
+        read_only_fields = ('state', 'available_transitions')
 
 
 class ViaFromConnectivityStatementSerializer(serializers.ModelSerializer):
