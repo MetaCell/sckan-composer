@@ -35,17 +35,25 @@ class NoteConnectivityStatementInline(admin.StackedInline):
     extra = 0
 
 
+class ConnectivityStatementInline(admin.StackedInline):
+    model = ConnectivityStatement
+    extra = 0
+    fields = ("provenance", "knowledge_statement", "uri")
+
 # Define a new User admin
 class UserAdmin(BaseUserAdmin):
     inlines = (ProfileInline,)
 
 
-class ProvenanceAdmin(admin.ModelAdmin):
+class ProvenanceAdmin(FSMTransitionMixin, admin.ModelAdmin):
+    # The name of one or more FSMFields on the model to transition
+    fsm_field = ("state",)
+    readonly_fields = ("state",)
     list_display = ("title", "pmid", "uri")
     list_display_links = ("title", "pmid", "uri")
     search_fields = ("title", "description", "pmid",)
     
-    inlines = (NoteProvenanceInline,)
+    inlines = (ConnectivityStatementInline, NoteProvenanceInline,)
 
 
 class AnatomicalEntityAdmin(admin.ModelAdmin):

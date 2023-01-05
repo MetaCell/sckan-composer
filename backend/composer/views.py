@@ -43,7 +43,7 @@ class AnsDivisionViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
 
 
-class ConnectivityStatementViewSet(ModelNoDeleteViewSet):
+class ConnectivityStatementViewSet(viewsets.ModelViewSet):
     """
     ConnectivityStatement
     """
