@@ -113,9 +113,9 @@ class Provenance(models.Model):
     """Provenance"""
     title = models.CharField(max_length=200, db_index=True)
     description = models.TextField(db_index=True)
-    pmid = models.BigIntegerField(db_index=True)
-    uri = models.URLField()
     state = FSMField(default=ProvenanceState.OPEN, protected=True)
+    pmid = models.BigIntegerField(db_index=True, unique=True, null=True, blank=True)
+    pmcid = models.CharField(max_length=10, db_index=True, unique=True, null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -139,12 +139,21 @@ class Provenance(models.Model):
     @transition(field=state, source=ProvenanceState.OPEN, target=ProvenanceState.DUPLICATE)
     def duplicate(self):
         ...
+        
+    @property
+    def pmid_uri(self):
+        return f"https://pubmed.ncbi.nlm.nih.gov/{self.pmid}/" if self.pmid else None
+
+    @property
+    def pmcid_uri(self):
+        return f"https://www.ncbi.nlm.nih.gov/pmc/articles/{self.pmcid}/" if self.pmcid else None
 
     class Meta:
         ordering = ["title"]
         verbose_name_plural = "Provenances"
         constraints = [
             models.CheckConstraint(check=models.Q(state__in=[l[0] for l in ProvenanceState.choices]), name="provenance_state_valid"),
+            models.CheckConstraint(check=models.Q(pmid__isnull=False) | models.Q(pmcid__isnull=False), name="provenance_pmid_pmcd_valid"),
         ]
 
 
