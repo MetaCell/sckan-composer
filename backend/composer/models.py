@@ -131,7 +131,7 @@ class Provenance(models.Model):
         ...
     @transition(field=state, source=ProvenanceState.TO_BE_REVIEWED, target=ProvenanceState.COMPOSE_NOW)
     def compose_now(self):
-        ProvenanceStatementService(self).set_connectivity_statements_to_compose_now()
+        ProvenanceStatementService(self).do_transition_compose_now()
     @transition(field=state, source=ProvenanceState.OPEN, target=ProvenanceState.EXCLUDED)
     def excluded(self):
         ...

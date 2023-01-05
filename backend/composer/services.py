@@ -45,7 +45,8 @@ class StateServiceMixin:
 class ProvenanceStatementService(StateServiceMixin):
 
     @transaction.atomic
-    def set_connectivity_statements_to_compose_now(self):
+    def do_transition_compose_now(self):
+        # when a Provenance record goes to compose_now state we need to set the state of all ConnectivityStatements to compose_now
         for cs in self.obj.connectivitystatement_set.all():
             cs.compose_now()
             cs.save()           
