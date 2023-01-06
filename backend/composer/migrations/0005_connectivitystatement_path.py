@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('composer', '0004_connectivitystatement_curator'),
+        ("composer", "0004_connectivitystatement_curator"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='connectivitystatement',
-            name='path',
-            field=models.ManyToManyField(through='composer.Via', to='composer.anatomicalentity', verbose_name='Path'),
+            model_name="connectivitystatement",
+            name="path",
+            field=models.ManyToManyField(
+                through="composer.Via",
+                to="composer.anatomicalentity",
+                verbose_name="Path",
+            ),
         ),
     ]

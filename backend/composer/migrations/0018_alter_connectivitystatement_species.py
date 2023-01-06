@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('composer', '0017_remove_connectivitystatement_laterality_valid_and_more'),
+        ("composer", "0017_remove_connectivitystatement_laterality_valid_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='connectivitystatement',
-            name='species',
-            field=models.ManyToManyField(null=True, to='composer.specie', verbose_name='Species'),
+            model_name="connectivitystatement",
+            name="species",
+            field=models.ManyToManyField(
+                null=True, to="composer.specie", verbose_name="Species"
+            ),
         ),
     ]

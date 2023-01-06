@@ -9,13 +9,18 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('composer', '0003_anatomicalentity_via_and_more'),
+        ("composer", "0003_anatomicalentity_via_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='connectivitystatement',
-            name='curator',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to=settings.AUTH_USER_MODEL, verbose_name='Curator'),
+            model_name="connectivitystatement",
+            name="curator",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Curator",
+            ),
         ),
     ]

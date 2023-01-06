@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('composer', '0018_alter_connectivitystatement_species'),
+        ("composer", "0018_alter_connectivitystatement_species"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='connectivitystatement',
-            name='species',
-            field=models.ManyToManyField(blank=True, null=True, to='composer.specie', verbose_name='Species'),
+            model_name="connectivitystatement",
+            name="species",
+            field=models.ManyToManyField(
+                blank=True, null=True, to="composer.specie", verbose_name="Species"
+            ),
         ),
     ]

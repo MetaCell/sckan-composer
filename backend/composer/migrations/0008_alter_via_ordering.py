@@ -6,13 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('composer', '0007_alter_anatomicalentity_name_alter_ansdivision_name_and_more'),
+        (
+            "composer",
+            "0007_alter_anatomicalentity_name_alter_ansdivision_name_and_more",
+        ),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='via',
-            name='ordering',
+            model_name="via",
+            name="ordering",
             field=models.PositiveIntegerField(default=0),
         ),
     ]

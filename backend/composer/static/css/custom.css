@@ -11,3 +11,15 @@ fieldset.sortable :is(.inline-related, td.original) span.sort {
     margin-left: 100px;
     float: right;
 }
+
+.djn-fieldset .module h2, .djn-fieldset .module h3 {  
+    display: none;
+}
+
+.djn-group-nested .djn-items .inline-related {
+    padding: 0;
+}
+
+.btn-default {
+    color: red !important;
+}

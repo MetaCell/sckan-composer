@@ -1,3 +1,6 @@
+import nested_admin
+import nested_admin
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
@@ -6,7 +9,18 @@ from django.utils.html import format_html
 from adminsortable2.admin import SortableAdminBase, SortableStackedInline
 from fsm_admin.mixins import FSMTransitionMixin
 
-from composer.models import AnatomicalEntity, AnsDivision, ConnectivityStatement, Note, NoteTag, Profile, Provenance, Specie, Via
+from composer.models import (
+    AnatomicalEntity,
+    AnsDivision,
+    ConnectivityStatement,
+    Doi,
+    Note,
+    NoteTag,
+    Profile,
+    Provenance,
+    Specie,
+    Via,
+)
 
 # Define Inlines
 
@@ -15,7 +29,7 @@ from composer.models import AnatomicalEntity, AnsDivision, ConnectivityStatement
 class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
-    verbose_name_plural = 'profile'
+    verbose_name_plural = "profile"
 
 
 class PathInline(SortableStackedInline):
@@ -24,10 +38,21 @@ class PathInline(SortableStackedInline):
     autocomplete_fields = ("anatomical_entity",)
 
 
+class DoiInline(admin.StackedInline):
+    model = Doi
+    extra = 1
+
+
+class DoiiNestedInline(nested_admin.NestedStackedInline):
+    model = Doi
+    extra = 1
+
+
 class NoteProvenanceInline(admin.StackedInline):
     model = Note
     exclude = ("connectivity_statement",)
     extra = 0
+    sortable_options = "disabled"
 
 
 class NoteConnectivityStatementInline(admin.StackedInline):
@@ -36,17 +61,21 @@ class NoteConnectivityStatementInline(admin.StackedInline):
     extra = 0
 
 
-class ConnectivityStatementInline(admin.StackedInline):
+class ConnectivityStatementInline(nested_admin.NestedStackedInline):
     model = ConnectivityStatement
-    extra = 0
-    fields = ("provenance", "knowledge_statement", "uri")
+    extra = 1
+    fields = ("provenance", "knowledge_statement")
+    inlines = (DoiiNestedInline,)
+
 
 # Define a new User admin
 class UserAdmin(BaseUserAdmin):
     inlines = (ProfileInline,)
 
 
-class ProvenanceAdmin(FSMTransitionMixin, admin.ModelAdmin):
+class ProvenanceAdmin(
+    FSMTransitionMixin, nested_admin.NestedModelAdmin, admin.ModelAdmin
+):
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
     readonly_fields = ("pmid_uri", "pmcid_uri", "state")
@@ -54,15 +83,26 @@ class ProvenanceAdmin(FSMTransitionMixin, admin.ModelAdmin):
     list_display_links = ("title", "pmid", "pmcid")
     search_fields = ("title", "description", "pmid", "pmcid")
 
-    @admin.display(description='PMID')
+    @admin.display(description="PMID")
     def pmid_uri(self, obj):
-        return format_html("<a href='{url}' target='blank'>{url}</a>", url=obj.pmid_uri) if obj.pmid_uri else ""
+        return (
+            format_html("<a href='{url}' target='blank'>{url}</a>", url=obj.pmid_uri)
+            if obj.pmid_uri
+            else ""
+        )
 
-    @admin.display(description='PMCID')
+    @admin.display(description="PMCID")
     def pmcid_uri(self, obj):
-        return format_html("<a href='{url}' target='blank'>{url}</a>", url=obj.pmcid_uri) if obj.pmcid_uri else ""
-  
-    inlines = (ConnectivityStatementInline, NoteProvenanceInline,)
+        return (
+            format_html("<a href='{url}' target='blank'>{url}</a>", url=obj.pmcid_uri)
+            if obj.pmcid_uri
+            else ""
+        )
+
+    inlines = (
+        ConnectivityStatementInline,
+        NoteProvenanceInline,
+    )
 
 
 class AnatomicalEntityAdmin(admin.ModelAdmin):
@@ -71,36 +111,57 @@ class AnatomicalEntityAdmin(admin.ModelAdmin):
     search_fields = ("name",)  # or ("^name",) for search to start with
 
 
-class ConnectivityStatementAdmin(SortableAdminBase, FSMTransitionMixin, admin.ModelAdmin):
+class ConnectivityStatementAdmin(
+    SortableAdminBase, FSMTransitionMixin, admin.ModelAdmin
+):
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
     readonly_fields = ("state",)
     autocomplete_fields = ("provenance", "origin", "destination")
-    list_display = ("provenance", "pmid", "pmcid", "short_ks", "origin", "destination", "state", "curator")
+    list_display = (
+        "provenance",
+        "pmid",
+        "pmcid",
+        "short_ks",
+        "origin",
+        "destination",
+        "state",
+        "curator",
+    )
     list_display_links = ("provenance", "pmid", "pmcid", "short_ks", "state")
     list_select_related = ("provenance", "origin", "destination")
-    search_fields = ("provenance__title", "provenance__description", "provenance__pmid", "provenance__pmcid", "knowledge_statement", "origin__name", "destination__name")
-    
+    search_fields = (
+        "provenance__title",
+        "provenance__description",
+        "provenance__pmid",
+        "provenance__pmcid",
+        "knowledge_statement",
+        "origin__name",
+        "destination__name",
+    )
+
     fieldsets = ()
 
-    inlines = (PathInline, NoteConnectivityStatementInline)
+    inlines = (DoiInline, PathInline, NoteConnectivityStatementInline)
 
-    @admin.display(description='Knowledge Statement')
+    @admin.display(description="Knowledge Statement")
     def short_ks(self, obj):
         return str(obj)
 
-    @admin.display(description='PMID')
+    @admin.display(description="PMID")
     def pmid(self, obj):
         return obj.provenance.pmid
 
-    @admin.display(description='PMCID')
+    @admin.display(description="PMCID")
     def pmcid(self, obj):
         return obj.provenance.pmcid
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "curator":
             kwargs["queryset"] = User.objects.filter(profile__is_curator=True)
-        return super(ConnectivityStatementAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        return super(ConnectivityStatementAdmin, self).formfield_for_foreignkey(
+            db_field, request, **kwargs
+        )
 
 
 # Re-register UserAdmin

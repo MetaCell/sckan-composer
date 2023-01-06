@@ -7,13 +7,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('composer', '0019_alter_connectivitystatement_species'),
+        ("composer", "0019_alter_connectivitystatement_species"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='connectivitystatement',
-            name='ans_division',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='composer.ansdivision', verbose_name='ANS Division'),
+            model_name="connectivitystatement",
+            name="ans_division",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="composer.ansdivision",
+                verbose_name="ANS Division",
+            ),
         ),
     ]

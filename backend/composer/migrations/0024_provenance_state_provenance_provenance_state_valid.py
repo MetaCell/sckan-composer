@@ -7,17 +7,32 @@ import django_fsm
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('composer', '0023_alter_connectivitystatement_state_and_more'),
+        ("composer", "0023_alter_connectivitystatement_state_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='provenance',
-            name='state',
-            field=django_fsm.FSMField(default='open', max_length=50, protected=True),
+            model_name="provenance",
+            name="state",
+            field=django_fsm.FSMField(default="open", max_length=50, protected=True),
         ),
         migrations.AddConstraint(
-            model_name='provenance',
-            constraint=models.CheckConstraint(check=models.Q(('state__in', ['open', 'to_be_reviewed', 'compose_later', 'compose_now', 'excluded', 'duplicate'])), name='provenance_state_valid'),
+            model_name="provenance",
+            constraint=models.CheckConstraint(
+                check=models.Q(
+                    (
+                        "state__in",
+                        [
+                            "open",
+                            "to_be_reviewed",
+                            "compose_later",
+                            "compose_now",
+                            "excluded",
+                            "duplicate",
+                        ],
+                    )
+                ),
+                name="provenance_state_valid",
+            ),
         ),
     ]

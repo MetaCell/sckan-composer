@@ -6,48 +6,48 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('composer', '0006_rename_iscurator_profile_is_curator_and_more'),
+        ("composer", "0006_rename_iscurator_profile_is_curator_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='anatomicalentity',
-            name='name',
+            model_name="anatomicalentity",
+            name="name",
             field=models.CharField(db_index=True, max_length=200, unique=True),
         ),
         migrations.AlterField(
-            model_name='ansdivision',
-            name='name',
+            model_name="ansdivision",
+            name="name",
             field=models.CharField(db_index=True, max_length=200, unique=True),
         ),
         migrations.AlterField(
-            model_name='connectivitystatement',
-            name='knowledge_statement',
+            model_name="connectivitystatement",
+            name="knowledge_statement",
             field=models.TextField(db_index=True),
         ),
         migrations.AlterField(
-            model_name='provenance',
-            name='description',
+            model_name="provenance",
+            name="description",
             field=models.TextField(db_index=True),
         ),
         migrations.AlterField(
-            model_name='provenance',
-            name='pmcid',
+            model_name="provenance",
+            name="pmcid",
             field=models.BigIntegerField(db_index=True),
         ),
         migrations.AlterField(
-            model_name='provenance',
-            name='pmid',
+            model_name="provenance",
+            name="pmid",
             field=models.BigIntegerField(db_index=True),
         ),
         migrations.AlterField(
-            model_name='provenance',
-            name='title',
+            model_name="provenance",
+            name="title",
             field=models.CharField(db_index=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='specie',
-            name='name',
+            model_name="specie",
+            name="name",
             field=models.CharField(db_index=True, max_length=200, unique=True),
         ),
     ]
