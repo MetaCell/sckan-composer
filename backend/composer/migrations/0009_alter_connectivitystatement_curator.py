@@ -9,13 +9,19 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('composer', '0008_alter_via_ordering'),
+        ("composer", "0008_alter_via_ordering"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='connectivitystatement',
-            name='curator',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to=settings.AUTH_USER_MODEL, verbose_name='Curator'),
+            model_name="connectivitystatement",
+            name="curator",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Curator",
+            ),
         ),
     ]

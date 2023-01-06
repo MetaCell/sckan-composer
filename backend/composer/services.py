@@ -39,13 +39,14 @@ class StateServiceMixin:
                     trans_func()
         else:
             # new state is not available raise exception
-            raise AttributeError("State transition {0} is not available.".format(transition))
+            raise AttributeError(
+                "State transition {0} is not available.".format(transition)
+            )
 
         return self.obj
 
 
 class ProvenanceStatementService(StateServiceMixin):
-
     @staticmethod
     @transaction.atomic
     def do_transition_compose_now(provenance):

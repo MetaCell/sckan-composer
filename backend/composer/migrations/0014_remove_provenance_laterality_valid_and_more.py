@@ -7,82 +7,130 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('composer', '0013_remove_provenance_laterality_valid_and_more'),
+        ("composer", "0013_remove_provenance_laterality_valid_and_more"),
     ]
 
     operations = [
         migrations.RemoveConstraint(
-            model_name='provenance',
-            name='laterality_valid',
+            model_name="provenance",
+            name="laterality_valid",
         ),
         migrations.RemoveConstraint(
-            model_name='provenance',
-            name='circuit_type_valid',
+            model_name="provenance",
+            name="circuit_type_valid",
         ),
         migrations.RemoveField(
-            model_name='provenance',
-            name='ans_division',
+            model_name="provenance",
+            name="ans_division",
         ),
         migrations.RemoveField(
-            model_name='provenance',
-            name='apinatomy_model',
+            model_name="provenance",
+            name="apinatomy_model",
         ),
         migrations.RemoveField(
-            model_name='provenance',
-            name='biological_sex',
+            model_name="provenance",
+            name="biological_sex",
         ),
         migrations.RemoveField(
-            model_name='provenance',
-            name='circuit_type',
+            model_name="provenance",
+            name="circuit_type",
         ),
         migrations.RemoveField(
-            model_name='provenance',
-            name='laterality',
+            model_name="provenance",
+            name="laterality",
         ),
         migrations.RemoveField(
-            model_name='provenance',
-            name='pmcid',
+            model_name="provenance",
+            name="pmcid",
         ),
         migrations.RemoveField(
-            model_name='provenance',
-            name='species',
+            model_name="provenance",
+            name="species",
         ),
         migrations.AddField(
-            model_name='connectivitystatement',
-            name='ans_division',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='composer.ansdivision', verbose_name='ANS Division'),
+            model_name="connectivitystatement",
+            name="ans_division",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="composer.ansdivision",
+                verbose_name="ANS Division",
+            ),
         ),
         migrations.AddField(
-            model_name='connectivitystatement',
-            name='apinatomy_model',
+            model_name="connectivitystatement",
+            name="apinatomy_model",
             field=models.CharField(max_length=200, null=True),
         ),
         migrations.AddField(
-            model_name='connectivitystatement',
-            name='biological_sex',
+            model_name="connectivitystatement",
+            name="biological_sex",
             field=models.CharField(max_length=200, null=True),
         ),
         migrations.AddField(
-            model_name='connectivitystatement',
-            name='circuit_type',
-            field=models.CharField(choices=[('Sensory', 'Sensory'), ('Motor', 'Motor'), ('Instrinsic', 'Intrinsic'), ('Projection', 'Projection'), ('Anaxonic', 'Anaxonic'), ('Not specified', 'Unknown')], default='Not specified', max_length=20),
+            model_name="connectivitystatement",
+            name="circuit_type",
+            field=models.CharField(
+                choices=[
+                    ("Sensory", "Sensory"),
+                    ("Motor", "Motor"),
+                    ("Instrinsic", "Intrinsic"),
+                    ("Projection", "Projection"),
+                    ("Anaxonic", "Anaxonic"),
+                    ("Not specified", "Unknown"),
+                ],
+                default="Not specified",
+                max_length=20,
+            ),
         ),
         migrations.AddField(
-            model_name='connectivitystatement',
-            name='laterality',
-            field=models.CharField(choices=[('Ipsi', 'Ipsi'), ('Contrat', 'Contrat'), ('Bilateral', 'Bi'), ('Not specified', 'Unknown')], default='Not specified', max_length=20),
+            model_name="connectivitystatement",
+            name="laterality",
+            field=models.CharField(
+                choices=[
+                    ("Ipsi", "Ipsi"),
+                    ("Contrat", "Contrat"),
+                    ("Bilateral", "Bi"),
+                    ("Not specified", "Unknown"),
+                ],
+                default="Not specified",
+                max_length=20,
+            ),
         ),
         migrations.AddField(
-            model_name='connectivitystatement',
-            name='species',
-            field=models.ManyToManyField(to='composer.specie', verbose_name='Species'),
+            model_name="connectivitystatement",
+            name="species",
+            field=models.ManyToManyField(to="composer.specie", verbose_name="Species"),
         ),
         migrations.AddConstraint(
-            model_name='connectivitystatement',
-            constraint=models.CheckConstraint(check=models.Q(('laterality__in', ['Ipsi', 'Contrat', 'Bilateral', 'Not specified'])), name='laterality_valid'),
+            model_name="connectivitystatement",
+            constraint=models.CheckConstraint(
+                check=models.Q(
+                    (
+                        "laterality__in",
+                        ["Ipsi", "Contrat", "Bilateral", "Not specified"],
+                    )
+                ),
+                name="laterality_valid",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='connectivitystatement',
-            constraint=models.CheckConstraint(check=models.Q(('circuit_type__in', ['Sensory', 'Motor', 'Instrinsic', 'Projection', 'Anaxonic', 'Not specified'])), name='circuit_type_valid'),
+            model_name="connectivitystatement",
+            constraint=models.CheckConstraint(
+                check=models.Q(
+                    (
+                        "circuit_type__in",
+                        [
+                            "Sensory",
+                            "Motor",
+                            "Instrinsic",
+                            "Projection",
+                            "Anaxonic",
+                            "Not specified",
+                        ],
+                    )
+                ),
+                name="circuit_type_valid",
+            ),
         ),
     ]

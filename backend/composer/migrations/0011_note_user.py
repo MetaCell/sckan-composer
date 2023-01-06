@@ -9,14 +9,18 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('composer', '0010_notetag_note_and_more'),
+        ("composer", "0010_notetag_note_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='note',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to=settings.AUTH_USER_MODEL, verbose_name='User'),
+            model_name="note",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="User",
+            ),
             preserve_default=False,
         ),
     ]

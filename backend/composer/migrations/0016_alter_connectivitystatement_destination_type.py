@@ -6,13 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('composer', '0015_alter_connectivitystatement_destination_type'),
+        ("composer", "0015_alter_connectivitystatement_destination_type"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='connectivitystatement',
-            name='destination_type',
-            field=models.CharField(choices=[('Axon sensory ending', 'Axon Se'), ('Axon terminal', 'Axon T'), ('Axon sensory terminal', 'Axon St'), ('Not specified', 'Unknown')], default='Not specified', max_length=25),
+            model_name="connectivitystatement",
+            name="destination_type",
+            field=models.CharField(
+                choices=[
+                    ("Axon sensory ending", "Axon Se"),
+                    ("Axon terminal", "Axon T"),
+                    ("Axon sensory terminal", "Axon St"),
+                    ("Not specified", "Unknown"),
+                ],
+                default="Not specified",
+                max_length=25,
+            ),
         ),
     ]

@@ -7,33 +7,53 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('composer', '0020_alter_connectivitystatement_ans_division'),
+        ("composer", "0020_alter_connectivitystatement_ans_division"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='connectivitystatement',
-            name='apinatomy_model',
+            model_name="connectivitystatement",
+            name="apinatomy_model",
             field=models.CharField(blank=True, max_length=200, null=True),
         ),
         migrations.AlterField(
-            model_name='connectivitystatement',
-            name='biological_sex',
+            model_name="connectivitystatement",
+            name="biological_sex",
             field=models.CharField(blank=True, max_length=200, null=True),
         ),
         migrations.AlterField(
-            model_name='connectivitystatement',
-            name='destination',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='destination', to='composer.anatomicalentity', verbose_name='Destination'),
+            model_name="connectivitystatement",
+            name="destination",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="destination",
+                to="composer.anatomicalentity",
+                verbose_name="Destination",
+            ),
         ),
         migrations.AlterField(
-            model_name='connectivitystatement',
-            name='origin',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='origin', to='composer.anatomicalentity', verbose_name='Origin'),
+            model_name="connectivitystatement",
+            name="origin",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="origin",
+                to="composer.anatomicalentity",
+                verbose_name="Origin",
+            ),
         ),
         migrations.AlterField(
-            model_name='connectivitystatement',
-            name='path',
-            field=models.ManyToManyField(blank=True, null=True, through='composer.Via', to='composer.anatomicalentity', verbose_name='Path'),
+            model_name="connectivitystatement",
+            name="path",
+            field=models.ManyToManyField(
+                blank=True,
+                null=True,
+                through="composer.Via",
+                to="composer.anatomicalentity",
+                verbose_name="Path",
+            ),
         ),
     ]
