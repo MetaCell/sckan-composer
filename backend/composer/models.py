@@ -1,56 +1,12 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Q
 
 from django_fsm import FSMField, transition
 
 from .services import ProvenanceStatementService
+from .enums import Laterality, CircuitType, DestinationType, ProvenanceState, CSState
 
-
-# Create your enums here.
-class Laterality(models.TextChoices):
-    IPSI    = "IPSI", "Ipsi"
-    CONTRAT = "ONTRAT", "Contrat"
-    BI      = "BI", "Bilateral"
-    UNKNOWN = "UNKNOWN", "Not specified"
-
-
-class CircuitType(models.TextChoices):
-    SENSORY    = "SENSORY", "Sensory"
-    MOTOR      = "MOTOR", "Motor"
-    INTRINSIC  = "INTRINSIC", "Intrinsic"
-    PROJECTION = "PROJECTION", "Projection"
-    ANAXONIC   = "ANAXONIC", "Anaxonic"
-    UNKNOWN    = "UNKNOWN", "Not specified"
-    
-
-class DestinationType(models.TextChoices):
-    # axon sensory ending, axon terminal, axon sensory terminal
-    AXON_SE = "AXON-SE", "Axon sensory ending"
-    AXON_T  = "AXON-T", "Axon terminal"
-    AXON_ST = "AXON-ST", "Axon sensory terminal"
-    UNKNOWN = "UNKNOW", "Not specified"
-
-
-class ProvenanceState(models.TextChoices):
-    OPEN           = "open"
-    TO_BE_REVIEWED = "to_be_reviewed"
-    COMPOSE_LATER  = "compose_later"
-    COMPOSE_NOW    = "compose_now"
-    EXCLUDED       = "excluded"
-    DUPLICATE      = "duplicate"
-
-
-class CSState(models.TextChoices):
-    # Connectivity Statement States
-    DRAFT              = "draft"
-    COMPOSE_NOW        = "compose_now"
-    CURATED            = "curated"
-    EXCLUDED           = "excluded"
-    REJECTED           = "rejected"
-    TO_BE_REVIEWED     = "to_be_reviewed"
-    CONNECTION_MISSING = "connection_missing"
-    NPO_APPROVED       = "npo_approved"
-    APPROVED           = "approved"
 
 # Create your models here.
 class Profile(models.Model):
@@ -121,7 +77,7 @@ class Provenance(models.Model):
         return self.title
 
     # states
-    @transition(field=state, source=[ProvenanceState.TO_BE_REVIEWED, ProvenanceState.COMPOSE_LATER], target=ProvenanceState.OPEN)
+    @transition(field=state, source=[ProvenanceState.TO_BE_REVIEWED,ProvenanceState.COMPOSE_LATER], target=ProvenanceState.OPEN)
     def open(self):
         ...
     @transition(field=state, source=ProvenanceState.OPEN, target=ProvenanceState.TO_BE_REVIEWED)
@@ -132,7 +88,7 @@ class Provenance(models.Model):
         ...
     @transition(field=state, source=ProvenanceState.TO_BE_REVIEWED, target=ProvenanceState.COMPOSE_NOW)
     def compose_now(self):
-        ProvenanceStatementService(self).do_transition_compose_now()
+        ProvenanceStatementService.do_transition_compose_now(self)
     @transition(field=state, source=ProvenanceState.OPEN, target=ProvenanceState.EXCLUDED)
     def excluded(self):
         ...
@@ -152,8 +108,8 @@ class Provenance(models.Model):
         ordering = ["title"]
         verbose_name_plural = "Provenances"
         constraints = [
-            models.CheckConstraint(check=models.Q(state__in=[l[0] for l in ProvenanceState.choices]), name="provenance_state_valid"),
-            models.CheckConstraint(check=models.Q(pmid__isnull=False) | models.Q(pmcid__isnull=False), name="provenance_pmid_pmcd_valid"),
+            models.CheckConstraint(check=Q(state__in=[l[0] for l in ProvenanceState.choices]), name="provenance_state_valid"),
+            models.CheckConstraint(check=Q(pmid__isnull=False) | Q(pmcid__isnull=False), name="provenance_pmid_pmcd_valid"),
         ]
 
 
@@ -212,9 +168,9 @@ class ConnectivityStatement(models.Model):
         ordering = ["knowledge_statement"]
         verbose_name_plural = "Connectivity Statements"
         constraints = [
-            models.CheckConstraint(check=models.Q(state__in=[l[0] for l in CSState.choices]), name="state_valid"),
-            models.CheckConstraint(check=models.Q(laterality__in=[l[0] for l in Laterality.choices]), name="laterality_valid"),
-            models.CheckConstraint(check=models.Q(circuit_type__in=[c[0] for c in CircuitType.choices]), name="circuit_type_valid"),
+            models.CheckConstraint(check=Q(state__in=[l[0] for l in CSState.choices]), name="state_valid"),
+            models.CheckConstraint(check=Q(laterality__in=[l[0] for l in Laterality.choices]), name="laterality_valid"),
+            models.CheckConstraint(check=Q(circuit_type__in=[c[0] for c in CircuitType.choices]), name="circuit_type_valid"),
         ]
 
 

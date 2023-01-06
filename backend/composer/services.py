@@ -1,5 +1,7 @@
 from django.db import transaction
 
+from .enums import CSState
+
 
 class StateServiceMixin:
     def __init__(self, obj):
@@ -44,12 +46,14 @@ class StateServiceMixin:
 
 class ProvenanceStatementService(StateServiceMixin):
 
+    @staticmethod
     @transaction.atomic
-    def do_transition_compose_now(self):
+    def do_transition_compose_now(provenance):
         # when a Provenance record goes to compose_now state we need to set the state of all ConnectivityStatements to compose_now
-        for cs in self.obj.connectivitystatement_set.all():
-            cs.compose_now()
-            cs.save()           
+        for cs in provenance.connectivitystatement_set.all():
+            if cs.state == CSState.DRAFT:
+                cs.compose_now()
+                cs.save()
 
 
 class ConnectivityStatementService(StateServiceMixin):
