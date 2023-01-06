@@ -12,4 +12,5 @@ drf-spectacular==0.25.1
 drf-spectacular-sidecar==2022.12.1
 drf-writable-nested==0.7.0
 django-debug-toolbar==3.8.1
+django-nested-admin==4.0.2
 black
