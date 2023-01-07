@@ -75,10 +75,8 @@ class Provenance(models.Model):
     title = models.CharField(max_length=200, db_index=True)
     description = models.TextField(db_index=True)
     state = FSMField(default=ProvenanceState.OPEN, protected=True)
-    pmid = models.BigIntegerField(db_index=True, unique=True, null=True, blank=True)
-    pmcid = models.CharField(
-        max_length=10, db_index=True, unique=True, null=True, blank=True
-    )
+    pmid = models.BigIntegerField(db_index=True, null=True, blank=True)
+    pmcid = models.CharField(max_length=10, db_index=True, null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -147,6 +145,9 @@ class Provenance(models.Model):
             models.CheckConstraint(
                 check=Q(pmid__isnull=False) | Q(pmcid__isnull=False),
                 name="provenance_pmid_pmcd_valid",
+            ),
+            models.UniqueConstraint(
+                "pmid", "pmcid", name="provenance_pmid_pmcd_unique"
             ),
         ]
 
