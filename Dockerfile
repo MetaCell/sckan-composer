@@ -1,4 +1,4 @@
-ARG PARENT=python:3.9.10
+ARG PARENT=python:3.9.15
 ARG NODE_PARENT=node:15.5
 
 ####
