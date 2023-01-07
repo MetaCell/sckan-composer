@@ -61,6 +61,15 @@ to stop:
 docker-compose -f docker-compose-dev.yaml down
 ```
 
+### Ingest sample NLP data
+The git repository comes with some sample NLP data. This data can be ingested using 
+the "ingest_nlp_sentence" management command
+
+```bash
+cd backend
+python3 manage.py ingest_nlp_sentence ./composer/resources/nlp_connectivity_20221025.csv
+```
+
 ### Open the admin page
 there will be a superuser created with username/password: `admin/admin`
 
