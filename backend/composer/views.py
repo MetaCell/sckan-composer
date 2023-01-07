@@ -97,7 +97,7 @@ class ConnectivityStatementViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
     ]
 
-    def get_serializer(self, *args, **kwargs):
+    def get_serializer_class(self, *args, **kwargs):
         if self.action in ("list", "retrieve"):
             return self.serializer_class_get
         return self.serializer_class
