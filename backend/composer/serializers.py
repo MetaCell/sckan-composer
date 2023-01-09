@@ -158,6 +158,7 @@ class ConnectivityStatementSerializer(serializers.ModelSerializer):
 
 class ConnectivityStatementViewSerializer(ConnectivityStatementSerializer):
     """Connectivity Statement"""
+    provenance = ProvenanceSerializer(read_only=True)
 
     class Meta(ConnectivityStatementSerializer.Meta):
         depth = 1
