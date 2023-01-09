@@ -9,7 +9,7 @@ from .models import (
     ConnectivityStatement,
     Doi,
     Note,
-    NoteTag,
+    Tag,
     Provenance,
     Specie,
     Profile,
@@ -61,11 +61,11 @@ class AnsDivisionSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class NoteTagSerializer(serializers.ModelSerializer):
+class TagSerializer(serializers.ModelSerializer):
     """Note Tag"""
 
     class Meta:
-        model = NoteTag
+        model = Tag
         fields = "__all__"
 
 
@@ -133,6 +133,7 @@ class ViaSerializer(serializers.ModelSerializer):
 
 class ViaViewSerializer(serializers.ModelSerializer):
     """Via"""
+
     # anatomical_entity = AnatomicalEntitySerializer(read_only=False)
 
     class Meta:
@@ -143,6 +144,7 @@ class ViaViewSerializer(serializers.ModelSerializer):
 
 class ConnectivityStatementSerializer(serializers.ModelSerializer):
     """Connectivity Statement"""
+
     available_transitions = serializers.SerializerMethodField()
     path = ViaViewSerializer(source="via_set", many=True, read_only=True)
 
@@ -158,6 +160,7 @@ class ConnectivityStatementSerializer(serializers.ModelSerializer):
 
 class ConnectivityStatementViewSerializer(ConnectivityStatementSerializer):
     """Connectivity Statement"""
+
     provenance = ProvenanceSerializer(read_only=True)
 
     class Meta(ConnectivityStatementSerializer.Meta):
