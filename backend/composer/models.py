@@ -77,7 +77,13 @@ class Provenance(models.Model):
     state = FSMField(default=ProvenanceState.OPEN, protected=True)
     pmid = models.BigIntegerField(db_index=True, null=True, blank=True)
     pmcid = models.CharField(max_length=10, db_index=True, null=True, blank=True)
-    owner = models.ForeignKey(User, verbose_name="Triage Operator", on_delete=models.DO_NOTHING, null=True, blank=True)
+    owner = models.ForeignKey(
+        User,
+        verbose_name="Triage Operator",
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return self.title
@@ -122,7 +128,7 @@ class Provenance(models.Model):
     )
     def duplicate(self):
         ...
-        
+
     def assign_owner(self, request):
         if ProvenanceService(self).should_set_owner(request):
             self.owner = request.user
