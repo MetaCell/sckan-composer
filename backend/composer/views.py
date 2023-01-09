@@ -8,11 +8,11 @@ from .models import (
     AnsDivision,
     ConnectivityStatement,
     Note,
-    NoteTag,
+    Tag,
     Provenance,
     Specie,
     Profile,
-    Via
+    Via,
 )
 from .serializers import (
     AnatomicalEntitySerializer,
@@ -20,11 +20,11 @@ from .serializers import (
     ConnectivityStatementSerializer,
     ConnectivityStatementViewSerializer,
     NoteSerializer,
-    NoteTagSerializer,
+    TagSerializer,
     ProvenanceSerializer,
     SpecieSerializer,
     ProfileSerializer,
-    ViaSerializer
+    ViaSerializer,
 )
 from .services import ConnectivityStatementService
 
@@ -117,13 +117,13 @@ class ConnectivityStatementViewSet(viewsets.ModelViewSet):
         return Response(self.get_serializer(cs).data)
 
 
-class NoteTagViewSet(ModelCreateRetrieveViewSet):
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    NoteTag
+    Tag
     """
 
-    queryset = NoteTag.objects.all()
-    serializer_class = NoteTagSerializer
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
@@ -172,9 +172,11 @@ class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
         return super().get_queryset().filter(user=self.request.user)
 
 
-class ViaViewSet(mixins.CreateModelMixin,
+class ViaViewSet(
+    mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
-    viewsets.GenericViewSet,):
+    viewsets.GenericViewSet,
+):
     """
     Via
     """

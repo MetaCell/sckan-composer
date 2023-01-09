@@ -56,8 +56,8 @@ class AnatomicalEntity(models.Model):
         verbose_name_plural = "Anatomical Entities"
 
 
-class NoteTag(models.Model):
-    """Note Tag"""
+class Tag(models.Model):
+    """Tag"""
 
     tag = models.CharField(max_length=200, db_index=True, unique=True)
 
@@ -66,7 +66,7 @@ class NoteTag(models.Model):
 
     class Meta:
         ordering = ["tag"]
-        verbose_name_plural = "Note Tags"
+        verbose_name_plural = "Tags"
 
 
 class Provenance(models.Model):
@@ -77,6 +77,7 @@ class Provenance(models.Model):
     state = FSMField(default=ProvenanceState.OPEN, protected=True)
     pmid = models.BigIntegerField(db_index=True, null=True, blank=True)
     pmcid = models.CharField(max_length=10, db_index=True, null=True, blank=True)
+    tags = models.ManyToManyField(Tag, verbose_name="Tags")
     owner = models.ForeignKey(
         User,
         verbose_name="Triage Operator",
@@ -161,8 +162,6 @@ class Provenance(models.Model):
         ]
 
 
-
-
 class Via(models.Model):
     """Via"""
 
@@ -170,9 +169,7 @@ class Via(models.Model):
         "ConnectivityStatement",
         on_delete=models.CASCADE,
     )
-    anatomical_entity = models.ForeignKey(
-        AnatomicalEntity, on_delete=models.DO_NOTHING
-    )
+    anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.DO_NOTHING)
     ordering = models.PositiveIntegerField(
         default=0,
         blank=False,
@@ -217,9 +214,7 @@ class ConnectivityStatement(models.Model):
     owner = models.ForeignKey(
         User, verbose_name="Curator", on_delete=models.DO_NOTHING, null=True, blank=True
     )
-    path = models.ManyToManyField(
-        AnatomicalEntity, through=Via, blank=True
-    )
+    path = models.ManyToManyField(AnatomicalEntity, through=Via, blank=True)
     laterality = models.CharField(
         max_length=20, default=Laterality.UNKNOWN, choices=Laterality.choices
     )
@@ -234,6 +229,7 @@ class ConnectivityStatement(models.Model):
         blank=True,
     )
     species = models.ManyToManyField(Specie, verbose_name="Species", blank=True)
+    tags = models.ManyToManyField(Tag, verbose_name="Tags")
     biological_sex = models.CharField(max_length=200, null=True, blank=True)
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
 
@@ -309,7 +305,6 @@ class ConnectivityStatement(models.Model):
         ]
 
 
-
 class Doi(models.Model):
     """DOI see https://doi.org/"""
 
@@ -334,7 +329,6 @@ class Note(models.Model):
     """Note"""
 
     note = models.TextField()
-    tags = models.ManyToManyField(NoteTag, verbose_name="Tags")
     user = models.ForeignKey(User, verbose_name="User", on_delete=models.DO_NOTHING)
     provenance = models.ForeignKey(
         Provenance,

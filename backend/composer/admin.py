@@ -15,7 +15,7 @@ from composer.models import (
     ConnectivityStatement,
     Doi,
     Note,
-    NoteTag,
+    Tag,
     Profile,
     Provenance,
     Specie,
@@ -43,7 +43,7 @@ class DoiInline(admin.StackedInline):
     extra = 1
 
 
-class DoiiNestedInline(nested_admin.NestedStackedInline):
+class DoiNestedInline(nested_admin.NestedStackedInline):
     model = Doi
     extra = 1
 
@@ -65,7 +65,7 @@ class ConnectivityStatementInline(nested_admin.NestedStackedInline):
     model = ConnectivityStatement
     extra = 1
     fields = ("provenance", "knowledge_statement")
-    inlines = (DoiiNestedInline,)
+    inlines = (DoiNestedInline,)
 
 
 # Define a new User admin
@@ -164,6 +164,6 @@ admin.site.register(User, UserAdmin)
 admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
 admin.site.register(AnsDivision)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
-admin.site.register(NoteTag)
+admin.site.register(Tag)
 admin.site.register(Provenance, ProvenanceAdmin)
 admin.site.register(Specie)

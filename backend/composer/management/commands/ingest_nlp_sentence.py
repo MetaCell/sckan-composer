@@ -34,9 +34,7 @@ class Command(BaseCommand):
                     out_of_scope = row[OUT_OF_SCOPE].lower()
                     if out_of_scope and out_of_scope.lower() == "yes":
                         # skip out of scope records
-                        self.stdout.write(
-                            f"{rowid}: out of scope."
-                        )
+                        self.stdout.write(f"{rowid}: out of scope.")
                         continue
                     rowid = row[ID]
                     pmid = row[PMID] if row[PMID] != "0" else None
