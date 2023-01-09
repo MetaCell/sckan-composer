@@ -158,9 +158,6 @@ class Provenance(models.Model):
                 check=Q(pmid__isnull=False) | Q(pmcid__isnull=False),
                 name="provenance_pmid_pmcd_valid",
             ),
-            models.UniqueConstraint(
-                "pmid", "pmcid", name="provenance_pmid_pmcd_unique"
-            ),
         ]
 
 

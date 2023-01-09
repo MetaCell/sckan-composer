@@ -11,6 +11,7 @@ PMID = "pmid"
 PMCID = "pmcid"
 DOI = "doi"
 SENTENCE = "sentence"
+OUT_OF_SCOPE = "out_of_scope"
 
 
 class Command(BaseCommand):
@@ -30,6 +31,13 @@ class Command(BaseCommand):
                     quotechar='"',
                 )
                 for row in nlpreader:
+                    out_of_scope = row[OUT_OF_SCOPE].lower()
+                    if out_of_scope and out_of_scope.lower() == "yes":
+                        # skip out of scope records
+                        self.stdout.write(
+                            f"{rowid}: out of scope."
+                        )
+                        continue
                     rowid = row[ID]
                     pmid = row[PMID] if row[PMID] != "0" else None
                     pmcid = row[PMCID] if row[PMCID] != "0" else None
@@ -39,23 +47,11 @@ class Command(BaseCommand):
                     provenance, created = Provenance.objects.get_or_create(
                         pmid=pmid,
                         pmcid=pmcid,
-                        defaults={"title": title, "description": description},
+                        description=description,
+                        defaults={"title": title},
                     )
                     if created:
                         self.stdout.write(
                             f"{rowid}: provenance created with pmid {pmid}, pmcid {pmcid}."
                         )
                         provenance.save()
-                    else:
-                        update_fields = []
-                        if provenance.description != description:
-                            provenance.description = description
-                            update_fields += ["description"]
-                        if provenance.title is None:
-                            provenance.title = title
-                            update_fields += ["title"]
-                        if len(update_fields) > 0:
-                            self.stdout.write(
-                                f"{rowid}: provenance with pmid {pmid}, pmcid {pmcid} found, updating."
-                            )
-                            provenance.save(update_fields=update_fields)
