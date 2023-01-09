@@ -4,14 +4,14 @@ from django.db.models import Q
 
 from django_fsm import FSMField, transition
 
-from .services import ProvenanceStatementService
+from .services import ConnectivityStatementService, ProvenanceService
 from .enums import Laterality, CircuitType, DestinationType, ProvenanceState, CSState
 
 
 # Create your models here.
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    is_triageOperator = models.BooleanField(default=False)
+    is_triage_operator = models.BooleanField(default=False)
     is_curator = models.BooleanField(default=False)
     is_reviewer = models.BooleanField(default=False)
 
@@ -77,6 +77,7 @@ class Provenance(models.Model):
     state = FSMField(default=ProvenanceState.OPEN, protected=True)
     pmid = models.BigIntegerField(db_index=True, null=True, blank=True)
     pmcid = models.CharField(max_length=10, db_index=True, null=True, blank=True)
+    owner = models.ForeignKey(User, verbose_name="Triage Operator", on_delete=models.DO_NOTHING, null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -108,7 +109,7 @@ class Provenance(models.Model):
         target=ProvenanceState.COMPOSE_NOW,
     )
     def compose_now(self):
-        ProvenanceStatementService.do_transition_compose_now(self)
+        ProvenanceService(self).do_transition_compose_now()
 
     @transition(
         field=state, source=ProvenanceState.OPEN, target=ProvenanceState.EXCLUDED
@@ -121,6 +122,11 @@ class Provenance(models.Model):
     )
     def duplicate(self):
         ...
+        
+    def assign_owner(self, request):
+        if ProvenanceService(self).should_set_owner(request):
+            self.owner = request.user
+            self.save(update_fields=["owner"])
 
     @property
     def pmid_uri(self):
@@ -179,7 +185,7 @@ class ConnectivityStatement(models.Model):
     destination_type = models.CharField(
         max_length=10, default=DestinationType.UNKNOWN, choices=DestinationType.choices
     )
-    curator = models.ForeignKey(
+    owner = models.ForeignKey(
         User, verbose_name="Curator", on_delete=models.DO_NOTHING, null=True, blank=True
     )
     path = models.ManyToManyField(
@@ -250,6 +256,11 @@ class ConnectivityStatement(models.Model):
     @transition(field=state, source=CSState.NPO_APPROVED, target=CSState.APPROVED)
     def approved(self):
         pass
+
+    def assign_owner(self, request):
+        if ConnectivityStatementService(self).should_set_owner(request):
+            self.owner = request.user
+            self.save(update_fields=["owner"])
 
     class Meta:
         ordering = ["knowledge_statement"]

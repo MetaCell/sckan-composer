@@ -79,7 +79,7 @@ class ProvenanceAdmin(
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
     readonly_fields = ("pmid_uri", "pmcid_uri", "state")
-    list_display = ("title", "pmid", "pmcid")
+    list_display = ("title", "pmid", "pmcid", "owner")
     list_display_links = ("title", "pmid", "pmcid")
     search_fields = ("title", "description", "pmid", "pmcid")
 
@@ -126,7 +126,7 @@ class ConnectivityStatementAdmin(
         "origin",
         "destination",
         "state",
-        "curator",
+        "owner",
     )
     list_display_links = ("provenance", "pmid", "pmcid", "short_ks", "state")
     list_select_related = ("provenance", "origin", "destination")
@@ -155,13 +155,6 @@ class ConnectivityStatementAdmin(
     @admin.display(description="PMCID")
     def pmcid(self, obj):
         return obj.provenance.pmcid
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "curator":
-            kwargs["queryset"] = User.objects.filter(profile__is_curator=True)
-        return super(ConnectivityStatementAdmin, self).formfield_for_foreignkey(
-            db_field, request, **kwargs
-        )
 
 
 # Re-register UserAdmin

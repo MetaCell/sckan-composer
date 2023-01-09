@@ -101,6 +101,10 @@ class ConnectivityStatementViewSet(viewsets.ModelViewSet):
         if self.action in ("list", "retrieve"):
             return self.serializer_class_get
         return self.serializer_class
+    
+    def retrieve(self, request, *args, **kwargs):
+        self.get_object().assign_owner(request)
+        return super().retrieve(request, *args, **kwargs)
 
     @action(detail=True, methods=["post"], url_path="do_transition/(?P<transition>\w+)")
     def transition(self, request, pk=None, transition=None):
@@ -133,6 +137,11 @@ class ProvenanceViewSet(ModelNoDeleteViewSet):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
+    
+    def retrieve(self, request, *args, **kwargs):
+        self.get_object().assign_owner(request)
+        return super().retrieve(request, *args, **kwargs)
+
 
 
 class SpecieViewSet(viewsets.ReadOnlyModelViewSet):

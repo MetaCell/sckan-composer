@@ -3,10 +3,23 @@ from django.db import transaction
 from .enums import CSState
 
 
-class StateServiceMixin:
+class BaseServiceMixin:
     def __init__(self, obj):
         self.obj = obj
 
+
+class OwnerServiceMixin(BaseServiceMixin):
+    def is_owner(self, owner):
+        return self.obj.owner == owner
+    
+    def should_set_owner(self, request):
+        if self.obj.owner:
+            return False
+        if request.user:
+            return True
+
+
+class StateServiceMixin(OwnerServiceMixin):
     def _is_transition_available(self, transition, user=None):
         """
         Checks if the requested transition is available
@@ -46,10 +59,10 @@ class StateServiceMixin:
         return self.obj
 
 
-class ProvenanceStatementService(StateServiceMixin):
-    @staticmethod
+class ProvenanceService(StateServiceMixin):
     @transaction.atomic
-    def do_transition_compose_now(provenance):
+    def do_transition_compose_now(self):
+        provenance = self.obj
         # when a Provenance record goes to compose_now state we need to set the state of all ConnectivityStatements to compose_now
         for cs in provenance.connectivitystatement_set.all():
             if cs.state == CSState.DRAFT:
