@@ -79,7 +79,7 @@ class ProvenanceAdmin(
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
     readonly_fields = ("pmid_uri", "pmcid_uri", "state")
-    list_display = ("title", "pmid", "pmcid", "owner")
+    list_display = ("title", "pmid", "pmcid", "tag_list", "owner")
     list_display_links = ("title", "pmid", "pmcid")
     search_fields = ("title", "description", "pmid", "pmcid")
 
@@ -99,6 +99,11 @@ class ProvenanceAdmin(
             else ""
         )
 
+    @admin.display(description="tags")
+    def tag_list(self, obj):
+        tags = ', '.join(obj.tags.all().values_list('tag', flat=True))
+        return  tags
+    
     inlines = (
         ConnectivityStatementInline,
         NoteProvenanceInline,
@@ -125,6 +130,7 @@ class ConnectivityStatementAdmin(
         "short_ks",
         "origin",
         "destination",
+        "tag_list",
         "state",
         "owner",
     )
@@ -156,6 +162,10 @@ class ConnectivityStatementAdmin(
     def pmcid(self, obj):
         return obj.provenance.pmcid
 
+    @admin.display(description="tags")
+    def tag_list(self, obj):
+        tags = ', '.join(obj.tags.all().values_list('tag', flat=True))
+        return  tags
 
 # Re-register UserAdmin
 admin.site.unregister(User)

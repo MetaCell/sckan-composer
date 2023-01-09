@@ -315,7 +315,7 @@ class Doi(models.Model):
 
     @property
     def doi_uri(self):
-        return f"https://doi.org/doi/full/{self.doi}"
+        return f"https://doi.org/{self.doi}"
 
     def __str__(self):
         return self.doi
