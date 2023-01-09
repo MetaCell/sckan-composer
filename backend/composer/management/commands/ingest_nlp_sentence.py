@@ -47,15 +47,15 @@ class Command(BaseCommand):
                         )
                         provenance.save()
                     else:
-                        self.stdout.write(
-                            f"{rowid}: provenance with pmid {pmid}, pmcid {pmcid} found, updating."
-                        )
-                        dirty = False
+                        update_fields = []
                         if provenance.description != description:
                             provenance.description = description
-                            dirty = True
+                            update_fields += ["description"]
                         if provenance.title is None:
                             provenance.title = title
-                            dirty = True
-                        if dirty:
-                            provenance.save()
+                            update_fields += ["title"]
+                        if len(update_fields) > 0:
+                            self.stdout.write(
+                                f"{rowid}: provenance with pmid {pmid}, pmcid {pmcid} found, updating."
+                            )
+                            provenance.save(update_fields=update_fields)
