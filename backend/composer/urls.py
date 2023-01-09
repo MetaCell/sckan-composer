@@ -9,6 +9,7 @@ from .views import (
     ProvenanceViewSet,
     SpecieViewSet,
     ProfileViewSet,
+    ViaViewSet
 )
 
 # Create a router and register our viewsets with it.
@@ -27,7 +28,7 @@ router.register(r"note-tag", NoteTagViewSet, basename="note-tag")
 router.register(r"provenance", ProvenanceViewSet, basename="provenance")
 router.register(r"specie", SpecieViewSet, basename="specie")
 router.register(r"profile", ProfileViewSet, basename="profile")
-# router.register(r'via', ViaViewSet, basename="via")
+router.register(r'via', ViaViewSet, basename="via")
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [

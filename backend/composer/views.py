@@ -12,6 +12,7 @@ from .models import (
     Provenance,
     Specie,
     Profile,
+    Via
 )
 from .serializers import (
     AnatomicalEntitySerializer,
@@ -23,6 +24,7 @@ from .serializers import (
     ProvenanceSerializer,
     SpecieSerializer,
     ProfileSerializer,
+    ViaSerializer
 )
 from .services import ConnectivityStatementService
 
@@ -168,3 +170,17 @@ class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
+
+
+class ViaViewSet(mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,):
+    """
+    Via
+    """
+
+    queryset = Via.objects.all()
+    serializer_class = ViaSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+    ]

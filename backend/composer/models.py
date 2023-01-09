@@ -161,6 +161,32 @@ class Provenance(models.Model):
         ]
 
 
+
+
+class Via(models.Model):
+    """Via"""
+
+    connectivity_statement = models.ForeignKey(
+        "ConnectivityStatement",
+        on_delete=models.CASCADE,
+    )
+    anatomical_entity = models.ForeignKey(
+        AnatomicalEntity, on_delete=models.DO_NOTHING
+    )
+    ordering = models.PositiveIntegerField(
+        default=0,
+        blank=False,
+        null=False,
+    )
+
+    def __str__(self):
+        return f"{self.connectivity_statement} - {self.anatomical_entity}"
+
+    class Meta:
+        ordering = ["ordering"]
+        verbose_name_plural = "Via"
+
+
 class ConnectivityStatement(models.Model):
     """Connectivity Statement"""
 
@@ -192,7 +218,7 @@ class ConnectivityStatement(models.Model):
         User, verbose_name="Curator", on_delete=models.DO_NOTHING, null=True, blank=True
     )
     path = models.ManyToManyField(
-        AnatomicalEntity, verbose_name="Path", through="Via", blank=True
+        AnatomicalEntity, through=Via, blank=True
     )
     laterality = models.CharField(
         max_length=20, default=Laterality.UNKNOWN, choices=Laterality.choices
@@ -282,31 +308,6 @@ class ConnectivityStatement(models.Model):
             ),
         ]
 
-
-class Via(models.Model):
-    """Via"""
-
-    connectivity_statement = models.ForeignKey(
-        ConnectivityStatement,
-        verbose_name="Connectivity Statement",
-        on_delete=models.CASCADE,
-        related_name="path_set",
-    )
-    anatomical_entity = models.ForeignKey(
-        AnatomicalEntity, verbose_name="Anatomical Entity", on_delete=models.DO_NOTHING
-    )
-    ordering = models.PositiveIntegerField(
-        default=0,
-        blank=False,
-        null=False,
-    )
-
-    def __str__(self):
-        return f"{self.connectivity_statement} - {self.anatomical_entity}"
-
-    class Meta:
-        ordering = ["ordering"]
-        verbose_name_plural = "Via"
 
 
 class Doi(models.Model):

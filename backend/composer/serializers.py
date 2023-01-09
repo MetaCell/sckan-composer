@@ -1,9 +1,7 @@
 from django.contrib.auth.models import User
-from django.db import transaction
 
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
-from drf_writable_nested import UniqueFieldsMixin
-from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 from .models import (
     AnatomicalEntity,
@@ -17,6 +15,7 @@ from .models import (
     Profile,
     Via,
 )
+
 
 # serializers
 class UserSerializer(serializers.ModelSerializer):
@@ -46,7 +45,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         dept = 2
 
 
-class AnatomicalEntitySerializer(UniqueFieldsMixin, serializers.ModelSerializer):
+class AnatomicalEntitySerializer(serializers.ModelSerializer):
     """Anatomical Entity"""
 
     class Meta:
@@ -94,13 +93,13 @@ class ProvenanceSerializer(serializers.ModelSerializer):
     pmid_uri = serializers.SerializerMethodField()
     pmcid_uri = serializers.SerializerMethodField()
 
-    def get_available_transitions(self, instance):
+    def get_available_transitions(self, instance) -> list[str]:
         return [t.name for t in instance.get_available_state_transitions()]
 
-    def get_pmid_uri(self, instance):
+    def get_pmid_uri(self, instance) -> str:
         return instance.pmid_uri
 
-    def get_pmcid_uri(self, instance):
+    def get_pmcid_uri(self, instance) -> str:
         return instance.pmcid_uri
 
     class Meta:
@@ -111,16 +110,8 @@ class ProvenanceSerializer(serializers.ModelSerializer):
             "available_transitions",
             "pmid_uri",
             "pmcid_uri",
+            "owner",
         )
-
-
-class ViaFromConnectivityStatementSerializer(serializers.ModelSerializer):
-    """Via"""
-
-    class Meta:
-        model = Via
-        fields = "__all__"
-        depth = 0
 
 
 class DoitSerializer(serializers.ModelSerializer):
@@ -132,32 +123,41 @@ class DoitSerializer(serializers.ModelSerializer):
         depth = 0
 
 
-class ConnectivityStatementSerializer(serializers.ModelSerializer):
-    """Connectivity Statement"""
-
-    available_transitions = serializers.SerializerMethodField()
-
-    def get_available_transitions(self, instance):
-        return [t.name for t in instance.get_available_state_transitions()]
-
-    class Meta:
-        model = ConnectivityStatement
-        fields = "__all__"
-        depth = 0
-        read_only_fields = ("state", "curator")
-
-
-class ConnectivityStatementViewSerializer(ConnectivityStatementSerializer):
-    """Connectivity Statement"""
-
-    class Meta(ConnectivityStatementSerializer.Meta):
-        depth = 2
-
-
 class ViaSerializer(serializers.ModelSerializer):
     """Via"""
 
     class Meta:
         model = Via
         fields = "__all__"
+
+
+class ViaViewSerializer(serializers.ModelSerializer):
+    """Via"""
+    # anatomical_entity = AnatomicalEntitySerializer(read_only=False)
+
+    class Meta:
+        model = Via
+        fields = ("id", "ordering", "anatomical_entity")
+        depth = 1
+
+
+class ConnectivityStatementSerializer(serializers.ModelSerializer):
+    """Connectivity Statement"""
+    available_transitions = serializers.SerializerMethodField()
+    path = ViaViewSerializer(source="via_set", many=True, read_only=True)
+
+    def get_available_transitions(self, instance) -> list[str]:
+        return [t.name for t in instance.get_available_state_transitions()]
+
+    class Meta:
+        model = ConnectivityStatement
+        fields = "__all__"
+        depth = 0
+        read_only_fields = ("state", "owner")
+
+
+class ConnectivityStatementViewSerializer(ConnectivityStatementSerializer):
+    """Connectivity Statement"""
+
+    class Meta(ConnectivityStatementSerializer.Meta):
         depth = 1
