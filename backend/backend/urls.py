@@ -38,7 +38,8 @@ urlpatterns = [
         name="redoc",
     ),
     # Composer
-    path("composer/", include("composer.urls")),
+    path("api/composer/", include("composer.api.urls")),
+    path("", include("composer.urls")),
     # Debug toolbar
     path("__debug__/", include("debug_toolbar.urls")),
     # Django REST Framework

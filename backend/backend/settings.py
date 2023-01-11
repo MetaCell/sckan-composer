@@ -345,4 +345,4 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
 )
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
-LOGIN_REDIRECT_URL = "/admin/"
+LOGIN_REDIRECT_URL = "/"

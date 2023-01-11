@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from .models import (
+from ..models import (
     AnatomicalEntity,
     AnsDivision,
     ConnectivityStatement,
