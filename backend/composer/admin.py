@@ -1,12 +1,9 @@
 import nested_admin
-import nested_admin
-
+from adminsortable2.admin import SortableAdminBase, SortableStackedInline
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from django.utils.html import format_html
-
-from adminsortable2.admin import SortableAdminBase, SortableStackedInline
 from fsm_admin.mixins import FSMTransitionMixin
 
 from composer.models import (
@@ -15,10 +12,10 @@ from composer.models import (
     ConnectivityStatement,
     Doi,
     Note,
-    Tag,
     Profile,
     Provenance,
     Specie,
+    Tag,
     Via,
 )
 
@@ -101,9 +98,9 @@ class ProvenanceAdmin(
 
     @admin.display(description="tags")
     def tag_list(self, obj):
-        tags = ', '.join(obj.tags.all().values_list('tag', flat=True))
-        return  tags
-    
+        tags = ", ".join(obj.tags.all().values_list("tag", flat=True))
+        return tags
+
     inlines = (
         ConnectivityStatementInline,
         NoteProvenanceInline,
@@ -164,8 +161,9 @@ class ConnectivityStatementAdmin(
 
     @admin.display(description="tags")
     def tag_list(self, obj):
-        tags = ', '.join(obj.tags.all().values_list('tag', flat=True))
-        return  tags
+        tags = ", ".join(obj.tags.all().values_list("tag", flat=True))
+        return tags
+
 
 # Re-register UserAdmin
 admin.site.unregister(User)

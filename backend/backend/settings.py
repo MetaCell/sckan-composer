@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
-
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -48,6 +47,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework.authtoken",
     "fsm_admin",
     "adminsortable2",
     "django_filters",
@@ -58,6 +58,8 @@ INSTALLED_APPS = [
     "nested_admin",
     "jazzmin",
     "django.contrib.admin",
+    "social_django",
+    "sslserver",
 ]
 
 MIDDLEWARE = [
@@ -319,6 +321,11 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 25,
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
 }
 
 SPECTACULAR_SETTINGS = {
@@ -331,3 +338,14 @@ SPECTACULAR_SETTINGS = {
     "REDOC_DIST": "SIDECAR",
     # OTHER SETTINGS
 }
+
+SOCIAL_AUTH_ORCID_KEY = "APP-GRRGRZ5EZQLQ6WZT"
+SOCIAL_AUTH_ORCID_SECRET = "a1363a17-22b0-4a99-81fc-a1a86a371251"
+SOCIAL_AUTH_AUTHENTICATION_BACKENDS = ("social_core.backends.orcid.ORCIDOAuth2",)
+AUTHENTICATION_BACKENDS = (
+    "social_core.backends.orcid.ORCIDOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+)
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
+
+LOGIN_REDIRECT_URL = "/"

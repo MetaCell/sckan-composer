@@ -1,11 +1,10 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
-
 from django_fsm import FSMField, transition
 
+from .enums import CircuitType, CSState, DestinationType, Laterality, ProvenanceState
 from .services import ConnectivityStatementService, ProvenanceService
-from .enums import Laterality, CircuitType, DestinationType, ProvenanceState, CSState
 
 
 # Create your models here.
@@ -77,7 +76,7 @@ class Provenance(models.Model):
     state = FSMField(default=ProvenanceState.OPEN, protected=True)
     pmid = models.BigIntegerField(db_index=True, null=True, blank=True)
     pmcid = models.CharField(max_length=10, db_index=True, null=True, blank=True)
-    tags = models.ManyToManyField(Tag, verbose_name="Tags")
+    tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
     owner = models.ForeignKey(
         User,
         verbose_name="Triage Operator",
@@ -229,7 +228,7 @@ class ConnectivityStatement(models.Model):
         blank=True,
     )
     species = models.ManyToManyField(Specie, verbose_name="Species", blank=True)
-    tags = models.ManyToManyField(Tag, verbose_name="Tags")
+    tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
     biological_sex = models.CharField(max_length=200, null=True, blank=True)
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
 
