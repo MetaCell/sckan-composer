@@ -1,0 +1,3 @@
+django-debug-toolbar
+django-sslserver # ssl dev server, for testing orcid social login
+black

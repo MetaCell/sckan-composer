@@ -17,7 +17,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
-
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
@@ -39,9 +38,12 @@ urlpatterns = [
         name="redoc",
     ),
     # Composer
-    path("composer/", include("composer.urls")),
+    path("api/composer/", include("composer.api.urls")),
+    path("", include("composer.urls")),
     # Debug toolbar
     path("__debug__/", include("debug_toolbar.urls")),
     # Django REST Framework
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    # Social auth
+    path("", include("social_django.urls", namespace="social")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
