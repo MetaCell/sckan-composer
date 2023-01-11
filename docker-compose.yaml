@@ -31,11 +31,8 @@ services:
     restart: "on-failure"
     volumes:
       - composer-db-data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-      PGPORT: ${DB_PORT}
+    env_file:
+      - .env
 
 volumes:
   composer-db-data:

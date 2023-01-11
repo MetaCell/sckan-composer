@@ -26,11 +26,15 @@ RUN apt update
 WORKDIR ${APP_DIR}
 RUN mkdir -p ${APP_DIR}static/www
 
+RUN git clone -b neurons https://github.com/SciCrunch/NIF-Ontology.git
+
 COPY backend/requirements.txt ${APP_DIR}
 RUN pip3 install --no-cache-dir --upgrade -r requirements.txt
 
 COPY backend/requirements.txt backend/setup.py ${APP_DIR}
 RUN python3 -m pip install -e .
+
+RUN ontutils set ontology-local-repo ./NIF-Ontology/
 
 COPY backend ${APP_DIR}
 RUN python3 manage.py collectstatic --noinput
