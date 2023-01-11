@@ -5,7 +5,6 @@ from django.db import connection
 
 from composer.models import Provenance
 
-
 ID = "id"
 PMID = "pmid"
 PMCID = "pmcid"
