@@ -1,5 +1,4 @@
 from django.contrib.auth.models import User
-
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
@@ -9,10 +8,10 @@ from .models import (
     ConnectivityStatement,
     Doi,
     Note,
-    Tag,
+    Profile,
     Provenance,
     Specie,
-    Profile,
+    Tag,
     Via,
 )
 
@@ -23,21 +22,17 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = (
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "is_active",
-            "is_staff",
-            "is_superuser",
-        )
+        fields = "__all__"
 
 
 class ProfileSerializer(serializers.ModelSerializer):
     """Profile"""
 
     user = UserSerializer(read_only=True)
+    token = serializers.SerializerMethodField()
+
+    def get_token(self, obj):
+        return obj.user.auth_token.key
 
     class Meta:
         model = Profile

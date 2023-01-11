@@ -42,10 +42,13 @@ cd backend
 # make sure your virtual env is activated
 # and install the requirements
 pip install --upgrade -r requirements.txt
+pip install --upgrade -r requirements-dev.txt
 # run the migrations
 python3 manage.py migrate
-# run the development server
+# run the development server (http)
 python3 manage.py runserver
+# OR run the development server (https)
+# python3 manage.py runsslserver
 ```
 
 ### Running on docker with docker-compose
@@ -74,6 +77,11 @@ python3 manage.py ingest_nlp_sentence ./composer/resources/nlp_connectivity_2022
 there will be a superuser created with username/password: `admin/admin`
 
 browse the Django [admin](http://127.0.0.1:8000/admin/) interface
+
+## ORCID login setup
+
+browse to [ORCID dev tools](https://orcid.org/developer-tools) and create a new api
+configure settings.py with the new key and secret
 
 
 ## Production setup

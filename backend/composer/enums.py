@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your enums here.
 class Laterality(models.TextChoices):
     IPSI = "IPSI", "Ipsi"
