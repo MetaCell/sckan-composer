@@ -40,6 +40,8 @@ urlpatterns = [
     ),
     # Composer
     path("composer/", include("composer.urls")),
+    # Debug toolbar
     path("__debug__/", include("debug_toolbar.urls")),
-    # path('_nested_admin/', include('nested_admin.urls')),
+    # Django REST Framework
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
