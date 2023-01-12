@@ -3,8 +3,7 @@ import csv
 from django.core.management.base import BaseCommand
 from django.db import connection
 
-from composer.models import Provenance
-
+from composer.models import Sentence
 
 ID = "id"
 PMID = "pmid"
@@ -42,7 +41,7 @@ class Command(BaseCommand):
                     doi = row[DOI] if row[DOI] != "0" else None
                     description = row[SENTENCE]
                     title = description[0:199]
-                    provenance, created = Provenance.objects.get_or_create(
+                    sentence, created = Sentence.objects.get_or_create(
                         pmid=pmid,
                         pmcid=pmcid,
                         description=description,
@@ -50,6 +49,6 @@ class Command(BaseCommand):
                     )
                     if created:
                         self.stdout.write(
-                            f"{rowid}: provenance created with pmid {pmid}, pmcid {pmcid}."
+                            f"{rowid}: sentence created with pmid {pmid}, pmcid {pmcid}."
                         )
-                        provenance.save()
+                        sentence.save()

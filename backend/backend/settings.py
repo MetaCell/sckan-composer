@@ -54,12 +54,15 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "drf_spectacular_sidecar",
     "debug_toolbar",
-    "composer",
     "nested_admin",
     "jazzmin",
     "django.contrib.admin",
     "social_django",
     "sslserver",
+
+    # local apps
+    "metacell_auth",
+    "composer",
 ]
 
 MIDDLEWARE = [
@@ -233,8 +236,8 @@ JAZZMIN_SETTINGS = {
     "order_with_respect_to": ["auth", "composer"],
     # # Custom links to append to app groups, keyed on app name
     # "custom_links": {
-    #     "provenance": [{
-    #         "name": "Make a new Provenance",
+    #     "sentence": [{
+    #         "name": "Make a new Sentence",
     #         "url": "make_messages",
     #         "icon": "fas fa-comments",
     #         "permissions": ["books.view_book"]
@@ -349,3 +352,4 @@ AUTHENTICATION_BACKENDS = (
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 
 LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/logged-out/"

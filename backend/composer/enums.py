@@ -26,7 +26,7 @@ class DestinationType(models.TextChoices):
     UNKNOWN = "UNKNOW", "Not specified"
 
 
-class ProvenanceState(models.TextChoices):
+class SentenceState(models.TextChoices):
     OPEN = "open"
     TO_BE_REVIEWED = "to_be_reviewed"
     COMPOSE_LATER = "compose_later"

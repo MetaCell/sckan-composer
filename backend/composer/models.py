@@ -3,8 +3,8 @@ from django.db import models
 from django.db.models import Q
 from django_fsm import FSMField, transition
 
-from .enums import CircuitType, CSState, DestinationType, Laterality, ProvenanceState
-from .services import ConnectivityStatementService, ProvenanceService
+from .enums import CircuitType, CSState, DestinationType, Laterality, SentenceState
+from .services import ConnectivityStatementService, SentenceService
 
 
 # Create your models here.
@@ -68,12 +68,12 @@ class Tag(models.Model):
         verbose_name_plural = "Tags"
 
 
-class Provenance(models.Model):
-    """Provenance"""
+class Sentence(models.Model):
+    """Sentence"""
 
     title = models.CharField(max_length=200, db_index=True)
-    description = models.TextField(db_index=True)
-    state = FSMField(default=ProvenanceState.OPEN, protected=True)
+    text = models.TextField(db_index=True)
+    state = FSMField(default=SentenceState.OPEN, protected=True)
     pmid = models.BigIntegerField(db_index=True, null=True, blank=True)
     pmcid = models.CharField(max_length=10, db_index=True, null=True, blank=True)
     tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
@@ -91,46 +91,46 @@ class Provenance(models.Model):
     # states
     @transition(
         field=state,
-        source=[ProvenanceState.TO_BE_REVIEWED, ProvenanceState.COMPOSE_LATER],
-        target=ProvenanceState.OPEN,
+        source=[SentenceState.TO_BE_REVIEWED, SentenceState.COMPOSE_LATER],
+        target=SentenceState.OPEN,
     )
     def open(self):
         ...
 
     @transition(
-        field=state, source=ProvenanceState.OPEN, target=ProvenanceState.TO_BE_REVIEWED
+        field=state, source=SentenceState.OPEN, target=SentenceState.TO_BE_REVIEWED
     )
     def to_be_reviewed(self):
         ...
 
     @transition(
-        field=state, source=ProvenanceState.OPEN, target=ProvenanceState.COMPOSE_LATER
+        field=state, source=SentenceState.OPEN, target=SentenceState.COMPOSE_LATER
     )
     def compose_later(self):
         ...
 
     @transition(
         field=state,
-        source=ProvenanceState.TO_BE_REVIEWED,
-        target=ProvenanceState.COMPOSE_NOW,
+        source=SentenceState.TO_BE_REVIEWED,
+        target=SentenceState.COMPOSE_NOW,
     )
     def compose_now(self):
-        ProvenanceService(self).do_transition_compose_now()
+        SentenceService(self).do_transition_compose_now()
 
     @transition(
-        field=state, source=ProvenanceState.OPEN, target=ProvenanceState.EXCLUDED
+        field=state, source=SentenceState.OPEN, target=SentenceState.EXCLUDED
     )
     def excluded(self):
         ...
 
     @transition(
-        field=state, source=ProvenanceState.OPEN, target=ProvenanceState.DUPLICATE
+        field=state, source=SentenceState.OPEN, target=SentenceState.DUPLICATE
     )
     def duplicate(self):
         ...
 
     def assign_owner(self, request):
-        if ProvenanceService(self).should_set_owner(request):
+        if SentenceService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
 
@@ -148,15 +148,15 @@ class Provenance(models.Model):
 
     class Meta:
         ordering = ["title"]
-        verbose_name_plural = "Provenances"
+        verbose_name_plural = "Sentences"
         constraints = [
             models.CheckConstraint(
-                check=Q(state__in=[l[0] for l in ProvenanceState.choices]),
-                name="provenance_state_valid",
+                check=Q(state__in=[l[0] for l in SentenceState.choices]),
+                name="sentence_state_valid",
             ),
             models.CheckConstraint(
                 check=Q(pmid__isnull=False) | Q(pmcid__isnull=False),
-                name="provenance_pmid_pmcd_valid",
+                name="sentence_pmid_pmcd_valid",
             ),
         ]
 
@@ -186,8 +186,8 @@ class Via(models.Model):
 class ConnectivityStatement(models.Model):
     """Connectivity Statement"""
 
-    provenance = models.ForeignKey(
-        Provenance, verbose_name="Provenance", on_delete=models.DO_NOTHING
+    sentence = models.ForeignKey(
+        Sentence, verbose_name="Sentence", on_delete=models.DO_NOTHING
     )
     knowledge_statement = models.TextField(db_index=True)
     state = FSMField(default=CSState.DRAFT, protected=True)
@@ -329,9 +329,9 @@ class Note(models.Model):
 
     note = models.TextField()
     user = models.ForeignKey(User, verbose_name="User", on_delete=models.DO_NOTHING)
-    provenance = models.ForeignKey(
-        Provenance,
-        verbose_name="Provenance",
+    sentence = models.ForeignKey(
+        Sentence,
+        verbose_name="Sentence",
         on_delete=models.DO_NOTHING,
         null=True,
         blank=True,
@@ -355,13 +355,13 @@ class Note(models.Model):
         constraints = [
             models.CheckConstraint(
                 check=models.Q(
-                    provenance__isnull=False,
+                    sentence__isnull=False,
                     connectivity_statement__isnull=True,
                 )
                 | models.Q(
-                    provenance__isnull=True,
+                    sentence__isnull=True,
                     connectivity_statement__isnull=False,
                 ),
-                name="only_provenance_or_connectivity_statement",
+                name="only_sentence_or_connectivity_statement",
             ),
         ]

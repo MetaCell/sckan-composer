@@ -37,13 +37,18 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
+    # Auth
+    path("", include("metacell_auth.urls")),
     # Composer
-    path("api/composer/", include("composer.api.urls")),
     path("", include("composer.urls")),
-    # Debug toolbar
-    path("__debug__/", include("debug_toolbar.urls")),
     # Django REST Framework
-    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    # path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # Social auth
     path("", include("social_django.urls", namespace="social")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+if settings.DEBUG:
+    urlpatterns += [
+        # Debug toolbar
+        path("__debug__/", include("debug_toolbar.urls")),
+    ]
