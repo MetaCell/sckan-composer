@@ -358,6 +358,7 @@ if DEBUG:
     MIDDLEWARE += [
         "debug_toolbar.middleware.DebugToolbarMiddleware",
     ]
+    SHOW_TOOLBAR_CALLBACK = lambda x: True
 
 if not PRODUCTION:
     INSTALLED_APPS += [
