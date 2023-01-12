@@ -42,21 +42,28 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "rest_framework",
-    "rest_framework.authtoken",
-    "fsm_admin",
-    "adminsortable2",
-    "django_filters",
-    "drf_spectacular",
-    "drf_spectacular_sidecar",
-    "nested_admin",
-    "jazzmin",
-    "django.contrib.admin",
-    "social_django",
-
+    #
     # local apps
     "metacell_auth",
     "composer",
+    #
+    # 3rd party apps
+    "jazzmin",
+    #
+    "rest_framework",
+    "rest_framework.authtoken",
+    #
+    "fsm_admin",
+    #
+    "adminsortable2",
+    "django_filters",
+    #
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
+    #
+    "nested_admin",
+    "django.contrib.admin",
+    "social_django",
 ]
 
 MIDDLEWARE = [
@@ -150,6 +157,9 @@ STATIC_ROOT = os.path.join(
     BASE_DIR,
     "static",
 )
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static",
+# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -166,7 +176,7 @@ JAZZMIN_SETTINGS = {
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_brand": "SCKAN Composer",
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "/static/img/composer-logo.png",
+    "site_logo": "img/composer-logo.png",
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
     "login_logo": None,
     # Logo to use for login form in dark themes (defaults to login_logo)
