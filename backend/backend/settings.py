@@ -363,3 +363,7 @@ if not PRODUCTION:
     INSTALLED_APPS += [
         "sslserver",
     ]
+    
+if PRODUCTION:
+    # we are behind a rev proxy, so we need to set this
+    USE_X_FORWARDED_HOST = True
