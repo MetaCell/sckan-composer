@@ -7,10 +7,10 @@ from .views import (
     ConnectivityStatementViewSet,
     NoteViewSet,
     ProfileViewSet,
-    ProvenanceViewSet,
+    SentenceViewSet,
     SpecieViewSet,
     TagViewSet,
-    ViaViewSet,
+    ViaViewSet
 )
 
 # Create a router and register our viewsets with it.
@@ -26,7 +26,7 @@ router.register(
 )
 router.register(r"note", NoteViewSet, basename="note")
 router.register(r"note-tag", TagViewSet, basename="note-tag")
-router.register(r"provenance", ProvenanceViewSet, basename="provenance")
+router.register(r"sentence", SentenceViewSet, basename="sentence")
 router.register(r"specie", SpecieViewSet, basename="specie")
 router.register(r"profile", ProfileViewSet, basename="profile")
 router.register(r"tag", TagViewSet, basename="tag")

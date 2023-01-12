@@ -9,7 +9,7 @@ from ..models import (
     Doi,
     Note,
     Profile,
-    Provenance,
+    Sentence,
     Specie,
     Tag,
     Via,
@@ -80,8 +80,8 @@ class SpecieSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ProvenanceSerializer(serializers.ModelSerializer):
-    """Provenance"""
+class SentenceSerializer(serializers.ModelSerializer):
+    """Sentence"""
 
     # notes = NoteSerializer(many=True, read_only=True)
     available_transitions = serializers.SerializerMethodField()
@@ -98,7 +98,7 @@ class ProvenanceSerializer(serializers.ModelSerializer):
         return instance.pmcid_uri
 
     class Meta:
-        model = Provenance
+        model = Sentence
         fields = "__all__"
         read_only_fields = (
             "state",
@@ -156,7 +156,7 @@ class ConnectivityStatementSerializer(serializers.ModelSerializer):
 class ConnectivityStatementViewSerializer(ConnectivityStatementSerializer):
     """Connectivity Statement"""
 
-    provenance = ProvenanceSerializer(read_only=True)
+    sentence = SentenceSerializer(read_only=True)
 
     class Meta(ConnectivityStatementSerializer.Meta):
         depth = 1

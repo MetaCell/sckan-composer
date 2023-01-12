@@ -1,5 +1,4 @@
-from rest_framework import mixins, permissions, views, viewsets
-from rest_framework.authtoken.models import Token
+from rest_framework import mixins, permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
@@ -10,7 +9,7 @@ from ..models import (
     ConnectivityStatement,
     Note,
     Profile,
-    Provenance,
+    Sentence,
     Specie,
     Tag,
     Via,
@@ -22,7 +21,7 @@ from .serializers import (
     ConnectivityStatementViewSerializer,
     NoteSerializer,
     ProfileSerializer,
-    ProvenanceSerializer,
+    SentenceSerializer,
     SpecieSerializer,
     TagSerializer,
     ViaSerializer,
@@ -130,13 +129,13 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     ]
 
 
-class ProvenanceViewSet(ModelNoDeleteViewSet):
+class SentenceViewSet(ModelNoDeleteViewSet):
     """
-    Provenance
+    Sentence
     """
 
-    queryset = Provenance.objects.all()
-    serializer_class = ProvenanceSerializer
+    queryset = Sentence.objects.all()
+    serializer_class = SentenceSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
@@ -175,14 +174,8 @@ class ProfileViewSet(viewsets.GenericViewSet):
         if not user.is_authenticated:
             msg = "User not logged in."
             raise ValidationError(msg, code="authorization")
-
-        # create a token if one does not exist for the user
-        # the token is used to authenticate the user in the frontend
-        # it will be serialized in the ProfileSerializer
-        token, created = Token.objects.get_or_create(user=user)
-
-        # get the user profile and if not exists create a profile
-        profile, created = Profile.objects.get_or_create(user=user)
+        
+        profile = self.get_queryset().first()
         return Response(self.get_serializer(profile).data)
 
 

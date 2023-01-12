@@ -13,7 +13,7 @@ from composer.models import (
     Doi,
     Note,
     Profile,
-    Provenance,
+    Sentence,
     Specie,
     Tag,
     Via,
@@ -45,7 +45,7 @@ class DoiNestedInline(nested_admin.NestedStackedInline):
     extra = 1
 
 
-class NoteProvenanceInline(admin.StackedInline):
+class NoteSentenceInline(admin.StackedInline):
     model = Note
     exclude = ("connectivity_statement",)
     extra = 0
@@ -54,14 +54,14 @@ class NoteProvenanceInline(admin.StackedInline):
 
 class NoteConnectivityStatementInline(admin.StackedInline):
     model = Note
-    exclude = ("provenance",)
+    exclude = ("sentence",)
     extra = 0
 
 
 class ConnectivityStatementInline(nested_admin.NestedStackedInline):
     model = ConnectivityStatement
     extra = 1
-    fields = ("provenance", "knowledge_statement")
+    fields = ("sentence", "knowledge_statement")
     inlines = (DoiNestedInline,)
 
 
@@ -70,7 +70,7 @@ class UserAdmin(BaseUserAdmin):
     inlines = (ProfileInline,)
 
 
-class ProvenanceAdmin(
+class SentenceAdmin(
     FSMTransitionMixin, nested_admin.NestedModelAdmin, admin.ModelAdmin
 ):
     # The name of one or more FSMFields on the model to transition
@@ -78,7 +78,7 @@ class ProvenanceAdmin(
     readonly_fields = ("pmid_uri", "pmcid_uri", "state")
     list_display = ("title", "pmid", "pmcid", "tag_list", "owner")
     list_display_links = ("title", "pmid", "pmcid")
-    search_fields = ("title", "description", "pmid", "pmcid")
+    search_fields = ("title", "text", "pmid", "pmcid")
 
     @admin.display(description="PMID")
     def pmid_uri(self, obj):
@@ -103,7 +103,7 @@ class ProvenanceAdmin(
 
     inlines = (
         ConnectivityStatementInline,
-        NoteProvenanceInline,
+        NoteSentenceInline,
     )
 
 
@@ -119,9 +119,9 @@ class ConnectivityStatementAdmin(
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
     readonly_fields = ("state",)
-    autocomplete_fields = ("provenance", "origin", "destination")
+    autocomplete_fields = ("sentence", "origin", "destination")
     list_display = (
-        "provenance",
+        "sentence",
         "pmid",
         "pmcid",
         "short_ks",
@@ -131,13 +131,13 @@ class ConnectivityStatementAdmin(
         "state",
         "owner",
     )
-    list_display_links = ("provenance", "pmid", "pmcid", "short_ks", "state")
-    list_select_related = ("provenance", "origin", "destination")
+    list_display_links = ("sentence", "pmid", "pmcid", "short_ks", "state")
+    list_select_related = ("sentence", "origin", "destination")
     search_fields = (
-        "provenance__title",
-        "provenance__description",
-        "provenance__pmid",
-        "provenance__pmcid",
+        "sentence__title",
+        "sentence__description",
+        "sentence__pmid",
+        "sentence__pmcid",
         "knowledge_statement",
         "origin__name",
         "destination__name",
@@ -153,11 +153,11 @@ class ConnectivityStatementAdmin(
 
     @admin.display(description="PMID")
     def pmid(self, obj):
-        return obj.provenance.pmid
+        return obj.sentence.pmid
 
     @admin.display(description="PMCID")
     def pmcid(self, obj):
-        return obj.provenance.pmcid
+        return obj.sentence.pmcid
 
     @admin.display(description="tags")
     def tag_list(self, obj):
@@ -173,5 +173,5 @@ admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
 admin.site.register(AnsDivision)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
 admin.site.register(Tag)
-admin.site.register(Provenance, ProvenanceAdmin)
+admin.site.register(Sentence, SentenceAdmin)
 admin.site.register(Specie)

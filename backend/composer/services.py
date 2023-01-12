@@ -59,12 +59,12 @@ class StateServiceMixin(OwnerServiceMixin):
         return self.obj
 
 
-class ProvenanceService(StateServiceMixin):
+class SentenceService(StateServiceMixin):
     @transaction.atomic
     def do_transition_compose_now(self):
-        provenance = self.obj
-        # when a Provenance record goes to compose_now state we need to set the state of all ConnectivityStatements to compose_now
-        for cs in provenance.connectivitystatement_set.all():
+        sentence = self.obj
+        # when a Sentence record goes to compose_now state we need to set the state of all ConnectivityStatements to compose_now
+        for cs in sentence.connectivitystatement_set.all():
             if cs.state == CSState.DRAFT:
                 cs.compose_now()
                 cs.save()
