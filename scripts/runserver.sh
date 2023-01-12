@@ -2,12 +2,16 @@
 
 set -e
 
-if [!  -z "${NODEBUG}" ]; then
+if [ -z "${PRODUCTION}" ]; then
     # when running in "dev" mode touch the db file so that it exists
     touch persistent/db.sqlite3
     # and make it writable for others and the group so that it can 
     # also be used while running on the local host
     chmod go+w persistent/db.sqlite3
+fi
+
+if [ -z "${NODEBUG}" ]; then
+    # running in "debug" mode install the dev requirements (incl debug toolbar)
     pip install -r requirements-dev.txt
 fi
 
