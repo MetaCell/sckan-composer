@@ -34,10 +34,6 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.metacell.us",
 ]
 
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -358,7 +354,9 @@ if DEBUG:
     MIDDLEWARE += [
         "debug_toolbar.middleware.DebugToolbarMiddleware",
     ]
-    SHOW_TOOLBAR_CALLBACK = lambda x: True
+    DEBUG_TOOLBAR_CONFIG = {
+        "SHOW_TOOLBAR_CALLBACK": lambda x: True,
+    }
 
 if not PRODUCTION:
     INSTALLED_APPS += [
