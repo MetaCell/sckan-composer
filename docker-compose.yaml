@@ -8,7 +8,7 @@ services:
       - COMPOSER=composer:latest
     restart: "on-failure"
     ports:
-      - "8000:80" # change the 8000 to whatever port you want to use
+      - "80:80" # change the 8000 to whatever port you want to use
     volumes:
       - composer-data:/usr/share/nginx/html/media
     depends_on:
