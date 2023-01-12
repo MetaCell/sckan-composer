@@ -45,6 +45,8 @@ spec:
           value: "{{DB_PORT}}"
         - name: PRODUCTION
           value: "True"
+        - name: DEBUG
+          value: "{{DEBUG}}"
         ports:
         - containerPort: 8000
         volumeMounts:
