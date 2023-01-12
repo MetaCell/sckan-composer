@@ -98,7 +98,7 @@ class Sentence(models.Model):
         ...
 
     @transition(
-        field=state, source=SentenceState.OPEN, target=SentenceState.TO_BE_REVIEWED
+        field=state, source=SentenceState.OPEN, target=SentenceState.TO_BE_REVIEWED, conditions=[SentenceService.can_be_reviewed]
     )
     def to_be_reviewed(self):
         ...
@@ -113,6 +113,7 @@ class Sentence(models.Model):
         field=state,
         source=SentenceState.TO_BE_REVIEWED,
         target=SentenceState.COMPOSE_NOW,
+        conditions=[SentenceService.can_be_reviewed]
     )
     def compose_now(self):
         SentenceService(self).do_transition_compose_now()
@@ -155,7 +156,7 @@ class Sentence(models.Model):
                 name="sentence_state_valid",
             ),
             models.CheckConstraint(
-                check=Q(pmid__isnull=False) | Q(pmcid__isnull=False),
+                check=~Q(state=SentenceState.COMPOSE_NOW) | (Q(state=SentenceState.COMPOSE_NOW) & (Q(pmid__isnull=False) | Q(pmcid__isnull=False))),
                 name="sentence_pmid_pmcd_valid",
             ),
         ]
