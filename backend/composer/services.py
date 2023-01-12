@@ -82,11 +82,8 @@ class SentenceService(StateServiceMixin):
     @staticmethod
     def can_be_composed(sentence):
         # return True if the sentence can go to state compose_now
-        # it should have at least one provenance (pmid, pmcid, doi) and at least one connectivity statement
-        return ( \
-            (sentence.pmid is not None or sentence.pmcid is not None) and \
-            (sentence.connectivitystatement_set.count() > 0)
-        )
+        # it should at least pass the can_be_reviewed test
+        return SentenceService.can_be_reviewed(sentence)
 
 
 class ConnectivityStatementService(StateServiceMixin):
