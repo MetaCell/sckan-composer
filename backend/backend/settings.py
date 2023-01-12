@@ -367,3 +367,5 @@ if not PRODUCTION:
 if PRODUCTION:
     # we are behind a rev proxy, so we need to set this
     USE_X_FORWARDED_HOST = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
