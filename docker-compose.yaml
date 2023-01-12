@@ -20,9 +20,6 @@ services:
     image: composer
     env_file:
       - .env
-    environment:
-      - PRODUCTION=1
-      # - NODEBUG=1  # uncomment this line to disable debug and debug toolbar (recommended for production)
     depends_on:
       - composer-db
     volumes:

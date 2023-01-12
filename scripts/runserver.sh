@@ -10,11 +10,6 @@ if [ -z "${PRODUCTION}" ]; then
     chmod go+w persistent/db.sqlite3
 fi
 
-if [ -z "${NODEBUG}" ]; then
-    # running in "debug" mode install the dev requirements (incl debug toolbar)
-    pip install -r requirements-dev.txt
-fi
-
 python3 manage.py collectstatic --noinput
 python3 manage.py migrate
 

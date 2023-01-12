@@ -1,5 +1,7 @@
 ARG PARENT=python:3.9.15
 ARG NODE_PARENT=node:15.5
+ARG PRODUCTION
+ARG NODEBUG
 
 ####
 # FROM ${NODE_PARENT} as frontend
@@ -37,7 +39,7 @@ RUN python3 -m pip install -e .
 RUN ontutils set ontology-local-repo ./NIF-Ontology/
 
 COPY backend ${APP_DIR}
-RUN NODEBUG=True PRODUCTION=True python3 manage.py collectstatic --noinput
+RUN python3 manage.py collectstatic --noinput
 
 # COPY --from=frontend /app/dist ${APP_DIR}/static/www
 

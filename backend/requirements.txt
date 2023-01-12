@@ -13,3 +13,7 @@ drf-spectacular-sidecar==2022.12.1
 drf-writable-nested==0.7.0
 social-auth-app-django==5.0.0
 pyontutils==0.1.31
+
+django-debug-toolbar
+django-sslserver # ssl dev server, for testing orcid social login
+black
