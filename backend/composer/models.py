@@ -113,7 +113,7 @@ class Sentence(models.Model):
         field=state,
         source=SentenceState.TO_BE_REVIEWED,
         target=SentenceState.COMPOSE_NOW,
-        conditions=[SentenceService.can_be_reviewed]
+        conditions=[SentenceService.can_be_composed]
     )
     def compose_now(self):
         SentenceService(self).do_transition_compose_now()
