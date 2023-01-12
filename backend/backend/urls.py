@@ -45,7 +45,10 @@ urlpatterns = [
     # path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # Social auth
     path("", include("social_django.urls", namespace="social")),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
+
+if not settings.PRODUCTION:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
     urlpatterns += [
