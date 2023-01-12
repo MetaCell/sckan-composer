@@ -39,12 +39,12 @@ class Command(BaseCommand):
                     pmid = row[PMID] if row[PMID] != "0" else None
                     pmcid = row[PMCID] if row[PMCID] != "0" else None
                     doi = row[DOI] if row[DOI] != "0" else None
-                    description = row[SENTENCE]
-                    title = description[0:199]
+                    text = row[SENTENCE]
+                    title = text[0:199]
                     sentence, created = Sentence.objects.get_or_create(
                         pmid=pmid,
                         pmcid=pmcid,
-                        description=description,
+                        text=text,
                         defaults={"title": title},
                     )
                     if created:

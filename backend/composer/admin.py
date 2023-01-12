@@ -135,7 +135,7 @@ class ConnectivityStatementAdmin(
     list_select_related = ("sentence", "origin", "destination")
     search_fields = (
         "sentence__title",
-        "sentence__description",
+        "sentence__text",
         "sentence__pmid",
         "sentence__pmcid",
         "knowledge_statement",
