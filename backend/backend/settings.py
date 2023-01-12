@@ -24,7 +24,7 @@ SECRET_KEY = "django-insecure-6dns-bbp&433ugro&j+z6p-w943$uhsax%f1245@7vfo3eyuw2
 
 # SECURITY WARNING: don't run with debug turned on in production!
 PRODUCTION = True if os.environ.get("PRODUCTION", None) else False
-DEBUG = not PRODUCTION
+DEBUG = False if os.environ.get("NODEBUG", None) else True
 
 ALLOWED_HOSTS = [
     "*",
@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     "jazzmin",
     "django.contrib.admin",
     "social_django",
-    "sslserver",
 
     # local apps
     "metacell_auth",
@@ -352,11 +351,15 @@ SOCIAL_AUTH_JSONFIELD_ENABLED = True
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/logged-out/"
 
-
 if DEBUG:
     INSTALLED_APPS += [
         "debug_toolbar",
     ]
     MIDDLEWARE += [
         "debug_toolbar.middleware.DebugToolbarMiddleware",
+    ]
+
+if not PRODUCTION:
+    INSTALLED_APPS += [
+        "sslserver",
     ]

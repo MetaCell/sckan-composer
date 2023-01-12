@@ -37,7 +37,7 @@ RUN python3 -m pip install -e .
 RUN ontutils set ontology-local-repo ./NIF-Ontology/
 
 COPY backend ${APP_DIR}
-RUN python3 manage.py collectstatic --noinput
+RUN NODEBUG=True python3 manage.py collectstatic --noinput
 
 # COPY --from=frontend /app/dist ${APP_DIR}/static/www
 

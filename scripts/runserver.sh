@@ -2,12 +2,13 @@
 
 set -e
 
-if [ -z "${PRODUCTION}" ]; then
+if [!  -z "${NODEBUG}" ]; then
     # when running in "dev" mode touch the db file so that it exists
     touch persistent/db.sqlite3
     # and make it writable for others and the group so that it can 
     # also be used while running on the local host
     chmod go+w persistent/db.sqlite3
+    pip install -r requirements-dev.txt
 fi
 
 python3 manage.py collectstatic --noinput
