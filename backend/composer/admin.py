@@ -3,7 +3,6 @@ from adminsortable2.admin import SortableAdminBase, SortableStackedInline
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from django.utils.html import format_html
 from fsm_admin.mixins import FSMTransitionMixin
 
 from composer.models import (
