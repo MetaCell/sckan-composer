@@ -1,4 +1,3 @@
-from django import forms
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
@@ -417,9 +416,3 @@ class Note(models.Model):
                 name="only_sentence_or_connectivity_statement",
             ),
         ]
-
-
-class SF(forms.ModelForm):
-    class Meta:
-        model = Sentence
-        fields = ("doi", "title")
