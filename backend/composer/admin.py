@@ -67,7 +67,7 @@ class SentenceAdmin(
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
     readonly_fields = ("state",)
-    list_display = ("title", "pmid", "pmcid", "tag_list", "state", "owner")
+    list_display = ("title", "pmid", "pmcid", "doi", "tag_list", "state", "owner")
     list_display_links = ("title", "pmid", "pmcid")
     list_filter = ("state", "owner", "tags__tag" )
     search_fields = ("title", "text", "pmid", "pmcid", "doi")
