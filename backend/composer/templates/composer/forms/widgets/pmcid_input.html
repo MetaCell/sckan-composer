@@ -1,0 +1,3 @@
+{% load composer_extras %}
+<input type="{{ widget.type }}" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value|stringformat:'s' }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}>
+<a href="{{ widget.value | to_pmcid_uri }}" target="_blank"><span>{{ widget.value|default_if_none:"" }}</span></a>

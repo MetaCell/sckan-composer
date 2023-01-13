@@ -44,11 +44,12 @@ class Command(BaseCommand):
                     sentence, created = Sentence.objects.get_or_create(
                         pmid=pmid,
                         pmcid=pmcid,
+                        doi=doi,
                         text=text,
                         defaults={"title": title},
                     )
                     if created:
                         self.stdout.write(
-                            f"{rowid}: sentence created with pmid {pmid}, pmcid {pmcid}."
+                            f"{rowid}: sentence created with pmid {pmid}, pmcid {pmcid}, doi {doi}."
                         )
                         sentence.save()

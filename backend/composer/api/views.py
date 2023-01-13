@@ -3,30 +3,14 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
-from ..models import (
-    AnatomicalEntity,
-    AnsDivision,
-    ConnectivityStatement,
-    Note,
-    Profile,
-    Sentence,
-    Specie,
-    Tag,
-    Via,
-)
-from .serializers import (
-    AnatomicalEntitySerializer,
-    AnsDivisionSerializer,
-    ConnectivityStatementSerializer,
-    ConnectivityStatementViewSerializer,
-    NoteSerializer,
-    ProfileSerializer,
-    SentenceSerializer,
-    SpecieSerializer,
-    TagSerializer,
-    ViaSerializer,
-)
+from ..models import (AnatomicalEntity, AnsDivision, ConnectivityStatement,
+                      Note, Profile, Sentence, Specie, Tag, Via)
 from ..services import ConnectivityStatementService
+from .serializers import (AnatomicalEntitySerializer, AnsDivisionSerializer,
+                          ConnectivityStatementSerializer,
+                          ConnectivityStatementViewSerializer, NoteSerializer,
+                          ProfileSerializer, SentenceSerializer,
+                          SpecieSerializer, TagSerializer, ViaSerializer)
 
 
 class ModelCreateRetrieveViewSet(
@@ -174,7 +158,7 @@ class ProfileViewSet(viewsets.GenericViewSet):
         if not user.is_authenticated:
             msg = "User not logged in."
             raise ValidationError(msg, code="authorization")
-        
+
         profile = self.get_queryset().first()
         return Response(self.get_serializer(profile).data)
 

@@ -2,18 +2,8 @@ from django.contrib.auth.models import User
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from ..models import (
-    AnatomicalEntity,
-    AnsDivision,
-    ConnectivityStatement,
-    Doi,
-    Note,
-    Profile,
-    Sentence,
-    Specie,
-    Tag,
-    Via,
-)
+from ..models import (AnatomicalEntity, AnsDivision, ConnectivityStatement,
+                      Doi, Note, Profile, Sentence, Specie, Tag, Via)
 
 
 # serializers
@@ -31,7 +21,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     token = serializers.SerializerMethodField()
 
-    def get_token(self, obj):
+    def get_token(self, obj) -> str:
         return obj.user.auth_token.key
 
     class Meta:
@@ -129,12 +119,11 @@ class ViaSerializer(serializers.ModelSerializer):
 class ViaViewSerializer(serializers.ModelSerializer):
     """Via"""
 
-    # anatomical_entity = AnatomicalEntitySerializer(read_only=False)
+    anatomical_entity = AnatomicalEntitySerializer(read_only=True)
 
     class Meta:
         model = Via
         fields = ("id", "ordering", "anatomical_entity")
-        depth = 1
 
 
 class ConnectivityStatementSerializer(serializers.ModelSerializer):
@@ -157,6 +146,8 @@ class ConnectivityStatementViewSerializer(ConnectivityStatementSerializer):
     """Connectivity Statement"""
 
     sentence = SentenceSerializer(read_only=True)
-
-    class Meta(ConnectivityStatementSerializer.Meta):
-        depth = 1
+    origen = AnatomicalEntitySerializer(read_only=True)
+    destination = AnatomicalEntitySerializer(read_only=True)
+    ans_division = AnsDivisionSerializer(read_only=True)
+    species = SpecieSerializer(many=True, read_only=True)
+    tags = TagSerializer(many=True, read_only=True)

@@ -1,10 +1,56 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
+from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
 
-from .enums import CircuitType, CSState, DestinationType, Laterality, SentenceState
+from .enums import (CircuitType, CSState, DestinationType, Laterality,
+                    SentenceState)
 from .services import ConnectivityStatementService, SentenceService
+from .utils import doi_uri, pmcid_uri, pmid_uri
+
+
+# custom widget + field classes
+class DoiWidget(InputWidget):
+    template_name = "composer/forms/widgets/doi_input.html"
+
+
+class PmIdWidget(InputWidget):
+    template_name = "composer/forms/widgets/pmid_input.html"
+
+
+class PmcIdWidget(InputWidget):
+    template_name = "composer/forms/widgets/pmcid_input.html"
+
+
+class DoiField(models.CharField):
+    def formfield(self, *args, **kwargs):
+        kwargs.update(
+            {
+                "widget": DoiWidget,
+            }
+        )
+        return super().formfield(*args, **kwargs)
+
+
+class PmIdField(models.IntegerField):
+    def formfield(self, *args, **kwargs):
+        kwargs.update(
+            {
+                "widget": PmIdWidget,
+            }
+        )
+        return super().formfield(*args, **kwargs)
+
+
+class PmcIdField(models.CharField):
+    def formfield(self, *args, **kwargs):
+        kwargs.update(
+            {
+                "widget": PmcIdWidget,
+            }
+        )
+        return super().formfield(*args, **kwargs)
 
 
 # Create your models here.
@@ -74,8 +120,9 @@ class Sentence(models.Model):
     title = models.CharField(max_length=200, db_index=True)
     text = models.TextField(db_index=True)
     state = FSMField(default=SentenceState.OPEN, protected=True)
-    pmid = models.BigIntegerField(db_index=True, null=True, blank=True)
-    pmcid = models.CharField(max_length=10, db_index=True, null=True, blank=True)
+    pmid = PmIdField(db_index=True, null=True, blank=True)
+    pmcid = PmcIdField(max_length=20, db_index=True, null=True, blank=True)
+    doi = DoiField(max_length=50, db_index=True, null=True, blank=True)
     tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
     owner = models.ForeignKey(
         User,
@@ -98,7 +145,10 @@ class Sentence(models.Model):
         ...
 
     @transition(
-        field=state, source=SentenceState.OPEN, target=SentenceState.TO_BE_REVIEWED, conditions=[SentenceService.can_be_reviewed]
+        field=state,
+        source=SentenceState.OPEN,
+        target=SentenceState.TO_BE_REVIEWED,
+        conditions=[SentenceService.can_be_reviewed],
     )
     def to_be_reviewed(self):
         ...
@@ -113,20 +163,16 @@ class Sentence(models.Model):
         field=state,
         source=SentenceState.TO_BE_REVIEWED,
         target=SentenceState.COMPOSE_NOW,
-        conditions=[SentenceService.can_be_composed]
+        conditions=[SentenceService.can_be_composed],
     )
     def compose_now(self):
         SentenceService(self).do_transition_compose_now()
 
-    @transition(
-        field=state, source=SentenceState.OPEN, target=SentenceState.EXCLUDED
-    )
+    @transition(field=state, source=SentenceState.OPEN, target=SentenceState.EXCLUDED)
     def excluded(self):
         ...
 
-    @transition(
-        field=state, source=SentenceState.OPEN, target=SentenceState.DUPLICATE
-    )
+    @transition(field=state, source=SentenceState.OPEN, target=SentenceState.DUPLICATE)
     def duplicate(self):
         ...
 
@@ -137,15 +183,15 @@ class Sentence(models.Model):
 
     @property
     def pmid_uri(self):
-        return f"https://pubmed.ncbi.nlm.nih.gov/{self.pmid}/" if self.pmid else None
+        return pmid_uri(self.pmid)
 
     @property
     def pmcid_uri(self):
-        return (
-            f"https://www.ncbi.nlm.nih.gov/pmc/articles/{self.pmcid}/"
-            if self.pmcid
-            else None
-        )
+        return pmcid_uri(self.pmid)
+
+    @property
+    def doi_uri(self):
+        return doi_uri(self.pmid)
 
     class Meta:
         ordering = ["title"]
@@ -156,7 +202,11 @@ class Sentence(models.Model):
                 name="sentence_state_valid",
             ),
             models.CheckConstraint(
-                check=~Q(state=SentenceState.COMPOSE_NOW) | (Q(state=SentenceState.COMPOSE_NOW) & (Q(pmid__isnull=False) | Q(pmcid__isnull=False))),
+                check=~Q(state=SentenceState.COMPOSE_NOW)
+                | (
+                    Q(state=SentenceState.COMPOSE_NOW)
+                    & (Q(pmid__isnull=False) | Q(pmcid__isnull=False) | Q(doi__isnull=False))
+                ),
                 name="sentence_pmid_pmcd_valid",
             ),
         ]
@@ -311,11 +361,11 @@ class Doi(models.Model):
     connectivity_statement = models.ForeignKey(
         ConnectivityStatement, on_delete=models.CASCADE
     )
-    doi = models.CharField(max_length=200)
+    doi = DoiField(max_length=50)
 
     @property
     def doi_uri(self):
-        return f"https://doi.org/{self.doi}"
+        return doi_uri(self.doi)
 
     def __str__(self):
         return self.doi
