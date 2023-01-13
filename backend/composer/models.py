@@ -3,10 +3,10 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
 from django.forms.widgets import Input as InputWidget
-
 from django_fsm import FSMField, transition
 
-from .enums import CircuitType, CSState, DestinationType, Laterality, SentenceState
+from .enums import (CircuitType, CSState, DestinationType, Laterality,
+                    SentenceState)
 from .services import ConnectivityStatementService, SentenceService
 from .utils import doi_uri, pmcid_uri, pmid_uri
 
@@ -14,25 +14,46 @@ from .utils import doi_uri, pmcid_uri, pmid_uri
 # custom widget + field classes
 class DoiWidget(InputWidget):
     template_name = "composer/forms/widgets/doi_input.html"
+
+
 class PmIdWidget(InputWidget):
     template_name = "composer/forms/widgets/pmid_input.html"
+
+
 class PmcIdWidget(InputWidget):
     template_name = "composer/forms/widgets/pmcid_input.html"
 
+
 class DoiField(models.CharField):
     def formfield(self, *args, **kwargs):
-        kwargs.update({"widget": DoiWidget,})
-        return super().formfield(*args, **kwargs)
-class PmIdField(models.IntegerField):
-    def formfield(self, *args, **kwargs):
-        kwargs.update({"widget": PmIdWidget,})
-        return super().formfield(*args, **kwargs)
-class PmcIdField(models.CharField):
-    def formfield(self, *args, **kwargs):
-        kwargs.update({"widget": PmcIdWidget,})
+        kwargs.update(
+            {
+                "widget": DoiWidget,
+            }
+        )
         return super().formfield(*args, **kwargs)
 
- 
+
+class PmIdField(models.IntegerField):
+    def formfield(self, *args, **kwargs):
+        kwargs.update(
+            {
+                "widget": PmIdWidget,
+            }
+        )
+        return super().formfield(*args, **kwargs)
+
+
+class PmcIdField(models.CharField):
+    def formfield(self, *args, **kwargs):
+        kwargs.update(
+            {
+                "widget": PmcIdWidget,
+            }
+        )
+        return super().formfield(*args, **kwargs)
+
+
 # Create your models here.
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -125,7 +146,10 @@ class Sentence(models.Model):
         ...
 
     @transition(
-        field=state, source=SentenceState.OPEN, target=SentenceState.TO_BE_REVIEWED, conditions=[SentenceService.can_be_reviewed]
+        field=state,
+        source=SentenceState.OPEN,
+        target=SentenceState.TO_BE_REVIEWED,
+        conditions=[SentenceService.can_be_reviewed],
     )
     def to_be_reviewed(self):
         ...
@@ -140,20 +164,16 @@ class Sentence(models.Model):
         field=state,
         source=SentenceState.TO_BE_REVIEWED,
         target=SentenceState.COMPOSE_NOW,
-        conditions=[SentenceService.can_be_composed]
+        conditions=[SentenceService.can_be_composed],
     )
     def compose_now(self):
         SentenceService(self).do_transition_compose_now()
 
-    @transition(
-        field=state, source=SentenceState.OPEN, target=SentenceState.EXCLUDED
-    )
+    @transition(field=state, source=SentenceState.OPEN, target=SentenceState.EXCLUDED)
     def excluded(self):
         ...
 
-    @transition(
-        field=state, source=SentenceState.OPEN, target=SentenceState.DUPLICATE
-    )
+    @transition(field=state, source=SentenceState.OPEN, target=SentenceState.DUPLICATE)
     def duplicate(self):
         ...
 
@@ -183,7 +203,11 @@ class Sentence(models.Model):
                 name="sentence_state_valid",
             ),
             models.CheckConstraint(
-                check=~Q(state=SentenceState.COMPOSE_NOW) | (Q(state=SentenceState.COMPOSE_NOW) & (Q(pmid__isnull=False) | Q(pmcid__isnull=False))),
+                check=~Q(state=SentenceState.COMPOSE_NOW)
+                | (
+                    Q(state=SentenceState.COMPOSE_NOW)
+                    & (Q(pmid__isnull=False) | Q(pmcid__isnull=False))
+                ),
                 name="sentence_pmid_pmcd_valid",
             ),
         ]
@@ -397,5 +421,5 @@ class Note(models.Model):
 
 class SF(forms.ModelForm):
     class Meta:
-        model=Sentence
-        fields=("doi","title")
+        model = Sentence
+        fields = ("doi", "title")

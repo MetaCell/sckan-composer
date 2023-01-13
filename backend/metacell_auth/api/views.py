@@ -1,19 +1,20 @@
 from django.conf import settings
 from django.contrib.auth import logout
 from django.urls import reverse
-
+from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema
 
 from .serializers import LoginSerializer, LogoutSerializer
 
 
 def _get_login_url():
-    return reverse('social:begin', kwargs={"backend":"orcid"})
+    return reverse("social:begin", kwargs={"backend": "orcid"})
 
 
-@extend_schema(responses=LoginSerializer,)
+@extend_schema(
+    responses=LoginSerializer,
+)
 @api_view(["GET"])
 def user_login(request):
     if request.user.is_authenticated:
@@ -24,7 +25,9 @@ def user_login(request):
     return Response(LoginSerializer(resp).data)
 
 
-@extend_schema(responses=LogoutSerializer,)
+@extend_schema(
+    responses=LogoutSerializer,
+)
 @api_view(["GET"])
 def user_logout(request):
     user = request.user
@@ -33,7 +36,15 @@ def user_logout(request):
             user.auth_token.delete()
         logout(request)
         # Redirect to logout redirect page. (configurable in settings.py)
-        resp = {"status_code": 302, "message": "User is logged out", "redirect_url": settings.LOGOUT_REDIRECT_URL}
+        resp = {
+            "status_code": 302,
+            "message": "User is logged out",
+            "redirect_url": settings.LOGOUT_REDIRECT_URL,
+        }
     else:
-        resp = {"status_code": 302, "message": "User is not logged in", "redirect_url": _get_login_url()}
+        resp = {
+            "status_code": 302,
+            "message": "User is not logged in",
+            "redirect_url": _get_login_url(),
+        }
     return Response(LogoutSerializer(resp).data)

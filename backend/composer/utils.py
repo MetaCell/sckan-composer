@@ -3,16 +3,8 @@ def pmid_uri(pmid):
 
 
 def pmcid_uri(pmcid):
-    return (
-        f"https://www.ncbi.nlm.nih.gov/pmc/articles/{pmcid}/"
-        if pmcid
-        else "."
-    )
+    return f"https://www.ncbi.nlm.nih.gov/pmc/articles/{pmcid}/" if pmcid else "."
 
 
 def doi_uri(doi):
-    return (
-        f"https://doi.org/{doi}"
-        if doi
-        else ""
-    )
+    return f"https://doi.org/{doi}" if doi else ""

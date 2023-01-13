@@ -1,17 +1,9 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import (
-    AnatomicalEntityViewSet,
-    AnsDivisionViewSet,
-    ConnectivityStatementViewSet,
-    NoteViewSet,
-    ProfileViewSet,
-    SentenceViewSet,
-    SpecieViewSet,
-    TagViewSet,
-    ViaViewSet
-)
+from .views import (AnatomicalEntityViewSet, AnsDivisionViewSet,
+                    ConnectivityStatementViewSet, NoteViewSet, ProfileViewSet,
+                    SentenceViewSet, SpecieViewSet, TagViewSet, ViaViewSet)
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()

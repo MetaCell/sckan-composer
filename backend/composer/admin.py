@@ -5,18 +5,9 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from fsm_admin.mixins import FSMTransitionMixin
 
-from composer.models import (
-    AnatomicalEntity,
-    AnsDivision,
-    ConnectivityStatement,
-    Doi,
-    Note,
-    Profile,
-    Sentence,
-    Specie,
-    Tag,
-    Via,
-)
+from composer.models import (AnatomicalEntity, AnsDivision,
+                             ConnectivityStatement, Doi, Note, Profile,
+                             Sentence, Specie, Tag, Via)
 
 # Define Inlines
 

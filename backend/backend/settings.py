@@ -372,9 +372,9 @@ if not PRODUCTION:
     INSTALLED_APPS += [
         "sslserver",
     ]
-    
+
 if PRODUCTION:
     # we are behind a rev proxy, so we need to set this
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     USE_X_FORWARDED_HOST = True
     SECURE_SSL_REDIRECT = True

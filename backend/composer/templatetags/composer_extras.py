@@ -3,7 +3,6 @@ from django.template.defaultfilters import stringfilter
 
 from composer.utils import doi_uri, pmcid_uri, pmid_uri
 
-
 register = template.Library()
 
 
