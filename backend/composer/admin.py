@@ -75,26 +75,10 @@ class SentenceAdmin(
 ):
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
-    readonly_fields = ("pmid_uri", "pmcid_uri", "state")
+    readonly_fields = ("state",)
     list_display = ("title", "pmid", "pmcid", "tag_list", "owner")
     list_display_links = ("title", "pmid", "pmcid")
-    search_fields = ("title", "text", "pmid", "pmcid")
-
-    @admin.display(description="PMID")
-    def pmid_uri(self, obj):
-        return (
-            format_html("<a href='{url}' target='blank'>{url}</a>", url=obj.pmid_uri)
-            if obj.pmid_uri
-            else ""
-        )
-
-    @admin.display(description="PMCID")
-    def pmcid_uri(self, obj):
-        return (
-            format_html("<a href='{url}' target='blank'>{url}</a>", url=obj.pmcid_uri)
-            if obj.pmcid_uri
-            else ""
-        )
+    search_fields = ("title", "text", "pmid", "pmcid", "doi")
 
     @admin.display(description="tags")
     def tag_list(self, obj):
