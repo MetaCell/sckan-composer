@@ -122,7 +122,7 @@ class Sentence(models.Model):
     state = FSMField(default=SentenceState.OPEN, protected=True)
     pmid = PmIdField(db_index=True, null=True, blank=True)
     pmcid = PmcIdField(max_length=20, db_index=True, null=True, blank=True)
-    doi = DoiField(max_length=50, db_index=True, null=True, blank=True)
+    doi = DoiField(max_length=100, db_index=True, null=True, blank=True)
     tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
     owner = models.ForeignKey(
         User,
@@ -361,7 +361,7 @@ class Doi(models.Model):
     connectivity_statement = models.ForeignKey(
         ConnectivityStatement, on_delete=models.CASCADE
     )
-    doi = DoiField(max_length=50)
+    doi = DoiField(max_length=100)
 
     @property
     def doi_uri(self):
