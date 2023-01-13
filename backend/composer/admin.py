@@ -69,7 +69,7 @@ class SentenceAdmin(
     readonly_fields = ("state",)
     list_display = ("title", "pmid", "pmcid", "tag_list", "state", "owner")
     list_display_links = ("title", "pmid", "pmcid")
-    list_filter = ('state', "owner", "tags__tag" )
+    list_filter = ("state", "owner", "tags__tag" )
     search_fields = ("title", "text", "pmid", "pmcid", "doi")
 
     @admin.display(description="tags")
@@ -109,6 +109,7 @@ class ConnectivityStatementAdmin(
         "owner",
     )
     list_display_links = ("sentence", "pmid", "pmcid", "short_ks", "state")
+    list_filter = ("state", "owner", "tags__tag" )
     list_select_related = ("sentence", "origin", "destination")
     search_fields = (
         "sentence__title",
