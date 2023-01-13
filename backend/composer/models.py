@@ -205,7 +205,7 @@ class Sentence(models.Model):
                 check=~Q(state=SentenceState.COMPOSE_NOW)
                 | (
                     Q(state=SentenceState.COMPOSE_NOW)
-                    & (Q(pmid__isnull=False) | Q(pmcid__isnull=False))
+                    & (Q(pmid__isnull=False) | Q(pmcid__isnull=False) | Q(doi__isnull=False))
                 ),
                 name="sentence_pmid_pmcd_valid",
             ),
