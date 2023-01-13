@@ -1427,7 +1427,7 @@ components:
         doi:
           type: string
           nullable: true
-          maxLength: 50
+          maxLength: 100
         owner:
           type: integer
           readOnly: true
@@ -1497,7 +1497,7 @@ components:
         doi:
           type: string
           nullable: true
-          maxLength: 50
+          maxLength: 100
         owner:
           type: integer
           readOnly: true

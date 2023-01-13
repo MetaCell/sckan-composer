@@ -77,6 +77,21 @@ there will be a superuser created with username/password: `admin/admin`
 
 browse the Django [admin](http://127.0.0.1:8000/admin/) interface
 
+### Install openapi generator
+
+For generating the frontend api client use the openapi generator
+isntall:
+
+```bash
+npm install -g @openapitools/openapi-generator-cli
+```
+
+and then run 
+```bash
+cd frontend
+./genapi.sh
+```
+
 ## ORCID login setup
 
 browse to [ORCID dev tools](https://orcid.org/developer-tools) and create a new api
