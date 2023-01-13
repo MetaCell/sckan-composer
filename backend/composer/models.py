@@ -10,6 +10,14 @@ from .services import ConnectivityStatementService, SentenceService
 from .utils import doi_uri, pmcid_uri, pmid_uri
 
 
+# some django user overwrite
+def get_name(self):
+    if self.first_name or self.last_name:
+        return '{} {}'.format(self.first_name, self.last_name)
+    return '{}'.format(self.username)
+User.add_to_class("__str__", get_name)
+
+
 # custom widget + field classes
 class DoiWidget(InputWidget):
     template_name = "composer/forms/widgets/doi_input.html"
@@ -416,3 +424,4 @@ class Note(models.Model):
                 name="only_sentence_or_connectivity_statement",
             ),
         ]
+
