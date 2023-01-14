@@ -9,6 +9,8 @@ export async function login(): Promise<any> {
 }
 
 export async function getProfile(): Promise<any> {
-   const response = await composerApi.composerProfileMyRetrieve()
+   const response = await composerApi.composerProfileMyRetrieve();
+   console.log("User Profile:");
+   console.log(response);
    return response
 }
