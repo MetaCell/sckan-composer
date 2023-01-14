@@ -159,7 +159,10 @@ class ProfileViewSet(viewsets.GenericViewSet):
             msg = "User not logged in."
             raise ValidationError(msg, code="authorization")
 
-        profile = self.get_queryset().first()
+        try:
+            profile = Profile.objects.get(user=self.request.user)
+        except Profile.DoesNotExist:
+            profile = None
         return Response(self.get_serializer(profile).data)
 
 
