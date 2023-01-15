@@ -4,7 +4,10 @@ import './index.css';
 import App from './App';
 import { getProfile } from './services/UserService';
 
-const profile = getProfile();
+getProfile().then(response => {
+  console.log("User Profile:");
+  console.log(response);
+});
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
