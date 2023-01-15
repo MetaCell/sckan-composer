@@ -2,5 +2,9 @@
 .vscode
 **/__pycache__
 **/*.pyc
+**/*.egg-info
 backend/persistent
 backend/static
+backend/NIF-Ontology/
+backend/neurondm_comp/
+
