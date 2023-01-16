@@ -14,7 +14,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
     if not created:
         # delete the token on user update
         try:
-            Token.objects.get(user=instance).delete()
+            Token.objects.filter(user=instance).delete()
         except Token.DoesNotExist:
             # token doesn't exist (may be already deleted)
             pass
