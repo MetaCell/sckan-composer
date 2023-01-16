@@ -21,4 +21,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
     # create a token if one does not exist for the user
     # the token is used to authenticate the user in the frontend
     # it will be serialized in the ProfileSerializer
-    Token.objects.create(user=instance)
+    try:
+        Token.objects.get(user=instance)
+    except Token.DoesNotExist:
+        Token.objects.create(user=instance)
