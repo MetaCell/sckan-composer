@@ -7,6 +7,7 @@ from django_fsm import FSMField, transition
 from .enums import (CircuitType, CSState, DestinationType, Laterality,
                     SentenceState)
 from .services import ConnectivityStatementService, SentenceService
+from .signals import create_profile
 from .utils import doi_uri, pmcid_uri, pmid_uri
 
 
@@ -135,7 +136,7 @@ class Sentence(models.Model):
     owner = models.ForeignKey(
         User,
         verbose_name="Triage Operator",
-        on_delete=models.DO_NOTHING,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
@@ -270,7 +271,7 @@ class ConnectivityStatement(models.Model):
         max_length=10, default=DestinationType.UNKNOWN, choices=DestinationType.choices
     )
     owner = models.ForeignKey(
-        User, verbose_name="Curator", on_delete=models.DO_NOTHING, null=True, blank=True
+        User, verbose_name="Curator", on_delete=models.SET_NULL, null=True, blank=True
     )
     path = models.ManyToManyField(AnatomicalEntity, through=Via, blank=True)
     laterality = models.CharField(
