@@ -7,10 +7,6 @@ from rest_framework.authtoken.models import Token
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
-    if created:
-        # assign staff role to user
-        User.objects.filter(id=instance.id).update(is_staff=True)
-
     if not created:
         # delete the token on user update
         try:
