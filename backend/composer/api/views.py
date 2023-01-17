@@ -8,7 +8,7 @@ from ..models import (AnatomicalEntity, AnsDivision, ConnectivityStatement,
 from ..services import ConnectivityStatementService
 from .serializers import (AnatomicalEntitySerializer, AnsDivisionSerializer,
                           ConnectivityStatementSerializer,
-                          ConnectivityStatementViewSerializer, NoteSerializer,
+                          ConnectivityStatementWithDetailsSerializer, NoteSerializer,
                           ProfileSerializer, SentenceSerializer,
                           SpecieSerializer, TagSerializer, ViaSerializer)
 
@@ -78,7 +78,7 @@ class ConnectivityStatementViewSet(viewsets.ModelViewSet):
 
     queryset = ConnectivityStatement.objects.all()
     serializer_class = ConnectivityStatementSerializer
-    serializer_class_get = ConnectivityStatementViewSerializer
+    serializer_class_get = ConnectivityStatementWithDetailsSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]

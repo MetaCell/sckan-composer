@@ -145,7 +145,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedConnectivityStatementViewList'
+                $ref: '#/components/schemas/PaginatedConnectivityStatementWithDetailsList'
           description: ''
     post:
       operationId: composer_connectivity_statement_create
@@ -198,7 +198,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConnectivityStatementView'
+                $ref: '#/components/schemas/ConnectivityStatementWithDetails'
           description: ''
     put:
       operationId: composer_connectivity_statement_update
@@ -981,7 +981,7 @@ components:
         path:
           type: array
           items:
-            $ref: '#/components/schemas/ViaView'
+            $ref: '#/components/schemas/ViaWithDetails'
           readOnly: true
         knowledge_statement:
           type: string
@@ -1034,7 +1034,7 @@ components:
       - path
       - sentence
       - state
-    ConnectivityStatementView:
+    ConnectivityStatementWithDetails:
       type: object
       description: Connectivity Statement
       properties:
@@ -1049,7 +1049,7 @@ components:
         path:
           type: array
           items:
-            $ref: '#/components/schemas/ViaView'
+            $ref: '#/components/schemas/ViaWithDetails'
           readOnly: true
         sentence:
           allOf:
@@ -1214,7 +1214,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnsDivision'
-    PaginatedConnectivityStatementViewList:
+    PaginatedConnectivityStatementWithDetailsList:
       type: object
       properties:
         count:
@@ -1233,7 +1233,7 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/ConnectivityStatementView'
+            $ref: '#/components/schemas/ConnectivityStatementWithDetails'
     PaginatedNoteList:
       type: object
       properties:
@@ -1329,7 +1329,7 @@ components:
         path:
           type: array
           items:
-            $ref: '#/components/schemas/ViaView'
+            $ref: '#/components/schemas/ViaWithDetails'
           readOnly: true
         knowledge_statement:
           type: string
@@ -1622,7 +1622,7 @@ components:
       - anatomical_entity
       - connectivity_statement
       - id
-    ViaView:
+    ViaWithDetails:
       type: object
       description: Via
       properties:

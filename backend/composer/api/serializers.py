@@ -116,7 +116,7 @@ class ViaSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ViaViewSerializer(serializers.ModelSerializer):
+class ViaWithDetailsSerializer(serializers.ModelSerializer):
     """Via"""
 
     anatomical_entity = AnatomicalEntitySerializer(read_only=True)
@@ -130,7 +130,7 @@ class ConnectivityStatementSerializer(serializers.ModelSerializer):
     """Connectivity Statement"""
 
     available_transitions = serializers.SerializerMethodField()
-    path = ViaViewSerializer(source="via_set", many=True, read_only=True)
+    path = ViaWithDetailsSerializer(source="via_set", many=True, read_only=True)
 
     def get_available_transitions(self, instance) -> list[str]:
         return [t.name for t in instance.get_available_state_transitions()]
@@ -142,7 +142,7 @@ class ConnectivityStatementSerializer(serializers.ModelSerializer):
         read_only_fields = ("state", "owner")
 
 
-class ConnectivityStatementViewSerializer(ConnectivityStatementSerializer):
+class ConnectivityStatementWithDetailsSerializer(ConnectivityStatementSerializer):
     """Connectivity Statement"""
 
     sentence = SentenceSerializer(read_only=True)

@@ -103,10 +103,10 @@ export interface ConnectivityStatement {
     'available_transitions': Array<string>;
     /**
      * 
-     * @type {Array<ViaView>}
+     * @type {Array<ViaWithDetails>}
      * @memberof ConnectivityStatement
      */
-    'path': Array<ViaView>;
+    'path': Array<ViaWithDetails>;
     /**
      * 
      * @type {string}
@@ -195,115 +195,115 @@ export interface ConnectivityStatement {
 /**
  * Connectivity Statement
  * @export
- * @interface ConnectivityStatementView
+ * @interface ConnectivityStatementWithDetails
  */
-export interface ConnectivityStatementView {
+export interface ConnectivityStatementWithDetails {
     /**
      * 
      * @type {number}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'id': number;
     /**
      * 
      * @type {Array<string>}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'available_transitions': Array<string>;
     /**
      * 
-     * @type {Array<ViaView>}
-     * @memberof ConnectivityStatementView
+     * @type {Array<ViaWithDetails>}
+     * @memberof ConnectivityStatementWithDetails
      */
-    'path': Array<ViaView>;
+    'path': Array<ViaWithDetails>;
     /**
      * 
      * @type {Sentence}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'sentence': Sentence;
     /**
      * 
      * @type {AnatomicalEntity}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'origen': AnatomicalEntity;
     /**
      * 
      * @type {AnatomicalEntity}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'destination': AnatomicalEntity;
     /**
      * 
      * @type {AnsDivision}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'ans_division': AnsDivision;
     /**
      * 
      * @type {Array<Specie>}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'species': Array<Specie>;
     /**
      * 
      * @type {Array<Tag>}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'tags': Array<Tag>;
     /**
      * 
      * @type {string}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'knowledge_statement': string;
     /**
      * 
      * @type {string}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'state': string;
     /**
      * 
      * @type {DestinationTypeEnum}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'destination_type'?: DestinationTypeEnum;
     /**
      * 
      * @type {LateralityEnum}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'laterality'?: LateralityEnum;
     /**
      * 
      * @type {CircuitTypeEnum}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'circuit_type'?: CircuitTypeEnum;
     /**
      * 
      * @type {string}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'biological_sex'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'apinatomy_model'?: string | null;
     /**
      * 
      * @type {number}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'origin'?: number | null;
     /**
      * 
      * @type {number}
-     * @memberof ConnectivityStatementView
+     * @memberof ConnectivityStatementWithDetails
      */
     'owner': number | null;
 }
@@ -491,33 +491,33 @@ export interface PaginatedAnsDivisionList {
 /**
  * 
  * @export
- * @interface PaginatedConnectivityStatementViewList
+ * @interface PaginatedConnectivityStatementWithDetailsList
  */
-export interface PaginatedConnectivityStatementViewList {
+export interface PaginatedConnectivityStatementWithDetailsList {
     /**
      * 
      * @type {number}
-     * @memberof PaginatedConnectivityStatementViewList
+     * @memberof PaginatedConnectivityStatementWithDetailsList
      */
     'count'?: number;
     /**
      * 
      * @type {string}
-     * @memberof PaginatedConnectivityStatementViewList
+     * @memberof PaginatedConnectivityStatementWithDetailsList
      */
     'next'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof PaginatedConnectivityStatementViewList
+     * @memberof PaginatedConnectivityStatementWithDetailsList
      */
     'previous'?: string | null;
     /**
      * 
-     * @type {Array<ConnectivityStatementView>}
-     * @memberof PaginatedConnectivityStatementViewList
+     * @type {Array<ConnectivityStatementWithDetails>}
+     * @memberof PaginatedConnectivityStatementWithDetailsList
      */
-    'results'?: Array<ConnectivityStatementView>;
+    'results'?: Array<ConnectivityStatementWithDetails>;
 }
 /**
  * 
@@ -663,10 +663,10 @@ export interface PatchedConnectivityStatement {
     'available_transitions'?: Array<string>;
     /**
      * 
-     * @type {Array<ViaView>}
+     * @type {Array<ViaWithDetails>}
      * @memberof PatchedConnectivityStatement
      */
-    'path'?: Array<ViaView>;
+    'path'?: Array<ViaWithDetails>;
     /**
      * 
      * @type {string}
@@ -1147,25 +1147,25 @@ export interface Via {
 /**
  * Via
  * @export
- * @interface ViaView
+ * @interface ViaWithDetails
  */
-export interface ViaView {
+export interface ViaWithDetails {
     /**
      * 
      * @type {number}
-     * @memberof ViaView
+     * @memberof ViaWithDetails
      */
     'id': number;
     /**
      * 
      * @type {number}
-     * @memberof ViaView
+     * @memberof ViaWithDetails
      */
     'ordering'?: number;
     /**
      * 
      * @type {AnatomicalEntity}
-     * @memberof ViaView
+     * @memberof ViaWithDetails
      */
     'anatomical_entity': AnatomicalEntity;
 }
@@ -2661,7 +2661,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementViewList>> {
+        async composerConnectivityStatementList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementWithDetailsList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(limit, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2682,7 +2682,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatementView>> {
+        async composerConnectivityStatementRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatementWithDetails>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementRetrieve(id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2989,7 +2989,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList(limit?: number, offset?: number, options?: any): AxiosPromise<PaginatedConnectivityStatementViewList> {
+        composerConnectivityStatementList(limit?: number, offset?: number, options?: any): AxiosPromise<PaginatedConnectivityStatementWithDetailsList> {
             return localVarFp.composerConnectivityStatementList(limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -3008,7 +3008,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementRetrieve(id: number, options?: any): AxiosPromise<ConnectivityStatementView> {
+        composerConnectivityStatementRetrieve(id: number, options?: any): AxiosPromise<ConnectivityStatementWithDetails> {
             return localVarFp.composerConnectivityStatementRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
