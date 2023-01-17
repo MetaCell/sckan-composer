@@ -17,7 +17,7 @@ const Login = () => {
   const handleClick = async () => {
     await logout();
     userProfile.clearProfile();
-    window.location.href = '/';
+    window.location.href = 'https://orcid.org/signout';
   }
 
   const profile = userProfile.getProfile();
