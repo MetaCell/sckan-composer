@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
@@ -9,11 +10,14 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
     if not created:
         # delete the token on user update
         try:
-            Token.objects.get(user=instance).delete()
+            Token.objects.filter(user=instance).delete()
         except Token.DoesNotExist:
             # token doesn't exist (may be already deleted)
             pass
     # create a token if one does not exist for the user
     # the token is used to authenticate the user in the frontend
     # it will be serialized in the ProfileSerializer
-    Token.objects.create(user=instance)
+    try:
+        Token.objects.get(user=instance)
+    except Token.DoesNotExist:
+        Token.objects.create(user=instance)

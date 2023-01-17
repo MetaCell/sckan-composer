@@ -15,7 +15,7 @@ python3 manage.py migrate
 
 if [ -z "${PRODUCTION}" ]; then
     # start the Django dev server
-    python3 manage.py runserver 0.0.0.0:${PORT}
+    python3 manage.py runsslerver 0.0.0.0:${PORT}
 else
     python3 -m uvicorn --workers ${WORKERS} --host 0.0.0.0 --port ${PORT} ${MODULE_NAME}.asgi:application
 fi
