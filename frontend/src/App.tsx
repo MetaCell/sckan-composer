@@ -5,7 +5,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Box } from '@mui/material';
 import Dashboard from './components/Dashboard';
-import SentencesGrid from './components/SentencesGrid';
+import SentenceDetails from './components/SentenceDetails';
 import { userProfile } from './services/UserService'
 
 
@@ -22,7 +22,7 @@ function App() {
             <BrowserRouter>
               <Routes>
                 <Route path='/' element={<Dashboard />} />
-                <Route path='/sentences' element={<SentencesGrid />} />
+                <Route path='/sentence/:sentenceId/' element={<SentenceDetails />} />
               </Routes>
             </BrowserRouter>
           </Box>

@@ -35,7 +35,7 @@ const Login = () => {
               Welcome back {profile?.user?.first_name}! Please enter your details.
             </Typography>
           </Box>
-          <Link to="/sentences">Sentences</Link>
+          <Link to="/sentence/1/">Open details of Sentence with id 1</Link>
           <Button variant='contained' fullWidth onClick={handleClick}>Logout</Button>
         </Stack>
       </Paper>
