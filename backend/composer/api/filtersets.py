@@ -22,6 +22,13 @@ class SentenceFilter(django_filters.FilterSet):
     notes = django_filters.BooleanFilter(field_name='notes', label='Checks if entity has notes',
                                          method=field_has_content)
 
+    ordering = django_filters.OrderingFilter(
+        fields=(
+            ('pmid', 'pmid'),
+            ('modified_date', 'last_edited'),
+        ),
+    )
+
     class Meta:
         model = Sentence
         fields = []
@@ -41,6 +48,12 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
     destination = django_filters.CharFilter(field_name='destination_id', lookup_expr='exact')
     notes = django_filters.BooleanFilter(field_name='notes', label='Checks if entity has notes',
                                          method=field_has_content)
+    ordering = django_filters.OrderingFilter(
+        fields=(
+            ('sentence__pmid', 'pmid'),
+            ('modified_date', 'last_edited'),
+        ),
+    )
 
     class Meta:
         model = ConnectivityStatement
