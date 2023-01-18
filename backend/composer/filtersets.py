@@ -2,7 +2,7 @@ from typing import List
 
 import django_filters
 from django.db.models import Q
-from composer.models import Sentence
+from composer.models import Sentence, ConnectivityStatement
 
 
 def iin(queryset, key: str, value: List):
@@ -25,4 +25,22 @@ class SentenceFilter(django_filters.FilterSet):
 
     class Meta:
         model = Sentence
+        fields = []
+
+
+class ConnectivityStatementFilter(django_filters.FilterSet):
+    knowledge_statement = django_filters.CharFilter(lookup_expr='icontains')
+    state = django_filters.BaseCSVFilter(
+        field_name='state',
+        method=iin,
+    )
+    tags = django_filters.BaseCSVFilter(
+        field_name='tags__tag',
+        method=iin,
+    )
+    origin = django_filters.CharFilter(field_name='origin__name', lookup_expr='iexact')
+    destination = django_filters.CharFilter(field_name='destination__name', lookup_expr='iexact')
+
+    class Meta:
+        model = ConnectivityStatement
         fields = []

@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
-from ..filtersets import SentenceFilter
+from ..filtersets import SentenceFilter, ConnectivityStatementFilter
 from ..models import (AnatomicalEntity, AnsDivision, ConnectivityStatement,
                       Note, Profile, Sentence, Specie, Tag, Via)
 from ..services import ConnectivityStatementService
@@ -83,6 +83,8 @@ class ConnectivityStatementViewSet(viewsets.ModelViewSet):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
+    filterset_class = ConnectivityStatementFilter
+
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action in ("list", "retrieve"):
