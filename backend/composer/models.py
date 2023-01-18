@@ -7,7 +7,6 @@ from django_fsm import FSMField, transition
 from .enums import (CircuitType, CSState, DestinationType, Laterality,
                     SentenceState)
 from .services import ConnectivityStatementService, SentenceService
-from .signals import create_profile
 from .utils import doi_uri, pmcid_uri, pmid_uri
 
 

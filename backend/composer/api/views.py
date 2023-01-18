@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
-from ..filtersets import SentenceFilter, ConnectivityStatementFilter
+from .filtersets import SentenceFilter, ConnectivityStatementFilter, AnatomicalEntityFilter
 from ..models import (AnatomicalEntity, AnsDivision, ConnectivityStatement,
                       Note, Profile, Sentence, Specie, Tag, Via)
 from ..services import ConnectivityStatementService
@@ -46,6 +46,8 @@ class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
+    filterset_class = AnatomicalEntityFilter
+
 
 
 class AnsDivisionViewSet(viewsets.ReadOnlyModelViewSet):
