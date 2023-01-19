@@ -1,7 +1,7 @@
 import django_filters
 
 from composer.enums import SentenceState, CSState
-from composer.models import Sentence, ConnectivityStatement, AnatomicalEntity
+from composer.models import Sentence, ConnectivityStatement, AnatomicalEntity, Tag
 
 
 def field_has_content(queryset, name, value):
@@ -15,13 +15,9 @@ class SentenceFilter(django_filters.FilterSet):
         field_name='state',
         choices=SentenceState.choices
     )
-    tags = django_filters.BaseCSVFilter(
-        field_name='tags',
-        lookup_expr='in',
-    )
+    tags = django_filters.ModelMultipleChoiceFilter(field_name='tags', queryset=Tag.objects.all())
     notes = django_filters.BooleanFilter(field_name='notes', label='Checks if entity has notes',
                                          method=field_has_content)
-
     ordering = django_filters.OrderingFilter(
         fields=(
             ('pmid', 'pmid'),
@@ -40,12 +36,9 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
         field_name='state',
         choices=CSState.choices
     )
-    tags = django_filters.BaseCSVFilter(
-        field_name='tags',
-        lookup_expr='in',
-    )
-    origin = django_filters.CharFilter(field_name='origin_id', lookup_expr='exact')
-    destination = django_filters.CharFilter(field_name='destination_id', lookup_expr='exact')
+    tags = django_filters.ModelMultipleChoiceFilter(field_name='tags', queryset=Tag.objects.all())
+    origin = django_filters.ModelChoiceFilter(field_name='origin', queryset=AnatomicalEntity.objects.all())
+    destination = django_filters.ModelChoiceFilter(field_name='destination', queryset=AnatomicalEntity.objects.all())
     notes = django_filters.BooleanFilter(field_name='notes', label='Checks if entity has notes',
                                          method=field_has_content)
     ordering = django_filters.OrderingFilter(
