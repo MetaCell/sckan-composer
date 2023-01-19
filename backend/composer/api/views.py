@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
+from .filtersets import SentenceFilter, ConnectivityStatementFilter, AnatomicalEntityFilter
 from ..models import (AnatomicalEntity, AnsDivision, ConnectivityStatement,
                       Note, Profile, Sentence, Specie, Tag, Via)
 from ..services import ConnectivityStatementService
@@ -45,6 +46,8 @@ class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
+    filterset_class = AnatomicalEntityFilter
+
 
 
 class AnsDivisionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -82,6 +85,8 @@ class ConnectivityStatementViewSet(viewsets.ModelViewSet):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
+    filterset_class = ConnectivityStatementFilter
+
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action in ("list", "retrieve"):
@@ -123,6 +128,7 @@ class SentenceViewSet(ModelNoDeleteViewSet):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
+    filterset_class = SentenceFilter
 
     def retrieve(self, request, *args, **kwargs):
         self.get_object().assign_owner(request)

@@ -7,7 +7,6 @@ from django_fsm import FSMField, transition
 from .enums import (CircuitType, CSState, DestinationType, Laterality,
                     SentenceState)
 from .services import ConnectivityStatementService, SentenceService
-from .signals import create_profile
 from .utils import doi_uri, pmcid_uri, pmid_uri
 
 
@@ -140,6 +139,7 @@ class Sentence(models.Model):
         null=True,
         blank=True,
     )
+    modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
@@ -291,6 +291,7 @@ class ConnectivityStatement(models.Model):
     tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
     biological_sex = models.CharField(max_length=200, null=True, blank=True)
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         suffix = ""
