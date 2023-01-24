@@ -1530,6 +1530,10 @@ components:
         pmcid_uri:
           type: string
           readOnly: true
+        owner:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
         title:
           type: string
           maxLength: 200
@@ -1553,11 +1557,6 @@ components:
           type: string
           format: date-time
           readOnly: true
-        owner:
-          type: integer
-          readOnly: true
-          nullable: true
-          title: Triage Operator
         tags:
           type: array
           items:
@@ -1604,6 +1603,10 @@ components:
         pmcid_uri:
           type: string
           readOnly: true
+        owner:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
         title:
           type: string
           maxLength: 200
@@ -1627,11 +1630,6 @@ components:
           type: string
           format: date-time
           readOnly: true
-        owner:
-          type: integer
-          readOnly: true
-          nullable: true
-          title: Triage Operator
         tags:
           type: array
           items:
@@ -1664,6 +1662,10 @@ components:
         pmcid_uri:
           type: string
           readOnly: true
+        owner:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
         connectivity_statements:
           type: array
           items:
@@ -1692,11 +1694,6 @@ components:
           type: string
           format: date-time
           readOnly: true
-        owner:
-          type: integer
-          readOnly: true
-          nullable: true
-          title: Triage Operator
         tags:
           type: array
           items:

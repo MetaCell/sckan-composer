@@ -26,7 +26,7 @@ export async function retrieveSentence(id:number): Promise<any> {
 }
 
 export async function editSentence(id:number,patchedSentence:any): Promise<any>{
-    const response = await composerApi.composerSentencePartialUpdate(id, patchedSentence, {xsrfCookieName: 'csrftoken', xsrfHeaderName:'X-CSRFToken'}) 
+    const response = await composerApi.composerSentencePartialUpdate(id, patchedSentence) 
     return response.data
 }
 

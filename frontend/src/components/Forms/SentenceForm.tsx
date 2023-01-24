@@ -15,7 +15,8 @@ const Form = withTheme(Theme);
 
 const log = (type:string) => console.log.bind(console, type);
 
-const schema = require("../../schemas/SentenceWithDetails.json")
+const schema = require("../../schemas/Sentence.json")
+const schema2 = require("../../schemas/SentenceWithDetails.json")
 
 const uiSchema: UiSchema = {
   "notes":{
@@ -38,8 +39,8 @@ const SentenceForm = (props:any) => {
   const { sentenceId } = useParams();
   
   const handleSubmit = async (event: IChangeEvent) => {
-    const updatedTitle = event.formData.nlpSentence.articleTitle
-    const tags = event.formData.nlpSentence.tags 
+    const updatedTitle = event.formData.title
+    const tags = event.formData.tags 
     try{
       await editSentence(Number(sentenceId), {title: updatedTitle})
       if(event.formData.knowledgeStatements) {
@@ -54,7 +55,7 @@ const SentenceForm = (props:any) => {
     }
   };
 
-  let form: any
+  let form: any;
   
   return (
     <Box p={2}>

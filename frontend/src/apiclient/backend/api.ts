@@ -839,6 +839,12 @@ export interface PatchedSentence {
     'pmcid_uri'?: string;
     /**
      * 
+     * @type {User}
+     * @memberof PatchedSentence
+     */
+    'owner'?: User;
+    /**
+     * 
      * @type {string}
      * @memberof PatchedSentence
      */
@@ -879,12 +885,6 @@ export interface PatchedSentence {
      * @memberof PatchedSentence
      */
     'modified_date'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof PatchedSentence
-     */
-    'owner'?: number | null;
     /**
      * 
      * @type {Array<number>}
@@ -967,6 +967,12 @@ export interface Sentence {
     'pmcid_uri': string;
     /**
      * 
+     * @type {User}
+     * @memberof Sentence
+     */
+    'owner': User;
+    /**
+     * 
      * @type {string}
      * @memberof Sentence
      */
@@ -1009,12 +1015,6 @@ export interface Sentence {
     'modified_date': string;
     /**
      * 
-     * @type {number}
-     * @memberof Sentence
-     */
-    'owner': number | null;
-    /**
-     * 
      * @type {Array<number>}
      * @memberof Sentence
      */
@@ -1050,6 +1050,12 @@ export interface SentenceWithDetails {
      * @memberof SentenceWithDetails
      */
     'pmcid_uri': string;
+    /**
+     * 
+     * @type {User}
+     * @memberof SentenceWithDetails
+     */
+    'owner': User;
     /**
      * 
      * @type {Array<ConnectivityStatement>}
@@ -1098,12 +1104,6 @@ export interface SentenceWithDetails {
      * @memberof SentenceWithDetails
      */
     'modified_date': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof SentenceWithDetails
-     */
-    'owner': number | null;
     /**
      * 
      * @type {Array<number>}
