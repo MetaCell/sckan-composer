@@ -9,11 +9,11 @@ import SentenceForm from './Forms/SentenceForm';
 import { retrieveSentence } from '../services/SentenceService';
 import { Sentence } from '../apiclient/backend';
 import { userProfile } from '../services/UserService';
+import NoteForm from './Forms/NoteForm';
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
   const [sentence, setSentence] = useState<Sentence>()
-  const profile = userProfile.getProfile()
 
   const fetchSentence = async (id: number)=> {
     const response = await retrieveSentence(id)
@@ -23,14 +23,6 @@ const SentencesDetails = () => {
   useEffect(() => {
     fetchSentence(Number(sentenceId))
   }, [])
-  
-  const formPrefilledData = {
-    nlpSentence:{
-      text: sentence?.text,
-      pmcid: sentence?.pmcid,
-      articleTitle: sentence?.title
-    }
-  }
 
   return (
     <Grid p={12} container justifyContent='center'>
@@ -48,8 +40,11 @@ const SentencesDetails = () => {
         </Stack>
       </Paper>
       </Grid>
-      <Grid item xl={12}>
-        <SentenceForm formData={sentence} userProfile={profile}/>
+      <Grid item xl={7}>
+        <SentenceForm formData={sentence}/>
+      </Grid>
+      <Grid item xl={5}>
+        <NoteForm/>
       </Grid>
     </Grid>
   )
