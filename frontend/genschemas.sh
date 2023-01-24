@@ -8,11 +8,7 @@ cd ../backend
 cd ../frontend
 rm -rf src/rest_tmp
 
-npx openapi-generator-cli generate -i ../openapi/openapi.yaml -g typescript -o src/rest --type-mappings=Date=string,URI=string
-
-# remove generic files that shouldn't be converted
-rm ./src/rest_tmp/models/ObjectSerializer.ts
-rm ./src/rest_tmp/models/all.ts
+npx openapi-generator-cli generate -i ../openapi/openapi.yaml -g typescript -o src/rest_tmp --type-mappings=Date=string,URI=string -c openapi_config.json
 
 # remove files that are not needed
 rm ./src/rest_tmp/models/Paginated*.ts
