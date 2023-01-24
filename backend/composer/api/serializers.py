@@ -18,8 +18,8 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     """Profile"""
 
-    user = UserSerializer(read_only=True)
-    token = serializers.SerializerMethodField()
+    user = UserSerializer(read_only=True, required=False)
+    token = serializers.SerializerMethodField(required=False, read_only=True)
 
     def get_token(self, obj) -> str:
         return obj.user.auth_token.key
@@ -105,6 +105,7 @@ class SentenceSerializer(serializers.ModelSerializer):
     available_transitions = serializers.SerializerMethodField()
     pmid_uri = serializers.SerializerMethodField()
     pmcid_uri = serializers.SerializerMethodField()
+    owner = UserSerializer(read_only=True)
 
     def get_available_transitions(self, instance) -> list[str]:
         return [t.name for t in instance.get_available_state_transitions()]
@@ -120,10 +121,7 @@ class SentenceSerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = (
             "state",
-            "available_transitions",
-            "pmid_uri",
-            "pmcid_uri",
-            "owner",
+            "modified_date",
         )
 
 
