@@ -8,6 +8,6 @@ export async function retrieveStatement(id:number): Promise<any> {
 }
 
 export async function createStatement(formStatement:any, sentenceId:any): Promise<any> {
-    const response = await composerApi.composerConnectivityStatementCreate(formStatement, sentenceId)
+    const response = await composerApi.composerConnectivityStatementCreate(formStatement, {xsrfCookieName: 'csrftoken', xsrfHeaderName:'X-CSRFToken'})
     return response.data
 }
