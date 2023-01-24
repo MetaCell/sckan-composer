@@ -7,4 +7,4 @@ cd ../backend
 
 cd ../frontend
 rm -rf src/apiclient/backend
-openapi-generator-cli generate -i ../openapi/openapi.yaml -g typescript-axios -o src/apiclient/backend --type-mappings Date=string
+npx openapi-generator-cli generate -i ../openapi/openapi.yaml -g typescript-axios -o src/apiclient/backend --type-mappings Date=string

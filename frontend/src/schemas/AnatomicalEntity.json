@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {},
+  "description": "Anatomical Entity",
+  "properties": {
+    "id": {
+      "type": "number"
+    },
+    "name": {
+      "type": "string"
+    },
+    "ontologyUri": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "ontologyUri"
+  ],
+  "type": "object"
+}

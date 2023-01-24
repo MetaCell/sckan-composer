@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {},
+  "description": "Via",
+  "properties": {
+    "anatomicalEntity": {
+      "type": "number"
+    },
+    "connectivityStatement": {
+      "type": "number"
+    },
+    "id": {
+      "type": "number"
+    },
+    "ordering": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "id",
+    "connectivityStatement",
+    "anatomicalEntity"
+  ],
+  "type": "object"
+}

@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {},
+  "description": "Sentence",
+  "properties": {
+    "availableTransitions": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "doi": {
+      "type": "string"
+    },
+    "id": {
+      "type": "number"
+    },
+    "modifiedDate": {
+      "type": "string"
+    },
+    "owner": {
+      "type": "number"
+    },
+    "pmcid": {
+      "type": "string"
+    },
+    "pmcidUri": {
+      "type": "string"
+    },
+    "pmid": {
+      "type": "number"
+    },
+    "pmidUri": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "tags": {
+      "items": {
+        "type": "number"
+      },
+      "type": "array"
+    },
+    "text": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "availableTransitions",
+    "pmidUri",
+    "pmcidUri",
+    "title",
+    "text",
+    "state",
+    "modifiedDate",
+    "owner"
+  ],
+  "type": "object"
+}

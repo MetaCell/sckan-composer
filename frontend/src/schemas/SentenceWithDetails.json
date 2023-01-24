@@ -1,0 +1,207 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {},
+  "description": "Connectivity Statement",
+  "properties": {
+    "availableTransitions": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "connectivityStatements": {
+      "items": {
+        "additionalProperties": false,
+        "description": "Connectivity Statement",
+        "properties": {
+          "ansDivision": {
+            "type": "number"
+          },
+          "apinatomyModel": {
+            "type": "string"
+          },
+          "availableTransitions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "biologicalSex": {
+            "type": "string"
+          },
+          "circuitType": {
+            "enum": [
+              "SENSORY",
+              "MOTOR",
+              "INTRINSIC",
+              "PROJECTION",
+              "ANAXONIC",
+              "UNKNOWN"
+            ],
+            "type": "string"
+          },
+          "destination": {
+            "type": "number"
+          },
+          "destinationType": {
+            "enum": [
+              "AXON-SE",
+              "AXON-T",
+              "AXON-ST",
+              "UNKNOW"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "type": "number"
+          },
+          "knowledgeStatement": {
+            "type": "string"
+          },
+          "laterality": {
+            "enum": [
+              "IPSI",
+              "ONTRAT",
+              "BI",
+              "UNKNOWN"
+            ],
+            "type": "string"
+          },
+          "modifiedDate": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "number"
+          },
+          "owner": {
+            "type": "number"
+          },
+          "path": {
+            "items": {
+              "additionalProperties": false,
+              "description": "Via",
+              "properties": {
+                "anatomicalEntity": {
+                  "additionalProperties": false,
+                  "description": "Anatomical Entity",
+                  "properties": {
+                    "id": {
+                      "type": "number"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "ontologyUri": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "ontologyUri"
+                  ],
+                  "type": "object"
+                },
+                "id": {
+                  "type": "number"
+                },
+                "ordering": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "anatomicalEntity"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sentence": {
+            "type": "number"
+          },
+          "species": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "state": {
+            "type": "string"
+          },
+          "tags": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "availableTransitions",
+          "path",
+          "knowledgeStatement",
+          "state",
+          "modifiedDate",
+          "sentence",
+          "owner"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "doi": {
+      "type": "string"
+    },
+    "id": {
+      "type": "number"
+    },
+    "modifiedDate": {
+      "type": "string"
+    },
+    "owner": {
+      "type": "number"
+    },
+    "pmcid": {
+      "type": "string"
+    },
+    "pmcidUri": {
+      "type": "string"
+    },
+    "pmid": {
+      "type": "number"
+    },
+    "pmidUri": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "tags": {
+      "items": {
+        "type": "number"
+      },
+      "type": "array"
+    },
+    "text": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "availableTransitions",
+    "pmidUri",
+    "pmcidUri",
+    "connectivityStatements",
+    "title",
+    "text",
+    "state",
+    "modifiedDate",
+    "owner"
+  ],
+  "type": "object"
+}
