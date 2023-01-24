@@ -196,11 +196,11 @@ class Sentence(models.Model):
 
     @property
     def pmcid_uri(self):
-        return pmcid_uri(self.pmid)
+        return pmcid_uri(self.pmcid)
 
     @property
     def doi_uri(self):
-        return doi_uri(self.pmid)
+        return doi_uri(self.doi)
 
     class Meta:
         ordering = ["title"]

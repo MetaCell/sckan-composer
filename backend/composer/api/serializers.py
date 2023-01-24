@@ -70,6 +70,34 @@ class SpecieSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class ViaSerializer(serializers.ModelSerializer):
+    """Via"""
+
+    class Meta:
+        model = Via
+        fields = "__all__"
+
+
+class ViaWithDetailsSerializer(serializers.ModelSerializer):
+    """Via"""
+
+    anatomical_entity = AnatomicalEntitySerializer(read_only=True)
+
+    class Meta:
+        model = Via
+        fields = ("id", "ordering", "anatomical_entity")
+
+
+
+class DoitSerializer(serializers.ModelSerializer):
+    """Doi"""
+
+    class Meta:
+        model = Doi
+        fields = "__all__"
+        depth = 0
+
+
 class SentenceSerializer(serializers.ModelSerializer):
     """Sentence"""
 
@@ -99,33 +127,6 @@ class SentenceSerializer(serializers.ModelSerializer):
         )
 
 
-class DoitSerializer(serializers.ModelSerializer):
-    """Doi"""
-
-    class Meta:
-        model = Doi
-        fields = "__all__"
-        depth = 0
-
-
-class ViaSerializer(serializers.ModelSerializer):
-    """Via"""
-
-    class Meta:
-        model = Via
-        fields = "__all__"
-
-
-class ViaWithDetailsSerializer(serializers.ModelSerializer):
-    """Via"""
-
-    anatomical_entity = AnatomicalEntitySerializer(read_only=True)
-
-    class Meta:
-        model = Via
-        fields = ("id", "ordering", "anatomical_entity")
-
-
 class ConnectivityStatementSerializer(serializers.ModelSerializer):
     """Connectivity Statement"""
 
@@ -140,6 +141,12 @@ class ConnectivityStatementSerializer(serializers.ModelSerializer):
         fields = "__all__"
         depth = 0
         read_only_fields = ("state", "owner")
+
+
+class SentenceWithDetailsSerializer(SentenceSerializer):
+    """Connectivity Statement"""
+
+    connectivity_statements = ConnectivityStatementSerializer(many=True, read_only=True)
 
 
 class ConnectivityStatementWithDetailsSerializer(ConnectivityStatementSerializer):

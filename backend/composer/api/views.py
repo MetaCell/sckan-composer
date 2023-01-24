@@ -10,7 +10,7 @@ from ..services import ConnectivityStatementService
 from .serializers import (AnatomicalEntitySerializer, AnsDivisionSerializer,
                           ConnectivityStatementSerializer,
                           ConnectivityStatementWithDetailsSerializer, NoteSerializer,
-                          ProfileSerializer, SentenceSerializer,
+                          ProfileSerializer, SentenceSerializer, SentenceWithDetailsSerializer,
                           SpecieSerializer, TagSerializer, ViaSerializer)
 
 
@@ -125,10 +125,16 @@ class SentenceViewSet(ModelNoDeleteViewSet):
 
     queryset = Sentence.objects.all()
     serializer_class = SentenceSerializer
+    serializer_class_get = SentenceWithDetailsSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = SentenceFilter
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.action in ("list", "retrieve"):
+            return self.serializer_class_get
+        return self.serializer_class
 
     def retrieve(self, request, *args, **kwargs):
         self.get_object().assign_owner(request)
