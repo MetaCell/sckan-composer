@@ -15,6 +15,10 @@ paths:
         description: Number of results to return per page.
         schema:
           type: integer
+      - in: query
+        name: name
+        schema:
+          type: string
       - name: offset
         required: false
         in: query
@@ -121,18 +125,75 @@ paths:
       operationId: composer_connectivity_statement_list
       description: ConnectivityStatement
       parameters:
+      - in: query
+        name: destination
+        schema:
+          type: integer
+      - in: query
+        name: knowledge_statement
+        schema:
+          type: string
       - name: limit
         required: false
         in: query
         description: Number of results to return per page.
         schema:
           type: integer
+      - in: query
+        name: notes
+        schema:
+          type: boolean
+        description: Checks if entity has notes
       - name: offset
         required: false
         in: query
         description: The initial index from which to return the results.
         schema:
           type: integer
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -last_edited
+            - -pmid
+            - last_edited
+            - pmid
+        description: Ordering
+        explode: false
+        style: form
+      - in: query
+        name: origin
+        schema:
+          type: integer
+      - in: query
+        name: state
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - approved
+            - compose_now
+            - connection_missing
+            - curated
+            - draft
+            - excluded
+            - npo_approved
+            - rejected
+            - to_be_reviewed
+        explode: true
+        style: form
+      - in: query
+        name: tags
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
       tags:
       - composer
       security:
@@ -587,12 +648,58 @@ paths:
         description: Number of results to return per page.
         schema:
           type: integer
+      - in: query
+        name: notes
+        schema:
+          type: boolean
+        description: Checks if entity has notes
       - name: offset
         required: false
         in: query
         description: The initial index from which to return the results.
         schema:
           type: integer
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -last_edited
+            - -pmid
+            - last_edited
+            - pmid
+        description: Ordering
+        explode: false
+        style: form
+      - in: query
+        name: state
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - compose_later
+            - compose_now
+            - duplicate
+            - excluded
+            - open
+            - to_be_reviewed
+        explode: true
+        style: form
+      - in: query
+        name: tags
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
+        name: title
+        schema:
+          type: string
       tags:
       - composer
       security:
@@ -605,7 +712,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSentenceList'
+                $ref: '#/components/schemas/PaginatedSentenceWithDetailsList'
           description: ''
     post:
       operationId: composer_sentence_create
@@ -658,7 +765,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Sentence'
+                $ref: '#/components/schemas/SentenceWithDetails'
           description: ''
     put:
       operationId: composer_sentence_update
@@ -1002,6 +1109,10 @@ components:
           type: string
           nullable: true
           maxLength: 200
+        modified_date:
+          type: string
+          format: date-time
+          readOnly: true
         sentence:
           type: integer
         origin:
@@ -1030,6 +1141,7 @@ components:
       - available_transitions
       - id
       - knowledge_statement
+      - modified_date
       - owner
       - path
       - sentence
@@ -1096,6 +1208,10 @@ components:
           type: string
           nullable: true
           maxLength: 200
+        modified_date:
+          type: string
+          format: date-time
+          readOnly: true
         origin:
           type: integer
           nullable: true
@@ -1110,6 +1226,7 @@ components:
       - destination
       - id
       - knowledge_statement
+      - modified_date
       - origen
       - owner
       - path
@@ -1254,7 +1371,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Note'
-    PaginatedSentenceList:
+    PaginatedSentenceWithDetailsList:
       type: object
       properties:
         count:
@@ -1273,7 +1390,7 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/Sentence'
+            $ref: '#/components/schemas/SentenceWithDetails'
     PaginatedSpecieList:
       type: object
       properties:
@@ -1350,6 +1467,10 @@ components:
           type: string
           nullable: true
           maxLength: 200
+        modified_date:
+          type: string
+          format: date-time
+          readOnly: true
         sentence:
           type: integer
         origin:
@@ -1428,6 +1549,10 @@ components:
           type: string
           nullable: true
           maxLength: 100
+        modified_date:
+          type: string
+          format: date-time
+          readOnly: true
         owner:
           type: integer
           readOnly: true
@@ -1498,6 +1623,10 @@ components:
           type: string
           nullable: true
           maxLength: 100
+        modified_date:
+          type: string
+          format: date-time
+          readOnly: true
         owner:
           type: integer
           readOnly: true
@@ -1510,6 +1639,73 @@ components:
       required:
       - available_transitions
       - id
+      - modified_date
+      - owner
+      - pmcid_uri
+      - pmid_uri
+      - state
+      - text
+      - title
+    SentenceWithDetails:
+      type: object
+      description: Connectivity Statement
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        available_transitions:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        pmid_uri:
+          type: string
+          readOnly: true
+        pmcid_uri:
+          type: string
+          readOnly: true
+        connectivity_statements:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConnectivityStatement'
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        text:
+          type: string
+        state:
+          type: string
+          readOnly: true
+        pmid:
+          type: integer
+          nullable: true
+        pmcid:
+          type: string
+          nullable: true
+          maxLength: 20
+        doi:
+          type: string
+          nullable: true
+          maxLength: 100
+        modified_date:
+          type: string
+          format: date-time
+          readOnly: true
+        owner:
+          type: integer
+          readOnly: true
+          nullable: true
+          title: Triage Operator
+        tags:
+          type: array
+          items:
+            type: integer
+      required:
+      - available_transitions
+      - connectivity_statements
+      - id
+      - modified_date
       - owner
       - pmcid_uri
       - pmid_uri
