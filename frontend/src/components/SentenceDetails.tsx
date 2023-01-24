@@ -8,10 +8,12 @@ import { useParams } from "react-router-dom";
 import SentenceForm from './Forms/SentenceForm';
 import { retrieveSentence } from '../services/SentenceService';
 import { Sentence } from '../apiclient/backend';
+import { userProfile } from '../services/UserService';
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
   const [sentence, setSentence] = useState<Sentence>()
+  const profile = userProfile.getProfile()
 
   const fetchSentence = async (id: number)=> {
     const response = await retrieveSentence(id)
@@ -22,6 +24,14 @@ const SentencesDetails = () => {
     fetchSentence(Number(sentenceId))
   }, [])
   
+  const formPrefilledData = {
+    nlpSentence:{
+      text: sentence?.text,
+      pmcid: sentence?.pmcid,
+      articleTitle: sentence?.title
+    }
+  }
+
   return (
     <Grid p={12} container justifyContent='center'>
       <Grid item xl={12}>
@@ -39,7 +49,7 @@ const SentencesDetails = () => {
       </Paper>
       </Grid>
       <Grid item xl={12}>
-        <SentenceForm formData={sentence}/>
+        <SentenceForm formData={sentence} userProfile={profile}/>
       </Grid>
     </Grid>
   )
