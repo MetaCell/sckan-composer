@@ -146,8 +146,8 @@ class ConnectivityStatementSerializer(serializers.ModelSerializer):
 class SentenceWithDetailsSerializer(SentenceSerializer):
     """Connectivity Statement"""
 
-    connectivity_statements = ConnectivityStatementSerializer(many=True, read_only=True)
-
+    connectivity_statements = ConnectivityStatementSerializer(source="connectivitystatement_set", many=True, read_only=True)
+    
 
 class ConnectivityStatementWithDetailsSerializer(ConnectivityStatementSerializer):
     """Connectivity Statement"""
