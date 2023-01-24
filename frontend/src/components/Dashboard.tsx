@@ -36,6 +36,7 @@ const Login = () => {
             </Typography>
           </Box>
           <Link to="/sentence/1/">Open details of Sentence with id 1</Link>
+          <Link to="/statement/2/">Open details of Statement with id 2</Link>
           <Button variant='contained' fullWidth onClick={handleClick}>Logout</Button>
         </Stack>
       </Paper>

@@ -7,6 +7,7 @@ import { Box } from '@mui/material';
 import Dashboard from './components/Dashboard';
 import SentenceDetails from './components/SentenceDetails';
 import { userProfile } from './services/UserService'
+import StatementDetails from './components/StatementDetails';
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
               <Routes>
                 <Route path='/' element={<Dashboard />} />
                 <Route path='/sentence/:sentenceId/' element={<SentenceDetails />} />
+                <Route path='/statement/:statementId/' element={<StatementDetails/>}/>
               </Routes>
             </BrowserRouter>
           </Box>
