@@ -6,15 +6,15 @@
     "message": {
       "type": "string"
     },
-    "redirectUrl": {
+    "redirect_url": {
       "type": "string"
     },
-    "statusCode": {
+    "status_code": {
       "type": "number"
     }
   },
   "required": [
-    "statusCode"
+    "status_code"
   ],
   "type": "object"
 }

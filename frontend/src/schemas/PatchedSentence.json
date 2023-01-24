@@ -4,7 +4,7 @@
   "definitions": {},
   "description": "Sentence",
   "properties": {
-    "availableTransitions": {
+    "available_transitions": {
       "items": {
         "type": "string"
       },
@@ -16,7 +16,7 @@
     "id": {
       "type": "number"
     },
-    "modifiedDate": {
+    "modified_date": {
       "type": "string"
     },
     "owner": {
@@ -25,13 +25,13 @@
     "pmcid": {
       "type": "string"
     },
-    "pmcidUri": {
+    "pmcid_uri": {
       "type": "string"
     },
     "pmid": {
       "type": "number"
     },
-    "pmidUri": {
+    "pmid_uri": {
       "type": "string"
     },
     "state": {

@@ -4,33 +4,33 @@
   "definitions": {},
   "description": "Connectivity Statement",
   "properties": {
-    "availableTransitions": {
+    "available_transitions": {
       "items": {
         "type": "string"
       },
       "type": "array"
     },
-    "connectivityStatements": {
+    "connectivity_statements": {
       "items": {
         "additionalProperties": false,
         "description": "Connectivity Statement",
         "properties": {
-          "ansDivision": {
+          "ans_division": {
             "type": "number"
           },
-          "apinatomyModel": {
+          "apinatomy_model": {
             "type": "string"
           },
-          "availableTransitions": {
+          "available_transitions": {
             "items": {
               "type": "string"
             },
             "type": "array"
           },
-          "biologicalSex": {
+          "biological_sex": {
             "type": "string"
           },
-          "circuitType": {
+          "circuit_type": {
             "enum": [
               "SENSORY",
               "MOTOR",
@@ -44,7 +44,7 @@
           "destination": {
             "type": "number"
           },
-          "destinationType": {
+          "destination_type": {
             "enum": [
               "AXON-SE",
               "AXON-T",
@@ -56,7 +56,7 @@
           "id": {
             "type": "number"
           },
-          "knowledgeStatement": {
+          "knowledge_statement": {
             "type": "string"
           },
           "laterality": {
@@ -68,7 +68,7 @@
             ],
             "type": "string"
           },
-          "modifiedDate": {
+          "modified_date": {
             "type": "string"
           },
           "origin": {
@@ -82,7 +82,7 @@
               "additionalProperties": false,
               "description": "Via",
               "properties": {
-                "anatomicalEntity": {
+                "anatomical_entity": {
                   "additionalProperties": false,
                   "description": "Anatomical Entity",
                   "properties": {
@@ -92,14 +92,14 @@
                     "name": {
                       "type": "string"
                     },
-                    "ontologyUri": {
+                    "ontology_uri": {
                       "type": "string"
                     }
                   },
                   "required": [
                     "id",
                     "name",
-                    "ontologyUri"
+                    "ontology_uri"
                   ],
                   "type": "object"
                 },
@@ -112,7 +112,7 @@
               },
               "required": [
                 "id",
-                "anatomicalEntity"
+                "anatomical_entity"
               ],
               "type": "object"
             },
@@ -139,11 +139,11 @@
         },
         "required": [
           "id",
-          "availableTransitions",
+          "available_transitions",
           "path",
-          "knowledgeStatement",
+          "knowledge_statement",
           "state",
-          "modifiedDate",
+          "modified_date",
           "sentence",
           "owner"
         ],
@@ -157,7 +157,7 @@
     "id": {
       "type": "number"
     },
-    "modifiedDate": {
+    "modified_date": {
       "type": "string"
     },
     "owner": {
@@ -166,13 +166,13 @@
     "pmcid": {
       "type": "string"
     },
-    "pmcidUri": {
+    "pmcid_uri": {
       "type": "string"
     },
     "pmid": {
       "type": "number"
     },
-    "pmidUri": {
+    "pmid_uri": {
       "type": "string"
     },
     "state": {
@@ -193,14 +193,14 @@
   },
   "required": [
     "id",
-    "availableTransitions",
-    "pmidUri",
-    "pmcidUri",
-    "connectivityStatements",
+    "available_transitions",
+    "pmid_uri",
+    "pmcid_uri",
+    "connectivity_statements",
     "title",
     "text",
     "state",
-    "modifiedDate",
+    "modified_date",
     "owner"
   ],
   "type": "object"

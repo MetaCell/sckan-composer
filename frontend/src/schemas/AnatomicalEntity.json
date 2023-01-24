@@ -10,14 +10,14 @@
     "name": {
       "type": "string"
     },
-    "ontologyUri": {
+    "ontology_uri": {
       "type": "string"
     }
   },
   "required": [
     "id",
     "name",
-    "ontologyUri"
+    "ontology_uri"
   ],
   "type": "object"
 }

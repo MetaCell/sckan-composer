@@ -4,7 +4,7 @@
   "definitions": {},
   "description": "Note",
   "properties": {
-    "connectivityStatement": {
+    "connectivity_statement": {
       "type": "number"
     },
     "id": {

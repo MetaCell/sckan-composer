@@ -4,7 +4,7 @@
   "definitions": {},
   "description": "Via",
   "properties": {
-    "anatomicalEntity": {
+    "anatomical_entity": {
       "additionalProperties": false,
       "description": "Anatomical Entity",
       "properties": {
@@ -14,14 +14,14 @@
         "name": {
           "type": "string"
         },
-        "ontologyUri": {
+        "ontology_uri": {
           "type": "string"
         }
       },
       "required": [
         "id",
         "name",
-        "ontologyUri"
+        "ontology_uri"
       ],
       "type": "object"
     },
@@ -34,7 +34,7 @@
   },
   "required": [
     "id",
-    "anatomicalEntity"
+    "anatomical_entity"
   ],
   "type": "object"
 }

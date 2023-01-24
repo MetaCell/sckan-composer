@@ -4,10 +4,10 @@
   "definitions": {},
   "description": "Via",
   "properties": {
-    "anatomicalEntity": {
+    "anatomical_entity": {
       "type": "number"
     },
-    "connectivityStatement": {
+    "connectivity_statement": {
       "type": "number"
     },
     "id": {
@@ -19,8 +19,8 @@
   },
   "required": [
     "id",
-    "connectivityStatement",
-    "anatomicalEntity"
+    "connectivity_statement",
+    "anatomical_entity"
   ],
   "type": "object"
 }
