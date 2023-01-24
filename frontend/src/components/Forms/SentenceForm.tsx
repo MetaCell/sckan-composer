@@ -2,11 +2,12 @@ import React from 'react'
 import validator from "@rjsf/validator-ajv8";
 import Form from '@rjsf/mui';
 import { UiSchema } from "@rjsf/utils";
-import { schema } from '../../schemas/sentenceSchema'
+// import { schema } from '../../schemas/sentenceSchema'
 import {IChangeEvent} from "@rjsf/core";
 
 const log = (type:string) => console.log.bind(console, type);
 
+const schema = require("../../schemas/SentenceWithDetails.json")
 
 const uiSchema: UiSchema = {
   "notes":{
@@ -18,6 +19,7 @@ const uiSchema: UiSchema = {
     "ui:widget": "textarea"
   }},
 };
+
 
 const SentenceForm = (props:any) => {
   

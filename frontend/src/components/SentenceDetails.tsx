@@ -22,19 +22,6 @@ const SentencesDetails = () => {
     fetchSentence(Number(sentenceId))
   }, [])
   
-  const formPrefilledData = {
-    nlpSentence:{
-      text: sentence?.text,
-      pmcid: sentence?.pmcid
-    },
-    // knowledgeStatements:[
-    //   {
-    //     knowledgeStatement: 'hello',
-    //     details: 'tengo detalles'
-    //   }
-    // ]
-  }
-
   return (
     <Grid p={12} container justifyContent='center'>
       <Grid item xl={12}>
@@ -52,7 +39,7 @@ const SentencesDetails = () => {
       </Paper>
       </Grid>
       <Grid item xl={12}>
-        <SentenceForm formData={formPrefilledData}/>
+        <SentenceForm formData={sentence}/>
       </Grid>
     </Grid>
   )
