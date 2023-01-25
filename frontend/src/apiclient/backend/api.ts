@@ -409,6 +409,12 @@ export interface Note {
     'note': string;
     /**
      * 
+     * @type {string}
+     * @memberof Note
+     */
+    'created': string;
+    /**
+     * 
      * @type {number}
      * @memberof Note
      */
@@ -776,6 +782,12 @@ export interface PatchedNote {
      * @memberof PatchedNote
      */
     'note'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedNote
+     */
+    'created'?: string;
     /**
      * 
      * @type {number}
@@ -1203,37 +1215,6 @@ export interface User {
      * @memberof User
      */
     'user_permissions'?: Array<number>;
-}
-/**
- * Via
- * @export
- * @interface Via
- */
-export interface Via {
-    /**
-     * 
-     * @type {number}
-     * @memberof Via
-     */
-    'id': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Via
-     */
-    'ordering'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Via
-     */
-    'connectivity_statement': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Via
-     */
-    'anatomical_entity': number;
 }
 
 /**
@@ -1877,12 +1858,14 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * Note
+         * @param {number} [connectivityStatementId] 
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
+         * @param {number} [sentenceId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteList: async (limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerNoteList: async (connectivityStatementId?: number, limit?: number, offset?: number, sentenceId?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/note/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1904,12 +1887,20 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
 
+            if (connectivityStatementId !== undefined) {
+                localVarQueryParameter['connectivity_statement_id'] = connectivityStatementId;
+            }
+
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
             }
 
             if (offset !== undefined) {
                 localVarQueryParameter['offset'] = offset;
+            }
+
+            if (sentenceId !== undefined) {
+                localVarQueryParameter['sentence_id'] = sentenceId;
             }
 
 
@@ -2620,92 +2611,6 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * Via
-         * @param {Via} via 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerViaCreate: async (via: Via, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'via' is not null or undefined
-            assertParamExists('composerViaCreate', 'via', via)
-            const localVarPath = `/api/composer/via/`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication cookieAuth required
-
-            // authentication tokenAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(via, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Via
-         * @param {number} id A unique integer value identifying this via.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerViaDestroy: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('composerViaDestroy', 'id', id)
-            const localVarPath = `/api/composer/via/{id}/`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication cookieAuth required
-
-            // authentication tokenAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -2864,13 +2769,15 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * Note
+         * @param {number} [connectivityStatementId] 
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
+         * @param {number} [sentenceId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerNoteList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedNoteList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerNoteList(limit, offset, options);
+        async composerNoteList(connectivityStatementId?: number, limit?: number, offset?: number, sentenceId?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedNoteList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerNoteList(connectivityStatementId, limit, offset, sentenceId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3035,26 +2942,6 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerTagRetrieve(id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
-        /**
-         * Via
-         * @param {Via} via 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async composerViaCreate(via: Via, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Via>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerViaCreate(via, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * Via
-         * @param {number} id A unique integer value identifying this via.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async composerViaDestroy(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerViaDestroy(id, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
     }
 };
 
@@ -3200,13 +3087,15 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * Note
+         * @param {number} [connectivityStatementId] 
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
+         * @param {number} [sentenceId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteList(limit?: number, offset?: number, options?: any): AxiosPromise<PaginatedNoteList> {
-            return localVarFp.composerNoteList(limit, offset, options).then((request) => request(axios, basePath));
+        composerNoteList(connectivityStatementId?: number, limit?: number, offset?: number, sentenceId?: number, options?: any): AxiosPromise<PaginatedNoteList> {
+            return localVarFp.composerNoteList(connectivityStatementId, limit, offset, sentenceId, options).then((request) => request(axios, basePath));
         },
         /**
          * Note
@@ -3354,24 +3243,6 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          */
         composerTagRetrieve(id: number, options?: any): AxiosPromise<Tag> {
             return localVarFp.composerTagRetrieve(id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Via
-         * @param {Via} via 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerViaCreate(via: Via, options?: any): AxiosPromise<Via> {
-            return localVarFp.composerViaCreate(via, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Via
-         * @param {number} id A unique integer value identifying this via.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerViaDestroy(id: number, options?: any): AxiosPromise<void> {
-            return localVarFp.composerViaDestroy(id, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -3544,14 +3415,16 @@ export class ComposerApi extends BaseAPI {
 
     /**
      * Note
+     * @param {number} [connectivityStatementId] 
      * @param {number} [limit] Number of results to return per page.
      * @param {number} [offset] The initial index from which to return the results.
+     * @param {number} [sentenceId] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerNoteList(limit?: number, offset?: number, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerNoteList(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    public composerNoteList(connectivityStatementId?: number, limit?: number, offset?: number, sentenceId?: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerNoteList(connectivityStatementId, limit, offset, sentenceId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -3729,28 +3602,6 @@ export class ComposerApi extends BaseAPI {
      */
     public composerTagRetrieve(id: number, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerTagRetrieve(id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Via
-     * @param {Via} via 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComposerApi
-     */
-    public composerViaCreate(via: Via, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerViaCreate(via, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Via
-     * @param {number} id A unique integer value identifying this via.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComposerApi
-     */
-    public composerViaDestroy(id: number, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerViaDestroy(id, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

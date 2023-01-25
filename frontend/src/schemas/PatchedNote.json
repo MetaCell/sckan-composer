@@ -7,6 +7,9 @@
     "connectivity_statement": {
       "type": "number"
     },
+    "created": {
+      "type": "string"
+    },
     "id": {
       "type": "number"
     },

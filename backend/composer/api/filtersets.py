@@ -1,7 +1,14 @@
 import django_filters
 
 from composer.enums import SentenceState, CSState
-from composer.models import Sentence, ConnectivityStatement, AnatomicalEntity, Tag
+from composer.models import (
+    Sentence,
+    ConnectivityStatement,
+    AnatomicalEntity,
+    Note,
+    Tag,
+    Via,
+)
 
 
 def field_has_content(queryset, name, value):
@@ -69,4 +76,25 @@ class AnatomicalEntityFilter(django_filters.FilterSet):
 
     class Meta:
         model = AnatomicalEntity
+        fields = []
+
+
+class NoteFilter(django_filters.FilterSet):
+    sentence_id = django_filters.NumberFilter(field_name="sentence__id")
+    connectivity_statement_id = django_filters.NumberFilter(
+        field_name="connectivity_statement__id"
+    )
+
+    class Meta:
+        model = Note
+        fields = []
+
+
+class ViaFilter(django_filters.FilterSet):
+    connectivity_statement_id = django_filters.NumberFilter(
+        field_name="connectivity_statement__id"
+    )
+
+    class Meta:
+        model = Via
         fields = []

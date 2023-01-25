@@ -7,6 +7,8 @@ from .filtersets import (
     SentenceFilter,
     ConnectivityStatementFilter,
     AnatomicalEntityFilter,
+    NoteFilter,
+    ViaFilter,
 )
 from ..models import (
     AnatomicalEntity,
@@ -92,6 +94,7 @@ class NoteViewSet(viewsets.ModelViewSet):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
+    filterset_class = NoteFilter
 
 
 class ConnectivityStatementViewSet(viewsets.ModelViewSet):
@@ -194,11 +197,7 @@ class ProfileViewSet(viewsets.GenericViewSet):
         return Response(self.get_serializer(profile).data)
 
 
-class ViaViewSet(
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet,
-):
+class ViaViewSet(viewsets.GenericViewSet):
     """
     Via
     """
@@ -208,3 +207,4 @@ class ViaViewSet(
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
+    filterset_class = ViaFilter

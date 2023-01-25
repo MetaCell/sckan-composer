@@ -400,6 +400,10 @@ paths:
       operationId: composer_note_list
       description: Note
       parameters:
+      - in: query
+        name: connectivity_statement_id
+        schema:
+          type: integer
       - name: limit
         required: false
         in: query
@@ -410,6 +414,10 @@ paths:
         required: false
         in: query
         description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - in: query
+        name: sentence_id
         schema:
           type: integer
       tags:
@@ -952,55 +960,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Tag'
           description: ''
-  /api/composer/via/:
-    post:
-      operationId: composer_via_create
-      description: Via
-      tags:
-      - composer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Via'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Via'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Via'
-        required: true
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      responses:
-        '201':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Via'
-          description: ''
-  /api/composer/via/{id}/:
-    delete:
-      operationId: composer_via_destroy
-      description: Via
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this via.
-        required: true
-      tags:
-      - composer
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      responses:
-        '204':
-          description: No response body
   /api/metacell_auth/login/:
     get:
       operationId: metacell_auth_login_retrieve
@@ -1259,6 +1218,10 @@ components:
           readOnly: true
         note:
           type: string
+        created:
+          type: string
+          format: date-time
+          readOnly: true
         user:
           type: integer
         sentence:
@@ -1268,6 +1231,7 @@ components:
           type: integer
           nullable: true
       required:
+      - created
       - id
       - note
       - user
@@ -1483,6 +1447,10 @@ components:
           readOnly: true
         note:
           type: string
+        created:
+          type: string
+          format: date-time
+          readOnly: true
         user:
           type: integer
         sentence:
@@ -1762,23 +1730,6 @@ components:
       - id
       - password
       - username
-    Via:
-      type: object
-      description: Via
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        ordering:
-          type: integer
-        connectivity_statement:
-          type: integer
-        anatomical_entity:
-          type: integer
-      required:
-      - anatomical_entity
-      - connectivity_statement
-      - id
   securitySchemes:
     basicAuth:
       type: http
