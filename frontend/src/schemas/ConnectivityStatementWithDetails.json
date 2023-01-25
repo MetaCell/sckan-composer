@@ -2,33 +2,13 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "additionalProperties": false,
   "definitions": {},
-  "description": "Connectivity Statement",
+  "description": "Connectivity Statement with details",
   "properties": {
     "ans_division": {
-      "additionalProperties": false,
-      "description": "ANS Division",
-      "properties": {
-        "id": {
-          "type": "number"
-        },
-        "name": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "name"
-      ],
-      "type": "object"
+      "type": "number"
     },
     "apinatomy_model": {
       "type": "string"
-    },
-    "available_transitions": {
-      "items": {
-        "type": "string"
-      },
-      "type": "array"
     },
     "biological_sex": {
       "type": "string"
@@ -45,25 +25,7 @@
       "type": "string"
     },
     "destination": {
-      "additionalProperties": false,
-      "description": "Anatomical Entity",
-      "properties": {
-        "id": {
-          "type": "number"
-        },
-        "name": {
-          "type": "string"
-        },
-        "ontology_uri": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "ontology_uri"
-      ],
-      "type": "object"
+      "type": "number"
     },
     "destination_type": {
       "enum": [
@@ -73,6 +35,9 @@
         "UNKNOW"
       ],
       "type": "string"
+    },
+    "has_notes": {
+      "type": "boolean"
     },
     "id": {
       "type": "number"
@@ -92,214 +57,78 @@
     "modified_date": {
       "type": "string"
     },
-    "origen": {
-      "additionalProperties": false,
-      "description": "Anatomical Entity",
-      "properties": {
-        "id": {
-          "type": "number"
-        },
-        "name": {
-          "type": "string"
-        },
-        "ontology_uri": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "ontology_uri"
-      ],
-      "type": "object"
-    },
     "origin": {
       "type": "number"
     },
     "owner": {
-      "type": "number"
-    },
-    "path": {
-      "items": {
-        "additionalProperties": false,
-        "description": "Via",
-        "properties": {
-          "anatomical_entity": {
-            "additionalProperties": false,
-            "description": "Anatomical Entity",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "name": {
-                "type": "string"
-              },
-              "ontology_uri": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id",
-              "name",
-              "ontology_uri"
-            ],
-            "type": "object"
-          },
-          "id": {
-            "type": "number"
-          },
-          "ordering": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "id",
-          "anatomical_entity"
-        ],
-        "type": "object"
-      },
-      "type": "array"
-    },
-    "sentence": {
       "additionalProperties": false,
-      "description": "Sentence",
+      "description": "User",
       "properties": {
-        "available_transitions": {
+        "date_joined": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "groups": {
+          "description": "The groups this user belongs to. A user will get all permissions granted to each of their groups.",
           "items": {
-            "type": "string"
+            "type": "number"
           },
           "type": "array"
-        },
-        "doi": {
-          "type": "string"
         },
         "id": {
           "type": "number"
         },
-        "modified_date": {
+        "is_active": {
+          "description": "Designates whether this user should be treated as active. Unselect this instead of deleting accounts.",
+          "type": "boolean"
+        },
+        "is_staff": {
+          "description": "Designates whether the user can log into this admin site.",
+          "type": "boolean"
+        },
+        "is_superuser": {
+          "description": "Designates that this user has all permissions without explicitly assigning them.",
+          "type": "boolean"
+        },
+        "last_login": {
           "type": "string"
         },
-        "owner": {
-          "additionalProperties": false,
-          "description": "User",
-          "properties": {
-            "date_joined": {
-              "type": "string"
-            },
-            "email": {
-              "type": "string"
-            },
-            "first_name": {
-              "type": "string"
-            },
-            "groups": {
-              "description": "The groups this user belongs to. A user will get all permissions granted to each of their groups.",
-              "items": {
-                "type": "number"
-              },
-              "type": "array"
-            },
-            "id": {
-              "type": "number"
-            },
-            "is_active": {
-              "description": "Designates whether this user should be treated as active. Unselect this instead of deleting accounts.",
-              "type": "boolean"
-            },
-            "is_staff": {
-              "description": "Designates whether the user can log into this admin site.",
-              "type": "boolean"
-            },
-            "is_superuser": {
-              "description": "Designates that this user has all permissions without explicitly assigning them.",
-              "type": "boolean"
-            },
-            "last_login": {
-              "type": "string"
-            },
-            "last_name": {
-              "type": "string"
-            },
-            "password": {
-              "type": "string"
-            },
-            "user_permissions": {
-              "description": "Specific permissions for this user.",
-              "items": {
-                "type": "number"
-              },
-              "type": "array"
-            },
-            "username": {
-              "description": "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
-              "type": "string"
-            }
-          },
-          "required": [
-            "id",
-            "password",
-            "username"
-          ],
-          "type": "object"
-        },
-        "pmcid": {
+        "last_name": {
           "type": "string"
         },
-        "pmcid_uri": {
+        "password": {
           "type": "string"
         },
-        "pmid": {
-          "type": "number"
-        },
-        "pmid_uri": {
-          "type": "string"
-        },
-        "state": {
-          "type": "string"
-        },
-        "tags": {
+        "user_permissions": {
+          "description": "Specific permissions for this user.",
           "items": {
             "type": "number"
           },
           "type": "array"
         },
-        "text": {
-          "type": "string"
-        },
-        "title": {
+        "username": {
+          "description": "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
           "type": "string"
         }
       },
       "required": [
         "id",
-        "available_transitions",
-        "pmid_uri",
-        "pmcid_uri",
-        "owner",
-        "title",
-        "text",
-        "state",
-        "modified_date"
+        "password",
+        "username"
       ],
       "type": "object"
     },
+    "sentence": {
+      "type": "number"
+    },
     "species": {
       "items": {
-        "additionalProperties": false,
-        "description": "Specie",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "name"
-        ],
-        "type": "object"
+        "type": "number"
       },
       "type": "array"
     },
@@ -329,18 +158,13 @@
   },
   "required": [
     "id",
-    "available_transitions",
-    "path",
-    "sentence",
-    "origen",
-    "destination",
-    "ans_division",
-    "species",
+    "has_notes",
+    "owner",
     "tags",
     "knowledge_statement",
     "state",
     "modified_date",
-    "owner"
+    "sentence"
   ],
   "type": "object"
 }

@@ -103,12 +103,6 @@ export interface ConnectivityStatement {
     'available_transitions': Array<string>;
     /**
      * 
-     * @type {Array<ViaWithDetails>}
-     * @memberof ConnectivityStatement
-     */
-    'path': Array<ViaWithDetails>;
-    /**
-     * 
      * @type {string}
      * @memberof ConnectivityStatement
      */
@@ -178,13 +172,19 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'owner': number | null;
+    'owner'?: number | null;
     /**
      * 
      * @type {number}
      * @memberof ConnectivityStatement
      */
     'ans_division'?: number | null;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof ConnectivityStatement
+     */
+    'path': Array<number>;
     /**
      * 
      * @type {Array<number>}
@@ -199,7 +199,7 @@ export interface ConnectivityStatement {
     'tags'?: Array<number>;
 }
 /**
- * Connectivity Statement
+ * Connectivity Statement with details
  * @export
  * @interface ConnectivityStatementWithDetails
  */
@@ -212,46 +212,16 @@ export interface ConnectivityStatementWithDetails {
     'id': number;
     /**
      * 
-     * @type {Array<string>}
+     * @type {boolean}
      * @memberof ConnectivityStatementWithDetails
      */
-    'available_transitions': Array<string>;
+    'has_notes': boolean;
     /**
      * 
-     * @type {Array<ViaWithDetails>}
+     * @type {User}
      * @memberof ConnectivityStatementWithDetails
      */
-    'path': Array<ViaWithDetails>;
-    /**
-     * 
-     * @type {Sentence}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'sentence': Sentence;
-    /**
-     * 
-     * @type {AnatomicalEntity}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'origen': AnatomicalEntity;
-    /**
-     * 
-     * @type {AnatomicalEntity}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'destination': AnatomicalEntity;
-    /**
-     * 
-     * @type {AnsDivision}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'ans_division': AnsDivision;
-    /**
-     * 
-     * @type {Array<Specie>}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'species': Array<Specie>;
+    'owner': User;
     /**
      * 
      * @type {Array<Tag>}
@@ -311,13 +281,31 @@ export interface ConnectivityStatementWithDetails {
      * @type {number}
      * @memberof ConnectivityStatementWithDetails
      */
+    'sentence': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementWithDetails
+     */
     'origin'?: number | null;
     /**
      * 
      * @type {number}
      * @memberof ConnectivityStatementWithDetails
      */
-    'owner': number | null;
+    'destination'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementWithDetails
+     */
+    'ans_division'?: number | null;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof ConnectivityStatementWithDetails
+     */
+    'species'?: Array<number>;
 }
 /**
  * 
@@ -675,12 +663,6 @@ export interface PatchedConnectivityStatement {
     'available_transitions'?: Array<string>;
     /**
      * 
-     * @type {Array<ViaWithDetails>}
-     * @memberof PatchedConnectivityStatement
-     */
-    'path'?: Array<ViaWithDetails>;
-    /**
-     * 
      * @type {string}
      * @memberof PatchedConnectivityStatement
      */
@@ -757,6 +739,12 @@ export interface PatchedConnectivityStatement {
      * @memberof PatchedConnectivityStatement
      */
     'ans_division'?: number | null;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof PatchedConnectivityStatement
+     */
+    'path'?: Array<number>;
     /**
      * 
      * @type {Array<number>}
@@ -839,12 +827,6 @@ export interface PatchedSentence {
     'pmcid_uri'?: string;
     /**
      * 
-     * @type {User}
-     * @memberof PatchedSentence
-     */
-    'owner'?: User;
-    /**
-     * 
      * @type {string}
      * @memberof PatchedSentence
      */
@@ -885,6 +867,12 @@ export interface PatchedSentence {
      * @memberof PatchedSentence
      */
     'modified_date'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedSentence
+     */
+    'owner'?: number | null;
     /**
      * 
      * @type {Array<number>}
@@ -967,12 +955,6 @@ export interface Sentence {
     'pmcid_uri': string;
     /**
      * 
-     * @type {User}
-     * @memberof Sentence
-     */
-    'owner': User;
-    /**
-     * 
      * @type {string}
      * @memberof Sentence
      */
@@ -1015,13 +997,19 @@ export interface Sentence {
     'modified_date': string;
     /**
      * 
+     * @type {number}
+     * @memberof Sentence
+     */
+    'owner'?: number | null;
+    /**
+     * 
      * @type {Array<number>}
      * @memberof Sentence
      */
     'tags'?: Array<number>;
 }
 /**
- * Connectivity Statement
+ * Sentence with details
  * @export
  * @interface SentenceWithDetails
  */
@@ -1034,22 +1022,10 @@ export interface SentenceWithDetails {
     'id': number;
     /**
      * 
-     * @type {Array<string>}
+     * @type {boolean}
      * @memberof SentenceWithDetails
      */
-    'available_transitions': Array<string>;
-    /**
-     * 
-     * @type {string}
-     * @memberof SentenceWithDetails
-     */
-    'pmid_uri': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SentenceWithDetails
-     */
-    'pmcid_uri': string;
+    'has_notes': boolean;
     /**
      * 
      * @type {User}
@@ -1058,10 +1034,10 @@ export interface SentenceWithDetails {
     'owner': User;
     /**
      * 
-     * @type {Array<ConnectivityStatement>}
+     * @type {Array<Tag>}
      * @memberof SentenceWithDetails
      */
-    'connectivity_statements': Array<ConnectivityStatement>;
+    'tags': Array<Tag>;
     /**
      * 
      * @type {string}
@@ -1104,12 +1080,6 @@ export interface SentenceWithDetails {
      * @memberof SentenceWithDetails
      */
     'modified_date': string;
-    /**
-     * 
-     * @type {Array<number>}
-     * @memberof SentenceWithDetails
-     */
-    'tags'?: Array<number>;
 }
 /**
  * Specie
@@ -1264,31 +1234,6 @@ export interface Via {
      * @memberof Via
      */
     'anatomical_entity': number;
-}
-/**
- * Via
- * @export
- * @interface ViaWithDetails
- */
-export interface ViaWithDetails {
-    /**
-     * 
-     * @type {number}
-     * @memberof ViaWithDetails
-     */
-    'id': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof ViaWithDetails
-     */
-    'ordering'?: number;
-    /**
-     * 
-     * @type {AnatomicalEntity}
-     * @memberof ViaWithDetails
-     */
-    'anatomical_entity': AnatomicalEntity;
 }
 
 /**
@@ -2876,7 +2821,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatementWithDetails>> {
+        async composerConnectivityStatementRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementRetrieve(id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -3027,7 +2972,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SentenceWithDetails>> {
+        async composerSentenceRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceRetrieve(id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -3215,7 +3160,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementRetrieve(id: number, options?: any): AxiosPromise<ConnectivityStatementWithDetails> {
+        composerConnectivityStatementRetrieve(id: number, options?: any): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -3352,7 +3297,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceRetrieve(id: number, options?: any): AxiosPromise<SentenceWithDetails> {
+        composerSentenceRetrieve(id: number, options?: any): AxiosPromise<Sentence> {
             return localVarFp.composerSentenceRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**

@@ -68,42 +68,7 @@
     },
     "path": {
       "items": {
-        "additionalProperties": false,
-        "description": "Via",
-        "properties": {
-          "anatomical_entity": {
-            "additionalProperties": false,
-            "description": "Anatomical Entity",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "name": {
-                "type": "string"
-              },
-              "ontology_uri": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id",
-              "name",
-              "ontology_uri"
-            ],
-            "type": "object"
-          },
-          "id": {
-            "type": "number"
-          },
-          "ordering": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "id",
-          "anatomical_entity"
-        ],
-        "type": "object"
+        "type": "number"
       },
       "type": "array"
     },
@@ -129,12 +94,11 @@
   "required": [
     "id",
     "available_transitions",
-    "path",
     "knowledge_statement",
     "state",
     "modified_date",
     "sentence",
-    "owner"
+    "path"
   ],
   "type": "object"
 }

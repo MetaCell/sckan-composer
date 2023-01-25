@@ -20,67 +20,7 @@
       "type": "string"
     },
     "owner": {
-      "additionalProperties": false,
-      "description": "User",
-      "properties": {
-        "date_joined": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "first_name": {
-          "type": "string"
-        },
-        "groups": {
-          "description": "The groups this user belongs to. A user will get all permissions granted to each of their groups.",
-          "items": {
-            "type": "number"
-          },
-          "type": "array"
-        },
-        "id": {
-          "type": "number"
-        },
-        "is_active": {
-          "description": "Designates whether this user should be treated as active. Unselect this instead of deleting accounts.",
-          "type": "boolean"
-        },
-        "is_staff": {
-          "description": "Designates whether the user can log into this admin site.",
-          "type": "boolean"
-        },
-        "is_superuser": {
-          "description": "Designates that this user has all permissions without explicitly assigning them.",
-          "type": "boolean"
-        },
-        "last_login": {
-          "type": "string"
-        },
-        "last_name": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        },
-        "user_permissions": {
-          "description": "Specific permissions for this user.",
-          "items": {
-            "type": "number"
-          },
-          "type": "array"
-        },
-        "username": {
-          "description": "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "password",
-        "username"
-      ],
-      "type": "object"
+      "type": "number"
     },
     "pmcid": {
       "type": "string"

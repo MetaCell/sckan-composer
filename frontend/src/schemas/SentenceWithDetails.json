@@ -2,157 +2,13 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "additionalProperties": false,
   "definitions": {},
-  "description": "Connectivity Statement",
+  "description": "Sentence with details",
   "properties": {
-    "available_transitions": {
-      "items": {
-        "type": "string"
-      },
-      "type": "array"
-    },
-    "connectivity_statements": {
-      "items": {
-        "additionalProperties": false,
-        "description": "Connectivity Statement",
-        "properties": {
-          "ans_division": {
-            "type": "number"
-          },
-          "apinatomy_model": {
-            "type": "string"
-          },
-          "available_transitions": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "biological_sex": {
-            "type": "string"
-          },
-          "circuit_type": {
-            "enum": [
-              "SENSORY",
-              "MOTOR",
-              "INTRINSIC",
-              "PROJECTION",
-              "ANAXONIC",
-              "UNKNOWN"
-            ],
-            "type": "string"
-          },
-          "destination": {
-            "type": "number"
-          },
-          "destination_type": {
-            "enum": [
-              "AXON-SE",
-              "AXON-T",
-              "AXON-ST",
-              "UNKNOW"
-            ],
-            "type": "string"
-          },
-          "id": {
-            "type": "number"
-          },
-          "knowledge_statement": {
-            "type": "string"
-          },
-          "laterality": {
-            "enum": [
-              "IPSI",
-              "ONTRAT",
-              "BI",
-              "UNKNOWN"
-            ],
-            "type": "string"
-          },
-          "modified_date": {
-            "type": "string"
-          },
-          "origin": {
-            "type": "number"
-          },
-          "owner": {
-            "type": "number"
-          },
-          "path": {
-            "items": {
-              "additionalProperties": false,
-              "description": "Via",
-              "properties": {
-                "anatomical_entity": {
-                  "additionalProperties": false,
-                  "description": "Anatomical Entity",
-                  "properties": {
-                    "id": {
-                      "type": "number"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "ontology_uri": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "name",
-                    "ontology_uri"
-                  ],
-                  "type": "object"
-                },
-                "id": {
-                  "type": "number"
-                },
-                "ordering": {
-                  "type": "number"
-                }
-              },
-              "required": [
-                "id",
-                "anatomical_entity"
-              ],
-              "type": "object"
-            },
-            "type": "array"
-          },
-          "sentence": {
-            "type": "number"
-          },
-          "species": {
-            "items": {
-              "type": "number"
-            },
-            "type": "array"
-          },
-          "state": {
-            "type": "string"
-          },
-          "tags": {
-            "items": {
-              "type": "number"
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "id",
-          "available_transitions",
-          "path",
-          "knowledge_statement",
-          "state",
-          "modified_date",
-          "sentence",
-          "owner"
-        ],
-        "type": "object"
-      },
-      "type": "array"
-    },
     "doi": {
       "type": "string"
+    },
+    "has_notes": {
+      "type": "boolean"
     },
     "id": {
       "type": "number"
@@ -226,21 +82,29 @@
     "pmcid": {
       "type": "string"
     },
-    "pmcid_uri": {
-      "type": "string"
-    },
     "pmid": {
       "type": "number"
-    },
-    "pmid_uri": {
-      "type": "string"
     },
     "state": {
       "type": "string"
     },
     "tags": {
       "items": {
-        "type": "number"
+        "additionalProperties": false,
+        "description": "Note Tag",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "tag": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tag"
+        ],
+        "type": "object"
       },
       "type": "array"
     },
@@ -253,11 +117,9 @@
   },
   "required": [
     "id",
-    "available_transitions",
-    "pmid_uri",
-    "pmcid_uri",
+    "has_notes",
     "owner",
-    "connectivity_statements",
+    "tags",
     "title",
     "text",
     "state",
