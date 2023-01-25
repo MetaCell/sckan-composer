@@ -13,7 +13,7 @@ const log = (type:string) => console.log.bind(console, type);
 
 const schema = require("../../schemas/Note.json")
 
-const excludedFields = ["connectivity_statement","id", "sentence", "user" ]
+const excludedFields = ["connectivity_statement","id", "sentence", "user","created" ]
 
 const uiSchema: UiSchema = {
     "ui:submitButtonOptions": {

@@ -4,16 +4,31 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 import { useParams } from "react-router-dom";
 import SentenceForm from './Forms/SentenceForm';
 import { retrieveSentence } from '../services/SentenceService';
 import { Sentence } from '../apiclient/backend';
 import { userProfile } from '../services/UserService';
 import NoteForm from './Forms/NoteForm';
+import StatementForm from './Forms/StatementForm';
+
+const excludedStatementFields = ['destination', 'destination_type', 'origin', 'path', 'state', 'tags', 'available_transitions']
+
+const ReducedStatementForm = (props:any)=>{
+  
+  const formData = {sentence:Number(props.sentenceId)}
+
+  return(
+    <StatementForm formData={formData} excludedFields={excludedStatementFields}/>
+  )
+}
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
   const [sentence, setSentence] = useState<Sentence>()
+  const [ extraStatementForm, setExtraStatementForm] = useState<string[]>([])
+
 
   const fetchSentence = async (id: number)=> {
     const response = await retrieveSentence(id)
@@ -42,6 +57,9 @@ const SentencesDetails = () => {
       </Grid>
       <Grid item xl={7}>
         <SentenceForm formData={sentence}/>
+        <ReducedStatementForm sentenceId={sentenceId}/>
+        {extraStatementForm.map(()=>(<ReducedStatementForm sentenceId={sentenceId}/>))}
+        <Button onClick={()=>setExtraStatementForm((prev)=>[...prev,''])}>Add Statement</Button>
       </Grid>
       <Grid item xl={5}>
         <NoteForm/>

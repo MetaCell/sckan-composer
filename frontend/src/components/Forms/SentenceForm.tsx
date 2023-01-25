@@ -10,22 +10,18 @@ const Form = withTheme(Theme);
 
 const log = (type:string) => console.log.bind(console, type);
 
-const sentenceSchema = require("../../schemas/SentenceWithDetails.json")
+const sentenceSchema = require("../../schemas/Sentence.json")
 
-const excludedFields = [ 'id', 'modified_date', 'owner', 'pmcid', 'pmcid_uri', 'pmid_uri']
-const statementExcludedFields =['id', 'destination', 'destination_type', 'modified_date', 'origin', 'owner', 'path', 'sentence', 'tags', 'state', 'available_transitions']
+const excludedFields:string[] = [ 
+  'id', 'modified_date', 'owner', 'pmcid', 'pmcid_uri', 'pmid_uri'
+]
 
 const uiSchema: UiSchema = {
   "ui:submitButtonOptions": {
     "norender": true,
   },
   ...hiddenWidget(excludedFields),
-  'ui:order':['connectivity_statements', 'text', 'title', 'pmid', 'state','doi','tags','available_transitions',...excludedFields ],
-  "connectivity_statements":{
-    "items":{ ...hiddenWidget(statementExcludedFields),
-      "ui:order":["knowledge_statement", "species", "biological_sex", "apinatomy_model", "circuit_type", "laterality", "ans_division", ...statementExcludedFields]
-    },
-  },
+  'ui:order':[ 'text', 'title', 'pmid', 'state','doi','tags','available_transitions',...excludedFields ],
 };
 
 
