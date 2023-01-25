@@ -81,11 +81,6 @@ class SentenceAdmin(
     list_filter = ("state", "owner", "tags__tag")
     search_fields = ("title", "text", "pmid", "pmcid", "doi")
 
-    @admin.display(description="tags")
-    def tag_list(self, obj):
-        tags = ", ".join(obj.tags.all().values_list("tag", flat=True))
-        return tags
-
     inlines = (
         ConnectivityStatementInline,
         NoteSentenceInline,
@@ -115,6 +110,7 @@ class ConnectivityStatementAdmin(
         "destination",
         "tag_list",
         "state",
+        "has_notes",
         "owner",
     )
     list_display_links = ("sentence", "pmid", "pmcid", "short_ks", "state")
@@ -145,11 +141,6 @@ class ConnectivityStatementAdmin(
     @admin.display(description="PMCID")
     def pmcid(self, obj):
         return obj.sentence.pmcid
-
-    @admin.display(description="tags")
-    def tag_list(self, obj):
-        tags = ", ".join(obj.tags.all().values_list("tag", flat=True))
-        return tags
 
 
 # Re-register UserAdmin

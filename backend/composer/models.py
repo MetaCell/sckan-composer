@@ -69,7 +69,11 @@ class ConnectivityStatementManager(models.Manager):
             super()
             .get_queryset()
             .select_related(
-                "owner", "origin", "destination", "ans_division", "sentence"
+                "owner",
+                "origin",
+                "destination",
+                "ans_division",
+                "sentence",
             )
             .prefetch_related("notes", "tags", "species")
         )
@@ -80,7 +84,9 @@ class SentenceStatementManager(models.Manager):
         return (
             super()
             .get_queryset()
-            .select_related("owner")
+            .select_related(
+                "owner",
+            )
             .prefetch_related("notes", "tags")
         )
 
@@ -227,6 +233,10 @@ class Sentence(models.Model):
     @property
     def doi_uri(self):
         return doi_uri(self.doi)
+
+    @property
+    def tag_list(self):
+        return ", ".join(self.tags.all().values_list("tag", flat=True))
 
     @property
     def has_notes(self):
@@ -381,6 +391,10 @@ class ConnectivityStatement(models.Model):
     @property
     def has_notes(self):
         return self.notes.exists()
+
+    @property
+    def tag_list(self):
+        return ", ".join(self.tags.all().values_list("tag", flat=True))
 
     def assign_owner(self, request):
         if ConnectivityStatementService(self).should_set_owner(request):
