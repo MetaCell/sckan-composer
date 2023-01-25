@@ -4,8 +4,7 @@ from django.db.models import Q
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
 
-from .enums import (CircuitType, CSState, DestinationType, Laterality,
-                    SentenceState)
+from .enums import CircuitType, CSState, DestinationType, Laterality, SentenceState
 from .services import ConnectivityStatementService, SentenceService
 from .utils import doi_uri, pmcid_uri, pmid_uri
 
@@ -13,8 +12,10 @@ from .utils import doi_uri, pmcid_uri, pmid_uri
 # some django user overwrite
 def get_name(self):
     if self.first_name or self.last_name:
-        return '{} {}'.format(self.first_name, self.last_name)
-    return '{}'.format(self.username)
+        return "{} {}".format(self.first_name, self.last_name)
+    return "{}".format(self.username)
+
+
 User.add_to_class("__str__", get_name)
 
 
@@ -64,12 +65,24 @@ class PmcIdField(models.CharField):
 # Model Managers
 class ConnectivityStatementManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related("owner", "origin", "destination", "ans_division", "sentence").prefetch_related('notes', 'tags', "species")
+        return (
+            super()
+            .get_queryset()
+            .select_related(
+                "owner", "origin", "destination", "ans_division", "sentence"
+            )
+            .prefetch_related("notes", "tags", "species")
+        )
 
 
 class SentenceStatementManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related("owner").prefetch_related('notes', 'tags')
+        return (
+            super()
+            .get_queryset()
+            .select_related("owner")
+            .prefetch_related("notes", "tags")
+        )
 
 
 # Create your models here.
@@ -135,6 +148,7 @@ class Tag(models.Model):
 
 class Sentence(models.Model):
     """Sentence"""
+
     objects = SentenceStatementManager()
 
     title = models.CharField(max_length=200, db_index=True)
@@ -213,7 +227,7 @@ class Sentence(models.Model):
     @property
     def doi_uri(self):
         return doi_uri(self.doi)
-    
+
     @property
     def has_notes(self):
         return self.notes.exists()
@@ -230,7 +244,11 @@ class Sentence(models.Model):
                 check=~Q(state=SentenceState.COMPOSE_NOW)
                 | (
                     Q(state=SentenceState.COMPOSE_NOW)
-                    & (Q(pmid__isnull=False) | Q(pmcid__isnull=False) | Q(doi__isnull=False))
+                    & (
+                        Q(pmid__isnull=False)
+                        | Q(pmcid__isnull=False)
+                        | Q(doi__isnull=False)
+                    )
                 ),
                 name="sentence_pmid_pmcd_valid",
             ),
@@ -261,6 +279,7 @@ class Via(models.Model):
 
 class ConnectivityStatement(models.Model):
     """Connectivity Statement"""
+
     objects = ConnectivityStatementManager()
 
     sentence = models.ForeignKey(
@@ -362,7 +381,7 @@ class ConnectivityStatement(models.Model):
     @property
     def has_notes(self):
         return self.notes.exists()
-    
+
     def assign_owner(self, request):
         if ConnectivityStatementService(self).should_set_owner(request):
             self.owner = request.user
@@ -447,4 +466,3 @@ class Note(models.Model):
                 name="only_sentence_or_connectivity_statement",
             ),
         ]
-

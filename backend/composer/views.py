@@ -9,7 +9,7 @@ def index(request):
             reverse("social:begin", kwargs={"backend": "orcid"})
         )
 
-    return HttpResponseRedirect("http://localhost:3000") # for testing purpose
+    return HttpResponseRedirect("http://localhost:3000")  # for testing purpose
     # template = loader.get_template("composer/index.html")
     # context = {}
     # return HttpResponse(template.render(context, request))

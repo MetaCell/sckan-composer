@@ -33,7 +33,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000/",
     "https://localhost:8000/",
     "https://*.metacell.us/",
-    "https://127.0.0.1:8000/"
+    "https://127.0.0.1:8000/",
 ]
 
 # Application definition
@@ -334,9 +334,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
-    'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',
-    ),
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
 }
 
 SPECTACULAR_SETTINGS = {

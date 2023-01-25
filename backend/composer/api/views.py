@@ -3,15 +3,36 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
-from .filtersets import SentenceFilter, ConnectivityStatementFilter, AnatomicalEntityFilter
-from ..models import (AnatomicalEntity, AnsDivision, ConnectivityStatement,
-                      Note, Profile, Sentence, Specie, Tag, Via)
+from .filtersets import (
+    SentenceFilter,
+    ConnectivityStatementFilter,
+    AnatomicalEntityFilter,
+)
+from ..models import (
+    AnatomicalEntity,
+    AnsDivision,
+    ConnectivityStatement,
+    Note,
+    Profile,
+    Sentence,
+    Specie,
+    Tag,
+    Via,
+)
 from ..services import ConnectivityStatementService
-from .serializers import (AnatomicalEntitySerializer, AnsDivisionSerializer,
-                          ConnectivityStatementSerializer,
-                          ConnectivityStatementWithDetailsSerializer, NoteSerializer,
-                          ProfileSerializer, SentenceSerializer, SentenceWithDetailsSerializer,
-                          SpecieSerializer, TagSerializer, ViaSerializer)
+from .serializers import (
+    AnatomicalEntitySerializer,
+    AnsDivisionSerializer,
+    ConnectivityStatementSerializer,
+    ConnectivityStatementWithDetailsSerializer,
+    NoteSerializer,
+    ProfileSerializer,
+    SentenceSerializer,
+    SentenceWithDetailsSerializer,
+    SpecieSerializer,
+    TagSerializer,
+    ViaSerializer,
+)
 
 
 class ModelCreateRetrieveViewSet(
@@ -47,7 +68,6 @@ class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = AnatomicalEntityFilter
-
 
 
 class AnsDivisionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -87,9 +107,8 @@ class ConnectivityStatementViewSet(viewsets.ModelViewSet):
     ]
     filterset_class = ConnectivityStatementFilter
 
-
     def get_serializer_class(self, *args, **kwargs):
-        if self.action in ("list", ):
+        if self.action in ("list",):
             return self.serializer_class_with_details
         return self.serializer_class
 
@@ -132,7 +151,7 @@ class SentenceViewSet(ModelNoDeleteViewSet):
     filterset_class = SentenceFilter
 
     def get_serializer_class(self, *args, **kwargs):
-        if self.action in ("list", ):
+        if self.action in ("list",):
             return self.serializer_class_with_details
         return self.serializer_class
 

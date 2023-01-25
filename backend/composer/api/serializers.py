@@ -2,8 +2,18 @@ from django.contrib.auth.models import User
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from ..models import (AnatomicalEntity, AnsDivision, ConnectivityStatement,
-                      Doi, Note, Profile, Sentence, Specie, Tag, Via)
+from ..models import (
+    AnatomicalEntity,
+    AnsDivision,
+    ConnectivityStatement,
+    Doi,
+    Note,
+    Profile,
+    Sentence,
+    Specie,
+    Tag,
+    Via,
+)
 
 
 # serializers
@@ -88,7 +98,6 @@ class ViaWithDetailsSerializer(serializers.ModelSerializer):
         fields = ("id", "ordering", "anatomical_entity")
 
 
-
 class DoitSerializer(serializers.ModelSerializer):
     """Doi"""
 
@@ -136,11 +145,12 @@ class ConnectivityStatementSerializer(serializers.ModelSerializer):
         model = ConnectivityStatement
         fields = "__all__"
         depth = 0
-        read_only_fields = ("state", )
+        read_only_fields = ("state",)
 
 
 class SentenceWithDetailsSerializer(serializers.ModelSerializer):
     """Sentence with details"""
+
     has_notes = serializers.SerializerMethodField()
     owner = UserSerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
@@ -154,10 +164,12 @@ class SentenceWithDetailsSerializer(serializers.ModelSerializer):
         read_only_fields = (
             "state",
             "modified_date",
-        )    
+        )
+
 
 class ConnectivityStatementWithDetailsSerializer(serializers.ModelSerializer):
     """Connectivity Statement with details"""
+
     has_notes = serializers.SerializerMethodField()
     owner = UserSerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
@@ -169,5 +181,5 @@ class ConnectivityStatementWithDetailsSerializer(serializers.ModelSerializer):
         model = ConnectivityStatement
         # fields = "__all__"
         # depth = 1
-        exclude=("path",)
-        read_only_fields = ("state", )
+        exclude = ("path",)
+        read_only_fields = ("state",)
