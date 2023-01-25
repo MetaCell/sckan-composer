@@ -81,7 +81,7 @@ class ConnectivityStatementViewSet(viewsets.ModelViewSet):
 
     queryset = ConnectivityStatement.objects.all()
     serializer_class = ConnectivityStatementSerializer
-    serializer_class_get = ConnectivityStatementWithDetailsSerializer
+    serializer_class_with_details = ConnectivityStatementWithDetailsSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
@@ -89,8 +89,8 @@ class ConnectivityStatementViewSet(viewsets.ModelViewSet):
 
 
     def get_serializer_class(self, *args, **kwargs):
-        if self.action in ("list", "retrieve"):
-            return self.serializer_class_get
+        if self.action in ("list", ):
+            return self.serializer_class_with_details
         return self.serializer_class
 
     def retrieve(self, request, *args, **kwargs):
@@ -125,15 +125,15 @@ class SentenceViewSet(ModelNoDeleteViewSet):
 
     queryset = Sentence.objects.all()
     serializer_class = SentenceSerializer
-    serializer_class_get = SentenceWithDetailsSerializer
+    serializer_class_with_details = SentenceWithDetailsSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = SentenceFilter
 
     def get_serializer_class(self, *args, **kwargs):
-        if self.action in ("list", "retrieve"):
-            return self.serializer_class_get
+        if self.action in ("list", ):
+            return self.serializer_class_with_details
         return self.serializer_class
 
     def retrieve(self, request, *args, **kwargs):

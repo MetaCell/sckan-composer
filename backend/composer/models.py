@@ -61,6 +61,17 @@ class PmcIdField(models.CharField):
         return super().formfield(*args, **kwargs)
 
 
+# Model Managers
+class ConnectivityStatementManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related("owner", "origin", "destination", "ans_division", "sentence").prefetch_related('notes', 'tags', "species")
+
+
+class SentenceStatementManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related("owner").prefetch_related('notes', 'tags')
+
+
 # Create your models here.
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -124,6 +135,7 @@ class Tag(models.Model):
 
 class Sentence(models.Model):
     """Sentence"""
+    objects = SentenceStatementManager()
 
     title = models.CharField(max_length=200, db_index=True)
     text = models.TextField(db_index=True)
@@ -201,6 +213,10 @@ class Sentence(models.Model):
     @property
     def doi_uri(self):
         return doi_uri(self.doi)
+    
+    @property
+    def has_notes(self):
+        return self.notes.exists()
 
     class Meta:
         ordering = ["title"]
@@ -245,6 +261,7 @@ class Via(models.Model):
 
 class ConnectivityStatement(models.Model):
     """Connectivity Statement"""
+    objects = ConnectivityStatementManager()
 
     sentence = models.ForeignKey(
         Sentence, verbose_name="Sentence", on_delete=models.DO_NOTHING
@@ -342,6 +359,10 @@ class ConnectivityStatement(models.Model):
     def approved(self):
         pass
 
+    @property
+    def has_notes(self):
+        return self.notes.exists()
+    
     def assign_owner(self, request):
         if ConnectivityStatementService(self).should_set_owner(request):
             self.owner = request.user

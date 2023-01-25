@@ -259,7 +259,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConnectivityStatementWithDetails'
+                $ref: '#/components/schemas/ConnectivityStatement'
           description: ''
     put:
       operationId: composer_connectivity_statement_update
@@ -765,7 +765,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SentenceWithDetails'
+                $ref: '#/components/schemas/Sentence'
           description: ''
     put:
       operationId: composer_sentence_update
@@ -1085,11 +1085,6 @@ components:
           items:
             type: string
           readOnly: true
-        path:
-          type: array
-          items:
-            $ref: '#/components/schemas/ViaWithDetails'
-          readOnly: true
         knowledge_statement:
           type: string
         state:
@@ -1123,12 +1118,16 @@ components:
           nullable: true
         owner:
           type: integer
-          readOnly: true
           nullable: true
           title: Curator
         ans_division:
           type: integer
           nullable: true
+        path:
+          type: array
+          items:
+            type: integer
+          readOnly: true
         species:
           type: array
           items:
@@ -1142,47 +1141,22 @@ components:
       - id
       - knowledge_statement
       - modified_date
-      - owner
       - path
       - sentence
       - state
     ConnectivityStatementWithDetails:
       type: object
-      description: Connectivity Statement
+      description: Connectivity Statement with details
       properties:
         id:
           type: integer
           readOnly: true
-        available_transitions:
-          type: array
-          items:
-            type: string
+        has_notes:
+          type: boolean
           readOnly: true
-        path:
-          type: array
-          items:
-            $ref: '#/components/schemas/ViaWithDetails'
-          readOnly: true
-        sentence:
+        owner:
           allOf:
-          - $ref: '#/components/schemas/Sentence'
-          readOnly: true
-        origen:
-          allOf:
-          - $ref: '#/components/schemas/AnatomicalEntity'
-          readOnly: true
-        destination:
-          allOf:
-          - $ref: '#/components/schemas/AnatomicalEntity'
-          readOnly: true
-        ans_division:
-          allOf:
-          - $ref: '#/components/schemas/AnsDivision'
-          readOnly: true
-        species:
-          type: array
-          items:
-            $ref: '#/components/schemas/Specie'
+          - $ref: '#/components/schemas/User'
           readOnly: true
         tags:
           type: array
@@ -1212,26 +1186,28 @@ components:
           type: string
           format: date-time
           readOnly: true
+        sentence:
+          type: integer
         origin:
           type: integer
           nullable: true
-        owner:
+        destination:
           type: integer
-          readOnly: true
           nullable: true
-          title: Curator
+        ans_division:
+          type: integer
+          nullable: true
+        species:
+          type: array
+          items:
+            type: integer
       required:
-      - ans_division
-      - available_transitions
-      - destination
+      - has_notes
       - id
       - knowledge_statement
       - modified_date
-      - origen
       - owner
-      - path
       - sentence
-      - species
       - state
       - tags
     DestinationTypeEnum:
@@ -1443,11 +1419,6 @@ components:
           items:
             type: string
           readOnly: true
-        path:
-          type: array
-          items:
-            $ref: '#/components/schemas/ViaWithDetails'
-          readOnly: true
         knowledge_statement:
           type: string
         state:
@@ -1481,12 +1452,16 @@ components:
           nullable: true
         owner:
           type: integer
-          readOnly: true
           nullable: true
           title: Curator
         ans_division:
           type: integer
           nullable: true
+        path:
+          type: array
+          items:
+            type: integer
+          readOnly: true
         species:
           type: array
           items:
@@ -1530,10 +1505,6 @@ components:
         pmcid_uri:
           type: string
           readOnly: true
-        owner:
-          allOf:
-          - $ref: '#/components/schemas/User'
-          readOnly: true
         title:
           type: string
           maxLength: 200
@@ -1557,6 +1528,10 @@ components:
           type: string
           format: date-time
           readOnly: true
+        owner:
+          type: integer
+          nullable: true
+          title: Triage Operator
         tags:
           type: array
           items:
@@ -1603,10 +1578,6 @@ components:
         pmcid_uri:
           type: string
           readOnly: true
-        owner:
-          allOf:
-          - $ref: '#/components/schemas/User'
-          readOnly: true
         title:
           type: string
           maxLength: 200
@@ -1630,6 +1601,10 @@ components:
           type: string
           format: date-time
           readOnly: true
+        owner:
+          type: integer
+          nullable: true
+          title: Triage Operator
         tags:
           type: array
           items:
@@ -1638,7 +1613,6 @@ components:
       - available_transitions
       - id
       - modified_date
-      - owner
       - pmcid_uri
       - pmid_uri
       - state
@@ -1646,30 +1620,22 @@ components:
       - title
     SentenceWithDetails:
       type: object
-      description: Connectivity Statement
+      description: Sentence with details
       properties:
         id:
           type: integer
           readOnly: true
-        available_transitions:
-          type: array
-          items:
-            type: string
-          readOnly: true
-        pmid_uri:
-          type: string
-          readOnly: true
-        pmcid_uri:
-          type: string
+        has_notes:
+          type: boolean
           readOnly: true
         owner:
           allOf:
           - $ref: '#/components/schemas/User'
           readOnly: true
-        connectivity_statements:
+        tags:
           type: array
           items:
-            $ref: '#/components/schemas/ConnectivityStatement'
+            $ref: '#/components/schemas/Tag'
           readOnly: true
         title:
           type: string
@@ -1694,19 +1660,13 @@ components:
           type: string
           format: date-time
           readOnly: true
-        tags:
-          type: array
-          items:
-            type: integer
       required:
-      - available_transitions
-      - connectivity_statements
+      - has_notes
       - id
       - modified_date
       - owner
-      - pmcid_uri
-      - pmid_uri
       - state
+      - tags
       - text
       - title
     Specie:
@@ -1814,22 +1774,6 @@ components:
       required:
       - anatomical_entity
       - connectivity_statement
-      - id
-    ViaWithDetails:
-      type: object
-      description: Via
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        ordering:
-          type: integer
-        anatomical_entity:
-          allOf:
-          - $ref: '#/components/schemas/AnatomicalEntity'
-          readOnly: true
-      required:
-      - anatomical_entity
       - id
   securitySchemes:
     basicAuth:
