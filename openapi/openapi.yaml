@@ -169,6 +169,10 @@ paths:
         schema:
           type: integer
       - in: query
+        name: sentence_id
+        schema:
+          type: integer
+      - in: query
         name: state
         schema:
           type: array

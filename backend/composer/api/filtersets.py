@@ -33,6 +33,7 @@ class SentenceFilter(django_filters.FilterSet):
 
 
 class ConnectivityStatementFilter(django_filters.FilterSet):
+    sentence_id = django_filters.NumberFilter(field_name="sentence__id")
     knowledge_statement = django_filters.CharFilter(
         field_name="knowledge_statement", lookup_expr="icontains"
     )
