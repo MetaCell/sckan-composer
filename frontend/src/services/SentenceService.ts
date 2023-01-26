@@ -30,3 +30,4 @@ export async function editSentence(id:number,patchedSentence:any): Promise<any>{
     return response.data
 }
 
+
