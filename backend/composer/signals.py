@@ -8,4 +8,5 @@ def create_profile(sender, instance=None, created=False, **kwargs):
     if created:
         # Create a profile for the user is the user was created
         from .models import Profile
+
         Profile.objects.get_or_create(user=instance)

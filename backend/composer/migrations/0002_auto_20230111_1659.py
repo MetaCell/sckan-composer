@@ -18,7 +18,11 @@ class Migration(migrations.Migration):
         DJANGO_SU_PASSWORD = os.environ.get("DJANGO_SU_PASSWORD")
 
         superuser = User.objects.create_superuser(
-            username="admin", email="admin@metacell.us", password="admin", first_name="Admin", last_name="Admin"
+            username="admin",
+            email="admin@metacell.us",
+            password="admin",
+            first_name="Admin",
+            last_name="Admin",
         )
 
         superuser.save()
