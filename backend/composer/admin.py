@@ -5,9 +5,18 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from fsm_admin.mixins import FSMTransitionMixin
 
-from composer.models import (AnatomicalEntity, AnsDivision,
-                             ConnectivityStatement, Doi, Note, Profile,
-                             Sentence, Specie, Tag, Via)
+from composer.models import (
+    AnatomicalEntity,
+    AnsDivision,
+    ConnectivityStatement,
+    Doi,
+    Note,
+    Profile,
+    Sentence,
+    Specie,
+    Tag,
+    Via,
+)
 
 # Define Inlines
 
@@ -69,13 +78,8 @@ class SentenceAdmin(
     readonly_fields = ("state",)
     list_display = ("title", "pmid", "pmcid", "doi", "tag_list", "state", "owner")
     list_display_links = ("title", "pmid", "pmcid")
-    list_filter = ("state", "owner", "tags__tag" )
+    list_filter = ("state", "owner", "tags__tag")
     search_fields = ("title", "text", "pmid", "pmcid", "doi")
-
-    @admin.display(description="tags")
-    def tag_list(self, obj):
-        tags = ", ".join(obj.tags.all().values_list("tag", flat=True))
-        return tags
 
     inlines = (
         ConnectivityStatementInline,
@@ -106,10 +110,11 @@ class ConnectivityStatementAdmin(
         "destination",
         "tag_list",
         "state",
+        "has_notes",
         "owner",
     )
     list_display_links = ("sentence", "pmid", "pmcid", "short_ks", "state")
-    list_filter = ("state", "owner", "tags__tag" )
+    list_filter = ("state", "owner", "tags__tag")
     list_select_related = ("sentence", "origin", "destination")
     search_fields = (
         "sentence__title",
@@ -136,11 +141,6 @@ class ConnectivityStatementAdmin(
     @admin.display(description="PMCID")
     def pmcid(self, obj):
         return obj.sentence.pmcid
-
-    @admin.display(description="tags")
-    def tag_list(self, obj):
-        tags = ", ".join(obj.tags.all().values_list("tag", flat=True))
-        return tags
 
 
 # Re-register UserAdmin

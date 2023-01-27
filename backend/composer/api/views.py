@@ -3,35 +3,64 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
-from .filtersets import SentenceFilter, ConnectivityStatementFilter, AnatomicalEntityFilter
-from ..models import (AnatomicalEntity, AnsDivision, ConnectivityStatement,
-                      Note, Profile, Sentence, Specie, Tag, Via)
-from ..services import ConnectivityStatementService
-from .serializers import (AnatomicalEntitySerializer, AnsDivisionSerializer,
-                          ConnectivityStatementSerializer,
-                          ConnectivityStatementWithDetailsSerializer, NoteSerializer,
-                          ProfileSerializer, SentenceSerializer,
-                          SpecieSerializer, TagSerializer, ViaSerializer)
+from drf_react_template.mixins import FormSchemaViewSetMixin
+
+from .filtersets import (
+    SentenceFilter,
+    ConnectivityStatementFilter,
+    AnatomicalEntityFilter,
+    NoteFilter,
+    ViaFilter,
+)
+from ..models import (
+    AnatomicalEntity,
+    AnsDivision,
+    ConnectivityStatement,
+    Note,
+    Profile,
+    Sentence,
+    Specie,
+    Tag,
+    Via,
+)
+from ..services import ConnectivityStatementService, SentenceService
+from .serializers import (
+    AnatomicalEntitySerializer,
+    AnsDivisionSerializer,
+    ConnectivityStatementSerializer,
+    ConnectivityStatementWithDetailsSerializer,
+    NoteSerializer,
+    ProfileSerializer,
+    SentenceSerializer,
+    SentenceWithDetailsSerializer,
+    SpecieSerializer,
+    TagSerializer,
+    ViaSerializer,
+)
 
 
-class ModelCreateRetrieveViewSet(
-    mixins.CreateModelMixin,
+class ModelRetrieveViewSet(
+    # mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
     # mixins.UpdateModelMixin,
     # mixins.DestroyModelMixin,
-    mixins.ListModelMixin,
+    # mixins.ListModelMixin,
     viewsets.GenericViewSet,
 ):
     ...
 
 
-class ModelNoDeleteViewSet(
+class ModelCreateRetrieveViewSet(
+    ModelRetrieveViewSet,
     mixins.CreateModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
-    # mixins.DestroyModelMixin,
     mixins.ListModelMixin,
-    viewsets.GenericViewSet,
+):
+    ...
+
+
+class ModelNoDeleteViewSet(
+    ModelCreateRetrieveViewSet,
+    mixins.UpdateModelMixin,
 ):
     ...
 
@@ -47,7 +76,6 @@ class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = AnatomicalEntityFilter
-
 
 
 class AnsDivisionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -72,6 +100,7 @@ class NoteViewSet(viewsets.ModelViewSet):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
+    filterset_class = NoteFilter
 
 
 class ConnectivityStatementViewSet(viewsets.ModelViewSet):
@@ -81,16 +110,15 @@ class ConnectivityStatementViewSet(viewsets.ModelViewSet):
 
     queryset = ConnectivityStatement.objects.all()
     serializer_class = ConnectivityStatementSerializer
-    serializer_class_get = ConnectivityStatementWithDetailsSerializer
+    serializer_class_with_details = ConnectivityStatementWithDetailsSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = ConnectivityStatementFilter
 
-
     def get_serializer_class(self, *args, **kwargs):
-        if self.action in ("list", "retrieve"):
-            return self.serializer_class_get
+        if self.action in ("list",):
+            return self.serializer_class_with_details
         return self.serializer_class
 
     def retrieve(self, request, *args, **kwargs):
@@ -125,14 +153,28 @@ class SentenceViewSet(ModelNoDeleteViewSet):
 
     queryset = Sentence.objects.all()
     serializer_class = SentenceSerializer
+    serializer_class_with_details = SentenceWithDetailsSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = SentenceFilter
 
+    def get_serializer_class(self, *args, **kwargs):
+        if self.action in ("list",):
+            return self.serializer_class_with_details
+        return self.serializer_class
+
     def retrieve(self, request, *args, **kwargs):
         self.get_object().assign_owner(request)
         return super().retrieve(request, *args, **kwargs)
+
+    @action(detail=True, methods=["post"], url_path="do_transition/(?P<transition>\w+)")
+    def transition(self, request, pk=None, transition=None):
+        cs = SentenceService(self.get_object()).do_transition(
+            transition, user=request.user, request=request
+        )
+        cs.save()
+        return Response(self.get_serializer(cs).data)
 
 
 class SpecieViewSet(viewsets.ReadOnlyModelViewSet):
@@ -169,11 +211,7 @@ class ProfileViewSet(viewsets.GenericViewSet):
         return Response(self.get_serializer(profile).data)
 
 
-class ViaViewSet(
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet,
-):
+class ViaViewSet(viewsets.GenericViewSet):
     """
     Via
     """
@@ -183,3 +221,30 @@ class ViaViewSet(
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
+    filterset_class = ViaFilter
+
+
+class JsonSchemaConnectivityStatementViewSet(
+    viewsets.ModelViewSet, FormSchemaViewSetMixin
+):
+    """
+    ConnectivityStatement JSON Schema
+    """
+
+    serializer_class = ConnectivityStatementSerializer
+
+
+class JsonSchemaSentenceViewSet(viewsets.ModelViewSet, FormSchemaViewSetMixin):
+    """
+    Sentence JSON Schema
+    """
+
+    serializer_class = SentenceSerializer
+
+
+class JsonSchemaNoteViewSet(viewsets.ModelViewSet, FormSchemaViewSetMixin):
+    """
+    Note JSON Schema
+    """
+
+    serializer_class = NoteSerializer

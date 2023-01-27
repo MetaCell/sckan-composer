@@ -1,9 +1,20 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import (AnatomicalEntityViewSet, AnsDivisionViewSet,
-                    ConnectivityStatementViewSet, NoteViewSet, ProfileViewSet,
-                    SentenceViewSet, SpecieViewSet, TagViewSet, ViaViewSet)
+from .views import (
+    AnatomicalEntityViewSet,
+    AnsDivisionViewSet,
+    ConnectivityStatementViewSet,
+    NoteViewSet,
+    ProfileViewSet,
+    SentenceViewSet,
+    SpecieViewSet,
+    TagViewSet,
+    ViaViewSet,
+    JsonSchemaConnectivityStatementViewSet,
+    JsonSchemaSentenceViewSet,
+    JsonSchemaNoteViewSet,
+)
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
@@ -28,4 +39,12 @@ router.register(r"via", ViaViewSet, basename="via")
 app_name = "composer-api"
 urlpatterns = [
     path("", include(router.urls)),
+    path(
+        "connectivity-statement/jsonschema",
+        JsonSchemaConnectivityStatementViewSet.as_view({"get": "create_form"}),
+    ),
+    path(
+        "sentence/jsonschema", JsonSchemaSentenceViewSet.as_view({"get": "create_form"})
+    ),
+    path("note/jsonschema", JsonSchemaNoteViewSet.as_view({"get": "create_form"})),
 ]
