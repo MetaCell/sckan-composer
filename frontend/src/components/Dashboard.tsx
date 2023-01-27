@@ -26,7 +26,7 @@ const Login = () => {
     <Grid pt={12} container justifyContent='center'>
       <Paper elevation={0} sx={{ padding: 8 }}>
         <Stack alignItems='center' spacing={4}>
-          <Box component='img' display='block' src={logo} alt='Composer logo' width='1rem' height='1.5rem' />
+          <Box component='img' display='block' src={logo} alt='Composer logo' />
           <Box textAlign='center'>
             <Typography variant='h3' marginBottom={1.5}>
               You are logged in!
