@@ -7,6 +7,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Toolbar from "@mui/material/Toolbar";
 import Dashboard from "./components/Dashboard";
 import SentenceDetails from "./components/SentenceDetails";
+import StatementDetails from "./components/StatementDetails";
 import Topbar from "./components/Topbar";
 import Sidebar from "./components/Sidebar";
 import { userProfile } from "./services/UserService";
@@ -27,6 +28,10 @@ function App() {
                 <Route
                   path="/sentence/:sentenceId/"
                   element={<SentenceDetails />}
+                />
+                <Route
+                  path="/statement/:statementId/"
+                  element={<StatementDetails />}
                 />
               </Routes>
             </Box>
