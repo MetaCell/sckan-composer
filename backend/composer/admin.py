@@ -32,6 +32,7 @@ class PathInline(SortableStackedInline):
     model = Via
     extra = 0
     autocomplete_fields = ("anatomical_entity",)
+    default_order_field = "display_order"
 
 
 class DoiInline(admin.StackedInline):

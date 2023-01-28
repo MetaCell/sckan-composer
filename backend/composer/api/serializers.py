@@ -74,20 +74,11 @@ class SpecieSerializer(serializers.ModelSerializer):
 
 class ViaSerializer(serializers.ModelSerializer):
     """Via"""
+    anatomical_entity = AnatomicalEntitySerializer(read_only=False)
 
     class Meta:
         model = Via
-        fields = ("id", "ordering", "anatomical_entity")
-
-
-class ViaWithDetailsSerializer(serializers.ModelSerializer):
-    """Via"""
-
-    anatomical_entity = AnatomicalEntitySerializer(read_only=True)
-
-    class Meta:
-        model = Via
-        fields = ("id", "ordering", "anatomical_entity")
+        fields = ("id", "display_order", "connectivity_statement_id", "anatomical_entity")
 
 
 class DoitSerializer(serializers.ModelSerializer):
@@ -144,7 +135,7 @@ class ConnectivityStatementSerializer(serializers.ModelSerializer):
     origin = AnatomicalEntitySerializer(required=False)
     destination = AnatomicalEntitySerializer(required=False)
     ans_division = AnsDivisionSerializer(required=False)
-    path = ViaSerializer(many=True, read_only=False)
+    path = ViaSerializer(source="via_set",many=True, read_only=False)
     species = SpecieSerializer(many=True, read_only=False)
 
     available_transitions = serializers.SerializerMethodField()
@@ -174,7 +165,7 @@ class ConnectivityStatementSerializer(serializers.ModelSerializer):
             "apinatomy_model",
             "modified_date",
         )
-        depth = 0
+        # depth = 1
         read_only_fields = ("state",)
 
 

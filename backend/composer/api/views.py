@@ -211,7 +211,7 @@ class ProfileViewSet(viewsets.GenericViewSet):
         return Response(self.get_serializer(profile).data)
 
 
-class ViaViewSet(viewsets.GenericViewSet):
+class ViaViewSet(viewsets.ModelViewSet):
     """
     Via
     """
@@ -248,3 +248,11 @@ class JsonSchemaNoteViewSet(viewsets.ModelViewSet, FormSchemaViewSetMixin):
     """
 
     serializer_class = NoteSerializer
+
+
+class JsonSchemaViaViewSet(viewsets.ModelViewSet, FormSchemaViewSetMixin):
+    """
+    Via JSON Schema
+    """
+
+    serializer_class = ViaSerializer

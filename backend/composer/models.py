@@ -273,7 +273,7 @@ class Via(models.Model):
         on_delete=models.CASCADE,
     )
     anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.DO_NOTHING)
-    ordering = models.PositiveIntegerField(
+    display_order = models.PositiveIntegerField(
         default=0,
         blank=False,
         null=False,
@@ -283,7 +283,7 @@ class Via(models.Model):
         return f"{self.connectivity_statement} - {self.anatomical_entity}"
 
     class Meta:
-        ordering = ["ordering"]
+        ordering = ["display_order"]
         verbose_name_plural = "Via"
 
 

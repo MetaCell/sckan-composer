@@ -14,6 +14,7 @@ from .views import (
     JsonSchemaConnectivityStatementViewSet,
     JsonSchemaSentenceViewSet,
     JsonSchemaNoteViewSet,
+    JsonSchemaViaViewSet,
 )
 
 # Create a router and register our viewsets with it.
@@ -47,4 +48,5 @@ urlpatterns = [
         "sentence/jsonschema", JsonSchemaSentenceViewSet.as_view({"get": "create_form"})
     ),
     path("note/jsonschema", JsonSchemaNoteViewSet.as_view({"get": "create_form"})),
+    path("via/jsonschema", JsonSchemaViaViewSet.as_view({"get": "create_form"})),
 ]

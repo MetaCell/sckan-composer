@@ -422,6 +422,7 @@ paths:
         name: connectivity_statement_id
         schema:
           type: integer
+          nullable: true
       - name: limit
         required: false
         in: query
@@ -438,6 +439,7 @@ paths:
         name: sentence_id
         schema:
           type: integer
+          nullable: true
       tags:
       - composer
       security:
@@ -1056,6 +1058,200 @@ paths:
               schema:
                 $ref: '#/components/schemas/Tag'
           description: ''
+  /api/composer/via/:
+    get:
+      operationId: composer_via_list
+      description: Via
+      parameters:
+      - in: query
+        name: connectivity_statement_id
+        schema:
+          type: integer
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedViaList'
+          description: ''
+    post:
+      operationId: composer_via_create
+      description: Via
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Via'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Via'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Via'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Via'
+          description: ''
+  /api/composer/via/{id}/:
+    get:
+      operationId: composer_via_retrieve
+      description: Via
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this via.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Via'
+          description: ''
+    put:
+      operationId: composer_via_update
+      description: Via
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this via.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Via'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Via'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Via'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Via'
+          description: ''
+    patch:
+      operationId: composer_via_partial_update
+      description: Via
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this via.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVia'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedVia'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedVia'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Via'
+          description: ''
+    delete:
+      operationId: composer_via_destroy
+      description: Via
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this via.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/composer/via/jsonschema:
+    get:
+      operationId: composer_via_jsonschema_retrieve
+      description: Via JSON Schema
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Via'
+          description: ''
   /api/metacell_auth/login/:
     get:
       operationId: metacell_auth_login_retrieve
@@ -1467,6 +1663,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Tag'
+    PaginatedViaList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Via'
     PatchedConnectivityStatement:
       type: object
       description: Connectivity Statement
@@ -1597,6 +1813,20 @@ components:
         doi_uri:
           type: string
           readOnly: true
+    PatchedVia:
+      type: object
+      description: Via
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        display_order:
+          type: integer
+        connectivity_statement_id:
+          type: integer
+          readOnly: true
+        anatomical_entity:
+          $ref: '#/components/schemas/AnatomicalEntity'
     Profile:
       type: object
       description: Profile
@@ -1792,12 +2022,16 @@ components:
         id:
           type: integer
           readOnly: true
-        ordering:
+        display_order:
           type: integer
+        connectivity_statement_id:
+          type: integer
+          readOnly: true
         anatomical_entity:
-          type: integer
+          $ref: '#/components/schemas/AnatomicalEntity'
       required:
       - anatomical_entity
+      - connectivity_statement_id
       - id
   securitySchemes:
     basicAuth:
