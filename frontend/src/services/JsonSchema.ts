@@ -4,17 +4,15 @@ export let jsonSchemas = (function () {
   let sentenceSchema:any = null;
   let connectivityStatementSchema:any = null;
   let noteSchema:any = null;
+  let viaSchema:any = null;
 
   return { // public interface
     initSchemas: async function () {
-      return composerApi.composerSentenceJsonschemaRetrieve().then((resp:any) => {
-        sentenceSchema = resp.data.serializer
-        return composerApi.composerConnectivityStatementJsonschemaRetrieve().then((resp:any) => {  
-          connectivityStatementSchema = resp.data.serializer
-          return composerApi.composerNoteJsonschemaRetrieve().then((resp:any) => {
-            noteSchema = resp.data.serializer
-          })
-        })
+      return composerApi.composerJsonschemasRetrieve().then((resp:any) => {
+        sentenceSchema = resp.data.Sentence
+        connectivityStatementSchema = resp.data.ConnectivityStatement
+        noteSchema = resp.data.Note
+        viaSchema = resp.data.Via
       })
     },
     getSentenceSchema: function () {
@@ -25,6 +23,9 @@ export let jsonSchemas = (function () {
     },
     getNoteSchema: function () {
       return noteSchema
+    },
+    getViaSchema: function () {
+      return viaSchema
     },
   };
 })();

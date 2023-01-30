@@ -14,16 +14,6 @@ export let sentence = (function () {
   };
 })();
 
-export async function getSentenceJsonSchema(): Promise<any> {
-  return composerApi.composerSentenceJsonschemaRetrieve().then((response: any) => {
-    if (response.status === 200) {
-      return response.data
-    } else {
-      console.log("Error")
-    }
-  })
-}
-
 export async function sentenceRetrieve(id: number): Promise<any> {
   return composerApi.composerSentenceRetrieve(id).then((response: any) => {
     if (response.status === 200) {

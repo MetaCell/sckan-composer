@@ -7,10 +7,8 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { useParams } from "react-router-dom";
 import SentenceForm from './Forms/SentenceForm';
-import { sentenceRetrieve, getSentenceJsonSchema } from '../services/SentenceService';
-import { Sentence } from '../apiclient/backend';
+import { sentenceRetrieve } from '../services/SentenceService';
 import NoteForm from './Forms/NoteForm';
-import StatementForm from './Forms/StatementForm';
 
 
 const SentencesDetails = () => {
@@ -28,7 +26,7 @@ const SentencesDetails = () => {
 
   useEffect(() => {
     fetchSentence(Number(sentenceId))
-  }, [])
+  }, [sentenceId])
 
   if(!sentence) {
     return <div>Loading...</div>

@@ -137,6 +137,7 @@ class ConnectivityStatementSerializer(serializers.ModelSerializer):
     ans_division = AnsDivisionSerializer(required=False)
     path = ViaSerializer(source="via_set",many=True, read_only=False)
     species = SpecieSerializer(many=True, read_only=False)
+    sentence = SentenceSerializer(read_only=True, required=False)
 
     available_transitions = serializers.SerializerMethodField()
 
@@ -147,6 +148,7 @@ class ConnectivityStatementSerializer(serializers.ModelSerializer):
         model = ConnectivityStatement
         fields = (
             "id",
+            "sentence",
             "knowledge_statement",
             "sentence_id",
             "tags",

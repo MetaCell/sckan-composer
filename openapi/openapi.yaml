@@ -395,10 +395,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConnectivityStatement'
           description: ''
-  /api/composer/connectivity-statement/jsonschema:
+  /api/composer/jsonschemas/:
     get:
-      operationId: composer_connectivity_statement_jsonschema_retrieve
-      description: ConnectivityStatement JSON Schema
+      operationId: composer_jsonschemas_retrieve
       tags:
       - composer
       security:
@@ -411,7 +410,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConnectivityStatement'
+                type: object
+                additionalProperties: {}
           description: ''
   /api/composer/note/:
     get:
@@ -651,24 +651,6 @@ paths:
       responses:
         '204':
           description: No response body
-  /api/composer/note/jsonschema:
-    get:
-      operationId: composer_note_jsonschema_retrieve
-      description: Note JSON Schema
-      tags:
-      - composer
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Note'
-          description: ''
   /api/composer/profile/my/:
     get:
       operationId: composer_profile_my_retrieve
@@ -921,24 +903,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Sentence'
-          description: ''
-  /api/composer/sentence/jsonschema:
-    get:
-      operationId: composer_sentence_jsonschema_retrieve
-      description: Sentence JSON Schema
-      tags:
-      - composer
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1234,24 +1198,6 @@ paths:
       responses:
         '204':
           description: No response body
-  /api/composer/via/jsonschema:
-    get:
-      operationId: composer_via_jsonschema_retrieve
-      description: Via JSON Schema
-      tags:
-      - composer
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Via'
-          description: ''
   /api/metacell_auth/login/:
     get:
       operationId: metacell_auth_login_retrieve
@@ -1335,6 +1281,10 @@ components:
         id:
           type: integer
           readOnly: true
+        sentence:
+          allOf:
+          - $ref: '#/components/schemas/Sentence'
+          readOnly: true
         knowledge_statement:
           type: string
         sentence_id:
@@ -1394,6 +1344,7 @@ components:
       - modified_date
       - owner
       - path
+      - sentence
       - sentence_id
       - species
       - state
@@ -1689,6 +1640,10 @@ components:
       properties:
         id:
           type: integer
+          readOnly: true
+        sentence:
+          allOf:
+          - $ref: '#/components/schemas/Sentence'
           readOnly: true
         knowledge_statement:
           type: string

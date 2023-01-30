@@ -1,9 +1,14 @@
+import json
+from django.http import HttpResponse
+from rest_framework.renderers import INDENT_SEPARATORS
 from rest_framework import mixins, permissions, viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
-from drf_react_template.mixins import FormSchemaViewSetMixin
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
+from drf_react_template.schema_form_encoder import SerializerEncoder
 
 from .filtersets import (
     SentenceFilter,
@@ -224,35 +229,32 @@ class ViaViewSet(viewsets.ModelViewSet):
     filterset_class = ViaFilter
 
 
-class JsonSchemaConnectivityStatementViewSet(
-    viewsets.ModelViewSet, FormSchemaViewSetMixin
-):
-    """
-    ConnectivityStatement JSON Schema
-    """
+@extend_schema(
+    responses=OpenApiTypes.OBJECT,
+)
+@api_view(["GET"])
+def jsonschemas(request):
+    serializers = [ConnectivityStatementSerializer, SentenceSerializer, ViaSerializer, NoteSerializer]
+    class View(object):
+        # fake view class
+        def __init__(self):
+            self.action = "schemas"
+    context = {
+        "request": request,
+        "format": None,
+        "view": View(),
+        "response": Response({}),
+    }
 
-    serializer_class = ConnectivityStatementSerializer
-
-
-class JsonSchemaSentenceViewSet(viewsets.ModelViewSet, FormSchemaViewSetMixin):
-    """
-    Sentence JSON Schema
-    """
-
-    serializer_class = SentenceSerializer
-
-
-class JsonSchemaNoteViewSet(viewsets.ModelViewSet, FormSchemaViewSetMixin):
-    """
-    Note JSON Schema
-    """
-
-    serializer_class = NoteSerializer
-
-
-class JsonSchemaViaViewSet(viewsets.ModelViewSet, FormSchemaViewSetMixin):
-    """
-    Via JSON Schema
-    """
-
-    serializer_class = ViaSerializer
+    ret = json.dumps(
+        obj=({s.Meta.model.__name__: s(context) for s in serializers}),
+        cls=SerializerEncoder,
+        indent=2,
+        ensure_ascii=True,
+        allow_nan=True,
+        separators=INDENT_SEPARATORS,
+        renderer_context=context,
+    )
+    ret = ret.replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
+    data = bytes(ret.encode("utf-8"))
+    return HttpResponse(data)

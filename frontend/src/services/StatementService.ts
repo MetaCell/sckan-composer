@@ -9,13 +9,3 @@ export async function statementRetrieve(id: number): Promise<any> {
     }
   })
 }
-
-export async function getStatementJsonSchema(): Promise<any> {
-  return composerApi.composerConnectivityStatementJsonschemaRetrieve().then((response: any) => {
-    if (response.status === 200) {
-      return response.data
-    } else {
-      console.log("Error")
-    }
-  })
-}

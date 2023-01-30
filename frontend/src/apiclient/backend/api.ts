@@ -97,6 +97,12 @@ export interface ConnectivityStatement {
     'id': number;
     /**
      * 
+     * @type {Sentence}
+     * @memberof ConnectivityStatement
+     */
+    'sentence': Sentence;
+    /**
+     * 
      * @type {string}
      * @memberof ConnectivityStatement
      */
@@ -686,6 +692,12 @@ export interface PatchedConnectivityStatement {
      * @memberof PatchedConnectivityStatement
      */
     'id'?: number;
+    /**
+     * 
+     * @type {Sentence}
+     * @memberof PatchedConnectivityStatement
+     */
+    'sentence'?: Sentence;
     /**
      * 
      * @type {string}
@@ -1586,44 +1598,6 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * ConnectivityStatement JSON Schema
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerConnectivityStatementJsonschemaRetrieve: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/composer/connectivity-statement/jsonschema`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication cookieAuth required
-
-            // authentication tokenAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * ConnectivityStatement
          * @param {number} [destination] 
          * @param {string} [knowledgeStatement] 
@@ -1848,6 +1822,44 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerJsonschemasRetrieve: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/jsonschemas/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication cookieAuth required
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Note
          * @param {Note} note 
          * @param {*} [options] Override http request option.
@@ -1910,44 +1922,6 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             }
 
             const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication cookieAuth required
-
-            // authentication tokenAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Note JSON Schema
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerNoteJsonschemaRetrieve: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/composer/note/jsonschema`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -2383,44 +2357,6 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(sentence, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Sentence JSON Schema
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerSentenceJsonschemaRetrieve: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/composer/sentence/jsonschema`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication cookieAuth required
-
-            // authentication tokenAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2903,44 +2839,6 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Via JSON Schema
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerViaJsonschemaRetrieve: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/composer/via/jsonschema`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication cookieAuth required
-
-            // authentication tokenAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * Via
          * @param {number} [connectivityStatementId] 
          * @param {number} [limit] Number of results to return per page.
@@ -3215,15 +3113,6 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * ConnectivityStatement JSON Schema
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async composerConnectivityStatementJsonschemaRetrieve(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementJsonschemaRetrieve(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
          * ConnectivityStatement
          * @param {number} [destination] 
          * @param {string} [knowledgeStatement] 
@@ -3275,6 +3164,15 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerJsonschemasRetrieve(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerJsonschemasRetrieve(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Note
          * @param {Note} note 
          * @param {*} [options] Override http request option.
@@ -3292,15 +3190,6 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          */
         async composerNoteDestroy(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerNoteDestroy(id, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * Note JSON Schema
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async composerNoteJsonschemaRetrieve(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Note>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerNoteJsonschemaRetrieve(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3398,15 +3287,6 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          */
         async composerSentenceDoTransitionCreate(id: number, transition: string, sentence: Sentence, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceDoTransitionCreate(id, transition, sentence, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * Sentence JSON Schema
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async composerSentenceJsonschemaRetrieve(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceJsonschemaRetrieve(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3517,15 +3397,6 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          */
         async composerViaDestroy(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerViaDestroy(id, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * Via JSON Schema
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async composerViaJsonschemaRetrieve(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Via>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerViaJsonschemaRetrieve(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3651,14 +3522,6 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementDoTransitionCreate(id, transition, connectivityStatement, options).then((request) => request(axios, basePath));
         },
         /**
-         * ConnectivityStatement JSON Schema
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerConnectivityStatementJsonschemaRetrieve(options?: any): AxiosPromise<ConnectivityStatement> {
-            return localVarFp.composerConnectivityStatementJsonschemaRetrieve(options).then((request) => request(axios, basePath));
-        },
-        /**
          * ConnectivityStatement
          * @param {number} [destination] 
          * @param {string} [knowledgeStatement] 
@@ -3706,6 +3569,14 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementUpdate(id, connectivityStatement, options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerJsonschemasRetrieve(options?: any): AxiosPromise<{ [key: string]: any; }> {
+            return localVarFp.composerJsonschemasRetrieve(options).then((request) => request(axios, basePath));
+        },
+        /**
          * Note
          * @param {Note} note 
          * @param {*} [options] Override http request option.
@@ -3722,14 +3593,6 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          */
         composerNoteDestroy(id: number, options?: any): AxiosPromise<void> {
             return localVarFp.composerNoteDestroy(id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Note JSON Schema
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerNoteJsonschemaRetrieve(options?: any): AxiosPromise<Note> {
-            return localVarFp.composerNoteJsonschemaRetrieve(options).then((request) => request(axios, basePath));
         },
         /**
          * Note
@@ -3818,14 +3681,6 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          */
         composerSentenceDoTransitionCreate(id: number, transition: string, sentence: Sentence, options?: any): AxiosPromise<Sentence> {
             return localVarFp.composerSentenceDoTransitionCreate(id, transition, sentence, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Sentence JSON Schema
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerSentenceJsonschemaRetrieve(options?: any): AxiosPromise<Sentence> {
-            return localVarFp.composerSentenceJsonschemaRetrieve(options).then((request) => request(axios, basePath));
         },
         /**
          * Sentence
@@ -3926,14 +3781,6 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          */
         composerViaDestroy(id: number, options?: any): AxiosPromise<void> {
             return localVarFp.composerViaDestroy(id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Via JSON Schema
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerViaJsonschemaRetrieve(options?: any): AxiosPromise<Via> {
-            return localVarFp.composerViaJsonschemaRetrieve(options).then((request) => request(axios, basePath));
         },
         /**
          * Via
@@ -4068,16 +3915,6 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * ConnectivityStatement JSON Schema
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComposerApi
-     */
-    public composerConnectivityStatementJsonschemaRetrieve(options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementJsonschemaRetrieve(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * ConnectivityStatement
      * @param {number} [destination] 
      * @param {string} [knowledgeStatement] 
@@ -4133,6 +3970,16 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerJsonschemasRetrieve(options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerJsonschemasRetrieve(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Note
      * @param {Note} note 
      * @param {*} [options] Override http request option.
@@ -4152,16 +3999,6 @@ export class ComposerApi extends BaseAPI {
      */
     public composerNoteDestroy(id: number, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerNoteDestroy(id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Note JSON Schema
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComposerApi
-     */
-    public composerNoteJsonschemaRetrieve(options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerNoteJsonschemaRetrieve(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4268,16 +4105,6 @@ export class ComposerApi extends BaseAPI {
      */
     public composerSentenceDoTransitionCreate(id: number, transition: string, sentence: Sentence, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentenceDoTransitionCreate(id, transition, sentence, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Sentence JSON Schema
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComposerApi
-     */
-    public composerSentenceJsonschemaRetrieve(options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerSentenceJsonschemaRetrieve(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4398,16 +4225,6 @@ export class ComposerApi extends BaseAPI {
      */
     public composerViaDestroy(id: number, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerViaDestroy(id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Via JSON Schema
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComposerApi
-     */
-    public composerViaJsonschemaRetrieve(options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerViaJsonschemaRetrieve(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
