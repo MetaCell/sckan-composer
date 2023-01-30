@@ -1,48 +1,55 @@
-import {useCallback, useRef, useState} from "react";
-import {useMachine} from "@xstate/react";
-import {createMachine} from "xstate/lib/Machine";
-import useQueue from "./useQueue";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {useDebouncedCallback} from "use-debounce";
-import {INPUT_DEBOUNCE_TIME} from "../settings";
-import {isEmpty} from "../utilities/functions";
+import {INPUT_DEBOUNCE_TIME, INPUT_DEFAULT_DELAY} from "../settings";
+import {delay} from "../utilities/functions";
 
 
-export enum AutoSaveStates {
-    Saved = "Saved",
-    WaitingToSave = "WaitingToSave",
-    ReadyToSave = "ReadyToSave",
-    Saving = "Saving",
-    Error = "Error",
-}
+export default function useAutoSave(onSave: (value: any) => Promise<any>, callback: (value: any) => void) {
+    const [queue, setQueue] = useState<{
+        isProcessing: boolean
+        dataValues: Array<any>
+    }>({isProcessing: false, dataValues: []})
 
-enum AutoSaveEvents {
-    HasUnsavedData,
-    SaveData,
-    Retry
-}
-
-enum AutoSaveServices {
-    save
-}
-
-const DEFAULT_DELAY = 30000
-
-type Task = (value: any) => Promise<any>
-
-export default function useAutoSave(resolve: Task, callback: (value: any) => void) {
-
-    const [queue, setQueue] = useState<Array<Task>>([])
-
-    const addTask = useCallback((task: Task) => {
-        setQueue((prev) => ([...prev, task]))
+    const add = useCallback((value: any) => {
+        setQueue((prev) => ({
+            isProcessing: prev.isProcessing,
+            dataValues: [...prev.dataValues, value],
+        }))
     }, [])
 
     const debounce = useDebouncedCallback((value) => {
-            addTask(() =>resolve(value))
-            callback(value)
+        add(value)
+        callback(value)
     }, INPUT_DEBOUNCE_TIME);
 
-    console.log(queue.length)
+    useEffect(() => {
+        if (queue.dataValues.length === 0) return
+        if (queue.isProcessing) return
+
+        console.debug("Starting save countdown")
+        delay(INPUT_DEFAULT_DELAY).then(() => {
+            console.debug("Starting save")
+            const latestData = queue.dataValues.at(-1)
+            setQueue((prev) => ({
+                isProcessing: true,
+                dataValues: [],
+            }))
+
+            Promise.resolve(onSave(latestData))
+                .then(()=>console.debug("Saved"))
+                .catch(()=>console.debug("Something went wrong"))
+                .finally(() => {
+                    console.debug(queue.dataValues)
+                setQueue((prev) => ({
+                    isProcessing: false,
+                    dataValues: prev.dataValues,
+                }))
+            })
+
+        })
+
+    }, [queue])
+
     return {
         debounce
     }

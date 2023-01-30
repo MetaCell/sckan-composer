@@ -1,1 +1,2 @@
 export const INPUT_DEBOUNCE_TIME = 1000
+export const INPUT_DEFAULT_DELAY = 7500
