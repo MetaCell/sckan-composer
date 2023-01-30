@@ -5,6 +5,7 @@ from .views import (
     AnatomicalEntityViewSet,
     AnsDivisionViewSet,
     ConnectivityStatementViewSet,
+    jsonschemas,
     NoteViewSet,
     ProfileViewSet,
     SentenceViewSet,
@@ -31,9 +32,11 @@ router.register(r"specie", SpecieViewSet, basename="specie")
 router.register(r"profile", ProfileViewSet, basename="profile")
 router.register(r"tag", TagViewSet, basename="tag")
 router.register(r"via", ViaViewSet, basename="via")
+# router.register(r"json", JsonViewSet, basename="json")
 
 # The API URLs are now determined automatically by the router.
 app_name = "composer-api"
 urlpatterns = [
     path("", include(router.urls)),
+    path("jsonschemas/", jsonschemas, name="jsonschemas"),
 ]

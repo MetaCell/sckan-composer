@@ -395,6 +395,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConnectivityStatement'
           description: ''
+  /api/composer/jsonschemas/:
+    get:
+      operationId: composer_jsonschemas_retrieve
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
   /api/composer/note/:
     get:
       operationId: composer_note_list
@@ -404,6 +422,7 @@ paths:
         name: connectivity_statement_id
         schema:
           type: integer
+          nullable: true
       - name: limit
         required: false
         in: query
@@ -420,6 +439,7 @@ paths:
         name: sentence_id
         schema:
           type: integer
+          nullable: true
       tags:
       - composer
       security:
@@ -848,6 +868,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/Sentence'
           description: ''
+  /api/composer/sentence/{id}/do_transition/{transition}/:
+    post:
+      operationId: composer_sentence_do_transition_create
+      description: Sentence
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sentence.
+        required: true
+      - in: path
+        name: transition
+        schema:
+          type: string
+          pattern: ^\w+$
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sentence'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Sentence'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Sentence'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sentence'
+          description: ''
   /api/composer/specie/:
     get:
       operationId: composer_specie_list
@@ -960,6 +1022,182 @@ paths:
               schema:
                 $ref: '#/components/schemas/Tag'
           description: ''
+  /api/composer/via/:
+    get:
+      operationId: composer_via_list
+      description: Via
+      parameters:
+      - in: query
+        name: connectivity_statement_id
+        schema:
+          type: integer
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedViaList'
+          description: ''
+    post:
+      operationId: composer_via_create
+      description: Via
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Via'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Via'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Via'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Via'
+          description: ''
+  /api/composer/via/{id}/:
+    get:
+      operationId: composer_via_retrieve
+      description: Via
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this via.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Via'
+          description: ''
+    put:
+      operationId: composer_via_update
+      description: Via
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this via.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Via'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Via'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Via'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Via'
+          description: ''
+    patch:
+      operationId: composer_via_partial_update
+      description: Via
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this via.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVia'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedVia'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedVia'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Via'
+          description: ''
+    delete:
+      operationId: composer_via_destroy
+      description: Via
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this via.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/metacell_auth/login/:
     get:
       operationId: metacell_auth_login_retrieve
@@ -1043,22 +1281,50 @@ components:
         id:
           type: integer
           readOnly: true
+        sentence:
+          allOf:
+          - $ref: '#/components/schemas/Sentence'
+          readOnly: true
+        knowledge_statement:
+          type: string
+        sentence_id:
+          type: integer
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        owner:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        state:
+          type: string
+          readOnly: true
         available_transitions:
           type: array
           items:
             type: string
           readOnly: true
-        knowledge_statement:
-          type: string
-        state:
-          type: string
-          readOnly: true
+        origin:
+          $ref: '#/components/schemas/AnatomicalEntity'
+        destination:
+          $ref: '#/components/schemas/AnatomicalEntity'
+        ans_division:
+          $ref: '#/components/schemas/AnsDivision'
         destination_type:
           $ref: '#/components/schemas/DestinationTypeEnum'
+        path:
+          type: array
+          items:
+            $ref: '#/components/schemas/Via'
         laterality:
           $ref: '#/components/schemas/LateralityEnum'
         circuit_type:
           $ref: '#/components/schemas/CircuitTypeEnum'
+        species:
+          type: array
+          items:
+            $ref: '#/components/schemas/Specie'
         biological_sex:
           type: string
           nullable: true
@@ -1071,42 +1337,18 @@ components:
           type: string
           format: date-time
           readOnly: true
-        sentence:
-          type: integer
-        origin:
-          type: integer
-          nullable: true
-        destination:
-          type: integer
-          nullable: true
-        owner:
-          type: integer
-          nullable: true
-          title: Curator
-        ans_division:
-          type: integer
-          nullable: true
-        path:
-          type: array
-          items:
-            type: integer
-          readOnly: true
-        species:
-          type: array
-          items:
-            type: integer
-        tags:
-          type: array
-          items:
-            type: integer
       required:
       - available_transitions
       - id
       - knowledge_statement
       - modified_date
+      - owner
       - path
       - sentence
+      - sentence_id
+      - species
       - state
+      - tags
     ConnectivityStatementWithDetails:
       type: object
       description: Connectivity Statement with details
@@ -1213,26 +1455,23 @@ components:
       type: object
       description: Note
       properties:
-        id:
-          type: integer
-          readOnly: true
         note:
           type: string
+        user:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
         created:
           type: string
           format: date-time
           readOnly: true
-        user:
+        connectivity_statement_id:
           type: integer
-        sentence:
+          title: Statement ID
+        sentence_id:
           type: integer
-          nullable: true
-        connectivity_statement:
-          type: integer
-          nullable: true
       required:
       - created
-      - id
       - note
       - user
     PaginatedAnatomicalEntityList:
@@ -1375,6 +1614,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Tag'
+    PaginatedViaList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Via'
     PatchedConnectivityStatement:
       type: object
       description: Connectivity Statement
@@ -1382,22 +1641,50 @@ components:
         id:
           type: integer
           readOnly: true
+        sentence:
+          allOf:
+          - $ref: '#/components/schemas/Sentence'
+          readOnly: true
+        knowledge_statement:
+          type: string
+        sentence_id:
+          type: integer
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        owner:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        state:
+          type: string
+          readOnly: true
         available_transitions:
           type: array
           items:
             type: string
           readOnly: true
-        knowledge_statement:
-          type: string
-        state:
-          type: string
-          readOnly: true
+        origin:
+          $ref: '#/components/schemas/AnatomicalEntity'
+        destination:
+          $ref: '#/components/schemas/AnatomicalEntity'
+        ans_division:
+          $ref: '#/components/schemas/AnsDivision'
         destination_type:
           $ref: '#/components/schemas/DestinationTypeEnum'
+        path:
+          type: array
+          items:
+            $ref: '#/components/schemas/Via'
         laterality:
           $ref: '#/components/schemas/LateralityEnum'
         circuit_type:
           $ref: '#/components/schemas/CircuitTypeEnum'
+        species:
+          type: array
+          items:
+            $ref: '#/components/schemas/Specie'
         biological_sex:
           type: string
           nullable: true
@@ -1410,61 +1697,62 @@ components:
           type: string
           format: date-time
           readOnly: true
-        sentence:
-          type: integer
-        origin:
-          type: integer
-          nullable: true
-        destination:
-          type: integer
-          nullable: true
-        owner:
-          type: integer
-          nullable: true
-          title: Curator
-        ans_division:
-          type: integer
-          nullable: true
-        path:
-          type: array
-          items:
-            type: integer
-          readOnly: true
-        species:
-          type: array
-          items:
-            type: integer
-        tags:
-          type: array
-          items:
-            type: integer
     PatchedNote:
       type: object
       description: Note
       properties:
-        id:
-          type: integer
-          readOnly: true
         note:
           type: string
+        user:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
         created:
           type: string
           format: date-time
           readOnly: true
-        user:
+        connectivity_statement_id:
           type: integer
-        sentence:
+          title: Statement ID
+        sentence_id:
           type: integer
-          nullable: true
-        connectivity_statement:
-          type: integer
-          nullable: true
     PatchedSentence:
       type: object
       description: Sentence
       properties:
         id:
           type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        text:
+          type: string
+        pmid:
+          type: integer
+          nullable: true
+        pmcid:
+          type: string
+          nullable: true
+          maxLength: 20
+        doi:
+          type: string
+          nullable: true
+          maxLength: 100
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        owner:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        state:
+          type: string
+          readOnly: true
+        modified_date:
+          type: string
+          format: date-time
           readOnly: true
         available_transitions:
           type: array
@@ -1477,37 +1765,23 @@ components:
         pmcid_uri:
           type: string
           readOnly: true
-        title:
-          type: string
-          maxLength: 200
-        text:
-          type: string
-        state:
+        doi_uri:
           type: string
           readOnly: true
-        pmid:
+    PatchedVia:
+      type: object
+      description: Via
+      properties:
+        id:
           type: integer
-          nullable: true
-        pmcid:
-          type: string
-          nullable: true
-          maxLength: 20
-        doi:
-          type: string
-          nullable: true
-          maxLength: 100
-        modified_date:
-          type: string
-          format: date-time
           readOnly: true
-        owner:
+        display_order:
           type: integer
-          nullable: true
-          title: Triage Operator
-        tags:
-          type: array
-          items:
-            type: integer
+        connectivity_statement_id:
+          type: integer
+          readOnly: true
+        anatomical_entity:
+          $ref: '#/components/schemas/AnatomicalEntity'
     Profile:
       type: object
       description: Profile
@@ -1519,9 +1793,6 @@ components:
           allOf:
           - $ref: '#/components/schemas/User'
           readOnly: true
-        token:
-          type: string
-          readOnly: true
         is_triage_operator:
           type: boolean
         is_curator:
@@ -1530,7 +1801,6 @@ components:
           type: boolean
       required:
       - id
-      - token
       - user
     Sentence:
       type: object
@@ -1538,6 +1808,37 @@ components:
       properties:
         id:
           type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        text:
+          type: string
+        pmid:
+          type: integer
+          nullable: true
+        pmcid:
+          type: string
+          nullable: true
+          maxLength: 20
+        doi:
+          type: string
+          nullable: true
+          maxLength: 100
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        owner:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        state:
+          type: string
+          readOnly: true
+        modified_date:
+          type: string
+          format: date-time
           readOnly: true
         available_transitions:
           type: array
@@ -1550,44 +1851,19 @@ components:
         pmcid_uri:
           type: string
           readOnly: true
-        title:
-          type: string
-          maxLength: 200
-        text:
-          type: string
-        state:
+        doi_uri:
           type: string
           readOnly: true
-        pmid:
-          type: integer
-          nullable: true
-        pmcid:
-          type: string
-          nullable: true
-          maxLength: 20
-        doi:
-          type: string
-          nullable: true
-          maxLength: 100
-        modified_date:
-          type: string
-          format: date-time
-          readOnly: true
-        owner:
-          type: integer
-          nullable: true
-          title: Triage Operator
-        tags:
-          type: array
-          items:
-            type: integer
       required:
       - available_transitions
+      - doi_uri
       - id
       - modified_date
+      - owner
       - pmcid_uri
       - pmid_uri
       - state
+      - tags
       - text
       - title
     SentenceWithDetails:
@@ -1674,18 +1950,6 @@ components:
         id:
           type: integer
           readOnly: true
-        password:
-          type: string
-          maxLength: 128
-        last_login:
-          type: string
-          format: date-time
-          nullable: true
-        is_superuser:
-          type: boolean
-          title: Superuser status
-          description: Designates that this user has all permissions without explicitly
-            assigning them.
         username:
           type: string
           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
@@ -1703,33 +1967,27 @@ components:
           format: email
           title: Email address
           maxLength: 254
-        is_staff:
-          type: boolean
-          title: Staff status
-          description: Designates whether the user can log into this admin site.
-        is_active:
-          type: boolean
-          title: Active
-          description: Designates whether this user should be treated as active. Unselect
-            this instead of deleting accounts.
-        date_joined:
-          type: string
-          format: date-time
-        groups:
-          type: array
-          items:
-            type: integer
-          description: The groups this user belongs to. A user will get all permissions
-            granted to each of their groups.
-        user_permissions:
-          type: array
-          items:
-            type: integer
-          description: Specific permissions for this user.
       required:
       - id
-      - password
       - username
+    Via:
+      type: object
+      description: Via
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        display_order:
+          type: integer
+        connectivity_statement_id:
+          type: integer
+          readOnly: true
+        anatomical_entity:
+          $ref: '#/components/schemas/AnatomicalEntity'
+      required:
+      - anatomical_entity
+      - connectivity_statement_id
+      - id
   securitySchemes:
     basicAuth:
       type: http

@@ -22,21 +22,17 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = "__all__"
+        fields = ("id", "username", "first_name", "last_name", "email")
 
 
 class ProfileSerializer(serializers.ModelSerializer):
     """Profile"""
 
     user = UserSerializer(read_only=True, required=False)
-    token = serializers.SerializerMethodField(required=False, read_only=True)
-
-    def get_token(self, obj) -> str:
-        return obj.user.auth_token.key
 
     class Meta:
         model = Profile
-        fields = "__all__"
+        fields = ("id", "user", "is_triage_operator", "is_curator", "is_reviewer")
         dept = 2
 
 
@@ -45,7 +41,11 @@ class AnatomicalEntitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AnatomicalEntity
-        fields = "__all__"
+        fields = (
+            "id",
+            "name",
+            "ontology_uri",
+        )
 
 
 class AnsDivisionSerializer(serializers.ModelSerializer):
@@ -53,7 +53,7 @@ class AnsDivisionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AnsDivision
-        fields = "__all__"
+        fields = ("id", "name")
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -61,15 +61,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = "__all__"
-
-
-class NoteSerializer(serializers.ModelSerializer):
-    """Note"""
-
-    class Meta:
-        model = Note
-        fields = "__all__"
+        fields = ("id", "tag")
 
 
 class SpecieSerializer(serializers.ModelSerializer):
@@ -77,25 +69,16 @@ class SpecieSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Specie
-        fields = "__all__"
+        fields = ("id", "name")
 
 
 class ViaSerializer(serializers.ModelSerializer):
     """Via"""
+    anatomical_entity = AnatomicalEntitySerializer(read_only=False)
 
     class Meta:
         model = Via
-        fields = "__all__"
-
-
-class ViaWithDetailsSerializer(serializers.ModelSerializer):
-    """Via"""
-
-    anatomical_entity = AnatomicalEntitySerializer(read_only=True)
-
-    class Meta:
-        model = Via
-        fields = ("id", "ordering", "anatomical_entity")
+        fields = ("id", "display_order", "connectivity_statement_id", "anatomical_entity")
 
 
 class DoitSerializer(serializers.ModelSerializer):
@@ -103,30 +86,38 @@ class DoitSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doi
-        fields = "__all__"
-        depth = 0
+        fields = ("id", "doi", "connectivity_statement")
 
 
 class SentenceSerializer(serializers.ModelSerializer):
     """Sentence"""
 
-    # notes = NoteSerializer(many=True, read_only=True)
+    tags = TagSerializer(many=True, read_only=False)
+    owner = UserSerializer(read_only=True, required=False)
+
     available_transitions = serializers.SerializerMethodField()
-    pmid_uri = serializers.SerializerMethodField()
-    pmcid_uri = serializers.SerializerMethodField()
 
     def get_available_transitions(self, instance) -> list[str]:
         return [t.name for t in instance.get_available_state_transitions()]
 
-    def get_pmid_uri(self, instance) -> str:
-        return instance.pmid_uri
-
-    def get_pmcid_uri(self, instance) -> str:
-        return instance.pmcid_uri
-
     class Meta:
         model = Sentence
-        fields = "__all__"
+        fields = (
+            "id",
+            "title",
+            "text",
+            "pmid",
+            "pmcid",
+            "doi",
+            "tags",
+            "owner",
+            "state",
+            "modified_date",
+            "available_transitions",
+            "pmid_uri",
+            "pmcid_uri",
+            "doi_uri",
+        )
         read_only_fields = (
             "state",
             "modified_date",
@@ -136,6 +127,18 @@ class SentenceSerializer(serializers.ModelSerializer):
 class ConnectivityStatementSerializer(serializers.ModelSerializer):
     """Connectivity Statement"""
 
+    sentence_id = serializers.IntegerField(
+        label="Sentence ID",
+    )
+    tags = TagSerializer(many=True, read_only=False)
+    owner = UserSerializer(read_only=True, required=False)
+    origin = AnatomicalEntitySerializer(required=False)
+    destination = AnatomicalEntitySerializer(required=False)
+    ans_division = AnsDivisionSerializer(required=False)
+    path = ViaSerializer(source="via_set",many=True, read_only=False)
+    species = SpecieSerializer(many=True, read_only=False)
+    sentence = SentenceSerializer(read_only=True, required=False)
+
     available_transitions = serializers.SerializerMethodField()
 
     def get_available_transitions(self, instance) -> list[str]:
@@ -143,8 +146,28 @@ class ConnectivityStatementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ConnectivityStatement
-        fields = "__all__"
-        depth = 0
+        fields = (
+            "id",
+            "sentence",
+            "knowledge_statement",
+            "sentence_id",
+            "tags",
+            "owner",
+            "state",
+            "available_transitions",
+            "origin",
+            "destination",
+            "ans_division",
+            "destination_type",
+            "path",
+            "laterality",
+            "circuit_type",
+            "species",
+            "biological_sex",
+            "apinatomy_model",
+            "modified_date",
+        )
+        # depth = 1
         read_only_fields = ("state",)
 
 
@@ -179,7 +202,19 @@ class ConnectivityStatementWithDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ConnectivityStatement
-        # fields = "__all__"
-        # depth = 1
         exclude = ("path",)
         read_only_fields = ("state",)
+
+
+class NoteSerializer(serializers.ModelSerializer):
+    """Note"""
+
+    user = UserSerializer(read_only=True, required=False)
+    connectivity_statement_id = serializers.IntegerField(
+        label="Statement ID", required=False
+    )
+    sentence_id = serializers.IntegerField(label="Sentence ID", required=False)
+
+    class Meta:
+        model = Note
+        fields = ("note", "user", "created", "connectivity_statement_id", "sentence_id")
