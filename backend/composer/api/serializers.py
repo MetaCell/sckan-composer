@@ -1,6 +1,9 @@
 from django.contrib.auth.models import User
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
+from drf_writable_nested.serializers import WritableNestedModelSerializer
+from drf_writable_nested.mixins import UniqueFieldsMixin, NestedCreateMixin, NestedUpdateMixin
+from django.db.models import Q
 
 from ..models import (
     AnatomicalEntity,
@@ -14,6 +17,25 @@ from ..models import (
     Tag,
     Via,
 )
+
+
+# MixIns
+class FixManyToManyMixin():
+    # custom many-to-many get pk from data
+    # first try to get pk from data
+    # if not found try to get pk from db
+    # this solves the problem of adding new objects without a pk
+    def _get_related_pk(self, data, model):
+        pk = super()._get_related_pk(data, model)
+        if not pk:
+            # if pk not found try to find by other fields and return the pk
+            and_condition = Q()
+            for key, value in data.items():
+                and_condition.add(Q(**{key: value}), Q.AND)
+            qs = model.objects.filter(and_condition)
+            if len(qs)>0:
+                pk = str(qs.first().pk)
+        return pk
 
 
 # serializers
@@ -36,7 +58,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         dept = 2
 
 
-class AnatomicalEntitySerializer(serializers.ModelSerializer):
+class AnatomicalEntitySerializer(UniqueFieldsMixin, serializers.ModelSerializer):
     """Anatomical Entity"""
 
     class Meta:
@@ -46,9 +68,10 @@ class AnatomicalEntitySerializer(serializers.ModelSerializer):
             "name",
             "ontology_uri",
         )
+        read_only_fields = ("ontology_uri",)
 
 
-class AnsDivisionSerializer(serializers.ModelSerializer):
+class AnsDivisionSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
     """ANS Division"""
 
     class Meta:
@@ -56,7 +79,7 @@ class AnsDivisionSerializer(serializers.ModelSerializer):
         fields = ("id", "name")
 
 
-class TagSerializer(serializers.ModelSerializer):
+class TagSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
     """Note Tag"""
 
     class Meta:
@@ -64,7 +87,7 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ("id", "tag")
 
 
-class SpecieSerializer(serializers.ModelSerializer):
+class SpecieSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
     """Specie"""
 
     class Meta:
@@ -89,14 +112,14 @@ class DoitSerializer(serializers.ModelSerializer):
         fields = ("id", "doi", "connectivity_statement")
 
 
-class SentenceSerializer(serializers.ModelSerializer):
+
+class SentenceSerializer(FixManyToManyMixin, WritableNestedModelSerializer):
     """Sentence"""
 
     tags = TagSerializer(many=True, read_only=False)
     owner = UserSerializer(read_only=True, required=False)
-
-    available_transitions = serializers.SerializerMethodField()
-
+    available_transitions = serializers.SerializerMethodField(read_only=True)
+  
     def get_available_transitions(self, instance) -> list[str]:
         return [t.name for t in instance.get_available_state_transitions()]
 
@@ -118,26 +141,34 @@ class SentenceSerializer(serializers.ModelSerializer):
             "pmcid_uri",
             "doi_uri",
         )
+        no_update_fields = (
+            "state",
+        )
         read_only_fields = (
             "state",
             "modified_date",
+            "pmcid_uri",
+            "pmid_uri",
+            "doi_uri",
+            "available_transitions"
         )
 
 
-class ConnectivityStatementSerializer(serializers.ModelSerializer):
+class ConnectivityStatementSerializer(FixManyToManyMixin, WritableNestedModelSerializer):
     """Connectivity Statement"""
 
-    sentence_id = serializers.IntegerField(
-        label="Sentence ID",
-    )
+    sentence_id = serializers.IntegerField()
+    origin_id = serializers.IntegerField()
+    destination_id = serializers.IntegerField()
+    ans_division_id = serializers.IntegerField()
     tags = TagSerializer(many=True, read_only=False)
-    owner = UserSerializer(read_only=True, required=False)
-    origin = AnatomicalEntitySerializer(required=False)
-    destination = AnatomicalEntitySerializer(required=False)
-    ans_division = AnsDivisionSerializer(required=False)
-    path = ViaSerializer(source="via_set",many=True, read_only=False)
+    owner = UserSerializer(required=False, read_only=True)
+    origin = AnatomicalEntitySerializer(required=False, read_only=True)
+    destination = AnatomicalEntitySerializer(required=False, read_only=True)
+    ans_division = AnsDivisionSerializer(required=False, read_only=True)
+    path = ViaSerializer(source="via_set",many=True, read_only=True)
     species = SpecieSerializer(many=True, read_only=False)
-    sentence = SentenceSerializer(read_only=True, required=False)
+    sentence = SentenceSerializer(required=False, read_only=True)
 
     available_transitions = serializers.SerializerMethodField()
 
@@ -148,15 +179,18 @@ class ConnectivityStatementSerializer(serializers.ModelSerializer):
         model = ConnectivityStatement
         fields = (
             "id",
+            "sentence_id",
             "sentence",
             "knowledge_statement",
-            "sentence_id",
             "tags",
             "owner",
             "state",
             "available_transitions",
+            "origin_id",
             "origin",
+            "destination_id",
             "destination",
+            "ans_division_id",
             "ans_division",
             "destination_type",
             "path",

@@ -1247,7 +1247,7 @@ components:
         ontology_uri:
           type: string
           format: uri
-          maxLength: 200
+          readOnly: true
       required:
       - id
       - name

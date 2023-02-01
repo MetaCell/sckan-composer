@@ -13,9 +13,7 @@ const root = ReactDOM.createRoot(
 doLogin().then(() => {
   jsonSchemas.initSchemas().then(() => {
     root.render(
-      <React.StrictMode>
         <App />
-      </React.StrictMode>
     )
   })
 })

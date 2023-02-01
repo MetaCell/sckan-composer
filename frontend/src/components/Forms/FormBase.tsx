@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import validator from "@rjsf/validator-ajv8";
 import { IChangeEvent, withTheme } from "@rjsf/core";
 import { Box } from '@mui/material';
@@ -9,8 +9,7 @@ const Form = withTheme(Theme)
 const log = (type: string) => console.log.bind(console, type)
 
 export const FormBase = (props: any) => {
-
-  const { data, schema, uiSchema, uiFields } = props
+  const { service, data, schema, setter, uiSchema, uiFields } = props
 
   if (!data) {
     return <div>Loading...</div>
@@ -26,7 +25,14 @@ export const FormBase = (props: any) => {
 
   const handleSubmit = (event: IChangeEvent) => {
     log("submitted")
-    log(event.formData)
+    service.save(event.formData).then((newData:any) => {
+      setter(newData)
+    })
+  }
+
+
+ const handleUpdate = (event: IChangeEvent) => {
+    log("update")
   }
 
   const onError = (errors: any) => {
@@ -43,6 +49,7 @@ export const FormBase = (props: any) => {
         validator={validator}
         onSubmit={handleSubmit}
         onError={onError}
+        onChange={handleUpdate}
       />
     </Box>
   )

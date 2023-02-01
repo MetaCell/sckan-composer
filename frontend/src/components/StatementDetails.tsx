@@ -6,27 +6,28 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import { useParams } from "react-router-dom";
 import StatementForm from './Forms/StatementForm';
-import { statementRetrieve } from '../services/StatementService';
+import statementService from '../services/StatementService';
 import NoteForm from './Forms/NoteForm';
+import { ConnectivityStatement } from '../apiclient/backend/api';
 
 
 const StatementDetails = () => {
   const { statementId } = useParams();
-  const [statement, setStatement] = useState<any>()
+  const [statement, setStatement] = useState({} as ConnectivityStatement)
+  const [loading, setLoading] = useState(true)
    
-  const fetchStatement = async (id: number) => {
-    if(id<1 || isNaN(id)){
-      setStatement({})
-    } else {
-      statementRetrieve(id).then((response) => {
-        setStatement(response)
+  useEffect(() => {
+    if(statementId) {
+      statementService.getObject(statementId).then((statement: ConnectivityStatement) => {
+        setStatement(statement)
+        setLoading(false)
       })
     }
+  }, []);
+
+  if(loading) {
+    return <div>Loading...</div>
   }
-  
-  useEffect(() => {
-    fetchStatement(Number(statementId))
-  }, [statementId])
 
   return (
     <Grid p={12} container justifyContent='center'>
@@ -51,7 +52,7 @@ const StatementDetails = () => {
       </Paper>
       </Grid>
       <Grid item xl={7}>
-        <StatementForm data={statement} format='full' />
+        <StatementForm data={statement} format='full' setter={setStatement}/>
       </Grid>
       <Grid item xl={5}>
         <NoteForm/>

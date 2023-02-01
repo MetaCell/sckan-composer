@@ -23,3 +23,12 @@ fieldset.sortable :is(.inline-related, td.original) span.sort {
 .btn-default {
     color: red !important;
 }
+
+.select2-container {
+    min-width: 380px;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+    margin-left: 20px;
+    color: #000;
+}
