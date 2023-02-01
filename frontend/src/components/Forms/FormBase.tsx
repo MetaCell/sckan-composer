@@ -14,9 +14,9 @@ const log = (type: string) => console.log.bind(console, type)
 
 export const FormBase = (props: any) => {
 
-    const dataRef = useRef();
+    const dataRef = useRef<any|null>();
     const {data, schema, uiSchema, uiFields} = props
-    const {debounce} = useAutoSave(() => onSave(), (value) => dataRef.current = value)
+    const {debounce, resolve} = useAutoSave(() => onSave(), (value) => dataRef.current = value)
     const formRef = useRef<any>(null);
 
     useEffect(() => {
@@ -36,24 +36,25 @@ export const FormBase = (props: any) => {
         )
     }
 
+    const onError = (errors: any) => {
+        log("errors")
+        log(errors)
+        resolve()
+    }
+
     const onSave = async () => {
         if (formRef.current != null) {
-            // TODO: Its resolving immediately but it should wait for handleSubmit response
-            return Promise.resolve(formRef.current.submit())
+            return formRef.current.submit()
         }
     }
 
     const handleSubmit = async (event: IChangeEvent) => {
-        await delay(INPUT_DEFAULT_DELAY * 2)
-        console.log("submitted")
-        console.log(event.formData)
+        console.debug("Simulating save")
+        console.debug(dataRef.current.title)
+        await delay(10000)
+        console.debug("Simulating save concluded")
+        resolve()
     }
-
-    const onError = (errors: any) => {
-        log("errors")
-        log(errors)
-    }
-
 
     return (
         <Box p={2}>
