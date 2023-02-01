@@ -51,9 +51,6 @@ const StatementDetails = () => {
             <Typography variant='subtitle2'>
               Sentence: {statement?.sentence.title}
             </Typography>
-            {
-              statement?.available_transitions.map((transition) => <Button onClick={() => doTransition(transition)}>{transition}</Button>)
-            }
             <Typography variant='subtitle2'>
               {statement?.sentence.text}
             </Typography>
@@ -62,6 +59,10 @@ const StatementDetails = () => {
       </Paper>
       </Grid>
       <Grid item xl={7}>
+        <Typography>Last modified by {statement?.owner?.first_name} on {statement?.modified_date}</Typography>
+        {
+          statement?.available_transitions.map((transition) => <Button onClick={() => doTransition(transition)}>{transition}</Button>)
+        }
         <StatementForm data={statement} format='full' setter={setStatement}/>
       </Grid>
       <Grid item xl={5}>
