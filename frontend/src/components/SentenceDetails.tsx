@@ -18,6 +18,12 @@ const SentencesDetails = () => {
   const [loading, setLoading] = useState(true)
   const [extraStatementForm, setExtraStatementForm] = useState<string[]>([])
 
+  const doTransition = (transition: string) => {
+    sentenceService.doTransition(sentence, transition).then((sentence: Sentence) => {
+      setSentence(sentence)
+    })
+  }
+
   useEffect(() => {
     if(sentenceId) {
       sentenceService.getObject(sentenceId).then((sentence: Sentence) => {
@@ -50,13 +56,13 @@ const SentencesDetails = () => {
       <Grid item xl={7}>
         <div>Last modified by {sentence?.owner?.first_name} on {sentence?.modified_date}</div>
         {
-          sentence?.available_transitions.map((transition) => <Button onClick={() => null}>{transition}</Button>)
+          sentence?.available_transitions.map((transition) => <Button onClick={() => doTransition(transition)}>{transition}</Button>)
         }
         <SentenceForm data={sentence} format='full' setter={setSentence}/>
         <Button onClick={() => setExtraStatementForm((prev) => [...prev, ''])}>Add Statement</Button>
       </Grid>
       <Grid item xl={5}>
-        <NoteForm />
+        <NoteForm extraData={{sentence_id: sentence.id}}/>
       </Grid>
     </Grid>
   )

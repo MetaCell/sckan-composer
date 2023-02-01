@@ -104,18 +104,23 @@ class ViaSerializer(serializers.ModelSerializer):
         fields = ("id", "display_order", "connectivity_statement_id", "anatomical_entity")
 
 
-class DoitSerializer(serializers.ModelSerializer):
+class DoiSerializer(serializers.ModelSerializer):
     """Doi"""
+    doi = serializers.CharField(required=True)
+    # connectivity_statement_id = serializers.IntegerField(required=True)
 
     class Meta:
         model = Doi
-        fields = ("id", "doi", "connectivity_statement")
+        fields = ("id", "doi",) #, "connectivity_statement_id")
 
 
 
 class SentenceSerializer(FixManyToManyMixin, WritableNestedModelSerializer):
     """Sentence"""
 
+    pmid = serializers.IntegerField(required=False, default=None, allow_null=True)
+    pmcid = serializers.CharField(required=False, default=None, allow_null=True)
+    doi = serializers.CharField(required=False, default=None, allow_null=True)
     tags = TagSerializer(many=True, read_only=False)
     owner = UserSerializer(read_only=True, required=False)
     available_transitions = serializers.SerializerMethodField(read_only=True)
@@ -141,9 +146,6 @@ class SentenceSerializer(FixManyToManyMixin, WritableNestedModelSerializer):
             "pmcid_uri",
             "doi_uri",
         )
-        no_update_fields = (
-            "state",
-        )
         read_only_fields = (
             "state",
             "modified_date",
@@ -162,6 +164,7 @@ class ConnectivityStatementSerializer(FixManyToManyMixin, WritableNestedModelSer
     destination_id = serializers.IntegerField()
     ans_division_id = serializers.IntegerField()
     tags = TagSerializer(many=True, read_only=False)
+    dois = DoiSerializer(source="doi_set", many=True, read_only=False)
     owner = UserSerializer(required=False, read_only=True)
     origin = AnatomicalEntitySerializer(required=False, read_only=True)
     destination = AnatomicalEntitySerializer(required=False, read_only=True)
@@ -183,6 +186,7 @@ class ConnectivityStatementSerializer(FixManyToManyMixin, WritableNestedModelSer
             "sentence",
             "knowledge_statement",
             "tags",
+            "dois",
             "owner",
             "state",
             "available_transitions",
@@ -201,7 +205,7 @@ class ConnectivityStatementSerializer(FixManyToManyMixin, WritableNestedModelSer
             "apinatomy_model",
             "modified_date",
         )
-        # depth = 1
+        depth = 2
         read_only_fields = ("state",)
 
 
@@ -242,13 +246,18 @@ class ConnectivityStatementWithDetailsSerializer(serializers.ModelSerializer):
 
 class NoteSerializer(serializers.ModelSerializer):
     """Note"""
-
-    user = UserSerializer(read_only=True, required=False)
-    connectivity_statement_id = serializers.IntegerField(
-        label="Statement ID", required=False
-    )
-    sentence_id = serializers.IntegerField(label="Sentence ID", required=False)
+    user = serializers.CharField(read_only=True, required=False, allow_null=True)
+    connectivity_statement_id = serializers.IntegerField(required=False)
+    sentence_id = serializers.IntegerField(required=False)
+    created_at = serializers.DateTimeField(read_only=True, required=False)
+    
+    def create(self, validated_data):
+        request = self.context.get('request', None)
+        if request:
+            # link the note to the user
+            validated_data.update({"user": request.user})
+        return super().create(validated_data)
 
     class Meta:
         model = Note
-        fields = ("note", "user", "created", "connectivity_statement_id", "sentence_id")
+        fields = ("note", "user", "created_at", "connectivity_statement_id", "sentence_id")

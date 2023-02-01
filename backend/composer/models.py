@@ -444,7 +444,7 @@ class Note(models.Model):
 
     note = models.TextField()
     user = models.ForeignKey(User, verbose_name="User", on_delete=models.DO_NOTHING)
-    created = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     sentence = models.ForeignKey(
         Sentence,
         verbose_name="Sentence",

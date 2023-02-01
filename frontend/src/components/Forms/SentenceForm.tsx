@@ -5,7 +5,7 @@ import { jsonSchemas } from '../../services/JsonSchema'
 import sentenceService from '../../services/SentenceService'
 
 const SentenceForm = (props: any) => {
-  const { data, format, setter } = props
+  const { format } = props
   const { schema, uiSchema } = jsonSchemas.getSentenceSchema()
 
   const uiFields = format === 'small'
@@ -17,12 +17,11 @@ const SentenceForm = (props: any) => {
   return (
     <Box p={2}>
       <FormBase
-        data={data}
         service={sentenceService}
         schema={schema}
-        setter={setter}
         uiSchema={uiSchema}
         uiFields={uiFields}
+        {...props}
       />
     </Box>
   )

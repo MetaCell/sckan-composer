@@ -5,7 +5,7 @@ import { jsonSchemas } from '../../services/JsonSchema'
 import statementService from '../../services/StatementService';
 
 const StatementForm = (props: any) => {
-  const { data, setter, format } = props
+  const { format } = props
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema()
 
   const uiFields = format === 'small'
@@ -17,12 +17,11 @@ const StatementForm = (props: any) => {
   return (
     <Box p={2}>
       <FormBase
-        data={data}
         service={statementService}
         schema={schema}
-        setter={setter}
         uiSchema={uiSchema}
         uiFields={uiFields}
+        {...props}
       />
     </Box>
   )

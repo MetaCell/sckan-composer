@@ -9,7 +9,7 @@ const Form = withTheme(Theme)
 const log = (type: string) => console.log.bind(console, type)
 
 export const FormBase = (props: any) => {
-  const { service, data, schema, setter, uiSchema, uiFields } = props
+  const { service, data, schema, setter, extraData, uiSchema, uiFields } = props
 
   if (!data) {
     return <div>Loading...</div>
@@ -25,7 +25,8 @@ export const FormBase = (props: any) => {
 
   const handleSubmit = (event: IChangeEvent) => {
     log("submitted")
-    service.save(event.formData).then((newData:any) => {
+    const formData = {...event.formData, ...extraData}
+    service.save(formData).then((newData:any) => {
       setter(newData)
     })
   }

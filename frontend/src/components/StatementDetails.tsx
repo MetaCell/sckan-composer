@@ -9,12 +9,19 @@ import StatementForm from './Forms/StatementForm';
 import statementService from '../services/StatementService';
 import NoteForm from './Forms/NoteForm';
 import { ConnectivityStatement } from '../apiclient/backend/api';
+import { Button } from '@mui/material';
 
 
 const StatementDetails = () => {
   const { statementId } = useParams();
   const [statement, setStatement] = useState({} as ConnectivityStatement)
   const [loading, setLoading] = useState(true)
+
+  const doTransition = (transition: string) => {
+    statementService.doTransition(statement, transition).then((statement: ConnectivityStatement) => {
+      setStatement(statement)
+    })
+  }
    
   useEffect(() => {
     if(statementId) {
@@ -44,6 +51,9 @@ const StatementDetails = () => {
             <Typography variant='subtitle2'>
               Sentence: {statement?.sentence.title}
             </Typography>
+            {
+              statement?.available_transitions.map((transition) => <Button onClick={() => doTransition(transition)}>{transition}</Button>)
+            }
             <Typography variant='subtitle2'>
               {statement?.sentence.text}
             </Typography>
@@ -55,7 +65,7 @@ const StatementDetails = () => {
         <StatementForm data={statement} format='full' setter={setStatement}/>
       </Grid>
       <Grid item xl={5}>
-        <NoteForm/>
+        <NoteForm extraData={{connectivity_statement_id: statement.id}}/>
       </Grid>
     </Grid>
   )

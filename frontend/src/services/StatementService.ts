@@ -1,24 +1,17 @@
-import { composerApi } from "./apis";
-import { ConnectivityStatement } from '../apiclient/backend/api';
-import { AbstractService } from "./AbstractService";
+import { composerApi } from "./apis"
+import { ConnectivityStatement } from '../apiclient/backend/api'
+import { AbstractService } from "./AbstractService"
 
 class ConnectivityStatementService extends AbstractService {
-  async save(object: any) {
-    return composerApi.composerConnectivityStatementPartialUpdate(object.id, object).then((response: any) => response.data)
+  async save(connectivityStatement: ConnectivityStatement) {
+    return composerApi.composerConnectivityStatementUpdate(connectivityStatement.id, connectivityStatement).then((response: any) => response.data)
   }
   async getObject(id: string): Promise<ConnectivityStatement> {
     return composerApi.composerConnectivityStatementRetrieve(Number(id)).then((response: any) => response.data)
   }
-}
-
-export async function statementRetrieve(id: number): Promise<any> {
-  return composerApi.composerConnectivityStatementRetrieve(id).then((response: any) => {
-    if (response.status === 200) {
-      return response.data
-    } else {
-      console.log("Error")
-    }
-  })
+  async doTransition(connectivityStatement: ConnectivityStatement, transition: string) {
+    return composerApi.composerConnectivityStatementDoTransitionCreate(connectivityStatement.id, transition, connectivityStatement).then((response: any) => response.data)
+  }
 }
 
 export default new ConnectivityStatementService()
