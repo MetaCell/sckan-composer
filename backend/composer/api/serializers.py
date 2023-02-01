@@ -2,7 +2,11 @@ from django.contrib.auth.models import User
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from drf_writable_nested.serializers import WritableNestedModelSerializer
-from drf_writable_nested.mixins import UniqueFieldsMixin, NestedCreateMixin, NestedUpdateMixin
+from drf_writable_nested.mixins import (
+    UniqueFieldsMixin,
+    NestedCreateMixin,
+    NestedUpdateMixin,
+)
 from django.db.models import Q
 
 from ..models import (
@@ -20,7 +24,7 @@ from ..models import (
 
 
 # MixIns
-class FixManyToManyMixin():
+class FixManyToManyMixin:
     # custom many-to-many get pk from data
     # first try to get pk from data
     # if not found try to get pk from db
@@ -33,7 +37,7 @@ class FixManyToManyMixin():
             for key, value in data.items():
                 and_condition.add(Q(**{key: value}), Q.AND)
             qs = model.objects.filter(and_condition)
-            if len(qs)>0:
+            if len(qs) > 0:
                 pk = str(qs.first().pk)
         return pk
 
@@ -97,22 +101,31 @@ class SpecieSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
 
 class ViaSerializer(serializers.ModelSerializer):
     """Via"""
+
     anatomical_entity = AnatomicalEntitySerializer(read_only=False)
 
     class Meta:
         model = Via
-        fields = ("id", "display_order", "connectivity_statement_id", "anatomical_entity")
+        fields = (
+            "id",
+            "display_order",
+            "connectivity_statement_id",
+            "anatomical_entity",
+        )
 
 
 class DoiSerializer(serializers.ModelSerializer):
     """Doi"""
+
     doi = serializers.CharField(required=True)
     # connectivity_statement_id = serializers.IntegerField(required=True)
 
     class Meta:
         model = Doi
-        fields = ("id", "doi",) #, "connectivity_statement_id")
-
+        fields = (
+            "id",
+            "doi",
+        )  # , "connectivity_statement_id")
 
 
 class SentenceSerializer(FixManyToManyMixin, WritableNestedModelSerializer):
@@ -124,7 +137,7 @@ class SentenceSerializer(FixManyToManyMixin, WritableNestedModelSerializer):
     tags = TagSerializer(many=True, read_only=False)
     owner = UserSerializer(read_only=True, required=False)
     available_transitions = serializers.SerializerMethodField(read_only=True)
-  
+
     def get_available_transitions(self, instance) -> list[str]:
         return [t.name for t in instance.get_available_state_transitions()]
 
@@ -152,11 +165,13 @@ class SentenceSerializer(FixManyToManyMixin, WritableNestedModelSerializer):
             "pmcid_uri",
             "pmid_uri",
             "doi_uri",
-            "available_transitions"
+            "available_transitions",
         )
 
 
-class ConnectivityStatementSerializer(FixManyToManyMixin, WritableNestedModelSerializer):
+class ConnectivityStatementSerializer(
+    FixManyToManyMixin, WritableNestedModelSerializer
+):
     """Connectivity Statement"""
 
     sentence_id = serializers.IntegerField()
@@ -169,7 +184,7 @@ class ConnectivityStatementSerializer(FixManyToManyMixin, WritableNestedModelSer
     origin = AnatomicalEntitySerializer(required=False, read_only=True)
     destination = AnatomicalEntitySerializer(required=False, read_only=True)
     ans_division = AnsDivisionSerializer(required=False, read_only=True)
-    path = ViaSerializer(source="via_set",many=True, read_only=True)
+    path = ViaSerializer(source="via_set", many=True, read_only=True)
     species = SpecieSerializer(many=True, read_only=False)
     sentence = SentenceSerializer(required=False, read_only=True)
 
@@ -246,13 +261,14 @@ class ConnectivityStatementWithDetailsSerializer(serializers.ModelSerializer):
 
 class NoteSerializer(serializers.ModelSerializer):
     """Note"""
+
     user = serializers.CharField(read_only=True, required=False, allow_null=True)
     connectivity_statement_id = serializers.IntegerField(required=False)
     sentence_id = serializers.IntegerField(required=False)
     created_at = serializers.DateTimeField(read_only=True, required=False)
-    
+
     def create(self, validated_data):
-        request = self.context.get('request', None)
+        request = self.context.get("request", None)
         if request:
             # link the note to the user
             validated_data.update({"user": request.user})
@@ -260,4 +276,10 @@ class NoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Note
-        fields = ("note", "user", "created_at", "connectivity_statement_id", "sentence_id")
+        fields = (
+            "note",
+            "user",
+            "created_at",
+            "connectivity_statement_id",
+            "sentence_id",
+        )

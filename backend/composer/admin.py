@@ -50,7 +50,7 @@ class NoteSentenceInline(admin.StackedInline):
     exclude = ("connectivity_statement",)
     readonly_fields = ("created_at",)
     extra = 0
- 
+
 
 class NoteConnectivityStatementInline(admin.StackedInline):
     model = Note

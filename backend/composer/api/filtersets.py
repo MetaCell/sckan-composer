@@ -40,7 +40,9 @@ class SentenceFilter(django_filters.FilterSet):
 
 
 class ConnectivityStatementFilter(django_filters.FilterSet):
-    sentence_id = django_filters.ModelChoiceFilter(field_name="sentence_id", queryset=Sentence.objects.all())
+    sentence_id = django_filters.ModelChoiceFilter(
+        field_name="sentence_id", queryset=Sentence.objects.all()
+    )
     knowledge_statement = django_filters.CharFilter(
         field_name="knowledge_statement", lookup_expr="icontains"
     )
@@ -80,9 +82,12 @@ class AnatomicalEntityFilter(django_filters.FilterSet):
 
 
 class NoteFilter(django_filters.FilterSet):
-    sentence_id = django_filters.ModelChoiceFilter(field_name="sentence_id", queryset=Sentence.objects.all())
+    sentence_id = django_filters.ModelChoiceFilter(
+        field_name="sentence_id", queryset=Sentence.objects.all()
+    )
     connectivity_statement_id = django_filters.ModelChoiceFilter(
-        field_name="connectivity_statement_id", queryset=ConnectivityStatement.objects.all()
+        field_name="connectivity_statement_id",
+        queryset=ConnectivityStatement.objects.all(),
     )
 
     class Meta:
@@ -92,7 +97,8 @@ class NoteFilter(django_filters.FilterSet):
 
 class ViaFilter(django_filters.FilterSet):
     connectivity_statement_id = django_filters.ModelChoiceFilter(
-        field_name="connectivity_statement_id", queryset=ConnectivityStatement.objects.all()
+        field_name="connectivity_statement_id",
+        queryset=ConnectivityStatement.objects.all(),
     )
 
     class Meta:
