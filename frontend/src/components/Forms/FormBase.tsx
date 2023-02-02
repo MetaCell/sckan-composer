@@ -1,11 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useRef, useState} from 'react'
 import validator from "@rjsf/validator-ajv8";
 import {IChangeEvent, withTheme} from "@rjsf/core";
 import {Box} from '@mui/material';
 import {Theme} from '@rjsf/mui'
-import useAutoSave from "../../hooks/useAutosave";
+import {useDebouncedCallback} from "use-debounce";
 import {INPUT_DEFAULT_DELAY} from "../../settings";
-import {delay} from "../../utilities/functions";
 
 const Form = withTheme(Theme)
 
@@ -14,15 +13,11 @@ const log = (type: string) => console.log.bind(console, type)
 
 export const FormBase = (props: any) => {
 
-    const dataRef = useRef<any|null>();
-    const {service, data, schema, setter, extraData, uiSchema, uiFields} = props
-    const {debounce, resolve} = useAutoSave(() => onSave(), (value) => dataRef.current = value)
+    const {service, data, schema, setter, extraData, uiSchema, uiFields, enableAutoSave} = props
+    const triggerAutoSave = useDebouncedCallback(() => onSave(), INPUT_DEFAULT_DELAY);
+
+
     const formRef = useRef<any>(null);
-
-    useEffect(() => {
-        dataRef.current = data;
-    }, [data]);
-
 
     if (!data) {
         return <div>Loading...</div>
@@ -39,24 +34,29 @@ export const FormBase = (props: any) => {
     const onError = (errors: any) => {
         log("errors")
         log(errors)
-        resolve()
     }
 
-    const onSave = async () => {
+    const onSave = () => {
+        // todo: Disable form
         if (formRef.current != null) {
+            console.debug("Saving")
             return formRef.current.submit()
         }
     }
 
     const handleSubmit = async (event: IChangeEvent) => {
-        console.debug("Simulating save")
-        console.debug(dataRef.current.title)
-      const formData = {...event.formData, ...extraData}
-      service.save(formData).then((newData:any) => {
-        setter(newData)
-      })
-        console.debug("Simulating save concluded")
-        resolve()
+        const formData = {...event.formData, ...extraData}
+        service.save(formData).then((newData: any) => {
+            setter(newData)
+        }).catch((error: any) => console.error("Something went wrong"))
+        console.debug("Saved")
+    }
+
+    const handleUpdate = async (event: IChangeEvent) => {
+        if (enableAutoSave) {
+            console.debug("Triggered Auto Save")
+            return triggerAutoSave()
+        }
     }
 
     return (
@@ -65,9 +65,9 @@ export const FormBase = (props: any) => {
                 ref={formRef}
                 schema={schema}
                 uiSchema={uiSchema}
-                formData={dataRef.current || data}
+                formData={data}
                 validator={validator}
-                onChange={(e) => debounce(e.formData)}
+                onChange={handleUpdate}
                 onSubmit={handleSubmit}
                 onError={onError}
             />

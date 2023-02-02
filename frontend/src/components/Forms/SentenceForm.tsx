@@ -21,6 +21,7 @@ const SentenceForm = (props: any) => {
         schema={schema}
         uiSchema={uiSchema}
         uiFields={uiFields}
+        enableAutoSave={true}
         {...props}
       />
     </Box>

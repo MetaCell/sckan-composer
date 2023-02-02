@@ -58,7 +58,7 @@ const SentencesDetails = () => {
         {
           sentence?.available_transitions.map((transition) => <Button onClick={() => doTransition(transition)}>{transition}</Button>)
         }
-        <SentenceForm data={sentence} format='full' setter={setSentence}/>
+        <SentenceForm data={sentence} format='full' setter={setSentence} />
         <Button onClick={() => setExtraStatementForm((prev) => [...prev, ''])}>Add Statement</Button>
       </Grid>
       <Grid item xl={5}>

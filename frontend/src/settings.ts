@@ -1,3 +1,2 @@
-export const INPUT_DEBOUNCE_TIME = 1000
-export const INPUT_DEFAULT_DELAY = 7500
-export const AUTOSAVE_TIMEOUT = 300000
+export const INPUT_DEBOUNCE_TIME = 1000 // 1 second
+export const INPUT_DEFAULT_DELAY = 3000 // 30 seconds
