@@ -1,0 +1,1832 @@
+o;o_label;o_synonym
+http://api.brain-map.org/api/v2/data/Structure/1047;Primary somatosensory area, barrel field, layer 4 (mba);Primary somatosensory area barrel field layer 4
+http://api.brain-map.org/api/v2/data/Structure/1066;Anteromedial visual area, layer 2/3 (mba);Anteromedial visual area layer 2/3
+http://api.brain-map.org/api/v2/data/Structure/1070;Primary somatosensory area, barrel field, layer 5 (mba);Primary somatosensory area barrel field layer 5
+http://api.brain-map.org/api/v2/data/Structure/1074;Anterolateral visual area, layer 1 (mba);Anterolateral visual area layer 1
+http://api.brain-map.org/api/v2/data/Structure/1086;Primary somatosensory area, trunk, layer 4 (mba);Primary somatosensory area trunk layer 4
+http://api.brain-map.org/api/v2/data/Structure/1111;Primary somatosensory area, trunk, layer 5 (mba);Primary somatosensory area trunk layer 5
+http://api.brain-map.org/api/v2/data/Structure/1114;Anterolateral visual area, layer 4 (mba);Anterolateral visual area layer 4
+http://api.brain-map.org/api/v2/data/Structure/121;Lateral visual area, layer 6b (mba);Lateral visual area layer 6b
+http://api.brain-map.org/api/v2/data/Structure/182305705;Primary somatosensory area, unassigned, layer 5 (mba);Primary somatosensory area unassigned layer 5
+http://api.brain-map.org/api/v2/data/Structure/201;Primary somatosensory area, barrel field, layer 2/3 (mba);Primary somatosensory area barrel field layer 2/3
+http://api.brain-map.org/api/v2/data/Structure/233;Anterolateral visual area, layer 5 (mba);Anterolateral visual area layer 5
+http://api.brain-map.org/api/v2/data/Structure/234;Temporal association areas, layer 4 (mba);Temporal association areas layer 4
+http://api.brain-map.org/api/v2/data/Structure/251;Primary auditory area, layer 2/3 (mba);Primary auditory area layer 2/3
+http://api.brain-map.org/api/v2/data/Structure/257;posteromedial visual area, layer 6a (mba);posteromedial visual area layer 6a
+http://api.brain-map.org/api/v2/data/Structure/269;Posterolateral visual area, layer 2/3 (mba);Posterolateral visual area layer 2/3
+http://api.brain-map.org/api/v2/data/Structure/274;Retrosplenial area, dorsal part, layer 6a (mba);Retrosplenial area dorsal part layer 6a
+http://api.brain-map.org/api/v2/data/Structure/281;Anteromedial visual area, layer 1 (mba);Anteromedial visual area layer 1
+http://api.brain-map.org/api/v2/data/Structure/305;Primary visual area, layer 6b (mba);Primary visual area layer 6b
+http://api.brain-map.org/api/v2/data/Structure/312782558;Anterior area, layer 4 (mba);Anterior area layer 4
+http://api.brain-map.org/api/v2/data/Structure/312782562;Anterior area, layer 5 (mba);Anterior area layer 5
+http://api.brain-map.org/api/v2/data/Structure/312782570;Anterior area, layer 6b (mba);Anterior area layer 6b
+http://api.brain-map.org/api/v2/data/Structure/312782582;Laterointermediate area, layer 2/3 (mba);Laterointermediate area layer 2/3
+http://api.brain-map.org/api/v2/data/Structure/312782586;Laterointermediate area, layer 4 (mba);Laterointermediate area layer 4
+http://api.brain-map.org/api/v2/data/Structure/312782590;Laterointermediate area, layer 5 (mba);Laterointermediate area layer 5
+http://api.brain-map.org/api/v2/data/Structure/312782594;Laterointermediate area, layer 6a (mba);Laterointermediate area layer 6a
+http://api.brain-map.org/api/v2/data/Structure/312782598;Laterointermediate area, layer 6b (mba);Laterointermediate area layer 6b
+http://api.brain-map.org/api/v2/data/Structure/312782608;Rostrolateral area, layer 2/3 (mba);Rostrolateral area layer 2/3
+http://api.brain-map.org/api/v2/data/Structure/312782612;Rostrolateral area, layer 4 (mba);Rostrolateral area layer 4
+http://api.brain-map.org/api/v2/data/Structure/312782620;Rostrolateral area, layer 6a (mba);Rostrolateral area layer 6a
+http://api.brain-map.org/api/v2/data/Structure/312782636;Postrhinal area, layer 2/3 (mba);Postrhinal area layer 2/3
+http://api.brain-map.org/api/v2/data/Structure/312782640;Postrhinal area, layer 4 (mba);Postrhinal area layer 4
+http://api.brain-map.org/api/v2/data/Structure/312782644;Postrhinal area, layer 5 (mba);Postrhinal area layer 5
+http://api.brain-map.org/api/v2/data/Structure/312782648;Postrhinal area, layer 6a (mba);Postrhinal area layer 6a
+http://api.brain-map.org/api/v2/data/Structure/312782652;Postrhinal area, layer 6b (mba);Postrhinal area layer 6b
+http://api.brain-map.org/api/v2/data/Structure/33;Primary visual area, layer 6a (mba);Primary visual area layer 6a
+http://api.brain-map.org/api/v2/data/Structure/393;Posterolateral visual area, layer 6b (mba);Posterolateral visual area layer 6b
+http://api.brain-map.org/api/v2/data/Structure/401;Anteromedial visual area, layer 4 (mba);Anteromedial visual area layer 4
+http://api.brain-map.org/api/v2/data/Structure/41;posteromedial visual area, layer 2/3 (mba);posteromedial visual area layer 2/3
+http://api.brain-map.org/api/v2/data/Structure/421;Lateral visual area, layer 1 (mba);Lateral visual area layer 1
+http://api.brain-map.org/api/v2/data/Structure/433;Anteromedial visual area, layer 5 (mba);Anteromedial visual area layer 5
+http://api.brain-map.org/api/v2/data/Structure/434;Retrosplenial area, dorsal part, layer 2/3 (mba);Retrosplenial area dorsal part layer 2/3
+http://api.brain-map.org/api/v2/data/Structure/469;posteromedial visual area, layer 6b (mba);posteromedial visual area layer 6b
+http://api.brain-map.org/api/v2/data/Structure/501;posteromedial visual area, layer 4 (mba);posteromedial visual area layer 4
+http://api.brain-map.org/api/v2/data/Structure/565;posteromedial visual area, layer 5 (mba);posteromedial visual area layer 5
+http://api.brain-map.org/api/v2/data/Structure/573;Lateral visual area, layer 4 (mba);Lateral visual area layer 4
+http://api.brain-map.org/api/v2/data/Structure/590;Retrosplenial area, ventral part, layer 6a (mba);Retrosplenial area ventral part layer 6a
+http://api.brain-map.org/api/v2/data/Structure/593;Primary visual area, layer 1 (mba);Primary visual area layer 1
+http://api.brain-map.org/api/v2/data/Structure/601;Anterolateral visual area, layer 6a (mba);Anterolateral visual area layer 6a
+http://api.brain-map.org/api/v2/data/Structure/610;Retrosplenial area, dorsal part, layer 5 (mba);Retrosplenial area dorsal part layer 5
+http://api.brain-map.org/api/v2/data/Structure/613;Lateral visual area, layer 5 (mba);Lateral visual area layer 5
+http://api.brain-map.org/api/v2/data/Structure/649;Anterolateral visual area, layer 6b (mba);Anterolateral visual area layer 6b
+http://api.brain-map.org/api/v2/data/Structure/654;Primary somatosensory area, nose, layer 4 (mba);Primary somatosensory area nose layer 4
+http://api.brain-map.org/api/v2/data/Structure/671;Retrosplenial area, lateral agranular part, layer 1 (mba);Retrosplenial area lateral agranular part layer 1
+http://api.brain-map.org/api/v2/data/Structure/687;Retrosplenial area, ventral part, layer 5 (mba);Retrosplenial area ventral part layer 5
+http://api.brain-map.org/api/v2/data/Structure/719;Primary somatosensory area, layer 6b (mba);Primary somatosensory area layer 6b
+http://api.brain-map.org/api/v2/data/Structure/721;Primary visual area, layer 4 (mba);Primary visual area layer 4
+http://api.brain-map.org/api/v2/data/Structure/729;Temporal association areas, layer 6a (mba);Temporal association areas layer 6a
+http://api.brain-map.org/api/v2/data/Structure/74;Lateral visual area, layer 6a (mba);Lateral visual area layer 6a
+http://api.brain-map.org/api/v2/data/Structure/774;Retrosplenial area, lateral agranular part, layer 5 (mba);Retrosplenial area lateral agranular part layer 5
+http://api.brain-map.org/api/v2/data/Structure/778;Primary visual area, layer 5 (mba);Primary visual area layer 5
+http://api.brain-map.org/api/v2/data/Structure/791;Posterior auditory area, layer 5 (mba);Posterior auditory area layer 5
+http://api.brain-map.org/api/v2/data/Structure/805;posteromedial visual area, layer 1 (mba);posteromedial visual area layer 1
+http://api.brain-map.org/api/v2/data/Structure/821;Primary visual area, layer 2/3 (mba);Primary visual area layer 2/3
+http://api.brain-map.org/api/v2/data/Structure/869;Posterolateral visual area, layer 4 (mba);Posterolateral visual area layer 4
+http://api.brain-map.org/api/v2/data/Structure/902;Posterolateral visual area, layer 5 (mba);Posterolateral visual area layer 5
+http://api.brain-map.org/api/v2/data/Structure/905;Anterolateral visual area, layer 2/3 (mba);Anterolateral visual area layer 2/3
+http://api.brain-map.org/api/v2/data/Structure/906;Retrosplenial area, lateral agranular part, layer 6a (mba);Retrosplenial area lateral agranular part layer 6a
+http://api.brain-map.org/api/v2/data/Structure/954;Primary auditory area, layer 6a (mba);Primary auditory area layer 6a
+http://api.brain-map.org/api/v2/data/Structure/965;Retrosplenial area, lateral agranular part, layer 2/3 (mba);Retrosplenial area lateral agranular part layer 2/3
+http://api.brain-map.org/api/v2/data/Structure/973;Lateral visual area, layer 2/3 (mba);Lateral visual area layer 2/3
+http://purl.obolibrary.org/obo/UBERON_0000006;islet of Langerhans;pancreatic islet
+http://purl.obolibrary.org/obo/UBERON_0000006;islet of Langerhans;pancreatic insula
+http://purl.obolibrary.org/obo/UBERON_0000006;islet of Langerhans;islets of Langerhans
+http://purl.obolibrary.org/obo/UBERON_0000006;islet of Langerhans;island of pancreas
+http://purl.obolibrary.org/obo/UBERON_0000006;islet of Langerhans;island of Langerhans
+http://purl.obolibrary.org/obo/UBERON_0000044;dorsal root ganglion;spinal ganglion part of peripheral nervous system
+http://purl.obolibrary.org/obo/UBERON_0000044;dorsal root ganglion;spinal ganglion
+http://purl.obolibrary.org/obo/UBERON_0000044;dorsal root ganglion;posterior root ganglion
+http://purl.obolibrary.org/obo/UBERON_0000044;dorsal root ganglion;ganglion spinalis
+http://purl.obolibrary.org/obo/UBERON_0000044;dorsal root ganglion;ganglion spinale
+http://purl.obolibrary.org/obo/UBERON_0000044;dorsal root ganglion;ganglion sensorium nervi spinalis
+http://purl.obolibrary.org/obo/UBERON_0000044;dorsal root ganglion;ganglion of dorsal root
+http://purl.obolibrary.org/obo/UBERON_0000044;dorsal root ganglion;DRG
+http://purl.obolibrary.org/obo/UBERON_0000044;dorsal root ganglion;dorsal root ganglia
+http://purl.obolibrary.org/obo/UBERON_0000044;dorsal root ganglion;dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0000127;facial nucleus;nucleus of facial nerve
+http://purl.obolibrary.org/obo/UBERON_0000127;facial nucleus;facial VII nucleus
+http://purl.obolibrary.org/obo/UBERON_0000127;facial nucleus;facial VII motor nucleus
+http://purl.obolibrary.org/obo/UBERON_0000127;facial nucleus;facial nerve nucleus
+http://purl.obolibrary.org/obo/UBERON_0000388;epiglottis;
+http://purl.obolibrary.org/obo/UBERON_0000388;Epiglottis;
+http://purl.obolibrary.org/obo/UBERON_0000468;multicellular organism;whole organism
+http://purl.obolibrary.org/obo/UBERON_0000468;multicellular organism;whole body
+http://purl.obolibrary.org/obo/UBERON_0000468;multicellular organism;multi-cellular organism
+http://purl.obolibrary.org/obo/UBERON_0000468;multicellular organism;Koerper
+http://purl.obolibrary.org/obo/UBERON_0000468;multicellular organism;body
+http://purl.obolibrary.org/obo/UBERON_0000468;multicellular organism;organism
+http://purl.obolibrary.org/obo/UBERON_0000947;aorta;trunk of systemic arterial tree
+http://purl.obolibrary.org/obo/UBERON_0000947;aorta;trunk of aortic tree
+http://purl.obolibrary.org/obo/UBERON_0000947;aorta;dorsal aorta
+http://purl.obolibrary.org/obo/UBERON_0000947;aorta;arteria maxima
+http://purl.obolibrary.org/obo/UBERON_0000961;thoracic ganglion;thorax ganglion
+http://purl.obolibrary.org/obo/UBERON_0000961;thoracic ganglion;thoracic sympathetic ganglion
+http://purl.obolibrary.org/obo/UBERON_0000961;thoracic ganglion;thoracic splanchnic ganglion
+http://purl.obolibrary.org/obo/UBERON_0000961;thoracic ganglion;thoracic paravertebral ganglion
+http://purl.obolibrary.org/obo/UBERON_0000961;thoracic ganglion;ganglion thoracicum splanchnicum
+http://purl.obolibrary.org/obo/UBERON_0000961;thoracic ganglion;ganglion of thorax
+http://purl.obolibrary.org/obo/UBERON_0000966;retina;tunica interna of eyeball
+http://purl.obolibrary.org/obo/UBERON_0000966;retina;retinas
+http://purl.obolibrary.org/obo/UBERON_0000966;retina;retina of camera-type eye
+http://purl.obolibrary.org/obo/UBERON_0000966;retina;Netzhaut
+http://purl.obolibrary.org/obo/UBERON_0000966;retina;inner layer of eyeball
+http://purl.obolibrary.org/obo/UBERON_0000988;pons;pons Varolii
+http://purl.obolibrary.org/obo/UBERON_0000988;pons;pons of Varolius
+http://purl.obolibrary.org/obo/UBERON_0000988;pons;pons cerebri
+http://purl.obolibrary.org/obo/UBERON_0001043;esophagus;oesophagus
+http://purl.obolibrary.org/obo/UBERON_0001043;esophagus;gullet
+http://purl.obolibrary.org/obo/UBERON_0001103;diaphragm;thoracic diaphragm
+http://purl.obolibrary.org/obo/UBERON_0001103;diaphragm;phren
+http://purl.obolibrary.org/obo/UBERON_0001103;diaphragm;midriff
+http://purl.obolibrary.org/obo/UBERON_0001103;diaphragm;diaphragm of thorax
+http://purl.obolibrary.org/obo/UBERON_0001103;diaphragm;diaphragm muscle
+http://purl.obolibrary.org/obo/UBERON_0001158;descending colon;colon descendens
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;ventriculus organ mucosa
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;ventriculus mucous membrane
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;ventriculus mucosa of organ
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;ventriculus mucosa
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;tunica mucosa gastris
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;tunica mucosa gastricae
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;tunica mucosa (gaster)
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;stomach organ mucosa
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;stomach mucous membrane
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;stomach mucosa of organ
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;stomach mucosa
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;organ mucosa of ventriculus
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;organ mucosa of stomach
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;mucous membrane of ventriculus
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;mucous membrane of stomach
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;mucosa of ventriculus
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;mucosa of organ of ventriculus
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;mucosa of organ of stomach
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;Magenschleimhaut
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;gastric mucous membrane
+http://purl.obolibrary.org/obo/UBERON_0001199;mucosa of stomach;gastric mucosa
+http://purl.obolibrary.org/obo/UBERON_0001200;submucosa of stomach;ventriculus submucosa
+http://purl.obolibrary.org/obo/UBERON_0001200;submucosa of stomach;tela submucosa ventriculi
+http://purl.obolibrary.org/obo/UBERON_0001200;submucosa of stomach;tela submucosa gastricae
+http://purl.obolibrary.org/obo/UBERON_0001200;submucosa of stomach;tela submucosa (gaster)
+http://purl.obolibrary.org/obo/UBERON_0001200;submucosa of stomach;submucous layer of stomach
+http://purl.obolibrary.org/obo/UBERON_0001200;submucosa of stomach;submucosa of ventriculus
+http://purl.obolibrary.org/obo/UBERON_0001200;submucosa of stomach;stomach submucosa
+http://purl.obolibrary.org/obo/UBERON_0001200;submucosa of stomach;gastric submucosa
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;wall of ventriculus serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;wall of ventriculus serosa
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;wall of stomach serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;wall of stomach serosa
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;visceral peritoneum of stomach
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;ventriculus wall serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;ventriculus wall serosa
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;ventriculus anatomical wall serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;ventriculus anatomical wall serosa
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;tunica serosa gastricae
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;tunica serosa (gaster)
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;stomach wall serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;stomach wall serosa
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;stomach serosa
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;stomach anatomical wall serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;stomach anatomical wall serosa
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serous membrane of wall of ventriculus
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serous membrane of wall of stomach
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serous membrane of ventriculus wall
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serous membrane of ventriculus anatomical wall
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serous membrane of stomach wall
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serous membrane of stomach anatomical wall
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serous membrane of gastric wall
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serous membrane of anatomical wall of ventriculus
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serous membrane of anatomical wall of stomach
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serous coat of stomach
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serosa of wall of ventriculus
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serosa of wall of stomach
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serosa of ventriculus wall
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serosa of ventriculus anatomical wall
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serosa of stomach wall
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serosa of stomach anatomical wall
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serosa of gastric wall
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serosa of anatomical wall of ventriculus
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;serosa of anatomical wall of stomach
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;gastric wall serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;gastric wall serosa
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;gastric serosa
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;anatomical wall of ventriculus serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;anatomical wall of ventriculus serosa
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;anatomical wall of stomach serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001201;serosa of stomach;anatomical wall of stomach serosa
+http://purl.obolibrary.org/obo/UBERON_0001203;muscularis mucosae of stomach;tunica muscularis gastricae
+http://purl.obolibrary.org/obo/UBERON_0001203;muscularis mucosae of stomach;stomach muscularis mucosa
+http://purl.obolibrary.org/obo/UBERON_0001203;muscularis mucosae of stomach;muscular coat of stomach
+http://purl.obolibrary.org/obo/UBERON_0001203;muscularis mucosae of stomach;lamina muscularis of gastric mucosa
+http://purl.obolibrary.org/obo/UBERON_0001203;muscularis mucosae of stomach;lamina muscularis mucosae gastricae
+http://purl.obolibrary.org/obo/UBERON_0001203;muscularis mucosae of stomach;lamina muscularis mucosae (tunica mucosa)(gaster)
+http://purl.obolibrary.org/obo/UBERON_0001203;muscularis mucosae of stomach;gastric muscularis mucosa
+http://purl.obolibrary.org/obo/UBERON_0001211;Peyer's patch;Peyers patch
+http://purl.obolibrary.org/obo/UBERON_0001211;Peyer's patch;Peyers gland
+http://purl.obolibrary.org/obo/UBERON_0001211;Peyer's patch;noduli lymphoidei aggregati
+http://purl.obolibrary.org/obo/UBERON_0001211;Peyer's patch;aggregated lymphoid nodule
+http://purl.obolibrary.org/obo/UBERON_0001211;Peyer's patch;aggregated lymphoid follicle of intestine
+http://purl.obolibrary.org/obo/UBERON_0001235;adrenal cortex;suprarenal cortex
+http://purl.obolibrary.org/obo/UBERON_0001235;adrenal cortex;suprarenal
+http://purl.obolibrary.org/obo/UBERON_0001235;adrenal cortex;cortex of suprarenal gland
+http://purl.obolibrary.org/obo/UBERON_0001235;adrenal cortex;cortex of adrenal gland
+http://purl.obolibrary.org/obo/UBERON_0001235;adrenal cortex;cortex glandulae suprarenalis
+http://purl.obolibrary.org/obo/UBERON_0001235;adrenal cortex;cortex (glandula suprarenalis)
+http://purl.obolibrary.org/obo/UBERON_0001235;adrenal cortex;adrenal gland cortex
+http://purl.obolibrary.org/obo/UBERON_0001236;adrenal medulla;suprarenal medulla
+http://purl.obolibrary.org/obo/UBERON_0001236;adrenal medulla;medulla of suprarenal gland
+http://purl.obolibrary.org/obo/UBERON_0001236;adrenal medulla;medulla of glandula suprarenalis
+http://purl.obolibrary.org/obo/UBERON_0001236;adrenal medulla;medulla of adrenal gland
+http://purl.obolibrary.org/obo/UBERON_0001236;adrenal medulla;medulla glandulae suprarenalis
+http://purl.obolibrary.org/obo/UBERON_0001236;adrenal medulla;medulla (glandula suprarenalis)
+http://purl.obolibrary.org/obo/UBERON_0001236;adrenal medulla;chromaffin cells
+http://purl.obolibrary.org/obo/UBERON_0001236;adrenal medulla;adrenal gland medulla
+http://purl.obolibrary.org/obo/UBERON_0001236;adrenal medulla;adrenal central medulla
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;wall of intestine serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;wall of intestine serosa
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;wall of bowel serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;wall of bowel serosa
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;visceral peritoneum of intestine
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serous membrane of wall of intestine
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serous membrane of wall of bowel
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serous membrane of intestine wall
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serous membrane of intestine anatomical wall
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serous membrane of intestinal wall
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serous membrane of bowel wall
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serous membrane of bowel anatomical wall
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serous membrane of anatomical wall of intestine
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serous membrane of anatomical wall of bowel
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serosa of wall of intestine
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serosa of wall of bowel
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serosa of intestine wall
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serosa of intestine anatomical wall
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serosa of intestinal wall
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serosa of bowel wall
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serosa of bowel anatomical wall
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serosa of anatomical wall of intestine
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;serosa of anatomical wall of bowel
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;intestine wall serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;intestine wall serosa
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;intestine serosa
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;intestine anatomical wall serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;intestine anatomical wall serosa
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;intestinal wall serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;intestinal wall serosa
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;intestinal serosa
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;bowel wall serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;bowel wall serosa
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;bowel anatomical wall serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;bowel anatomical wall serosa
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;anatomical wall of intestine serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;anatomical wall of intestine serosa
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;anatomical wall of bowel serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001243;serosa of intestine;anatomical wall of bowel serosa
+http://purl.obolibrary.org/obo/UBERON_0001250;red pulp of spleen;splenic red pulp
+http://purl.obolibrary.org/obo/UBERON_0001250;red pulp of spleen;spleen red pulp
+http://purl.obolibrary.org/obo/UBERON_0001250;red pulp of spleen;red pulp
+http://purl.obolibrary.org/obo/UBERON_0001250;red pulp of spleen;pulpa splenica
+http://purl.obolibrary.org/obo/UBERON_0001250;red pulp of spleen;pulpa rubra
+http://purl.obolibrary.org/obo/UBERON_0001258;neck of urinary bladder;vesical neck
+http://purl.obolibrary.org/obo/UBERON_0001258;neck of urinary bladder;urinary bladder neck
+http://purl.obolibrary.org/obo/UBERON_0001258;neck of urinary bladder;neck of bladder
+http://purl.obolibrary.org/obo/UBERON_0001258;neck of urinary bladder;collum vesicae
+http://purl.obolibrary.org/obo/UBERON_0001258;neck of urinary bladder;cervix vesicae urinariae
+http://purl.obolibrary.org/obo/UBERON_0001258;neck of urinary bladder;cervix vesicae
+http://purl.obolibrary.org/obo/UBERON_0001258;neck of urinary bladder;bladder neck
+http://purl.obolibrary.org/obo/UBERON_0001605;ciliary muscle;musculus ciliarus
+http://purl.obolibrary.org/obo/UBERON_0001605;ciliary muscle;musculus ciliaris
+http://purl.obolibrary.org/obo/UBERON_0001605;ciliary muscle;ciliaris
+http://purl.obolibrary.org/obo/UBERON_0001605;ciliary muscle;Bowman`s muscles
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;spincter pupillae
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;sphincter pupillae muscle
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;sphincter muscle of pupil
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;pupillary sphincter muscle
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;pupillary sphincter
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;pupillary constrictor muscle
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;musculus sphincter pupillae
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;m. sphincter pupillae
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;M. sphincter pupillae
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;iris sphincter muscle
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;iris sphincter
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;iris constrictor muscle
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;iris constrictor
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;constrictor pupillae
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;circular fibers
+http://purl.obolibrary.org/obo/UBERON_0001607;sphincter pupillae;sphincter pupillae
+http://purl.obolibrary.org/obo/UBERON_0001629;carotid body;glomus caroticum
+http://purl.obolibrary.org/obo/UBERON_0001629;carotid body;carotid glomus
+http://purl.obolibrary.org/obo/UBERON_0001643;oculomotor nerve;third cranial nerve
+http://purl.obolibrary.org/obo/UBERON_0001643;oculomotor nerve;oculomotor nerve tree
+http://purl.obolibrary.org/obo/UBERON_0001643;oculomotor nerve;oculomotor nerve or its root
+http://purl.obolibrary.org/obo/UBERON_0001643;oculomotor nerve;oculomotor nerve [III]
+http://purl.obolibrary.org/obo/UBERON_0001643;oculomotor nerve;oculomotor III nerve
+http://purl.obolibrary.org/obo/UBERON_0001643;oculomotor nerve;oculomotor III
+http://purl.obolibrary.org/obo/UBERON_0001643;oculomotor nerve;occulomotor
+http://purl.obolibrary.org/obo/UBERON_0001643;oculomotor nerve;nervus oculomotorius [III]
+http://purl.obolibrary.org/obo/UBERON_0001643;oculomotor nerve;nervus oculomotorius
+http://purl.obolibrary.org/obo/UBERON_0001643;oculomotor nerve;nerve III
+http://purl.obolibrary.org/obo/UBERON_0001643;oculomotor nerve;cranial nerve III
+http://purl.obolibrary.org/obo/UBERON_0001643;oculomotor nerve;CN-III
+http://purl.obolibrary.org/obo/UBERON_0001643;oculomotor nerve;3n
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;seventh cranial nerve
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;nervus facialis [vii]
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;nervus facialis
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;nerve VII
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;nerve of face
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;facial VII nerve
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;facial VII
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;facial nerve/root
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;facial nerve tree
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;facial nerve or its root
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;facial nerve [VII]
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;face nerve
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;cranial nerve VII
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;CN-VII
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;branchiomeric cranial nerve
+http://purl.obolibrary.org/obo/UBERON_0001647;facial nerve;7n
+http://purl.obolibrary.org/obo/UBERON_0001649;glossopharyngeal nerve;ninth cranial nerve
+http://purl.obolibrary.org/obo/UBERON_0001649;glossopharyngeal nerve;nervus glossopharyngeus [ix]
+http://purl.obolibrary.org/obo/UBERON_0001649;glossopharyngeal nerve;nervus glossopharyngeus
+http://purl.obolibrary.org/obo/UBERON_0001649;glossopharyngeal nerve;nerve IX
+http://purl.obolibrary.org/obo/UBERON_0001649;glossopharyngeal nerve;glossopharyngeal nerve tree
+http://purl.obolibrary.org/obo/UBERON_0001649;glossopharyngeal nerve;glossopharyngeal nerve [IX]
+http://purl.obolibrary.org/obo/UBERON_0001649;glossopharyngeal nerve;glossopharyngeal IX nerve
+http://purl.obolibrary.org/obo/UBERON_0001649;glossopharyngeal nerve;glossopharyngeal IX
+http://purl.obolibrary.org/obo/UBERON_0001649;glossopharyngeal nerve;cranial nerve IX
+http://purl.obolibrary.org/obo/UBERON_0001649;glossopharyngeal nerve;CN-IX
+http://purl.obolibrary.org/obo/UBERON_0001649;glossopharyngeal nerve;9n
+http://purl.obolibrary.org/obo/UBERON_0001650;hypoglossal nerve;twelfth cranial nerve
+http://purl.obolibrary.org/obo/UBERON_0001650;hypoglossal nerve;nervus hypoglossus [xii]
+http://purl.obolibrary.org/obo/UBERON_0001650;hypoglossal nerve;nervus hypoglossus
+http://purl.obolibrary.org/obo/UBERON_0001650;hypoglossal nerve;nervi hypoglossalis
+http://purl.obolibrary.org/obo/UBERON_0001650;hypoglossal nerve;nerve XII
+http://purl.obolibrary.org/obo/UBERON_0001650;hypoglossal nerve;hypoglossal XII nerve
+http://purl.obolibrary.org/obo/UBERON_0001650;hypoglossal nerve;hypoglossal XII
+http://purl.obolibrary.org/obo/UBERON_0001650;hypoglossal nerve;hypoglossal nerve/ root
+http://purl.obolibrary.org/obo/UBERON_0001650;hypoglossal nerve;hypoglossal nerve tree
+http://purl.obolibrary.org/obo/UBERON_0001650;hypoglossal nerve;hypoglossal nerve [XII]
+http://purl.obolibrary.org/obo/UBERON_0001650;hypoglossal nerve;cranial nerve XII
+http://purl.obolibrary.org/obo/UBERON_0001650;hypoglossal nerve;CN-XII
+http://purl.obolibrary.org/obo/UBERON_0001650;hypoglossal nerve;12n
+http://purl.obolibrary.org/obo/UBERON_0001715;oculomotor nuclear complex;third cranial nerve nucleus
+http://purl.obolibrary.org/obo/UBERON_0001715;oculomotor nuclear complex;OM
+http://purl.obolibrary.org/obo/UBERON_0001715;oculomotor nuclear complex;oculomotor nucleus
+http://purl.obolibrary.org/obo/UBERON_0001715;oculomotor nuclear complex;oculomotor motornucleus
+http://purl.obolibrary.org/obo/UBERON_0001715;oculomotor nuclear complex;oculomotor III nucleus
+http://purl.obolibrary.org/obo/UBERON_0001715;oculomotor nuclear complex;oculomotor III nuclear complex
+http://purl.obolibrary.org/obo/UBERON_0001715;oculomotor nuclear complex;nucleus of third cranial nerve
+http://purl.obolibrary.org/obo/UBERON_0001715;oculomotor nuclear complex;nucleus of oculomotor nuclear complex
+http://purl.obolibrary.org/obo/UBERON_0001715;oculomotor nuclear complex;nucleus of oculomotor nerve
+http://purl.obolibrary.org/obo/UBERON_0001715;oculomotor nuclear complex;nucleus oculomotorius
+http://purl.obolibrary.org/obo/UBERON_0001715;oculomotor nuclear complex;nucleus nervi oculomotorii
+http://purl.obolibrary.org/obo/UBERON_0001715;oculomotor nuclear complex;nIII
+http://purl.obolibrary.org/obo/UBERON_0001715;oculomotor nuclear complex;motor nucleus III
+http://purl.obolibrary.org/obo/UBERON_0001719;nucleus ambiguus;nucleus innominatus
+http://purl.obolibrary.org/obo/UBERON_0001719;nucleus ambiguus;ambiguus nucleus
+http://purl.obolibrary.org/obo/UBERON_0001719;nucleus ambiguus;ambiguous nucleus
+http://purl.obolibrary.org/obo/UBERON_0001719;nucleus ambiguus;Amb
+http://purl.obolibrary.org/obo/UBERON_0001723;tongue;glossus
+http://purl.obolibrary.org/obo/UBERON_0001736;submandibular gland;submaxillary gland
+http://purl.obolibrary.org/obo/UBERON_0001736;submandibular gland;submandibular salivary gland
+http://purl.obolibrary.org/obo/UBERON_0001736;submandibular gland;maxillary gland
+http://purl.obolibrary.org/obo/UBERON_0001736;submandibular gland;mandibular salivary gland
+http://purl.obolibrary.org/obo/UBERON_0001736;submandibular gland;mandibular gland
+http://purl.obolibrary.org/obo/UBERON_0001736;submandibular gland;glandula submandibularis
+http://purl.obolibrary.org/obo/UBERON_0001737;larynx;
+http://purl.obolibrary.org/obo/UBERON_0001759;vagus nerve;vagus X nerve
+http://purl.obolibrary.org/obo/UBERON_0001759;vagus nerve;vagus nerve tree
+http://purl.obolibrary.org/obo/UBERON_0001759;vagus nerve;vagus nerve or its root
+http://purl.obolibrary.org/obo/UBERON_0001759;vagus nerve;vagus nerve [X]
+http://purl.obolibrary.org/obo/UBERON_0001759;vagus nerve;vagus
+http://purl.obolibrary.org/obo/UBERON_0001759;vagus nerve;vagal nerve
+http://purl.obolibrary.org/obo/UBERON_0001759;vagus nerve;tenth cranial nerve
+http://purl.obolibrary.org/obo/UBERON_0001759;vagus nerve;pneuomgastric nerve
+http://purl.obolibrary.org/obo/UBERON_0001759;vagus nerve;nervus vagus [x]
+http://purl.obolibrary.org/obo/UBERON_0001759;vagus nerve;nervus vagus
+http://purl.obolibrary.org/obo/UBERON_0001759;vagus nerve;nerve X
+http://purl.obolibrary.org/obo/UBERON_0001759;vagus nerve;cranial nerve X
+http://purl.obolibrary.org/obo/UBERON_0001759;vagus nerve;CN-X
+http://purl.obolibrary.org/obo/UBERON_0001759;vagus nerve;10n
+http://purl.obolibrary.org/obo/UBERON_0001780;spinal nerve;vertebral column nerve
+http://purl.obolibrary.org/obo/UBERON_0001780;spinal nerve;spine nerve
+http://purl.obolibrary.org/obo/UBERON_0001780;spinal nerve;spinal nerves
+http://purl.obolibrary.org/obo/UBERON_0001780;spinal nerve;spinal nerve tree
+http://purl.obolibrary.org/obo/UBERON_0001780;spinal nerve;spinal column nerve
+http://purl.obolibrary.org/obo/UBERON_0001780;spinal nerve;nervi spinales
+http://purl.obolibrary.org/obo/UBERON_0001780;spinal nerve;nerve of vertebral column
+http://purl.obolibrary.org/obo/UBERON_0001780;spinal nerve;nerve of spine
+http://purl.obolibrary.org/obo/UBERON_0001780;spinal nerve;nerve of spinal column
+http://purl.obolibrary.org/obo/UBERON_0001780;spinal nerve;nerve of backbone
+http://purl.obolibrary.org/obo/UBERON_0001780;spinal nerve;backbone nerve
+http://purl.obolibrary.org/obo/UBERON_0001789;outer nuclear layer of retina;stratum nucleare externum retinae
+http://purl.obolibrary.org/obo/UBERON_0001789;outer nuclear layer of retina;stratum nucleare externum (retina)
+http://purl.obolibrary.org/obo/UBERON_0001789;outer nuclear layer of retina;retinal outer nuclear layers
+http://purl.obolibrary.org/obo/UBERON_0001789;outer nuclear layer of retina;retinal outer nuclear layer
+http://purl.obolibrary.org/obo/UBERON_0001789;outer nuclear layer of retina;retina, outer nuclear layer
+http://purl.obolibrary.org/obo/UBERON_0001789;outer nuclear layer of retina;retina outer nuclear layer
+http://purl.obolibrary.org/obo/UBERON_0001789;outer nuclear layer of retina;outer nuclear layer
+http://purl.obolibrary.org/obo/UBERON_0001789;outer nuclear layer of retina;ONL
+http://purl.obolibrary.org/obo/UBERON_0001789;outer nuclear layer of retina;neural retina outer nuclear layer
+http://purl.obolibrary.org/obo/UBERON_0001789;outer nuclear layer of retina;layer of outer granules
+http://purl.obolibrary.org/obo/UBERON_0001789;outer nuclear layer of retina;external nuclear layer
+http://purl.obolibrary.org/obo/UBERON_0001790;outer plexiform layer of retina;stratum plexiforme externum retinae
+http://purl.obolibrary.org/obo/UBERON_0001790;outer plexiform layer of retina;stratum plexiforme externum
+http://purl.obolibrary.org/obo/UBERON_0001790;outer plexiform layer of retina;retinal outer plexiform layers
+http://purl.obolibrary.org/obo/UBERON_0001790;outer plexiform layer of retina;retinal outer plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0001790;outer plexiform layer of retina;retina, outer plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0001790;outer plexiform layer of retina;retina outer plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0001790;outer plexiform layer of retina;outer plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0001790;outer plexiform layer of retina;OPL
+http://purl.obolibrary.org/obo/UBERON_0001790;outer plexiform layer of retina;external plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0001791;inner nuclear layer of retina;stratum nucleare internum retinae
+http://purl.obolibrary.org/obo/UBERON_0001791;inner nuclear layer of retina;stratum nucleare internum
+http://purl.obolibrary.org/obo/UBERON_0001791;inner nuclear layer of retina;retinal inner nuclear layer
+http://purl.obolibrary.org/obo/UBERON_0001791;inner nuclear layer of retina;retina, inner nuclear layer
+http://purl.obolibrary.org/obo/UBERON_0001791;inner nuclear layer of retina;retina inner nuclear layer
+http://purl.obolibrary.org/obo/UBERON_0001791;inner nuclear layer of retina;neural retina inner nuclear layer
+http://purl.obolibrary.org/obo/UBERON_0001791;inner nuclear layer of retina;layer of inner granules
+http://purl.obolibrary.org/obo/UBERON_0001791;inner nuclear layer of retina;intermediate cell layer
+http://purl.obolibrary.org/obo/UBERON_0001791;inner nuclear layer of retina;inner nuclear layer
+http://purl.obolibrary.org/obo/UBERON_0001791;inner nuclear layer of retina;INL
+http://purl.obolibrary.org/obo/UBERON_0001792;ganglionic layer of retina;stratum ganglionicum retinae
+http://purl.obolibrary.org/obo/UBERON_0001792;ganglionic layer of retina;stratum ganglionicum (retina)
+http://purl.obolibrary.org/obo/UBERON_0001792;ganglionic layer of retina;RGC layer
+http://purl.obolibrary.org/obo/UBERON_0001792;ganglionic layer of retina;retinal ganglion layer
+http://purl.obolibrary.org/obo/UBERON_0001792;ganglionic layer of retina;retinal ganglion cell layer
+http://purl.obolibrary.org/obo/UBERON_0001792;ganglionic layer of retina;retina, ganglion cell layer
+http://purl.obolibrary.org/obo/UBERON_0001792;ganglionic layer of retina;retina ganglion layer
+http://purl.obolibrary.org/obo/UBERON_0001792;ganglionic layer of retina;retina ganglion cell layer
+http://purl.obolibrary.org/obo/UBERON_0001792;ganglionic layer of retina;GCL layer
+http://purl.obolibrary.org/obo/UBERON_0001792;ganglionic layer of retina;ganglionic cell layer of retina
+http://purl.obolibrary.org/obo/UBERON_0001792;ganglionic layer of retina;ganglion cell layer
+http://purl.obolibrary.org/obo/UBERON_0001795;inner plexiform layer of retina;stratum plexiforme internum retinae
+http://purl.obolibrary.org/obo/UBERON_0001795;inner plexiform layer of retina;stratum plexiforme internum
+http://purl.obolibrary.org/obo/UBERON_0001795;inner plexiform layer of retina;stratum plexifome internum
+http://purl.obolibrary.org/obo/UBERON_0001795;inner plexiform layer of retina;retinal internal plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0001795;inner plexiform layer of retina;retinal inner plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0001795;inner plexiform layer of retina;retina, inner plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0001795;inner plexiform layer of retina;retina inner plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0001795;inner plexiform layer of retina;internal plexiform layer of retina
+http://purl.obolibrary.org/obo/UBERON_0001795;inner plexiform layer of retina;inner plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0001795;inner plexiform layer of retina;IPL
+http://purl.obolibrary.org/obo/UBERON_0001817;lacrimal gland;tear gland
+http://purl.obolibrary.org/obo/UBERON_0001817;lacrimal gland;preorbital gland
+http://purl.obolibrary.org/obo/UBERON_0001817;lacrimal gland;lacrimal-preorbital gland
+http://purl.obolibrary.org/obo/UBERON_0001817;lacrimal gland;glandula praeorbitalis
+http://purl.obolibrary.org/obo/UBERON_0001817;lacrimal gland;glandula lacrimalis
+http://purl.obolibrary.org/obo/UBERON_0001826;nasal cavity mucosa;tunica mucosa nasi
+http://purl.obolibrary.org/obo/UBERON_0001826;nasal cavity mucosa;tunica mucosa nasalis
+http://purl.obolibrary.org/obo/UBERON_0001826;nasal cavity mucosa;nasal mucosa
+http://purl.obolibrary.org/obo/UBERON_0001826;nasal cavity mucosa;mucous membrane of nose
+http://purl.obolibrary.org/obo/UBERON_0001826;nasal cavity mucosa;mucosa of nose
+http://purl.obolibrary.org/obo/UBERON_0001831;parotid gland;parotid
+http://purl.obolibrary.org/obo/UBERON_0001831;parotid gland;glandula parotidea
+http://purl.obolibrary.org/obo/UBERON_0001832;sublingual gland;sublingual salivary gland
+http://purl.obolibrary.org/obo/UBERON_0001832;sublingual gland;Rivinus' gland
+http://purl.obolibrary.org/obo/UBERON_0001832;sublingual gland;Rivinus gland
+http://purl.obolibrary.org/obo/UBERON_0001832;sublingual gland;glandula sublingualis
+http://purl.obolibrary.org/obo/UBERON_0001832;sublingual gland;ductus sublingualis
+http://purl.obolibrary.org/obo/UBERON_0001832;sublingual gland;submaxillary gland
+http://purl.obolibrary.org/obo/UBERON_0001844;cochlea;lagenas
+http://purl.obolibrary.org/obo/UBERON_0001844;cochlea;lagena
+http://purl.obolibrary.org/obo/UBERON_0001844;cochlea;cochlear part of bony labyrinth
+http://purl.obolibrary.org/obo/UBERON_0001844;cochlea;cochlear organ
+http://purl.obolibrary.org/obo/UBERON_0001844;cochlea;cochlear duct
+http://purl.obolibrary.org/obo/UBERON_0001844;cochlea;cochleae
+http://purl.obolibrary.org/obo/UBERON_0001880;bed nucleus of stria terminalis;stria terminalis nucleus
+http://purl.obolibrary.org/obo/UBERON_0001880;bed nucleus of stria terminalis;nucleus striae terminalis
+http://purl.obolibrary.org/obo/UBERON_0001880;bed nucleus of stria terminalis;nucleus proprius stria terminalis (bed nucleus)
+http://purl.obolibrary.org/obo/UBERON_0001880;bed nucleus of stria terminalis;nucleus of the stria terminalis
+http://purl.obolibrary.org/obo/UBERON_0001880;bed nucleus of stria terminalis;nucleus of stria terminalis
+http://purl.obolibrary.org/obo/UBERON_0001880;bed nucleus of stria terminalis;nucleus interstitialis striae terminalis
+http://purl.obolibrary.org/obo/UBERON_0001880;bed nucleus of stria terminalis;nuclei of stria terminalis
+http://purl.obolibrary.org/obo/UBERON_0001880;bed nucleus of stria terminalis;interstitial nucleus of stria terminalis
+http://purl.obolibrary.org/obo/UBERON_0001880;bed nucleus of stria terminalis;intercalate nucleus of stria terminalis
+http://purl.obolibrary.org/obo/UBERON_0001880;bed nucleus of stria terminalis;bed nucleus striae terminalis
+http://purl.obolibrary.org/obo/UBERON_0001880;bed nucleus of stria terminalis;bed nucleus stria terminalis (Johnson)
+http://purl.obolibrary.org/obo/UBERON_0001880;bed nucleus of stria terminalis;bed nucleus of the stria terminalis
+http://purl.obolibrary.org/obo/UBERON_0001880;bed nucleus of stria terminalis;bed nuclei of the stria terminalis
+http://purl.obolibrary.org/obo/UBERON_0001880;bed nucleus of stria terminalis;BST
+http://purl.obolibrary.org/obo/UBERON_0001884;phrenic nerve;phrenic
+http://purl.obolibrary.org/obo/UBERON_0001884;phrenic nerve;nervus phrenicus
+http://purl.obolibrary.org/obo/UBERON_0001884;phrenic nerve;diaphragmatic nerve
+http://purl.obolibrary.org/obo/UBERON_0001885;dentate gyrus of hippocampal formation;hippocampal dentate gyrus
+http://purl.obolibrary.org/obo/UBERON_0001885;dentate gyrus of hippocampal formation;gyrus dentatus
+http://purl.obolibrary.org/obo/UBERON_0001885;dentate gyrus of hippocampal formation;fascia dentata
+http://purl.obolibrary.org/obo/UBERON_0001885;dentate gyrus of hippocampal formation;dentate gyrus
+http://purl.obolibrary.org/obo/UBERON_0001885;dentate gyrus of hippocampal formation;dentate area (dentate gyrus)
+http://purl.obolibrary.org/obo/UBERON_0001885;dentate gyrus of hippocampal formation;dentate area
+http://purl.obolibrary.org/obo/UBERON_0001885;dentate gyrus of hippocampal formation;area dentata
+http://purl.obolibrary.org/obo/UBERON_0001891;midbrain;mesencephalon
+http://purl.obolibrary.org/obo/UBERON_0001891;midbrain;MB
+http://purl.obolibrary.org/obo/UBERON_0001894;diencephalon;thalamencephalon
+http://purl.obolibrary.org/obo/UBERON_0001894;diencephalon;mature diencephalon
+http://purl.obolibrary.org/obo/UBERON_0001894;diencephalon;interbrain
+http://purl.obolibrary.org/obo/UBERON_0001894;diencephalon;DiE
+http://purl.obolibrary.org/obo/UBERON_0001894;diencephalon;betweenbrain
+http://purl.obolibrary.org/obo/UBERON_0001894;diencephalon;between brain
+http://purl.obolibrary.org/obo/UBERON_0001894;diencephalon;diencephalon
+http://purl.obolibrary.org/obo/UBERON_0001896;medulla oblongata;metepencephalon
+http://purl.obolibrary.org/obo/UBERON_0001896;medulla oblongata;medulla oblonzata
+http://purl.obolibrary.org/obo/UBERON_0001896;medulla oblongata;bulbus
+http://purl.obolibrary.org/obo/UBERON_0001896;medulla oblongata;bulb
+http://purl.obolibrary.org/obo/UBERON_0001896;medulla oblongata;medulla
+http://purl.obolibrary.org/obo/UBERON_0001898;hypothalamus;preoptico-hypothalamic region
+http://purl.obolibrary.org/obo/UBERON_0001898;hypothalamus;preoptico-hypothalamic area
+http://purl.obolibrary.org/obo/UBERON_0001898;hypothalamus;Hy
+http://purl.obolibrary.org/obo/UBERON_0001898;hypothalamus;hypothalamus
+http://purl.obolibrary.org/obo/UBERON_0001926;lateral geniculate body;nucleus geniculatus lateralis
+http://purl.obolibrary.org/obo/UBERON_0001926;lateral geniculate body;nucleus corporis geniculati lateralis
+http://purl.obolibrary.org/obo/UBERON_0001926;lateral geniculate body;LGN
+http://purl.obolibrary.org/obo/UBERON_0001926;lateral geniculate body;LGB
+http://purl.obolibrary.org/obo/UBERON_0001926;lateral geniculate body;lateral geniculate nucleus
+http://purl.obolibrary.org/obo/UBERON_0001926;lateral geniculate body;lateral geniculate complex
+http://purl.obolibrary.org/obo/UBERON_0001926;lateral geniculate body;external geniculate body
+http://purl.obolibrary.org/obo/UBERON_0001926;lateral geniculate body;corpus geniculatus lateralis
+http://purl.obolibrary.org/obo/UBERON_0001926;lateral geniculate body;corpus geniculatum laterales
+http://purl.obolibrary.org/obo/UBERON_0001926;lateral geniculate body;corpus geniculatum laterale
+http://purl.obolibrary.org/obo/UBERON_0001926;lateral geniculate body;corpus geniculatum externum
+http://purl.obolibrary.org/obo/UBERON_0001930;paraventricular nucleus of hypothalamus;subcommissural nucleus (Ziehen)
+http://purl.obolibrary.org/obo/UBERON_0001930;paraventricular nucleus of hypothalamus;parvocellular hypothalamic nucleus
+http://purl.obolibrary.org/obo/UBERON_0001930;paraventricular nucleus of hypothalamus;paraventricular nucleus of the hypothalamus
+http://purl.obolibrary.org/obo/UBERON_0001930;paraventricular nucleus of hypothalamus;paraventricular nucleus hypothalamus (Malone)
+http://purl.obolibrary.org/obo/UBERON_0001930;paraventricular nucleus of hypothalamus;paraventricular nucleus
+http://purl.obolibrary.org/obo/UBERON_0001930;paraventricular nucleus of hypothalamus;paraventricular hypothalamic nucleus
+http://purl.obolibrary.org/obo/UBERON_0001930;paraventricular nucleus of hypothalamus;Pa
+http://purl.obolibrary.org/obo/UBERON_0001930;paraventricular nucleus of hypothalamus;nucleus paraventricularis hypothalami
+http://purl.obolibrary.org/obo/UBERON_0001930;paraventricular nucleus of hypothalamus;nucleus hypothalami paraventricularis
+http://purl.obolibrary.org/obo/UBERON_0001930;paraventricular nucleus of hypothalamus;nucleus hypothalami filiformis
+http://purl.obolibrary.org/obo/UBERON_0001930;paraventricular nucleus of hypothalamus;nucleus filiformis
+http://purl.obolibrary.org/obo/UBERON_0001930;paraventricular nucleus of hypothalamus;nuclei paraventricularis hypothalami
+http://purl.obolibrary.org/obo/UBERON_0001930;paraventricular nucleus of hypothalamus;nuclei paraventriculares
+http://purl.obolibrary.org/obo/UBERON_0001930;paraventricular nucleus of hypothalamus;filiform nucleus
+http://purl.obolibrary.org/obo/UBERON_0001931;lateral preoptic nucleus;nucleus preopticus lateralis
+http://purl.obolibrary.org/obo/UBERON_0001931;lateral preoptic nucleus;nucleus praeopticus lateralis
+http://purl.obolibrary.org/obo/UBERON_0001931;lateral preoptic nucleus;lateral preoptic hypothalamic nucleus
+http://purl.obolibrary.org/obo/UBERON_0001931;lateral preoptic nucleus;lateral preoptic area
+http://purl.obolibrary.org/obo/UBERON_0001931;lateral preoptic nucleus;area preoptica lateralis
+http://purl.obolibrary.org/obo/UBERON_0001931;lateral preoptic nucleus;area praeoptica lateralis
+http://purl.obolibrary.org/obo/UBERON_0001931;lateral preoptic nucleus;LPO
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;tectum opticum
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;tectum
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;tectal lobe
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;strata (grisea et alba) colliculi superioris
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;strata (grisea et alba) colliculi cranialis
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;optic tectum
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;optic lobe
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;nates
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;lobus opticus
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;layers of the superior colliculus
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;dorsal midbrain
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;cranial colliculus
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;corpus quadrigeminum superius
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;corpora bigemina
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;colliculus superior
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;colliculus rostralis
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;colliculus cranialis
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;colliculus bigeminalis oralis
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;anterior corpus quadrigeminum
+http://purl.obolibrary.org/obo/UBERON_0001945;superior colliculus;anterior colliculus
+http://purl.obolibrary.org/obo/UBERON_0001946;inferior colliculus;posterior corpus quadrigeminum
+http://purl.obolibrary.org/obo/UBERON_0001946;inferior colliculus;posterior colliculus
+http://purl.obolibrary.org/obo/UBERON_0001946;inferior colliculus;inferior colliculi
+http://purl.obolibrary.org/obo/UBERON_0001946;inferior colliculus;corpus quadrigeminum inferius
+http://purl.obolibrary.org/obo/UBERON_0001946;inferior colliculus;corpus bigeminum posterioris
+http://purl.obolibrary.org/obo/UBERON_0001946;inferior colliculus;corpus bigeminalis caudalis
+http://purl.obolibrary.org/obo/UBERON_0001946;inferior colliculus;colliculus inferior
+http://purl.obolibrary.org/obo/UBERON_0001946;inferior colliculus;colliculus caudalis
+http://purl.obolibrary.org/obo/UBERON_0001946;inferior colliculus;caudal colliculus
+http://purl.obolibrary.org/obo/UBERON_0001950;neocortex;nucleus hypoglossalis
+http://purl.obolibrary.org/obo/UBERON_0001950;neocortex;nonolfactory cortex
+http://purl.obolibrary.org/obo/UBERON_0001950;neocortex;neopallium
+http://purl.obolibrary.org/obo/UBERON_0001950;neocortex;neopallial cortex
+http://purl.obolibrary.org/obo/UBERON_0001950;neocortex;neocortex (isocortex)
+http://purl.obolibrary.org/obo/UBERON_0001950;neocortex;isocortex (sensu lato)
+http://purl.obolibrary.org/obo/UBERON_0001950;neocortex;isocortex
+http://purl.obolibrary.org/obo/UBERON_0001950;neocortex;iso-cortex
+http://purl.obolibrary.org/obo/UBERON_0001950;neocortex;homotypical cortex
+http://purl.obolibrary.org/obo/UBERON_0001950;neocortex;homogenetic cortex
+http://purl.obolibrary.org/obo/UBERON_0001950;neocortex;cerebral neocortex
+http://purl.obolibrary.org/obo/UBERON_0001959;white pulp of spleen;white pulp
+http://purl.obolibrary.org/obo/UBERON_0001959;white pulp of spleen;splenic white pulp
+http://purl.obolibrary.org/obo/UBERON_0001959;white pulp of spleen;spleen white pulp
+http://purl.obolibrary.org/obo/UBERON_0001959;white pulp of spleen;pulpa alba
+http://purl.obolibrary.org/obo/UBERON_0001959;white pulp of spleen;noduli lymphoidei splenici
+http://purl.obolibrary.org/obo/UBERON_0001960;periarterial lymphatic sheath;T cell domain of the splenic white pulp
+http://purl.obolibrary.org/obo/UBERON_0001960;periarterial lymphatic sheath;splenic periarteriolar lymphoid sheath
+http://purl.obolibrary.org/obo/UBERON_0001960;periarterial lymphatic sheath;spleen periarteriolar lymphatic sheath
+http://purl.obolibrary.org/obo/UBERON_0001960;periarterial lymphatic sheath;periarteriolar sheath
+http://purl.obolibrary.org/obo/UBERON_0001960;periarterial lymphatic sheath;periarterial lymphoid sheath
+http://purl.obolibrary.org/obo/UBERON_0001960;periarterial lymphatic sheath;PALS
+http://purl.obolibrary.org/obo/UBERON_0001975;serosa of esophagus;tunica serosa oesophageae
+http://purl.obolibrary.org/obo/UBERON_0001975;serosa of esophagus;serous membrane of oesophagus
+http://purl.obolibrary.org/obo/UBERON_0001975;serosa of esophagus;serous membrane of gullet
+http://purl.obolibrary.org/obo/UBERON_0001975;serosa of esophagus;serous membrane of esophagus
+http://purl.obolibrary.org/obo/UBERON_0001975;serosa of esophagus;serous coat of oesophagus
+http://purl.obolibrary.org/obo/UBERON_0001975;serosa of esophagus;serosa of oesophagus
+http://purl.obolibrary.org/obo/UBERON_0001975;serosa of esophagus;serosa of gullet
+http://purl.obolibrary.org/obo/UBERON_0001975;serosa of esophagus;serosa of abdominal part of esophagus
+http://purl.obolibrary.org/obo/UBERON_0001975;serosa of esophagus;oesophagus serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001975;serosa of esophagus;oesophagus serosa
+http://purl.obolibrary.org/obo/UBERON_0001975;serosa of esophagus;gullet serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001975;serosa of esophagus;gullet serosa
+http://purl.obolibrary.org/obo/UBERON_0001975;serosa of esophagus;esophagus serous membrane
+http://purl.obolibrary.org/obo/UBERON_0001975;serosa of esophagus;esophagus serosa
+http://purl.obolibrary.org/obo/UBERON_0001989;superior cervical ganglion;superior sympathetic cervical ganglion
+http://purl.obolibrary.org/obo/UBERON_0001989;superior cervical ganglion;superior cervical sympathetic ganglion
+http://purl.obolibrary.org/obo/UBERON_0001989;superior cervical ganglion;SCG
+http://purl.obolibrary.org/obo/UBERON_0001989;superior cervical ganglion;ganglion cervicale superius
+http://purl.obolibrary.org/obo/UBERON_0001990;middle cervical ganglion;middle cervical sympathetic ganglion
+http://purl.obolibrary.org/obo/UBERON_0001990;middle cervical ganglion;ganglion cervicale medium
+http://purl.obolibrary.org/obo/UBERON_0001997;olfactory epithelium;sensory olfactory epithelium
+http://purl.obolibrary.org/obo/UBERON_0001997;olfactory epithelium;pseudostratified main olfactory epithelium
+http://purl.obolibrary.org/obo/UBERON_0001997;olfactory epithelium;olfactory sensory epithelium
+http://purl.obolibrary.org/obo/UBERON_0001997;olfactory epithelium;olfactory membrane
+http://purl.obolibrary.org/obo/UBERON_0001997;olfactory epithelium;nasal sensory epithelium
+http://purl.obolibrary.org/obo/UBERON_0001997;olfactory epithelium;nasal epithelium
+http://purl.obolibrary.org/obo/UBERON_0001997;olfactory epithelium;nasal cavity olfactory epithelium
+http://purl.obolibrary.org/obo/UBERON_0001997;olfactory epithelium;MOE
+http://purl.obolibrary.org/obo/UBERON_0001997;olfactory epithelium;main olfactory epithelium
+http://purl.obolibrary.org/obo/UBERON_0002012;pulmonary artery;truncus pulmonalis
+http://purl.obolibrary.org/obo/UBERON_0002012;pulmonary artery;pulmonary arterial tree organ part
+http://purl.obolibrary.org/obo/UBERON_0002012;pulmonary artery;pulmonary arterial tree
+http://purl.obolibrary.org/obo/UBERON_0002012;pulmonary artery;pulmonary arterial subtree
+http://purl.obolibrary.org/obo/UBERON_0002012;pulmonary artery;arteria pulmonalis
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;morphological insula
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;lobus insularis
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;island of Reil
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;insulary cortex
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;insular region
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;insular lobe
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;insular gyrus
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;insular cortex
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;insula Reilii
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;insula of Reil
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;insula lobule
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;insula cerebri
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;iNS
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;cortex of island
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;cortex insularis
+http://purl.obolibrary.org/obo/UBERON_0002022;insula;central lobe
+http://purl.obolibrary.org/obo/UBERON_0002023;claustrum of brain;dorsal portion of claustrum
+http://purl.obolibrary.org/obo/UBERON_0002023;claustrum of brain;dorsal claustrum
+http://purl.obolibrary.org/obo/UBERON_0002023;claustrum of brain;claustrum (Burdach)
+http://purl.obolibrary.org/obo/UBERON_0002023;claustrum of brain;claustrum
+http://purl.obolibrary.org/obo/UBERON_0002024;internal carotid nerve plexus;plexus caroticus internus
+http://purl.obolibrary.org/obo/UBERON_0002024;internal carotid nerve plexus;internal carotid plexus
+http://purl.obolibrary.org/obo/UBERON_0002034;suprachiasmatic nucleus;suprachiasmatic nucleus of hypothalamus
+http://purl.obolibrary.org/obo/UBERON_0002034;suprachiasmatic nucleus;suprachiasmatic nucleus (Spiegel-Zwieg)
+http://purl.obolibrary.org/obo/UBERON_0002034;suprachiasmatic nucleus;SCN
+http://purl.obolibrary.org/obo/UBERON_0002034;suprachiasmatic nucleus;SCh
+http://purl.obolibrary.org/obo/UBERON_0002034;suprachiasmatic nucleus;nucleus suprachiasmaticus hypothalami
+http://purl.obolibrary.org/obo/UBERON_0002034;suprachiasmatic nucleus;nucleus suprachiasmaticus
+http://purl.obolibrary.org/obo/UBERON_0002037;cerebellum;parencephalon
+http://purl.obolibrary.org/obo/UBERON_0002037;cerebellum;infratentorial region
+http://purl.obolibrary.org/obo/UBERON_0002037;cerebellum;epencephalon-1
+http://purl.obolibrary.org/obo/UBERON_0002037;cerebellum;corpus cerebelli
+http://purl.obolibrary.org/obo/UBERON_0002058;main ciliary ganglion;ganglion ciliare
+http://purl.obolibrary.org/obo/UBERON_0002058;main ciliary ganglion;ciliary ganglion
+http://purl.obolibrary.org/obo/UBERON_0002059;submandibular ganglion;submaxillary ganglion
+http://purl.obolibrary.org/obo/UBERON_0002059;submandibular ganglion;maxillary ganglion
+http://purl.obolibrary.org/obo/UBERON_0002059;submandibular ganglion;mandibular ganglion
+http://purl.obolibrary.org/obo/UBERON_0002059;submandibular ganglion;lingual ganglion
+http://purl.obolibrary.org/obo/UBERON_0002059;submandibular ganglion;ganglion submandibulare
+http://purl.obolibrary.org/obo/UBERON_0002059;submandibular ganglion;Blandin`s ganglion
+http://purl.obolibrary.org/obo/UBERON_0002078;right cardiac atrium;right atrium of heart
+http://purl.obolibrary.org/obo/UBERON_0002078;right cardiac atrium;right atrium
+http://purl.obolibrary.org/obo/UBERON_0002078;right cardiac atrium;heart right atrium
+http://purl.obolibrary.org/obo/UBERON_0002078;right cardiac atrium;cardiac right atrium
+http://purl.obolibrary.org/obo/UBERON_0002078;right cardiac atrium;atrium dextrum
+http://purl.obolibrary.org/obo/UBERON_0002078;right cardiac atrium;right cardiac atrium
+http://purl.obolibrary.org/obo/UBERON_0002079;left cardiac atrium;left atrium of heart
+http://purl.obolibrary.org/obo/UBERON_0002079;left cardiac atrium;left atrium
+http://purl.obolibrary.org/obo/UBERON_0002079;left cardiac atrium;heart left atrium
+http://purl.obolibrary.org/obo/UBERON_0002079;left cardiac atrium;cardiac left atrium
+http://purl.obolibrary.org/obo/UBERON_0002079;left cardiac atrium;atrium sinistrum
+http://purl.obolibrary.org/obo/UBERON_0002079;left cardiac atrium;left cardiac atrium
+http://purl.obolibrary.org/obo/UBERON_0002080;heart right ventricle;ventriculus dexter
+http://purl.obolibrary.org/obo/UBERON_0002080;heart right ventricle;right ventricle of heart
+http://purl.obolibrary.org/obo/UBERON_0002080;heart right ventricle;right ventricle
+http://purl.obolibrary.org/obo/UBERON_0002080;heart right ventricle;right cardiac ventricle
+http://purl.obolibrary.org/obo/UBERON_0002080;heart right ventricle;cardiac right ventricle
+http://purl.obolibrary.org/obo/UBERON_0002084;heart left ventricle;ventriculus sinister cordis
+http://purl.obolibrary.org/obo/UBERON_0002084;heart left ventricle;left ventricle of heart
+http://purl.obolibrary.org/obo/UBERON_0002084;heart left ventricle;left ventricle
+http://purl.obolibrary.org/obo/UBERON_0002084;heart left ventricle;left cardiac ventricle
+http://purl.obolibrary.org/obo/UBERON_0002084;heart left ventricle;cardiac left ventricle
+http://purl.obolibrary.org/obo/UBERON_0002128;superior olivary complex;superior olive
+http://purl.obolibrary.org/obo/UBERON_0002128;superior olivary complex;superior olivary nucleus (Barr & Kiernan)
+http://purl.obolibrary.org/obo/UBERON_0002128;superior olivary complex;superior olivary nucleus
+http://purl.obolibrary.org/obo/UBERON_0002128;superior olivary complex;superior olivary nuclei
+http://purl.obolibrary.org/obo/UBERON_0002128;superior olivary complex;regio olivaris superioris
+http://purl.obolibrary.org/obo/UBERON_0002128;superior olivary complex;nucleus olivaris superior
+http://purl.obolibrary.org/obo/UBERON_0002129;cerebellar cortex;cortex of cerebellar hemisphere
+http://purl.obolibrary.org/obo/UBERON_0002129;cerebellar cortex;cortex cerebelli
+http://purl.obolibrary.org/obo/UBERON_0002129;cerebellar cortex;cortex cerebellaris
+http://purl.obolibrary.org/obo/UBERON_0002130;cerebellar nuclear complex;roof nuclei-2
+http://purl.obolibrary.org/obo/UBERON_0002130;cerebellar nuclear complex;nuclei cerebelli
+http://purl.obolibrary.org/obo/UBERON_0002130;cerebellar nuclear complex;nuclei cerebellaris
+http://purl.obolibrary.org/obo/UBERON_0002130;cerebellar nuclear complex;nuclei cerebellares
+http://purl.obolibrary.org/obo/UBERON_0002130;cerebellar nuclear complex;intrinsic nuclei of cerebellum
+http://purl.obolibrary.org/obo/UBERON_0002130;cerebellar nuclear complex;intracerebellar nuclei
+http://purl.obolibrary.org/obo/UBERON_0002130;cerebellar nuclear complex;deep cerebellar nuclei
+http://purl.obolibrary.org/obo/UBERON_0002130;cerebellar nuclear complex;deep cerebellar nuclear complex
+http://purl.obolibrary.org/obo/UBERON_0002130;cerebellar nuclear complex;cerebellar nuclei
+http://purl.obolibrary.org/obo/UBERON_0002130;cerebellar nuclear complex;central nuclei
+http://purl.obolibrary.org/obo/UBERON_0002141;parvocellular oculomotor nucleus;PC3
+http://purl.obolibrary.org/obo/UBERON_0002141;parvocellular oculomotor nucleus;oculomotor nucleus, parvocellular part
+http://purl.obolibrary.org/obo/UBERON_0002141;parvocellular oculomotor nucleus;oculomotor nucleus, parvicellular part
+http://purl.obolibrary.org/obo/UBERON_0002141;parvocellular oculomotor nucleus;nucleus Westphal-Edinger
+http://purl.obolibrary.org/obo/UBERON_0002141;parvocellular oculomotor nucleus;nucleus rostralis nervi oculomotorii
+http://purl.obolibrary.org/obo/UBERON_0002141;parvocellular oculomotor nucleus;nucleus nervi oculomotorii parvocellularis
+http://purl.obolibrary.org/obo/UBERON_0002141;parvocellular oculomotor nucleus;nucleus nervi oculomotorii Edinger-Westphal
+http://purl.obolibrary.org/obo/UBERON_0002141;parvocellular oculomotor nucleus;nucleus Edinger-Westphal
+http://purl.obolibrary.org/obo/UBERON_0002141;parvocellular oculomotor nucleus;nucleus Edinger Westphal
+http://purl.obolibrary.org/obo/UBERON_0002141;parvocellular oculomotor nucleus;nuclei accessorii nervi oculomtorii (Edinger-Westphal)
+http://purl.obolibrary.org/obo/UBERON_0002141;parvocellular oculomotor nucleus;Edinger-Westphal nucleus of oculomotor nerve
+http://purl.obolibrary.org/obo/UBERON_0002141;parvocellular oculomotor nucleus;accessory oculomotor nucleus
+http://purl.obolibrary.org/obo/UBERON_0002141;parvocellular oculomotor nucleus;EW
+http://purl.obolibrary.org/obo/UBERON_0002141;parvocellular oculomotor nucleus;Edinger-Westphal nucleus
+http://purl.obolibrary.org/obo/UBERON_0002142;pedunculopontine tegmental nucleus;PPTg
+http://purl.obolibrary.org/obo/UBERON_0002142;pedunculopontine tegmental nucleus;pedunculopontine nucleus
+http://purl.obolibrary.org/obo/UBERON_0002142;pedunculopontine tegmental nucleus;peduncular pontine nucleus
+http://purl.obolibrary.org/obo/UBERON_0002142;pedunculopontine tegmental nucleus;nucleus tegmenti pedunculopontinus
+http://purl.obolibrary.org/obo/UBERON_0002142;pedunculopontine tegmental nucleus;nucleus pedunculopontinus
+http://purl.obolibrary.org/obo/UBERON_0002149;superior salivatory nucleus;superior salivary nucleus
+http://purl.obolibrary.org/obo/UBERON_0002149;superior salivatory nucleus;nucleus salivatorius superior
+http://purl.obolibrary.org/obo/UBERON_0002149;superior salivatory nucleus;nucleus salivatorius rostralis
+http://purl.obolibrary.org/obo/UBERON_0002149;superior salivatory nucleus;nucleus salivatorius cranialis
+http://purl.obolibrary.org/obo/UBERON_0002149;superior salivatory nucleus;nucleus salivarius superior
+http://purl.obolibrary.org/obo/UBERON_0002185;bronchus;bronchial trunk
+http://purl.obolibrary.org/obo/UBERON_0002185;bronchus;bronchial tissue
+http://purl.obolibrary.org/obo/UBERON_0002185;bronchus;bronchi
+http://purl.obolibrary.org/obo/UBERON_0002186;bronchiole;lobular bronchiole
+http://purl.obolibrary.org/obo/UBERON_0002186;bronchiole;bronchiolus
+http://purl.obolibrary.org/obo/UBERON_0002186;bronchiole;bronchioli
+http://purl.obolibrary.org/obo/UBERON_0002187;terminal bronchiole;terminal bronchiole tube
+http://purl.obolibrary.org/obo/UBERON_0002187;terminal bronchiole;bronchiolus terminalis
+http://purl.obolibrary.org/obo/UBERON_0002187;terminal bronchiole;bronchioli terminalis
+http://purl.obolibrary.org/obo/UBERON_0002191;subiculum;subiculum hippocampi
+http://purl.obolibrary.org/obo/UBERON_0002191;subiculum;subiculum cornu ammonis
+http://purl.obolibrary.org/obo/UBERON_0002191;subiculum;subicular cortex
+http://purl.obolibrary.org/obo/UBERON_0002191;subiculum;gyrus parahippocampalis
+http://purl.obolibrary.org/obo/UBERON_0002240;spinal cord;spinal medulla
+http://purl.obolibrary.org/obo/UBERON_0002240;spinal cord;spinal cord structure
+http://purl.obolibrary.org/obo/UBERON_0002240;spinal cord;SpC
+http://purl.obolibrary.org/obo/UBERON_0002240;spinal cord;medulla spinalis
+http://purl.obolibrary.org/obo/UBERON_0002240;spinal cord;fissura cerebrocerebellaris
+http://purl.obolibrary.org/obo/UBERON_0002240;spinal cord;fissura cerebro-cerebellaris
+http://purl.obolibrary.org/obo/UBERON_0002240;spinal cord;cerebrocerebellar fissure
+http://purl.obolibrary.org/obo/UBERON_0002240;spinal cord;cerebro-cerebellar fissure
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;ventral spinal cord
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;ventral region of spinal cord
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;ventral horns spinal cord
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;ventral horn spinal cord
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;ventral horn of the spinal cord
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;ventral grey horn
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;ventral grey column of spinal cord
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;ventral gray matter of spinal cord
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;ventral gray column of spinal cord
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;spinal cord ventral horn
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;spinal cord anterior horn
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;cornu anterius medullae spinalis
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;columna grisea anterior medullae spinalis
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;anterior horn (spinal cord)
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;anterior horn
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;anterior grey column of spinal cord
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;anterior gray horn of spinal cord
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;anterior gray column of spinal cord
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;anterior column of the spinal cord
+http://purl.obolibrary.org/obo/UBERON_0002257;ventral horn of spinal cord;anterior column
+http://purl.obolibrary.org/obo/UBERON_0002262;celiac ganglion;coeliac ganglion
+http://purl.obolibrary.org/obo/UBERON_0002264;olfactory bulb;olfactory lobe (Barr & Kiernan)
+http://purl.obolibrary.org/obo/UBERON_0002264;olfactory bulb;olfactory lobe
+http://purl.obolibrary.org/obo/UBERON_0002264;olfactory bulb;bulbus olfactorius (Morgagni)
+http://purl.obolibrary.org/obo/UBERON_0002264;olfactory bulb;bulbus olfactorius
+http://purl.obolibrary.org/obo/UBERON_0002309;medial longitudinal fasciculus;MLF
+http://purl.obolibrary.org/obo/UBERON_0002309;medial longitudinal fasciculus;fasciculus longitudinalis medialis
+http://purl.obolibrary.org/obo/UBERON_0002309;medial longitudinal fasciculus;medial longitudinal fascicle
+http://purl.obolibrary.org/obo/UBERON_0002318;white matter of spinal cord;white substance of spinal cord
+http://purl.obolibrary.org/obo/UBERON_0002318;white matter of spinal cord;white matter of neuraxis of spinal cord
+http://purl.obolibrary.org/obo/UBERON_0002318;white matter of spinal cord;substantia alba medullae spinalis
+http://purl.obolibrary.org/obo/UBERON_0002318;white matter of spinal cord;spinal cord white substance
+http://purl.obolibrary.org/obo/UBERON_0002318;white matter of spinal cord;spinal cord white matter of neuraxis
+http://purl.obolibrary.org/obo/UBERON_0002318;white matter of spinal cord;spinal cord white matter
+http://purl.obolibrary.org/obo/UBERON_0002348;epicardium;visceral serous pericardium proper
+http://purl.obolibrary.org/obo/UBERON_0002348;epicardium;visceral serous pericardium of heart
+http://purl.obolibrary.org/obo/UBERON_0002348;epicardium;pericardium visceral mesothelium
+http://purl.obolibrary.org/obo/UBERON_0002348;epicardium;heart epicardium
+http://purl.obolibrary.org/obo/UBERON_0002370;thymus;thymus organ
+http://purl.obolibrary.org/obo/UBERON_0002370;thymus;thymus gland
+http://purl.obolibrary.org/obo/UBERON_0002421;hippocampal formation;seahorse
+http://purl.obolibrary.org/obo/UBERON_0002421;hippocampal formation;primal cortex
+http://purl.obolibrary.org/obo/UBERON_0002421;hippocampal formation;major hippocampus
+http://purl.obolibrary.org/obo/UBERON_0002421;hippocampal formation;hippocampus (Crosby)
+http://purl.obolibrary.org/obo/UBERON_0002421;hippocampal formation;formatio hippocampi
+http://purl.obolibrary.org/obo/UBERON_0002421;hippocampal formation;archipallium
+http://purl.obolibrary.org/obo/UBERON_0002421;hippocampal formation;hippocampus
+http://purl.obolibrary.org/obo/UBERON_0002430;lateral hypothalamic area;lateral hypothalamic zone (Crosby)
+http://purl.obolibrary.org/obo/UBERON_0002430;lateral hypothalamic area;lateral hypothalamic region
+http://purl.obolibrary.org/obo/UBERON_0002430;lateral hypothalamic area;lateral hypothalamic nucleus
+http://purl.obolibrary.org/obo/UBERON_0002430;lateral hypothalamic area;lateral hypothalamic group
+http://purl.obolibrary.org/obo/UBERON_0002430;lateral hypothalamic area;lateral hypothalamic area proper
+http://purl.obolibrary.org/obo/UBERON_0002430;lateral hypothalamic area;lateral hypothalamic area (Nissl 1913)
+http://purl.obolibrary.org/obo/UBERON_0002430;lateral hypothalamic area;lateral group of hypothalamic nuclei
+http://purl.obolibrary.org/obo/UBERON_0002430;lateral hypothalamic area;lateral division of hypothalamus
+http://purl.obolibrary.org/obo/UBERON_0002430;lateral hypothalamic area;area lateralis hypothalami
+http://purl.obolibrary.org/obo/UBERON_0002430;lateral hypothalamic area;area hypothalamica lateralis
+http://purl.obolibrary.org/obo/UBERON_0002430;lateral hypothalamic area;LH
+http://purl.obolibrary.org/obo/UBERON_0002435;striatum;striatum of neuraxis
+http://purl.obolibrary.org/obo/UBERON_0002435;striatum;striated nucleus
+http://purl.obolibrary.org/obo/UBERON_0002435;striatum;striate nucleus
+http://purl.obolibrary.org/obo/UBERON_0002435;striatum;neuraxis striatum
+http://purl.obolibrary.org/obo/UBERON_0002435;striatum;neostriatum
+http://purl.obolibrary.org/obo/UBERON_0002435;striatum;dorsal striatum
+http://purl.obolibrary.org/obo/UBERON_0002435;striatum;corpus striatum (Zilles)
+http://purl.obolibrary.org/obo/UBERON_0002435;striatum;caudate putamen
+http://purl.obolibrary.org/obo/UBERON_0002435;striatum;striatum
+http://purl.obolibrary.org/obo/UBERON_0002435;striatum;corpus striatum
+http://purl.obolibrary.org/obo/UBERON_0002440;inferior cervical ganglion;variant cervical ganglion
+http://purl.obolibrary.org/obo/UBERON_0002440;inferior cervical ganglion;stellate ganglion
+http://purl.obolibrary.org/obo/UBERON_0002440;inferior cervical ganglion;ganglion cervicale inferius
+http://purl.obolibrary.org/obo/UBERON_0002440;inferior cervical ganglion;ganglion cervicale inferioris
+http://purl.obolibrary.org/obo/UBERON_0002440;inferior cervical ganglion;cervico-thoracic ganglion
+http://purl.obolibrary.org/obo/UBERON_0002440;inferior cervical ganglion;cervico-thoracic
+http://purl.obolibrary.org/obo/UBERON_0002441;cervicothoracic ganglion;ganglion stellatum
+http://purl.obolibrary.org/obo/UBERON_0002441;cervicothoracic ganglion;ganglion cervicothoracicum
+http://purl.obolibrary.org/obo/UBERON_0002441;cervicothoracic ganglion;cervicothoracic sympathetic ganglion
+http://purl.obolibrary.org/obo/UBERON_0002441;cervicothoracic ganglion;stellate ganglion
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;principal medial geniculate nucleus
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;pars medialis globi pallidi
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;pallidus I
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;pallidum II
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;pallidum dorsal region internal segment
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;nucleus medialis globi pallidi
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;mesial pallidum
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;medial segment of the globus pallidus
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;medial segment of globus pallidus
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;medial part of globus pallidus
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;medial pallidal segment
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;medial globus pallidus (entopeduncular nucleus)
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;medial division of globus pallidus
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;internal part of globus pallidus
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;internal pallidum
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;internal globus pallidus
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;globus pallidus, pars interna
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;globus pallidus, medial segment
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;globus pallidus, medial part
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;globus pallidus, internal segment
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;globus pallidus pars medialis
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;globus pallidus medialis
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;globus pallidus medial segment
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;globus pallidus medial part
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;globus pallidus internus
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;globus pallidus internal segment
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;globus pallidus interna
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;globus pallidus inernal segment
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;entopeduncular nucleus (monakow)
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;entopeduncular nucleus
+http://purl.obolibrary.org/obo/UBERON_0002477;medial globus pallidus;pallidum I
+http://purl.obolibrary.org/obo/UBERON_0002580;brachium of superior colliculus;superior quadrigeminal brachium
+http://purl.obolibrary.org/obo/UBERON_0002580;brachium of superior colliculus;superior colliculus brachium
+http://purl.obolibrary.org/obo/UBERON_0002580;brachium of superior colliculus;superior collicular brachium
+http://purl.obolibrary.org/obo/UBERON_0002580;brachium of superior colliculus;superior brachium
+http://purl.obolibrary.org/obo/UBERON_0002580;brachium of superior colliculus;brachium quadrigeminum superius
+http://purl.obolibrary.org/obo/UBERON_0002580;brachium of superior colliculus;brachium colliculi superioris
+http://purl.obolibrary.org/obo/UBERON_0002580;brachium of superior colliculus;brachium colliculi rostralis
+http://purl.obolibrary.org/obo/UBERON_0002580;brachium of superior colliculus;brachium colliculi cranialis
+http://purl.obolibrary.org/obo/UBERON_0002580;brachium of superior colliculus;brachium of the superior colliculus
+http://purl.obolibrary.org/obo/UBERON_0002604;ventral nucleus of lateral lemniscus;ventral nucleus of the lateral lemniscus
+http://purl.obolibrary.org/obo/UBERON_0002604;ventral nucleus of lateral lemniscus;nucleus of the lateral lemniscus, ventral part
+http://purl.obolibrary.org/obo/UBERON_0002604;ventral nucleus of lateral lemniscus;nucleus of the lateral lemniscus ventral part
+http://purl.obolibrary.org/obo/UBERON_0002604;ventral nucleus of lateral lemniscus;nucleus lemnisci lateralis ventralis
+http://purl.obolibrary.org/obo/UBERON_0002604;ventral nucleus of lateral lemniscus;nucleus lemnisci lateralis pars ventralis
+http://purl.obolibrary.org/obo/UBERON_0002604;ventral nucleus of lateral lemniscus;nucleus anterior lemnisci lateralis
+http://purl.obolibrary.org/obo/UBERON_0002604;ventral nucleus of lateral lemniscus;anterior nucleus of lateral lemniscus
+http://purl.obolibrary.org/obo/UBERON_0002610;cochlear nuclear complex;nuclei cochleares
+http://purl.obolibrary.org/obo/UBERON_0002610;cochlear nuclear complex;cochlear nuclei
+http://purl.obolibrary.org/obo/UBERON_0002625;median preoptic nucleus;periventricular nucleus, preventricular portion
+http://purl.obolibrary.org/obo/UBERON_0002625;median preoptic nucleus;nucleus preopticus medianus
+http://purl.obolibrary.org/obo/UBERON_0002625;median preoptic nucleus;nucleus praeopticus medianus
+http://purl.obolibrary.org/obo/UBERON_0002625;median preoptic nucleus;MnPO
+http://purl.obolibrary.org/obo/UBERON_0002625;median preoptic nucleus;median preoptic nucleus (Loo)
+http://purl.obolibrary.org/obo/UBERON_0002682;abducens nucleus;sixth cranial nerve nucleus
+http://purl.obolibrary.org/obo/UBERON_0002682;abducens nucleus;nVI
+http://purl.obolibrary.org/obo/UBERON_0002682;abducens nucleus;nucleus of abducens nerve (VI)
+http://purl.obolibrary.org/obo/UBERON_0002682;abducens nucleus;nucleus of abducens nerve
+http://purl.obolibrary.org/obo/UBERON_0002682;abducens nucleus;nucleus nervi abducentis
+http://purl.obolibrary.org/obo/UBERON_0002682;abducens nucleus;nucleus abducens
+http://purl.obolibrary.org/obo/UBERON_0002682;abducens nucleus;motor nucleus VI
+http://purl.obolibrary.org/obo/UBERON_0002682;abducens nucleus;abducent nucleus
+http://purl.obolibrary.org/obo/UBERON_0002682;abducens nucleus;abducens VI nucleus
+http://purl.obolibrary.org/obo/UBERON_0002682;abducens nucleus;abducens nucleus proper
+http://purl.obolibrary.org/obo/UBERON_0002682;abducens nucleus;abducens nerve nucleus
+http://purl.obolibrary.org/obo/UBERON_0002682;abducens nucleus;abducens motor nucleus
+http://purl.obolibrary.org/obo/UBERON_0002682;abducens nucleus;abducens motor nuclei
+http://purl.obolibrary.org/obo/UBERON_0002691;ventral tegmental area;ventromedial mesencephalic tegmentum
+http://purl.obolibrary.org/obo/UBERON_0002691;ventral tegmental area;ventral tegmental nucleus of tsai
+http://purl.obolibrary.org/obo/UBERON_0002691;ventral tegmental area;ventral tegmental nucleus (tsai)
+http://purl.obolibrary.org/obo/UBERON_0002691;ventral tegmental area;ventral tegmental nucleus (Rioch)
+http://purl.obolibrary.org/obo/UBERON_0002691;ventral tegmental area;ventral tegmental area of tsai
+http://purl.obolibrary.org/obo/UBERON_0002691;ventral tegmental area;ventral tegmental area (Tsai)
+http://purl.obolibrary.org/obo/UBERON_0002691;ventral tegmental area;ventral brain stem
+http://purl.obolibrary.org/obo/UBERON_0002691;ventral tegmental area;tegmentum ventrale
+http://purl.obolibrary.org/obo/UBERON_0002691;ventral tegmental area;area tegmentalis ventralis (Tsai)
+http://purl.obolibrary.org/obo/UBERON_0002691;ventral tegmental area;area tegmentalis ventralis
+http://purl.obolibrary.org/obo/UBERON_0002691;ventral tegmental area;a10a
+http://purl.obolibrary.org/obo/UBERON_0002691;ventral tegmental area;VTA
+http://purl.obolibrary.org/obo/UBERON_0002722;trochlear nucleus;trochlear motor nucleus
+http://purl.obolibrary.org/obo/UBERON_0002722;trochlear nucleus;trochlear IV nucleus
+http://purl.obolibrary.org/obo/UBERON_0002722;trochlear nucleus;nucleus of trochlear nerve
+http://purl.obolibrary.org/obo/UBERON_0002722;trochlear nucleus;nucleus nervi trochlearis
+http://purl.obolibrary.org/obo/UBERON_0002722;trochlear nucleus;nIV
+http://purl.obolibrary.org/obo/UBERON_0002722;trochlear nucleus;motor nucleus IV
+http://purl.obolibrary.org/obo/UBERON_0002722;trochlear nucleus;fourth cranial nerve nucleus
+http://purl.obolibrary.org/obo/UBERON_0002728;entorhinal cortex;entorhinal area
+http://purl.obolibrary.org/obo/UBERON_0002728;entorhinal cortex;cortex entorhinalis
+http://purl.obolibrary.org/obo/UBERON_0002728;entorhinal cortex;Brodmann's area 28
+http://purl.obolibrary.org/obo/UBERON_0002728;entorhinal cortex;area entorhinalis ventralis et dorsalis
+http://purl.obolibrary.org/obo/UBERON_0002728;entorhinal cortex;area entorhinalis (28,34)
+http://purl.obolibrary.org/obo/UBERON_0002728;entorhinal cortex;entorhinal cortex
+http://purl.obolibrary.org/obo/UBERON_0002743;basal forebrain;pars basalis telencephali
+http://purl.obolibrary.org/obo/UBERON_0002743;basal forebrain;basal forebrain area
+http://purl.obolibrary.org/obo/UBERON_0002790;dorsal acoustic stria;striae acusticae dorsalis
+http://purl.obolibrary.org/obo/UBERON_0002790;dorsal acoustic stria;stria cochlearis posterior
+http://purl.obolibrary.org/obo/UBERON_0002790;dorsal acoustic stria;posterior acoustic stria
+http://purl.obolibrary.org/obo/UBERON_0002790;dorsal acoustic stria;dorsal acoustic stria (Monakow)
+http://purl.obolibrary.org/obo/UBERON_0002824;vestibular ganglion;vestibulocochlear VIII ganglion vestibular component
+http://purl.obolibrary.org/obo/UBERON_0002824;vestibular ganglion;vestibulocochlear ganglion vestibular component
+http://purl.obolibrary.org/obo/UBERON_0002824;vestibular ganglion;vestibular part of vestibulocochlear ganglion
+http://purl.obolibrary.org/obo/UBERON_0002824;vestibular ganglion;Scarpa's ganglion
+http://purl.obolibrary.org/obo/UBERON_0002824;vestibular ganglion;nucleus nervi oculomotorii, pars medialis
+http://purl.obolibrary.org/obo/UBERON_0002828;ventral cochlear nucleus;ventral division of cochlear nucleus
+http://purl.obolibrary.org/obo/UBERON_0002828;ventral cochlear nucleus;ventral coclear nucleus
+http://purl.obolibrary.org/obo/UBERON_0002828;ventral cochlear nucleus;ventral cochlear nuclei
+http://purl.obolibrary.org/obo/UBERON_0002828;ventral cochlear nucleus;VCo
+http://purl.obolibrary.org/obo/UBERON_0002828;ventral cochlear nucleus;nucleus cochlearis ventralis
+http://purl.obolibrary.org/obo/UBERON_0002828;ventral cochlear nucleus;nucleus cochlearis anterior
+http://purl.obolibrary.org/obo/UBERON_0002828;ventral cochlear nucleus;nucleus acustici accessorici
+http://purl.obolibrary.org/obo/UBERON_0002828;ventral cochlear nucleus;c1281209
+http://purl.obolibrary.org/obo/UBERON_0002828;ventral cochlear nucleus;anterior cochlear nucleus
+http://purl.obolibrary.org/obo/UBERON_0002828;ventral cochlear nucleus;accessory cochlear nucleus
+http://purl.obolibrary.org/obo/UBERON_0002828;ventral cochlear nucleus;ventral cochlear nucleus
+http://purl.obolibrary.org/obo/UBERON_0002829;dorsal cochlear nucleus;tuberculum acousticum
+http://purl.obolibrary.org/obo/UBERON_0002829;dorsal cochlear nucleus;posterior cochlear nucleus
+http://purl.obolibrary.org/obo/UBERON_0002829;dorsal cochlear nucleus;nucleus cochlearis posterior
+http://purl.obolibrary.org/obo/UBERON_0002829;dorsal cochlear nucleus;nucleus cochlearis dorsalis
+http://purl.obolibrary.org/obo/UBERON_0002829;dorsal cochlear nucleus;dorsal division of cochlear nucleus
+http://purl.obolibrary.org/obo/UBERON_0002829;dorsal cochlear nucleus;dorsal coclear nucleus
+http://purl.obolibrary.org/obo/UBERON_0002829;dorsal cochlear nucleus;DCo
+http://purl.obolibrary.org/obo/UBERON_0002829;dorsal cochlear nucleus;dorsal cochlear nucleus
+http://purl.obolibrary.org/obo/UBERON_0002833;medial nucleus of trapezoid body;MNTB
+http://purl.obolibrary.org/obo/UBERON_0002843;seventh cervical dorsal root ganglion;seventh cervical spinal ganglion
+http://purl.obolibrary.org/obo/UBERON_0002843;seventh cervical dorsal root ganglion;C7 dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0002843;seventh cervical dorsal root ganglion;seventh cervical dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0002844;eighth cervical dorsal root ganglion;eighth cervical spinal ganglion
+http://purl.obolibrary.org/obo/UBERON_0002844;eighth cervical dorsal root ganglion;eighth cervical dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0002845;first thoracic dorsal root ganglion;first thoracic spinal ganglion
+http://purl.obolibrary.org/obo/UBERON_0002845;first thoracic dorsal root ganglion;first thoracic dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0002846;second thoracic dorsal root ganglion;second thoracic spinal ganglion
+http://purl.obolibrary.org/obo/UBERON_0002846;second thoracic dorsal root ganglion;second thoracic dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0002847;third thoracic dorsal root ganglion;third thoracic spinal ganglion
+http://purl.obolibrary.org/obo/UBERON_0002847;third thoracic dorsal root ganglion;third thoracic dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0002848;fifth thoracic dorsal root ganglion;fifth thoracic spinal ganglion
+http://purl.obolibrary.org/obo/UBERON_0002848;fifth thoracic dorsal root ganglion;fifth thoracic dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0002849;sixth thoracic dorsal root ganglion;sixth thoracic spinal ganglion
+http://purl.obolibrary.org/obo/UBERON_0002849;sixth thoracic dorsal root ganglion;sixth thoracic dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0002856;second lumbar dorsal root ganglion;second lumbar spinal ganglion
+http://purl.obolibrary.org/obo/UBERON_0002856;second lumbar dorsal root ganglion;second lumbar dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0002857;first lumbar dorsal root ganglion;first lumbar spinal ganglion
+http://purl.obolibrary.org/obo/UBERON_0002857;first lumbar dorsal root ganglion;first lumbar dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0002858;third lumbar dorsal root ganglion;third lumbar spinal ganglion
+http://purl.obolibrary.org/obo/UBERON_0002858;third lumbar dorsal root ganglion;third lumbar dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0002859;fifth lumbar dorsal root ganglion;L5 ganglion
+http://purl.obolibrary.org/obo/UBERON_0002859;fifth lumbar dorsal root ganglion;L5 dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0002859;fifth lumbar dorsal root ganglion;fifth lumbar spinal ganglion
+http://purl.obolibrary.org/obo/UBERON_0002859;fifth lumbar dorsal root ganglion;fifth lumbar dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0002860;first sacral dorsal root ganglion;first sacral spinal ganglion
+http://purl.obolibrary.org/obo/UBERON_0002860;first sacral dorsal root ganglion;first sacral dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;vagus nucleus
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;posterior nucleus of vagus nerve
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;nucleus vagalis dorsalis
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;nucleus posterior nervi vagi
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;nucleus dorsalis nervi vagi
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;nucleus dorsalis motorius nervi vagi
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;nucleus alaris (Oertel)
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;nucleus alaris
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;dorsal vagal nucleus
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;dorsal nucleus of vagus nerve
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;dorsal nucleus of the vagus nerve
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;dorsal motor vagal nucleus
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;dorsal motor nucleus of vagus X nerve
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;dorsal motor nucleus of vagus
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;dorsal motor nucleus of the vagus nerve
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;dorsal motor nucleus of the vagus (vagal nucleus)
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;dorsal motor nucleus of the vagus
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;dorsal motor nucleus
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;dorsal efferent nucleus of vagus
+http://purl.obolibrary.org/obo/UBERON_0002870;dorsal motor nucleus of vagus nerve;dorsal motor nucleus of vagus nerve
+http://purl.obolibrary.org/obo/UBERON_0002871;hypoglossal nucleus;twelfth cranial nerve nucleus
+http://purl.obolibrary.org/obo/UBERON_0002871;hypoglossal nucleus;nucleus of hypoglossal nerve
+http://purl.obolibrary.org/obo/UBERON_0002871;hypoglossal nucleus;nucleus nervi hypoglossi
+http://purl.obolibrary.org/obo/UBERON_0002871;hypoglossal nucleus;hypoglossal XII nucleus
+http://purl.obolibrary.org/obo/UBERON_0002871;hypoglossal nucleus;hypoglossal nerve nucleus
+http://purl.obolibrary.org/obo/UBERON_0002871;hypoglossal nucleus;hypoglossal nucleus
+http://purl.obolibrary.org/obo/UBERON_0002871;hypoglossal nucleus;nucleus hypoglossalis
+http://purl.obolibrary.org/obo/UBERON_0002872;inferior salivatory nucleus;nucleus salivatorius inferior nervi glossopharyngei
+http://purl.obolibrary.org/obo/UBERON_0002872;inferior salivatory nucleus;nucleus salivatorius inferior
+http://purl.obolibrary.org/obo/UBERON_0002872;inferior salivatory nucleus;nucleus salivatorius caudalis
+http://purl.obolibrary.org/obo/UBERON_0002872;inferior salivatory nucleus;nucleus salivarius inferior
+http://purl.obolibrary.org/obo/UBERON_0002872;inferior salivatory nucleus;inferior salivatary nucleus
+http://purl.obolibrary.org/obo/UBERON_0002872;inferior salivatory nucleus;inferior salivary nucleus
+http://purl.obolibrary.org/obo/UBERON_0002883;central amygdaloid nucleus;nucleus centralis amygdalae
+http://purl.obolibrary.org/obo/UBERON_0002883;central amygdaloid nucleus;nucleus amygdaloideus centralis
+http://purl.obolibrary.org/obo/UBERON_0002883;central amygdaloid nucleus;nucleus amygdalae centralis
+http://purl.obolibrary.org/obo/UBERON_0002883;central amygdaloid nucleus;central nucleus of the amygdala
+http://purl.obolibrary.org/obo/UBERON_0002883;central amygdaloid nucleus;central nucleus of amygdala
+http://purl.obolibrary.org/obo/UBERON_0002883;central amygdaloid nucleus;central nucleus of amygda
+http://purl.obolibrary.org/obo/UBERON_0002883;central amygdaloid nucleus;central nucleus amygdala
+http://purl.obolibrary.org/obo/UBERON_0002883;central amygdaloid nucleus;central nuclear group
+http://purl.obolibrary.org/obo/UBERON_0002883;central amygdaloid nucleus;central amygdalar nucleus
+http://purl.obolibrary.org/obo/UBERON_0002883;central amygdaloid nucleus;central amygdala
+http://purl.obolibrary.org/obo/UBERON_0002883;central amygdaloid nucleus;amygdala central nucleus
+http://purl.obolibrary.org/obo/UBERON_0002894;olfactory cortex;olfactory areas
+http://purl.obolibrary.org/obo/UBERON_0002894;olfactory cortex;archeocortex
+http://purl.obolibrary.org/obo/UBERON_0002894;olfactory cortex;archaeocortex
+http://purl.obolibrary.org/obo/UBERON_0002894;olfactory cortex;olfactory lobe
+http://purl.obolibrary.org/obo/UBERON_0002932;trapezoid body;TZ
+http://purl.obolibrary.org/obo/UBERON_0002932;trapezoid body;trapezoid body (Treviranus)
+http://purl.obolibrary.org/obo/UBERON_0002932;trapezoid body;corpus trapezoideum
+http://purl.obolibrary.org/obo/UBERON_0002932;trapezoid body;corpus trapezoides
+http://purl.obolibrary.org/obo/UBERON_0002952;intermediate acoustic stria;striae acusticae intermedius
+http://purl.obolibrary.org/obo/UBERON_0002952;intermediate acoustic stria;intermediate acoustic stria of held
+http://purl.obolibrary.org/obo/UBERON_0002952;intermediate acoustic stria;intermediate acoustic stria (held)
+http://purl.obolibrary.org/obo/UBERON_0002952;intermediate acoustic stria;commissure of held
+http://purl.obolibrary.org/obo/UBERON_0002953;lateral lemniscus;lemniscus lateralis
+http://purl.obolibrary.org/obo/UBERON_0002953;lateral lemniscus;lemniscus acusticus
+http://purl.obolibrary.org/obo/UBERON_0002953;lateral lemniscus;lateral lemniscus (Reil)
+http://purl.obolibrary.org/obo/UBERON_0002953;lateral lemniscus;lateral fillet
+http://purl.obolibrary.org/obo/UBERON_0002953;lateral lemniscus;central acoustic tract
+http://purl.obolibrary.org/obo/UBERON_0002956;granular layer of cerebellar cortex;stratum granulosum corticis cerebelli
+http://purl.obolibrary.org/obo/UBERON_0002956;granular layer of cerebellar cortex;stratum granulosum cerebelli
+http://purl.obolibrary.org/obo/UBERON_0002956;granular layer of cerebellar cortex;granule cell layer of cerebellar cortex
+http://purl.obolibrary.org/obo/UBERON_0002956;granular layer of cerebellar cortex;granular layer of cerebellum
+http://purl.obolibrary.org/obo/UBERON_0002956;granular layer of cerebellar cortex;cerebellum granule layer
+http://purl.obolibrary.org/obo/UBERON_0002956;granular layer of cerebellar cortex;cerebellum granule cell layer
+http://purl.obolibrary.org/obo/UBERON_0002956;granular layer of cerebellar cortex;cerebellar granule layer
+http://purl.obolibrary.org/obo/UBERON_0002956;granular layer of cerebellar cortex;cerebellar granule cell layer
+http://purl.obolibrary.org/obo/UBERON_0002956;granular layer of cerebellar cortex;cerebellar granular layer
+http://purl.obolibrary.org/obo/UBERON_0002974;molecular layer of cerebellar cortex;thalamic fiber tracts
+http://purl.obolibrary.org/obo/UBERON_0002974;molecular layer of cerebellar cortex;stratum moleculare corticis cerebelli
+http://purl.obolibrary.org/obo/UBERON_0002974;molecular layer of cerebellar cortex;fasciculi thalami
+http://purl.obolibrary.org/obo/UBERON_0002974;molecular layer of cerebellar cortex;cerebellum molecular layer
+http://purl.obolibrary.org/obo/UBERON_0002974;molecular layer of cerebellar cortex;cerebellum molecular cell layer
+http://purl.obolibrary.org/obo/UBERON_0002974;molecular layer of cerebellar cortex;cerebellar molecular layer
+http://purl.obolibrary.org/obo/UBERON_0002979;Purkinje cell layer of cerebellar cortex;Purkinje cell layer
+http://purl.obolibrary.org/obo/UBERON_0002979;Purkinje cell layer of cerebellar cortex;cerebellum Purkinje layer
+http://purl.obolibrary.org/obo/UBERON_0002979;Purkinje cell layer of cerebellar cortex;cerebellum Purkinje cell layer
+http://purl.obolibrary.org/obo/UBERON_0002979;Purkinje cell layer of cerebellar cortex;cerebellar Purkinje cell layer
+http://purl.obolibrary.org/obo/UBERON_0002979;Purkinje cell layer of cerebellar cortex;reticulatum thalami (Hassler)
+http://purl.obolibrary.org/obo/UBERON_0002979;Purkinje cell layer of cerebellar cortex;reticular nucleus thalamus (Arnold)
+http://purl.obolibrary.org/obo/UBERON_0002979;Purkinje cell layer of cerebellar cortex;nucleus thalamicus reticularis
+http://purl.obolibrary.org/obo/UBERON_0002979;Purkinje cell layer of cerebellar cortex;nucleus reticulatus (thalami)
+http://purl.obolibrary.org/obo/UBERON_0002979;Purkinje cell layer of cerebellar cortex;nucleus reticularis
+http://purl.obolibrary.org/obo/UBERON_0002979;Purkinje cell layer of cerebellar cortex;nuclei reticulares (thalami)
+http://purl.obolibrary.org/obo/UBERON_0003011;facial motor nucleus;nVII
+http://purl.obolibrary.org/obo/UBERON_0003011;facial motor nucleus;nucleus nervi facialis
+http://purl.obolibrary.org/obo/UBERON_0003011;facial motor nucleus;nucleus motorius nervi facialis
+http://purl.obolibrary.org/obo/UBERON_0003011;facial motor nucleus;nucleus facialis
+http://purl.obolibrary.org/obo/UBERON_0003011;facial motor nucleus;n. nervi facialis
+http://purl.obolibrary.org/obo/UBERON_0003011;facial motor nucleus;motor nucleus VII
+http://purl.obolibrary.org/obo/UBERON_0003011;facial motor nucleus;motor nucleus of VII
+http://purl.obolibrary.org/obo/UBERON_0003011;facial motor nucleus;motor nucleus of facial nerve
+http://purl.obolibrary.org/obo/UBERON_0003011;facial motor nucleus;facial nerve motor nucleus
+http://purl.obolibrary.org/obo/UBERON_0003011;facial motor nucleus;branchiomotor nucleus of facial nerve
+http://purl.obolibrary.org/obo/UBERON_0003011;facial motor nucleus;facial motor nucleus
+http://purl.obolibrary.org/obo/UBERON_0003011;facial motor nucleus;facial nucleus
+http://purl.obolibrary.org/obo/UBERON_0003126;trachea;windpipe
+http://purl.obolibrary.org/obo/UBERON_0003126;trachea;vertebrate trachea
+http://purl.obolibrary.org/obo/UBERON_0003126;trachea;tracheal tubule
+http://purl.obolibrary.org/obo/UBERON_0003126;trachea;cartilaginous trachea
+http://purl.obolibrary.org/obo/UBERON_0003708;carotid sinus;sinus caroticus
+http://purl.obolibrary.org/obo/UBERON_0003708;carotid sinus;carotid bulb
+http://purl.obolibrary.org/obo/UBERON_0003715;splanchnic nerve;visceral nerve
+http://purl.obolibrary.org/obo/UBERON_0003715;splanchnic nerve;splanchnic nerves
+http://purl.obolibrary.org/obo/UBERON_0003721;lingual nerve;trigeminal V nerve lingual branch
+http://purl.obolibrary.org/obo/UBERON_0003721;lingual nerve;trigeminal nerve lingual branch
+http://purl.obolibrary.org/obo/UBERON_0003721;lingual nerve;lingual branch of trigeminal nerve
+http://purl.obolibrary.org/obo/UBERON_0003729;mouth mucosa;tunica mucosa oris
+http://purl.obolibrary.org/obo/UBERON_0003729;mouth mucosa;oral part of viscerocranial mucosa
+http://purl.obolibrary.org/obo/UBERON_0003729;mouth mucosa;oral mucous membrane
+http://purl.obolibrary.org/obo/UBERON_0003729;mouth mucosa;oral mucosa
+http://purl.obolibrary.org/obo/UBERON_0003729;mouth mucosa;mucous membrane of mouth
+http://purl.obolibrary.org/obo/UBERON_0003729;mouth mucosa;mucosal lining of mouth
+http://purl.obolibrary.org/obo/UBERON_0003729;mouth mucosa;mucosa of mouth
+http://purl.obolibrary.org/obo/UBERON_0003729;mouth mucosa;mouth organ mucosa
+http://purl.obolibrary.org/obo/UBERON_0003729;mouth mucosa;mouth mucous membrane
+http://purl.obolibrary.org/obo/UBERON_0003729;mouth mucosa;buccal mucosa
+http://purl.obolibrary.org/obo/UBERON_0003729;mouth mucosa;mouth mucosa
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;region i of hippocampus proper
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;region i of ammon's horn
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;region CA1
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;region 1 of Ammon's horn
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;regio superior of the hippocampus
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;regio superior
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;regio i hippocampi proprii
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;regio i cornus ammonis
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;prosubiculum = distal ca1
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;hippocampus CA1
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;field CA1, Ammon's horn (Lorente de Ns)
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;field CA1 of hippocampus
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;field CA1
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;cornu ammonis 1
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;CA1 field of the hippocampus
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;CA1 field of the Ammon horn
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;CA1 field of cornu ammonis
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;CA1 field of Ammon's horn
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;CA1 field
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;CA1 field of hippocampus
+http://purl.obolibrary.org/obo/UBERON_0003881;CA1 field of hippocampus;CA1
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;region II of hippocampus proper
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;region II of ammon's horn
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;region CA2
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;region 2 of Ammon's horn
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;regio ii hippocampi proprii
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;regio ii cornus ammonis
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;hippocampus CA2
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;field CA2, Ammon's horn (Lorente de Ns)
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;field CA2 of hippocampus
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;field CA2
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;cornu Ammonis 2
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;CA2 field of the hippocampus
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;CA2 field of the Ammon horn
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;CA2 field of cornu ammonis
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;CA2 field of Ammon's horn
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;CA2 field
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;CA2 field of hippocampus
+http://purl.obolibrary.org/obo/UBERON_0003882;CA2 field of hippocampus;CA2
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;region III of hippocampus proper
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;region III of ammon's horn
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;region CA3
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;region 3 of Ammon's horn
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;regio inferior
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;regio III hippocampi proprii
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;regio III cornus ammonis
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;regio hippocampi proprii III
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;hippocampus CA3
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;field CA3, Ammon's horn (Lorente de Ns)
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;field CA3 of hippocampus
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;field CA3
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;cornu Ammonis 3
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;CA3 field of the hippocampus
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;CA3 field of the Ammon horn
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;CA3 field of cornu ammonis
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;CA3 field of Ammon's horn
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;CA3 field
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;CA3 field of hippocampus
+http://purl.obolibrary.org/obo/UBERON_0003883;CA3 field of hippocampus;CA3
+http://purl.obolibrary.org/obo/UBERON_0003943;fourth lumbar dorsal root ganglion;L4 ganglion
+http://purl.obolibrary.org/obo/UBERON_0003943;fourth lumbar dorsal root ganglion;L4 dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0003943;fourth lumbar dorsal root ganglion;fourth lumbar spinal ganglion
+http://purl.obolibrary.org/obo/UBERON_0003943;fourth lumbar dorsal root ganglion;forth lumbar dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0003943;fourth lumbar dorsal root ganglion;fourth lumbar dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0003962;pterygopalatine ganglion;sphenopalatine parasympathetic ganglion
+http://purl.obolibrary.org/obo/UBERON_0003962;pterygopalatine ganglion;sphenopalatine ganglion
+http://purl.obolibrary.org/obo/UBERON_0003962;pterygopalatine ganglion;pterygopalatine ganglia
+http://purl.obolibrary.org/obo/UBERON_0003962;pterygopalatine ganglion;palatine ganglion
+http://purl.obolibrary.org/obo/UBERON_0003962;pterygopalatine ganglion;nasal ganglion
+http://purl.obolibrary.org/obo/UBERON_0003962;pterygopalatine ganglion;Meckel's ganglion
+http://purl.obolibrary.org/obo/UBERON_0003962;pterygopalatine ganglion;Meckel ganglion
+http://purl.obolibrary.org/obo/UBERON_0003962;pterygopalatine ganglion;g. pterygopalatinum
+http://purl.obolibrary.org/obo/UBERON_0003963;otic ganglion;otic parasympathetic ganglion
+http://purl.obolibrary.org/obo/UBERON_0003963;otic ganglion;ganglion oticum
+http://purl.obolibrary.org/obo/UBERON_0003963;otic ganglion;Arnold's ganglion
+http://purl.obolibrary.org/obo/UBERON_0004069;accessory olfactory bulb;olfactory bulb accessory nucleus
+http://purl.obolibrary.org/obo/UBERON_0004069;accessory olfactory bulb;accessory olfactory formation
+http://purl.obolibrary.org/obo/UBERON_0004069;accessory olfactory bulb;accessory (vomeronasal) bulb
+http://purl.obolibrary.org/obo/UBERON_0004186;olfactory bulb mitral cell layer;olfactory bulb main mitral cell body layer
+http://purl.obolibrary.org/obo/UBERON_0004186;olfactory bulb mitral cell layer;OB mitral cell layer
+http://purl.obolibrary.org/obo/UBERON_0004186;olfactory bulb mitral cell layer;mitral cell layer of the olfactory bulb
+http://purl.obolibrary.org/obo/UBERON_0004186;olfactory bulb mitral cell layer;mitral cell layer
+http://purl.obolibrary.org/obo/UBERON_0004186;olfactory bulb mitral cell layer;mitral cell body layer
+http://purl.obolibrary.org/obo/UBERON_0004641;spleen capsule;tunica fibrosa splenica
+http://purl.obolibrary.org/obo/UBERON_0004641;spleen capsule;tunica fibrosa (splen)(lien)
+http://purl.obolibrary.org/obo/UBERON_0004641;spleen capsule;splenic capsule
+http://purl.obolibrary.org/obo/UBERON_0004641;spleen capsule;Malpighian capsule
+http://purl.obolibrary.org/obo/UBERON_0004641;spleen capsule;fibrous capsule of spleen
+http://purl.obolibrary.org/obo/UBERON_0004641;spleen capsule;fibroelastic coat of spleen
+http://purl.obolibrary.org/obo/UBERON_0004641;spleen capsule;capsule of spleen
+http://purl.obolibrary.org/obo/UBERON_0004641;spleen capsule;capsula splenica
+http://purl.obolibrary.org/obo/UBERON_0004676;spinal cord lateral horn;spinal cord intermediate horn
+http://purl.obolibrary.org/obo/UBERON_0004676;spinal cord lateral horn;lateral horn of spinal cord
+http://purl.obolibrary.org/obo/UBERON_0004676;spinal cord lateral horn;lateral gray matter of spinal cord
+http://purl.obolibrary.org/obo/UBERON_0004676;spinal cord lateral horn;lateral gray horn
+http://purl.obolibrary.org/obo/UBERON_0004676;spinal cord lateral horn;lateral gray column of spinal cord
+http://purl.obolibrary.org/obo/UBERON_0004676;spinal cord lateral horn;intermediate grey column of spinal cord
+http://purl.obolibrary.org/obo/UBERON_0004676;spinal cord lateral horn;intermediate gray column of spinal cord
+http://purl.obolibrary.org/obo/UBERON_0004676;spinal cord lateral horn;cornu laterale medullae spinalis
+http://purl.obolibrary.org/obo/UBERON_0004676;spinal cord lateral horn;columna grisea intermedia medullare spinalis
+http://purl.obolibrary.org/obo/UBERON_0004676;spinal cord lateral horn;spinal cord lateral horn
+http://purl.obolibrary.org/obo/UBERON_0004679;dentate gyrus molecular layer;stratum moleculare gyri dentati
+http://purl.obolibrary.org/obo/UBERON_0004679;dentate gyrus molecular layer;molecular layer of the dentate gyrus
+http://purl.obolibrary.org/obo/UBERON_0004679;dentate gyrus molecular layer;molecular layer of dentate gyrus
+http://purl.obolibrary.org/obo/UBERON_0004679;dentate gyrus molecular layer;dentate gyrus molecular layer
+http://purl.obolibrary.org/obo/UBERON_0004917;urethral sphincter;urethral sphincter muscle
+http://purl.obolibrary.org/obo/UBERON_0004917;urethral sphincter;sphincter urethrae
+http://purl.obolibrary.org/obo/UBERON_0004917;urethral sphincter;sphincter of urethra
+http://purl.obolibrary.org/obo/UBERON_0004917;urethral sphincter;sphincter muscle of urethra
+http://purl.obolibrary.org/obo/UBERON_0005303;hypogastric nerve;nervus hypogastricus
+http://purl.obolibrary.org/obo/UBERON_0005303;hypogastric nerve;hypogastric plexus
+http://purl.obolibrary.org/obo/UBERON_0005303;hypogastric nerve;hypogastric nerve plexus
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;petrous ganglion
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;ninth cranial nerve inferior ganglion
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;inferior glossopharyngeal ganglion of the glossopharyngeal (IX) nerve
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;inferior glossopharyngeal ganglion
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;inferior ganglion of glossopharyngeal nerve
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;glossopharyngeal nerve petrous ganglion
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;glossopharyngeal nerve inferior ganglion
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;glossopharyngeal IX inferior ganglion
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;glossopharyngeal inferior ganglion
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;ganglion petrosum
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;ganglion of andersch
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;ganglion inferius nervus glossopharyngei
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;ganglion inferius nervi glossopharyngei
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;ganglion inferius (nervus glossopharygeus)
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;extracraniale ganglion
+http://purl.obolibrary.org/obo/UBERON_0005360;inferior glossopharyngeal IX ganglion;petrosal ganglion
+http://purl.obolibrary.org/obo/UBERON_0005363;inferior vagus X ganglion;vagus X inferior ganglion
+http://purl.obolibrary.org/obo/UBERON_0005363;inferior vagus X ganglion;vagus nerve nodose ganglion
+http://purl.obolibrary.org/obo/UBERON_0005363;inferior vagus X ganglion;vagus nerve inferior ganglion
+http://purl.obolibrary.org/obo/UBERON_0005363;inferior vagus X ganglion;tenth cranial nerve nodose ganglion
+http://purl.obolibrary.org/obo/UBERON_0005363;inferior vagus X ganglion;nodose ganglion
+http://purl.obolibrary.org/obo/UBERON_0005363;inferior vagus X ganglion;nodose ganglia
+http://purl.obolibrary.org/obo/UBERON_0005363;inferior vagus X ganglion;inferior vagus X
+http://purl.obolibrary.org/obo/UBERON_0005363;inferior vagus X ganglion;inferior vagus ganglion
+http://purl.obolibrary.org/obo/UBERON_0005363;inferior vagus X ganglion;inferior ganglion of vagus nerve
+http://purl.obolibrary.org/obo/UBERON_0005363;inferior vagus X ganglion;inferior ganglion of vagus
+http://purl.obolibrary.org/obo/UBERON_0005363;inferior vagus X ganglion;ganglion nodosum
+http://purl.obolibrary.org/obo/UBERON_0005363;inferior vagus X ganglion;ganglion inferius nervus vagi
+http://purl.obolibrary.org/obo/UBERON_0005363;inferior vagus X ganglion;ganglion inferius nervi vagi
+http://purl.obolibrary.org/obo/UBERON_0005363;inferior vagus X ganglion;ganglion inferius (nervus vagus)
+http://purl.obolibrary.org/obo/UBERON_0005370;hippocampus stratum lacunosum;lacunar layer of hippocampus
+http://purl.obolibrary.org/obo/UBERON_0005376;olfactory bulb external plexiform layer;olfactory bulb main external plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0005376;olfactory bulb external plexiform layer;OB outer plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0005376;olfactory bulb external plexiform layer;external plexiform layer of the olfactory bulb
+http://purl.obolibrary.org/obo/UBERON_0005376;olfactory bulb external plexiform layer;external plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0005376;olfactory bulb external plexiform layer;EPL
+http://purl.obolibrary.org/obo/UBERON_0005378;olfactory bulb granule cell layer;olfactory bulb main granule cell layer
+http://purl.obolibrary.org/obo/UBERON_0005378;olfactory bulb granule cell layer;main olfactory bulb, granule layer
+http://purl.obolibrary.org/obo/UBERON_0005378;olfactory bulb granule cell layer;main olfactory bulb granule cell layer
+http://purl.obolibrary.org/obo/UBERON_0005378;olfactory bulb granule cell layer;granule layer of main olfactory bulb
+http://purl.obolibrary.org/obo/UBERON_0005378;olfactory bulb granule cell layer;granule cell layer
+http://purl.obolibrary.org/obo/UBERON_0005378;olfactory bulb granule cell layer;accessory olfactory bulb granule cell layer
+http://purl.obolibrary.org/obo/UBERON_0005381;dentate gyrus granule cell layer;stratum granulare gyri dentati
+http://purl.obolibrary.org/obo/UBERON_0005381;dentate gyrus granule cell layer;granular layer of the dentate gyrus
+http://purl.obolibrary.org/obo/UBERON_0005381;dentate gyrus granule cell layer;granular layer of dentate gyrus
+http://purl.obolibrary.org/obo/UBERON_0005381;dentate gyrus granule cell layer;DG granule cell layer
+http://purl.obolibrary.org/obo/UBERON_0005381;dentate gyrus granule cell layer;dentate gyrus, granule cell layer
+http://purl.obolibrary.org/obo/UBERON_0005390;cortical layer I;plexiform layer of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005390;cortical layer I;plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0005390;cortical layer I;neocortex plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0005390;cortical layer I;neocortex molecular layer
+http://purl.obolibrary.org/obo/UBERON_0005390;cortical layer I;neocortex layer I
+http://purl.obolibrary.org/obo/UBERON_0005390;cortical layer I;neocortex layer 1
+http://purl.obolibrary.org/obo/UBERON_0005390;cortical layer I;molecular layer of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005390;cortical layer I;molecular layer of isocortex [layer i]
+http://purl.obolibrary.org/obo/UBERON_0005390;cortical layer I;molecular layer of cerebral cortex
+http://purl.obolibrary.org/obo/UBERON_0005390;cortical layer I;molecular layer
+http://purl.obolibrary.org/obo/UBERON_0005390;cortical layer I;layer I of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005390;cortical layer I;layer 1 of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005390;cortical layer I;lamina molecularis isocorticis [lamina I]
+http://purl.obolibrary.org/obo/UBERON_0005390;cortical layer I;cerebral cortex, layer 1
+http://purl.obolibrary.org/obo/UBERON_0005391;cortical layer II;neocortex layer II
+http://purl.obolibrary.org/obo/UBERON_0005391;cortical layer II;neocortex layer 2
+http://purl.obolibrary.org/obo/UBERON_0005391;cortical layer II;layer II of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005391;cortical layer II;lamina granularis externa isocorticis [lamina ii]
+http://purl.obolibrary.org/obo/UBERON_0005391;cortical layer II;granule cell layer of cerebral cortex
+http://purl.obolibrary.org/obo/UBERON_0005391;cortical layer II;external granule cell layer of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005391;cortical layer II;external granule cell layer
+http://purl.obolibrary.org/obo/UBERON_0005391;cortical layer II;external granular layer of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005391;cortical layer II;external granular layer of isocortex [layer II]
+http://purl.obolibrary.org/obo/UBERON_0005391;cortical layer II;external granular layer of cerebral cortex
+http://purl.obolibrary.org/obo/UBERON_0005391;cortical layer II;external granular layer
+http://purl.obolibrary.org/obo/UBERON_0005391;cortical layer II;external granular cell layer
+http://purl.obolibrary.org/obo/UBERON_0005391;cortical layer II;EGL
+http://purl.obolibrary.org/obo/UBERON_0005391;cortical layer II;cerebral cortex, layer 2
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;pyramidal layer
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;neocortex layer III
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;neocortex layer 3
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;neocortex external pyramidal cell layer
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;layer of medium-sized and large pyramidal cells
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;layer III of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;layer 3 of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;lamina pyramidalis externa isocorticis [lamina iii]
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;lamina pyramidalis externa
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;isocortex, deep supragranular pyramidal layer
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;external pyramidal layer of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;external pyramidal layer of isocortex [layer iii]
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;external pyramidal layer of cerebral cortex
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;external pyramidal cell layer of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;external pyramidal cell layer
+http://purl.obolibrary.org/obo/UBERON_0005392;cortical layer III;cerebral cortex, layer 3
+http://purl.obolibrary.org/obo/UBERON_0005393;cortical layer IV;neocortical layer IV
+http://purl.obolibrary.org/obo/UBERON_0005393;cortical layer IV;neocortical internal granule cell layer
+http://purl.obolibrary.org/obo/UBERON_0005393;cortical layer IV;neocortex layer IV
+http://purl.obolibrary.org/obo/UBERON_0005393;cortical layer IV;neocortex layer 4
+http://purl.obolibrary.org/obo/UBERON_0005393;cortical layer IV;neocortex internal granule cell layer
+http://purl.obolibrary.org/obo/UBERON_0005393;cortical layer IV;layer IV of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005393;cortical layer IV;layer 4 of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005393;cortical layer IV;lamina granularis interna isocorticis [lamina iv]
+http://purl.obolibrary.org/obo/UBERON_0005393;cortical layer IV;internal granule cell layer of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005393;cortical layer IV;internal granular layer of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005393;cortical layer IV;internal granular layer of isocortex [layer iv]
+http://purl.obolibrary.org/obo/UBERON_0005393;cortical layer IV;internal granular layer
+http://purl.obolibrary.org/obo/UBERON_0005393;cortical layer IV;cerebral cortex, layer 4
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;neocortical layer V
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;neocortical layer 5
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;neocortex layer V
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;neocortex layer 5
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;neocortex internal pyramidal cell layer
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;layer V of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;layer 5 of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;lamina pyramidalis interna isocorticis [lamina v]
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;lamina pyramidalis interna
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;lamina ganglionaris
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;isocortex, infragranular pyramidal layer
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;internal pyramidal layer of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;internal pyramidal layer of isocortex [layer v]
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;internal pyramidal layer
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;internal pyramidal cell layer of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;inner layer of large pyramidal cells
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;ganglionic layer of cerebral cortex
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;ganglionic layer
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;deep layer of large pyramidal cells
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;cerebral cortex, layer 5
+http://purl.obolibrary.org/obo/UBERON_0005394;cortical layer V;betz' cells
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;spindle cell layer
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;pleiomorphic layer of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;neocortical layer VI
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;neocortical layer 6
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;neocortex multiform layer
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;neocortex layer VI
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;neocortex layer 6
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;multiform layer of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;multiform layer of isocortex [layer vi]
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;multiform layer
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;layer VI of neocortex
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;lamina multiformis isocorticis [lamina vi]
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;lamina multiformis
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;isocortex, polymorph layer
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;fusiform layer
+http://purl.obolibrary.org/obo/UBERON_0005395;cortical layer VI;cerebral cortex, layer 6
+http://purl.obolibrary.org/obo/UBERON_0005453;inferior mesenteric ganglion;ganglion mesentericum inferius
+http://purl.obolibrary.org/obo/UBERON_0005479;superior mesenteric ganglion;superior mesenteric ganglia
+http://purl.obolibrary.org/obo/UBERON_0005479;superior mesenteric ganglion;ganglion mesentericum superius
+http://purl.obolibrary.org/obo/UBERON_0005807;rostral ventrolateral medulla;RVLM
+http://purl.obolibrary.org/obo/UBERON_0005807;rostral ventrolateral medulla;medulla pressor
+http://purl.obolibrary.org/obo/UBERON_0005843;sacral spinal cord;segmenta sacralia medullae spinalis [1-5]
+http://purl.obolibrary.org/obo/UBERON_0005843;sacral spinal cord;sacral segments of spinal cord [1-5]
+http://purl.obolibrary.org/obo/UBERON_0005843;sacral spinal cord;sacral segment of spinal cord
+http://purl.obolibrary.org/obo/UBERON_0005843;sacral spinal cord;pars sacralis medullae spinalis
+http://purl.obolibrary.org/obo/UBERON_0006447;fifth lumbar spinal cord segment;L5 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006447;fifth lumbar spinal cord segment;L5 segment
+http://purl.obolibrary.org/obo/UBERON_0006447;fifth lumbar spinal cord segment;fifth lumbar spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006448;first lumbar spinal cord segment;L1 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006448;first lumbar spinal cord segment;L1 segment
+http://purl.obolibrary.org/obo/UBERON_0006448;first lumbar spinal cord segment;first lumbar spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006449;third lumbar spinal cord segment;L3 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006449;third lumbar spinal cord segment;L3 segment
+http://purl.obolibrary.org/obo/UBERON_0006449;third lumbar spinal cord segment;third lumbar spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006450;second lumbar spinal cord segment;L2 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006450;second lumbar spinal cord segment;l2 segment
+http://purl.obolibrary.org/obo/UBERON_0006450;second lumbar spinal cord segment;second lumbar spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006451;fourth lumbar spinal cord segment;L4 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006451;fourth lumbar spinal cord segment;L4 segment
+http://purl.obolibrary.org/obo/UBERON_0006452;fourth thoracic spinal cord segment;T4 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006452;fourth thoracic spinal cord segment;T4 segment
+http://purl.obolibrary.org/obo/UBERON_0006453;fifth thoracic spinal cord segment;T5 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006453;fifth thoracic spinal cord segment;t5 segment
+http://purl.obolibrary.org/obo/UBERON_0006453;fifth thoracic spinal cord segment;fifth thoracic spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006454;sixth thoracic spinal cord segment;T6 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006454;sixth thoracic spinal cord segment;t6 segment
+http://purl.obolibrary.org/obo/UBERON_0006454;sixth thoracic spinal cord segment;sixth thoracic spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006455;seventh thoracic spinal cord segment;T7 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006455;seventh thoracic spinal cord segment;t7 segment
+http://purl.obolibrary.org/obo/UBERON_0006455;seventh thoracic spinal cord segment;seventh thoracic spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006456;eighth thoracic spinal cord segment;T8 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006456;eighth thoracic spinal cord segment;t8 segment
+http://purl.obolibrary.org/obo/UBERON_0006456;eighth thoracic spinal cord segment;eighth thoracic spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006457;first thoracic spinal cord segment;T1 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006457;first thoracic spinal cord segment;t1 segment
+http://purl.obolibrary.org/obo/UBERON_0006457;first thoracic spinal cord segment;first thoracic spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006458;second thoracic spinal cord segment;T2 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006458;second thoracic spinal cord segment;t2 segment
+http://purl.obolibrary.org/obo/UBERON_0006458;second thoracic spinal cord segment;second thoracic spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006459;third thoracic spinal cord segment;T3 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006459;third thoracic spinal cord segment;t3 segment
+http://purl.obolibrary.org/obo/UBERON_0006459;third thoracic spinal cord segment;third thoracic spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006460;first sacral spinal cord segment;S1 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006460;first sacral spinal cord segment;S1 segment
+http://purl.obolibrary.org/obo/UBERON_0006460;first sacral spinal cord segment;first sacral spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006465;ninth thoracic spinal cord segment;T9 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006465;ninth thoracic spinal cord segment;t9 segment
+http://purl.obolibrary.org/obo/UBERON_0006465;ninth thoracic spinal cord segment;ninth thoracic spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006466;tenth thoracic spinal cord segment;T10 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006466;tenth thoracic spinal cord segment;t10 segment
+http://purl.obolibrary.org/obo/UBERON_0006466;tenth thoracic spinal cord segment;tenth thoracic spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006467;eleventh thoracic spinal cord segment;T11 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006467;eleventh thoracic spinal cord segment;t11 segment
+http://purl.obolibrary.org/obo/UBERON_0006467;eleventh thoracic spinal cord segment;eleventh thoracic spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006468;twelfth thoracic spinal cord segment;T12 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006468;twelfth thoracic spinal cord segment;t12 segment
+http://purl.obolibrary.org/obo/UBERON_0006468;twelfth thoracic spinal cord segment;twelfth thoracic spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006469;C1 segment of cervical spinal cord;first cervical spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006469;C1 segment of cervical spinal cord;C1 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006469;C1 segment of cervical spinal cord;C1 segment
+http://purl.obolibrary.org/obo/UBERON_0006469;C1 segment of cervical spinal cord;C1 cervical spinal cord
+http://purl.obolibrary.org/obo/UBERON_0006470;C8 segment of cervical spinal cord;eighth cervical spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006470;C8 segment of cervical spinal cord;C8 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006470;C8 segment of cervical spinal cord;C8 segment
+http://purl.obolibrary.org/obo/UBERON_0006488;C3 segment of cervical spinal cord;third cervical spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006488;C3 segment of cervical spinal cord;C3 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006488;C3 segment of cervical spinal cord;C3 segment
+http://purl.obolibrary.org/obo/UBERON_0006489;C2 segment of cervical spinal cord;second cervical spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006489;C2 segment of cervical spinal cord;C2 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006489;C2 segment of cervical spinal cord;C2 segment
+http://purl.obolibrary.org/obo/UBERON_0006490;C4 segment of cervical spinal cord;forth cervical spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006490;C4 segment of cervical spinal cord;C4 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006490;C4 segment of cervical spinal cord;C4 segment
+http://purl.obolibrary.org/obo/UBERON_0006491;C5 segment of cervical spinal cord;fifth cervical spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006491;C5 segment of cervical spinal cord;C5 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006491;C5 segment of cervical spinal cord;C5 segment
+http://purl.obolibrary.org/obo/UBERON_0006492;C6 segment of cervical spinal cord;sixth cervical spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006492;C6 segment of cervical spinal cord;C6 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006492;C6 segment of cervical spinal cord;C6 segment
+http://purl.obolibrary.org/obo/UBERON_0006493;C7 segment of cervical spinal cord;seventh cervical spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006493;C7 segment of cervical spinal cord;C7 spinal cord segment
+http://purl.obolibrary.org/obo/UBERON_0006493;C7 segment of cervical spinal cord;C7 segment
+http://purl.obolibrary.org/obo/UBERON_0006562;pharynx;pharyngeal tube
+http://purl.obolibrary.org/obo/UBERON_0006562;pharynx;anterior part of foregut
+http://purl.obolibrary.org/obo/UBERON_0007631;accessory olfactory bulb glomerular layer;glomerular layer of the accessory olfactory bulb
+http://purl.obolibrary.org/obo/UBERON_0007631;accessory olfactory bulb glomerular layer;AOB, glomerular layer
+http://purl.obolibrary.org/obo/UBERON_0007631;accessory olfactory bulb glomerular layer;accessory olfactory bulb, glomerular layer
+http://purl.obolibrary.org/obo/UBERON_0007632;Barrington's nucleus;nucleus of Barrington
+http://purl.obolibrary.org/obo/UBERON_0007632;Barrington's nucleus;Barrington nucleus
+http://purl.obolibrary.org/obo/UBERON_0007634;parabrachial nucleus;parabrachial nuclei
+http://purl.obolibrary.org/obo/UBERON_0007634;parabrachial nucleus;parabrachial complex
+http://purl.obolibrary.org/obo/UBERON_0007634;parabrachial nucleus;parabrachial area
+http://purl.obolibrary.org/obo/UBERON_0007639;hippocampus alveus;neuraxis alveus
+http://purl.obolibrary.org/obo/UBERON_0007639;hippocampus alveus;alveus of the hippocampus
+http://purl.obolibrary.org/obo/UBERON_0007639;hippocampus alveus;alveus of hippocampus
+http://purl.obolibrary.org/obo/UBERON_0007639;hippocampus alveus;alveus of fornix
+http://purl.obolibrary.org/obo/UBERON_0007639;hippocampus alveus;alveus hippocampi
+http://purl.obolibrary.org/obo/UBERON_0007639;hippocampus alveus;alveus
+http://purl.obolibrary.org/obo/UBERON_0007639;hippocampus alveus;CA2 alveus
+http://purl.obolibrary.org/obo/UBERON_0007639;Alveus;neuraxis alveus
+http://purl.obolibrary.org/obo/UBERON_0007639;Alveus;alveus of the hippocampus
+http://purl.obolibrary.org/obo/UBERON_0007639;Alveus;alveus of hippocampus
+http://purl.obolibrary.org/obo/UBERON_0007639;Alveus;alveus of fornix
+http://purl.obolibrary.org/obo/UBERON_0007639;Alveus;alveus hippocampi
+http://purl.obolibrary.org/obo/UBERON_0007639;Alveus;alveus
+http://purl.obolibrary.org/obo/UBERON_0007639;Alveus;CA2 alveus
+http://purl.obolibrary.org/obo/UBERON_0007711;sixth cervical dorsal root ganglion;sixth cervical spinal ganglion
+http://purl.obolibrary.org/obo/UBERON_0007711;sixth cervical dorsal root ganglion;sixth cervical dorsal root ganglia
+http://purl.obolibrary.org/obo/UBERON_0007711;sixth cervical dorsal root ganglion;C6 dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0007711;sixth cervical dorsal root ganglion;sixth cervical dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0007712;fourth thoracic spinal ganglion;fourth thoracic dorsal root ganglion
+http://purl.obolibrary.org/obo/UBERON_0007769;medial preoptic region;medial preopticarea
+http://purl.obolibrary.org/obo/UBERON_0007769;medial preoptic region;medial preoptic area
+http://purl.obolibrary.org/obo/UBERON_0008810;nasopalatine nerve;Scarpa's nerve
+http://purl.obolibrary.org/obo/UBERON_0008810;nasopalatine nerve;nervus nasopalatinus
+http://purl.obolibrary.org/obo/UBERON_0008810;nasopalatine nerve;nasopalatine nerves
+http://purl.obolibrary.org/obo/UBERON_0008810;nasopalatine nerve;nasopalatine
+http://purl.obolibrary.org/obo/UBERON_0008810;nasopalatine nerve;naso-palatine nerve
+http://purl.obolibrary.org/obo/UBERON_0008857;stomach smooth muscle circular layer;stratum circulare tunicae muscularis gastricae
+http://purl.obolibrary.org/obo/UBERON_0008857;stomach smooth muscle circular layer;stratum circulare gastris
+http://purl.obolibrary.org/obo/UBERON_0008857;stomach smooth muscle circular layer;stratum circulare (tunica muscularis)(gaster)
+http://purl.obolibrary.org/obo/UBERON_0008857;stomach smooth muscle circular layer;middle circular muscle layer of stomach
+http://purl.obolibrary.org/obo/UBERON_0008857;stomach smooth muscle circular layer;circular muscle layer of stomach
+http://purl.obolibrary.org/obo/UBERON_0008857;stomach smooth muscle circular layer;circular layer of gastric muscularis
+http://purl.obolibrary.org/obo/UBERON_0008862;stomach smooth muscle inner oblique layer;oblique muscle layer of stomach
+http://purl.obolibrary.org/obo/UBERON_0008862;stomach smooth muscle inner oblique layer;oblique fiber layer of gastric muscularis
+http://purl.obolibrary.org/obo/UBERON_0008862;stomach smooth muscle inner oblique layer;inner oblique muscle layer of stomach
+http://purl.obolibrary.org/obo/UBERON_0008863;stomach smooth muscle outer longitudinal layer;stratum longitudinale tunicae muscularis gastricae
+http://purl.obolibrary.org/obo/UBERON_0008863;stomach smooth muscle outer longitudinal layer;stratum longitudinale (tunica muscularis)(gaster)
+http://purl.obolibrary.org/obo/UBERON_0008863;stomach smooth muscle outer longitudinal layer;outer longitudinal muscle layer of stomach
+http://purl.obolibrary.org/obo/UBERON_0008863;stomach smooth muscle outer longitudinal layer;muscle layer 1 of stomach
+http://purl.obolibrary.org/obo/UBERON_0008863;stomach smooth muscle outer longitudinal layer;longitudinal layer of gastric muscularis
+http://purl.obolibrary.org/obo/UBERON_0009009;carotid sinus nerve;sinus nerve of Hering
+http://purl.obolibrary.org/obo/UBERON_0009009;carotid sinus nerve;ramus sinus carotici nervus glossopharyngei
+http://purl.obolibrary.org/obo/UBERON_0009009;carotid sinus nerve;ramus sinus carotici nervi glossopharyngei
+http://purl.obolibrary.org/obo/UBERON_0009009;carotid sinus nerve;ramus sinus carotici
+http://purl.obolibrary.org/obo/UBERON_0009009;carotid sinus nerve;Hering sinus nerve
+http://purl.obolibrary.org/obo/UBERON_0009009;carotid sinus nerve;carotid branch of glossopharyngeal nerve
+http://purl.obolibrary.org/obo/UBERON_0009050;nucleus of solitary tract;solitary tract nucleus
+http://purl.obolibrary.org/obo/UBERON_0009050;nucleus of solitary tract;solitary nucleus
+http://purl.obolibrary.org/obo/UBERON_0009050;nucleus of solitary tract;solitary nuclear complex
+http://purl.obolibrary.org/obo/UBERON_0009050;nucleus of solitary tract;nucleus tractus solitarii medullae oblongatae
+http://purl.obolibrary.org/obo/UBERON_0009050;nucleus of solitary tract;nucleus tracti solitarii
+http://purl.obolibrary.org/obo/UBERON_0009050;nucleus of solitary tract;nucleus solitarius
+http://purl.obolibrary.org/obo/UBERON_0009050;nucleus of solitary tract;nucleus of tractus solitarius
+http://purl.obolibrary.org/obo/UBERON_0009050;nucleus of solitary tract;nucleus of the tractus solitarius
+http://purl.obolibrary.org/obo/UBERON_0009050;nucleus of solitary tract;nucleus of the solitary tract
+http://purl.obolibrary.org/obo/UBERON_0009050;nucleus of solitary tract;nuclei tractus solitarii
+http://purl.obolibrary.org/obo/UBERON_0009050;nucleus of solitary tract;nucleus tractus solitarii
+http://purl.obolibrary.org/obo/UBERON_0009675;chorda tympani branch of facial nerve;tympanic cord
+http://purl.obolibrary.org/obo/UBERON_0009675;chorda tympani branch of facial nerve;radix parasympathica ganglii submandibularis
+http://purl.obolibrary.org/obo/UBERON_0009675;chorda tympani branch of facial nerve;parasympathetic root of submandibular ganglion
+http://purl.obolibrary.org/obo/UBERON_0009675;chorda tympani branch of facial nerve;nervus corda tympani
+http://purl.obolibrary.org/obo/UBERON_0009675;chorda tympani branch of facial nerve;facial VII nerve chorda tympani branch
+http://purl.obolibrary.org/obo/UBERON_0009675;chorda tympani branch of facial nerve;corda tympani nerve
+http://purl.obolibrary.org/obo/UBERON_0009675;chorda tympani branch of facial nerve;chorda tympani nerve
+http://purl.obolibrary.org/obo/UBERON_0009675;chorda tympani branch of facial nerve;chorda tympani
+http://purl.obolibrary.org/obo/UBERON_0009918;retrotrapezoid nucleus;
+http://purl.obolibrary.org/obo/UBERON_0009960;esophagus smooth muscle circular layer;inner circular muscle layer of esophagus
+http://purl.obolibrary.org/obo/UBERON_0009960;esophagus smooth muscle circular layer;circular muscle layer of esophagus
+http://purl.obolibrary.org/obo/UBERON_0009960;esophagus smooth muscle circular layer;esophagus smooth muscle circular layer
+http://purl.obolibrary.org/obo/UBERON_0009961;esophagus smooth muscle longitudinal layer;outer longitudinal muscle layer of esophagus
+http://purl.obolibrary.org/obo/UBERON_0009961;esophagus smooth muscle longitudinal layer;longitudinal muscle layer of esophagus
+http://purl.obolibrary.org/obo/UBERON_0009961;esophagus smooth muscle longitudinal layer;esophagus smooth muscle longitudinal layer
+http://purl.obolibrary.org/obo/UBERON_0010398;spleen marginal sinus;splenic marginal sinus
+http://purl.obolibrary.org/obo/UBERON_0011096;lacrimal nerve;nervus lacrimalis
+http://purl.obolibrary.org/obo/UBERON_0011173;anterior division of bed nuclei of stria terminalis;bed nucleus of thestria terminalis anterior division
+http://purl.obolibrary.org/obo/UBERON_0011173;anterior division of bed nuclei of stria terminalis;bed nucleus of the stria terminalis anterior part
+http://purl.obolibrary.org/obo/UBERON_0011173;anterior division of bed nuclei of stria terminalis;bed nucleus of the stria terminalis anterior division
+http://purl.obolibrary.org/obo/UBERON_0011173;anterior division of bed nuclei of stria terminalis;bed nuclei of the stria terminals anterior division
+http://purl.obolibrary.org/obo/UBERON_0011173;anterior division of bed nuclei of stria terminalis;bed nuclei of the stria terminalis, anterior division
+http://purl.obolibrary.org/obo/UBERON_0011173;anterior division of bed nuclei of stria terminalis;bed nuclei of the stria terminalis anterior division
+http://purl.obolibrary.org/obo/UBERON_0011173;anterior division of bed nuclei of stria terminalis;anterior part of the bed nucleus of the stria terminalis
+http://purl.obolibrary.org/obo/UBERON_0011173;anterior division of bed nuclei of stria terminalis;anterior nuclei of stria terminalis
+http://purl.obolibrary.org/obo/UBERON_0011173;anterior division of bed nuclei of stria terminalis;anterior division
+http://purl.obolibrary.org/obo/UBERON_0011194;ophthalmic plexus;plexus ophthalmicus
+http://purl.obolibrary.org/obo/UBERON_0011194;ophthalmic plexus;opthalmic plexus
+http://purl.obolibrary.org/obo/UBERON_0011194;ophthalmic plexus;ophthalmic nerve plexus
+http://purl.obolibrary.org/obo/UBERON_0011194;ophthalmic plexus;ophthalmic plexus
+http://purl.obolibrary.org/obo/UBERON_0011326;superior laryngeal nerve;superior laryngeal branch of vagus
+http://purl.obolibrary.org/obo/UBERON_0011326;superior laryngeal nerve;superior laryngeal branch of inferior vagal ganglion
+http://purl.obolibrary.org/obo/UBERON_0011326;superior laryngeal nerve;nervus laryngeus superior
+http://purl.obolibrary.org/obo/UBERON_0011326;superior laryngeal nerve;nervus laryngealis superior
+http://purl.obolibrary.org/obo/UBERON_0011390;pudendal nerve;pudendal
+http://purl.obolibrary.org/obo/UBERON_0011390;pudendal nerve;pudenal nerve
+http://purl.obolibrary.org/obo/UBERON_0011390;pudendal nerve;nervus pudendales
+http://purl.obolibrary.org/obo/UBERON_0011390;pudendal nerve;nervus pudendae
+http://purl.obolibrary.org/obo/UBERON_0011390;pudendal nerve;internal pudendal nerve
+http://purl.obolibrary.org/obo/UBERON_0013473;lower esophagus;lower third of esophagus
+http://purl.obolibrary.org/obo/UBERON_0013473;lower esophagus;distal part of esophagus
+http://purl.obolibrary.org/obo/UBERON_0014277;piriform cortex layer 1;pyriform cortex layer 1
+http://purl.obolibrary.org/obo/UBERON_0014277;piriform cortex layer 1;plexiform layer of piriform cortex
+http://purl.obolibrary.org/obo/UBERON_0014277;piriform cortex layer 1;piriform cortex plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0014277;piriform cortex layer 1;layer 1 of piriform cortex
+http://purl.obolibrary.org/obo/UBERON_0014277;piriform cortex layer 1;piriform cortex layer 1
+http://purl.obolibrary.org/obo/UBERON_0014283;piriform cortex layer 3;layer 3 of piriform cortex
+http://purl.obolibrary.org/obo/UBERON_0014283;piriform cortex layer 3;piriform cortex layer 3
+http://purl.obolibrary.org/obo/UBERON_0014284;endopiriform nucleus;layer IV of piriform cortex
+http://purl.obolibrary.org/obo/UBERON_0014284;endopiriform nucleus;layer 4 of piriform cortex
+http://purl.obolibrary.org/obo/UBERON_0014284;endopiriform nucleus;endopiriform nucleus
+http://purl.obolibrary.org/obo/UBERON_0014548;pyramidal layer of CA1;stratum pyramidale of the CA1 field
+http://purl.obolibrary.org/obo/UBERON_0014548;pyramidal layer of CA1;stratum pyramidale of CA1
+http://purl.obolibrary.org/obo/UBERON_0014548;pyramidal layer of CA1;field CA1, pyramidal layer
+http://purl.obolibrary.org/obo/UBERON_0014548;pyramidal layer of CA1;CA1 stratum pyramidale hippocampi
+http://purl.obolibrary.org/obo/UBERON_0014548;pyramidal layer of CA1;CA1 stratum pyramidale
+http://purl.obolibrary.org/obo/UBERON_0014548;pyramidal layer of CA1;CA1 pyramidal cell layer
+http://purl.obolibrary.org/obo/UBERON_0014548;pyramidal layer of CA1;CA1 part of stratum pyramidale hippocampi
+http://purl.obolibrary.org/obo/UBERON_0014549;pyramidal layer of CA2;stratum pyramidale of the CA2 field
+http://purl.obolibrary.org/obo/UBERON_0014549;pyramidal layer of CA2;stratum pyramidale of CA2
+http://purl.obolibrary.org/obo/UBERON_0014549;pyramidal layer of CA2;field CA2, pyramidal layer
+http://purl.obolibrary.org/obo/UBERON_0014549;pyramidal layer of CA2;CA2 stratum pyramidale hippocampi
+http://purl.obolibrary.org/obo/UBERON_0014549;pyramidal layer of CA2;CA2 part of stratum pyramidale hippocampi
+http://purl.obolibrary.org/obo/UBERON_0014550;pyramidal layer of CA3;stratum pyramidale of the CA3 field
+http://purl.obolibrary.org/obo/UBERON_0014550;pyramidal layer of CA3;stratum pyramidale of CA3
+http://purl.obolibrary.org/obo/UBERON_0014550;pyramidal layer of CA3;field CA3, pyramidal layer
+http://purl.obolibrary.org/obo/UBERON_0014550;pyramidal layer of CA3;CA3 stratum pyramidale hippocampi
+http://purl.obolibrary.org/obo/UBERON_0014550;pyramidal layer of CA3;CA3 part of stratum pyramidale hippocampi
+http://purl.obolibrary.org/obo/UBERON_0014551;CA2 stratum oriens;stratum oriens of the CA2 field
+http://purl.obolibrary.org/obo/UBERON_0014551;CA2 stratum oriens;oriens layer of CA2 field
+http://purl.obolibrary.org/obo/UBERON_0014551;CA2 stratum oriens;CA2 part of stratum oriens
+http://purl.obolibrary.org/obo/UBERON_0014551;CA2 stratum oriens;CA2 stratum oriens
+http://purl.obolibrary.org/obo/UBERON_0014552;CA1 stratum oriens;stratum oriens of the CA1 field
+http://purl.obolibrary.org/obo/UBERON_0014552;CA1 stratum oriens;oriens layer of CA1 field
+http://purl.obolibrary.org/obo/UBERON_0014552;CA1 stratum oriens;CA1 part of stratum oriens
+http://purl.obolibrary.org/obo/UBERON_0014552;CA1 stratum oriens;CA1 stratum oriens
+http://purl.obolibrary.org/obo/UBERON_0014553;CA3 stratum oriens;stratum oriens of the CA3 field
+http://purl.obolibrary.org/obo/UBERON_0014553;CA3 stratum oriens;oriens layer of CA3 field
+http://purl.obolibrary.org/obo/UBERON_0014553;CA3 stratum oriens;CA3 part of stratum oriens
+http://purl.obolibrary.org/obo/UBERON_0014553;CA3 stratum oriens;CA3 stratum oriens
+http://purl.obolibrary.org/obo/UBERON_0014554;CA1 stratum radiatum;stratum radiatum of the CA1 field
+http://purl.obolibrary.org/obo/UBERON_0014554;CA1 stratum radiatum;radiate layer of CA1 field
+http://purl.obolibrary.org/obo/UBERON_0014554;CA1 stratum radiatum;CA1 part of stratum radiatum
+http://purl.obolibrary.org/obo/UBERON_0014554;CA1 stratum radiatum;CA1 stratum radiatum
+http://purl.obolibrary.org/obo/UBERON_0014555;CA2 stratum radiatum;stratum radiatum of the CA2 field
+http://purl.obolibrary.org/obo/UBERON_0014555;CA2 stratum radiatum;radiate layer of CA2 field
+http://purl.obolibrary.org/obo/UBERON_0014555;CA2 stratum radiatum;CA2 part of stratum radiatum
+http://purl.obolibrary.org/obo/UBERON_0014555;CA2 stratum radiatum;CA2 stratum radiatum
+http://purl.obolibrary.org/obo/UBERON_0014556;CA3 stratum radiatum;stratum radiatum of the CA3 field
+http://purl.obolibrary.org/obo/UBERON_0014556;CA3 stratum radiatum;radiate layer of CA3 field
+http://purl.obolibrary.org/obo/UBERON_0014556;CA3 stratum radiatum;CA3 part of stratum radiatum
+http://purl.obolibrary.org/obo/UBERON_0014556;CA3 stratum radiatum;CA3 stratum radiatum
+http://purl.obolibrary.org/obo/UBERON_0014570;CA1 alveus;alveus of the CA1 field
+http://purl.obolibrary.org/obo/UBERON_0014571;CA3 alveus;alveus of the CA3 field
+http://purl.obolibrary.org/obo/UBERON_0014617;ventral nerve root of thoracic spinal cord;anterior nerve root of thoracic spinal cord
+http://purl.obolibrary.org/obo/UBERON_0014617;ventral nerve root of thoracic spinal cord;ventral nerve root of thoracic spinal cord
+http://purl.obolibrary.org/obo/UBERON_0015432;accessory olfactory bulb mitral cell layer;accessory olfactory bulb, mitral layer
+http://purl.obolibrary.org/obo/UBERON_0016508;pelvic ganglion;pelvic ganglia
+http://purl.obolibrary.org/obo/UBERON_0016508;pelvic ganglion;inferior hypogastric ganglion
+http://purl.obolibrary.org/obo/UBERON_0018412;vidian nerve;pterygoid canal nerve
+http://purl.obolibrary.org/obo/UBERON_0018412;vidian nerve;nerve of the pterygoid canal
+http://purl.obolibrary.org/obo/UBERON_0018412;vidian nerve;nerve of pterygoid canal
+http://purl.obolibrary.org/obo/UBERON_0018412;vidian nerve;vidian nerve
+http://purl.obolibrary.org/obo/UBERON_0018675;pelvic splanchnic nerve;pelvic splanchnic parasympathetic nerve
+http://purl.obolibrary.org/obo/UBERON_0018675;pelvic splanchnic nerve;nn erigentes
+http://purl.obolibrary.org/obo/UBERON_0018675;pelvic splanchnic nerve;nervi splanchnici pelvici
+http://purl.obolibrary.org/obo/UBERON_0018675;pelvic splanchnic nerve;nervi pelvici splanchnici
+http://purl.obolibrary.org/obo/UBERON_0018675;pelvic splanchnic nerve;nervi erigentes
+http://purl.obolibrary.org/obo/UBERON_0018675;pelvic splanchnic nerve;pelvic splanchnic nerve
+http://purl.obolibrary.org/obo/UBERON_0018680;greater splanchnic nerve;greater thoracic splanchnic nerve
+http://purl.obolibrary.org/obo/UBERON_0018683;lumbar splanchnic nerve;lumbar splanchnic nerve
+http://purl.obolibrary.org/obo/UBERON_0022278;nucleus of pudendal nerve;pudendal neural nucleus
+http://purl.obolibrary.org/obo/UBERON_0022278;nucleus of pudendal nerve;Onuf's nucleus
+http://purl.obolibrary.org/obo/UBERON_0022278;nucleus of pudendal nerve;nucleus of Onuf
+http://purl.obolibrary.org/obo/UBERON_0022301;long ciliary nerve;nervi ciliares longi
+http://purl.obolibrary.org/obo/UBERON_0022301;long ciliary nerve;long ciliary nerve
+http://purl.obolibrary.org/obo/UBERON_0022302;short ciliary nerve;nervi ciliares brevis
+http://purl.obolibrary.org/obo/UBERON_0022302;short ciliary nerve;nervi ciliares breves
+http://purl.obolibrary.org/obo/UBERON_0022302;short ciliary nerve;lower branch of ciliary ganglion
+http://purl.obolibrary.org/obo/UBERON_0022302;short ciliary nerve;short ciliary nerve
+http://purl.obolibrary.org/obo/UBERON_0022317;olfactory cortex layer 1;olfactory cortex plexiform layer
+http://purl.obolibrary.org/obo/UBERON_0022317;olfactory cortex layer 1;layer 1 of olfactory cortex
+http://purl.obolibrary.org/obo/UBERON_0022318;olfactory cortex layer 2;layer 2 of olfactory cortex
+http://purl.obolibrary.org/obo/UBERON_0022326;molecular layer of dorsal cochlear nucleus;MoC
+http://purl.obolibrary.org/obo/UBERON_0022326;molecular layer of dorsal cochlear nucleus;dorsal cochlear nucleus molecular layer
+http://purl.obolibrary.org/obo/UBERON_0023934;olfactory bulb main glomerular layer;olfactory bulb main glomerular layer
+http://purl.obolibrary.org/obo/UBERON_0035044;olfactory cortex layer 3;
+http://purl.obolibrary.org/obo/UBERON_0036216;tympanic nerve;tympanic branch of the glossopharyngeal
+http://purl.obolibrary.org/obo/UBERON_0036216;tympanic nerve;tympanic branch
+http://purl.obolibrary.org/obo/UBERON_0036216;tympanic nerve;tympanic
+http://purl.obolibrary.org/obo/UBERON_0036216;tympanic nerve;nerve of jacobson
+http://purl.obolibrary.org/obo/UBERON_0036216;tympanic nerve;jacobson%27s nerve
+http://purl.obolibrary.org/obo/UBERON_0038727;juxta-intestinal mesenteric lymph node;para-intestinal mesenteric lymph node
+http://purl.obolibrary.org/obo/UBERON_0038727;juxta-intestinal mesenteric lymph node;mural mesenteric lymph node
+http://uri.interlex.org/base/ilx_0101528;CA2 alveus;
+http://uri.interlex.org/base/ilx_0738290;ICG-MCG sympathetic trunk;
+http://uri.interlex.org/base/ilx_0738291;T1-ICG sympathetic trunk;
+http://uri.interlex.org/base/ilx_0738292;MCG-SCG sympathetic trunk;
+http://uri.interlex.org/base/ilx_0738293;Ganglioglomerular nerve;
+http://uri.interlex.org/base/ilx_0738304;Wall of arch of aorta;
+http://uri.interlex.org/base/ilx_0738308;External branch of inferior laryngeal nerve;
+http://uri.interlex.org/base/ilx_0738309;Internal branch of inferior laryngeal nerve;
+http://uri.interlex.org/base/ilx_0738312;Aortic arch depressor nerve;
+http://uri.interlex.org/base/ilx_0738313;Rami glomi carotici;
+http://uri.interlex.org/base/ilx_0738316;Aortic arch baroreceptors;
+http://uri.interlex.org/base/ilx_0738317;Laryngeal mechanoreceptors;
+http://uri.interlex.org/base/ilx_0738318;Epiglottic mechanoreceptors;
+http://uri.interlex.org/base/ilx_0738319;T1-T2 intercostal muscle;
+http://uri.interlex.org/base/ilx_0738324;Phrenic nucleus of C4;
+http://uri.interlex.org/base/ilx_0738325;Phrenic nucleus of C5;
+http://uri.interlex.org/base/ilx_0738372;T1 white ramus;
+http://uri.interlex.org/base/ilx_0738432;Sixth lumbar spinal cord segment;L6
+http://uri.interlex.org/base/ilx_0738433;Dome of the Bladder;
+http://uri.interlex.org/base/ilx_0738444;interscapular brown adipose tissue;iBAT
+http://uri.interlex.org/base/ilx_0739295;Thirteenth thoracic ganglion;thirteenth thoracic sympathetic ganglion
+http://uri.interlex.org/base/ilx_0739295;Thirteenth thoracic ganglion;T13 sympathetic ganglion
+http://uri.interlex.org/base/ilx_0739296;fifth lumbar sympathetic ganglion;L5 sympathetic ganglion
+http://uri.interlex.org/base/ilx_0739296;fifth lumbar sympathetic ganglion;fifth lumbar ganglion
+http://uri.interlex.org/base/ilx_0739297;sixth lumbar sympathetic ganglion;sixth lumbar ganglion
+http://uri.interlex.org/base/ilx_0739297;sixth lumbar sympathetic ganglion;L6 sympathetic ganglion
+http://uri.interlex.org/base/ilx_0739299;Gray communicating ramus of sixth lumbar nerve;L6 gray ramus
+http://uri.interlex.org/base/ilx_0739303;gray communicating ramus of second thoracic nerve;T2 gray ramus
+http://uri.interlex.org/base/ilx_0739304;gray communicating ramus of third thoracic nerve;T3 gray ramus
+http://uri.interlex.org/base/ilx_0770759;Lamina propria mucosae of descending colon;
+http://uri.interlex.org/base/ilx_0771089;Serosa of descending colon;
+http://uri.interlex.org/base/ilx_0773760;Circular muscle layer of descending colon;
+http://uri.interlex.org/base/ilx_0774266;T1 sympathetic ganglion;First thoracic ganglion
+http://uri.interlex.org/base/ilx_0776070;Longitudinal muscle layer of descending colon;
+http://uri.interlex.org/base/ilx_0776616;External carotid nerve;
+http://uri.interlex.org/base/ilx_0777086;T12 - T13 Interganglionic segment;
+http://uri.interlex.org/base/ilx_0777087;T13 - L1 Interganglionic segment;
+http://uri.interlex.org/base/ilx_0777088;L1 - L2 interganglionic segment;
+http://uri.interlex.org/base/ilx_0777089;L2 - L3 interganglionic segment;
+http://uri.interlex.org/base/ilx_0777090;L3 - L4 interganglionic segment;
+http://uri.interlex.org/base/ilx_0777091;L4 - L5 interganglionic segment;
+http://uri.interlex.org/base/ilx_0777092;L5 - L6 interganglionic segment;
+http://uri.interlex.org/base/ilx_0777093;L6 - S1 interganglionic segment;
+http://uri.interlex.org/base/ilx_0777094;T1 - T2 Interganglionic segment;
+http://uri.interlex.org/base/ilx_0777095;T2 - T3 Interganglionic segment;
+http://uri.interlex.org/base/ilx_0777096;T3 - T4 Interganglionic segment;
+http://uri.interlex.org/base/ilx_0777097;T4 - T5 Interganglionic segment;
+http://uri.interlex.org/base/ilx_0777098;T5 - T6 Interganglionic segment;
+http://uri.interlex.org/base/ilx_0784378;Ninth thoracic ganglion;
+http://uri.interlex.org/base/ilx_0784439;Gray communicating ramus of fifth thoracic anterior ramus;T5 gray ramus
+http://uri.interlex.org/base/ilx_0784721;Eighth thoracic ganglion;
+http://uri.interlex.org/base/ilx_0784804;Anterior root of third thoracic nerve;
+http://uri.interlex.org/base/ilx_0785421;Anterior root of first lumbar nerve;
+http://uri.interlex.org/base/ilx_0785733;Gray communicating ramus of second lumbar nerve;
+http://uri.interlex.org/base/ilx_0785825;Gray communicating ramus of first lumbar nerve;
+http://uri.interlex.org/base/ilx_0785932;Gray communicating ramus of third lumbar nerve;
+http://uri.interlex.org/base/ilx_0786141;Fifth thoracic ganglion;
+http://uri.interlex.org/base/ilx_0786228;Second thoracic ganglion;
+http://uri.interlex.org/base/ilx_0786272;Fourth thoracic ganglion;
+http://uri.interlex.org/base/ilx_0786722;Third thoracic ganglion;
+http://uri.interlex.org/base/ilx_0786933;Second lumbar ganglion;
+http://uri.interlex.org/base/ilx_0787009;Twelfth thoracic ganglion;
+http://uri.interlex.org/base/ilx_0787082;Gray communicating ramus of first intercostal nerve;
+http://uri.interlex.org/base/ilx_0787520;Anterior root of third lumbar nerve;
+http://uri.interlex.org/base/ilx_0787562;Gray communicating ramus of third intercostal nerve;
+http://uri.interlex.org/base/ilx_0787722;Anterior root of first thoracic nerve;
+http://uri.interlex.org/base/ilx_0787946;Gray communicating ramus of sixth intercostal nerve;
+http://uri.interlex.org/base/ilx_0788022;Gray communicating ramus of thoracic nerve;
+http://uri.interlex.org/base/ilx_0788026;Anterior root of eighth thoracic nerve;
+http://uri.interlex.org/base/ilx_0788315;Third lumbar ganglion;
+http://uri.interlex.org/base/ilx_0788536;Gray communicating ramus of fourth lumbar nerve;
+http://uri.interlex.org/base/ilx_0788675;Anterior root of second lumbar nerve;
+http://uri.interlex.org/base/ilx_0788945;Gray communicating ramus of fourth thoracic anterior nerve;T4 gray ramus
+http://uri.interlex.org/base/ilx_0789109;First sacral ganglion;
+http://uri.interlex.org/base/ilx_0789339;Pharyngeal branch of glossopharyngeal nerve;
+http://uri.interlex.org/base/ilx_0789862;First lumbar ganglion;L1 sympathetic ganglion
+http://uri.interlex.org/base/ilx_0789894;Anterior root of second thoracic nerve;
+http://uri.interlex.org/base/ilx_0789947;Sixth thoracic ganglion;
+http://uri.interlex.org/base/ilx_0789966;Anterior root of seventh thoracic nerve;
+http://uri.interlex.org/base/ilx_0789968;Anterior root of fourth lumbar nerve;
+http://uri.interlex.org/base/ilx_0790146;Anterior root of fifth thoracic nerve;
+http://uri.interlex.org/base/ilx_0790472;Fourth lumbar ganglion;
+http://uri.interlex.org/base/ilx_0790482;Seventh thoracic ganglion;
+http://uri.interlex.org/base/ilx_0790497;Gray communicating ramus of cervicothoracic ganglion to first thoracic spinal nerve;
+http://uri.interlex.org/base/ilx_0791062;Anterior root of sixth thoracic nerve;
+http://uri.interlex.org/base/ilx_0791105;Gray communicating ramus of second intercostal nerve;
+http://uri.interlex.org/base/ilx_0791148;Anterior root of fifth lumbar nerve;
+http://uri.interlex.org/base/ilx_0791932;Anterior root of ninth thoracic nerve;
+http://uri.interlex.org/base/ilx_0792627;White communicating ramus of thoracic anterior ramus;
+http://uri.interlex.org/base/ilx_0792838;Anterior root of fourth thoracic nerve;
+http://uri.interlex.org/base/ilx_0792853;Anterior root of first sacral nerve;
+http://uri.interlex.org/base/ilx_0793082;celiac ganglion- superior mesenteric ganglion complex;CSMG
+http://uri.interlex.org/base/ilx_0793082;celiac ganglion- superior mesenteric ganglion complex;coeliac-superior mesenteric ganglion complex
+http://uri.interlex.org/base/ilx_0793141;urethral rhabdosphincter;
+http://uri.interlex.org/base/ilx_0793178;intrapancreatic ganglia;
+http://uri.interlex.org/base/ilx_0793208;White communicating ramus of second thoracic anterior ramus;T2 white ramus
+http://uri.interlex.org/base/ilx_0793209;White communicating ramus of third thoracic anterior ramus;T3 white ramus
+http://uri.interlex.org/base/ilx_0793210;White communicating ramus of fourth thoracic anterior ramus;T4 white ramus
+http://uri.interlex.org/base/ilx_0793211;White communicating ramus of fifth thoracic anterior ramus;T5 white ramus
+http://uri.interlex.org/base/ilx_0793212;White communicating ramus of sixth thoracic anterior ramus;T6 white ramus
+http://uri.interlex.org/base/ilx_0793220;White communicating ramus of first lumbar anterior ramus;L1 white ramus
+http://uri.interlex.org/base/ilx_0793221;White communicating ramus of second lumbar anterior ramus;L2 white ramus
+http://uri.interlex.org/base/ilx_0793228;Gray communicating ramus of first sacral nerve;S1 gray ramus
+http://uri.interlex.org/base/ilx_0793335;T5 sympathetic chain;
+http://uri.interlex.org/base/ilx_0793336;T6 sympathetic chain;
+http://uri.interlex.org/base/ilx_0793357;Thirteenth thoracic spinal cord segment;T13 spinal cord segment
+http://uri.interlex.org/base/ilx_0793357;Thirteenth thoracic spinal cord segment;T13 segment
+http://uri.interlex.org/base/ilx_0793359;Thirteenth thoracic dorsal root ganglion;
+http://uri.interlex.org/base/ilx_0793360;Sixth lumbar dorsal root ganglion;Sixth lumbar spinal ganglion
+http://uri.interlex.org/base/ilx_0793360;Sixth lumbar dorsal root ganglion;L6 dorsal root ganglia
+http://uri.interlex.org/base/ilx_0793361;White communicating ramus of third lumbar anterior ramus;L3 white ramus
+http://uri.interlex.org/base/ilx_0793362;White communicating ramus of fourth lumbar anterior ramus;L4 white ramus
+http://uri.interlex.org/base/ilx_0793550;mediastinal ganglion;
+http://uri.interlex.org/base/ilx_0793555;Atrial intrinsic cardiac ganglion;atrial ganglionated plexus
+http://uri.interlex.org/base/ilx_0793556;ventricular intrinsic cardiac ganglion;Ventricular ganglionated plexus
+http://uri.interlex.org/base/ilx_0793559;bladder nerve;nerve of bladder
+http://uri.interlex.org/base/ilx_0793560;External laryngeal nerve;external superior laryngeal nerve
+http://uri.interlex.org/base/ilx_0793560;External laryngeal nerve;External laryngeal nerve
+http://uri.interlex.org/base/ilx_0793561;Internal branch of superior laryngeal nerve;Internal superior laryngeal nerve
+http://uri.interlex.org/base/ilx_0793561;Internal branch of superior laryngeal nerve;Internal laryngeal nerve
+http://uri.interlex.org/base/ilx_0793563;splenic nerve;Splenic nerve plexus
+http://uri.interlex.org/base/ilx_0793570;trachea parasympathetic ganglia;
+http://uri.interlex.org/base/ilx_0793571;bronchus parasympathetic ganglia;
+http://uri.interlex.org/base/ilx_0793572;bronchiole parasympathetic ganglia;
+http://uri.interlex.org/base/ilx_0793573;terminal bronchiole parasympathetic ganglia;
+http://uri.interlex.org/base/ilx_0793613;Epithelium of pancreatic acinus;
+http://uri.interlex.org/base/ilx_0793615;Ventral root of the sixth lumbar nerve;Anterior root of sixth lumbar nerve
+http://uri.interlex.org/base/ilx_0793617;T2 sympathetic chain;
+http://uri.interlex.org/base/ilx_0793618;T3 sympathetic chain;
+http://uri.interlex.org/base/ilx_0793619;T4 sympathetic chain;
+http://uri.interlex.org/base/ilx_0793621;External carotid nerve plexus;
+http://uri.interlex.org/base/ilx_0793626;ventrolateral periaqueductal gray;
+http://uri.interlex.org/base/ilx_0793632;lumbar colonic nerve;
+http://uri.interlex.org/base/ilx_0793641;Arteriole in circular muscle layer of descending colon;
+http://uri.interlex.org/base/ilx_0793642;Arteriole in lamina propria of mucosa of descending colon;
+http://uri.interlex.org/base/ilx_0793643;Arteriole in longitudinal muscle layer of descending colon;
+http://uri.interlex.org/base/ilx_0793644;Arteriole in myenteric nerve plexus of descending colon;
+http://uri.interlex.org/base/ilx_0793645;Arteriole in serosa of descending colon;
+http://uri.interlex.org/base/ilx_0793646;Arteriole in submucous nerve plexus of descending colon;
+http://uri.interlex.org/base/ilx_0793656;myenteric nerve plexus of stomach;
+http://uri.interlex.org/base/ilx_0793657;Myenteric nerve plexus of descending colon;
+http://uri.interlex.org/base/ilx_0793659;Submucous nerve plexus of descending colon;
+http://uri.interlex.org/base/ilx_0793660;myenteric nerve plexus of lower esophagus;
+http://uri.interlex.org/base/ilx_0793663;Arteriole in connective tissue of bladder neck;
+http://uri.interlex.org/base/ilx_0793664;Arteriole in connective tissue of bladder dome;
+http://uri.interlex.org/base/ilx_0793667;myenteric plexus of gastric antrum;
+http://uri.interlex.org/base/ilx_0793668;myenteric plexus of proximal duodenum;
+http://uri.interlex.org/base/ilx_0793669;basement membrane of pancreatic acinus;
+http://uri.interlex.org/base/ilx_0793671;adventitia of superior mesenteric artery;
+http://uri.interlex.org/base/ilx_0793673;Nerve plexus in adventitia of splenic artery;
+http://uri.interlex.org/base/ilx_0793674;nerve plexus in adventitia of inferior pancreaticoduodenal artery;
+http://uri.interlex.org/base/ilx_0793675;adventitia of celiac trunk;
+http://uri.interlex.org/base/ilx_0793676;nerve plexus in adventitia of hepatic artery;
+http://uri.interlex.org/base/ilx_0793680;Perimarginal cavernous sinus;
+http://uri.interlex.org/base/ilx_0793681;Marginal zone network;
+http://uri.interlex.org/base/ilx_0793697;Intermediolateral nucleus of second thoracic segment;T2 intermediolateral nucleus
+http://uri.interlex.org/base/ilx_0793697;Intermediolateral nucleus of second thoracic segment;T2 intermediolateral cell column
+http://uri.interlex.org/base/ilx_0793698;Intermediolateral nucleus of third thoracic segment;T3 intermediolateral nucleus
+http://uri.interlex.org/base/ilx_0793698;Intermediolateral nucleus of third thoracic segment;T3 intermediolateral cell column
+http://uri.interlex.org/base/ilx_0793699;Intermediolateral nucleus of fourth thoracic segment;T4 intermediolateral nucleus
+http://uri.interlex.org/base/ilx_0793699;Intermediolateral nucleus of fourth thoracic segment;T4 intermediolateral cell column
+http://uri.interlex.org/base/ilx_0793700;Intermediolateral nucleus of fifth thoracic segment;
+http://uri.interlex.org/base/ilx_0793701;Intermediolateral nucleus of sixth thoracic segment;T6 intermediorlateral nucleus
+http://uri.interlex.org/base/ilx_0793701;Intermediolateral nucleus of sixth thoracic segment;T6 intermediolateral nucleus
+http://uri.interlex.org/base/ilx_0793702;Greater petrosal nerve;
+http://uri.interlex.org/base/ilx_0793711;Communicating branch of zygomatic nerve;Communicating branch with zygomatic nerve
+http://uri.interlex.org/base/ilx_0793711;Communicating branch of zygomatic nerve;Communicating branch to V1
+http://uri.interlex.org/base/ilx_0793712;Zygomatic nerve;Zygomatic branch of V2
+http://uri.interlex.org/base/ilx_0793713;Deep petrosal nerve;Sympathetic root of pterygopalatine ganglion
+http://uri.interlex.org/base/ilx_0793714;Mesenteric nerve;
+http://uri.interlex.org/base/ilx_0793722;Lesser petrosal nerve;
+http://uri.interlex.org/base/ilx_0793723;Auriculotemporal nerve;
+http://uri.interlex.org/base/ilx_0793735;Myenteric ganglion of small intestine;
+http://uri.interlex.org/base/ilx_0793737;Nerve fiber from submandibular ganglion to submandibular gland;
+http://uri.interlex.org/base/ilx_0793738;Nerve fiber from submandibular ganglion to mouth mucosa;
+http://uri.interlex.org/base/ilx_0793739;Nerve fiber from submandibular ganglion to sublingual gland;
+http://uri.interlex.org/paxinos/uris/rat/labels/794;primary somatosensory cortex (paxrat);primary somatosensory cortex
+http://uri.neuinfo.org/nif/nifstd/nlx_149264;Superior paraolivary nucleus;
+http://uri.neuinfo.org/nif/nifstd/nlx_152184;Retina outer plexiform layer;external plexiform layer
+http://uri.neuinfo.org/nif/nifstd/nlx_152528;Olfactory bulb (accessory) external plexiform layer;external plexiform layer of the AOB
+http://uri.neuinfo.org/nif/nifstd/nlx_153849;Dorsal cochlear nucleus deep layer;
+http://uri.neuinfo.org/nif/nifstd/nlx_50884;Ventral nuclei of the lateral lemniscus;
+http://uri.neuinfo.org/nif/nifstd/nlx_63363;Olfactory bulb (main) internal plexiform layer;
+http://uri.neuinfo.org/nif/nifstd/nlx_66882;Mediodorsal thalamus;
+http://uri.neuinfo.org/nif/nifstd/nlx_96;Olfactory bulb main external plexiform layer;EPL
