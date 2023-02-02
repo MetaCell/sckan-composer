@@ -1,8 +1,15 @@
-import { composerApi } from "./apis";
-import { Note } from "../apiclient/backend";
+import { composerApi } from "./apis"
+import { Note } from "../apiclient/backend"
+import { AbstractService } from "./AbstractService"
 
 
-export async function noteCreate(formNote:Note): Promise<any> {
-    const response = await composerApi.composerNoteCreate(formNote)
-    return response.data
+class NoteService extends AbstractService {
+  async save(note: Note) {
+    return composerApi.composerNoteCreate(note).then((response: any) => response.data)
+  }
+  async getObject(id: string): Promise<Note> {
+    return {} as Note
+  }
 }
+
+export default new NoteService()

@@ -2,14 +2,11 @@ import React from 'react'
 import { Box } from '@mui/material'
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
+import statementService from '../../services/StatementService';
 
 const StatementForm = (props: any) => {
-  const { data, format } = props
+  const { format } = props
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema()
-
-  if (!data) {
-    return (<div>Loading...</div>)
-  }
 
   const uiFields = format === 'small'
     ? ["knowledge_statement",]
@@ -20,10 +17,11 @@ const StatementForm = (props: any) => {
   return (
     <Box p={2}>
       <FormBase
-        data={data}
+        service={statementService}
         schema={schema}
         uiSchema={uiSchema}
         uiFields={uiFields}
+        {...props}
       />
     </Box>
   )

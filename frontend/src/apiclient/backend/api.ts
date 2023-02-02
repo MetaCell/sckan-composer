@@ -97,6 +97,12 @@ export interface ConnectivityStatement {
     'id': number;
     /**
      * 
+     * @type {number}
+     * @memberof ConnectivityStatement
+     */
+    'sentence_id': number;
+    /**
+     * 
      * @type {Sentence}
      * @memberof ConnectivityStatement
      */
@@ -109,16 +115,16 @@ export interface ConnectivityStatement {
     'knowledge_statement': string;
     /**
      * 
-     * @type {number}
-     * @memberof ConnectivityStatement
-     */
-    'sentence_id': number;
-    /**
-     * 
      * @type {Array<Tag>}
      * @memberof ConnectivityStatement
      */
     'tags': Array<Tag>;
+    /**
+     * 
+     * @type {Array<Doi>}
+     * @memberof ConnectivityStatement
+     */
+    'dois': Array<Doi>;
     /**
      * 
      * @type {User}
@@ -139,22 +145,40 @@ export interface ConnectivityStatement {
     'available_transitions': Array<string>;
     /**
      * 
-     * @type {AnatomicalEntity}
+     * @type {number}
      * @memberof ConnectivityStatement
      */
-    'origin'?: AnatomicalEntity;
+    'origin_id': number;
     /**
      * 
      * @type {AnatomicalEntity}
      * @memberof ConnectivityStatement
      */
-    'destination'?: AnatomicalEntity;
+    'origin': AnatomicalEntity;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatement
+     */
+    'destination_id': number;
+    /**
+     * 
+     * @type {AnatomicalEntity}
+     * @memberof ConnectivityStatement
+     */
+    'destination': AnatomicalEntity;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatement
+     */
+    'ans_division_id': number;
     /**
      * 
      * @type {AnsDivision}
      * @memberof ConnectivityStatement
      */
-    'ans_division'?: AnsDivision;
+    'ans_division': AnsDivision;
     /**
      * 
      * @type {DestinationTypeEnum}
@@ -330,6 +354,25 @@ export type DestinationTypeEnum = typeof DestinationTypeEnum[keyof typeof Destin
 
 
 /**
+ * Doi
+ * @export
+ * @interface Doi
+ */
+export interface Doi {
+    /**
+     * 
+     * @type {number}
+     * @memberof Doi
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Doi
+     */
+    'doi': string;
+}
+/**
  * 
  * @export
  * @enum {string}
@@ -409,16 +452,16 @@ export interface Note {
     'note': string;
     /**
      * 
-     * @type {User}
+     * @type {string}
      * @memberof Note
      */
-    'user': User;
+    'user': string | null;
     /**
      * 
      * @type {string}
      * @memberof Note
      */
-    'created': string;
+    'created_at': string;
     /**
      * 
      * @type {number}
@@ -694,6 +737,12 @@ export interface PatchedConnectivityStatement {
     'id'?: number;
     /**
      * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatement
+     */
+    'sentence_id'?: number;
+    /**
+     * 
      * @type {Sentence}
      * @memberof PatchedConnectivityStatement
      */
@@ -706,16 +755,16 @@ export interface PatchedConnectivityStatement {
     'knowledge_statement'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof PatchedConnectivityStatement
-     */
-    'sentence_id'?: number;
-    /**
-     * 
      * @type {Array<Tag>}
      * @memberof PatchedConnectivityStatement
      */
     'tags'?: Array<Tag>;
+    /**
+     * 
+     * @type {Array<Doi>}
+     * @memberof PatchedConnectivityStatement
+     */
+    'dois'?: Array<Doi>;
     /**
      * 
      * @type {User}
@@ -736,16 +785,34 @@ export interface PatchedConnectivityStatement {
     'available_transitions'?: Array<string>;
     /**
      * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatement
+     */
+    'origin_id'?: number;
+    /**
+     * 
      * @type {AnatomicalEntity}
      * @memberof PatchedConnectivityStatement
      */
     'origin'?: AnatomicalEntity;
     /**
      * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatement
+     */
+    'destination_id'?: number;
+    /**
+     * 
      * @type {AnatomicalEntity}
      * @memberof PatchedConnectivityStatement
      */
     'destination'?: AnatomicalEntity;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatement
+     */
+    'ans_division_id'?: number;
     /**
      * 
      * @type {AnsDivision}
@@ -815,16 +882,16 @@ export interface PatchedNote {
     'note'?: string;
     /**
      * 
-     * @type {User}
+     * @type {string}
      * @memberof PatchedNote
      */
-    'user'?: User;
+    'user'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof PatchedNote
      */
-    'created'?: string;
+    'created_at'?: string;
     /**
      * 
      * @type {number}

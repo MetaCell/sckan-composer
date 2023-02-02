@@ -48,6 +48,7 @@ class DoiNestedInline(nested_admin.NestedStackedInline):
 class NoteSentenceInline(admin.StackedInline):
     model = Note
     exclude = ("connectivity_statement",)
+    readonly_fields = ("created_at",)
     extra = 0
     sortable_options = "disabled"
 
@@ -55,7 +56,9 @@ class NoteSentenceInline(admin.StackedInline):
 class NoteConnectivityStatementInline(admin.StackedInline):
     model = Note
     exclude = ("sentence",)
+    readonly_fields = ("created_at",)
     extra = 0
+    sortable_options = "disabled"
 
 
 class ConnectivityStatementInline(nested_admin.NestedStackedInline):

@@ -7,28 +7,33 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { useParams } from "react-router-dom";
 import SentenceForm from './Forms/SentenceForm';
-import { sentenceRetrieve } from '../services/SentenceService';
+import sentenceService from '../services/SentenceService'
 import NoteForm from './Forms/NoteForm';
+import { Sentence } from '../apiclient/backend/api';
 
 
 const SentencesDetails = () => {
-  const { sentenceId } = useParams();
-  const [sentence, setSentence] = useState<any>()
+  const { sentenceId } = useParams()
+  const [sentence, setSentence] = useState({} as Sentence)
+  const [loading, setLoading] = useState(true)
   const [extraStatementForm, setExtraStatementForm] = useState<string[]>([])
 
-  const fetchSentence = async (id: number) => {
-    if(id<1 || isNaN(id)){
-      setSentence({})
-    } else {
-      sentenceRetrieve(id).then((response) => setSentence(response))
-    }
+  const doTransition = (transition: string) => {
+    sentenceService.doTransition(sentence, transition).then((sentence: Sentence) => {
+      setSentence(sentence)
+    })
   }
 
   useEffect(() => {
-    fetchSentence(Number(sentenceId))
-  }, [sentenceId])
+    if(sentenceId) {
+      sentenceService.getObject(sentenceId).then((sentence: Sentence) => {
+        setSentence(sentence)
+        setLoading(false)
+      })
+    }
+  }, []);
 
-  if(!sentence) {
+  if(loading) {
     return <div>Loading...</div>
   }
 
@@ -50,11 +55,14 @@ const SentencesDetails = () => {
       </Grid>
       <Grid item xl={7}>
         <div>Last modified by {sentence?.owner?.first_name} on {sentence?.modified_date}</div>
-        <SentenceForm data={sentence} format='full' />
+        {
+          sentence?.available_transitions.map((transition) => <Button onClick={() => doTransition(transition)}>{transition}</Button>)
+        }
+        <SentenceForm data={sentence} format='full' setter={setSentence}/>
         <Button onClick={() => setExtraStatementForm((prev) => [...prev, ''])}>Add Statement</Button>
       </Grid>
       <Grid item xl={5}>
-        <NoteForm />
+        <NoteForm extraData={{sentence_id: sentence.id}}/>
       </Grid>
     </Grid>
   )

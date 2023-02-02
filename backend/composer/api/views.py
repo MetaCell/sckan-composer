@@ -234,11 +234,18 @@ class ViaViewSet(viewsets.ModelViewSet):
 )
 @api_view(["GET"])
 def jsonschemas(request):
-    serializers = [ConnectivityStatementSerializer, SentenceSerializer, ViaSerializer, NoteSerializer]
+    serializers = [
+        ConnectivityStatementSerializer,
+        SentenceSerializer,
+        ViaSerializer,
+        NoteSerializer,
+    ]
+
     class View(object):
         # fake view class
         def __init__(self):
             self.action = "schemas"
+
     context = {
         "request": request,
         "format": None,

@@ -1247,7 +1247,7 @@ components:
         ontology_uri:
           type: string
           format: uri
-          maxLength: 200
+          readOnly: true
       required:
       - id
       - name
@@ -1281,18 +1281,22 @@ components:
         id:
           type: integer
           readOnly: true
+        sentence_id:
+          type: integer
         sentence:
           allOf:
           - $ref: '#/components/schemas/Sentence'
           readOnly: true
         knowledge_statement:
           type: string
-        sentence_id:
-          type: integer
         tags:
           type: array
           items:
             $ref: '#/components/schemas/Tag'
+        dois:
+          type: array
+          items:
+            $ref: '#/components/schemas/Doi'
         owner:
           allOf:
           - $ref: '#/components/schemas/User'
@@ -1305,18 +1309,31 @@ components:
           items:
             type: string
           readOnly: true
+        origin_id:
+          type: integer
         origin:
-          $ref: '#/components/schemas/AnatomicalEntity'
+          allOf:
+          - $ref: '#/components/schemas/AnatomicalEntity'
+          readOnly: true
+        destination_id:
+          type: integer
         destination:
-          $ref: '#/components/schemas/AnatomicalEntity'
+          allOf:
+          - $ref: '#/components/schemas/AnatomicalEntity'
+          readOnly: true
+        ans_division_id:
+          type: integer
         ans_division:
-          $ref: '#/components/schemas/AnsDivision'
+          allOf:
+          - $ref: '#/components/schemas/AnsDivision'
+          readOnly: true
         destination_type:
           $ref: '#/components/schemas/DestinationTypeEnum'
         path:
           type: array
           items:
             $ref: '#/components/schemas/Via'
+          readOnly: true
         laterality:
           $ref: '#/components/schemas/LateralityEnum'
         circuit_type:
@@ -1338,10 +1355,17 @@ components:
           format: date-time
           readOnly: true
       required:
+      - ans_division
+      - ans_division_id
       - available_transitions
+      - destination
+      - destination_id
+      - dois
       - id
       - knowledge_statement
       - modified_date
+      - origin
+      - origin_id
       - owner
       - path
       - sentence
@@ -1422,6 +1446,18 @@ components:
       - AXON-ST
       - UNKNOW
       type: string
+    Doi:
+      type: object
+      description: Doi
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        doi:
+          type: string
+      required:
+      - doi
+      - id
     LateralityEnum:
       enum:
       - IPSI
@@ -1458,20 +1494,19 @@ components:
         note:
           type: string
         user:
-          allOf:
-          - $ref: '#/components/schemas/User'
+          type: string
           readOnly: true
-        created:
+          nullable: true
+        created_at:
           type: string
           format: date-time
           readOnly: true
         connectivity_statement_id:
           type: integer
-          title: Statement ID
         sentence_id:
           type: integer
       required:
-      - created
+      - created_at
       - note
       - user
     PaginatedAnatomicalEntityList:
@@ -1641,18 +1676,22 @@ components:
         id:
           type: integer
           readOnly: true
+        sentence_id:
+          type: integer
         sentence:
           allOf:
           - $ref: '#/components/schemas/Sentence'
           readOnly: true
         knowledge_statement:
           type: string
-        sentence_id:
-          type: integer
         tags:
           type: array
           items:
             $ref: '#/components/schemas/Tag'
+        dois:
+          type: array
+          items:
+            $ref: '#/components/schemas/Doi'
         owner:
           allOf:
           - $ref: '#/components/schemas/User'
@@ -1665,18 +1704,31 @@ components:
           items:
             type: string
           readOnly: true
+        origin_id:
+          type: integer
         origin:
-          $ref: '#/components/schemas/AnatomicalEntity'
+          allOf:
+          - $ref: '#/components/schemas/AnatomicalEntity'
+          readOnly: true
+        destination_id:
+          type: integer
         destination:
-          $ref: '#/components/schemas/AnatomicalEntity'
+          allOf:
+          - $ref: '#/components/schemas/AnatomicalEntity'
+          readOnly: true
+        ans_division_id:
+          type: integer
         ans_division:
-          $ref: '#/components/schemas/AnsDivision'
+          allOf:
+          - $ref: '#/components/schemas/AnsDivision'
+          readOnly: true
         destination_type:
           $ref: '#/components/schemas/DestinationTypeEnum'
         path:
           type: array
           items:
             $ref: '#/components/schemas/Via'
+          readOnly: true
         laterality:
           $ref: '#/components/schemas/LateralityEnum'
         circuit_type:
@@ -1704,16 +1756,15 @@ components:
         note:
           type: string
         user:
-          allOf:
-          - $ref: '#/components/schemas/User'
+          type: string
           readOnly: true
-        created:
+          nullable: true
+        created_at:
           type: string
           format: date-time
           readOnly: true
         connectivity_statement_id:
           type: integer
-          title: Statement ID
         sentence_id:
           type: integer
     PatchedSentence:
@@ -1734,11 +1785,9 @@ components:
         pmcid:
           type: string
           nullable: true
-          maxLength: 20
         doi:
           type: string
           nullable: true
-          maxLength: 100
         tags:
           type: array
           items:
@@ -1820,11 +1869,9 @@ components:
         pmcid:
           type: string
           nullable: true
-          maxLength: 20
         doi:
           type: string
           nullable: true
-          maxLength: 100
         tags:
           type: array
           items:

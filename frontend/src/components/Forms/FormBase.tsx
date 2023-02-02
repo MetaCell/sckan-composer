@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import validator from "@rjsf/validator-ajv8";
 import {IChangeEvent, withTheme} from "@rjsf/core";
 import {Box} from '@mui/material';
@@ -15,7 +15,7 @@ const log = (type: string) => console.log.bind(console, type)
 export const FormBase = (props: any) => {
 
     const dataRef = useRef<any|null>();
-    const {data, schema, uiSchema, uiFields} = props
+    const {service, data, schema, setter, extraData, uiSchema, uiFields} = props
     const {debounce, resolve} = useAutoSave(() => onSave(), (value) => dataRef.current = value)
     const formRef = useRef<any>(null);
 
@@ -51,7 +51,10 @@ export const FormBase = (props: any) => {
     const handleSubmit = async (event: IChangeEvent) => {
         console.debug("Simulating save")
         console.debug(dataRef.current.title)
-        await delay(10000)
+      const formData = {...event.formData, ...extraData}
+      service.save(formData).then((newData:any) => {
+        setter(newData)
+      })
         console.debug("Simulating save concluded")
         resolve()
     }

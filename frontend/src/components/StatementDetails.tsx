@@ -6,27 +6,35 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import { useParams } from "react-router-dom";
 import StatementForm from './Forms/StatementForm';
-import { statementRetrieve } from '../services/StatementService';
+import statementService from '../services/StatementService';
 import NoteForm from './Forms/NoteForm';
+import { ConnectivityStatement } from '../apiclient/backend/api';
+import { Button } from '@mui/material';
 
 
 const StatementDetails = () => {
   const { statementId } = useParams();
-  const [statement, setStatement] = useState<any>()
+  const [statement, setStatement] = useState({} as ConnectivityStatement)
+  const [loading, setLoading] = useState(true)
+
+  const doTransition = (transition: string) => {
+    statementService.doTransition(statement, transition).then((statement: ConnectivityStatement) => {
+      setStatement(statement)
+    })
+  }
    
-  const fetchStatement = async (id: number) => {
-    if(id<1 || isNaN(id)){
-      setStatement({})
-    } else {
-      statementRetrieve(id).then((response) => {
-        setStatement(response)
+  useEffect(() => {
+    if(statementId) {
+      statementService.getObject(statementId).then((statement: ConnectivityStatement) => {
+        setStatement(statement)
+        setLoading(false)
       })
     }
+  }, []);
+
+  if(loading) {
+    return <div>Loading...</div>
   }
-  
-  useEffect(() => {
-    fetchStatement(Number(statementId))
-  }, [statementId])
 
   return (
     <Grid p={12} container justifyContent='center'>
@@ -51,10 +59,14 @@ const StatementDetails = () => {
       </Paper>
       </Grid>
       <Grid item xl={7}>
-        <StatementForm data={statement} format='full' />
+        <Typography>Last modified by {statement?.owner?.first_name} on {statement?.modified_date}</Typography>
+        {
+          statement?.available_transitions.map((transition) => <Button onClick={() => doTransition(transition)}>{transition}</Button>)
+        }
+        <StatementForm data={statement} format='full' setter={setStatement}/>
       </Grid>
       <Grid item xl={5}>
-        <NoteForm/>
+        <NoteForm extraData={{connectivity_statement_id: statement.id}}/>
       </Grid>
     </Grid>
   )

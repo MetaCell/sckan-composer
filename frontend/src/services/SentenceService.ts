@@ -1,31 +1,18 @@
 import { composerApi } from "./apis";
-import { Sentence } from '../apiclient/backend';
+import { Sentence } from '../apiclient/backend/api';
+import { AbstractService } from "./AbstractService";
 
-export let sentence = (function () {
-  var sentence: Sentence = {} as Sentence;
 
-  return { // public interface
-    setProfile: function (fetchedSentence: Sentence) {
-      sentence = fetchedSentence;
-    },
-    getSentence: function (): Sentence {
-      return sentence
-    },
-  };
-})();
-
-export async function sentenceRetrieve(id: number): Promise<any> {
-  return composerApi.composerSentenceRetrieve(id).then((response: any) => {
-    if (response.status === 200) {
-      return response.data
-    } else {
-      console.log("Error")
-    }
-  })
+class SentenceService extends AbstractService {
+  async save(sentence: Sentence) {
+    return composerApi.composerSentenceUpdate(sentence.id, sentence).then((response: any) => response.data)
+  }
+  async getObject(id: string): Promise<Sentence> {
+    return composerApi.composerSentenceRetrieve(Number(id)).then((response: any) => response.data)
+  }
+  async doTransition(sentence: Sentence, transition: string) {
+    return composerApi.composerSentenceDoTransitionCreate(sentence.id, transition, sentence).then((response: any) => response.data)
+  }
 }
 
-export async function editSentence(id: number, patchedSentence: any): Promise<any> {
-  const response = await composerApi.composerSentencePartialUpdate(id, patchedSentence)
-  return response.data
-}
-
+export default new SentenceService()
