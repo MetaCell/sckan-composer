@@ -2,11 +2,7 @@ from django.contrib.auth.models import User
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from drf_writable_nested.serializers import WritableNestedModelSerializer
-from drf_writable_nested.mixins import (
-    UniqueFieldsMixin,
-    NestedCreateMixin,
-    NestedUpdateMixin,
-)
+from drf_writable_nested.mixins import UniqueFieldsMixin, NestedUpdateMixin
 from django.db.models import Q
 
 from ..models import (
@@ -40,6 +36,27 @@ class FixManyToManyMixin:
             if len(qs) > 0:
                 pk = str(qs.first().pk)
         return pk
+
+
+class FixNestedUpdateMixin:
+    def update(self, instance, validated_data):
+        relations, reverse_relations = self._extract_relations(validated_data)
+
+        # Create or update direct relations (foreign key, one-to-one)
+        self.update_or_create_direct_relations(
+            validated_data,
+            relations,
+        )
+
+        # Update instance
+        instance = super(NestedUpdateMixin, self).update(
+            instance,
+            validated_data,
+        )
+        self.update_or_create_reverse_relations(instance, reverse_relations)
+        self.delete_reverse_relations_if_need(instance, reverse_relations)
+        # instance.refresh_from_db()  # this one fails for object "fsm state" field updates
+        return instance
 
 
 # serializers
@@ -128,9 +145,10 @@ class DoiSerializer(serializers.ModelSerializer):
         )  # , "connectivity_statement_id")
 
 
-class SentenceSerializer(FixManyToManyMixin, WritableNestedModelSerializer):
+class SentenceSerializer(FixManyToManyMixin, FixNestedUpdateMixin, WritableNestedModelSerializer):
     """Sentence"""
 
+    state = serializers.CharField(read_only=True)
     pmid = serializers.IntegerField(required=False, default=None, allow_null=True)
     pmcid = serializers.CharField(required=False, default=None, allow_null=True)
     doi = serializers.CharField(required=False, default=None, allow_null=True)
@@ -140,6 +158,8 @@ class SentenceSerializer(FixManyToManyMixin, WritableNestedModelSerializer):
 
     def get_available_transitions(self, instance) -> list[str]:
         return [t.name for t in instance.get_available_state_transitions()]
+    
+
 
     class Meta:
         model = Sentence
@@ -170,7 +190,7 @@ class SentenceSerializer(FixManyToManyMixin, WritableNestedModelSerializer):
 
 
 class ConnectivityStatementSerializer(
-    FixManyToManyMixin, WritableNestedModelSerializer
+    FixManyToManyMixin, FixNestedUpdateMixin, WritableNestedModelSerializer
 ):
     """Connectivity Statement"""
 
