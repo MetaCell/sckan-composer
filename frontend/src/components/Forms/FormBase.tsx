@@ -1,7 +1,7 @@
 import React, {useRef, useState} from 'react'
 import validator from "@rjsf/validator-ajv8";
 import {IChangeEvent, withTheme} from "@rjsf/core";
-import {Box} from '@mui/material';
+import {Backdrop, Box, CircularProgress} from '@mui/material';
 import {Theme} from '@rjsf/mui'
 import {useDebouncedCallback} from "use-debounce";
 import {INPUT_DEFAULT_DELAY} from "../../settings";
@@ -14,13 +14,18 @@ const log = (type: string) => console.log.bind(console, type)
 export const FormBase = (props: any) => {
 
     const {service, data, schema, setter, extraData, uiSchema, uiFields, enableAutoSave} = props
+    const [isSaving, setIsSaving] = useState<boolean>(false)
     const triggerAutoSave = useDebouncedCallback(() => onSave(), INPUT_DEFAULT_DELAY);
 
 
     const formRef = useRef<any>(null);
 
-    if (!data) {
-        return <div>Loading...</div>
+    if (!data || isSaving) {
+        return <Backdrop
+            open={isSaving}
+        >
+            <CircularProgress color="inherit"/>
+        </Backdrop>
     }
 
     if (uiFields) {
@@ -46,9 +51,14 @@ export const FormBase = (props: any) => {
 
     const handleSubmit = async (event: IChangeEvent) => {
         const formData = {...event.formData, ...extraData}
+        setIsSaving(true)
         service.save(formData).then((newData: any) => {
             setter(newData)
-        }).catch((error: any) => console.error("Something went wrong"))
+        }).catch((error: any) => {
+            console.error("Something went wrong")
+        }).finally(() => {
+            setIsSaving(false)
+        })
         console.debug("Saved")
     }
 
