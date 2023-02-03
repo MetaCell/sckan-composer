@@ -10,6 +10,7 @@ import statementService from '../services/StatementService';
 import NoteForm from './Forms/NoteForm';
 import { ConnectivityStatement } from '../apiclient/backend/api';
 import { Button } from '@mui/material';
+import { userProfile } from '../services/UserService'
 
 
 const StatementDetails = () => {
@@ -35,6 +36,8 @@ const StatementDetails = () => {
   if(loading) {
     return <div>Loading...</div>
   }
+
+  const disabled = statement.owner?.id !== userProfile.getUser().id
 
   return (
     <Grid p={12} container justifyContent='center'>
@@ -63,7 +66,7 @@ const StatementDetails = () => {
         {
           statement?.available_transitions.map((transition) => <Button onClick={() => doTransition(transition)}>{transition}</Button>)
         }
-        <StatementForm data={statement} format='full' setter={setStatement}/>
+        <StatementForm data={statement} disabled={disabled} format='full' setter={setStatement}/>
       </Grid>
       <Grid item xl={5}>
         <NoteForm extraData={{connectivity_statement_id: statement.id}}/>
