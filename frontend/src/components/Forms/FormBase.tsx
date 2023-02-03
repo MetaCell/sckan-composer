@@ -21,6 +21,7 @@ export const FormBase = (props: any) => {
     const formRef = useRef<any>(null);
 
     if (!data || isSaving) {
+        // todo: style loader?
         return <Backdrop
             open={isSaving}
         >
@@ -42,9 +43,7 @@ export const FormBase = (props: any) => {
     }
 
     const onSave = () => {
-        // todo: Disable form
         if (formRef.current != null) {
-            console.debug("Saving")
             return formRef.current.submit()
         }
     }
@@ -55,16 +54,15 @@ export const FormBase = (props: any) => {
         service.save(formData).then((newData: any) => {
             setter(newData)
         }).catch((error: any) => {
+            // todo: handle errors here
             console.error("Something went wrong")
         }).finally(() => {
             setIsSaving(false)
         })
-        console.debug("Saved")
     }
 
     const handleUpdate = async (event: IChangeEvent) => {
         if (enableAutoSave) {
-            console.debug("Triggered Auto Save")
             return triggerAutoSave()
         }
     }
