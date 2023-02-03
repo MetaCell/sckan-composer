@@ -72,6 +72,15 @@ cd backend
 python3 manage.py ingest_nlp_sentence ./composer/resources/nlp_connectivity_20221025.csv
 ```
 
+### Ingest sample Anatomical Entities data
+The git repository comes with some sampleAnatomical Entities data. This data can be ingested using 
+the "ingest_anatomical_entities" management command
+
+```bash
+cd backend
+python3 manage.py ingest_anatomical_entities ./composer/resources/anatomical_entities.csv
+```
+
 ### Open the admin page
 there will be a superuser created with username/password: `admin/admin`
 
