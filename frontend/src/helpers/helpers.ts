@@ -19,3 +19,8 @@ export const removeFieldsFromSchema = (schema:any, fields:string[]) =>{
     }
     return schema;
 }
+
+export const mapCheckboxInfo = (items: any[], selectedFilters:any)=>{
+    let mappedItems = items.map(i=>({name:i.id, label: i.tag, checked: selectedFilters.tags[i.id] }))
+    return mappedItems
+}

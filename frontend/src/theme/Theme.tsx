@@ -12,6 +12,10 @@ const {
   grey400,
   topbarShadow,
   menuItemSelectedBg,
+  captionColor,
+  iconPrimaryColor,
+  buttonOutlinedColor,
+  buttonOutlinedBorderColor,
 } = vars;
 
 const theme = createTheme({
@@ -47,8 +51,13 @@ const theme = createTheme({
     },
     h3: {
       fontFamily: titleFont,
-      fontWeight: 600,
+      fontWeight: 500,
       fontSize: "1.875rem",
+      color: titleFontColor,
+    },
+    h5: {
+      fontWeight: 600,
+      fontSize: "1.25rem",
       color: titleFontColor,
     },
     h6: {
@@ -66,21 +75,57 @@ const theme = createTheme({
     body1: {
       fontSize: "0.875rem",
     },
+    body2: {
+      fontSize: "0.875rem",
+      fontWeight: 400,
+      color: captionColor,
+    },
   },
   components: {
-    MuiCssBaseline: {},
+    MuiCssBaseline: {
+      styleOverrides: `
+      .MuiDataGrid-row {
+        cursor: pointer;
+        background: #fff;
+      }
+
+      .MuiDataGrid-columnSeparator {
+        visibility: hidden;
+      }
+      .MuiDataGrid-columnHeaders {
+        background: #F9FAFB;
+        border-radius: 0 !important;
+      }
+      .MuiDataGrid-footerContainer {
+        background: #fff;
+        border-radius: 0 0 12px 12px;
+      }
+      .MuiDataGrid-main {
+        background: #fff;
+      }`,
+    },
     MuiButton: {
       styleOverrides: {
         root: ({ theme }) => ({
           textTransform: "none",
           boxShadow: "none",
           borderRadius: "1.5rem",
-          padding: theme.spacing(1.25, 3),
-          fontSize: "1rem",
+          padding: theme.spacing(1.25, 2),
+          fontSize: "0.875rem",
           fontWeight: 600,
+          lineHeight: "normal",
         }),
         containedSecondary: {
           fontWeight: "600",
+        },
+        outlinedSecondary: {
+          background: "#fff",
+          color: buttonOutlinedColor,
+          borderColor: buttonOutlinedBorderColor,
+          "&:hover": {
+            background: "#F9FAFB",
+            borderColor: buttonOutlinedBorderColor,
+          },
         },
       },
     },
@@ -118,6 +163,38 @@ const theme = createTheme({
             color: "#fff",
             background: menuItemSelectedBg,
           },
+        },
+      },
+    },
+    MuiSvgIcon: {
+      styleOverrides: {
+        colorPrimary: {
+          color: iconPrimaryColor,
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          border: "1px solid #EAECF0;",
+          boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
+          // "&:hover": {
+          //   border: "1px solid #EAECF0;",
+          //   boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
+          //   color: "#EAECF0",
+          // },
+          // "&:focus": {
+          //   border: "1px solid #EAECF0;",
+          //   boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
+          //   color: "#EAECF0",
+          // },
+        },
+      },
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          borderRadius: 0,
         },
       },
     },
