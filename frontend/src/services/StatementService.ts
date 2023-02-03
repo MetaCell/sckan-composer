@@ -14,4 +14,5 @@ class ConnectivityStatementService extends AbstractService {
   }
 }
 
-export default new ConnectivityStatementService()
+const connectivityStatementService = new ConnectivityStatementService()
+export default connectivityStatementService

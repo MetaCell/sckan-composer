@@ -32,7 +32,7 @@ const SentencesDetails = () => {
         setLoading(false)
       })
     }
-  }, []);
+  }, [sentenceId]);
 
   if(loading) {
     return <div>Loading...</div>

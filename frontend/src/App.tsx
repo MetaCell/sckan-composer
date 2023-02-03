@@ -10,7 +10,21 @@ import SentenceDetails from "./components/SentenceDetails";
 import StatementDetails from "./components/StatementDetails";
 import Topbar from "./components/Topbar";
 import Sidebar from "./components/Sidebar";
+import StatementList from "./components/StatementList";
+import SentenceList from "./components/SentenceList";
 import { userProfile } from "./services/UserService";
+
+const PageSelect = () => {
+  const user = userProfile.getProfile();
+
+  if (user.is_triage_operator) {
+    return <SentenceList />;
+  } else if (user.is_curator || user.is_reviewer) {
+    return <StatementList />;
+  } else {
+    return <Dashboard />;
+  }
+};
 
 function App() {
   if (userProfile.isSignedIn()) {
@@ -24,7 +38,7 @@ function App() {
             <Box component="main" flexGrow={1}>
               <Toolbar />
               <Routes>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<PageSelect />} />
                 <Route
                   path="/sentence/:sentenceId/"
                   element={<SentenceDetails />}
