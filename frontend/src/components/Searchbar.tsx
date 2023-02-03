@@ -44,7 +44,7 @@ const Searchbar = (props: any) => {
         inputRef={inputRef}
         onChange={debouncedChangeHandler}
         variant="outlined"
-        placeholder="Search for NLP Sentences"
+        placeholder="Search for Sentences"
         size="small"
         fullWidth
         InputProps={{
