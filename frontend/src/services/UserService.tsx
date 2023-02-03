@@ -1,5 +1,5 @@
 import { authApi, composerApi } from "./apis";
-import { Profile } from '../apiclient/backend';
+import { Profile, User } from '../apiclient/backend';
 
 
 export let userProfile = (function () {
@@ -11,6 +11,9 @@ export let userProfile = (function () {
     },
     getProfile: function (): Profile {
       return privateUserProfile;
+    },
+    getUser: function(): User {
+      return privateUserProfile.user;
     },
     isSignedIn: function (): boolean {
       return JSON.stringify(privateUserProfile) !== JSON.stringify({} as Profile);

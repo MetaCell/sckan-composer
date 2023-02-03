@@ -13,7 +13,7 @@ const log = (type: string) => console.log.bind(console, type)
 
 export const FormBase = (props: any) => {
 
-    const {service, data, schema, setter, extraData, uiSchema, uiFields, enableAutoSave} = props
+    const {service, data, schema, setter, extraData, uiSchema, uiFields, enableAutoSave, disabled=false} = props
     const [isSaving, setIsSaving] = useState<boolean>(false)
     const triggerAutoSave = useDebouncedCallback(() => onSave(), INPUT_DEFAULT_DELAY);
 
@@ -53,6 +53,8 @@ export const FormBase = (props: any) => {
         setIsSaving(true)
         service.save(formData).then((newData: any) => {
             setter(newData)
+            // todo: Add UI feedback
+            console.log("Saved")
         }).catch((error: any) => {
             // todo: handle errors here
             console.error("Something went wrong")
@@ -74,6 +76,7 @@ export const FormBase = (props: any) => {
                 schema={schema}
                 uiSchema={uiSchema}
                 formData={data}
+                disabled={disabled}
                 validator={validator}
                 onChange={handleUpdate}
                 onSubmit={handleSubmit}
