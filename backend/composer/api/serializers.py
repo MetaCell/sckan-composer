@@ -40,7 +40,7 @@ class FixManyToManyMixin:
         return pk
 
 
-class FixedNestedUpdateMixin(NestedUpdateMixin):
+class FixedWritableNestedModelSerializer(WritableNestedModelSerializer):
     def update(self, instance, validated_data):
         # remove the protected FSMFields from instance dict so it will become part of the "non_loaded_fields"
         # those fields may not be updated during the refresh_from_db (they are protected for update)
@@ -48,7 +48,7 @@ class FixedNestedUpdateMixin(NestedUpdateMixin):
         for f in instance._meta.concrete_fields:
             if isinstance(f, FSMField) and f.protected:
                 del instance.__dict__[f.attname]
-        return super(FixedNestedUpdateMixin, self).update(
+        return super(FixedWritableNestedModelSerializer, self).update(
             instance,
             validated_data,
         )
@@ -140,7 +140,7 @@ class DoiSerializer(serializers.ModelSerializer):
         )  # , "connectivity_statement_id")
 
 
-class SentenceSerializer(FixManyToManyMixin, FixedNestedUpdateMixin):
+class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer):
     """Sentence"""
 
     state = serializers.CharField(read_only=True)
@@ -153,8 +153,6 @@ class SentenceSerializer(FixManyToManyMixin, FixedNestedUpdateMixin):
 
     def get_available_transitions(self, instance) -> list[str]:
         return [t.name for t in instance.get_available_state_transitions()]
-    
-
 
     class Meta:
         model = Sentence
@@ -185,7 +183,7 @@ class SentenceSerializer(FixManyToManyMixin, FixedNestedUpdateMixin):
 
 
 class ConnectivityStatementSerializer(
-    FixManyToManyMixin, FixedNestedUpdateMixin
+    FixManyToManyMixin, FixedWritableNestedModelSerializer
 ):
     """Connectivity Statement"""
 
