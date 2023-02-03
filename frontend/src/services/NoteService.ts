@@ -12,4 +12,5 @@ class NoteService extends AbstractService {
   }
 }
 
-export default new NoteService()
+const noteService = new NoteService()
+export default noteService
