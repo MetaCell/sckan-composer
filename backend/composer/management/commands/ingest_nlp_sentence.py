@@ -18,6 +18,9 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("csv_files", nargs="+", type=str)
 
+    def to_none(self, value):
+        return None if value == "0" or len(str(value)) == 0 else value
+
     def handle(self, *args, **options):
         for csv_file in options["csv_files"]:
             with open(
@@ -29,15 +32,15 @@ class Command(BaseCommand):
                     quotechar='"',
                 )
                 for row in nlpreader:
+                    rowid = row[ID]
                     out_of_scope = row[OUT_OF_SCOPE].lower()
                     if out_of_scope and out_of_scope.lower() == "yes":
                         # skip out of scope records
                         self.stdout.write(f"{rowid}: out of scope.")
                         continue
-                    rowid = row[ID]
-                    pmid = row[PMID] if row[PMID] != "0" else None
-                    pmcid = row[PMCID] if row[PMCID] != "0" else None
-                    doi = row[DOI] if row[DOI] != "0" else None
+                    pmid = self.to_none(row[PMID])
+                    pmcid = self.to_none(row[PMCID])
+                    doi = self.to_none(row[DOI])
                     text = row[SENTENCE]
                     title = text[0:199]
                     sentence, created = Sentence.objects.get_or_create(

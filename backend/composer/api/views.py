@@ -8,7 +8,7 @@ from rest_framework.serializers import ValidationError
 
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
-from drf_react_template.schema_form_encoder import SerializerEncoder
+from drf_react_template.schema_form_encoder import SchemaProcessor, UiSchemaProcessor
 
 from .filtersets import (
     SentenceFilter,
@@ -241,26 +241,20 @@ def jsonschemas(request):
         NoteSerializer,
     ]
 
-    class View(object):
-        # fake view class
-        def __init__(self):
-            self.action = "schemas"
-
-    context = {
-        "request": request,
-        "format": None,
-        "view": View(),
-        "response": Response({}),
-    }
+    schema = {}
+    for s in serializers:
+        obj = s({})
+        schema[s.Meta.model.__name__] = {
+            "schema": SchemaProcessor(obj, {}).get_schema(),
+            "uiSchema": UiSchemaProcessor(obj, {}).get_ui_schema(),
+        }
 
     ret = json.dumps(
-        obj=({s.Meta.model.__name__: s(context) for s in serializers}),
-        cls=SerializerEncoder,
+        schema,
         indent=2,
         ensure_ascii=True,
         allow_nan=True,
         separators=INDENT_SEPARATORS,
-        renderer_context=context,
     )
     ret = ret.replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
     data = bytes(ret.encode("utf-8"))

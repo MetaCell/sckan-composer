@@ -2,12 +2,10 @@ from django.contrib.auth.models import User
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from drf_writable_nested.serializers import WritableNestedModelSerializer
-from drf_writable_nested.mixins import (
-    UniqueFieldsMixin,
-    NestedCreateMixin,
-    NestedUpdateMixin,
-)
+from drf_writable_nested.mixins import UniqueFieldsMixin, NestedUpdateMixin
 from django.db.models import Q
+
+from django_fsm import FSMField
 
 from ..models import (
     AnatomicalEntity,
@@ -40,6 +38,20 @@ class FixManyToManyMixin:
             if len(qs) > 0:
                 pk = str(qs.first().pk)
         return pk
+
+
+class FixedWritableNestedModelSerializer(WritableNestedModelSerializer):
+    def update(self, instance, validated_data):
+        # remove the protected FSMFields from instance dict so it will become part of the "non_loaded_fields"
+        # those fields may not be updated during the refresh_from_db (they are protected for update)
+        # refresh_from_db() can be found in django.models.base.py and is called by NestedUpdateMixin.update()
+        for f in instance._meta.concrete_fields:
+            if isinstance(f, FSMField) and f.protected:
+                del instance.__dict__[f.attname]
+        return super(FixedWritableNestedModelSerializer, self).update(
+            instance,
+            validated_data,
+        )
 
 
 # serializers
@@ -128,9 +140,10 @@ class DoiSerializer(serializers.ModelSerializer):
         )  # , "connectivity_statement_id")
 
 
-class SentenceSerializer(FixManyToManyMixin, WritableNestedModelSerializer):
+class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer):
     """Sentence"""
 
+    state = serializers.CharField(read_only=True)
     pmid = serializers.IntegerField(required=False, default=None, allow_null=True)
     pmcid = serializers.CharField(required=False, default=None, allow_null=True)
     doi = serializers.CharField(required=False, default=None, allow_null=True)
@@ -170,7 +183,7 @@ class SentenceSerializer(FixManyToManyMixin, WritableNestedModelSerializer):
 
 
 class ConnectivityStatementSerializer(
-    FixManyToManyMixin, WritableNestedModelSerializer
+    FixManyToManyMixin, FixedWritableNestedModelSerializer
 ):
     """Connectivity Statement"""
 
