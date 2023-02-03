@@ -14,20 +14,12 @@ const log = (type: string) => console.log.bind(console, type)
 export const FormBase = (props: any) => {
 
     const {service, data, schema, setter, extraData, uiSchema, uiFields, enableAutoSave, disabled=false} = props
+    const [localData, setLocalData] = useState<any>(data)
     const [isSaving, setIsSaving] = useState<boolean>(false)
     const triggerAutoSave = useDebouncedCallback(() => onSave(), INPUT_DEFAULT_DELAY);
 
 
     const formRef = useRef<any>(null);
-
-    if (!data || isSaving) {
-        // todo: style loader?
-        return <Backdrop
-            open={isSaving}
-        >
-            <CircularProgress color="inherit"/>
-        </Backdrop>
-    }
 
     if (uiFields) {
         Object.entries(uiSchema).forEach((p) =>
@@ -51,13 +43,14 @@ export const FormBase = (props: any) => {
     const handleSubmit = async (event: IChangeEvent) => {
         const formData = {...event.formData, ...extraData}
         setIsSaving(true)
+        setLocalData(formData)
         service.save(formData).then((newData: any) => {
             setter(newData)
             // todo: Add UI feedback
-            console.log("Saved")
+            log("Saved")
         }).catch((error: any) => {
             // todo: handle errors here
-            console.error("Something went wrong")
+            log("Something went wrong")
         }).finally(() => {
             setIsSaving(false)
         })
@@ -70,12 +63,19 @@ export const FormBase = (props: any) => {
     }
 
     return (
+      <>
+        {!data || isSaving && <Backdrop
+              open={isSaving}
+          >
+            <CircularProgress color="inherit"/>
+        </Backdrop>
+        }
         <Box p={2}>
             <Form
                 ref={formRef}
                 schema={schema}
                 uiSchema={uiSchema}
-                formData={data}
+                formData={localData}
                 disabled={disabled}
                 validator={validator}
                 onChange={handleUpdate}
@@ -83,5 +83,6 @@ export const FormBase = (props: any) => {
                 onError={onError}
             />
         </Box>
+      </>
     )
 }

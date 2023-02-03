@@ -1,1 +1,1 @@
-export const INPUT_DEFAULT_DELAY = 30000 // 30 seconds
+export const INPUT_DEFAULT_DELAY = 1500 // 1.5 seconds
