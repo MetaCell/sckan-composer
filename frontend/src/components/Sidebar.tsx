@@ -7,11 +7,13 @@ import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { vars } from "../theme/variables";
 import { userProfile } from "../services/UserService";
+import { useNavigate } from "react-router";
 
 const Sidebar = () => {
   const [selectedItem, setSelectedItem] = useState(0);
 
   const profile = userProfile.getProfile();
+  const navigate = useNavigate();
 
   const drawerStyle = {
     width: vars.drawerWidth,
@@ -36,7 +38,10 @@ const Sidebar = () => {
           <MenuItem
             sx={{ padding: "0.875rem 1.25rem" }}
             selected={selectedItem === 0}
-            onClick={() => setSelectedItem(0)}
+            onClick={() => {
+              setSelectedItem(0);
+              navigate("/");
+            }}
           >
             <Typography variant="subtitle1">
               {profile.is_triage_operator

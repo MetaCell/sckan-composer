@@ -15,4 +15,5 @@ class SentenceService extends AbstractService {
   }
 }
 
-export default new SentenceService()
+const sentenceService = new SentenceService()
+export default sentenceService

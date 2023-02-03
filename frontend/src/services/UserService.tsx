@@ -38,7 +38,7 @@ export async function doLogin() {
     userProfile.setProfile(response.data);
   } catch (error) {
     const response = await login();
-    if (response.data.status_code == 302) {
+    if (response.data.status_code === 302) {
       window.location.href = response.data.redirect_url;
     }
   }

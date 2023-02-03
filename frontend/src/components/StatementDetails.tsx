@@ -31,7 +31,7 @@ const StatementDetails = () => {
         setLoading(false)
       })
     }
-  }, []);
+  }, [statementId]);
 
   if(loading) {
     return <div>Loading...</div>
