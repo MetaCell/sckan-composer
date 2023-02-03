@@ -9,7 +9,7 @@ const Form = withTheme(Theme)
 const log = (type: string) => console.log.bind(console, type)
 
 export const FormBase = (props: any) => {
-  const { service, data, schema, setter, extraData, uiSchema, uiFields } = props
+  const { service, data, schema, setter, disabled=false, extraData, uiSchema, uiFields } = props
 
   if (!data) {
     return <div>Loading...</div>
@@ -47,6 +47,7 @@ export const FormBase = (props: any) => {
         schema={schema}
         uiSchema={uiSchema}
         formData={data}
+        disabled={disabled}
         validator={validator}
         onSubmit={handleSubmit}
         onError={onError}

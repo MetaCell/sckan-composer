@@ -2,7 +2,7 @@ import React from 'react'
 import { Box } from '@mui/material'
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
-import statementService from '../../services/StatementService';
+import statementService from '../../services/StatementService'
 
 const StatementForm = (props: any) => {
   const { format } = props
