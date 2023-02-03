@@ -5,6 +5,8 @@ from drf_writable_nested.serializers import WritableNestedModelSerializer
 from drf_writable_nested.mixins import UniqueFieldsMixin, NestedUpdateMixin
 from django.db.models import Q
 
+from django_fsm import FSMField
+
 from ..models import (
     AnatomicalEntity,
     AnsDivision,
@@ -38,25 +40,18 @@ class FixManyToManyMixin:
         return pk
 
 
-class FixNestedUpdateMixin:
+class FixedNestedUpdateMixin(NestedUpdateMixin):
     def update(self, instance, validated_data):
-        relations, reverse_relations = self._extract_relations(validated_data)
-
-        # Create or update direct relations (foreign key, one-to-one)
-        self.update_or_create_direct_relations(
-            validated_data,
-            relations,
-        )
-
-        # Update instance
-        instance = super(NestedUpdateMixin, self).update(
+        # remove the protected FSMFields from instance dict so it will become part of the "non_loaded_fields"
+        # those fields may not be updated during the refresh_from_db (they are protected for update)
+        # refresh_from_db() can be found in django.models.base.py and is called by NestedUpdateMixin.update()
+        for f in instance._meta.concrete_fields:
+            if isinstance(f, FSMField) and f.protected:
+                del instance.__dict__[f.attname]
+        return super(FixedNestedUpdateMixin, self).update(
             instance,
             validated_data,
         )
-        self.update_or_create_reverse_relations(instance, reverse_relations)
-        self.delete_reverse_relations_if_need(instance, reverse_relations)
-        # instance.refresh_from_db()  # this one fails for object "fsm state" field updates
-        return instance
 
 
 # serializers
@@ -145,7 +140,7 @@ class DoiSerializer(serializers.ModelSerializer):
         )  # , "connectivity_statement_id")
 
 
-class SentenceSerializer(FixManyToManyMixin, FixNestedUpdateMixin, WritableNestedModelSerializer):
+class SentenceSerializer(FixManyToManyMixin, FixedNestedUpdateMixin):
     """Sentence"""
 
     state = serializers.CharField(read_only=True)
@@ -190,7 +185,7 @@ class SentenceSerializer(FixManyToManyMixin, FixNestedUpdateMixin, WritableNeste
 
 
 class ConnectivityStatementSerializer(
-    FixManyToManyMixin, FixNestedUpdateMixin, WritableNestedModelSerializer
+    FixManyToManyMixin, FixedNestedUpdateMixin
 ):
     """Connectivity Statement"""
 
