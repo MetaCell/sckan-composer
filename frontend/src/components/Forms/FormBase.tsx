@@ -64,7 +64,7 @@ export const FormBase = (props: any) => {
 
     return (
       <>
-        {!data || isSaving && <Backdrop
+        {(!data || isSaving) && <Backdrop
               open={isSaving}
           >
             <CircularProgress color="inherit"/>
