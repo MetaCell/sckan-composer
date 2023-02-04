@@ -1301,6 +1301,9 @@ components:
           allOf:
           - $ref: '#/components/schemas/User'
           readOnly: true
+        owner_id:
+          type: integer
+          nullable: true
         state:
           type: string
           readOnly: true
@@ -1696,6 +1699,9 @@ components:
           allOf:
           - $ref: '#/components/schemas/User'
           readOnly: true
+        owner_id:
+          type: integer
+          nullable: true
         state:
           type: string
           readOnly: true
@@ -1796,6 +1802,9 @@ components:
           allOf:
           - $ref: '#/components/schemas/User'
           readOnly: true
+        owner_id:
+          type: integer
+          nullable: true
         state:
           type: string
           readOnly: true
@@ -1880,6 +1889,9 @@ components:
           allOf:
           - $ref: '#/components/schemas/User'
           readOnly: true
+        owner_id:
+          type: integer
+          nullable: true
         state:
           type: string
           readOnly: true

@@ -149,6 +149,7 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
     doi = serializers.CharField(required=False, default=None, allow_null=True)
     tags = TagSerializer(many=True, read_only=False)
     owner = UserSerializer(read_only=True, required=False)
+    owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
     available_transitions = serializers.SerializerMethodField(read_only=True)
 
     def get_available_transitions(self, instance) -> list[str]:
@@ -165,6 +166,7 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
             "doi",
             "tags",
             "owner",
+            "owner_id",
             "state",
             "modified_date",
             "available_transitions",
@@ -188,6 +190,7 @@ class ConnectivityStatementSerializer(
     """Connectivity Statement"""
 
     sentence_id = serializers.IntegerField()
+    owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
     origin_id = serializers.IntegerField()
     destination_id = serializers.IntegerField()
     ans_division_id = serializers.IntegerField()
@@ -216,6 +219,7 @@ class ConnectivityStatementSerializer(
             "tags",
             "dois",
             "owner",
+            "owner_id",
             "state",
             "available_transitions",
             "origin_id",

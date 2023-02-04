@@ -29,10 +29,15 @@ const SentencesDetails = () => {
     if(sentenceId) {
       sentenceService.getObject(sentenceId).then((sentence: Sentence) => {
         setSentence(sentence)
-        setLoading(false)
         if(sentence.owner && sentence.owner?.id !== userProfile.getUser().id) {
-          alert('You are not the owner of this sentence.')
+          if(window.confirm('You are not the owner of this sentence, do you want to take ownership?')){
+            sentenceService.save({...sentence, owner_id: userProfile.getUser().id}).then((sentence: Sentence) => {
+              setSentence(sentence)
+            })
+          }
         }
+      }).finally(() => {
+        setLoading(false)
       })
     }
   }, [sentenceId]);

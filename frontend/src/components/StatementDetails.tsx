@@ -28,10 +28,13 @@ const StatementDetails = () => {
     if(statementId) {
       statementService.getObject(statementId).then((statement: ConnectivityStatement) => {
         setStatement(statement)
-        setLoading(false)
-        if(statement.owner && statement.owner?.id !== userProfile.getUser().id) {
-          alert('You are not the owner of this statement.')
+        if(window.confirm('You are not the owner of this sentence, do you want to take ownership?')){
+          statementService.save({...statement, owner_id: userProfile.getUser().id}).then((statement: ConnectivityStatement) => {
+            setStatement(statement)
+          })
         }
+      }).finally(() => { 
+        setLoading(false)
       })
     }
   }, [statementId]);

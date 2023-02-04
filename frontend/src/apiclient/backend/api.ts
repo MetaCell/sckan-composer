@@ -133,6 +133,12 @@ export interface ConnectivityStatement {
     'owner': User;
     /**
      * 
+     * @type {number}
+     * @memberof ConnectivityStatement
+     */
+    'owner_id'?: number | null;
+    /**
+     * 
      * @type {string}
      * @memberof ConnectivityStatement
      */
@@ -773,6 +779,12 @@ export interface PatchedConnectivityStatement {
     'owner'?: User;
     /**
      * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatement
+     */
+    'owner_id'?: number | null;
+    /**
+     * 
      * @type {string}
      * @memberof PatchedConnectivityStatement
      */
@@ -961,6 +973,12 @@ export interface PatchedSentence {
     'owner'?: User;
     /**
      * 
+     * @type {number}
+     * @memberof PatchedSentence
+     */
+    'owner_id'?: number | null;
+    /**
+     * 
      * @type {string}
      * @memberof PatchedSentence
      */
@@ -1118,6 +1136,12 @@ export interface Sentence {
      * @memberof Sentence
      */
     'owner': User;
+    /**
+     * 
+     * @type {number}
+     * @memberof Sentence
+     */
+    'owner_id'?: number | null;
     /**
      * 
      * @type {string}
