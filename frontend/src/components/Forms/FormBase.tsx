@@ -13,7 +13,7 @@ const log = (type: string) => console.log.bind(console, type)
 
 export const FormBase = (props: any) => {
 
-    const {service, data, schema, setter, extraData, uiSchema, uiFields, enableAutoSave, disabled=false} = props
+    const {service, data, schema, setter, extraData, uiSchema, uiFields, enableAutoSave, disabled=false, clearOnSave=false} = props
     const [localData, setLocalData] = useState<any>(data)
     const [isSaving, setIsSaving] = useState<boolean>(false)
     const triggerAutoSave = useDebouncedCallback(() => onSave(), INPUT_DEFAULT_DELAY);
@@ -53,6 +53,9 @@ export const FormBase = (props: any) => {
             log("Something went wrong")
         }).finally(() => {
             setIsSaving(false)
+            if(clearOnSave){
+                setLocalData({})
+            }
         })
     }
 

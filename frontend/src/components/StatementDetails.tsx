@@ -29,6 +29,9 @@ const StatementDetails = () => {
       statementService.getObject(statementId).then((statement: ConnectivityStatement) => {
         setStatement(statement)
         setLoading(false)
+        if(statement.owner && statement.owner?.id !== userProfile.getUser().id) {
+          alert('You are not the owner of this statement.')
+        }
       })
     }
   }, [statementId]);
@@ -36,8 +39,6 @@ const StatementDetails = () => {
   if(loading) {
     return <div>Loading...</div>
   }
-
-  const disabled = statement.owner?.id !== userProfile.getUser().id
 
   return (
     <Grid p={12} container justifyContent='center'>
@@ -66,7 +67,7 @@ const StatementDetails = () => {
         {
           statement?.available_transitions.map((transition) => <Button onClick={() => doTransition(transition)}>{transition}</Button>)
         }
-        <StatementForm data={statement} disabled={disabled} format='full' setter={setStatement}/>
+        <StatementForm data={statement} format='full' setter={setStatement}/>
       </Grid>
       <Grid item xl={5}>
         <NoteForm extraData={{connectivity_statement_id: statement.id}}/>

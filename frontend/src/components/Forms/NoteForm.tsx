@@ -23,6 +23,8 @@ const NoteForm = (props: any) => {
         schema={schema}
         uiSchema={uiSchema}
         uiFields={uiFields}
+        enableAutoSave={false}
+        clearOnSave={true}
         {...props}
       />
     </Box>

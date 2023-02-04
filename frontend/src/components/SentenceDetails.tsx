@@ -30,6 +30,9 @@ const SentencesDetails = () => {
       sentenceService.getObject(sentenceId).then((sentence: Sentence) => {
         setSentence(sentence)
         setLoading(false)
+        if(sentence.owner && sentence.owner?.id !== userProfile.getUser().id) {
+          alert('You are not the owner of this sentence.')
+        }
       })
     }
   }, [sentenceId]);
@@ -38,7 +41,7 @@ const SentencesDetails = () => {
     return <div>Loading...</div>
   }
 
-  const disabled = sentence?.owner?.id !== userProfile.getUser().id
+  const disabled = sentence.owner?.id !== userProfile.getUser().id
 
   return (
     <Grid p={12} container justifyContent='center'>
