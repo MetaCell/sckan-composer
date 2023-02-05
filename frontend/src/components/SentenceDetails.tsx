@@ -30,7 +30,7 @@ const SentencesDetails = () => {
       sentenceService.getObject(sentenceId).then((sentence: Sentence) => {
         setSentence(sentence)
         if(sentence.owner && sentence.owner?.id !== userProfile.getUser().id) {
-          if(window.confirm('You are not the owner of this sentence, do you want to take ownership?')){
+          if(window.confirm(`This sentence is assigned to ${sentence.owner.first_name}, assign to yourself?`)){
             sentenceService.save({...sentence, owner_id: userProfile.getUser().id}).then((sentence: Sentence) => {
               setSentence(sentence)
             })

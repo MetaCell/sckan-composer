@@ -28,7 +28,7 @@ const StatementDetails = () => {
     if(statementId) {
       statementService.getObject(statementId).then((statement: ConnectivityStatement) => {
         setStatement(statement)
-        if(window.confirm('You are not the owner of this sentence, do you want to take ownership?')){
+        if(window.confirm(`This statement is assigned to ${statement.owner.first_name}, assign to yourself?`)){
           statementService.save({...statement, owner_id: userProfile.getUser().id}).then((statement: ConnectivityStatement) => {
             setStatement(statement)
           })
