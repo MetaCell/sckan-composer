@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from drf_react_template.schema_form_encoder import SchemaProcessor, UiSchemaProcessor
 
 from .filtersets import (
@@ -43,6 +43,59 @@ from .serializers import (
     ViaSerializer,
 )
 
+
+# Mixins
+class TagMixin(
+    viewsets.GenericViewSet,
+):
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "tag_id",
+                OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                required=True,
+            )
+        ],
+        request=None,
+    )
+    @action(detail=True, methods=["post"], url_path="add_tag/(?P<tag_id>\w+)")
+    def add_tag(self, request, pk=None, tag_id=None):
+        instance = self.get_object()
+        tag_instance = Tag.objects.get(id=tag_id)
+        instance.tags.add(tag_instance)
+        return Response(self.get_serializer(instance).data)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "tag_id",
+                OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                required=True,
+            )
+        ],
+        request=None,
+    )
+    @action(detail=True, methods=["post"], url_path="del_tag/(?P<tag_id>\w+)")
+    def del_tag(self, request, pk=None, tag_id=None):
+        instance = self.get_object()
+        tag_instance = Tag.objects.get(id=tag_id)
+        instance.tags.remove(tag_instance)
+        return Response(self.get_serializer(instance).data)
+
+
+class TransitionMixin(viewsets.GenericViewSet):
+    @action(detail=True, methods=["post"], url_path="do_transition/(?P<transition>\w+)")
+    def transition(self, request, pk=None, transition=None):
+        instance = self.service(self.get_object()).do_transition(
+            transition, user=request.user, request=request
+        )
+        instance.save()
+        return Response(self.get_serializer(instance).data)
+
+
+# Viewsets
 
 class ModelRetrieveViewSet(
     # mixins.CreateModelMixin,
@@ -108,7 +161,7 @@ class NoteViewSet(viewsets.ModelViewSet):
     filterset_class = NoteFilter
 
 
-class ConnectivityStatementViewSet(viewsets.ModelViewSet):
+class ConnectivityStatementViewSet(TagMixin, TransitionMixin, viewsets.ModelViewSet):
     """
     ConnectivityStatement
     """
@@ -120,6 +173,7 @@ class ConnectivityStatementViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = ConnectivityStatementFilter
+    service = ConnectivityStatementService
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action in ("list",):
@@ -129,14 +183,6 @@ class ConnectivityStatementViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         self.get_object().assign_owner(request)
         return super().retrieve(request, *args, **kwargs)
-
-    @action(detail=True, methods=["post"], url_path="do_transition/(?P<transition>\w+)")
-    def transition(self, request, pk=None, transition=None):
-        cs = ConnectivityStatementService(self.get_object()).do_transition(
-            transition, user=request.user, request=request
-        )
-        cs.save()
-        return Response(self.get_serializer(cs).data)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -151,7 +197,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     ]
 
 
-class SentenceViewSet(ModelNoDeleteViewSet):
+class SentenceViewSet(TagMixin, TransitionMixin, ModelNoDeleteViewSet):
     """
     Sentence
     """
@@ -163,6 +209,8 @@ class SentenceViewSet(ModelNoDeleteViewSet):
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = SentenceFilter
+    service = SentenceService
+
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action in ("list",):
@@ -172,14 +220,6 @@ class SentenceViewSet(ModelNoDeleteViewSet):
     def retrieve(self, request, *args, **kwargs):
         self.get_object().assign_owner(request)
         return super().retrieve(request, *args, **kwargs)
-
-    @action(detail=True, methods=["post"], url_path="do_transition/(?P<transition>\w+)")
-    def transition(self, request, pk=None, transition=None):
-        cs = SentenceService(self.get_object()).do_transition(
-            transition, user=request.user, request=request
-        )
-        cs.save()
-        return Response(self.get_serializer(cs).data)
 
 
 class SpecieViewSet(viewsets.ReadOnlyModelViewSet):
@@ -238,6 +278,7 @@ def jsonschemas(request):
         ConnectivityStatementSerializer,
         SentenceSerializer,
         ViaSerializer,
+        TagSerializer,
         NoteSerializer,
     ]
 
