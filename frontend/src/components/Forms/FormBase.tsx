@@ -18,7 +18,6 @@ export const FormBase = (props: any) => {
     const [isSaving, setIsSaving] = useState<boolean>(false)
     const triggerAutoSave = useDebouncedCallback(() => onSave(), INPUT_DEFAULT_DELAY);
 
-
     const formRef = useRef<any>(null);
 
     if (uiFields) {

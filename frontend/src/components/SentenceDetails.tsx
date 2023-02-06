@@ -9,9 +9,9 @@ import { useParams } from "react-router-dom";
 import SentenceForm from './Forms/SentenceForm';
 import sentenceService from '../services/SentenceService'
 import NoteForm from './Forms/NoteForm';
+import TagForm from './Forms/TagForm';
 import { Sentence } from '../apiclient/backend/api';
 import { userProfile } from '../services/UserService'
-
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams()
@@ -67,13 +67,16 @@ const SentencesDetails = () => {
       <Grid item xl={7}>
         <div>Last modified by {sentence?.owner?.first_name} on {sentence?.modified_date}</div>
         {
-          !disabled && sentence?.available_transitions.map((transition) => <Button onClick={() => doTransition(transition)}>{transition}</Button>)
+          !disabled && sentence?.available_transitions.map((transition) => <Button key={transition} onClick={() => doTransition(transition)}>{transition}</Button>)
         }
         <SentenceForm data={sentence} disabled={disabled} format='full' setter={setSentence}/>
         <Button onClick={() => setExtraStatementForm((prev) => [...prev, ''])}>Add Statement</Button>
       </Grid>
       <Grid item xl={5}>
-        <NoteForm extraData={{sentence_id: sentence.id}}/>
+        <TagForm data={sentence.tags} extraData={{parentId: sentence.id, service: sentenceService}} setter={setSentence}/>
+      </Grid>
+      <Grid item xl={5}>
+        <NoteForm extraData={{sentence_id: sentence.id}} setter={setSentence}/>
       </Grid>
     </Grid>
   )

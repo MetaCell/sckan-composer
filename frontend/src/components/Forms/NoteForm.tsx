@@ -6,10 +6,14 @@ import noteService from '../../services/NoteService'
 
 
 const NoteForm = (props: any) => {
+  const { setter } = props
   const { schema, uiSchema } = jsonSchemas.getNoteSchema()
   const [data, setData] = React.useState({})
 
-  const clearNoteForm = () => setData({})
+  const clearNoteForm = (newData: any) => {
+    setData({})
+    setter(newData)
+  }
 
   // TODO: set up the widgets for the schema
   const uiFields = ["note",]
