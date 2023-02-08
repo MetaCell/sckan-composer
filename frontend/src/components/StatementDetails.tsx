@@ -12,6 +12,7 @@ import TagForm from './Forms/TagForm'
 import { ConnectivityStatement } from '../apiclient/backend/api';
 import { Button } from '@mui/material';
 import { userProfile } from '../services/UserService'
+import CheckDuplicates from "./CheckDuplicates";
 
 
 const StatementDetails = () => {
@@ -71,6 +72,7 @@ const StatementDetails = () => {
         {
           statement?.available_transitions.map((transition) => <Button onClick={() => doTransition(transition)}>{transition}</Button>)
         }
+        <CheckDuplicates/>
         <StatementForm data={statement} format='full' setter={setStatement}/>
       </Grid>
       <Grid item xl={5}>
