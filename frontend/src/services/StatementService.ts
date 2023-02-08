@@ -12,6 +12,12 @@ class ConnectivityStatementService extends AbstractService {
   async doTransition(connectivityStatement: ConnectivityStatement, transition: string) {
     return composerApi.composerConnectivityStatementDoTransitionCreate(connectivityStatement.id, transition, connectivityStatement).then((response: any) => response.data)
   }
+  async addTag(id: number, tagId: number): Promise<ConnectivityStatement> {
+    return composerApi.composerConnectivityStatementAddTagCreate(id, tagId).then((response: any) => response.data)
+  }
+  async removeTag(id: number, tagId: number): Promise<ConnectivityStatement> {
+    return composerApi.composerConnectivityStatementDelTagCreate(id, tagId).then((response: any) => response.data)
+  }
 }
 
 const connectivityStatementService = new ConnectivityStatementService()

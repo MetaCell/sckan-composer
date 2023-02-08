@@ -9,9 +9,9 @@ import { useParams } from "react-router-dom";
 import SentenceForm from './Forms/SentenceForm';
 import sentenceService from '../services/SentenceService'
 import NoteForm from './Forms/NoteForm';
+import TagForm from './Forms/TagForm';
 import { Sentence } from '../apiclient/backend/api';
 import { userProfile } from '../services/UserService'
-
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams()
@@ -29,6 +29,14 @@ const SentencesDetails = () => {
     if(sentenceId) {
       sentenceService.getObject(sentenceId).then((sentence: Sentence) => {
         setSentence(sentence)
+        if(sentence.owner && sentence.owner?.id !== userProfile.getUser().id) {
+          if(window.confirm(`This sentence is assigned to ${sentence.owner.first_name}, assign to yourself?`)){
+            sentenceService.save({...sentence, owner_id: userProfile.getUser().id}).then((sentence: Sentence) => {
+              setSentence(sentence)
+            })
+          }
+        }
+      }).finally(() => {
         setLoading(false)
       })
     }
@@ -38,7 +46,7 @@ const SentencesDetails = () => {
     return <div>Loading...</div>
   }
 
-  const disabled = sentence?.owner?.id !== userProfile.getUser().id
+  const disabled = sentence.owner?.id !== userProfile.getUser().id
 
   return (
     <Grid p={12} container justifyContent='center'>
@@ -59,13 +67,16 @@ const SentencesDetails = () => {
       <Grid item xl={7}>
         <div>Last modified by {sentence?.owner?.first_name} on {sentence?.modified_date}</div>
         {
-          !disabled && sentence?.available_transitions.map((transition) => <Button onClick={() => doTransition(transition)}>{transition}</Button>)
+          !disabled && sentence?.available_transitions.map((transition) => <Button key={transition} onClick={() => doTransition(transition)}>{transition}</Button>)
         }
         <SentenceForm data={sentence} disabled={disabled} format='full' setter={setSentence}/>
         <Button onClick={() => setExtraStatementForm((prev) => [...prev, ''])}>Add Statement</Button>
       </Grid>
       <Grid item xl={5}>
-        <NoteForm extraData={{sentence_id: sentence.id}}/>
+        <TagForm data={sentence.tags} extraData={{parentId: sentence.id, service: sentenceService}} setter={setSentence}/>
+      </Grid>
+      <Grid item xl={5}>
+        <NoteForm extraData={{sentence_id: sentence.id}} setter={setSentence}/>
       </Grid>
     </Grid>
   )

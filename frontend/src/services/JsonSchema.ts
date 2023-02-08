@@ -4,6 +4,7 @@ export let jsonSchemas = (function () {
   let sentenceSchema:any = null;
   let connectivityStatementSchema:any = null;
   let noteSchema:any = null;
+  let tagSchema:any = null;
   let viaSchema:any = null;
 
   return { // public interface
@@ -12,6 +13,7 @@ export let jsonSchemas = (function () {
         sentenceSchema = resp.data.Sentence
         connectivityStatementSchema = resp.data.ConnectivityStatement
         noteSchema = resp.data.Note
+        tagSchema = resp.data.Tag
         viaSchema = resp.data.Via
       })
     },
@@ -23,6 +25,9 @@ export let jsonSchemas = (function () {
     },
     getNoteSchema: function () {
       return noteSchema
+    },
+    getTagSchema: function () {
+      return tagSchema
     },
     getViaSchema: function () {
       return viaSchema

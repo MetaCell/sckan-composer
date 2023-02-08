@@ -353,6 +353,64 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/composer/connectivity-statement/{id}/add_tag/{tag_id}/:
+    post:
+      operationId: composer_connectivity_statement_add_tag_create
+      description: ConnectivityStatement
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement.
+        required: true
+      - in: path
+        name: tag_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatement'
+          description: ''
+  /api/composer/connectivity-statement/{id}/del_tag/{tag_id}/:
+    post:
+      operationId: composer_connectivity_statement_del_tag_create
+      description: ConnectivityStatement
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement.
+        required: true
+      - in: path
+        name: tag_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatement'
+          description: ''
   /api/composer/connectivity-statement/{id}/do_transition/{transition}/:
     post:
       operationId: composer_connectivity_statement_do_transition_create
@@ -868,6 +926,64 @@ paths:
               schema:
                 $ref: '#/components/schemas/Sentence'
           description: ''
+  /api/composer/sentence/{id}/add_tag/{tag_id}/:
+    post:
+      operationId: composer_sentence_add_tag_create
+      description: Sentence
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sentence.
+        required: true
+      - in: path
+        name: tag_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sentence'
+          description: ''
+  /api/composer/sentence/{id}/del_tag/{tag_id}/:
+    post:
+      operationId: composer_sentence_del_tag_create
+      description: Sentence
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sentence.
+        required: true
+      - in: path
+        name: tag_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sentence'
+          description: ''
   /api/composer/sentence/{id}/do_transition/{transition}/:
     post:
       operationId: composer_sentence_do_transition_create
@@ -1301,6 +1417,9 @@ components:
           allOf:
           - $ref: '#/components/schemas/User'
           readOnly: true
+        owner_id:
+          type: integer
+          nullable: true
         state:
           type: string
           readOnly: true
@@ -1696,6 +1815,9 @@ components:
           allOf:
           - $ref: '#/components/schemas/User'
           readOnly: true
+        owner_id:
+          type: integer
+          nullable: true
         state:
           type: string
           readOnly: true
@@ -1792,10 +1914,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Tag'
+          readOnly: true
         owner:
           allOf:
           - $ref: '#/components/schemas/User'
           readOnly: true
+        owner_id:
+          type: integer
+          nullable: true
         state:
           type: string
           readOnly: true
@@ -1876,10 +2002,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Tag'
+          readOnly: true
         owner:
           allOf:
           - $ref: '#/components/schemas/User'
           readOnly: true
+        owner_id:
+          type: integer
+          nullable: true
         state:
           type: string
           readOnly: true

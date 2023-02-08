@@ -13,6 +13,12 @@ class SentenceService extends AbstractService {
   async doTransition(sentence: Sentence, transition: string) {
     return composerApi.composerSentenceDoTransitionCreate(sentence.id, transition, sentence).then((response: any) => response.data)
   }
+  async addTag(id: number, tagId: number): Promise<Sentence> {
+    return composerApi.composerSentenceAddTagCreate(id, tagId).then((response: any) => response.data)
+  }
+  async removeTag(id: number, tagId: number): Promise<Sentence> {
+    return composerApi.composerSentenceDelTagCreate(id, tagId).then((response: any) => response.data)
+  }
 }
 
 const sentenceService = new SentenceService()

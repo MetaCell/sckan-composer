@@ -4,7 +4,7 @@ import {IChangeEvent, withTheme} from "@rjsf/core";
 import {Backdrop, Box, CircularProgress} from '@mui/material';
 import {Theme} from '@rjsf/mui'
 import {useDebouncedCallback} from "use-debounce";
-import {INPUT_DEFAULT_DELAY} from "../../settings";
+import {EDIT_DEBOUNCE} from "../../settings";
 
 const Form = withTheme(Theme)
 
@@ -13,10 +13,10 @@ const log = (type: string) => console.log.bind(console, type)
 
 export const FormBase = (props: any) => {
 
-    const {service, data, schema, setter, extraData, uiSchema, uiFields, enableAutoSave, disabled=false} = props
+    const {service, data, schema, setter, extraData, uiSchema, uiFields, enableAutoSave, disabled=false,  clearOnSave=false} = props
     const [localData, setLocalData] = useState<any>(data)
     const [isSaving, setIsSaving] = useState<boolean>(false)
-    const triggerAutoSave = useDebouncedCallback(() => onSave(), INPUT_DEFAULT_DELAY);
+    const triggerAutoSave = useDebouncedCallback(() => onSave(), EDIT_DEBOUNCE);
 
 
     const formRef = useRef<any>(null);
@@ -53,6 +53,9 @@ export const FormBase = (props: any) => {
             log("Something went wrong")
         }).finally(() => {
             setIsSaving(false)
+            if(clearOnSave){
+                setLocalData({})
+            }
         })
     }
 
@@ -64,7 +67,7 @@ export const FormBase = (props: any) => {
 
     return (
       <>
-        {!data || isSaving && <Backdrop
+        {(!data || isSaving) && <Backdrop
               open={isSaving}
           >
             <CircularProgress color="inherit"/>

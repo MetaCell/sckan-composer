@@ -7,7 +7,8 @@ import Grid from '@mui/material/Grid';
 import { useParams } from "react-router-dom";
 import StatementForm from './Forms/StatementForm';
 import statementService from '../services/StatementService';
-import NoteForm from './Forms/NoteForm';
+import NoteForm from './Forms/NoteForm'
+import TagForm from './Forms/TagForm'
 import { ConnectivityStatement } from '../apiclient/backend/api';
 import { Button } from '@mui/material';
 import { userProfile } from '../services/UserService'
@@ -28,6 +29,12 @@ const StatementDetails = () => {
     if(statementId) {
       statementService.getObject(statementId).then((statement: ConnectivityStatement) => {
         setStatement(statement)
+        if(window.confirm(`This statement is assigned to ${statement.owner.first_name}, assign to yourself?`)){
+          statementService.save({...statement, owner_id: userProfile.getUser().id}).then((statement: ConnectivityStatement) => {
+            setStatement(statement)
+          })
+        }
+      }).finally(() => { 
         setLoading(false)
       })
     }
@@ -36,8 +43,6 @@ const StatementDetails = () => {
   if(loading) {
     return <div>Loading...</div>
   }
-
-  const disabled = statement.owner?.id !== userProfile.getUser().id
 
   return (
     <Grid p={12} container justifyContent='center'>
@@ -66,7 +71,10 @@ const StatementDetails = () => {
         {
           statement?.available_transitions.map((transition) => <Button onClick={() => doTransition(transition)}>{transition}</Button>)
         }
-        <StatementForm data={statement} disabled={disabled} format='full' setter={setStatement}/>
+        <StatementForm data={statement} format='full' setter={setStatement}/>
+      </Grid>
+      <Grid item xl={5}>
+        <TagForm data={statement.tags} extraData={{parentId: statement.id, service: statementService}} setter={setStatement}/>
       </Grid>
       <Grid item xl={5}>
         <NoteForm extraData={{connectivity_statement_id: statement.id}}/>
