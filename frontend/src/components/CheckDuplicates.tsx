@@ -21,7 +21,7 @@ function NoResults() {
 }
 
 function NoSearch() {
-    return <Box sx={{display: "flex", alignItems: "center", flexDirection: "column"}}>
+    return <Box sx={{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center"}}>
         <Typography>Add origin and destination to find duplicates</Typography>
     </Box>
 }
@@ -75,7 +75,7 @@ export default function CheckDuplicates() {
                     </IconButton>
                 </DialogTitle>
 
-                <DialogContent sx={{backgroundColor: "#F9FAFB"}}>
+                <DialogContent sx={{backgroundColor: "#F9FAFB", display:"flex", flexDirection: "column"}}>
                     <Box sx={{
                         display: "flex",
                         justifyContent: "space-between",
@@ -135,6 +135,7 @@ export default function CheckDuplicates() {
                             Check for duplicates
                         </Button>
                     </Box>
+
                     {listComponent}
                 </DialogContent>
             </Dialog>
