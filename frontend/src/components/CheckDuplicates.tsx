@@ -74,8 +74,7 @@ function NoSearch() {
     </Box>
 }
 
-function AnatomicalEntityAutoComplete({placeholder, ...props}: any) {
-    const [value, setValue] = React.useState<AnatomicalEntity | null>(null);
+function AnatomicalEntityAutoComplete({placeholder, value, setValue, ...props}: any) {
     const [inputValue, setInputValue] = useState<string>("")
     const [options, setOptions] = useState<readonly AnatomicalEntity[]>([]);
 
@@ -120,20 +119,21 @@ function AnatomicalEntityAutoComplete({placeholder, ...props}: any) {
             }}
             fullWidth
             popupIcon={<ExpandMoreIcon/>}
-
             getOptionLabel={(option) =>
                 typeof option === 'string' ? option : option.name
             }
+            isOptionEqualToValue={(option, value) => option.name === value.name}
             filterOptions={(x) => x}
             options={options}
             autoComplete
             includeInputInList
             filterSelectedOptions
-            value={value}
+            defaultValue={null}
+            value={value || null}
             noOptionsText="No entities found"
             onChange={(event: any, newValue: AnatomicalEntity | null) => {
                 setOptions(newValue ? [newValue, ...options] : options);
-                setValue(newValue);
+                setValue(newValue)
             }}
             onInputChange={(e, v) => handleInputChange(v)}
             renderInput={(params) => (
@@ -151,8 +151,8 @@ type criteria =
 
 export default function CheckDuplicates() {
     const [dialogOpen, setDialogOpen] = React.useState(false);
-    const [origin, setOrigin] = React.useState<number | undefined>(undefined);
-    const [destination, setDestination] = React.useState<number | undefined>(undefined);
+    const [origin, setOrigin] = React.useState<AnatomicalEntity | undefined>(undefined);
+    const [destination, setDestination] = React.useState<AnatomicalEntity | undefined>(undefined);
     const [statementsList, setStatementsList] = useState<PaginatedConnectivityStatementWithDetailsList>();
     const [currentPage, setCurrentPage] = useState(0);
     const [sorting, setSorting] = useState<criteria>(undefined);
@@ -164,13 +164,13 @@ export default function CheckDuplicates() {
     ) => {
         if (origin && destination) {
             api.composerConnectivityStatementList(
-                destination,
+                destination.id,
                 undefined,
                 rowsPerPage,
                 undefined,
                 index,
                 ordering || sorting,
-                origin,
+                origin.id,
             )
                 .then((res) => {
                     setStatementsList(res.data);
@@ -283,7 +283,10 @@ export default function CheckDuplicates() {
                         boxShadow: "0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)",
                         border: "1px solid #EAECF0"
                     }}>
-                        <AnatomicalEntityAutoComplete placeholder="Select origin"/>
+                        <AnatomicalEntityAutoComplete placeholder="Select origin"
+                                                      setValue={(value: AnatomicalEntity)=>setOrigin(value)}
+                                                      value={origin}
+                        />
                         <Fab sx={{
                             display: "flex",
                             flexDirection: "row",
@@ -301,7 +304,10 @@ export default function CheckDuplicates() {
                         }} onClick={() => swapEntities()}>
                             <SwapHorizIcon sx={{color: "#548CE5"}}/>
                         </Fab>
-                        <AnatomicalEntityAutoComplete placeholder="Select destination"/>
+                        <AnatomicalEntityAutoComplete placeholder="Select destination"
+                                                      setValue={(value: AnatomicalEntity)=>setDestination(value)}
+                                                      value={destination}
+                        />
                         <Button variant="contained" sx={{minWidth: "14em"}}
                                 onClick={() => fetchDuplicates()}>
                             Check for duplicates
