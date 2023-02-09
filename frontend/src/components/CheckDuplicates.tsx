@@ -13,10 +13,20 @@ import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 function NoResults() {
-    return <Box sx={{display: "flex", alignItems: "center", flexDirection: "column"}}>
-        <Typography>No duplicates found</Typography>
-        <Typography>We couldn’t find any record with these origin and destination in the database.</Typography>
-        <Button variant="outlined">Clear Search</Button>
+    return <Box
+        sx={{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center", flexDirection: "column"}}>
+        <Box sx={{
+            display: "flex",
+            flexGrow: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            maxWidth: "25em",
+            flexDirection: "column"
+        }}>
+            <Typography variant="h6">No duplicates found</Typography>
+            <Typography sx={{textAlign: "center"}}>We couldn’t find any record with these origin and destination in the database.</Typography>
+        </Box>
+        <Button sx={{marginBottom: "3em", color:"#344054", border: "1px solid #D0D5DD"}} variant="outlined">Clear Search</Button>
     </Box>
 }
 
@@ -42,7 +52,7 @@ export default function CheckDuplicates() {
         setHasSearchHappened(true);
     }
 
-    const listComponent = hasSearchHappened ? NoResults() : NoSearch()
+    const listComponent = !hasSearchHappened ? NoResults() : NoSearch()
 
     return (
         <div>
@@ -75,7 +85,7 @@ export default function CheckDuplicates() {
                     </IconButton>
                 </DialogTitle>
 
-                <DialogContent sx={{backgroundColor: "#F9FAFB", display:"flex", flexDirection: "column"}}>
+                <DialogContent sx={{backgroundColor: "#F9FAFB", display: "flex", flexDirection: "column"}}>
                     <Box sx={{
                         display: "flex",
                         justifyContent: "space-between",
@@ -97,7 +107,7 @@ export default function CheckDuplicates() {
                                    }}
                                    InputLabelProps={{shrink: false, sx: {paddingLeft: "1em"}}}
                                    SelectProps={{
-                                       IconComponent: () => <ExpandMoreIcon />,
+                                       IconComponent: () => <ExpandMoreIcon/>,
                                    }}
                         >
                         </TextField>
@@ -124,7 +134,7 @@ export default function CheckDuplicates() {
                                    }}
                                    InputLabelProps={{shrink: false, sx: {paddingLeft: "1em"}}}
                                    SelectProps={{
-                                       IconComponent: () => <ExpandMoreIcon />,
+                                       IconComponent: () => <ExpandMoreIcon/>,
                                    }}
                         >
 
