@@ -12,18 +12,21 @@ import IconButton from "@mui/material/IconButton";
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {DataGrid, GridColDef, GridEventListener, GridRowsProp} from "@mui/x-data-grid";
-import {useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {AnatomicalEntity, PaginatedConnectivityStatementWithDetailsList} from "../apiclient/backend";
 import {composerApi as api} from "../services/apis";
 import {useNavigate} from "react-router-dom";
-import {Autocomplete, CircularProgress} from "@mui/material";
+import {Autocomplete, CircularProgress, debounce, Fab} from "@mui/material";
+import {SEARCH_DEBOUNCE} from "../settings";
 
 const columns: GridColDef[] = [
     {field: "pmid", headerName: "PMID"},
     {field: "state", headerName: "Status", sortable: false, flex: 1},
     {field: "knowledge_statement", headerName: "Connectivity Statement", sortable: false, flex: 2},
 ];
+
 const rowsPerPage = 10;
+const selectRowsPerPage = 100;
 
 function ResultsGrid({rows, totalResults, handlePageChange, handleRowClick, handleSortModelChange, currentPage}: any) {
     return <Box flexGrow={1} height="calc(100vh - 325px)">
@@ -71,17 +74,43 @@ function NoSearch() {
     </Box>
 }
 
-function AnatomicalEntityAutoComplete ({ label, ...props } : any) {
-    const [open, setOpen] = React.useState(false);
-    const [loading, setLoading] = React.useState(false);
-    const [options, setOptions] = React.useState<readonly AnatomicalEntity[]>([]);
+function AnatomicalEntityAutoComplete({placeholder, ...props}: any) {
+    const [value, setValue] = React.useState<AnatomicalEntity | null>(null);
+    const [inputValue, setInputValue] = useState<string>("")
+    const [options, setOptions] = useState<readonly AnatomicalEntity[]>([]);
 
 
-    React.useEffect(() => {
-        if (!open) {
-            setOptions([]);
-        }
-    }, [open]);
+    const handleInputChange = (inputValue: string) => {
+        setInputValue(inputValue)
+    }
+
+    const fetchEntities = React.useMemo(
+        () =>
+            debounce(
+                () => {
+                    api.composerAnatomicalEntityList(
+                        selectRowsPerPage,
+                        inputValue,
+                        // todo: Add infinite scroll?
+                        0
+                    ).then(res => {
+                        const {data} = res
+                        const {results} = data
+                        let entities = results
+                        if (!entities) {
+                            entities = []
+                        }
+                        setOptions(entities)
+                    })
+                }, SEARCH_DEBOUNCE,
+            ),
+        [inputValue],
+    );
+
+
+    useEffect(() => {
+        fetchEntities()
+    }, [inputValue, value, fetchEntities])
 
     return (
         <Autocomplete
@@ -90,31 +119,27 @@ function AnatomicalEntityAutoComplete ({ label, ...props } : any) {
                 paddingRight: "1em"
             }}
             fullWidth
-            open={open}
-            onOpen={() => {
-                setOpen(true);
-            }}
-            onClose={() => {
-                setOpen(false);
-            }}
-            getOptionLabel={(anatomicalEntity) => anatomicalEntity.name}
+            popupIcon={<ExpandMoreIcon/>}
+
+            getOptionLabel={(option) =>
+                typeof option === 'string' ? option : option.name
+            }
+            filterOptions={(x) => x}
             options={options}
-            loading={loading}
+            autoComplete
+            includeInputInList
+            filterSelectedOptions
+            value={value}
+            noOptionsText="No entities found"
+            onChange={(event: any, newValue: AnatomicalEntity | null) => {
+                setOptions(newValue ? [newValue, ...options] : options);
+                setValue(newValue);
+            }}
+            onInputChange={(e, v) => handleInputChange(v)}
             renderInput={(params) => (
-                <TextField
-                    {...params}
-                    placeholder={label}
-                    InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                            <React.Fragment>
-                                {loading ? <CircularProgress color="inherit" size={20}/> : null}
-                                {params.InputProps.endAdornment}
-                            </React.Fragment>
-                        ),
-                    }}
-                />
+                <TextField {...params} placeholder={placeholder} fullWidth />
             )}
+
         />
     );
 }
@@ -181,6 +206,12 @@ export default function CheckDuplicates() {
         fetchDuplicates(ordering);
         setCurrentPage(0);
     };
+
+    const swapEntities = () => {
+        const temp = origin
+        setOrigin(destination)
+        setDestination(temp)
+    }
 
     const rows: GridRowsProp =
         statementsList?.results?.map((statement) => {
@@ -252,8 +283,8 @@ export default function CheckDuplicates() {
                         boxShadow: "0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)",
                         border: "1px solid #EAECF0"
                     }}>
-                        <AnatomicalEntityAutoComplete label="Select origin"/>
-                        <Box sx={{
+                        <AnatomicalEntityAutoComplete placeholder="Select origin"/>
+                        <Fab sx={{
                             display: "flex",
                             flexDirection: "row",
                             justifyContent: "center",
@@ -265,11 +296,12 @@ export default function CheckDuplicates() {
                             border: "1px solid #E2ECFB",
                             borderRadius: "100px",
                             flex: "none",
-                            flexGrow: 0
-                        }}>
+                            flexGrow: 0,
+                            boxShadow: "none"
+                        }} onClick={() => swapEntities()}>
                             <SwapHorizIcon sx={{color: "#548CE5"}}/>
-                        </Box>
-                        <AnatomicalEntityAutoComplete label="Select destination"/>
+                        </Fab>
+                        <AnatomicalEntityAutoComplete placeholder="Select destination"/>
                         <Button variant="contained" sx={{minWidth: "14em"}}
                                 onClick={() => fetchDuplicates()}>
                             Check for duplicates
