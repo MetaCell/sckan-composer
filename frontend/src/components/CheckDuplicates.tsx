@@ -16,7 +16,6 @@ import {
     GridColDef,
     GridEventListener,
     GridRenderCellParams,
-    GridRowSpacingParams,
     GridRowsProp
 } from "@mui/x-data-grid";
 import {useEffect, useMemo, useState} from "react";
@@ -25,13 +24,31 @@ import {composerApi as api} from "../services/apis";
 import {useNavigate} from "react-router-dom";
 import {Autocomplete, Chip, debounce, Fab} from "@mui/material";
 import {SEARCH_DEBOUNCE} from "../settings";
+import {
+    connectivityStatementStateColorMapping,
+    duplicatesRowsPerPage,
+    duplicatesSelectRowsPerPage
+} from "../helpers/settings";
+
+
+type chipColor =
+    | ("default" | "info" | "success" | "error" | "warning" | "primary" | "secondary")
+    | undefined;
+
+function getStateColor(value: string | undefined) {
+    let state = value
+    if (!state) {
+        state = "default"
+    }
+    return connectivityStatementStateColorMapping[state as keyof typeof connectivityStatementStateColorMapping] as chipColor;
+}
 
 const columns: GridColDef[] = [
     {
         field: "pmid", headerName: "PMID",
         renderCell:
             (params: GridRenderCellParams<string>) => (
-                <Box sx={{padding:"1em"}}>
+                <Box sx={{padding: "1em"}}>
                     <Typography variant={"h6"}>#{params.value}</Typography>
                 </Box>
             )
@@ -40,8 +57,8 @@ const columns: GridColDef[] = [
         field: "state", headerName: "Status", sortable: false, flex: 1,
         renderCell:
             (params: GridRenderCellParams<string>) => (
-                <Box sx={{padding:"1em"}}>
-                    <Chip label={params.value}/>
+                <Box sx={{padding: "1em"}}>
+                    <Chip color={getStateColor(params.value)} label={params.value}/>
                 </Box>
             )
     },
@@ -49,31 +66,30 @@ const columns: GridColDef[] = [
         field: "knowledge_statement", headerName: "Connectivity Statement", sortable: false, flex: 2,
         renderCell:
             (params: GridRenderCellParams<string>) => (
-                <Box sx={{padding:"1em"}}>
+                <Box sx={{padding: "1em"}}>
                     <Typography>{params.value}</Typography>
                 </Box>
             )
     },
 ];
 
-const rowsPerPage = 10;
-const selectRowsPerPage = 100;
-
 function ResultsGrid({rows, totalResults, handlePageChange, handleRowClick, handleSortModelChange, currentPage}: any) {
-
-    return <Box flexGrow={1} height="calc(100vh - 325px)">
+    const resultStr = totalResults != 1 ? "Results" : "Result";
+    return <Box flexGrow={1} height="calc(100vh - 125px)">
+        <Typography sx={{paddingLeft: "1em", paddingBottom: "1em"}}>{totalResults} {resultStr}</Typography>
         <DataGrid
+            sx={{height: "calc(100% - 2em)"}}
             rows={rows}
             columns={columns}
             getRowHeight={() => "auto"}
-            pageSize={rowsPerPage}
+            pageSize={duplicatesRowsPerPage}
             paginationMode="server"
             sortingMode="server"
             rowCount={totalResults}
             onPageChange={handlePageChange}
             onRowClick={handleRowClick}
             onSortModelChange={handleSortModelChange}
-            rowsPerPageOptions={[rowsPerPage]}
+            rowsPerPageOptions={[duplicatesRowsPerPage]}
             page={currentPage}
             disableColumnMenu
         />
@@ -81,8 +97,14 @@ function ResultsGrid({rows, totalResults, handlePageChange, handleRowClick, hand
 }
 
 function NoResults({handleClearSearch}: any) {
-    return <Box
-        sx={{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center", flexDirection: "column"}}>
+    return <Box height="calc(100vh - 125px)"
+                sx={{
+                    display: "flex",
+                    flexGrow: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "column"
+                }}>
         <Box sx={{
             display: "flex",
             flexGrow: 1,
@@ -103,7 +125,8 @@ function NoResults({handleClearSearch}: any) {
 }
 
 function NoSearch() {
-    return <Box sx={{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center"}}>
+    return <Box sx={{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center"}}
+                height="calc(100vh - 125px)">
         <Typography>Add origin and destination to find duplicates</Typography>
     </Box>
 }
@@ -122,7 +145,7 @@ function AnatomicalEntityAutoComplete({placeholder, value, setValue, ...props}: 
             debounce(
                 () => {
                     api.composerAnatomicalEntityList(
-                        selectRowsPerPage,
+                        duplicatesSelectRowsPerPage,
                         inputValue,
                         // todo: Add infinite scroll?
                         0
@@ -205,7 +228,7 @@ export default function CheckDuplicates() {
             api.composerConnectivityStatementList(
                 destination.id,
                 undefined,
-                rowsPerPage,
+                duplicatesRowsPerPage,
                 undefined,
                 index,
                 ordering || sorting,
@@ -215,13 +238,15 @@ export default function CheckDuplicates() {
                     setStatementsList(res.data);
                     setSorting(ordering);
                 });
+        } else {
+            setStatementsList(undefined)
         }
 
     };
 
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);
-        const index = newPage * rowsPerPage;
+        const index = newPage * duplicatesRowsPerPage;
         fetchDuplicates(sorting, index);
     };
 
@@ -283,7 +308,7 @@ export default function CheckDuplicates() {
         NoSearch()
 
     return (
-        <div>
+        <Box>
             <Button variant="text" onClick={() => setDialogOpen(true)}>
                 <Box sx={{display: "flex", alignItems: "center"}}>
                     <ManageSearchIcon/> Check for duplicates
@@ -362,6 +387,6 @@ export default function CheckDuplicates() {
                     {results}
                 </DialogContent>
             </Dialog>
-        </div>
+        </Box>
     );
 }
