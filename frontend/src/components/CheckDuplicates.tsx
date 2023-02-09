@@ -11,6 +11,39 @@ import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import {DataGrid, GridColDef, GridEventListener, GridRowsProp} from "@mui/x-data-grid";
+import {useState} from "react";
+import {AnatomicalEntity, PaginatedConnectivityStatementWithDetailsList} from "../apiclient/backend";
+import {composerApi as api} from "../services/apis";
+import {useNavigate} from "react-router-dom";
+import {Autocomplete, CircularProgress} from "@mui/material";
+
+const columns: GridColDef[] = [
+    {field: "pmid", headerName: "PMID"},
+    {field: "state", headerName: "Status", sortable: false, flex: 1},
+    {field: "knowledge_statement", headerName: "Connectivity Statement", sortable: false, flex: 2},
+];
+const rowsPerPage = 10;
+
+function ResultsGrid({rows, totalResults, handlePageChange, handleRowClick, handleSortModelChange, currentPage}: any) {
+    return <Box flexGrow={1} height="calc(100vh - 325px)">
+        <DataGrid
+            rows={rows}
+            columns={columns}
+            getRowHeight={() => "auto"}
+            pageSize={rowsPerPage}
+            paginationMode="server"
+            sortingMode="server"
+            rowCount={totalResults}
+            onPageChange={handlePageChange}
+            onRowClick={handleRowClick}
+            onSortModelChange={handleSortModelChange}
+            rowsPerPageOptions={[rowsPerPage]}
+            page={currentPage}
+            disableColumnMenu
+        />
+    </Box>
+}
 
 function NoResults() {
     return <Box
@@ -24,9 +57,11 @@ function NoResults() {
             flexDirection: "column"
         }}>
             <Typography variant="h6">No duplicates found</Typography>
-            <Typography sx={{textAlign: "center"}}>We couldn’t find any record with these origin and destination in the database.</Typography>
+            <Typography sx={{textAlign: "center"}}>We couldn’t find any record with these origin and destination in the
+                database.</Typography>
         </Box>
-        <Button sx={{marginBottom: "3em", color:"#344054", border: "1px solid #D0D5DD"}} variant="outlined">Clear Search</Button>
+        <Button sx={{marginBottom: "3em", color: "#344054", border: "1px solid #D0D5DD"}} variant="outlined">Clear
+            Search</Button>
     </Box>
 }
 
@@ -36,34 +71,151 @@ function NoSearch() {
     </Box>
 }
 
-export default function CheckDuplicates() {
+function AnatomicalEntityAutoComplete ({ label, ...props } : any) {
     const [open, setOpen] = React.useState(false);
-    const [hasSearchHappened, setHasSearchHappened] = React.useState<boolean>(false)
+    const [loading, setLoading] = React.useState(false);
+    const [options, setOptions] = React.useState<readonly AnatomicalEntity[]>([]);
 
-    const handleClickOpen = () => {
-        setOpen(true);
+
+    React.useEffect(() => {
+        if (!open) {
+            setOptions([]);
+        }
+    }, [open]);
+
+    return (
+        <Autocomplete
+            sx={{
+                paddingLeft: "1em",
+                paddingRight: "1em"
+            }}
+            fullWidth
+            open={open}
+            onOpen={() => {
+                setOpen(true);
+            }}
+            onClose={() => {
+                setOpen(false);
+            }}
+            getOptionLabel={(anatomicalEntity) => anatomicalEntity.name}
+            options={options}
+            loading={loading}
+            renderInput={(params) => (
+                <TextField
+                    {...params}
+                    placeholder={label}
+                    InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                            <React.Fragment>
+                                {loading ? <CircularProgress color="inherit" size={20}/> : null}
+                                {params.InputProps.endAdornment}
+                            </React.Fragment>
+                        ),
+                    }}
+                />
+            )}
+        />
+    );
+}
+
+
+type criteria =
+    | ("pmid" | "-pmid")[]
+    | undefined;
+
+export default function CheckDuplicates() {
+    const [dialogOpen, setDialogOpen] = React.useState(false);
+    const [origin, setOrigin] = React.useState<number | undefined>(undefined);
+    const [destination, setDestination] = React.useState<number | undefined>(undefined);
+    const [statementsList, setStatementsList] = useState<PaginatedConnectivityStatementWithDetailsList>();
+    const [currentPage, setCurrentPage] = useState(0);
+    const [sorting, setSorting] = useState<criteria>(undefined);
+    const navigate = useNavigate();
+
+    const fetchDuplicates = (
+        ordering?: criteria,
+        index?: number,
+    ) => {
+        if (origin && destination) {
+            api.composerConnectivityStatementList(
+                destination,
+                undefined,
+                rowsPerPage,
+                undefined,
+                index,
+                ordering || sorting,
+                origin,
+            )
+                .then((res) => {
+                    setStatementsList(res.data);
+                    setSorting(ordering);
+                });
+        }
+
     };
 
-    const handleClose = () => {
-        setOpen(false);
+    const handlePageChange = (newPage: number) => {
+        setCurrentPage(newPage);
+        const index = newPage * rowsPerPage;
+        fetchDuplicates(sorting, index);
     };
 
-    const handleSearch = (event: any) => {
-        setHasSearchHappened(true);
-    }
+    const handleRowClick: GridEventListener<"rowClick"> = (params) => {
+        navigate(`statement/${params.row.id}`);
+    };
 
-    const listComponent = !hasSearchHappened ? NoResults() : NoSearch()
+    const handleSortModelChange = (model: any) => {
+        let ordering: criteria;
+        if (model.length === 0) {
+            ordering = undefined;
+        } else {
+            const {field, sort} = model[0];
+            const sortingCriteria = `${field} ${sort}`;
+            if (sortingCriteria === "pmid asc") {
+                ordering = ["pmid"];
+            } else if (sortingCriteria === "pmid desc") {
+                ordering = ["-pmid"];
+            }
+        }
+        fetchDuplicates(ordering);
+        setCurrentPage(0);
+    };
+
+    const rows: GridRowsProp =
+        statementsList?.results?.map((statement) => {
+            const {id, sentence, knowledge_statement, state} = statement;
+            return {
+                id,
+                // todo: change id to sentence.pmid
+                pmid: id,
+                knowledge_statement,
+                state,
+            };
+        }) || [];
+
+    const results = statementsList ?
+        statementsList.count == 0 ? NoResults() :
+            ResultsGrid({
+                rows,
+                totalResults: statementsList.count,
+                handlePageChange,
+                handleRowClick,
+                handleSortModelChange,
+                currentPage
+            }) :
+        NoSearch()
 
     return (
         <div>
-            <Button variant="text" onClick={handleClickOpen}>
+            <Button variant="text" onClick={() => setDialogOpen(true)}>
                 <Box sx={{display: "flex", alignItems: "center"}}>
                     <ManageSearchIcon/> Check for duplicates
                 </Box>
             </Button>
             <Dialog
-                open={open}
-                onClose={handleClose}
+                open={dialogOpen}
+                onClose={() => setDialogOpen(false)}
                 PaperProps={{
                     sx: {
                         minWidth: "50%",
@@ -81,7 +233,7 @@ export default function CheckDuplicates() {
                         </Typography>
                     </Box>
                     <IconButton sx={{ml: 'auto'}}>
-                        <CloseIcon onClick={() => handleClose()}/>
+                        <CloseIcon onClick={() => setDialogOpen(false)}/>
                     </IconButton>
                 </DialogTitle>
 
@@ -100,17 +252,7 @@ export default function CheckDuplicates() {
                         boxShadow: "0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)",
                         border: "1px solid #EAECF0"
                     }}>
-                        <TextField select variant={"outlined"} fullWidth label="Select origin"
-                                   sx={{
-                                       paddingLeft: "1em",
-                                       paddingRight: "1em"
-                                   }}
-                                   InputLabelProps={{shrink: false, sx: {paddingLeft: "1em"}}}
-                                   SelectProps={{
-                                       IconComponent: () => <ExpandMoreIcon/>,
-                                   }}
-                        >
-                        </TextField>
+                        <AnatomicalEntityAutoComplete label="Select origin"/>
                         <Box sx={{
                             display: "flex",
                             flexDirection: "row",
@@ -127,26 +269,14 @@ export default function CheckDuplicates() {
                         }}>
                             <SwapHorizIcon sx={{color: "#548CE5"}}/>
                         </Box>
-                        <TextField select variant={"outlined"} fullWidth label="Select destination"
-                                   sx={{
-                                       paddingLeft: "1em",
-                                       paddingRight: "1em"
-                                   }}
-                                   InputLabelProps={{shrink: false, sx: {paddingLeft: "1em"}}}
-                                   SelectProps={{
-                                       IconComponent: () => <ExpandMoreIcon/>,
-                                   }}
-                        >
-
-
-                        </TextField>
+                        <AnatomicalEntityAutoComplete label="Select destination"/>
                         <Button variant="contained" sx={{minWidth: "14em"}}
-                                onClick={(event) => handleSearch(event)}>
+                                onClick={() => fetchDuplicates()}>
                             Check for duplicates
                         </Button>
                     </Box>
 
-                    {listComponent}
+                    {results}
                 </DialogContent>
             </Dialog>
         </div>
