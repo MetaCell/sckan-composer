@@ -11,24 +11,56 @@ import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {DataGrid, GridColDef, GridEventListener, GridRowsProp} from "@mui/x-data-grid";
+import {
+    DataGrid,
+    GridColDef,
+    GridEventListener,
+    GridRenderCellParams,
+    GridRowSpacingParams,
+    GridRowsProp
+} from "@mui/x-data-grid";
 import {useEffect, useMemo, useState} from "react";
 import {AnatomicalEntity, PaginatedConnectivityStatementWithDetailsList} from "../apiclient/backend";
 import {composerApi as api} from "../services/apis";
 import {useNavigate} from "react-router-dom";
-import {Autocomplete, CircularProgress, debounce, Fab} from "@mui/material";
+import {Autocomplete, Chip, debounce, Fab} from "@mui/material";
 import {SEARCH_DEBOUNCE} from "../settings";
 
 const columns: GridColDef[] = [
-    {field: "pmid", headerName: "PMID"},
-    {field: "state", headerName: "Status", sortable: false, flex: 1},
-    {field: "knowledge_statement", headerName: "Connectivity Statement", sortable: false, flex: 2},
+    {
+        field: "pmid", headerName: "PMID",
+        renderCell:
+            (params: GridRenderCellParams<string>) => (
+                <Box sx={{padding:"1em"}}>
+                    <Typography variant={"h6"}>#{params.value}</Typography>
+                </Box>
+            )
+    },
+    {
+        field: "state", headerName: "Status", sortable: false, flex: 1,
+        renderCell:
+            (params: GridRenderCellParams<string>) => (
+                <Box sx={{padding:"1em"}}>
+                    <Chip label={params.value}/>
+                </Box>
+            )
+    },
+    {
+        field: "knowledge_statement", headerName: "Connectivity Statement", sortable: false, flex: 2,
+        renderCell:
+            (params: GridRenderCellParams<string>) => (
+                <Box sx={{padding:"1em"}}>
+                    <Typography>{params.value}</Typography>
+                </Box>
+            )
+    },
 ];
 
 const rowsPerPage = 10;
 const selectRowsPerPage = 100;
 
 function ResultsGrid({rows, totalResults, handlePageChange, handleRowClick, handleSortModelChange, currentPage}: any) {
+
     return <Box flexGrow={1} height="calc(100vh - 325px)">
         <DataGrid
             rows={rows}
@@ -48,7 +80,7 @@ function ResultsGrid({rows, totalResults, handlePageChange, handleRowClick, hand
     </Box>
 }
 
-function NoResults() {
+function NoResults({handleClearSearch}: any) {
     return <Box
         sx={{display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center", flexDirection: "column"}}>
         <Box sx={{
@@ -63,8 +95,10 @@ function NoResults() {
             <Typography sx={{textAlign: "center"}}>We couldn’t find any record with these origin and destination in the
                 database.</Typography>
         </Box>
-        <Button sx={{marginBottom: "3em", color: "#344054", border: "1px solid #D0D5DD"}} variant="outlined">Clear
-            Search</Button>
+        <Button sx={{marginBottom: "3em", color: "#344054", border: "1px solid #D0D5DD"}} variant="outlined"
+                onClick={() => handleClearSearch()}>
+            Clear Search
+        </Button>
     </Box>
 }
 
@@ -109,7 +143,13 @@ function AnatomicalEntityAutoComplete({placeholder, value, setValue, ...props}: 
 
     useEffect(() => {
         fetchEntities()
-    }, [inputValue, value, fetchEntities])
+    }, [inputValue, fetchEntities])
+
+    // useEffect(() => {
+    //     if(value){
+    //         setOptions([value, ...options])
+    //     }
+    // }, [value])
 
     return (
         <Autocomplete
@@ -137,9 +177,8 @@ function AnatomicalEntityAutoComplete({placeholder, value, setValue, ...props}: 
             }}
             onInputChange={(e, v) => handleInputChange(v)}
             renderInput={(params) => (
-                <TextField {...params} placeholder={placeholder} fullWidth />
+                <TextField {...params} placeholder={placeholder} fullWidth/>
             )}
-
         />
     );
 }
@@ -213,6 +252,12 @@ export default function CheckDuplicates() {
         setDestination(temp)
     }
 
+    const handleClearSearch = () => {
+        setOrigin(undefined)
+        setDestination(undefined)
+        setStatementsList(undefined)
+    }
+
     const rows: GridRowsProp =
         statementsList?.results?.map((statement) => {
             const {id, sentence, knowledge_statement, state} = statement;
@@ -226,7 +271,7 @@ export default function CheckDuplicates() {
         }) || [];
 
     const results = statementsList ?
-        statementsList.count == 0 ? NoResults() :
+        statementsList.count == 0 ? NoResults({handleClearSearch: () => handleClearSearch()}) :
             ResultsGrid({
                 rows,
                 totalResults: statementsList.count,
@@ -284,7 +329,7 @@ export default function CheckDuplicates() {
                         border: "1px solid #EAECF0"
                     }}>
                         <AnatomicalEntityAutoComplete placeholder="Select origin"
-                                                      setValue={(value: AnatomicalEntity)=>setOrigin(value)}
+                                                      setValue={(value: AnatomicalEntity) => setOrigin(value)}
                                                       value={origin}
                         />
                         <Fab sx={{
@@ -305,7 +350,7 @@ export default function CheckDuplicates() {
                             <SwapHorizIcon sx={{color: "#548CE5"}}/>
                         </Fab>
                         <AnatomicalEntityAutoComplete placeholder="Select destination"
-                                                      setValue={(value: AnatomicalEntity)=>setDestination(value)}
+                                                      setValue={(value: AnatomicalEntity) => setDestination(value)}
                                                       value={destination}
                         />
                         <Button variant="contained" sx={{minWidth: "14em"}}
