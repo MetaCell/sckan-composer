@@ -189,6 +189,7 @@ function AnatomicalEntityAutoComplete({placeholder, value, setValue, ...props}: 
             filterOptions={(x) => x}
             options={options}
             autoComplete
+            freeSolo
             includeInputInList
             filterSelectedOptions
             defaultValue={null}
