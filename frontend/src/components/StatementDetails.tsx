@@ -30,11 +30,15 @@ const StatementDetails = () => {
     if(statementId) {
       statementService.getObject(statementId).then((statement: ConnectivityStatement) => {
         setStatement(statement)
-        if(window.confirm(`This statement is assigned to ${statement.owner.first_name}, assign to yourself?`)){
-          statementService.save({...statement, owner_id: userProfile.getUser().id}).then((statement: ConnectivityStatement) => {
-            setStatement(statement)
-          })
+
+        if(statement.owner && statement.owner?.id !== userProfile.getUser().id) {
+          if(window.confirm(`This statement is assigned to ${statement.owner.first_name}, assign to yourself?`)){
+            statementService.save({...statement, owner_id: userProfile.getUser().id}).then((statement: ConnectivityStatement) => {
+              setStatement(statement)
+            })
+          }  
         }
+        
       }).finally(() => { 
         setLoading(false)
       })
