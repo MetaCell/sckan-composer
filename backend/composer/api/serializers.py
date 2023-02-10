@@ -151,6 +151,10 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
     owner = UserSerializer(required=False, read_only=True)
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
     available_transitions = serializers.SerializerMethodField(read_only=True)
+    has_notes = serializers.SerializerMethodField(read_only=True)
+
+    def get_has_notes(self, instance) -> bool:
+        return instance.has_notes
 
     def get_available_transitions(self, instance) -> list[str]:
         return [t.name for t in instance.get_available_state_transitions()]
@@ -164,12 +168,15 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
             "pmid",
             "pmcid",
             "doi",
+            "batch_name",
+            "external_ref",
             "tags",
             "owner",
             "owner_id",
             "state",
             "modified_date",
             "available_transitions",
+            "has_notes",
             "pmid_uri",
             "pmcid_uri",
             "doi_uri",
@@ -203,12 +210,15 @@ class ConnectivityStatementSerializer(
     path = ViaSerializer(source="via_set", many=True, read_only=True)
     species = SpecieSerializer(many=True, read_only=False)
     sentence = SentenceSerializer(required=False, read_only=True)
-
     available_transitions = serializers.SerializerMethodField()
+    has_notes = serializers.SerializerMethodField()
 
     def get_available_transitions(self, instance) -> list[str]:
         return [t.name for t in instance.get_available_state_transitions()]
 
+    def get_has_notes(self, instance) -> bool:
+        return instance.has_notes
+    
     class Meta:
         model = ConnectivityStatement
         fields = (
@@ -236,43 +246,9 @@ class ConnectivityStatementSerializer(
             "biological_sex",
             "apinatomy_model",
             "modified_date",
+            "has_notes",
         )
         depth = 2
-        read_only_fields = ("state",)
-
-
-class SentenceWithDetailsSerializer(serializers.ModelSerializer):
-    """Sentence with details"""
-
-    has_notes = serializers.SerializerMethodField()
-    owner = UserSerializer(read_only=True)
-    tags = TagSerializer(many=True, read_only=True)
-
-    def get_has_notes(self, instance) -> bool:
-        return instance.has_notes
-
-    class Meta:
-        model = Sentence
-        fields = "__all__"
-        read_only_fields = (
-            "state",
-            "modified_date",
-        )
-
-
-class ConnectivityStatementWithDetailsSerializer(serializers.ModelSerializer):
-    """Connectivity Statement with details"""
-
-    has_notes = serializers.SerializerMethodField()
-    owner = UserSerializer(read_only=True)
-    tags = TagSerializer(many=True, read_only=True)
-
-    def get_has_notes(self, instance) -> bool:
-        return instance.has_notes
-
-    class Meta:
-        model = ConnectivityStatement
-        exclude = ("path",)
         read_only_fields = ("state",)
 
 
