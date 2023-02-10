@@ -164,6 +164,8 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
             "pmid",
             "pmcid",
             "doi",
+            "batch_name",
+            "external_ref",
             "tags",
             "owner",
             "owner_id",
