@@ -19,7 +19,7 @@ import {
     GridRowsProp
 } from "@mui/x-data-grid";
 import {useEffect, useState} from "react";
-import {AnatomicalEntity, PaginatedConnectivityStatementWithDetailsList} from "../apiclient/backend";
+import {AnatomicalEntity, PaginatedConnectivityStatementList} from "../apiclient/backend";
 import {composerApi as api} from "../services/apis";
 import {useNavigate} from "react-router-dom";
 import {Autocomplete, Chip, debounce, Fab} from "@mui/material";
@@ -209,7 +209,7 @@ export default function CheckDuplicates() {
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const [origin, setOrigin] = React.useState<AnatomicalEntity | undefined>(undefined);
     const [destination, setDestination] = React.useState<AnatomicalEntity | undefined>(undefined);
-    const [statementsList, setStatementsList] = useState<PaginatedConnectivityStatementWithDetailsList>();
+    const [statementsList, setStatementsList] = useState<PaginatedConnectivityStatementList>();
     const [currentPage, setCurrentPage] = useState(0);
     const [sorting, setSorting] = useState<criteria>(undefined);
     const navigate = useNavigate();
