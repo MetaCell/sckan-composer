@@ -168,6 +168,7 @@ function AnatomicalEntityAutoComplete({placeholder, value, setValue, ...props}: 
         fetchEntities()
     }, [inputValue, fetchEntities])
 
+
     return (
         <Autocomplete
             sx={{
@@ -183,7 +184,6 @@ function AnatomicalEntityAutoComplete({placeholder, value, setValue, ...props}: 
             filterOptions={(x) => x}
             options={options}
             autoComplete
-            freeSolo
             includeInputInList
             filterSelectedOptions
             defaultValue={null}
