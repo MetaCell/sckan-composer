@@ -49,7 +49,7 @@ const columns: GridColDef[] = [
         renderCell:
             (params: GridRenderCellParams<string>) => (
                 <Box sx={{padding: "1em"}}>
-                    <Typography variant={"h6"}>#{params.value}</Typography>
+                    <Typography variant={"h6"}>{params.value}</Typography>
                 </Box>
             )
     },
@@ -73,7 +73,7 @@ const columns: GridColDef[] = [
     },
 ];
 
-function ResultsGrid({rows, totalResults, handlePageChange, handleRowClick, handleSortModelChange, currentPage}: any) {
+function ResultsGrid({rows, totalResults, handlePageChange, handleSortModelChange, currentPage}: any) {
     const resultStr = totalResults != 1 ? "Results" : "Result";
     return <Box flexGrow={1} height="calc(100vh - 125px)">
         <Typography sx={{paddingLeft: "1em", paddingBottom: "1em"}}>{totalResults} {resultStr}</Typography>
@@ -87,7 +87,6 @@ function ResultsGrid({rows, totalResults, handlePageChange, handleRowClick, hand
             sortingMode="server"
             rowCount={totalResults}
             onPageChange={handlePageChange}
-            onRowClick={handleRowClick}
             onSortModelChange={handleSortModelChange}
             rowsPerPageOptions={[duplicatesRowsPerPage]}
             page={currentPage}
@@ -244,10 +243,6 @@ export default function CheckDuplicates() {
         fetchDuplicates(sorting, index);
     };
 
-    const handleRowClick: GridEventListener<"rowClick"> = (params) => {
-        navigate(`/statement/${params.row.id}`);
-    };
-
     const handleSortModelChange = (model: any) => {
         let ordering: criteria;
         if (model.length === 0) {
@@ -287,8 +282,7 @@ export default function CheckDuplicates() {
             const {id, sentence, knowledge_statement, state} = statement;
             return {
                 id,
-                // todo: change id to sentence.pmid
-                pmid: id,
+                pmid: sentence.pmid,
                 knowledge_statement,
                 state,
             };
@@ -300,7 +294,6 @@ export default function CheckDuplicates() {
                 rows,
                 totalResults: statementsList.count,
                 handlePageChange,
-                handleRowClick,
                 handleSortModelChange,
                 currentPage
             }) :
