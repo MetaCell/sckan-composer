@@ -277,6 +277,11 @@ export default function CheckDuplicates() {
         setStatementsList(undefined)
     }
 
+    const handleClose = () => {
+        setDialogOpen(false)
+        handleClearSearch()
+    }
+
     const rows: GridRowsProp =
         statementsList?.results?.map((statement) => {
             const {id, sentence, knowledge_statement, state} = statement;
@@ -310,7 +315,9 @@ export default function CheckDuplicates() {
             </Button>
             <Dialog
                 open={dialogOpen}
-                onClose={() => setDialogOpen(false)}
+                onClose={() => {
+                    handleClose()
+                }}
                 PaperProps={{
                     sx: {
                         minWidth: "50%",
@@ -328,7 +335,7 @@ export default function CheckDuplicates() {
                         </Typography>
                     </Box>
                     <IconButton sx={{ml: 'auto'}}>
-                        <CloseIcon onClick={() => setDialogOpen(false)}/>
+                        <CloseIcon onClick={() => handleClose()}/>
                     </IconButton>
                 </DialogTitle>
 
