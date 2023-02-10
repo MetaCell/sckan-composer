@@ -1,4 +1,5 @@
 import csv
+import os
 
 from django.core.management.base import BaseCommand
 
@@ -8,7 +9,10 @@ ID = "id"
 PMID = "pmid"
 PMCID = "pmcid"
 DOI = "doi"
+BATCH_NAME = "batch_name"
+EXTERNAL_REF = "sentence_id"
 SENTENCE = "sentence"
+SENTENCE_ID = "sentence_id"
 OUT_OF_SCOPE = "out_of_scope"
 
 
@@ -22,15 +26,16 @@ class Command(BaseCommand):
         return None if value == "0" or len(str(value)) == 0 else value
 
     def handle(self, *args, **options):
-        for csv_file in options["csv_files"]:
+        for csv_file_name in options["csv_files"]:
             with open(
-                csv_file, newline="", encoding="utf-8", errors="ignore"
+                csv_file_name, newline="", encoding="utf-8", errors="ignore"
             ) as csvfile:
                 nlpreader = csv.DictReader(
                     csvfile,
                     delimiter=";",
                     quotechar='"',
                 )
+                default_batch_name = os.path.basename(csv_file_name)
                 for row in nlpreader:
                     rowid = row[ID]
                     out_of_scope = row[OUT_OF_SCOPE].lower()
@@ -42,16 +47,18 @@ class Command(BaseCommand):
                     pmcid = self.to_none(row[PMCID])
                     doi = self.to_none(row[DOI])
                     text = row[SENTENCE]
+                    external_ref = row[EXTERNAL_REF]
+                    batch_name = self.to_none(row[BATCH_NAME])
+                    if not batch_name:
+                        batch_name = default_batch_name
                     title = text[0:199]
                     sentence, created = Sentence.objects.get_or_create(
-                        pmid=pmid,
-                        pmcid=pmcid,
-                        doi=doi,
-                        text=text,
-                        defaults={"title": title},
+                        external_ref=external_ref,
+                        batch_name=batch_name,
+                        defaults={"title": title, "text": text, "doi": doi, "pmid": pmid, "pmcid": pmcid},
                     )
                     if created:
                         self.stdout.write(
-                            f"{rowid}: sentence created with pmid {pmid}, pmcid {pmcid}, doi {doi}."
+                            f"{rowid}: sentence created: batch {batch_name}, ref {external_ref}, pmid {pmid}, pmcid {pmcid}, doi {doi}."
                         )
                         sentence.save()
