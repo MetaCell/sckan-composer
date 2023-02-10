@@ -18,7 +18,7 @@ import {
     GridRenderCellParams,
     GridRowsProp
 } from "@mui/x-data-grid";
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useState} from "react";
 import {AnatomicalEntity, PaginatedConnectivityStatementWithDetailsList} from "../apiclient/backend";
 import {composerApi as api} from "../services/apis";
 import {useNavigate} from "react-router-dom";
@@ -147,7 +147,7 @@ function AnatomicalEntityAutoComplete({placeholder, value, setValue, ...props}: 
                     api.composerAnatomicalEntityList(
                         duplicatesSelectRowsPerPage,
                         inputValue,
-                        // todo: Add infinite scroll?
+                        // todo: Add 'paginated' scroll?
                         0
                     ).then(res => {
                         const {data} = res
@@ -167,12 +167,6 @@ function AnatomicalEntityAutoComplete({placeholder, value, setValue, ...props}: 
     useEffect(() => {
         fetchEntities()
     }, [inputValue, fetchEntities])
-
-    // useEffect(() => {
-    //     if(value){
-    //         setOptions([value, ...options])
-    //     }
-    // }, [value])
 
     return (
         <Autocomplete
@@ -206,7 +200,6 @@ function AnatomicalEntityAutoComplete({placeholder, value, setValue, ...props}: 
         />
     );
 }
-
 
 type criteria =
     | ("pmid" | "-pmid")[]
@@ -252,7 +245,7 @@ export default function CheckDuplicates() {
     };
 
     const handleRowClick: GridEventListener<"rowClick"> = (params) => {
-        navigate(`statement/${params.row.id}`);
+        navigate(`/statement/${params.row.id}`);
     };
 
     const handleSortModelChange = (model: any) => {
