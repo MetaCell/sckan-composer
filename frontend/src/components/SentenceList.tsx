@@ -13,7 +13,7 @@ import AddIcon from "@mui/icons-material/Add";
 import FilterListIcon from "@mui/icons-material/FilterList";
 
 import { useNavigate } from "react-router-dom";
-import { PaginatedSentenceWithDetailsList } from "../apiclient/backend";
+import { PaginatedSentenceList } from "../apiclient/backend";
 import { composerApi as api } from "../services/apis";
 import { useGutters } from "../styles/styles";
 import Header from "./Header";
@@ -33,7 +33,7 @@ const toolbarStyle = {
 
 const SentenceList = () => {
   const [sentenceList, setSentenceList] =
-    useState<PaginatedSentenceWithDetailsList>();
+    useState<PaginatedSentenceList>();
   const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [sorting, setSorting] = useState<criteria>();

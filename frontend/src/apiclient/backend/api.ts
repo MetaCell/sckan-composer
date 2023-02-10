@@ -233,115 +233,12 @@ export interface ConnectivityStatement {
      * @memberof ConnectivityStatement
      */
     'modified_date': string;
-}
-/**
- * Connectivity Statement with details
- * @export
- * @interface ConnectivityStatementWithDetails
- */
-export interface ConnectivityStatementWithDetails {
-    /**
-     * 
-     * @type {number}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'id': number;
     /**
      * 
      * @type {boolean}
-     * @memberof ConnectivityStatementWithDetails
+     * @memberof ConnectivityStatement
      */
     'has_notes': boolean;
-    /**
-     * 
-     * @type {User}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'owner': User;
-    /**
-     * 
-     * @type {Array<Tag>}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'tags': Array<Tag>;
-    /**
-     * 
-     * @type {string}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'knowledge_statement': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'state': string;
-    /**
-     * 
-     * @type {DestinationTypeEnum}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'destination_type'?: DestinationTypeEnum;
-    /**
-     * 
-     * @type {LateralityEnum}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'laterality'?: LateralityEnum;
-    /**
-     * 
-     * @type {CircuitTypeEnum}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'circuit_type'?: CircuitTypeEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'biological_sex'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'apinatomy_model'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'modified_date': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'sentence': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'origin'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'destination'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'ans_division'?: number | null;
-    /**
-     * 
-     * @type {Array<number>}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'species'?: Array<number>;
 }
 /**
  * 
@@ -546,33 +443,33 @@ export interface PaginatedAnsDivisionList {
 /**
  * 
  * @export
- * @interface PaginatedConnectivityStatementWithDetailsList
+ * @interface PaginatedConnectivityStatementList
  */
-export interface PaginatedConnectivityStatementWithDetailsList {
+export interface PaginatedConnectivityStatementList {
     /**
      * 
      * @type {number}
-     * @memberof PaginatedConnectivityStatementWithDetailsList
+     * @memberof PaginatedConnectivityStatementList
      */
     'count'?: number;
     /**
      * 
      * @type {string}
-     * @memberof PaginatedConnectivityStatementWithDetailsList
+     * @memberof PaginatedConnectivityStatementList
      */
     'next'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof PaginatedConnectivityStatementWithDetailsList
+     * @memberof PaginatedConnectivityStatementList
      */
     'previous'?: string | null;
     /**
      * 
-     * @type {Array<ConnectivityStatementWithDetails>}
-     * @memberof PaginatedConnectivityStatementWithDetailsList
+     * @type {Array<ConnectivityStatement>}
+     * @memberof PaginatedConnectivityStatementList
      */
-    'results'?: Array<ConnectivityStatementWithDetails>;
+    'results'?: Array<ConnectivityStatement>;
 }
 /**
  * 
@@ -608,33 +505,33 @@ export interface PaginatedNoteList {
 /**
  * 
  * @export
- * @interface PaginatedSentenceWithDetailsList
+ * @interface PaginatedSentenceList
  */
-export interface PaginatedSentenceWithDetailsList {
+export interface PaginatedSentenceList {
     /**
      * 
      * @type {number}
-     * @memberof PaginatedSentenceWithDetailsList
+     * @memberof PaginatedSentenceList
      */
     'count'?: number;
     /**
      * 
      * @type {string}
-     * @memberof PaginatedSentenceWithDetailsList
+     * @memberof PaginatedSentenceList
      */
     'next'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof PaginatedSentenceWithDetailsList
+     * @memberof PaginatedSentenceList
      */
     'previous'?: string | null;
     /**
      * 
-     * @type {Array<SentenceWithDetails>}
-     * @memberof PaginatedSentenceWithDetailsList
+     * @type {Array<Sentence>}
+     * @memberof PaginatedSentenceList
      */
-    'results'?: Array<SentenceWithDetails>;
+    'results'?: Array<Sentence>;
 }
 /**
  * 
@@ -879,6 +776,12 @@ export interface PatchedConnectivityStatement {
      * @memberof PatchedConnectivityStatement
      */
     'modified_date'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PatchedConnectivityStatement
+     */
+    'has_notes'?: boolean;
 }
 /**
  * Note
@@ -961,6 +864,18 @@ export interface PatchedSentence {
     'doi'?: string | null;
     /**
      * 
+     * @type {string}
+     * @memberof PatchedSentence
+     */
+    'batch_name'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedSentence
+     */
+    'external_ref'?: string;
+    /**
+     * 
      * @type {Array<Tag>}
      * @memberof PatchedSentence
      */
@@ -995,6 +910,12 @@ export interface PatchedSentence {
      * @memberof PatchedSentence
      */
     'available_transitions'?: Array<string>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PatchedSentence
+     */
+    'has_notes'?: boolean;
     /**
      * 
      * @type {string}
@@ -1126,6 +1047,18 @@ export interface Sentence {
     'doi'?: string | null;
     /**
      * 
+     * @type {string}
+     * @memberof Sentence
+     */
+    'batch_name'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof Sentence
+     */
+    'external_ref': string;
+    /**
+     * 
      * @type {Array<Tag>}
      * @memberof Sentence
      */
@@ -1162,6 +1095,12 @@ export interface Sentence {
     'available_transitions': Array<string>;
     /**
      * 
+     * @type {boolean}
+     * @memberof Sentence
+     */
+    'has_notes': boolean;
+    /**
+     * 
      * @type {string}
      * @memberof Sentence
      */
@@ -1178,79 +1117,6 @@ export interface Sentence {
      * @memberof Sentence
      */
     'doi_uri': string;
-}
-/**
- * Sentence with details
- * @export
- * @interface SentenceWithDetails
- */
-export interface SentenceWithDetails {
-    /**
-     * 
-     * @type {number}
-     * @memberof SentenceWithDetails
-     */
-    'id': number;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SentenceWithDetails
-     */
-    'has_notes': boolean;
-    /**
-     * 
-     * @type {User}
-     * @memberof SentenceWithDetails
-     */
-    'owner': User;
-    /**
-     * 
-     * @type {Array<Tag>}
-     * @memberof SentenceWithDetails
-     */
-    'tags': Array<Tag>;
-    /**
-     * 
-     * @type {string}
-     * @memberof SentenceWithDetails
-     */
-    'title': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SentenceWithDetails
-     */
-    'text': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SentenceWithDetails
-     */
-    'state': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof SentenceWithDetails
-     */
-    'pmid'?: number | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof SentenceWithDetails
-     */
-    'pmcid'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof SentenceWithDetails
-     */
-    'doi'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof SentenceWithDetails
-     */
-    'modified_date': string;
 }
 /**
  * Specie
@@ -3424,7 +3290,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementWithDetailsList>> {
+        async composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destination, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -3620,7 +3486,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceList(limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceWithDetailsList>> {
+        async composerSentenceList(limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceList(limit, notes, offset, ordering, state, tags, title, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -3875,7 +3741,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementWithDetailsList> {
+        composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementList> {
             return localVarFp.composerConnectivityStatementList(destination, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options).then((request) => request(axios, basePath));
         },
         /**
@@ -4053,7 +3919,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceList(limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: any): AxiosPromise<PaginatedSentenceWithDetailsList> {
+        composerSentenceList(limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: any): AxiosPromise<PaginatedSentenceList> {
             return localVarFp.composerSentenceList(limit, notes, offset, ordering, state, tags, title, options).then((request) => request(axios, basePath));
         },
         /**
