@@ -39,6 +39,25 @@ class SentenceFilter(django_filters.FilterSet):
         fields = []
 
 
+def ae_destination(request, *args, **kwargs):
+    if request is None:
+        return AnatomicalEntity.objects.none()
+    
+    destination = request.query_params.get("destination")
+    if destination is None:
+        return AnatomicalEntity.objects.none()
+    ae = AnatomicalEntity.objects.get(id=destination)
+    return AnatomicalEntity.objects.filter(ontology_uri=ae.ontology_uri)
+
+
+def ae_destination(qs, field, anatomical_entity):
+    return qs.filter(destination__ontology_uri=anatomical_entity.ontology_uri)
+
+
+def ae_origin(qs, field, anatomical_entity):
+    return qs.filter(origin__ontology_uri=anatomical_entity.ontology_uri)
+
+
 class ConnectivityStatementFilter(django_filters.FilterSet):
     sentence_id = django_filters.ModelChoiceFilter(
         field_name="sentence_id", queryset=Sentence.objects.all()
@@ -53,10 +72,10 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
         field_name="tags", queryset=Tag.objects.all()
     )
     origin = django_filters.ModelChoiceFilter(
-        field_name="origin", queryset=AnatomicalEntity.objects.all()
+        field_name="origin", queryset=AnatomicalEntity.objects.all(), method=ae_origin
     )
     destination = django_filters.ModelChoiceFilter(
-        field_name="destination", queryset=AnatomicalEntity.objects.all()
+        field_name="destination", queryset=AnatomicalEntity.objects.all(), method=ae_destination
     )
     notes = django_filters.BooleanFilter(
         field_name="notes", label="Checks if entity has notes", method=field_has_content
