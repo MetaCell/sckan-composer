@@ -52,13 +52,16 @@ class Command(BaseCommand):
                     if not batch_name:
                         batch_name = default_batch_name
                     title = text[0:199]
-                    sentence, created = Sentence.objects.get_or_create(
-                        external_ref=external_ref,
-                        batch_name=batch_name,
-                        defaults={"title": title, "text": text, "doi": doi, "pmid": pmid, "pmcid": pmcid},
-                    )
-                    if created:
-                        self.stdout.write(
-                            f"{rowid}: sentence created: batch {batch_name}, ref {external_ref}, pmid {pmid}, pmcid {pmcid}, doi {doi}."
+                    try:
+                        sentence, created = Sentence.objects.get_or_create(
+                            external_ref=external_ref,
+                            batch_name=batch_name,
+                            defaults={"title": title, "text": text, "doi": doi, "pmid": pmid, "pmcid": pmcid},
                         )
-                        sentence.save()
+                        if created:
+                            self.stdout.write(
+                                f"{rowid}: sentence created: batch {batch_name}, ref {external_ref}, pmid {pmid}, pmcid {pmcid}, doi {doi}."
+                            )
+                            sentence.save()
+                    except Exception as e:
+                        self.stdout.write(f"{rowid}: error: {e}")
