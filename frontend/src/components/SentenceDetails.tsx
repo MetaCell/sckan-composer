@@ -12,6 +12,7 @@ import NoteForm from './Forms/NoteForm';
 import TagForm from './Forms/TagForm';
 import { Sentence } from '../apiclient/backend/api';
 import { userProfile } from '../services/UserService'
+import CheckDuplicates from "./CheckForDuplicates/CheckDuplicatesDialog"
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams()
@@ -69,6 +70,7 @@ const SentencesDetails = () => {
         {
           !disabled && sentence?.available_transitions.map((transition) => <Button key={transition} onClick={() => doTransition(transition)}>{transition}</Button>)
         }
+        <CheckDuplicates/>
         <SentenceForm data={sentence} disabled={disabled} format='full' setter={setSentence}/>
         <Button onClick={() => setExtraStatementForm((prev) => [...prev, ''])}>Add Statement</Button>
       </Grid>
