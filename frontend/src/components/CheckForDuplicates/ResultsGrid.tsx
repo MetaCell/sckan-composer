@@ -47,7 +47,7 @@ export default function ResultsGrid({rows, totalResults, handlePageChange, handl
             headerClassName: 'grid--header',
             renderCell:
                 (params: GridRenderCellParams<string>) => (
-                    <Box sx={{padding: "0.2em 0.7em"}}>
+                    <Box>
                         <Chip sx={{
                             color: getChipColor(params.value, false),
                             backgroundColor: getChipColor(params.value, true)
@@ -60,7 +60,7 @@ export default function ResultsGrid({rows, totalResults, handlePageChange, handl
             headerClassName: 'grid--header',
             renderCell:
                 (params: GridRenderCellParams<string>) => (
-                    <Box sx={{padding: "1em"}}>
+                    <Box sx={{padding: "1em 1em 1em 0"}}>
                         <Typography>{params.value}</Typography>
                     </Box>
                 )
