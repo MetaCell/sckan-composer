@@ -12,7 +12,7 @@ import TagForm from './Forms/TagForm'
 import { ConnectivityStatement } from '../apiclient/backend/api';
 import { Button } from '@mui/material';
 import { userProfile } from '../services/UserService'
-import CheckDuplicates from "./CheckDuplicates";
+import CheckDuplicates from "./CheckForDuplicates/CheckDuplicatesDialog";
 
 
 const StatementDetails = () => {
