@@ -109,7 +109,7 @@ class SpecieSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Specie
-        fields = ("id", "name")
+        fields = ("id", "name", "uri")
 
 
 class ViaSerializer(serializers.ModelSerializer):
