@@ -26,6 +26,22 @@ const theme = createTheme({
     primary: {
       main: colorPrimary,
     },
+    info: {
+      main: '#184EA2',
+      light: '#ECFDF3',
+    },
+    success: {
+      main: '#027A48',
+      light: '#ECFDF3',
+    },
+    error: {
+      main: '#B42318',
+      light: '#FEF3F2',
+    },
+    warning: {
+      main: '#B54708',
+      light: '#FFFAEB'
+    },
     text: {
       primary: "#475467",
       disabled: "",

@@ -22,7 +22,7 @@ import {useEffect, useState} from "react";
 import {AnatomicalEntity, PaginatedConnectivityStatementList} from "../apiclient/backend";
 import {composerApi as api} from "../services/apis";
 import {useNavigate} from "react-router-dom";
-import {Autocomplete, Chip, debounce, Fab} from "@mui/material";
+import {Autocomplete, Chip, debounce, Fab, Theme, useTheme} from "@mui/material";
 import {SEARCH_DEBOUNCE} from "../settings";
 import {
     connectivityStatementStateColorMapping,
@@ -35,45 +35,59 @@ type chipColor =
     | ("default" | "info" | "success" | "error" | "warning" | "primary" | "secondary")
     | undefined;
 
-function getStateColor(value: string | undefined) {
-    let state = value
-    if (!state) {
-        state = "default"
-    }
-    return connectivityStatementStateColorMapping[state as keyof typeof connectivityStatementStateColorMapping] as chipColor;
-}
-
-const columns: GridColDef[] = [
-    {
-        field: "pmid", headerName: "PMID",
-        renderCell:
-            (params: GridRenderCellParams<string>) => (
-                <Box sx={{padding: "1em"}}>
-                    <Typography variant={"h6"}>{params.value}</Typography>
-                </Box>
-            )
-    },
-    {
-        field: "state", headerName: "Status", sortable: false, flex: 1,
-        renderCell:
-            (params: GridRenderCellParams<string>) => (
-                <Box sx={{padding: "1em"}}>
-                    <Chip color={getStateColor(params.value)} label={params.value}/>
-                </Box>
-            )
-    },
-    {
-        field: "knowledge_statement", headerName: "Connectivity Statement", sortable: false, flex: 2,
-        renderCell:
-            (params: GridRenderCellParams<string>) => (
-                <Box sx={{padding: "1em"}}>
-                    <Typography>{params.value}</Typography>
-                </Box>
-            )
-    },
-];
-
 function ResultsGrid({rows, totalResults, handlePageChange, handleSortModelChange, currentPage}: any) {
+    const theme = useTheme<Theme>()
+    const getChipColor = (state: string | undefined, background: boolean) => {
+        if(!state){
+            return theme.palette.primary.main
+        }
+        const severity = connectivityStatementStateColorMapping[state as keyof typeof connectivityStatementStateColorMapping] as chipColor;
+        switch (severity) {
+            case "info":
+                return background ? theme.palette.info.light : theme.palette.info.main;
+            case "success":
+                return background ? theme.palette.success.light : theme.palette.success.main;
+            case "warning":
+                return background ? theme.palette.warning.light : theme.palette.warning.main
+            case "error":
+                return background ? theme.palette.error.light : theme.palette.error.main
+            default:
+                return background ? theme.palette.primary.light : theme.palette.primary.main
+        }
+    }
+
+    const columns: GridColDef[] = [
+        {
+            field: "pmid", headerName: "PMID",
+            renderCell:
+                (params: GridRenderCellParams<string>) => (
+                    <Box sx={{padding: "1em"}}>
+                        <Typography variant={"h6"}>{params.value}</Typography>
+                    </Box>
+                )
+        },
+        {
+            field: "state", headerName: "Status", sortable: false, flex: 1,
+            renderCell:
+                (params: GridRenderCellParams<string>) => (
+                    <Box sx={{padding: "1em"}}>
+                        <Chip sx={{
+                            color: getChipColor(params.value, false),
+                            backgroundColor: getChipColor(params.value, true)
+                        }} label={params.value}/>
+                    </Box>
+                )
+        },
+        {
+            field: "knowledge_statement", headerName: "Connectivity Statement", sortable: false, flex: 2,
+            renderCell:
+                (params: GridRenderCellParams<string>) => (
+                    <Box sx={{padding: "1em"}}>
+                        <Typography>{params.value}</Typography>
+                    </Box>
+                )
+        },
+    ];
     const resultStr = totalResults != 1 ? "Results" : "Result";
     return <Box flexGrow={1} height="calc(100vh - 125px)">
         <Typography sx={{paddingLeft: "1em", paddingBottom: "1em"}}>{totalResults} {resultStr}</Typography>
