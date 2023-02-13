@@ -1,5 +1,3 @@
-
-
 export const hiddenWidget = (fields: string[]) => {
   let hiddenSchema = {}
   for (const f of fields) {
@@ -61,4 +59,8 @@ export const mapTagFilterSelectionToCheckbox = (tags: any[], currentSelection: a
   return initialSelection
 }
 
-
+export const snakeToSpace = (str: string) => {
+  return str.replaceAll('_',' ').split(' ').map((word) => {
+    return word[0].toUpperCase() + word.substring(1);
+  }).join(" ");
+}
