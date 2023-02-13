@@ -37,7 +37,7 @@ export default function ResultsGrid({rows, totalResults, handlePageChange, handl
             headerClassName: 'grid--header',
             renderCell:
                 (params: GridRenderCellParams<string>) => (
-                    <Box sx={{padding: "1em"}}>
+                    <Box sx={{padding: "1em 1em 1em 0"}}>
                         <Typography variant={"h6"}>{params.value}</Typography>
                     </Box>
                 )
