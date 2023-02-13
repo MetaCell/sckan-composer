@@ -16,6 +16,7 @@ from composer.models import (
     Specie,
     Tag,
     Via,
+    BiologicalSex
 )
 
 # Define Inlines
@@ -157,3 +158,4 @@ admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
 admin.site.register(Tag)
 admin.site.register(Sentence, SentenceAdmin)
 admin.site.register(Specie)
+admin.site.register(BiologicalSex)
