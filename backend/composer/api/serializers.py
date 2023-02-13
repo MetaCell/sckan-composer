@@ -19,6 +19,7 @@ from ..models import (
     Tag,
     Via,
 )
+from ..enums import SentenceState, CSState
 
 
 # MixIns
@@ -155,8 +156,8 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
 
     def get_has_notes(self, instance) -> bool:
         return instance.has_notes
-
-    def get_available_transitions(self, instance) -> list[str]:
+    
+    def get_available_transitions(self, instance) -> list[SentenceState]:
         return [t.name for t in instance.get_available_state_transitions()]
 
     class Meta:
@@ -213,7 +214,7 @@ class ConnectivityStatementSerializer(
     available_transitions = serializers.SerializerMethodField()
     has_notes = serializers.SerializerMethodField()
 
-    def get_available_transitions(self, instance) -> list[str]:
+    def get_available_transitions(self, instance) -> list[CSState]:
         return [t.name for t in instance.get_available_state_transitions()]
 
     def get_has_notes(self, instance) -> bool:

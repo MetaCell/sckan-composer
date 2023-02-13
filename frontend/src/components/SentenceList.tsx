@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useAppSelector, useAppDispatch } from "../redux/hooks";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
@@ -13,12 +14,14 @@ import AddIcon from "@mui/icons-material/Add";
 import FilterListIcon from "@mui/icons-material/FilterList";
 
 import { useNavigate } from "react-router-dom";
-import { PaginatedSentenceList } from "../apiclient/backend";
-import { composerApi as api } from "../services/apis";
 import { useGutters } from "../styles/styles";
+import { mapSortingModel } from "../helpers/helpers";
 import Header from "./Header";
 import Searchbar from "./Searchbar";
-import FilterDrawer from "./FilterDrawer";
+import FilterDrawer from "./Filters/FilterDrawer";
+import { setFilters, setIndex, setSorting } from "../redux/sentenceSlice";
+import { Sentence } from "../apiclient/backend";
+import sentenceService from "../services/SentenceService";
 
 type criteria =
   | ("pmid" | "-pmid" | "last_edited" | "-last_edited")[]
@@ -32,26 +35,19 @@ const toolbarStyle = {
 };
 
 const SentenceList = () => {
-  const [sentenceList, setSentenceList] =
-    useState<PaginatedSentenceList>();
-  const [totalResults, setTotalResults] = useState(0);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [sorting, setSorting] = useState<criteria>();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-  const [activeFilter, setActiveFilter] = useState({
-    states: [],
-    tags: [],
-  });
+  const [sentenceList, setSentenceList] = useState<Sentence[]>();
+  const [totalResults, setTotalResults] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+  const queryOptions = useAppSelector((state) => state.sentence.queryOptions);
 
-  const rowsPerPage = 10;
-
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
   const gutters = useGutters();
 
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+
   const rows: GridRowsProp =
-    sentenceList?.results?.map((sentence) => {
+    sentenceList?.map((sentence) => {
       const { id, pmid, title, state, modified_date, owner, tags, has_notes } =
         sentence;
       const ownerName = !owner ? "" : `${owner.first_name} ${owner.last_name}`;
@@ -86,40 +82,19 @@ const SentenceList = () => {
     { field: "notes", headerName: "Notes", sortable: false },
   ];
 
-  const fetchSentenceList = (
-    ordering?: criteria,
-    index?: number,
-    stateFilter?: any,
-    tagFilter?: any
-  ) => {
-    api
-      .composerSentenceList(
-        rowsPerPage,
-        undefined,
-        index,
-        ordering || sorting,
-        stateFilter || activeFilter.states,
-        tagFilter || activeFilter.tags,
-        searchQuery
-      )
-      .then((res) => {
-        setSentenceList(res.data);
-        setTotalResults(res.data.count || 0);
-        stateFilter &&
-          setActiveFilter((prev) => ({ ...prev, states: stateFilter }));
-        tagFilter && setActiveFilter((prev) => ({ ...prev, tags: tagFilter }));
-        setSorting(ordering);
-      });
-  };
-
   useEffect(() => {
-    fetchSentenceList(sorting, undefined);
-  }, [searchQuery]);
+    sentenceService.getList(queryOptions).then((res) => {
+      setSentenceList(res.results);
+      res.count && setTotalResults(res.count);
+      setLoading(false);
+    });
+  }, [queryOptions]);
+
+  const currentPage = (queryOptions.index || 0) / queryOptions.limit;
 
   const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-    const index = newPage * rowsPerPage;
-    fetchSentenceList(sorting, index);
+    const index = newPage * queryOptions.limit;
+    dispatch(setIndex(index));
   };
 
   const handleRowClick: GridEventListener<"rowClick"> = (params) => {
@@ -145,20 +120,11 @@ const SentenceList = () => {
         ordering = undefined;
       }
     }
-    fetchSentenceList(ordering);
-    setCurrentPage(0);
-  };
-
-  const handleFilter = (stateFilter = [], tagFilter = []) => {
-    fetchSentenceList(undefined, undefined, stateFilter, tagFilter);
+    dispatch(setSorting(ordering));
   };
 
   const handleClearFilter = () => {
-    fetchSentenceList(undefined, undefined, [], []);
-    setActiveFilter({
-      states: [],
-      tags: [],
-    });
+    dispatch(setFilters({ stateFilter: undefined, tagFilter: undefined }));
   };
 
   return (
@@ -176,7 +142,7 @@ const SentenceList = () => {
         sx={toolbarStyle}
       >
         <Grid item xs={3}>
-          <Searchbar setSearchQuery={setSearchQuery} />
+          <Searchbar queryOptions={queryOptions} />
         </Grid>
         <Grid item>
           <Button
@@ -195,12 +161,11 @@ const SentenceList = () => {
           >
             <FilterDrawer
               toggleDrawer={setIsFilterDrawerOpen}
-              handleFilter={handleFilter}
-              activeFilter={activeFilter}
+              queryOptions={queryOptions}
+              entity="sentence"
             />
           </Drawer>
-          {(activeFilter.states.length !== 0 ||
-            activeFilter.tags.length !== 0) && (
+          {(queryOptions.stateFilter || queryOptions.tagFilter) && (
             <Button onClick={handleClearFilter}>Clear Filter</Button>
           )}
         </Grid>
@@ -210,16 +175,22 @@ const SentenceList = () => {
           rows={rows}
           columns={columns}
           getRowHeight={() => "auto"}
-          pageSize={rowsPerPage}
+          pageSize={queryOptions.limit}
           paginationMode="server"
           sortingMode="server"
+          loading={loading}
           rowCount={totalResults}
           onPageChange={handlePageChange}
           onRowClick={handleRowClick}
           onSortModelChange={handleSortModelChange}
-          rowsPerPageOptions={[rowsPerPage]}
+          rowsPerPageOptions={[queryOptions.limit]}
           page={currentPage}
           disableColumnMenu
+          initialState={
+            queryOptions.ordering
+              ? mapSortingModel(queryOptions.ordering[0])
+              : undefined
+          }
         />
       </Box>
     </Box>

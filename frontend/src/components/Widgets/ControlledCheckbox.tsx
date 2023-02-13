@@ -19,7 +19,7 @@ const ControlledCheckbox = (props: any) => {
                 key={s.name}
                 checked={s.checked}
                 onChange={handleChange}
-                name={s.name}
+                name={s.name.toString()}
               />
             }
           />
