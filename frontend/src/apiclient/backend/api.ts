@@ -145,10 +145,10 @@ export interface ConnectivityStatement {
     'state': string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<ConnectivityStatementAvailableTransitionsEnum>}
      * @memberof ConnectivityStatement
      */
-    'available_transitions': Array<string>;
+    'available_transitions': Array<ConnectivityStatementAvailableTransitionsEnum>;
     /**
      * 
      * @type {number}
@@ -240,6 +240,27 @@ export interface ConnectivityStatement {
      */
     'has_notes': boolean;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const ConnectivityStatementAvailableTransitionsEnum = {
+    Draft: 'draft',
+    ComposeNow: 'compose_now',
+    Curated: 'curated',
+    Excluded: 'excluded',
+    Rejected: 'rejected',
+    ToBeReviewed: 'to_be_reviewed',
+    ConnectionMissing: 'connection_missing',
+    NpoApproved: 'npo_approved',
+    Approved: 'approved'
+} as const;
+
+export type ConnectivityStatementAvailableTransitionsEnum = typeof ConnectivityStatementAvailableTransitionsEnum[keyof typeof ConnectivityStatementAvailableTransitionsEnum];
+
+
 /**
  * 
  * @export
@@ -688,10 +709,10 @@ export interface PatchedConnectivityStatement {
     'state'?: string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<ConnectivityStatementAvailableTransitionsEnum>}
      * @memberof PatchedConnectivityStatement
      */
-    'available_transitions'?: Array<string>;
+    'available_transitions'?: Array<ConnectivityStatementAvailableTransitionsEnum>;
     /**
      * 
      * @type {number}
@@ -906,10 +927,10 @@ export interface PatchedSentence {
     'modified_date'?: string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<SentenceAvailableTransitionsEnum>}
      * @memberof PatchedSentence
      */
-    'available_transitions'?: Array<string>;
+    'available_transitions'?: Array<SentenceAvailableTransitionsEnum>;
     /**
      * 
      * @type {boolean}
@@ -1089,10 +1110,10 @@ export interface Sentence {
     'modified_date': string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<SentenceAvailableTransitionsEnum>}
      * @memberof Sentence
      */
-    'available_transitions': Array<string>;
+    'available_transitions': Array<SentenceAvailableTransitionsEnum>;
     /**
      * 
      * @type {boolean}
@@ -1118,6 +1139,24 @@ export interface Sentence {
      */
     'doi_uri': string;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const SentenceAvailableTransitionsEnum = {
+    Open: 'open',
+    ToBeReviewed: 'to_be_reviewed',
+    ComposeLater: 'compose_later',
+    ComposeNow: 'compose_now',
+    Excluded: 'excluded',
+    Duplicate: 'duplicate'
+} as const;
+
+export type SentenceAvailableTransitionsEnum = typeof SentenceAvailableTransitionsEnum[keyof typeof SentenceAvailableTransitionsEnum];
+
+
 /**
  * Specie
  * @export

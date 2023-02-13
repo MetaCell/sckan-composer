@@ -1,6 +1,7 @@
 import { composerApi } from "./apis";
-import { Sentence } from '../apiclient/backend/api';
+import { PaginatedSentenceList, Sentence } from '../apiclient/backend';
 import { AbstractService } from "./AbstractService";
+import { QueryParams } from "../redux/sentenceSlice";
 
 
 class SentenceService extends AbstractService {
@@ -18,6 +19,10 @@ class SentenceService extends AbstractService {
   }
   async removeTag(id: number, tagId: number): Promise<Sentence> {
     return composerApi.composerSentenceDelTagCreate(id, tagId).then((response: any) => response.data)
+  }
+  async getList(queryOptions: QueryParams): Promise<PaginatedSentenceList> {
+    const { limit, ordering, index, title, stateFilter, tagFilter } = queryOptions
+    return composerApi.composerSentenceList(limit, undefined, index, ordering, stateFilter, tagFilter, title).then((res: any) => res.data)
   }
 }
 
