@@ -1,4 +1,4 @@
-from django.db.models import F, Q
+from django.db.models import Q
 import django_filters
 
 from composer.enums import SentenceState, CSState
