@@ -66,6 +66,31 @@ export interface AnsDivision {
     'name': string;
 }
 /**
+ * BiologicalSex
+ * @export
+ * @interface BiologicalSex
+ */
+export interface BiologicalSex {
+    /**
+     * 
+     * @type {number}
+     * @memberof BiologicalSex
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof BiologicalSex
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BiologicalSex
+     */
+    'ontology_uri': string;
+}
+/**
  * 
  * @export
  * @enum {string}
@@ -217,10 +242,16 @@ export interface ConnectivityStatement {
     'species': Array<Specie>;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof ConnectivityStatement
      */
-    'biological_sex'?: string | null;
+    'biological_sex_id': number;
+    /**
+     * 
+     * @type {BiologicalSex}
+     * @memberof ConnectivityStatement
+     */
+    'biological_sex': BiologicalSex;
     /**
      * 
      * @type {string}
@@ -781,10 +812,16 @@ export interface PatchedConnectivityStatement {
     'species'?: Array<Specie>;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof PatchedConnectivityStatement
      */
-    'biological_sex'?: string | null;
+    'biological_sex_id'?: number;
+    /**
+     * 
+     * @type {BiologicalSex}
+     * @memberof PatchedConnectivityStatement
+     */
+    'biological_sex'?: BiologicalSex;
     /**
      * 
      * @type {string}
@@ -1175,6 +1212,12 @@ export interface Specie {
      * @memberof Specie
      */
     'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Specie
+     */
+    'ontology_uri': string;
 }
 /**
  * Note Tag
