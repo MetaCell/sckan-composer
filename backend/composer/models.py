@@ -116,7 +116,7 @@ class Specie(models.Model):
     """Specie"""
 
     name = models.CharField(max_length=200, db_index=True, unique=True)
-    uri = models.URLField()
+    ontology_uri = models.URLField()
 
     def __str__(self):
         return self.name
@@ -130,7 +130,7 @@ class BiologicalSex(models.Model):
     """Biological Sex"""
 
     name = models.CharField(max_length=200, db_index=True, unique=True)
-    uri = models.URLField()
+    ontology_uri = models.URLField()
 
     def __str__(self):
         return self.name

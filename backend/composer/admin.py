@@ -8,6 +8,7 @@ from fsm_admin.mixins import FSMTransitionMixin
 from composer.models import (
     AnatomicalEntity,
     AnsDivision,
+    BiologicalSex,
     ConnectivityStatement,
     Doi,
     Note,
@@ -16,7 +17,6 @@ from composer.models import (
     Specie,
     Tag,
     Via,
-    BiologicalSex
 )
 
 # Define Inlines
@@ -152,10 +152,11 @@ class ConnectivityStatementAdmin(
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
+#
 admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
 admin.site.register(AnsDivision)
+admin.site.register(BiologicalSex)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
-admin.site.register(Tag)
 admin.site.register(Sentence, SentenceAdmin)
 admin.site.register(Specie)
-admin.site.register(BiologicalSex)
+admin.site.register(Tag)

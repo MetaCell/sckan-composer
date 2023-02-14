@@ -10,6 +10,7 @@ from django_fsm import FSMField
 from ..models import (
     AnatomicalEntity,
     AnsDivision,
+    BiologicalSex,
     ConnectivityStatement,
     Doi,
     Note,
@@ -109,7 +110,15 @@ class SpecieSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Specie
-        fields = ("id", "name", "uri")
+        fields = ("id", "name", "ontology_uri")
+
+
+class BiologicalSexSerializer(serializers.ModelSerializer):
+    """BiologicalSex"""
+
+    class Meta:
+        model = BiologicalSex
+        fields = ("id", "name", "ontology_uri")
 
 
 class ViaSerializer(serializers.ModelSerializer):
@@ -202,12 +211,14 @@ class ConnectivityStatementSerializer(
     origin_id = serializers.IntegerField()
     destination_id = serializers.IntegerField()
     ans_division_id = serializers.IntegerField()
+    biological_sex_id = serializers.IntegerField()
     tags = TagSerializer(many=True, read_only=False)
     dois = DoiSerializer(source="doi_set", many=True, read_only=False)
     owner = UserSerializer(required=False, read_only=True)
     origin = AnatomicalEntitySerializer(required=False, read_only=True)
     destination = AnatomicalEntitySerializer(required=False, read_only=True)
     ans_division = AnsDivisionSerializer(required=False, read_only=True)
+    biological_sex = BiologicalSexSerializer(required=False, read_only=True)
     path = ViaSerializer(source="via_set", many=True, read_only=True)
     species = SpecieSerializer(many=True, read_only=False)
     sentence = SentenceSerializer(required=False, read_only=True)
@@ -244,6 +255,7 @@ class ConnectivityStatementSerializer(
             "laterality",
             "circuit_type",
             "species",
+            "biological_sex_id",
             "biological_sex",
             "apinatomy_model",
             "modified_date",
