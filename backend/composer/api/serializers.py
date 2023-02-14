@@ -220,7 +220,7 @@ class ConnectivityStatementSerializer(
     ans_division = AnsDivisionSerializer(required=False, read_only=True)
     biological_sex = BiologicalSexSerializer(required=False, read_only=True)
     path = ViaSerializer(source="via_set", many=True, read_only=True)
-    species = SpecieSerializer(many=True, read_only=False)
+    species = SpecieSerializer(many=True, read_only=True)
     sentence = SentenceSerializer(required=False, read_only=True)
     available_transitions = serializers.SerializerMethodField()
     has_notes = serializers.SerializerMethodField()
