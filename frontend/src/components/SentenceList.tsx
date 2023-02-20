@@ -11,6 +11,7 @@ import {
   GridEventListener,
 } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import FilterListIcon from "@mui/icons-material/FilterList";
 
 import { useNavigate } from "react-router-dom";
@@ -22,6 +23,15 @@ import FilterDrawer from "./Filters/FilterDrawer";
 import { setFilters, setIndex, setSorting } from "../redux/sentenceSlice";
 import { Sentence } from "../apiclient/backend";
 import sentenceService from "../services/SentenceService";
+import CustomPagination from "./CustomPagination";
+import {
+  renderDate,
+  renderNote,
+  renderPMID,
+  renderState,
+  renderTag,
+  renderTitle,
+} from "./DataGridWidgets/DataGridWidgets";
 
 type criteria =
   | ("pmid" | "-pmid" | "last_edited" | "-last_edited")[]
@@ -64,22 +74,49 @@ const SentenceList = () => {
     }) || [];
 
   const columns: GridColDef[] = [
-    { field: "pmid", headerName: "PMID" },
-    { field: "title", headerName: "Sentence", flex: 2, sortable: false },
-    { field: "state", headerName: "Status", sortable: false, flex: 1 },
+    { field: "pmid", headerName: "PMID", renderCell: renderPMID },
+    {
+      field: "title",
+      headerName: "Sentence",
+      flex: 2,
+      sortable: false,
+      renderCell: renderTitle,
+    },
+    {
+      field: "state",
+      headerName: "Status",
+      sortable: false,
+      flex: 1,
+      renderCell: renderState,
+    },
     {
       field: "last_edited",
       headerName: "Last edited",
-      flex: 0.5,
-      valueFormatter: ({ value }) =>
-        new Date(value).toLocaleString(undefined, {
-          dateStyle: "long",
-          timeStyle: "short",
-        }),
+      flex: 1,
+      renderCell: renderDate,
     },
-    { field: "owner", headerName: "Owner", sortable: false },
-    { field: "tags", headerName: "Tags", sortable: false, flex: 1 },
-    { field: "notes", headerName: "Notes", sortable: false },
+    { field: "owner", headerName: "Owner", sortable: false, flex: 1 },
+    {
+      field: "tags",
+      headerName: "Tags",
+      sortable: false,
+      flex: 1,
+      renderCell: renderTag,
+    },
+    {
+      field: "notes",
+      headerName: "Notes",
+      sortable: false,
+      flex: 0.5,
+      renderCell: renderNote,
+    },
+    {
+      field: "icon",
+      headerName: "",
+      sortable: false,
+      flex: 0.1,
+      renderCell: () => <ChevronRightIcon fontSize="small" />,
+    },
   ];
 
   useEffect(() => {
@@ -191,6 +228,9 @@ const SentenceList = () => {
               ? mapSortingModel(queryOptions.ordering[0])
               : undefined
           }
+          components={{
+            Pagination: CustomPagination,
+          }}
         />
       </Box>
     </Box>

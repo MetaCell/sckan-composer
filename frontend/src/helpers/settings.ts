@@ -1,15 +1,21 @@
 
+import { StateToColor } from "./helpers";
+
 export const duplicatesRowsPerPage = 10;
 export const duplicatesSelectRowsPerPage = 100;
 
-export const connectivityStatementStateColorMapping = {
-    "draft": "info",
-    "compose_now": "info",
-    "curated": "success",
-    "excluded": "error",
-    "rejected": "error",
-    "to_be_reviewed": "warning",
-    "connection_missing": "warning",
-    "npo_approved": "success",
-    "approved": "success",
-}
+
+export const stateToColor: StateToColor = {
+    open: "primary", //blue,
+    compose_now: "error", //red
+    compose_later: "warning", // orange
+    curated: "success", // green
+    to_be_reviewed: "warning", //orange
+    excluded: "info", //grey
+    duplicate: "info", //grey
+    draft: "primary", // blue
+    rejected: "info", //grey,
+    connection_missing: "warning", // orange
+    npo_approved: "success", //green
+    approved: "success", //green
+};

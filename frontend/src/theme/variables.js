@@ -15,5 +15,7 @@ export const vars = {
     iconPrimaryColor:'#667085',
     buttonOutlinedColor:"#344054",
     buttonOutlinedBorderColor: "#D0D5DD",
+    buttonOutlinedHoverBg: '#F9FAFB',
+    darkTextColor: '#101828'
   };
   
