@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
 import { tags } from "../../services/TagService";
 import {
   mapStateFilterSelectionToCheckbox,
@@ -72,7 +73,7 @@ const FilterDrawer = (props: any) => {
       flexGrow={1}
       role="presentation"
     >
-      <Stack spacing={3} p={3}>
+      <Stack spacing={3} p={3} flex={1}>
         <Box>
           <Box
             display="flex"
@@ -96,6 +97,7 @@ const FilterDrawer = (props: any) => {
           setSelectedTags={setSelectedTags}
         />
       </Stack>
+      <Divider />
       <Box px={3} py={2} textAlign="right">
         <Button
           variant="outlined"

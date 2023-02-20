@@ -60,7 +60,33 @@ export const mapTagFilterSelectionToCheckbox = (tags: any[], currentSelection: a
 }
 
 export const snakeToSpace = (str: string) => {
-  return str.replaceAll('_',' ').split(' ').map((word) => {
+  return str.replaceAll('_', ' ').split(' ').map((word) => {
     return word[0].toUpperCase() + word.substring(1);
   }).join(" ");
 }
+export type color =
+  | "default"
+  | "primary"
+  | "secondary"
+  | "error"
+  | "info"
+  | "success"
+  | "warning";
+
+export interface StateToColor {
+  open: color;
+  compose_now: color;
+  compose_later: color;
+  curated: color;
+  to_be_reviewed: color;
+  excluded: color;
+  duplicate: color;
+  draft: color;
+  rejected: color;
+  connection_missing: color;
+  npo_approved: color;
+  approved: color;
+}
+
+
+

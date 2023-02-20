@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import ControlledCheckbox from "../Widgets/ControlledCheckbox";
 import { tags } from "../../services/TagService";
 
@@ -21,12 +21,12 @@ const TagFilter = (props: any) => {
   };
 
   return (
-    <Box>
+    <Stack spacing={2}>
       <Typography variant="subtitle1" color="#344054">
         Tags
       </Typography>
       <ControlledCheckbox data={tagsCheckboxData} handleChange={handleChange} />
-    </Box>
+    </Stack>
   );
 };
 

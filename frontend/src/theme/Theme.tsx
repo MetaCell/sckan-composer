@@ -16,6 +16,7 @@ const {
   iconPrimaryColor,
   buttonOutlinedColor,
   buttonOutlinedBorderColor,
+  buttonOutlinedHoverBg,
 } = vars;
 
 const theme = createTheme({
@@ -25,22 +26,24 @@ const theme = createTheme({
     },
     primary: {
       main: colorPrimary,
+      light: "#E2ECFB",
+      dark: "#184EA2",
     },
     info: {
-      main: '#184EA2',
-      light: '#ECFDF3',
+      main: "#344054",
+      light: "#F2F4F7",
     },
     success: {
-      main: '#027A48',
-      light: '#ECFDF3',
+      main: "#027A48",
+      light: "#ECFDF3",
     },
     error: {
-      main: '#B42318',
-      light: '#FEF3F2',
+      main: "#B42318",
+      light: "#FEF3F2",
     },
     warning: {
-      main: '#B54708',
-      light: '#FFFAEB'
+      main: "#B54708",
+      light: "#FFFAEB",
     },
     text: {
       primary: "#475467",
@@ -112,12 +115,25 @@ const theme = createTheme({
         background: #F9FAFB;
         border-radius: 0 !important;
       }
+      .MuiDataGrid-columnHeaderTitle {
+        font-size: 0.75rem;
+        color: #475467;
+      }
       .MuiDataGrid-footerContainer {
         background: #fff;
         border-radius: 0 0 12px 12px;
+        border-top: 0 !important;
       }
       .MuiDataGrid-main {
         background: #fff;
+      },
+      .MuiDataGrid-cell {
+        font-feature-settings: 'ss01' on, 'cv10' on, 'cv09' on;
+        padding: 8px 10px !important;
+        color: ${menuItemSelectedBg};
+      },
+      .MuiDataGrid-row:last-child > .MuiDataGrid-cell {
+        border-bottom: 0;
       }`,
     },
     MuiButton: {
@@ -194,16 +210,11 @@ const theme = createTheme({
         root: {
           border: "1px solid #EAECF0;",
           boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
-          // "&:hover": {
-          //   border: "1px solid #EAECF0;",
-          //   boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
-          //   color: "#EAECF0",
-          // },
-          // "&:focus": {
-          //   border: "1px solid #EAECF0;",
-          //   boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
-          //   color: "#EAECF0",
-          // },
+          "&:focus-within fieldset, &:focus-visible fieldset": {
+            border: "1px solid #8DB2EE !important",
+            boxShadow:
+              "0px 1px 2px rgba(16, 24, 40, 0.05), 0px 0px 0px 4px #CEDDED",
+          },
         },
       },
     },
@@ -212,6 +223,67 @@ const theme = createTheme({
         paper: {
           borderRadius: 0,
         },
+      },
+    },
+    MuiPagination: {
+      styleOverrides: {
+        ul: {
+          "& li:last-child": { marginLeft: "auto" },
+          "& li:first-of-type": { marginRight: "auto" },
+        },
+      },
+    },
+    MuiPaginationItem: {
+      styleOverrides: {
+        previousNext: ({ theme }) => ({
+          padding: theme.spacing(1, 1.5),
+          border: `1px solid ${buttonOutlinedBorderColor}`,
+          "&:hover": {
+            background: buttonOutlinedHoverBg,
+          },
+        }),
+        page: {
+          fontWeight: 500,
+          fontFeatureSettings: "'ss01' on, 'cv10' on, 'cv09' on;",
+          "&.Mui-selected": {
+            background: bodyBgColor,
+          },
+          "&.Mui-selected:hover": {
+            background: bodyBgColor,
+          },
+          "&:hover": {
+            background: bodyBgColor,
+          },
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        filled: ({ theme }) => ({
+          fontSize: "0.875rem",
+          fontWeight: 500,
+          padding: "0 2px",
+          "&.MuiChip-filledWarning": {
+            background: theme.palette.warning.light,
+            color: theme.palette.warning.main,
+          },
+          "&.MuiChip-filledSuccess": {
+            background: theme.palette.success.light,
+            color: theme.palette.success.main,
+          },
+          "&.MuiChip-filledError": {
+            background: theme.palette.error.light,
+            color: theme.palette.error.main,
+          },
+          "&.MuiChip-filledInfo": {
+            background: theme.palette.info.light,
+            color: theme.palette.info.main,
+          },
+        }),
+        filledPrimary: ({ theme }) => ({
+          background: theme.palette.primary.light,
+          color: theme.palette.primary.dark,
+        }),
       },
     },
   },
