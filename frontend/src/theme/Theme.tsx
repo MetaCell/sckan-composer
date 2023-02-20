@@ -131,6 +131,9 @@ const theme = createTheme({
         font-feature-settings: 'ss01' on, 'cv10' on, 'cv09' on;
         padding: 8px 10px !important;
         color: ${menuItemSelectedBg};
+      },
+      .MuiDataGrid-row:last-child > .MuiDataGrid-cell {
+        border-bottom: 0;
       }`,
     },
     MuiButton: {
