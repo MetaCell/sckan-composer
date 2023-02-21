@@ -1,15 +1,14 @@
-import React from "react";
-
-import Checkbox from "@mui/material/Checkbox";
-import FormControl from "@mui/material/FormControl";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormGroup from "@mui/material/FormGroup";
-import StateChip from "./StateChip";
-import Tag from "./Tag";
-import { CheckedItemIcon, UncheckedItemIcon } from "../icons";
+import React from "react"
+import Checkbox from "@mui/material/Checkbox"
+import FormControl from "@mui/material/FormControl"
+import FormControlLabel from "@mui/material/FormControlLabel"
+import FormGroup from "@mui/material/FormGroup"
+import {SentenceStateChip, StatementStateChip} from "./StateChip"
+import Tag from "./Tag"
+import { CheckedItemIcon, UncheckedItemIcon } from "../icons"
 
 const ControlledCheckbox = (props: any) => {
-  const { data, handleChange, type } = props;
+  const { data, handleChange, type, entity } = props
 
   return (
     <FormControl>
@@ -18,9 +17,12 @@ const ControlledCheckbox = (props: any) => {
           <FormControlLabel
             key={s.name}
             label={
-              type === "state" ? (
-                <StateChip key={s.name} value={s.name} />
-              ) : (
+              type === "state" ?
+                entity === "sentence" ? (
+                  <SentenceStateChip key={s.name} value={s.name} />
+                ) : (
+                  <StatementStateChip key={s.name} value={s.name} />
+                ) : (
                 <Tag key={s.name} label={s.label} />
               )
             }
@@ -39,7 +41,7 @@ const ControlledCheckbox = (props: any) => {
         ))}
       </FormGroup>
     </FormControl>
-  );
-};
+  )
+}
 
-export default ControlledCheckbox;
+export default ControlledCheckbox

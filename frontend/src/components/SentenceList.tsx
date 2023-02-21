@@ -28,7 +28,7 @@ import {
   renderDate,
   renderNote,
   renderPMID,
-  renderState,
+  renderSentenceState,
   renderTag,
   renderTitle,
 } from "./DataGridWidgets/DataGridWidgets";
@@ -87,7 +87,7 @@ const SentenceList = () => {
       headerName: "Status",
       sortable: false,
       flex: 1,
-      renderCell: renderState,
+      renderCell: renderSentenceState,
     },
     {
       field: "last_edited",

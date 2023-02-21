@@ -6,7 +6,7 @@ import { duplicatesRowsPerPage } from "../../helpers/settings";
 import CustomPagination from "../CustomPagination";
 import {
   renderPMID,
-  renderState,
+  renderSentenceState as renderStatementState,
   renderTitle,
 } from "../DataGridWidgets/DataGridWidgets";
 
@@ -30,7 +30,7 @@ export default function ResultsGrid({
       sortable: false,
       flex: 1,
       headerClassName: "grid--header",
-      renderCell: renderState,
+      renderCell: renderStatementState,
     },
     {
       field: "knowledge_statement",

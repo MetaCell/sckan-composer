@@ -1,11 +1,11 @@
-import { GridRenderCellParams } from "@mui/x-data-grid";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
-import { vars } from "../../theme/variables";
-import Tag from "../Widgets/Tag";
-import StateChip from "../Widgets/StateChip";
+import { GridRenderCellParams } from "@mui/x-data-grid"
+import Typography from "@mui/material/Typography"
+import Box from "@mui/material/Box"
+import Grid from "@mui/material/Grid"
+import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined"
+import { vars } from "../../theme/variables"
+import Tag from "../Widgets/Tag"
+import {SentenceStateChip, StatementStateChip} from "../Widgets/StateChip"
 
 export const renderPMID = (params: GridRenderCellParams) => (
   <Typography variant="subtitle1" color={vars.darkTextColor}>
@@ -76,6 +76,10 @@ export const renderTag = (params: GridRenderCellParams) => {
   );
 };
 
-export const renderState = (params: GridRenderCellParams) => {
-  return <StateChip value={params.value} />;
-};
+export const renderSentenceState = (params: GridRenderCellParams) => {
+  return <SentenceStateChip value={params.value} />
+}
+
+export const renderStatementState = (params: GridRenderCellParams) => {
+  return <StatementStateChip value={params.value} />
+}
