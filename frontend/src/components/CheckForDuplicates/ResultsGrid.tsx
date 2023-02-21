@@ -6,7 +6,7 @@ import { duplicatesRowsPerPage } from "../../helpers/settings";
 import CustomPagination from "../CustomPagination";
 import {
   renderPMID,
-  renderSentenceState as renderStatementState,
+  renderStatementState,
   renderTitle,
 } from "../DataGridWidgets/DataGridWidgets";
 
