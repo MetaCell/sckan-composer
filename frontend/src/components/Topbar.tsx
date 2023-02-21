@@ -38,7 +38,7 @@ const Topbar = () => {
         <Box display="flex">
           <Box component="img" display="block" src={logo} alt="Composer logo" />
           <Typography variant="h6" component="div" ml={1.5}>
-            UCSD Composer
+            SCKAN Composer
           </Typography>
         </Box>
         <Box ml={2.5} mr="auto" px={2.5} sx={descriptionStyle}>
