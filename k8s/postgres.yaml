@@ -48,10 +48,10 @@ spec:
         - containerPort: {{DB_PORT}}
         resources:
           limits:
-            cpu: 250m
+            cpu: 100m
             memory: 256Mi
           requests:
-            cpu: 250m
+            cpu: 100m
             memory: 256Mi
         volumeMounts:
         - name: composer-db

@@ -87,7 +87,7 @@ class SentenceStatementManager(models.Manager):
             .select_related(
                 "owner",
             )
-            .prefetch_related("notes", "tags")
+            .prefetch_related("notes", "tags", "connectivitystatement_set")
         )
 
 
