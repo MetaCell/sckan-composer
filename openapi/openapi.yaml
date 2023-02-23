@@ -1479,6 +1479,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Specie'
+          readOnly: true
         biological_sex_id:
           type: integer
         biological_sex:
@@ -1831,6 +1832,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Specie'
+          readOnly: true
         biological_sex_id:
           type: integer
         biological_sex:
@@ -1917,6 +1919,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SentenceAvailableTransitionsEnum'
+          readOnly: true
+        connectivity_statements:
+          type: array
+          items:
+            $ref: '#/components/schemas/SentenceConnectivityStatement'
           readOnly: true
         has_notes:
           type: boolean
@@ -2016,6 +2023,11 @@ components:
           items:
             $ref: '#/components/schemas/SentenceAvailableTransitionsEnum'
           readOnly: true
+        connectivity_statements:
+          type: array
+          items:
+            $ref: '#/components/schemas/SentenceConnectivityStatement'
+          readOnly: true
         has_notes:
           type: boolean
           readOnly: true
@@ -2030,6 +2042,7 @@ components:
           readOnly: true
       required:
       - available_transitions
+      - connectivity_statements
       - doi_uri
       - external_ref
       - has_notes
@@ -2051,6 +2064,64 @@ components:
       - excluded
       - duplicate
       type: string
+    SentenceConnectivityStatement:
+      type: object
+      description: Connectivity Statement
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        sentence_id:
+          type: integer
+        knowledge_statement:
+          type: string
+          readOnly: true
+        dois:
+          type: array
+          items:
+            $ref: '#/components/schemas/Doi'
+        ans_division_id:
+          type: integer
+        ans_division:
+          allOf:
+          - $ref: '#/components/schemas/AnsDivision'
+          readOnly: true
+        laterality:
+          allOf:
+          - $ref: '#/components/schemas/LateralityEnum'
+          readOnly: true
+        circuit_type:
+          allOf:
+          - $ref: '#/components/schemas/CircuitTypeEnum'
+          readOnly: true
+        species:
+          type: array
+          items:
+            $ref: '#/components/schemas/Specie'
+          readOnly: true
+        biological_sex_id:
+          type: integer
+        biological_sex:
+          allOf:
+          - $ref: '#/components/schemas/BiologicalSex'
+          readOnly: true
+        apinatomy_model:
+          type: string
+          readOnly: true
+          nullable: true
+      required:
+      - ans_division
+      - ans_division_id
+      - apinatomy_model
+      - biological_sex
+      - biological_sex_id
+      - circuit_type
+      - dois
+      - id
+      - knowledge_statement
+      - laterality
+      - sentence_id
+      - species
     Specie:
       type: object
       description: Specie

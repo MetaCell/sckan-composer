@@ -4,16 +4,19 @@ import Box from "@mui/material/Box";
 import SearchIcon from "@mui/icons-material/Search";
 import { useDebouncedCallback } from "use-debounce";
 import { SEARCH_DEBOUNCE } from "../settings";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { useAppDispatch } from "../redux/hooks";
 import { setTitleQuery } from "../redux/sentenceSlice";
+import { setKnowledgeStatementQuery } from "../redux/statementSlice";
 
 const Searchbar = (props: any) => {
-  const { queryOptions } = props;
+  const { queryOptions, entityType } = props;
   const inputRef = useRef<HTMLInputElement>(null);
   const dispatch = useAppDispatch();
 
   const handleInputChange = (e: any) => {
-    dispatch(setTitleQuery(e.target.value));
+    entityType === "sentence" && dispatch(setTitleQuery(e.target.value));
+    entityType === "statement" &&
+      dispatch(setKnowledgeStatementQuery(e.target.value));
   };
 
   const debouncedChangeHandler = useDebouncedCallback(
@@ -24,7 +27,9 @@ const Searchbar = (props: any) => {
   const onEscapeHandler = (e: any) => {
     if (e.key === "Escape" && inputRef.current) {
       inputRef.current.value = "";
-      dispatch(setTitleQuery(undefined));
+      entityType === "sentence" && dispatch(setTitleQuery(undefined));
+      entityType === "statement" &&
+        dispatch(setKnowledgeStatementQuery(undefined));
     }
   };
 
@@ -50,7 +55,11 @@ const Searchbar = (props: any) => {
         variant="outlined"
         placeholder="Search for Sentences"
         size="small"
-        defaultValue={queryOptions.title}
+        defaultValue={
+          entityType === "sentence"
+            ? queryOptions.title
+            : queryOptions.knowledgeStatement
+        }
         fullWidth
         InputProps={{
           startAdornment: (

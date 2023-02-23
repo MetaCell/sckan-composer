@@ -6,13 +6,15 @@ import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import Toolbar from "@mui/material/Toolbar";
 import Dashboard from "./components/Dashboard";
-import SentenceDetails from "./components/SentenceDetails";
-import StatementDetails from "./components/StatementDetails";
+import SentenceDetails from "./components/Pages/SentenceDetails";
+import StatementDetails from "./components/Pages/StatementDetails";
 import Topbar from "./components/Topbar";
 import Sidebar from "./components/Sidebar";
-import StatementList from "./components/StatementList";
-import SentenceList from "./components/SentenceList";
+import StatementList from "./components/Pages/StatementList";
+import SentenceList from "./components/Pages/SentenceList";
 import { userProfile } from "./services/UserService";
+import { useAppDispatch } from "./redux/hooks";
+import { setFilters } from "./redux/statementSlice";
 
 const PageSelect = () => {
   const user = userProfile.getProfile();
@@ -27,7 +29,15 @@ const PageSelect = () => {
 };
 
 function App() {
+  const dispatch = useAppDispatch();
+
   if (userProfile.isSignedIn()) {
+    const user = userProfile.getProfile();
+
+    if (user.is_curator) {
+      dispatch(setFilters({ stateFilter: ["compose_now"] }));
+    }
+
     return (
       <BrowserRouter>
         <ThemeProvider theme={theme}>
@@ -43,6 +53,7 @@ function App() {
                   path="/sentence/:sentenceId/"
                   element={<SentenceDetails />}
                 />
+                <Route path="/statement" element={<StatementList />} />
                 <Route
                   path="/statement/:statementId/"
                   element={<StatementDetails />}

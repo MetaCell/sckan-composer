@@ -12,8 +12,12 @@ import {
   mapTagFilterSelectionToCheckbox,
 } from "../../helpers/helpers";
 import { useAppDispatch } from "../../redux/hooks";
-import { SentenceAvailableTransitionsEnum as sentenceStates } from "../../apiclient/backend";
-import { setFilters } from "../../redux/sentenceSlice";
+import {
+  SentenceAvailableTransitionsEnum as sentenceStates,
+  ConnectivityStatementAvailableTransitionsEnum as statementStates,
+} from "../../apiclient/backend";
+import { setFilters as setSentenceFilters } from "../../redux/sentenceSlice";
+import { setFilters as setStatementFilters } from "../../redux/statementSlice";
 import StateFilter from "./StateFilter";
 import TagFilter from "./TagFilter";
 
@@ -32,6 +36,10 @@ const FilterDrawer = (props: any) => {
         currentSelection
       );
     } else if (entity === "statement") {
+      return mapStateFilterSelectionToCheckbox(
+        statementStates,
+        currentSelection
+      );
     }
   };
 
@@ -60,7 +68,10 @@ const FilterDrawer = (props: any) => {
   const handleApplyFilter = () => {
     const stateFilter = mapObjToArray(selectedStates);
     let tagFilter = mapObjToArray(selectedTags);
-    dispatch(setFilters({ stateFilter, tagFilter }));
+    entity === "sentence" &&
+      dispatch(setSentenceFilters({ stateFilter, tagFilter }));
+    entity === "statement" &&
+      dispatch(setStatementFilters({ stateFilter, tagFilter }));
     toggleDrawer(false);
   };
 
