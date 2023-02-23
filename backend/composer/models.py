@@ -77,6 +77,9 @@ class ConnectivityStatementManager(models.Manager):
             )
             .prefetch_related("notes", "tags", "species")
         )
+    
+    def excluding_draft(self):
+        return self.get_queryset().exclude(state=CSState.DRAFT)
 
 
 class SentenceStatementManager(models.Manager):
@@ -308,6 +311,7 @@ class ConnectivityStatement(models.Model):
     """Connectivity Statement"""
 
     objects = ConnectivityStatementManager()
+    all_objects = models.Manager()
 
     sentence = models.ForeignKey(
         Sentence, verbose_name="Sentence", on_delete=models.DO_NOTHING

@@ -970,6 +970,12 @@ export interface PatchedSentence {
     'available_transitions'?: Array<SentenceAvailableTransitionsEnum>;
     /**
      * 
+     * @type {Array<SentenceConnectivityStatement>}
+     * @memberof PatchedSentence
+     */
+    'connectivity_statements'?: Array<SentenceConnectivityStatement>;
+    /**
+     * 
      * @type {boolean}
      * @memberof PatchedSentence
      */
@@ -1153,6 +1159,12 @@ export interface Sentence {
     'available_transitions': Array<SentenceAvailableTransitionsEnum>;
     /**
      * 
+     * @type {Array<SentenceConnectivityStatement>}
+     * @memberof Sentence
+     */
+    'connectivity_statements': Array<SentenceConnectivityStatement>;
+    /**
+     * 
      * @type {boolean}
      * @memberof Sentence
      */
@@ -1194,6 +1206,85 @@ export const SentenceAvailableTransitionsEnum = {
 export type SentenceAvailableTransitionsEnum = typeof SentenceAvailableTransitionsEnum[keyof typeof SentenceAvailableTransitionsEnum];
 
 
+/**
+ * Connectivity Statement
+ * @export
+ * @interface SentenceConnectivityStatement
+ */
+export interface SentenceConnectivityStatement {
+    /**
+     * 
+     * @type {number}
+     * @memberof SentenceConnectivityStatement
+     */
+    'id': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SentenceConnectivityStatement
+     */
+    'sentence_id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof SentenceConnectivityStatement
+     */
+    'knowledge_statement': string;
+    /**
+     * 
+     * @type {Array<Doi>}
+     * @memberof SentenceConnectivityStatement
+     */
+    'dois': Array<Doi>;
+    /**
+     * 
+     * @type {number}
+     * @memberof SentenceConnectivityStatement
+     */
+    'ans_division_id': number;
+    /**
+     * 
+     * @type {AnsDivision}
+     * @memberof SentenceConnectivityStatement
+     */
+    'ans_division': AnsDivision;
+    /**
+     * 
+     * @type {LateralityEnum}
+     * @memberof SentenceConnectivityStatement
+     */
+    'laterality': LateralityEnum;
+    /**
+     * 
+     * @type {CircuitTypeEnum}
+     * @memberof SentenceConnectivityStatement
+     */
+    'circuit_type': CircuitTypeEnum;
+    /**
+     * 
+     * @type {Array<Specie>}
+     * @memberof SentenceConnectivityStatement
+     */
+    'species': Array<Specie>;
+    /**
+     * 
+     * @type {number}
+     * @memberof SentenceConnectivityStatement
+     */
+    'biological_sex_id': number;
+    /**
+     * 
+     * @type {BiologicalSex}
+     * @memberof SentenceConnectivityStatement
+     */
+    'biological_sex': BiologicalSex;
+    /**
+     * 
+     * @type {string}
+     * @memberof SentenceConnectivityStatement
+     */
+    'apinatomy_model': string | null;
+}
 /**
  * Specie
  * @export

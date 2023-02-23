@@ -1,5 +1,6 @@
 import json
 from django.http import HttpResponse
+from django.db.models import Q
 from rest_framework.renderers import INDENT_SEPARATORS
 from rest_framework import mixins, permissions, viewsets
 from rest_framework.decorators import action, api_view
@@ -177,6 +178,11 @@ class ConnectivityStatementViewSet(TagMixin, TransitionMixin, AssignOwnerMixin, 
     ]
     filterset_class = ConnectivityStatementFilter
     service = ConnectivityStatementService
+    
+    def get_queryset(self):
+        if self.action == "list" and "sentence_id" in self.request.query_params:
+            return super().get_queryset()
+        return ConnectivityStatement.objects.excluding_draft()
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
