@@ -34,8 +34,17 @@ function App() {
   if (userProfile.isSignedIn()) {
     const user = userProfile.getProfile();
 
+    const defaultStateFilter = []
     if (user.is_curator) {
-      dispatch(setFilters({ stateFilter: ["compose_now"] }));
+      defaultStateFilter.push("compose_now")
+    }
+
+    if (user.is_reviewer) {
+      defaultStateFilter.push("to_be_reviewed")
+    }
+
+    if (defaultStateFilter.length > 0) {
+      dispatch(setFilters({ stateFilter: defaultStateFilter }));
     }
 
     return (
