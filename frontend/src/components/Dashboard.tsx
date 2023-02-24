@@ -32,11 +32,9 @@ const Login = () => {
               You are logged in!
             </Typography>
             <Typography variant='subtitle2'>
-              Welcome back {profile?.user?.first_name}! Please enter your details.
+              Welcome back {profile?.user?.first_name}. Unfortunately you don't have permission to any of the pages. Please ask the administrator to assign the required role.
             </Typography>
           </Box>
-          <Link to="/sentence/1/">Open details of Sentence with id 1</Link>
-          <Link to="/statement/2/">Open details of Statement with id 2</Link>
           <Button variant='contained' fullWidth onClick={handleClick}>Logout</Button>
         </Stack>
       </Paper>
