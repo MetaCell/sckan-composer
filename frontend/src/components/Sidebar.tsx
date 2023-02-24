@@ -7,13 +7,22 @@ import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { vars } from "../theme/variables";
 import { userProfile } from "../services/UserService";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 
 const Sidebar = () => {
-  const [selectedItem, setSelectedItem] = useState(0);
-
   const profile = userProfile.getProfile();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const userIsCuratorAndTriageOperator =
+    profile.is_triage_operator && (profile.is_curator || profile.is_reviewer);
+
+  const initialItem =
+    userIsCuratorAndTriageOperator && location.pathname.match("/statement")
+      ? 1
+      : 0;
+
+  const [selectedItem, setSelectedItem] = useState(initialItem);
 
   const drawerStyle = {
     width: vars.drawerWidth,
@@ -49,13 +58,18 @@ const Sidebar = () => {
                 : "Statements List"}
             </Typography>
           </MenuItem>
-          <MenuItem
-            sx={{ padding: "0.875rem 1.25rem" }}
-            selected={selectedItem === 1}
-            onClick={() => setSelectedItem(1)}
-          >
-            <Typography variant="subtitle1">Collabotators</Typography>
-          </MenuItem>
+          {userIsCuratorAndTriageOperator && (
+            <MenuItem
+              sx={{ padding: "0.875rem 1.25rem" }}
+              selected={selectedItem === 1}
+              onClick={() => {
+                setSelectedItem(1);
+                navigate("/statement");
+              }}
+            >
+              <Typography variant="subtitle1">Statements List</Typography>
+            </MenuItem>
+          )}
         </MenuList>
       </Box>
     </Drawer>

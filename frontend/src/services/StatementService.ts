@@ -1,6 +1,7 @@
 import { composerApi } from "./apis"
-import { ConnectivityStatement } from '../apiclient/backend/api'
+import { ConnectivityStatement, PaginatedConnectivityStatementList } from '../apiclient/backend/api'
 import { AbstractService } from "./AbstractService"
+import { QueryParams } from "../redux/statementSlice"
 
 class ConnectivityStatementService extends AbstractService {
   async save(connectivityStatement: ConnectivityStatement) {
@@ -17,6 +18,10 @@ class ConnectivityStatementService extends AbstractService {
   }
   async removeTag(id: number, tagId: number): Promise<ConnectivityStatement> {
     return composerApi.composerConnectivityStatementDelTagCreate(id, tagId).then((response: any) => response.data)
+  }
+  async getList(queryOptions: QueryParams): Promise<PaginatedConnectivityStatementList> {
+    const { limit, ordering, index, knowledgeStatement, stateFilter, tagFilter } = queryOptions
+    return composerApi.composerConnectivityStatementList(undefined, knowledgeStatement, limit, undefined, index, ordering, undefined, undefined, stateFilter, tagFilter).then((res: any) => res.data)
   }
 }
 

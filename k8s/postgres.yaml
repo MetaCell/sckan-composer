@@ -46,6 +46,13 @@ spec:
           value: /opt/db/data
         ports:
         - containerPort: {{DB_PORT}}
+        resources:
+          limits:
+            cpu: 100m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
         volumeMounts:
         - name: composer-db
           mountPath: /opt/db

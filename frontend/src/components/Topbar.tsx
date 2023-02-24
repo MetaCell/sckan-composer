@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import logo from "../assets/logoWhiteBg.svg";
+import logo from "../assets/logo.svg";
 
 import { userProfile, logout } from "../services/UserService";
 
@@ -36,9 +36,9 @@ const Topbar = () => {
     >
       <Toolbar>
         <Box display="flex">
-          <Box component="img" display="block" src={logo} alt="Composer logo" />
+          <Box sx={{height: 24, width: 24}} component="img" display="block" src={logo} alt="Composer logo" />
           <Typography variant="h6" component="div" ml={1.5}>
-            UCSD Composer
+            SCKAN Composer
           </Typography>
         </Box>
         <Box ml={2.5} mr="auto" px={2.5} sx={descriptionStyle}>

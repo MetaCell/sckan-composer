@@ -178,7 +178,8 @@ JAZZMIN_SETTINGS = {
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_brand": "SCKAN Composer",
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "img/composer-logo.png",
+    # "site_logo": "img/composer-logo.png",
+    "site_logo": "logo.svg",
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
     "login_logo": None,
     # Logo to use for login form in dark themes (defaults to login_logo)
@@ -380,4 +381,4 @@ if PRODUCTION:
     # we are behind a rev proxy, so we need to set this
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     USE_X_FORWARDED_HOST = True
-    SECURE_SSL_REDIRECT = True
+    SECURE_SSL_REDIRECT = False

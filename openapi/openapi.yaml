@@ -210,7 +210,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedConnectivityStatementWithDetailsList'
+                $ref: '#/components/schemas/PaginatedConnectivityStatementList'
           description: ''
     post:
       operationId: composer_connectivity_statement_create
@@ -802,7 +802,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSentenceWithDetailsList'
+                $ref: '#/components/schemas/PaginatedSentenceList'
           description: ''
     post:
       operationId: composer_sentence_create
@@ -1381,6 +1381,24 @@ components:
       required:
       - id
       - name
+    BiologicalSex:
+      type: object
+      description: BiologicalSex
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        ontology_uri:
+          type: string
+          format: uri
+          maxLength: 200
+      required:
+      - id
+      - name
+      - ontology_uri
     CircuitTypeEnum:
       enum:
       - SENSORY
@@ -1426,7 +1444,7 @@ components:
         available_transitions:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/ConnectivityStatementAvailableTransitionsEnum'
           readOnly: true
         origin_id:
           type: integer
@@ -1461,10 +1479,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Specie'
+          readOnly: true
+        biological_sex_id:
+          type: integer
         biological_sex:
-          type: string
-          nullable: true
-          maxLength: 200
+          allOf:
+          - $ref: '#/components/schemas/BiologicalSex'
+          readOnly: true
         apinatomy_model:
           type: string
           nullable: true
@@ -1473,13 +1494,19 @@ components:
           type: string
           format: date-time
           readOnly: true
+        has_notes:
+          type: boolean
+          readOnly: true
       required:
       - ans_division
       - ans_division_id
       - available_transitions
+      - biological_sex
+      - biological_sex_id
       - destination
       - destination_id
       - dois
+      - has_notes
       - id
       - knowledge_statement
       - modified_date
@@ -1492,72 +1519,18 @@ components:
       - species
       - state
       - tags
-    ConnectivityStatementWithDetails:
-      type: object
-      description: Connectivity Statement with details
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        has_notes:
-          type: boolean
-          readOnly: true
-        owner:
-          allOf:
-          - $ref: '#/components/schemas/User'
-          readOnly: true
-        tags:
-          type: array
-          items:
-            $ref: '#/components/schemas/Tag'
-          readOnly: true
-        knowledge_statement:
-          type: string
-        state:
-          type: string
-          readOnly: true
-        destination_type:
-          $ref: '#/components/schemas/DestinationTypeEnum'
-        laterality:
-          $ref: '#/components/schemas/LateralityEnum'
-        circuit_type:
-          $ref: '#/components/schemas/CircuitTypeEnum'
-        biological_sex:
-          type: string
-          nullable: true
-          maxLength: 200
-        apinatomy_model:
-          type: string
-          nullable: true
-          maxLength: 200
-        modified_date:
-          type: string
-          format: date-time
-          readOnly: true
-        sentence:
-          type: integer
-        origin:
-          type: integer
-          nullable: true
-        destination:
-          type: integer
-          nullable: true
-        ans_division:
-          type: integer
-          nullable: true
-        species:
-          type: array
-          items:
-            type: integer
-      required:
-      - has_notes
-      - id
-      - knowledge_statement
-      - modified_date
-      - owner
-      - sentence
-      - state
-      - tags
+    ConnectivityStatementAvailableTransitionsEnum:
+      enum:
+      - draft
+      - compose_now
+      - curated
+      - excluded
+      - rejected
+      - to_be_reviewed
+      - connection_missing
+      - npo_approved
+      - approved
+      type: string
     DestinationTypeEnum:
       enum:
       - AXON-SE
@@ -1668,7 +1641,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnsDivision'
-    PaginatedConnectivityStatementWithDetailsList:
+    PaginatedConnectivityStatementList:
       type: object
       properties:
         count:
@@ -1687,7 +1660,7 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/ConnectivityStatementWithDetails'
+            $ref: '#/components/schemas/ConnectivityStatement'
     PaginatedNoteList:
       type: object
       properties:
@@ -1708,7 +1681,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Note'
-    PaginatedSentenceWithDetailsList:
+    PaginatedSentenceList:
       type: object
       properties:
         count:
@@ -1727,7 +1700,7 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/SentenceWithDetails'
+            $ref: '#/components/schemas/Sentence'
     PaginatedSpecieList:
       type: object
       properties:
@@ -1824,7 +1797,7 @@ components:
         available_transitions:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/ConnectivityStatementAvailableTransitionsEnum'
           readOnly: true
         origin_id:
           type: integer
@@ -1859,10 +1832,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Specie'
+          readOnly: true
+        biological_sex_id:
+          type: integer
         biological_sex:
-          type: string
-          nullable: true
-          maxLength: 200
+          allOf:
+          - $ref: '#/components/schemas/BiologicalSex'
+          readOnly: true
         apinatomy_model:
           type: string
           nullable: true
@@ -1870,6 +1846,9 @@ components:
         modified_date:
           type: string
           format: date-time
+          readOnly: true
+        has_notes:
+          type: boolean
           readOnly: true
     PatchedNote:
       type: object
@@ -1910,6 +1889,13 @@ components:
         doi:
           type: string
           nullable: true
+        batch_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        external_ref:
+          type: string
+          maxLength: 20
         tags:
           type: array
           items:
@@ -1932,7 +1918,15 @@ components:
         available_transitions:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/SentenceAvailableTransitionsEnum'
+          readOnly: true
+        connectivity_statements:
+          type: array
+          items:
+            $ref: '#/components/schemas/SentenceConnectivityStatement'
+          readOnly: true
+        has_notes:
+          type: boolean
           readOnly: true
         pmid_uri:
           type: string
@@ -1998,6 +1992,13 @@ components:
         doi:
           type: string
           nullable: true
+        batch_name:
+          type: string
+          nullable: true
+          maxLength: 100
+        external_ref:
+          type: string
+          maxLength: 20
         tags:
           type: array
           items:
@@ -2020,7 +2021,15 @@ components:
         available_transitions:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/SentenceAvailableTransitionsEnum'
+          readOnly: true
+        connectivity_statements:
+          type: array
+          items:
+            $ref: '#/components/schemas/SentenceConnectivityStatement'
+          readOnly: true
+        has_notes:
+          type: boolean
           readOnly: true
         pmid_uri:
           type: string
@@ -2033,7 +2042,10 @@ components:
           readOnly: true
       required:
       - available_transitions
+      - connectivity_statements
       - doi_uri
+      - external_ref
+      - has_notes
       - id
       - modified_date
       - owner
@@ -2043,57 +2055,73 @@ components:
       - tags
       - text
       - title
-    SentenceWithDetails:
+    SentenceAvailableTransitionsEnum:
+      enum:
+      - open
+      - to_be_reviewed
+      - compose_later
+      - compose_now
+      - excluded
+      - duplicate
+      type: string
+    SentenceConnectivityStatement:
       type: object
-      description: Sentence with details
+      description: Connectivity Statement
       properties:
         id:
           type: integer
           readOnly: true
-        has_notes:
-          type: boolean
+        sentence_id:
+          type: integer
+        knowledge_statement:
+          type: string
           readOnly: true
-        owner:
-          allOf:
-          - $ref: '#/components/schemas/User'
-          readOnly: true
-        tags:
+        dois:
           type: array
           items:
-            $ref: '#/components/schemas/Tag'
-          readOnly: true
-        title:
-          type: string
-          maxLength: 200
-        text:
-          type: string
-        state:
-          type: string
-          readOnly: true
-        pmid:
+            $ref: '#/components/schemas/Doi'
+        ans_division_id:
           type: integer
-          nullable: true
-        pmcid:
-          type: string
-          nullable: true
-          maxLength: 20
-        doi:
-          type: string
-          nullable: true
-          maxLength: 100
-        modified_date:
-          type: string
-          format: date-time
+        ans_division:
+          allOf:
+          - $ref: '#/components/schemas/AnsDivision'
           readOnly: true
+        laterality:
+          allOf:
+          - $ref: '#/components/schemas/LateralityEnum'
+          readOnly: true
+        circuit_type:
+          allOf:
+          - $ref: '#/components/schemas/CircuitTypeEnum'
+          readOnly: true
+        species:
+          type: array
+          items:
+            $ref: '#/components/schemas/Specie'
+          readOnly: true
+        biological_sex_id:
+          type: integer
+        biological_sex:
+          allOf:
+          - $ref: '#/components/schemas/BiologicalSex'
+          readOnly: true
+        apinatomy_model:
+          type: string
+          readOnly: true
+          nullable: true
       required:
-      - has_notes
+      - ans_division
+      - ans_division_id
+      - apinatomy_model
+      - biological_sex
+      - biological_sex_id
+      - circuit_type
+      - dois
       - id
-      - modified_date
-      - owner
-      - state
-      - tags
-      - text
-      - title
+      - knowledge_statement
+      - laterality
+      - sentence_id
+      - species
     Specie:
       type: object
       description: Specie
@@ -2104,9 +2132,14 @@ components:
         name:
           type: string
           maxLength: 200
+        ontology_uri:
+          type: string
+          format: uri
+          maxLength: 200
       required:
       - id
       - name
+      - ontology_uri
     Tag:
       type: object
       description: Note Tag

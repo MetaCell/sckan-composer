@@ -15,7 +15,7 @@ const Header = (props: any) => {
         <Typography variant="body2">{caption}</Typography>
       </Box>
       <Box>
-        {actions.map((a: any, i: any) => (
+        {actions?.map((a: any, i: any) => (
           <Button variant="contained" key={i} startIcon={<a.icon />}>
             {a.label}
           </Button>

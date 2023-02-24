@@ -77,6 +77,9 @@ class ConnectivityStatementManager(models.Manager):
             )
             .prefetch_related("notes", "tags", "species")
         )
+    
+    def excluding_draft(self):
+        return self.get_queryset().exclude(state=CSState.DRAFT)
 
 
 class SentenceStatementManager(models.Manager):
@@ -87,7 +90,7 @@ class SentenceStatementManager(models.Manager):
             .select_related(
                 "owner",
             )
-            .prefetch_related("notes", "tags")
+            .prefetch_related("notes", "tags", "connectivitystatement_set")
         )
 
 
@@ -116,6 +119,7 @@ class Specie(models.Model):
     """Specie"""
 
     name = models.CharField(max_length=200, db_index=True, unique=True)
+    ontology_uri = models.URLField()
 
     def __str__(self):
         return self.name
@@ -123,6 +127,20 @@ class Specie(models.Model):
     class Meta:
         ordering = ["name"]
         verbose_name_plural = "Species"
+
+
+class BiologicalSex(models.Model):
+    """Biological Sex"""
+
+    name = models.CharField(max_length=200, db_index=True, unique=True)
+    ontology_uri = models.URLField()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Biological Sex"
 
 
 class AnatomicalEntity(models.Model):
@@ -254,14 +272,14 @@ class Sentence(models.Model):
             ),
             models.CheckConstraint(
                 check=~Q(state=SentenceState.COMPOSE_NOW)
-                | (
-                    Q(state=SentenceState.COMPOSE_NOW)
-                    & (
-                        Q(pmid__isnull=False)
-                        | Q(pmcid__isnull=False)
-                        | Q(doi__isnull=False)
-                    )
-                ),
+                      | (
+                              Q(state=SentenceState.COMPOSE_NOW)
+                              & (
+                                      Q(pmid__isnull=False)
+                                      | Q(pmcid__isnull=False)
+                                      | Q(doi__isnull=False)
+                              )
+                      ),
                 name="sentence_pmid_pmcd_valid",
             ),
         ]
@@ -293,6 +311,7 @@ class ConnectivityStatement(models.Model):
     """Connectivity Statement"""
 
     objects = ConnectivityStatementManager()
+    all_objects = models.Manager()
 
     sentence = models.ForeignKey(
         Sentence, verbose_name="Sentence", on_delete=models.DO_NOTHING
@@ -337,7 +356,7 @@ class ConnectivityStatement(models.Model):
     )
     species = models.ManyToManyField(Specie, verbose_name="Species", blank=True)
     tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
-    biological_sex = models.CharField(max_length=200, null=True, blank=True)
+    biological_sex = models.ForeignKey(BiologicalSex, on_delete=models.DO_NOTHING, null=True, blank=True)
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
     modified_date = models.DateTimeField(auto_now=True)
 
@@ -476,7 +495,7 @@ class Note(models.Model):
                     sentence__isnull=False,
                     connectivity_statement__isnull=True,
                 )
-                | models.Q(
+                      | models.Q(
                     sentence__isnull=True,
                     connectivity_statement__isnull=False,
                 ),

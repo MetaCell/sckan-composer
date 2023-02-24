@@ -66,6 +66,31 @@ export interface AnsDivision {
     'name': string;
 }
 /**
+ * BiologicalSex
+ * @export
+ * @interface BiologicalSex
+ */
+export interface BiologicalSex {
+    /**
+     * 
+     * @type {number}
+     * @memberof BiologicalSex
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof BiologicalSex
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BiologicalSex
+     */
+    'ontology_uri': string;
+}
+/**
  * 
  * @export
  * @enum {string}
@@ -145,10 +170,10 @@ export interface ConnectivityStatement {
     'state': string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<ConnectivityStatementAvailableTransitionsEnum>}
      * @memberof ConnectivityStatement
      */
-    'available_transitions': Array<string>;
+    'available_transitions': Array<ConnectivityStatementAvailableTransitionsEnum>;
     /**
      * 
      * @type {number}
@@ -217,10 +242,16 @@ export interface ConnectivityStatement {
     'species': Array<Specie>;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof ConnectivityStatement
      */
-    'biological_sex'?: string | null;
+    'biological_sex_id': number;
+    /**
+     * 
+     * @type {BiologicalSex}
+     * @memberof ConnectivityStatement
+     */
+    'biological_sex': BiologicalSex;
     /**
      * 
      * @type {string}
@@ -233,116 +264,34 @@ export interface ConnectivityStatement {
      * @memberof ConnectivityStatement
      */
     'modified_date': string;
-}
-/**
- * Connectivity Statement with details
- * @export
- * @interface ConnectivityStatementWithDetails
- */
-export interface ConnectivityStatementWithDetails {
-    /**
-     * 
-     * @type {number}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'id': number;
     /**
      * 
      * @type {boolean}
-     * @memberof ConnectivityStatementWithDetails
+     * @memberof ConnectivityStatement
      */
     'has_notes': boolean;
-    /**
-     * 
-     * @type {User}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'owner': User;
-    /**
-     * 
-     * @type {Array<Tag>}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'tags': Array<Tag>;
-    /**
-     * 
-     * @type {string}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'knowledge_statement': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'state': string;
-    /**
-     * 
-     * @type {DestinationTypeEnum}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'destination_type'?: DestinationTypeEnum;
-    /**
-     * 
-     * @type {LateralityEnum}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'laterality'?: LateralityEnum;
-    /**
-     * 
-     * @type {CircuitTypeEnum}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'circuit_type'?: CircuitTypeEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'biological_sex'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'apinatomy_model'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'modified_date': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'sentence': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'origin'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'destination'?: number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'ans_division'?: number | null;
-    /**
-     * 
-     * @type {Array<number>}
-     * @memberof ConnectivityStatementWithDetails
-     */
-    'species'?: Array<number>;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const ConnectivityStatementAvailableTransitionsEnum = {
+    Draft: 'draft',
+    ComposeNow: 'compose_now',
+    Curated: 'curated',
+    Excluded: 'excluded',
+    Rejected: 'rejected',
+    ToBeReviewed: 'to_be_reviewed',
+    ConnectionMissing: 'connection_missing',
+    NpoApproved: 'npo_approved',
+    Approved: 'approved'
+} as const;
+
+export type ConnectivityStatementAvailableTransitionsEnum = typeof ConnectivityStatementAvailableTransitionsEnum[keyof typeof ConnectivityStatementAvailableTransitionsEnum];
+
+
 /**
  * 
  * @export
@@ -546,33 +495,33 @@ export interface PaginatedAnsDivisionList {
 /**
  * 
  * @export
- * @interface PaginatedConnectivityStatementWithDetailsList
+ * @interface PaginatedConnectivityStatementList
  */
-export interface PaginatedConnectivityStatementWithDetailsList {
+export interface PaginatedConnectivityStatementList {
     /**
      * 
      * @type {number}
-     * @memberof PaginatedConnectivityStatementWithDetailsList
+     * @memberof PaginatedConnectivityStatementList
      */
     'count'?: number;
     /**
      * 
      * @type {string}
-     * @memberof PaginatedConnectivityStatementWithDetailsList
+     * @memberof PaginatedConnectivityStatementList
      */
     'next'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof PaginatedConnectivityStatementWithDetailsList
+     * @memberof PaginatedConnectivityStatementList
      */
     'previous'?: string | null;
     /**
      * 
-     * @type {Array<ConnectivityStatementWithDetails>}
-     * @memberof PaginatedConnectivityStatementWithDetailsList
+     * @type {Array<ConnectivityStatement>}
+     * @memberof PaginatedConnectivityStatementList
      */
-    'results'?: Array<ConnectivityStatementWithDetails>;
+    'results'?: Array<ConnectivityStatement>;
 }
 /**
  * 
@@ -608,33 +557,33 @@ export interface PaginatedNoteList {
 /**
  * 
  * @export
- * @interface PaginatedSentenceWithDetailsList
+ * @interface PaginatedSentenceList
  */
-export interface PaginatedSentenceWithDetailsList {
+export interface PaginatedSentenceList {
     /**
      * 
      * @type {number}
-     * @memberof PaginatedSentenceWithDetailsList
+     * @memberof PaginatedSentenceList
      */
     'count'?: number;
     /**
      * 
      * @type {string}
-     * @memberof PaginatedSentenceWithDetailsList
+     * @memberof PaginatedSentenceList
      */
     'next'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof PaginatedSentenceWithDetailsList
+     * @memberof PaginatedSentenceList
      */
     'previous'?: string | null;
     /**
      * 
-     * @type {Array<SentenceWithDetails>}
-     * @memberof PaginatedSentenceWithDetailsList
+     * @type {Array<Sentence>}
+     * @memberof PaginatedSentenceList
      */
-    'results'?: Array<SentenceWithDetails>;
+    'results'?: Array<Sentence>;
 }
 /**
  * 
@@ -791,10 +740,10 @@ export interface PatchedConnectivityStatement {
     'state'?: string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<ConnectivityStatementAvailableTransitionsEnum>}
      * @memberof PatchedConnectivityStatement
      */
-    'available_transitions'?: Array<string>;
+    'available_transitions'?: Array<ConnectivityStatementAvailableTransitionsEnum>;
     /**
      * 
      * @type {number}
@@ -863,10 +812,16 @@ export interface PatchedConnectivityStatement {
     'species'?: Array<Specie>;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof PatchedConnectivityStatement
      */
-    'biological_sex'?: string | null;
+    'biological_sex_id'?: number;
+    /**
+     * 
+     * @type {BiologicalSex}
+     * @memberof PatchedConnectivityStatement
+     */
+    'biological_sex'?: BiologicalSex;
     /**
      * 
      * @type {string}
@@ -879,6 +834,12 @@ export interface PatchedConnectivityStatement {
      * @memberof PatchedConnectivityStatement
      */
     'modified_date'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PatchedConnectivityStatement
+     */
+    'has_notes'?: boolean;
 }
 /**
  * Note
@@ -961,6 +922,18 @@ export interface PatchedSentence {
     'doi'?: string | null;
     /**
      * 
+     * @type {string}
+     * @memberof PatchedSentence
+     */
+    'batch_name'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedSentence
+     */
+    'external_ref'?: string;
+    /**
+     * 
      * @type {Array<Tag>}
      * @memberof PatchedSentence
      */
@@ -991,10 +964,22 @@ export interface PatchedSentence {
     'modified_date'?: string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<SentenceAvailableTransitionsEnum>}
      * @memberof PatchedSentence
      */
-    'available_transitions'?: Array<string>;
+    'available_transitions'?: Array<SentenceAvailableTransitionsEnum>;
+    /**
+     * 
+     * @type {Array<SentenceConnectivityStatement>}
+     * @memberof PatchedSentence
+     */
+    'connectivity_statements'?: Array<SentenceConnectivityStatement>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PatchedSentence
+     */
+    'has_notes'?: boolean;
     /**
      * 
      * @type {string}
@@ -1126,6 +1111,18 @@ export interface Sentence {
     'doi'?: string | null;
     /**
      * 
+     * @type {string}
+     * @memberof Sentence
+     */
+    'batch_name'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof Sentence
+     */
+    'external_ref': string;
+    /**
+     * 
      * @type {Array<Tag>}
      * @memberof Sentence
      */
@@ -1156,10 +1153,22 @@ export interface Sentence {
     'modified_date': string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<SentenceAvailableTransitionsEnum>}
      * @memberof Sentence
      */
-    'available_transitions': Array<string>;
+    'available_transitions': Array<SentenceAvailableTransitionsEnum>;
+    /**
+     * 
+     * @type {Array<SentenceConnectivityStatement>}
+     * @memberof Sentence
+     */
+    'connectivity_statements': Array<SentenceConnectivityStatement>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof Sentence
+     */
+    'has_notes': boolean;
     /**
      * 
      * @type {string}
@@ -1180,77 +1189,101 @@ export interface Sentence {
     'doi_uri': string;
 }
 /**
- * Sentence with details
+ * 
  * @export
- * @interface SentenceWithDetails
+ * @enum {string}
  */
-export interface SentenceWithDetails {
+
+export const SentenceAvailableTransitionsEnum = {
+    Open: 'open',
+    ToBeReviewed: 'to_be_reviewed',
+    ComposeLater: 'compose_later',
+    ComposeNow: 'compose_now',
+    Excluded: 'excluded',
+    Duplicate: 'duplicate'
+} as const;
+
+export type SentenceAvailableTransitionsEnum = typeof SentenceAvailableTransitionsEnum[keyof typeof SentenceAvailableTransitionsEnum];
+
+
+/**
+ * Connectivity Statement
+ * @export
+ * @interface SentenceConnectivityStatement
+ */
+export interface SentenceConnectivityStatement {
     /**
      * 
      * @type {number}
-     * @memberof SentenceWithDetails
+     * @memberof SentenceConnectivityStatement
      */
     'id': number;
     /**
      * 
-     * @type {boolean}
-     * @memberof SentenceWithDetails
+     * @type {number}
+     * @memberof SentenceConnectivityStatement
      */
-    'has_notes': boolean;
-    /**
-     * 
-     * @type {User}
-     * @memberof SentenceWithDetails
-     */
-    'owner': User;
-    /**
-     * 
-     * @type {Array<Tag>}
-     * @memberof SentenceWithDetails
-     */
-    'tags': Array<Tag>;
+    'sentence_id': number;
     /**
      * 
      * @type {string}
-     * @memberof SentenceWithDetails
+     * @memberof SentenceConnectivityStatement
      */
-    'title': string;
+    'knowledge_statement': string;
     /**
      * 
-     * @type {string}
-     * @memberof SentenceWithDetails
+     * @type {Array<Doi>}
+     * @memberof SentenceConnectivityStatement
      */
-    'text': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SentenceWithDetails
-     */
-    'state': string;
+    'dois': Array<Doi>;
     /**
      * 
      * @type {number}
-     * @memberof SentenceWithDetails
+     * @memberof SentenceConnectivityStatement
      */
-    'pmid'?: number | null;
+    'ans_division_id': number;
+    /**
+     * 
+     * @type {AnsDivision}
+     * @memberof SentenceConnectivityStatement
+     */
+    'ans_division': AnsDivision;
+    /**
+     * 
+     * @type {LateralityEnum}
+     * @memberof SentenceConnectivityStatement
+     */
+    'laterality': LateralityEnum;
+    /**
+     * 
+     * @type {CircuitTypeEnum}
+     * @memberof SentenceConnectivityStatement
+     */
+    'circuit_type': CircuitTypeEnum;
+    /**
+     * 
+     * @type {Array<Specie>}
+     * @memberof SentenceConnectivityStatement
+     */
+    'species': Array<Specie>;
+    /**
+     * 
+     * @type {number}
+     * @memberof SentenceConnectivityStatement
+     */
+    'biological_sex_id': number;
+    /**
+     * 
+     * @type {BiologicalSex}
+     * @memberof SentenceConnectivityStatement
+     */
+    'biological_sex': BiologicalSex;
     /**
      * 
      * @type {string}
-     * @memberof SentenceWithDetails
+     * @memberof SentenceConnectivityStatement
      */
-    'pmcid'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof SentenceWithDetails
-     */
-    'doi'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof SentenceWithDetails
-     */
-    'modified_date': string;
+    'apinatomy_model': string | null;
 }
 /**
  * Specie
@@ -1270,6 +1303,12 @@ export interface Specie {
      * @memberof Specie
      */
     'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Specie
+     */
+    'ontology_uri': string;
 }
 /**
  * Note Tag
@@ -3424,7 +3463,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementWithDetailsList>> {
+        async composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destination, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -3620,7 +3659,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceList(limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceWithDetailsList>> {
+        async composerSentenceList(limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceList(limit, notes, offset, ordering, state, tags, title, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -3875,7 +3914,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementWithDetailsList> {
+        composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementList> {
             return localVarFp.composerConnectivityStatementList(destination, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options).then((request) => request(axios, basePath));
         },
         /**
@@ -4053,7 +4092,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceList(limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: any): AxiosPromise<PaginatedSentenceWithDetailsList> {
+        composerSentenceList(limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: any): AxiosPromise<PaginatedSentenceList> {
             return localVarFp.composerSentenceList(limit, notes, offset, ordering, state, tags, title, options).then((request) => request(axios, basePath));
         },
         /**

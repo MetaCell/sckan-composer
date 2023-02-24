@@ -1,3 +1,4 @@
+from django.db.models import Q
 import django_filters
 
 from composer.enums import SentenceState, CSState
@@ -39,6 +40,10 @@ class SentenceFilter(django_filters.FilterSet):
         fields = []
 
 
+def filter_by_ontology_uri(qs, field, anatomical_entity):
+    return qs.filter(Q(**{f"{field}__ontology_uri": anatomical_entity.ontology_uri}))
+
+
 class ConnectivityStatementFilter(django_filters.FilterSet):
     sentence_id = django_filters.ModelChoiceFilter(
         field_name="sentence_id", queryset=Sentence.objects.all()
@@ -53,10 +58,10 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
         field_name="tags", queryset=Tag.objects.all()
     )
     origin = django_filters.ModelChoiceFilter(
-        field_name="origin", queryset=AnatomicalEntity.objects.all()
+        field_name="origin", queryset=AnatomicalEntity.objects.all(), method=filter_by_ontology_uri
     )
     destination = django_filters.ModelChoiceFilter(
-        field_name="destination", queryset=AnatomicalEntity.objects.all()
+        field_name="destination", queryset=AnatomicalEntity.objects.all(), method=filter_by_ontology_uri
     )
     notes = django_filters.BooleanFilter(
         field_name="notes", label="Checks if entity has notes", method=field_has_content

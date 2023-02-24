@@ -44,10 +44,8 @@ cd backend
 pip install --upgrade -r requirements.txt
 # run the migrations
 python3 manage.py migrate
-# run the development server (http)
-python3 manage.py runserver
-# OR run the development server (https)
-# python3 manage.py runsslserver
+# run the development server (https)
+python3 manage.py runsslserver
 ```
 
 ### Running on docker with docker-compose

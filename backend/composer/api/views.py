@@ -1,5 +1,6 @@
 import json
 from django.http import HttpResponse
+from django.db.models import Q
 from rest_framework.renderers import INDENT_SEPARATORS
 from rest_framework import mixins, permissions, viewsets
 from rest_framework.decorators import action, api_view
@@ -33,11 +34,9 @@ from .serializers import (
     AnatomicalEntitySerializer,
     AnsDivisionSerializer,
     ConnectivityStatementSerializer,
-    ConnectivityStatementWithDetailsSerializer,
     NoteSerializer,
     ProfileSerializer,
     SentenceSerializer,
-    SentenceWithDetailsSerializer,
     SpecieSerializer,
     TagSerializer,
     ViaSerializer,
@@ -45,6 +44,12 @@ from .serializers import (
 
 
 # Mixins
+class AssignOwnerMixin(viewsets.GenericViewSet):
+    def retrieve(self, request, *args, **kwargs):
+        self.get_object().assign_owner(request)
+        return super().retrieve(request, *args, **kwargs)
+
+    
 class TagMixin(
     viewsets.GenericViewSet,
 ):
@@ -161,28 +166,23 @@ class NoteViewSet(viewsets.ModelViewSet):
     filterset_class = NoteFilter
 
 
-class ConnectivityStatementViewSet(TagMixin, TransitionMixin, viewsets.ModelViewSet):
+class ConnectivityStatementViewSet(TagMixin, TransitionMixin, AssignOwnerMixin, viewsets.ModelViewSet):
     """
     ConnectivityStatement
     """
 
     queryset = ConnectivityStatement.objects.all()
     serializer_class = ConnectivityStatementSerializer
-    serializer_class_with_details = ConnectivityStatementWithDetailsSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = ConnectivityStatementFilter
     service = ConnectivityStatementService
-
-    def get_serializer_class(self, *args, **kwargs):
-        if self.action in ("list",):
-            return self.serializer_class_with_details
-        return self.serializer_class
-
-    def retrieve(self, request, *args, **kwargs):
-        self.get_object().assign_owner(request)
-        return super().retrieve(request, *args, **kwargs)
+    
+    def get_queryset(self):
+        if self.action == "list" and "sentence_id" in self.request.query_params:
+            return super().get_queryset()
+        return ConnectivityStatement.objects.excluding_draft()
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -197,29 +197,18 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     ]
 
 
-class SentenceViewSet(TagMixin, TransitionMixin, ModelNoDeleteViewSet):
+class SentenceViewSet(TagMixin, TransitionMixin, AssignOwnerMixin, ModelNoDeleteViewSet):
     """
     Sentence
     """
 
     queryset = Sentence.objects.all()
     serializer_class = SentenceSerializer
-    serializer_class_with_details = SentenceWithDetailsSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = SentenceFilter
     service = SentenceService
-
-
-    def get_serializer_class(self, *args, **kwargs):
-        if self.action in ("list",):
-            return self.serializer_class_with_details
-        return self.serializer_class
-
-    def retrieve(self, request, *args, **kwargs):
-        self.get_object().assign_owner(request)
-        return super().retrieve(request, *args, **kwargs)
 
 
 class SpecieViewSet(viewsets.ReadOnlyModelViewSet):
