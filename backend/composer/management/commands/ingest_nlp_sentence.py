@@ -69,31 +69,34 @@ async def save_sentence(session, row, default_batch_name):
     if not batch_name:
         batch_name = default_batch_name
     title = text[0:199]
-    sentence, created = await Sentence.objects.aget_or_create(
-        external_ref=external_ref,
-        batch_name=batch_name,
-        defaults={"title": title, "text": text, "doi": doi, "pmid": pmid, "pmcid": pmcid},
-    )
-    if created:
-        url = None
-        if sentence.doi:
-            url = sentence.doi
-            title_extractor = doi_title_extractor
-        elif sentence.pmid:
-            url = sentence.pmid_uri
-            title_extractor = pmid_title_extractor
-        elif sentence.pmcid:
-            pmcid = sentence.pmcid.replace("PMC", "")
-            url = f"https://www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi?verb=GetRecord&identifier=oai:pubmedcentral.nih.gov:{pmcid}&metadataPrefix=oai_dc"
-            title_extractor = pmcid_title_extractor
-        if url:
-            new_title = await title_extractor(session, url)
-            if new_title:
-                sentence.title = new_title
-        await sync_to_async(sentence.save)()
-        print(
-            f"{rowid}: sentence created: batch {batch_name}, ref {external_ref}, pmid {pmid}, pmcid {pmcid}, doi {doi}."
+    try:
+        sentence, created = await Sentence.objects.aget_or_create(
+            external_ref=external_ref,
+            batch_name=batch_name,
+            defaults={"title": title, "text": text, "doi": doi, "pmid": pmid, "pmcid": pmcid},
         )
+        if created:
+            url = None
+            if sentence.doi:
+                url = sentence.doi
+                title_extractor = doi_title_extractor
+            elif sentence.pmid:
+                url = sentence.pmid_uri
+                title_extractor = pmid_title_extractor
+            elif sentence.pmcid:
+                pmcid = sentence.pmcid.replace("PMC", "")
+                url = f"https://www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi?verb=GetRecord&identifier=oai:pubmedcentral.nih.gov:{pmcid}&metadataPrefix=oai_dc"
+                title_extractor = pmcid_title_extractor
+            if url:
+                new_title = await title_extractor(session, url)
+                if new_title:
+                    sentence.title = new_title[0:199]
+            await sync_to_async(sentence.save)()
+            print(
+                f"{rowid}: sentence created: batch {batch_name}, ref {external_ref}, pmid {pmid}, pmcid {pmcid}, doi {doi}."
+            )
+    except Exception as e:
+        print(f"{rowid}: batch {batch_name}, ref {external_ref} ... skipped! Exception {e}")
 
 
 class Command(BaseCommand):
