@@ -41,7 +41,7 @@ This step is an optional step
 cd backend
 # make sure your virtual env is activated
 # and install the requirements
-pip install --upgrade -r requirements.txt
+pip3 install --upgrade -r requirements.txt
 # run the migrations
 python3 manage.py migrate
 # run the development server (https)
