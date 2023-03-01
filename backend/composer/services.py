@@ -88,4 +88,10 @@ class SentenceService(StateServiceMixin):
 
 
 class ConnectivityStatementService(StateServiceMixin):
-    ...
+    @staticmethod
+    def compile_journey(connectivity_statement):
+        origin = connectivity_statement.origin
+        destination = connectivity_statement.destination
+        journey =  f"{origin} to {destination}"
+        journey += " via ".join(str(path) for path in connectivity_statement.path.all())
+        return journey.lower().capitalize()

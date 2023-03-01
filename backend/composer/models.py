@@ -408,6 +408,10 @@ class ConnectivityStatement(models.Model):
     @transition(field=state, source=CSState.NPO_APPROVED, target=CSState.APPROVED)
     def approved(self):
         pass
+    
+    @property
+    def journey(self):
+        return ConnectivityStatementService.compile_journey(self)
 
     @property
     def has_notes(self):
