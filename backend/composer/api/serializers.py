@@ -294,6 +294,7 @@ class ConnectivityStatementSerializer(
     sentence = SentenceSerializer(required=False, read_only=True)
     available_transitions = serializers.SerializerMethodField()
     has_notes = serializers.SerializerMethodField()
+    journey = serializers.CharField(read_only=True)
 
     def get_available_transitions(self, instance) -> list[CSState]:
         return [t.name for t in instance.get_available_state_transitions()]
@@ -322,6 +323,7 @@ class ConnectivityStatementSerializer(
             "ans_division",
             "destination_type",
             "path",
+            "journey",
             "laterality",
             "circuit_type",
             "species",
