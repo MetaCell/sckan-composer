@@ -49,7 +49,7 @@ class AssignOwnerMixin(viewsets.GenericViewSet):
         self.get_object().assign_owner(request)
         return super().retrieve(request, *args, **kwargs)
 
-    
+
 class TagMixin(
     viewsets.GenericViewSet,
 ):
@@ -87,6 +87,46 @@ class TagMixin(
         instance = self.get_object()
         tag_instance = Tag.objects.get(id=tag_id)
         instance.tags.remove(tag_instance)
+        return Response(self.get_serializer(instance).data)
+
+
+class SpecieMixin(
+    viewsets.GenericViewSet,
+):
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "specie_id",
+                OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                required=True,
+            )
+        ],
+        request=None,
+    )
+    @action(detail=True, methods=["post"], url_path="add_specie/(?P<specie_id>\w+)")
+    def add_specie(self, request, pk=None, specie_id=None):
+        instance = self.get_object()
+        specie_instance = Specie.objects.get(id=specie_id)
+        instance.species.add(specie_instance)
+        return Response(self.get_serializer(instance).data)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "specie_id",
+                OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                required=True,
+            )
+        ],
+        request=None,
+    )
+    @action(detail=True, methods=["post"], url_path="del_specie/(?P<specie_id>\w+)")
+    def del_specie(self, request, pk=None, specie_id=None):
+        instance = self.get_object()
+        specie_instance = Specie.objects.get(id=specie_id)
+        instance.species.remove(specie_instance)
         return Response(self.get_serializer(instance).data)
 
 
@@ -166,7 +206,7 @@ class NoteViewSet(viewsets.ModelViewSet):
     filterset_class = NoteFilter
 
 
-class ConnectivityStatementViewSet(TagMixin, TransitionMixin, AssignOwnerMixin, viewsets.ModelViewSet):
+class ConnectivityStatementViewSet(SpecieMixin, TagMixin, TransitionMixin, AssignOwnerMixin, viewsets.ModelViewSet):
     """
     ConnectivityStatement
     """
@@ -178,7 +218,7 @@ class ConnectivityStatementViewSet(TagMixin, TransitionMixin, AssignOwnerMixin, 
     ]
     filterset_class = ConnectivityStatementFilter
     service = ConnectivityStatementService
-    
+
     def get_queryset(self):
         if self.action == "list" and "sentence_id" in self.request.query_params:
             return super().get_queryset()
@@ -197,7 +237,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     ]
 
 
-class SentenceViewSet(TagMixin, TransitionMixin, AssignOwnerMixin, ModelNoDeleteViewSet):
+class SentenceViewSet(SpecieMixin, TagMixin, TransitionMixin, AssignOwnerMixin, ModelNoDeleteViewSet):
     """
     Sentence
     """
@@ -268,6 +308,7 @@ def jsonschemas(request):
         SentenceSerializer,
         ViaSerializer,
         TagSerializer,
+        SpecieSerializer,
         NoteSerializer,
     ]
 
