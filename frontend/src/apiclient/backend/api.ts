@@ -224,6 +224,12 @@ export interface ConnectivityStatement {
     'path': Array<Via>;
     /**
      * 
+     * @type {string}
+     * @memberof ConnectivityStatement
+     */
+    'journey': string;
+    /**
+     * 
      * @type {LateralityEnum}
      * @memberof ConnectivityStatement
      */
@@ -792,6 +798,12 @@ export interface PatchedConnectivityStatement {
      * @memberof PatchedConnectivityStatement
      */
     'path'?: Array<Via>;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'journey'?: string;
     /**
      * 
      * @type {LateralityEnum}
