@@ -1603,6 +1603,52 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * ConnectivityStatement
+         * @param {number} doi 
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAddDoiCreate: async (doi: number, id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'doi' is not null or undefined
+            assertParamExists('composerConnectivityStatementAddDoiCreate', 'doi', doi)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementAddDoiCreate', 'id', id)
+            const localVarPath = `/api/composer/connectivity-statement/{id}/add_doi/{doi}/`
+                .replace(`{${"doi"}}`, encodeURIComponent(String(doi)))
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication cookieAuth required
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {number} specieId 
          * @param {*} [options] Override http request option.
@@ -1731,6 +1777,52 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(connectivityStatement, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} doi 
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementDelDoiCreate: async (doi: number, id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'doi' is not null or undefined
+            assertParamExists('composerConnectivityStatementDelDoiCreate', 'doi', doi)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementDelDoiCreate', 'id', id)
+            const localVarPath = `/api/composer/connectivity-statement/{id}/del_doi/{doi}/`
+                .replace(`{${"doi"}}`, encodeURIComponent(String(doi)))
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication cookieAuth required
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -3500,6 +3592,17 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * ConnectivityStatement
+         * @param {number} doi 
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementAddDoiCreate(doi: number, id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAddDoiCreate(doi, id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {number} specieId 
          * @param {*} [options] Override http request option.
@@ -3528,6 +3631,17 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          */
         async composerConnectivityStatementCreate(connectivityStatement: ConnectivityStatement, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementCreate(connectivityStatement, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} doi 
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementDelDoiCreate(doi: number, id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementDelDoiCreate(doi, id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3978,6 +4092,16 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * ConnectivityStatement
+         * @param {number} doi 
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAddDoiCreate(doi: number, id: number, options?: any): AxiosPromise<ConnectivityStatement> {
+            return localVarFp.composerConnectivityStatementAddDoiCreate(doi, id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {number} specieId 
          * @param {*} [options] Override http request option.
@@ -4004,6 +4128,16 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          */
         composerConnectivityStatementCreate(connectivityStatement: ConnectivityStatement, options?: any): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementCreate(connectivityStatement, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} doi 
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementDelDoiCreate(doi: number, id: number, options?: any): AxiosPromise<ConnectivityStatement> {
+            return localVarFp.composerConnectivityStatementDelDoiCreate(doi, id, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -4425,6 +4559,18 @@ export class ComposerApi extends BaseAPI {
 
     /**
      * ConnectivityStatement
+     * @param {number} doi 
+     * @param {number} id A unique integer value identifying this connectivity statement.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementAddDoiCreate(doi: number, id: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementAddDoiCreate(doi, id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatement
      * @param {number} id A unique integer value identifying this connectivity statement.
      * @param {number} specieId 
      * @param {*} [options] Override http request option.
@@ -4456,6 +4602,18 @@ export class ComposerApi extends BaseAPI {
      */
     public composerConnectivityStatementCreate(connectivityStatement: ConnectivityStatement, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementCreate(connectivityStatement, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatement
+     * @param {number} doi 
+     * @param {number} id A unique integer value identifying this connectivity statement.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementDelDoiCreate(doi: number, id: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementDelDoiCreate(doi, id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
