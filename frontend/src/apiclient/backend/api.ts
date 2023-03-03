@@ -13,15 +13,13 @@
  */
 
 
-import type { Configuration } from './configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
-import globalAxios from 'axios';
+import { Configuration } from './configuration';
+import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
-import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
  * Anatomical Entity
@@ -181,7 +179,7 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'origin_id': number;
+    'origin_id'?: number;
     /**
      * 
      * @type {AnatomicalEntity}
@@ -193,7 +191,7 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'destination_id': number;
+    'destination_id'?: number;
     /**
      * 
      * @type {AnatomicalEntity}
@@ -279,8 +277,6 @@ export interface ConnectivityStatement {
      */
     'has_notes': boolean;
 }
-
-
 /**
  * 
  * @export
@@ -857,8 +853,6 @@ export interface PatchedConnectivityStatement {
      */
     'has_notes'?: boolean;
 }
-
-
 /**
  * Note
  * @export
