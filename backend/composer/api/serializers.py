@@ -285,7 +285,7 @@ class ConnectivityStatementSerializer(
     tags = TagSerializer(many=True, read_only=True)
     species = SpecieSerializer(many=True, read_only=True)
     path = ViaSerializer(source="via_set", many=True, read_only=True)
-    dois = DoiSerializer(source="doi_set", many=True, read_only=False)
+    dois = DoiSerializer(source="doi_set", many=True, read_only=True)
     owner = UserSerializer(required=False, read_only=True)
     origin = AnatomicalEntitySerializer(required=False, read_only=True)
     destination = AnatomicalEntitySerializer(required=False, read_only=True)

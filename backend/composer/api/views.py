@@ -1,15 +1,14 @@
 import json
+
 from django.http import HttpResponse
-from django.db.models import Q
-from rest_framework.renderers import INDENT_SEPARATORS
+from drf_react_template.schema_form_encoder import SchemaProcessor, UiSchemaProcessor
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import mixins, permissions, viewsets
 from rest_framework.decorators import action, api_view
+from rest_framework.renderers import INDENT_SEPARATORS
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
-
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
-from drf_react_template.schema_form_encoder import SchemaProcessor, UiSchemaProcessor
 
 from .filtersets import (
     SentenceFilter,
@@ -18,18 +17,6 @@ from .filtersets import (
     NoteFilter,
     ViaFilter,
 )
-from ..models import (
-    AnatomicalEntity,
-    AnsDivision,
-    ConnectivityStatement,
-    Note,
-    Profile,
-    Sentence,
-    Specie,
-    Tag,
-    Via,
-)
-from ..services import ConnectivityStatementService, SentenceService
 from .serializers import (
     AnatomicalEntitySerializer,
     AnsDivisionSerializer,
@@ -41,6 +28,18 @@ from .serializers import (
     TagSerializer,
     ViaSerializer,
 )
+from ..models import (
+    AnatomicalEntity,
+    AnsDivision,
+    ConnectivityStatement,
+    Note,
+    Profile,
+    Sentence,
+    Specie,
+    Tag,
+    Via, Doi,
+)
+from ..services import ConnectivityStatementService, SentenceService
 
 
 # Mixins
@@ -206,7 +205,8 @@ class NoteViewSet(viewsets.ModelViewSet):
     filterset_class = NoteFilter
 
 
-class ConnectivityStatementViewSet(SpecieMixin, TagMixin, TransitionMixin, AssignOwnerMixin, viewsets.ModelViewSet):
+class ConnectivityStatementViewSet(SpecieMixin, TagMixin, TransitionMixin, AssignOwnerMixin,
+                                   viewsets.ModelViewSet):
     """
     ConnectivityStatement
     """
@@ -237,7 +237,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     ]
 
 
-class SentenceViewSet(SpecieMixin, TagMixin, TransitionMixin, AssignOwnerMixin, ModelNoDeleteViewSet):
+class SentenceViewSet(TagMixin, TransitionMixin, AssignOwnerMixin, ModelNoDeleteViewSet):
     """
     Sentence
     """
