@@ -272,6 +272,9 @@ class ProfileViewSet(viewsets.GenericViewSet):
     serializer_class = ProfileSerializer
 
     def get_queryset(self):
+        user = self.request.user
+        if user.is_anonymous:
+            return super().get_queryset().none()
         return super().get_queryset().filter(user=self.request.user)
 
     @action(detail=False, methods=["get"])
