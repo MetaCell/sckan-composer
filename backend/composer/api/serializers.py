@@ -137,6 +137,7 @@ class SpecieSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
     class Meta:
         model = Specie
         fields = ("id", "name", "ontology_uri")
+        read_only_fields = ("id", "name", "ontology_uri")
 
 
 class BiologicalSexSerializer(serializers.ModelSerializer):
@@ -283,7 +284,7 @@ class ConnectivityStatementSerializer(
     ans_division_id = serializers.IntegerField()
     biological_sex_id = serializers.IntegerField()
     tags = TagSerializer(many=True, read_only=True)
-    species = SpecieSerializer(many=True, read_only=True)
+    species = SpecieSerializer(many=True, read_only=False)
     path = ViaSerializer(source="via_set", many=True, read_only=True)
     dois = DoiSerializer(source="doi_set", many=True, read_only=True)
     owner = UserSerializer(required=False, read_only=True)
