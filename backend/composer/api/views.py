@@ -26,7 +26,7 @@ from .serializers import (
     SentenceSerializer,
     SpecieSerializer,
     TagSerializer,
-    ViaSerializer,
+    ViaSerializer, DoiSerializer,
 )
 from ..models import (
     AnatomicalEntity,
@@ -86,6 +86,51 @@ class TagMixin(
         instance = self.get_object()
         tag_instance = Tag.objects.get(id=tag_id)
         instance.tags.remove(tag_instance)
+        return Response(self.get_serializer(instance).data)
+
+
+class DoiMixin(
+    viewsets.GenericViewSet,
+):
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "doi",
+                OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                required=True,
+            )
+        ],
+        request=None,
+    )
+    @action(detail=True, methods=["post"], url_path="add_doi/(?P<doi>\w+)")
+    def add_doi(self, request, pk=None, doi=None):
+        instance = self.get_object()
+        _, _ = Doi.objects.get_or_create(
+            connectivity_statement=instance,
+            doi=doi,
+        )
+        return Response(self.get_serializer(instance).data)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "doi",
+                OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                required=True,
+            )
+        ],
+        request=None,
+    )
+    @action(detail=True, methods=["post"], url_path="del_doi/(?P<doi>\w+)")
+    def del_doi(self, request, pk=None, doi=None):
+        instance = self.get_object()
+        doi_instance = Doi.objects.get(connectivity_statement=instance.id,
+                                       doi=doi
+                                       )
+        if doi_instance:
+            doi_instance.delete()
         return Response(self.get_serializer(instance).data)
 
 
@@ -205,7 +250,7 @@ class NoteViewSet(viewsets.ModelViewSet):
     filterset_class = NoteFilter
 
 
-class ConnectivityStatementViewSet(SpecieMixin, TagMixin, TransitionMixin, AssignOwnerMixin,
+class ConnectivityStatementViewSet(DoiMixin, SpecieMixin, TagMixin, TransitionMixin, AssignOwnerMixin,
                                    viewsets.ModelViewSet):
     """
     ConnectivityStatement
@@ -308,6 +353,7 @@ def jsonschemas(request):
         SentenceSerializer,
         ViaSerializer,
         TagSerializer,
+        DoiSerializer,
         SpecieSerializer,
         NoteSerializer,
     ]
