@@ -137,6 +137,7 @@ class SpecieSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
     class Meta:
         model = Specie
         fields = ("id", "name", "ontology_uri")
+        read_only_fields = ("id", "name", "ontology_uri")
 
 
 class BiologicalSexSerializer(serializers.ModelSerializer):
@@ -282,15 +283,15 @@ class ConnectivityStatementSerializer(
     destination_id = serializers.IntegerField()
     ans_division_id = serializers.IntegerField()
     biological_sex_id = serializers.IntegerField()
-    tags = TagSerializer(many=True, read_only=False)
+    tags = TagSerializer(many=True, read_only=True)
+    species = SpecieSerializer(many=True, read_only=False)
     dois = DoiSerializer(source="doi_set", many=True, read_only=False)
+    path = ViaSerializer(source="via_set", many=True, read_only=True)
     owner = UserSerializer(required=False, read_only=True)
     origin = AnatomicalEntitySerializer(required=False, read_only=True)
     destination = AnatomicalEntitySerializer(required=False, read_only=True)
     ans_division = AnsDivisionSerializer(required=False, read_only=True)
     biological_sex = BiologicalSexSerializer(required=False, read_only=True)
-    path = ViaSerializer(source="via_set", many=True, read_only=True)
-    species = SpecieSerializer(many=True, read_only=True)
     sentence = SentenceSerializer(required=False, read_only=True)
     available_transitions = serializers.SerializerMethodField()
     has_notes = serializers.SerializerMethodField()

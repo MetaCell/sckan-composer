@@ -353,6 +353,35 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/composer/connectivity-statement/{id}/add_specie/{specie_id}/:
+    post:
+      operationId: composer_connectivity_statement_add_specie_create
+      description: ConnectivityStatement
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement.
+        required: true
+      - in: path
+        name: specie_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatement'
+          description: ''
   /api/composer/connectivity-statement/{id}/add_tag/{tag_id}/:
     post:
       operationId: composer_connectivity_statement_add_tag_create
@@ -366,6 +395,35 @@ paths:
         required: true
       - in: path
         name: tag_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatement'
+          description: ''
+  /api/composer/connectivity-statement/{id}/del_specie/{specie_id}/:
+    post:
+      operationId: composer_connectivity_statement_del_specie_create
+      description: ConnectivityStatement
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement.
+        required: true
+      - in: path
+        name: specie_id
         schema:
           type: integer
         required: true
@@ -1427,6 +1485,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Tag'
+          readOnly: true
         dois:
           type: array
           items:
@@ -1482,7 +1541,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Specie'
-          readOnly: true
         biological_sex_id:
           type: integer
         biological_sex:
@@ -1784,6 +1842,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Tag'
+          readOnly: true
         dois:
           type: array
           items:
@@ -1839,7 +1898,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Specie'
-          readOnly: true
         biological_sex_id:
           type: integer
         biological_sex:
@@ -2138,11 +2196,11 @@ components:
           readOnly: true
         name:
           type: string
-          maxLength: 200
+          readOnly: true
         ontology_uri:
           type: string
           format: uri
-          maxLength: 200
+          readOnly: true
       required:
       - id
       - name
