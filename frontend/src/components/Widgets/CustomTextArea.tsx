@@ -1,7 +1,7 @@
 import * as React from "react";
 import TextField from "@mui/material/TextField";
 
-export default function TextArea({placeholder, options: { rows } }: any) {
+export default function TextArea({placeholder,onChange, options: { rows } }: any) {
 
   return (
     <TextField
@@ -9,6 +9,7 @@ export default function TextArea({placeholder, options: { rows } }: any) {
       rows={rows}
       placeholder={placeholder}
       fullWidth
+      onChange={(event) => onChange(event.target.value)}
       sx={{
         "& .Mui-focused": {
           border: '0 !important',

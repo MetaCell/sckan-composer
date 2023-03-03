@@ -58,13 +58,13 @@ const SentenceForm = (props: any) => {
         placeholder: "Enter Biological Sex",
       }
     },
-    ans_division_id: {
-      "ui:widget": AutoComplete,
-      "ui:options": {
-        label: 'ANS Division',
-        placeholder: "Select ANS Division",
-      }
-    },
+    // ans_division_id: {
+    //   "ui:widget": AutoComplete,
+    //   "ui:options": {
+    //     label: 'ANS Division',
+    //     placeholder: "Select ANS Division",
+    //   }
+    // },
   };
 
   const customSchema = {

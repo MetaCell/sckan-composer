@@ -14,14 +14,16 @@ const StyledInput = styled(TextField)(({ theme }) => ({
   }
 }));
 
-export default function CustomTextField({placeholder, options: { label } }: any) {
+export default function CustomTextField({placeholder,onChange,  options: { label } }: any) {
 
   return (
       <FormControl variant="standard">
         <InputLabel shrink htmlFor="custom-input">
           <Typography variant="h5" fontWeight={500}>{label}</Typography>
         </InputLabel>
-        <StyledInput id='custom-input' placeholder={placeholder} />
+        <StyledInput
+          onChange={(event) => onChange(event.target.value)}
+          id='custom-input' placeholder={placeholder} />
       </FormControl>
 
   );
