@@ -64,8 +64,8 @@ const EntityDataGrid = (props: DataGridProps) => {
       notes: has_notes,
     };
     if (entityType === "sentence") {
-      const { pmid, title } = item;
-      return { ...commonRowProps, pmid, title };
+      const { pmid, text } = item;
+      return { ...commonRowProps, pmid, text };
     }
     if (entityType === "statement") {
       const { sentence, knowledge_statement } = item;
@@ -80,7 +80,7 @@ const EntityDataGrid = (props: DataGridProps) => {
   const columns: GridColDef[] = [
     { field: "pmid", headerName: "PMID", renderCell: renderPMID },
     {
-      field: entityType === "sentence" ? "title" : "knowledge_statement",
+      field: entityType === "sentence" ? "text" : "knowledge_statement",
       headerName:
         entityType === "sentence" ? "Sentence" : "Knowledge Statement",
       flex: 2,

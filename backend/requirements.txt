@@ -14,6 +14,8 @@ drf-writable-nested==0.7.0
 social-auth-app-django==5.0.0
 pyontutils==0.1.31
 drf-react-template-framework==0.0.17
+aiohttp==3.8.3
+crossref-commons==0.0.7
 
 django-debug-toolbar
 django-sslserver # ssl dev server, for testing orcid social login
