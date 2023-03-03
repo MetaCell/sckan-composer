@@ -279,8 +279,8 @@ class ConnectivityStatementSerializer(
 
     sentence_id = serializers.IntegerField()
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
-    origin_id = serializers.IntegerField()
-    destination_id = serializers.IntegerField()
+    origin_id = serializers.IntegerField(required=False)
+    destination_id = serializers.IntegerField(required=False)
     ans_division_id = serializers.IntegerField()
     biological_sex_id = serializers.IntegerField()
     tags = TagSerializer(many=True, read_only=True)

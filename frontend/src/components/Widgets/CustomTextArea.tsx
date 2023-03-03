@@ -1,10 +1,11 @@
 import * as React from "react";
 import TextField from "@mui/material/TextField";
 
-export default function TextArea({placeholder,onChange, options: { rows } }: any) {
+export default function TextArea({value, placeholder,onChange, options: { rows } }: any) {
 
   return (
     <TextField
+      value={value}
       multiline
       rows={rows}
       placeholder={placeholder}
