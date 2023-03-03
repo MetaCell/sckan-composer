@@ -13,14 +13,12 @@ const log = (type: string) => console.log.bind(console, type)
 
 export const FormBase = (props: any) => {
 
-    const {service, data, schema, setter, extraData, uiSchema, uiFields, enableAutoSave, disabled=false,  clearOnSave=false} = props
+    const {service, data, schema, setter, extraData, uiSchema, uiFields, enableAutoSave, disabled=false,  clearOnSave=false, sx} = props
     const [localData, setLocalData] = useState<any>(data)
     const [isSaving, setIsSaving] = useState<boolean>(false)
     const triggerAutoSave = useDebouncedCallback(() => onSave(), EDIT_DEBOUNCE);
 
-
     const formRef = useRef<any>(null);
-
     if (uiFields) {
         Object.entries(uiSchema).forEach((p) =>
             !p[0].startsWith("ui:") && !uiFields.includes(p[0])
@@ -64,7 +62,6 @@ export const FormBase = (props: any) => {
             return triggerAutoSave()
         }
     }
-
     return (
       <>
         {(!data || isSaving) && <Backdrop

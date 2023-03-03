@@ -16,6 +16,7 @@ export const vars = {
     buttonOutlinedColor:"#344054",
     buttonOutlinedBorderColor: "#D0D5DD",
     buttonOutlinedHoverBg: '#F9FAFB',
-    darkTextColor: '#101828'
+    darkTextColor: '#101828',
+    labelColor: '#1D2939',
+    radioBorderColor: '#D0D5DD'
   };
-  

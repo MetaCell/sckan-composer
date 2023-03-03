@@ -17,6 +17,8 @@ const {
   buttonOutlinedColor,
   buttonOutlinedBorderColor,
   buttonOutlinedHoverBg,
+  labelColor,
+  radioBorderColor
 } = vars;
 
 const theme = createTheme({
@@ -145,7 +147,6 @@ const theme = createTheme({
           padding: theme.spacing(1.25, 2),
           fontSize: "0.875rem",
           fontWeight: 600,
-          lineHeight: "normal",
         }),
         containedSecondary: {
           fontWeight: "600",
@@ -157,6 +158,21 @@ const theme = createTheme({
           "&:hover": {
             background: "#F9FAFB",
             borderColor: buttonOutlinedBorderColor,
+          },
+        },
+      },
+    },
+    MuiButtonGroup: {
+      styleOverrides: {
+        root: {
+          boxShadow: 'none',
+        },
+        groupedContained: {
+          '&:not(:last-of-type)': {
+            borderRight: 'none',
+          },
+          '&:not(:first-of-type)': {
+            padding: 0
           },
         },
       },
@@ -286,6 +302,54 @@ const theme = createTheme({
         }),
       },
     },
+    MuiFormControl: {
+      styleOverrides: {
+        root: {
+          "& .costume-dois": {
+            "& .MuiPaper-root":{
+              boxShadow: 'none'
+            }
+          }
+        }
+      }
+    },
+    MuiFormLabel: {
+      styleOverrides: {
+        root: {
+          color: labelColor,
+          fontWeight: 500,
+        },
+      }
+    } ,
+    MuiRadio: {
+      styleOverrides: {
+        root: {
+          "& .MuiSvgIcon-root": {
+             fontSize: '1rem',
+            color: radioBorderColor
+          },
+        }
+      }
+    },
+    MuiFormGroup: {
+      styleOverrides: {
+        root: {
+          "& .MuiFormControlLabel-root":{
+            color: labelColor
+          }
+        }
+      }
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          fontWeight: '500',
+          fontSize: '0.875rem',
+          lineHeight: '20px',
+          color: '#344054'
+        }
+      }
+    }
   },
 });
 

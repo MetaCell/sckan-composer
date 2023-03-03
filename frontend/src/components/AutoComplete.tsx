@@ -1,11 +1,24 @@
 import {useEffect, useState} from "react";
 import * as React from "react";
-import {Autocomplete, debounce} from "@mui/material";
+import {Autocomplete, debounce, styled} from "@mui/material";
 import {SEARCH_DEBOUNCE} from "../settings";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import TextField from "@mui/material/TextField";
+import InputLabel from "@mui/material/InputLabel";
+import Typography from "@mui/material/Typography";
+import FormControl from "@mui/material/FormControl";
 
-export default function AutoComplete({placeholder, value, setValue, fetch, noOptionsText}: any) {
+const StyledAutoComplete = styled(Autocomplete)(({ theme }) => ({
+  'label + &': {
+    marginTop: theme.spacing(4),
+  },
+  "&.Mui-focused .MuiOutlinedInput-root":{
+    border: "1px solid #8DB2EE",
+    boxShadow: '0px 1px 2px rgba(16, 24, 40, 0.05), 0px 0px 0px 4px #CEDDED'
+  }
+}));
+
+export default function AutoComplete({placeholder, value, setValue, fetch, noOptionsText, options: {label}}: any) {
     const [inputValue, setInputValue] = useState<string>("")
     const [options, setOptions] = useState<readonly any[]>([]);
 
@@ -37,23 +50,19 @@ export default function AutoComplete({placeholder, value, setValue, fetch, noOpt
         fetchEntities()
     }, [inputValue, fetchEntities])
 
-
     return (
-        <Autocomplete
-            sx={{
-                paddingLeft: "1em",
-                paddingRight: "1em",
-                "&.Mui-focused .MuiOutlinedInput-root":{
-                    border: "1px solid #8DB2EE",
-                    boxShadow: '0px 1px 2px rgba(16, 24, 40, 0.05), 0px 0px 0px 4px #CEDDED'
-                }
-            }}
+      <FormControl variant="standard">
+      <InputLabel shrink htmlFor="custom-AutoComplete">
+        <Typography variant="h5" fontWeight={500}>{label}</Typography>
+      </InputLabel>
+        <StyledAutoComplete
+          id='custom-AutoComplete'
             fullWidth
             popupIcon={<ExpandMoreIcon/>}
-            getOptionLabel={(option) =>
+            getOptionLabel={(option: any) =>
                 typeof option === 'string' ? option : option.name
             }
-            isOptionEqualToValue={(option, value) => option.name === value.name}
+            isOptionEqualToValue={(option: any, value: any) => option.name === value.name}
             filterOptions={(x) => x}
             options={options}
             autoComplete
@@ -71,5 +80,6 @@ export default function AutoComplete({placeholder, value, setValue, fetch, noOpt
                 <TextField {...params} placeholder={placeholder} fullWidth/>
             )}
         />
+      </FormControl>
     );
 }

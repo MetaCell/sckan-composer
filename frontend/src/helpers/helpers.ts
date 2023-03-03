@@ -1,3 +1,5 @@
+import {SentenceAvailableTransitionsEnum as sentenceStates} from "../apiclient/backend";
+
 export const hiddenWidget = (fields: string[]) => {
   let hiddenSchema = {}
   for (const f of fields) {
@@ -92,4 +94,29 @@ export interface StatementStateToColor {
   connection_missing: StateColor
   npo_approved: StateColor
   approved: StateColor
+}
+
+export const SentenceLabels = {
+  [sentenceStates.Open]: "Open",
+  [sentenceStates.ToBeReviewed]: "To be reviewed",
+  [sentenceStates.ComposeLater]: "Compose later",
+  [sentenceStates.ComposeNow]: "Compose now",
+  [sentenceStates.Duplicate]: "Duplicate",
+  [sentenceStates.Excluded]: "Excluded",
+}
+
+export const formatDate = (date: string) => {
+  return new Date(date).toLocaleDateString("en-UK", {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+export const formatTime = (date: string) => {
+  return new Date(date).toLocaleDateString("en-UK", {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true
+  });
 }

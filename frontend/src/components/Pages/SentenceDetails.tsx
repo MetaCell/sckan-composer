@@ -1,31 +1,63 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
-import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import { useParams } from "react-router-dom";
 import SentenceForm from "../Forms/SentenceForm";
+import KnowledgeStatementsForm from "../Forms/KnowledgeStatementsForm";
 import sentenceService from "../../services/SentenceService";
 import NoteForm from "../Forms/NoteForm";
 import TagForm from "../Forms/TagForm";
-import { Sentence } from "../../apiclient/backend/api";
+import { Sentence } from "../../apiclient/backend";
 import { userProfile } from "../../services/UserService";
 import CheckDuplicates from "../CheckForDuplicates/CheckDuplicatesDialog";
+import {SentenceStateChip} from "../Widgets/StateChip";
+import {SentenceLabels, formatDate, formatTime} from "../../helpers/helpers";
+import Stack from "@mui/material/Stack";
+import GroupedButtons from "../Widgets/CustomGroupedButtons";
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
   const [sentence, setSentence] = useState({} as Sentence);
   const [loading, setLoading] = useState(true);
-  const [extraStatementForm, setExtraStatementForm] = useState<string[]>([]);
+  const [extraStatementForm, setExtraStatementForm] = useState<string[]>([""]);
+  const [open, setOpen] = React.useState(false);
+  const anchorRef = React.useRef<HTMLDivElement>(null);
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
 
-  const doTransition = (transition: string) => {
+  const handleClick = () => {
+    const transition = sentence?.available_transitions[selectedIndex]
     sentenceService
       .doTransition(sentence, transition)
       .then((sentence: Sentence) => {
         setSentence(sentence);
+        setSelectedIndex(0)
       });
+  };
+
+  const handleMenuItemClick = (
+    event: React.MouseEvent<HTMLLIElement, MouseEvent>,
+    index: number,
+  ) => {
+    setSelectedIndex(index);
+    setOpen(false);
+  };
+
+  const handleToggle = () => {
+    setOpen((prevOpen) => !prevOpen);
+  };
+
+  const handleClose = (event: Event) => {
+    if (
+      anchorRef.current &&
+      anchorRef.current.contains(event.target as HTMLElement)
+    ) {
+      return;
+    }
+
+    setOpen(false);
   };
 
   useEffect(() => {
@@ -64,55 +96,96 @@ const SentencesDetails = () => {
   const disabled = sentence.owner?.id !== userProfile.getUser().id;
 
   return (
-    <Grid p={12} container justifyContent="center">
-      <Grid item xl={12}>
-        <Paper elevation={0} sx={{ padding: 8 }}>
-          <Stack alignItems="center" spacing={4}>
-            <Box textAlign="center">
-              <Typography variant="h3" marginBottom={1.5}>
-                Sentence Details
+    <Grid p={6} container>
+      <Grid item xs={12} mb={4}>
+        <Grid container>
+          <Grid item xs={12} md={6}>
+            <Box>
+              <Typography variant="h3" mb={1}>
+                Sentence Details #{sentenceId} <span><SentenceStateChip key={sentence?.state} value={sentence?.state} /></span>
               </Typography>
-              <Typography variant="subtitle2">
-                Show the sentence with id {sentenceId} details here
-              </Typography>
+              <span>
+                Last Edited on  {formatDate(sentence?.modified_date)}, {formatTime(sentence?.modified_date)}
+              </span>
             </Box>
-          </Stack>
-        </Paper>
+          </Grid>
+          <Grid item xs={12} md={6} display='flex' justifyContent='flex-end'>
+            {!disabled &&
+              <GroupedButtons
+                handleClick={handleClick}
+                selectedOption={SentenceLabels[sentence?.available_transitions[selectedIndex]]}
+                options={sentence?.available_transitions}
+                selectedIndex={selectedIndex}
+                handleMenuItemClick={handleMenuItemClick}
+                hasFormat={true}
+                format={SentenceLabels}
+              />
+            }
+          </Grid>
+        </Grid>
       </Grid>
-      <Grid item xl={7}>
-        <div>
-          Last modified by {sentence?.owner?.first_name} on{" "}
-          {sentence?.modified_date}
-        </div>
-        {!disabled &&
-          sentence?.available_transitions.map((transition) => (
-            <Button key={transition} onClick={() => doTransition(transition)}>
-              {transition}
+
+      <Grid item xs={12}>
+        <Grid container spacing={1}>
+          <Grid item xs={12} md={7}>
+            {
+              extraStatementForm?.map((row, key) =>
+                <Paper>
+                  <Grid container p={3}>
+                    <Grid item xs={12}>
+                      <Stack direction="row" justifyContent="space-between"
+                             sx={{
+                                "& .MuiButtonBase-root": {
+                                  padding: 0
+                           }
+                      }}>
+                        <Typography variant="h5" mb={1}>
+                          Knowledge Statements
+                        </Typography>
+                        <CheckDuplicates />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                    <KnowledgeStatementsForm
+                      key={key}
+                      data={sentence?.connectivity_statements}
+                      disabled={disabled}
+                      format="small"
+                      setter={setSentence}
+                  />
+                    </Grid>
+                  </Grid>
+                </Paper>
+              )
+            }
+
+            <Button onClick={() => setExtraStatementForm((prev) => [...prev, ""])}>
+              Add Statement
             </Button>
-          ))}
-        <CheckDuplicates />
-        <SentenceForm
-          data={sentence}
-          disabled={disabled}
-          format="full"
-          setter={setSentence}
-        />
-        <Button onClick={() => setExtraStatementForm((prev) => [...prev, ""])}>
-          Add Statement
-        </Button>
-      </Grid>
-      <Grid item xl={5}>
-        <TagForm
-          data={sentence.tags}
-          extraData={{ parentId: sentence.id, service: sentenceService }}
-          setter={setSentence}
-        />
-      </Grid>
-      <Grid item xl={5}>
-        <NoteForm
-          extraData={{ sentence_id: sentence.id }}
-          setter={setSentence}
-        />
+            <SentenceForm
+              data={sentence}
+              disabled={disabled}
+              format="small"
+              setter={setSentence}
+            />
+
+          </Grid>
+
+          <Grid item xs={12} md={5}>
+            <Box>
+              <TagForm
+                data={sentence.tags}
+                extraData={{ parentId: sentence.id, service: sentenceService }}
+                setter={setSentence}
+              />
+
+              <NoteForm
+                extraData={{ sentence_id: sentence.id }}
+                setter={setSentence}
+              />
+            </Box>
+          </Grid>
+          </Grid>
       </Grid>
     </Grid>
   );
