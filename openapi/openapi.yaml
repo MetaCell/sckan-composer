@@ -353,6 +353,35 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/composer/connectivity-statement/{id}/add_doi/{doi}/:
+    post:
+      operationId: composer_connectivity_statement_add_doi_create
+      description: ConnectivityStatement
+      parameters:
+      - in: path
+        name: doi
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatement'
+          description: ''
   /api/composer/connectivity-statement/{id}/add_specie/{specie_id}/:
     post:
       operationId: composer_connectivity_statement_add_specie_create
@@ -397,6 +426,35 @@ paths:
         name: tag_id
         schema:
           type: integer
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatement'
+          description: ''
+  /api/composer/connectivity-statement/{id}/del_doi/{doi}/:
+    post:
+      operationId: composer_connectivity_statement_del_doi_create
+      description: ConnectivityStatement
+      parameters:
+      - in: path
+        name: doi
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement.
         required: true
       tags:
       - composer
