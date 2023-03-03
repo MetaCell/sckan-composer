@@ -1592,6 +1592,52 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {number} specieId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAddSpecieCreate: async (id: number, specieId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementAddSpecieCreate', 'id', id)
+            // verify required parameter 'specieId' is not null or undefined
+            assertParamExists('composerConnectivityStatementAddSpecieCreate', 'specieId', specieId)
+            const localVarPath = `/api/composer/connectivity-statement/{id}/add_specie/{specie_id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"specie_id"}}`, encodeURIComponent(String(specieId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication cookieAuth required
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {number} tagId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1673,6 +1719,52 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(connectivityStatement, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {number} specieId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementDelSpecieCreate: async (id: number, specieId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementDelSpecieCreate', 'id', id)
+            // verify required parameter 'specieId' is not null or undefined
+            assertParamExists('composerConnectivityStatementDelSpecieCreate', 'specieId', specieId)
+            const localVarPath = `/api/composer/connectivity-statement/{id}/del_specie/{specie_id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"specie_id"}}`, encodeURIComponent(String(specieId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication cookieAuth required
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2492,6 +2584,52 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * Sentence
          * @param {number} id A unique integer value identifying this sentence.
+         * @param {number} specieId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSentenceAddSpecieCreate: async (id: number, specieId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerSentenceAddSpecieCreate', 'id', id)
+            // verify required parameter 'specieId' is not null or undefined
+            assertParamExists('composerSentenceAddSpecieCreate', 'specieId', specieId)
+            const localVarPath = `/api/composer/sentence/{id}/add_specie/{specie_id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"specie_id"}}`, encodeURIComponent(String(specieId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication cookieAuth required
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Sentence
+         * @param {number} id A unique integer value identifying this sentence.
          * @param {number} tagId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2573,6 +2711,52 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(sentence, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Sentence
+         * @param {number} id A unique integer value identifying this sentence.
+         * @param {number} specieId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSentenceDelSpecieCreate: async (id: number, specieId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerSentenceDelSpecieCreate', 'id', id)
+            // verify required parameter 'specieId' is not null or undefined
+            assertParamExists('composerSentenceDelSpecieCreate', 'specieId', specieId)
+            const localVarPath = `/api/composer/sentence/{id}/del_specie/{specie_id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"specie_id"}}`, encodeURIComponent(String(specieId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication cookieAuth required
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -3397,6 +3581,17 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {number} specieId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementAddSpecieCreate(id: number, specieId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAddSpecieCreate(id, specieId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {number} tagId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3413,6 +3608,17 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          */
         async composerConnectivityStatementCreate(connectivityStatement: ConnectivityStatement, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementCreate(connectivityStatement, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {number} specieId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementDelSpecieCreate(id: number, specieId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementDelSpecieCreate(id, specieId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3606,6 +3812,17 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         /**
          * Sentence
          * @param {number} id A unique integer value identifying this sentence.
+         * @param {number} specieId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerSentenceAddSpecieCreate(id: number, specieId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceAddSpecieCreate(id, specieId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Sentence
+         * @param {number} id A unique integer value identifying this sentence.
          * @param {number} tagId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3622,6 +3839,17 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          */
         async composerSentenceCreate(sentence: Sentence, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceCreate(sentence, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Sentence
+         * @param {number} id A unique integer value identifying this sentence.
+         * @param {number} specieId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerSentenceDelSpecieCreate(id: number, specieId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceDelSpecieCreate(id, specieId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3853,6 +4081,16 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {number} specieId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAddSpecieCreate(id: number, specieId: number, options?: any): AxiosPromise<ConnectivityStatement> {
+            return localVarFp.composerConnectivityStatementAddSpecieCreate(id, specieId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {number} tagId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3868,6 +4106,16 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          */
         composerConnectivityStatementCreate(connectivityStatement: ConnectivityStatement, options?: any): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementCreate(connectivityStatement, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {number} specieId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementDelSpecieCreate(id: number, specieId: number, options?: any): AxiosPromise<ConnectivityStatement> {
+            return localVarFp.composerConnectivityStatementDelSpecieCreate(id, specieId, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -4043,6 +4291,16 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         /**
          * Sentence
          * @param {number} id A unique integer value identifying this sentence.
+         * @param {number} specieId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSentenceAddSpecieCreate(id: number, specieId: number, options?: any): AxiosPromise<Sentence> {
+            return localVarFp.composerSentenceAddSpecieCreate(id, specieId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Sentence
+         * @param {number} id A unique integer value identifying this sentence.
          * @param {number} tagId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4058,6 +4316,16 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          */
         composerSentenceCreate(sentence: Sentence, options?: any): AxiosPromise<Sentence> {
             return localVarFp.composerSentenceCreate(sentence, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Sentence
+         * @param {number} id A unique integer value identifying this sentence.
+         * @param {number} specieId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSentenceDelSpecieCreate(id: number, specieId: number, options?: any): AxiosPromise<Sentence> {
+            return localVarFp.composerSentenceDelSpecieCreate(id, specieId, options).then((request) => request(axios, basePath));
         },
         /**
          * Sentence
@@ -4280,6 +4548,18 @@ export class ComposerApi extends BaseAPI {
     /**
      * ConnectivityStatement
      * @param {number} id A unique integer value identifying this connectivity statement.
+     * @param {number} specieId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementAddSpecieCreate(id: number, specieId: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementAddSpecieCreate(id, specieId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatement
+     * @param {number} id A unique integer value identifying this connectivity statement.
      * @param {number} tagId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -4298,6 +4578,18 @@ export class ComposerApi extends BaseAPI {
      */
     public composerConnectivityStatementCreate(connectivityStatement: ConnectivityStatement, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementCreate(connectivityStatement, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatement
+     * @param {number} id A unique integer value identifying this connectivity statement.
+     * @param {number} specieId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementDelSpecieCreate(id: number, specieId: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementDelSpecieCreate(id, specieId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4508,6 +4800,18 @@ export class ComposerApi extends BaseAPI {
     /**
      * Sentence
      * @param {number} id A unique integer value identifying this sentence.
+     * @param {number} specieId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerSentenceAddSpecieCreate(id: number, specieId: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSentenceAddSpecieCreate(id, specieId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Sentence
+     * @param {number} id A unique integer value identifying this sentence.
      * @param {number} tagId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -4526,6 +4830,18 @@ export class ComposerApi extends BaseAPI {
      */
     public composerSentenceCreate(sentence: Sentence, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentenceCreate(sentence, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Sentence
+     * @param {number} id A unique integer value identifying this sentence.
+     * @param {number} specieId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerSentenceDelSpecieCreate(id: number, specieId: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSentenceDelSpecieCreate(id, specieId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
