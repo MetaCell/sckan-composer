@@ -984,35 +984,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Sentence'
           description: ''
-  /api/composer/sentence/{id}/add_specie/{specie_id}/:
-    post:
-      operationId: composer_sentence_add_specie_create
-      description: Sentence
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this sentence.
-        required: true
-      - in: path
-        name: specie_id
-        schema:
-          type: integer
-        required: true
-      tags:
-      - composer
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Sentence'
-          description: ''
   /api/composer/sentence/{id}/add_tag/{tag_id}/:
     post:
       operationId: composer_sentence_add_tag_create
@@ -1026,35 +997,6 @@ paths:
         required: true
       - in: path
         name: tag_id
-        schema:
-          type: integer
-        required: true
-      tags:
-      - composer
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Sentence'
-          description: ''
-  /api/composer/sentence/{id}/del_specie/{specie_id}/:
-    post:
-      operationId: composer_sentence_del_specie_create
-      description: Sentence
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this sentence.
-        required: true
-      - in: path
-        name: specie_id
         schema:
           type: integer
         required: true

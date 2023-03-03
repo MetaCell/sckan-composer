@@ -31,5 +31,5 @@ class TagService extends AbstractService {
   }
 }
 
-const noteService = new TagService()
-export default noteService
+const tagService = new TagService()
+export default tagService
