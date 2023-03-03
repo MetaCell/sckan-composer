@@ -237,7 +237,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     ]
 
 
-class SentenceViewSet(SpecieMixin, TagMixin, TransitionMixin, AssignOwnerMixin, ModelNoDeleteViewSet):
+class SentenceViewSet(TagMixin, TransitionMixin, AssignOwnerMixin, ModelNoDeleteViewSet):
     """
     Sentence
     """
