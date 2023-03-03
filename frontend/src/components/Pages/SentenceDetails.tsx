@@ -10,13 +10,14 @@ import KnowledgeStatementsForm from "../Forms/KnowledgeStatementsForm";
 import sentenceService from "../../services/SentenceService";
 import NoteForm from "../Forms/NoteForm";
 import TagForm from "../Forms/TagForm";
-import { Sentence } from "../../apiclient/backend";
+import { Sentence, SentenceConnectivityStatement } from "../../apiclient/backend";
 import { userProfile } from "../../services/UserService";
 import CheckDuplicates from "../CheckForDuplicates/CheckDuplicatesDialog";
 import {SentenceStateChip} from "../Widgets/StateChip";
 import {SentenceLabels, formatDate, formatTime} from "../../helpers/helpers";
 import Stack from "@mui/material/Stack";
 import GroupedButtons from "../Widgets/CustomGroupedButtons";
+import { ConnectivityStatement } from "../../apiclient/backend";
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
@@ -146,13 +147,17 @@ const SentencesDetails = () => {
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
-                    <KnowledgeStatementsForm
-                      key={key}
-                      data={sentence?.connectivity_statements}
-                      disabled={disabled}
-                      format="small"
-                      setter={setSentence}
-                  />
+                      {sentence?.connectivity_statements.map((statement: SentenceConnectivityStatement) => {
+                        return (
+                          <KnowledgeStatementsForm
+                            key={statement.id}
+                            data={statement}
+                            disabled={disabled}
+                            format="small"
+                            setter={setSentence}
+                          />
+                        )})
+                      }
                     </Grid>
                   </Grid>
                 </Paper>
