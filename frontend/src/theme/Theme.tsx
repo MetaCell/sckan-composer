@@ -349,7 +349,7 @@ const theme = createTheme({
           color: '#344054'
         }
       }
-    }
+    },
   },
 });
 

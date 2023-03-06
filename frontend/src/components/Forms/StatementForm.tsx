@@ -13,7 +13,7 @@ const SentenceForm = (props: any) => {
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema()
 
   const uiFields = format === 'small'
-    ? ["species","biological_sex_id", "apinatomy_model", "circuit_type", "laterality", "ans_division_id"]
+    ? ["biological_sex_id", "apinatomy_model", "circuit_type", "laterality", "ans_division_id"]
     : undefined
   // TODO: set up the widgets for the schema
 
@@ -38,12 +38,6 @@ const SentenceForm = (props: any) => {
         rows: 5,
       }
     },
-    dois: {
-      "ui:title": "",
-      "ui:options": {
-        classNames: "costume-dois",
-      }
-    },
     apinatomy_model: {
       "ui:widget": CustomTextField,
       "ui:options": {
@@ -58,32 +52,34 @@ const SentenceForm = (props: any) => {
         placeholder: "Enter Biological Sex",
       }
     },
-    // ans_division_id: {
-    //   "ui:widget": AutoComplete,
-    //   "ui:options": {
-    //     label: 'ANS Division',
-    //     placeholder: "Select ANS Division",
-    //   }
-    // },
+    ans_division_id: {
+      "ui:options": {
+        label: 'ANS Division',
+        placeholder: "Select ANS Division",
+      }
+    },
   };
+
 
   const customSchema = {
     ...schema,
-    "title": ""
-  }
+    title: "",
+    ui: {
+      "ui:options": {
+        submit: false
+      }
+    }
+  };
 
   return (
-    <Paper sx={{background: '#F2F4F7'}}>
-      <FormBase
-        service={statementService}
-        schema={customSchema}
-        uiSchema={customUiSchema}
-        uiFields={uiFields}
-        enableAutoSave={true}
-        {...props}
-      />
-    </Paper>
-
+    <FormBase
+      service={statementService}
+      schema={customSchema}
+      uiSchema={customUiSchema}
+      uiFields={uiFields}
+      enableAutoSave={true}
+      {...props}
+    />
   )
 }
 

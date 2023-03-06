@@ -17,6 +17,7 @@ import {SentenceLabels, formatDate, formatTime} from "../../helpers/helpers";
 import Stack from "@mui/material/Stack";
 import GroupedButtons from "../Widgets/CustomGroupedButtons";
 import StatementForm from "../Forms/StatementForm";
+import DoisForm from "../Forms/DoisForm";
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
@@ -148,13 +149,21 @@ const SentencesDetails = () => {
                     <Grid item xs={12}>
                       {sentence?.connectivity_statements?.map((statement: SentenceConnectivityStatement) => {
                         return (
-                          <StatementForm
-                            key={statement.id}
-                            data={statement}
-                            disabled={disabled}
-                            format="small"
-                            setter={setSentence}
-                          />
+                          <Paper sx={{background: '#F2F4F7'}}>
+                            <DoisForm
+                              data={statement.dois}
+                              extraData={{ parentId: sentence.id, service: sentenceService }}
+                              setter={setSentence}
+                            />
+                            <StatementForm
+                              key={statement.id}
+                              data={statement}
+                              disabled={disabled}
+                              format="small"
+                              setter={setSentence}
+                            />
+                          </Paper>
+
                         )})
                       }
                     </Grid>

@@ -32,7 +32,7 @@ export let jsonSchemas = (function () {
       return tagSchema
     },
     getDoiSchema: function () {
-      return tagSchema
+      return doiSchema
     },
     getViaSchema: function () {
       return viaSchema
