@@ -6,7 +6,6 @@ import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import { useParams } from "react-router-dom";
 import SentenceForm from "../Forms/SentenceForm";
-import KnowledgeStatementsForm from "../Forms/KnowledgeStatementsForm";
 import sentenceService from "../../services/SentenceService";
 import NoteForm from "../Forms/NoteForm";
 import TagForm from "../Forms/TagForm";
@@ -17,7 +16,7 @@ import {SentenceStateChip} from "../Widgets/StateChip";
 import {SentenceLabels, formatDate, formatTime} from "../../helpers/helpers";
 import Stack from "@mui/material/Stack";
 import GroupedButtons from "../Widgets/CustomGroupedButtons";
-import { ConnectivityStatement } from "../../apiclient/backend";
+import StatementForm from "../Forms/StatementForm";
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
@@ -147,9 +146,9 @@ const SentencesDetails = () => {
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
-                      {sentence?.connectivity_statements.map((statement: SentenceConnectivityStatement) => {
+                      {sentence?.connectivity_statements?.map((statement: SentenceConnectivityStatement) => {
                         return (
-                          <KnowledgeStatementsForm
+                          <StatementForm
                             key={statement.id}
                             data={statement}
                             disabled={disabled}
