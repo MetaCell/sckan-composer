@@ -8,11 +8,22 @@ import { Sentence } from "../../apiclient/backend";
 import sentenceService from "../../services/SentenceService";
 import EntityDataGrid from "../EntityDataGrid";
 import DataGridHeader from "../DataGridHeader";
+import AddSentencesDialog from "../AddSentencesDialog";
 
 const SentenceList = () => {
   const [sentenceList, setSentenceList] = useState<Sentence[]>();
   const [totalResults, setTotalResults] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
   const queryOptions = useAppSelector((state) => state.sentence.queryOptions);
 
   const gutters = useGutters();
@@ -30,8 +41,15 @@ const SentenceList = () => {
       <Header
         title="Sentences List"
         caption={`${totalResults} sentences in total`}
-        actions={[{ label: "Add a record", icon: AddIcon }]}
+        actions={[
+          {
+            label: "Add a record",
+            icon: AddIcon,
+            handleClick: handleClickOpen,
+          },
+        ]}
       />
+      <AddSentencesDialog open={open} handleClose={handleClose} />
       <DataGridHeader entityType="sentence" queryOptions={queryOptions} />
       <EntityDataGrid
         entityList={sentenceList}

@@ -17,6 +17,8 @@ const {
   buttonOutlinedColor,
   buttonOutlinedBorderColor,
   buttonOutlinedHoverBg,
+  labelColor,
+  radioBorderColor,
 } = vars;
 
 const theme = createTheme({
@@ -72,6 +74,11 @@ const theme = createTheme({
       fontFamily: titleFont,
       fontWeight: 500,
       fontSize: "1.875rem",
+      color: titleFontColor,
+    },
+    h4: {
+      fontWeight: 600,
+      fontSize: "1.125rem",
       color: titleFontColor,
     },
     h5: {
@@ -161,6 +168,24 @@ const theme = createTheme({
         },
       },
     },
+<<<<<<< HEAD
+=======
+    MuiButtonGroup: {
+      styleOverrides: {
+        root: {
+          boxShadow: "none",
+        },
+        groupedContained: {
+          "&:not(:last-of-type)": {
+            borderRight: "none",
+          },
+          "&:not(:first-of-type)": {
+            padding: 0,
+          },
+        },
+      },
+    },
+>>>>>>> cc4f2fd (SCKAN-63 feat: open dialog when hitting add-a-record button)
     MuiPaper: {
       styleOverrides: {
         root: {
@@ -286,6 +311,57 @@ const theme = createTheme({
         }),
       },
     },
+<<<<<<< HEAD
+=======
+    MuiFormControl: {
+      styleOverrides: {
+        root: {
+          "& .costume-dois": {
+            "& .MuiPaper-root": {
+              boxShadow: "none",
+            },
+          },
+        },
+      },
+    },
+    MuiFormLabel: {
+      styleOverrides: {
+        root: {
+          color: labelColor,
+          fontWeight: 500,
+        },
+      },
+    },
+    MuiRadio: {
+      styleOverrides: {
+        root: {
+          "& .MuiSvgIcon-root": {
+            fontSize: "1rem",
+            color: radioBorderColor,
+          },
+        },
+      },
+    },
+    MuiFormGroup: {
+      styleOverrides: {
+        root: {
+          "& .MuiFormControlLabel-root": {
+            color: labelColor,
+          },
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          fontWeight: "500",
+          fontSize: "0.875rem",
+          lineHeight: "20px",
+          color: "#344054",
+        },
+      },
+    },
+>>>>>>> cc4f2fd (SCKAN-63 feat: open dialog when hitting add-a-record button)
   },
 });
 
