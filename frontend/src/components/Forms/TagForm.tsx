@@ -33,7 +33,8 @@ const TagForm = (props: any) => {
       "ui:widget": ChipsInput,
       "ui:options": {
         data: data.map((row: Tag) => ({id: row.id, label: row.tag})),
-        placeholder: 'Add a Tag'
+        placeholder: 'Add a Tag',
+        removeChip: delTag,
       }
     },
   };

@@ -22,9 +22,9 @@ const StyledInput = styled(TextField)(({ theme }) => ({
   }
 }));
 
-export const ChipsInput = ({onChange,placeholder, options: { data }}: any) => {
+export const ChipsInput = ({onChange,placeholder, options: { data, removeChip, extraData }}: any) => {
   const handleDelete = (id: number) => {
-    console.log(id)
+    removeChip(id)
   }
 
   return (

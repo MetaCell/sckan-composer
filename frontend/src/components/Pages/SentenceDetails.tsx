@@ -152,7 +152,7 @@ const SentencesDetails = () => {
                           <Paper sx={{background: '#F2F4F7'}}>
                             <DoisForm
                               data={statement.dois}
-                              extraData={{ parentId: sentence.id, service: sentenceService }}
+                              extraData={{ parentId: sentence.id }}
                               setter={setSentence}
                             />
                             <StatementForm

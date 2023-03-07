@@ -27,7 +27,7 @@ const DoisForm = (props: any) => {
       "ui:widget": ChipsInput,
       "ui:options": {
         data: data.map((row: Doi) => ({id: row.id, label: row.doi})),
-        placeholder: 'Enter DOIs (Press Enter to add a DOI)'
+        placeholder: 'Enter DOIs (Press Enter to add a DOI)',
       }
     },
   };
