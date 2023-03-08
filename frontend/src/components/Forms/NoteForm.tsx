@@ -4,6 +4,10 @@ import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
 import noteService from '../../services/NoteService'
 import Button from "@mui/material/Button";
+import {UiSchema} from "@rjsf/utils";
+import CustomTextArea from "../Widgets/CustomTextArea";
+import SendIcon from '@mui/icons-material/Send';
+import {vars} from "../../theme/variables";
 
 
 const NoteForm = (props: any) => {
@@ -23,14 +27,39 @@ const NoteForm = (props: any) => {
     "title": ""
   }
 
+  const customUiSchema: UiSchema = {
+    ...uiSchema,
+    note: {
+      "ui:widget": CustomTextArea,
+      "ui:options": {
+        placeholder: "Write your note",
+        rows: 5,
+      }
+    },
+  };
+
+
   return (
-    <Box p={1} sx={{background: '#F2F4F7', borderRadius: '12px'}}>
+    <Box sx={{
+      background: '#F2F4F7',
+      borderRadius: '12px',
+      padding: '0 8px 8px !important',
+      textAlign: 'center',
+      "& .MuiGrid-item":
+        {
+          paddingTop: 0
+        },
+      "& .MuiInputBase-root": {
+        background: '#fff',
+        borderRadius: '12px'
+      }
+    }}>
       <FormBase
         data={data}
         service={noteService}
         setter={clearNoteForm}
         schema={customSchema}
-        uiSchema={uiSchema}
+        uiSchema={customUiSchema}
         uiFields={uiFields}
         enableAutoSave={false}
         clearOnSave={true}
@@ -39,8 +68,18 @@ const NoteForm = (props: any) => {
         <Button
           type="submit"
           className="btn btn-primary"
+          sx={{
+            padding: 0,
+            color: vars.darkBlue,
+
+            "&:hover": {
+              background: 'transparent',
+              color: vars.mediumBlue
+            }
+          }}
+          startIcon={<SendIcon />}
         >
-          salam
+          Send
         </Button>
       </FormBase>
     </Box>

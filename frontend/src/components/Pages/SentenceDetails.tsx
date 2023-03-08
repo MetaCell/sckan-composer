@@ -20,6 +20,7 @@ import DoisForm from "../Forms/DoisForm";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import SentenceForm from '../Forms/SentenceForm'
 import SpeciesForm from "../Forms/SpeciesForm";
+import Divider from "@mui/material/Divider";
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
@@ -183,13 +184,13 @@ const SentencesDetails = () => {
           </Grid>
 
           <Grid item xs={12} md={5} p={1}>
-            <Paper sx={{padding: '24px'}}>
+            <Paper sx={{padding: '24px', "& .MuiBox-root": {padding: 0}}}>
               <TagForm
                 data={sentence.tags}
                 extraData={{ parentId: sentence.id, service: sentenceService }}
                 setter={setSentence}
               />
-
+              <Divider sx={{margin: '36px 0'}} />
               <NoteForm
                 extraData={{ sentence_id: sentence.id }}
                 setter={setSentence}

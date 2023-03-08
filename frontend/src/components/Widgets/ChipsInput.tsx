@@ -17,9 +17,6 @@ const StyledInput = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-notchedOutline': {
     border: 0
   },
-  '& .MuiInputBase-root': {
-    padding: 8
-  }
 }));
 
 export const ChipsInput = ({onChange,placeholder, options: { data, removeChip, extraData }}: any) => {
