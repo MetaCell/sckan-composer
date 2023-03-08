@@ -66,21 +66,23 @@ const SentenceForm = (props: any) => {
         <Typography color={vars.labelColor} fontWeight={500} mb={1}>
           PMID (PubMed identifier)
         </Typography>
-        <Chip
-          label={data?.pmid}
-          variant="filled"
-          deleteIcon={<OpenInNewIcon />}
-          onDelete={handleOpenPmid}
-          sx={{
-            background: vars.lightBlue,
-            color: vars.darkBlue,
+        {
+          data?.pmid && <Chip
+            label={data?.pmid}
+            variant="filled"
+            deleteIcon={<OpenInNewIcon />}
+            onDelete={handleOpenPmid}
+            sx={{
+              background: vars.lightBlue,
+              color: vars.darkBlue,
 
-            "& .MuiChip-deleteIcon": {
-              fontSize: '14px',
-              color: vars.mediumBlue
-            }
-          }}
-        />
+              "& .MuiChip-deleteIcon": {
+                fontSize: '14px',
+                color: vars.mediumBlue
+              }
+            }}
+          />
+        }
       </Box>
     </Paper>
   )
