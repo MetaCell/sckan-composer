@@ -168,24 +168,6 @@ const theme = createTheme({
         },
       },
     },
-<<<<<<< HEAD
-=======
-    MuiButtonGroup: {
-      styleOverrides: {
-        root: {
-          boxShadow: "none",
-        },
-        groupedContained: {
-          "&:not(:last-of-type)": {
-            borderRight: "none",
-          },
-          "&:not(:first-of-type)": {
-            padding: 0,
-          },
-        },
-      },
-    },
->>>>>>> cc4f2fd (SCKAN-63 feat: open dialog when hitting add-a-record button)
     MuiPaper: {
       styleOverrides: {
         root: {
@@ -311,8 +293,6 @@ const theme = createTheme({
         }),
       },
     },
-<<<<<<< HEAD
-=======
     MuiFormControl: {
       styleOverrides: {
         root: {
@@ -361,7 +341,6 @@ const theme = createTheme({
         },
       },
     },
->>>>>>> cc4f2fd (SCKAN-63 feat: open dialog when hitting add-a-record button)
   },
 });
 

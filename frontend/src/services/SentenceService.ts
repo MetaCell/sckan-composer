@@ -24,6 +24,9 @@ class SentenceService extends AbstractService {
     const { limit, ordering, index, title, stateFilter, tagFilter } = queryOptions
     return composerApi.composerSentenceList(limit, undefined, index, ordering, stateFilter, tagFilter, title).then((res: any) => res.data)
   }
+  async post(sentence: Sentence) {
+    return composerApi.composerSentenceCreate(sentence).then((response: any) => response.data)
+  }
 }
 
 const sentenceService = new SentenceService()
