@@ -5,11 +5,10 @@ import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import { useParams } from "react-router-dom";
-import SentenceForm from "../Forms/SentenceForm";
 import sentenceService from "../../services/SentenceService";
 import NoteForm from "../Forms/NoteForm";
 import TagForm from "../Forms/TagForm";
-import { Sentence, SentenceConnectivityStatement } from "../../apiclient/backend";
+import { Sentence } from "../../apiclient/backend";
 import { userProfile } from "../../services/UserService";
 import CheckDuplicates from "../CheckForDuplicates/CheckDuplicatesDialog";
 import {SentenceStateChip} from "../Widgets/StateChip";
@@ -19,7 +18,7 @@ import GroupedButtons from "../Widgets/CustomGroupedButtons";
 import StatementForm from "../Forms/StatementForm";
 import DoisForm from "../Forms/DoisForm";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import NLPSentenceForm from "../Forms/NLPSentence";
+import SentenceForm from '../Forms/SentenceForm'
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
@@ -183,7 +182,7 @@ const SentencesDetails = () => {
             </Button>
               </Grid>
             </Paper>
-            <NLPSentenceForm
+            <SentenceForm
               data={sentence}
               disabled={disabled}
               format="small"

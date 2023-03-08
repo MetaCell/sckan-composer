@@ -6,12 +6,12 @@ import {UiSchema} from "@rjsf/utils";
 import CustomTextArea from '../Widgets/CustomTextArea'
 import CustomTextField from "../Widgets/CustomTextField";
 
-const SentenceForm = (props: any) => {
+const StatementForm = (props: any) => {
   const { format } = props
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema()
 
   const uiFields = format === 'small'
-    ? ["biological_sex_id", "apinatomy_model", "circuit_type", "laterality", "ans_division_id"]
+    ? ["biological_sex_id", "species", "apinatomy_model", "circuit_type", "laterality", "ans_division_id"]
     : undefined
   // TODO: set up the widgets for the schema
 
@@ -81,4 +81,4 @@ const SentenceForm = (props: any) => {
   )
 }
 
-export default SentenceForm
+export default StatementForm
