@@ -93,23 +93,18 @@ class DoiMixin(
     viewsets.GenericViewSet,
 ):
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "doi",
-                OpenApiTypes.INT,
-                location=OpenApiParameter.PATH,
-                required=True,
-            )
-        ],
-        request=None,
+        parameters=None,
+        request=DoiSerializer(many=True),
     )
-    @action(detail=True, methods=["post"], url_path="add_doi/(?P<doi>\w+)")
-    def add_doi(self, request, pk=None, doi=None):
+    @action(detail=True, methods=["post"])
+    def add_dois(self, request, pk=None):
         instance = self.get_object()
-        _, _ = Doi.objects.get_or_create(
-            connectivity_statement=instance,
-            doi=doi,
-        )
+        for entry in request.data:
+            doi = entry['doi']
+            _, _ = Doi.objects.get_or_create(
+                connectivity_statement=instance,
+                doi=doi,
+            )
         return Response(self.get_serializer(instance).data)
 
     @extend_schema(
