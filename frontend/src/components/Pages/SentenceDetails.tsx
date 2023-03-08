@@ -19,6 +19,7 @@ import StatementForm from "../Forms/StatementForm";
 import DoisForm from "../Forms/DoisForm";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import SentenceForm from '../Forms/SentenceForm'
+import SpeciesForm from "../Forms/SpeciesForm";
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
@@ -44,21 +45,6 @@ const SentencesDetails = () => {
     index: number,
   ) => {
     setSelectedIndex(index);
-    setOpen(false);
-  };
-
-  const handleToggle = () => {
-    setOpen((prevOpen) => !prevOpen);
-  };
-
-  const handleClose = (event: Event) => {
-    if (
-      anchorRef.current &&
-      anchorRef.current.contains(event.target as HTMLElement)
-    ) {
-      return;
-    }
-
     setOpen(false);
   };
 
@@ -163,6 +149,12 @@ const SentencesDetails = () => {
                                 disabled={disabled}
                                 format="small"
                                 setter={setSentence}
+                                extraData={{sentence_id: sentence.id}}
+                              />
+                              <SpeciesForm
+                                data={sentence}
+                                extraData={{ parentId: sentence.id }}
+                                setter={setSentence}
                               />
                             </Paper>
 
@@ -190,8 +182,8 @@ const SentencesDetails = () => {
             />
           </Grid>
 
-          <Grid item xs={12} md={5}>
-            <Box>
+          <Grid item xs={12} md={5} p={1}>
+            <Paper sx={{padding: '24px'}}>
               <TagForm
                 data={sentence.tags}
                 extraData={{ parentId: sentence.id, service: sentenceService }}
@@ -202,7 +194,7 @@ const SentencesDetails = () => {
                 extraData={{ sentence_id: sentence.id }}
                 setter={setSentence}
               />
-            </Box>
+            </Paper>
           </Grid>
           </Grid>
       </Grid>

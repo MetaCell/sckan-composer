@@ -7,6 +7,7 @@ export let jsonSchemas = (function () {
   let tagSchema:any = null;
   let doiSchema:any = null;
   let viaSchema:any = null;
+  let speciesSchema:any = null;
 
   return { // public interface
     initSchemas: async function () {
@@ -17,6 +18,7 @@ export let jsonSchemas = (function () {
         tagSchema = resp.data.Tag
         doiSchema = resp.data.Doi
         viaSchema = resp.data.Via
+        speciesSchema = resp.data.Specie
       })
     },
     getSentenceSchema: function () {
@@ -36,6 +38,9 @@ export let jsonSchemas = (function () {
     },
     getViaSchema: function () {
       return viaSchema
+    },
+    getSpeciesSchema: function () {
+      return speciesSchema
     },
   };
 })();

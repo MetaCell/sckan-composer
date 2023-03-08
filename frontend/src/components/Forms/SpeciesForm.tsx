@@ -2,25 +2,19 @@ import React from 'react'
 import { Box } from '@mui/material'
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
-import tagService from '../../services/TagService'
+import specieService from "../../services/SpecieService";
 import {UiSchema} from "@rjsf/utils";
 import {ChipsInput} from "../Widgets/ChipsInput";
-import {Tag} from "../../apiclient/backend";
+import {Doi, Tag} from "../../apiclient/backend";
 
 
-const TagForm = (props: any) => {
+const SpeciesForm = (props: any) => {
   const { data, extraData, setter } = props
-  const { schema, uiSchema } = jsonSchemas.getTagSchema()
 
-  const delTag = (tagId: number) => {
-    extraData.service.removeTag(extraData.parentId, tagId).then((newData: any) => {
-      setter(newData)
-    })
-  }
+  const { schema, uiSchema } = jsonSchemas.getSpeciesSchema()
 
   // TODO: set up the widgets for the schema
-  const uiFields = ["tag",]
-
+  const uiFields = ["name",]
 
   const customSchema = {
     ...schema,
@@ -29,12 +23,11 @@ const TagForm = (props: any) => {
 
   const customUiSchema: UiSchema = {
     ...uiSchema,
-    tag: {
+    name: {
       "ui:widget": ChipsInput,
       "ui:options": {
-        data: data?.map((row: Tag) => ({id: row.id, label: row.tag})),
-        placeholder: 'Add a Tag',
-        removeChip: delTag,
+        data: data?.connectivity_statements?.dois?.map((row: Doi) => ({id: row.id, label: row.doi})),
+        placeholder: 'Enter DOIs (Press Enter to add a DOI)',
       }
     },
   };
@@ -42,7 +35,7 @@ const TagForm = (props: any) => {
   return (
     <FormBase
       data={{}}
-      service={tagService}
+      service={specieService}
       schema={customSchema}
       uiSchema={customUiSchema}
       uiFields={uiFields}
@@ -54,4 +47,4 @@ const TagForm = (props: any) => {
   )
 }
 
-export default TagForm
+export default SpeciesForm
