@@ -13,7 +13,7 @@ const log = (type: string) => console.log.bind(console, type)
 
 export const FormBase = (props: any) => {
 
-    const {service, data, schema, setter, extraData, uiSchema, uiFields, enableAutoSave, disabled=false,  clearOnSave=false, sx} = props
+    const {service, data, schema, setter, extraData, uiSchema, uiFields, enableAutoSave, disabled=false,  clearOnSave=false, children = false} = props
     const [localData, setLocalData] = useState<any>(data)
     const [isSaving, setIsSaving] = useState<boolean>(false)
     const triggerAutoSave = useDebouncedCallback(() => onSave(), EDIT_DEBOUNCE);
@@ -81,6 +81,7 @@ export const FormBase = (props: any) => {
                 onChange={handleUpdate}
                 onSubmit={handleSubmit}
                 onError={onError}
+                children={children}
             />
         </Box>
       </>

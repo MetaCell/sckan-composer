@@ -5,8 +5,6 @@ import statementService from '../../services/StatementService'
 import {UiSchema} from "@rjsf/utils";
 import CustomTextArea from '../Widgets/CustomTextArea'
 import CustomTextField from "../Widgets/CustomTextField";
-import Paper from "@mui/material/Paper";
-import AutoComplete from "../AutoComplete";
 
 const SentenceForm = (props: any) => {
   const { format } = props

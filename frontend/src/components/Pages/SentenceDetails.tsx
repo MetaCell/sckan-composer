@@ -18,6 +18,8 @@ import Stack from "@mui/material/Stack";
 import GroupedButtons from "../Widgets/CustomGroupedButtons";
 import StatementForm from "../Forms/StatementForm";
 import DoisForm from "../Forms/DoisForm";
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import NLPSentenceForm from "../Forms/NLPSentence";
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
@@ -129,59 +131,64 @@ const SentencesDetails = () => {
       <Grid item xs={12}>
         <Grid container spacing={1}>
           <Grid item xs={12} md={7}>
+            <Paper>
+              <Grid container p={3}  mb={2}>
+                <Grid item xs={12}>
+                  <Stack direction="row" justifyContent="space-between"
+                         sx={{
+                           "& .MuiButtonBase-root": {
+                             padding: 0
+                           }
+                         }}>
+                    <Typography variant="h5" mb={1}>
+                      Knowledge Statements
+                    </Typography>
+                    <CheckDuplicates />
+                  </Stack>
+                </Grid>
             {
               extraStatementForm?.map((row, key) =>
-                <Paper>
-                  <Grid container p={3}>
-                    <Grid item xs={12}>
-                      <Stack direction="row" justifyContent="space-between"
-                             sx={{
-                                "& .MuiButtonBase-root": {
-                                  padding: 0
-                           }
-                      }}>
-                        <Typography variant="h5" mb={1}>
-                          Knowledge Statements
-                        </Typography>
-                        <CheckDuplicates />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      {sentence?.connectivity_statements?.map((statement: SentenceConnectivityStatement) => {
-                        return (
-                          <Paper sx={{background: '#F2F4F7'}}>
-                            <DoisForm
-                              data={statement.dois}
-                              extraData={{ parentId: sentence.id }}
-                              setter={setSentence}
-                            />
-                            <StatementForm
-                              key={statement.id}
-                              data={statement}
-                              disabled={disabled}
-                              format="small"
-                              setter={setSentence}
-                            />
-                          </Paper>
 
-                        )})
-                      }
+                    <Grid item xs={12}>
+                      <Box p={1} mb={2} sx={{background: '#F2F4F7', borderRadius: '12px'}}>
+                        <Grid container spacing={1} alignItems='center'>
+                          <Grid item xs={11}>
+                            <Paper>
+                              <DoisForm
+                                data={sentence}
+                                extraData={{ parentId: sentence.id }}
+                                setter={setSentence}
+                              />
+                              <StatementForm
+                                data={sentence}
+                                disabled={disabled}
+                                format="small"
+                                setter={setSentence}
+                              />
+                            </Paper>
+
+                          </Grid>
+                          <Grid item xs={1} textAlign='center'>
+                            {
+                              key !== 0 &&  <DeleteOutlineIcon />
+                            }
+                          </Grid>
+                          </Grid>
+                      </Box>
                     </Grid>
-                  </Grid>
-                </Paper>
               )
             }
-
             <Button onClick={() => setExtraStatementForm((prev) => [...prev, ""])}>
               Add Statement
             </Button>
-            <SentenceForm
+              </Grid>
+            </Paper>
+            <NLPSentenceForm
               data={sentence}
               disabled={disabled}
               format="small"
               setter={setSentence}
             />
-
           </Grid>
 
           <Grid item xs={12} md={5}>

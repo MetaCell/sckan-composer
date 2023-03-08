@@ -26,7 +26,7 @@ const DoisForm = (props: any) => {
     doi: {
       "ui:widget": ChipsInput,
       "ui:options": {
-        data: data.map((row: Doi) => ({id: row.id, label: row.doi})),
+        data: data?.connectivity_statements?.dois?.map((row: Doi) => ({id: row.id, label: row.doi})),
         placeholder: 'Enter DOIs (Press Enter to add a DOI)',
       }
     },

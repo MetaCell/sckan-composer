@@ -18,7 +18,7 @@ const StyledAutoComplete = styled(Autocomplete)(({ theme }) => ({
   }
 }));
 
-export default function AutoComplete({placeholder, value, setValue, fetch, noOptionsText, options: {label}}: any) {
+export default function AutoComplete({placeholder, value, setValue, fetch, noOptionsText}: any) {
     const [inputValue, setInputValue] = useState<string>("")
     const [options, setOptions] = useState<readonly any[]>([]);
 
@@ -52,9 +52,6 @@ export default function AutoComplete({placeholder, value, setValue, fetch, noOpt
 
     return (
       <FormControl variant="standard">
-      <InputLabel shrink htmlFor="custom-AutoComplete">
-        <Typography variant="h5" fontWeight={500}>{label}</Typography>
-      </InputLabel>
         <StyledAutoComplete
           id='custom-AutoComplete'
             fullWidth

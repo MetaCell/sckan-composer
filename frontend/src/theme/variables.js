@@ -18,5 +18,8 @@ export const vars = {
     buttonOutlinedHoverBg: '#F9FAFB',
     darkTextColor: '#101828',
     labelColor: '#1D2939',
-    radioBorderColor: '#D0D5DD'
+    radioBorderColor: '#D0D5DD',
+    darkBlue: "#184EA2",
+    lightBlue: "#E2ECFB",
+    mediumBlue: "#548CE5"
   };

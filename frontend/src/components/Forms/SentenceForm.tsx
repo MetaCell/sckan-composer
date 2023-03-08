@@ -27,6 +27,8 @@ const SentenceForm = (props: any) => {
       }
     },
   };
+
+
   return (
     <Box p={2}>
       <FormBase
