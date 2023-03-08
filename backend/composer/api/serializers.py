@@ -137,7 +137,6 @@ class SpecieSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
     class Meta:
         model = Specie
         fields = ("id", "name", "ontology_uri")
-        read_only_fields = ("id", "name", "ontology_uri")
 
 
 class BiologicalSexSerializer(serializers.ModelSerializer):
@@ -167,6 +166,7 @@ class DoiSerializer(serializers.ModelSerializer):
     """Doi"""
 
     doi = serializers.CharField(required=True)
+
     # connectivity_statement_id = serializers.IntegerField(required=True)
 
     class Meta:
@@ -186,7 +186,7 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
     biological_sex = BiologicalSexSerializer(required=False, read_only=True)
     species = SpecieSerializer(many=True, read_only=True)
     ans_division = AnsDivisionSerializer(required=False, read_only=True)
-  
+
     class Meta:
         model = ConnectivityStatement
         fields = (
@@ -227,7 +227,8 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
     pmcid = serializers.CharField(required=False, default=None, allow_null=True)
     doi = serializers.CharField(required=False, default=None, allow_null=True)
     tags = TagSerializer(many=True, read_only=True)
-    connectivity_statements = SentenceConnectivityStatement(source="connectivitystatement_set", many=True, read_only=True)
+    connectivity_statements = SentenceConnectivityStatement(source="connectivitystatement_set", many=True,
+                                                            read_only=True)
     owner = UserSerializer(required=False, read_only=True)
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
     available_transitions = serializers.SerializerMethodField(read_only=True)
@@ -235,7 +236,7 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
 
     def get_has_notes(self, instance) -> bool:
         return instance.has_notes
-    
+
     def get_available_transitions(self, instance) -> list[SentenceState]:
         return [t.name for t in instance.get_available_state_transitions()]
 
@@ -302,7 +303,7 @@ class ConnectivityStatementSerializer(
 
     def get_has_notes(self, instance) -> bool:
         return instance.has_notes
-    
+
     class Meta:
         model = ConnectivityStatement
         fields = (
