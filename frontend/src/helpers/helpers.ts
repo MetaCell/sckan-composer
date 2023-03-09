@@ -62,7 +62,7 @@ export const mapTagFilterSelectionToCheckbox = (tags: any[], currentSelection: a
 }
 
 export const snakeToSpace = (str: string) => {
-  return str.replaceAll('_', ' ').split(' ').map((word) => {
+  return str?.replaceAll('_', ' ').split(' ').map((word) => {
     return word[0].toUpperCase() + word.substring(1)
   }).join(" ")
 }
