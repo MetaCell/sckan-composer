@@ -39,7 +39,6 @@ export const FormBase = (props: any) => {
     }
 
     const handleSubmit = async (event: IChangeEvent) => {
-        console.log('lkslsks')
         const formData = {...event.formData, ...extraData, ...extraFormData}
         setIsSaving(true)
         setLocalData(formData)

@@ -156,6 +156,13 @@ const SentencesDetails = () => {
                           <Grid item xs={11}>
 
                             <Paper>
+                              <KnowledgeStatementsForm
+                                data={sentence}
+                                disabled={disabled}
+                                format="small"
+                                setter={setSentence}
+                                extraData={{parentId: sentence.id}}
+                              />
                               <DoisForm
                                 data={sentence}
                                 setter={setSentence}

@@ -1,12 +1,17 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
 import statementService from '../../services/StatementService'
 import {UiSchema} from "@rjsf/utils";
 import CustomTextField from "../Widgets/CustomTextField";
 import CustomMultipleSelectChip from "../Widgets/CustomMultipleSelectChip";
+import sentenceService from "../../services/SentenceService";
+import {Doi} from "../../apiclient/backend";
+import CustomSingleSelect from "../Widgets/CustomSingleSelect";
 
 const StatementForm = (props: any) => {
+  const [divisionList,setDivisionList] = useState([])
+  const [biologicalSex,setBiologicalSexList] = useState([])
   const { format, extraData } = props
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema()
 
@@ -44,10 +49,11 @@ const StatementForm = (props: any) => {
       }
     },
     ans_division_id: {
-      "ui:widget": CustomMultipleSelectChip,
+      "ui:widget": CustomSingleSelect,
       "ui:options": {
         label: 'ANS Division',
         placeholder: "Select ANS Division",
+        data: divisionList?.map((row: any) => ({id: row.id, label: row.name})),
       }
     },
   };
@@ -62,6 +68,18 @@ const StatementForm = (props: any) => {
       }
     },
   };
+
+  console.log(biologicalSex)
+
+  useEffect(() => {
+    statementService.getANSDivisionList().then((result) => {
+      setDivisionList(result.results)
+    })
+    statementService.getBiologicalSexList().then((result) => {
+      setBiologicalSexList(result.results)
+    })
+  }, [])
+
   return (
     <FormBase
       service={statementService}

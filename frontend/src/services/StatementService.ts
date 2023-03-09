@@ -23,6 +23,12 @@ class ConnectivityStatementService extends AbstractService {
     const { limit, ordering, index, knowledgeStatement, stateFilter, tagFilter } = queryOptions
     return composerApi.composerConnectivityStatementList(undefined, knowledgeStatement, limit, undefined, index, ordering, undefined, undefined, stateFilter, tagFilter).then((res: any) => res.data)
   }
+  async getANSDivisionList() {
+    return composerApi.composerAnsDivisionList(undefined).then((res: any) => res.data)
+  }
+  async getBiologicalSexList() {
+    return composerApi.composerBiologicalSexList(undefined).then((res: any) => res.data)
+  }
 }
 
 const connectivityStatementService = new ConnectivityStatementService()
