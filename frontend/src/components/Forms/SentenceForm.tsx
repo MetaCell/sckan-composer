@@ -14,7 +14,7 @@ const SentenceForm = (props: any) => {
     format === "small"
       ? ["title"]
       : format === "create"
-      ? ["title", "pmid", "pmcid", "text"]
+      ? ["title", "pmid", "pmcid", "doi", "text"]
       : undefined;
 
   const uiOrder = format === "create" ? ["*", "text"] : undefined;
@@ -60,6 +60,13 @@ const SentenceForm = (props: any) => {
       "ui:options": {
         label: "PMCID",
         placeholder: "Enter PMCID",
+      },
+    },
+    doi: {
+      "ui:widget": CustomTextField,
+      "ui:options": {
+        label: "DOI",
+        placeholder: "Enter DOI",
       },
     },
     "ui:order": uiOrder,
