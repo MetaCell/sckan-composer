@@ -5,7 +5,6 @@ import { jsonSchemas } from '../../services/JsonSchema'
 import specieService from "../../services/SpecieService";
 import {UiSchema} from "@rjsf/utils";
 import {ChipsInput} from "../Widgets/ChipsInput";
-import {Doi, Tag} from "../../apiclient/backend";
 
 
 const SpeciesForm = (props: any) => {
@@ -26,8 +25,8 @@ const SpeciesForm = (props: any) => {
     name: {
       "ui:widget": ChipsInput,
       "ui:options": {
-        data: data?.connectivity_statements?.dois?.map((row: Doi) => ({id: row.id, label: row.doi})),
-        placeholder: 'Enter DOIs (Press Enter to add a DOI)',
+        label: 'Species',
+        placeholder: 'Select Species',
       }
     },
   };

@@ -9,7 +9,7 @@ import {Doi, Tag} from "../../apiclient/backend";
 
 
 const DoisForm = (props: any) => {
-  const { data, extraData, setter } = props
+  const { data } = props
 
   const { schema, uiSchema } = jsonSchemas.getDoiSchema()
 
@@ -41,6 +41,7 @@ const DoisForm = (props: any) => {
       uiFields={uiFields}
       enableAutoSave={false}
       clearOnSave={true}
+      children={true}
       {...props}
     />
   )

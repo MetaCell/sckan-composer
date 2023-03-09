@@ -3,15 +3,15 @@ import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
 import statementService from '../../services/StatementService'
 import {UiSchema} from "@rjsf/utils";
-import CustomTextArea from '../Widgets/CustomTextArea'
 import CustomTextField from "../Widgets/CustomTextField";
+import CustomMultipleSelectChip from "../Widgets/CustomMultipleSelectChip";
 
 const StatementForm = (props: any) => {
   const { format, extraData } = props
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema()
 
   const uiFields = format === 'small'
-    ? ["sentence_id","knowledge_statement","biological_sex_id", "apinatomy_model", "circuit_type", "laterality", "ans_division_id"]
+    ? ["biological_sex_id", "apinatomy_model", "circuit_type", "laterality", "ans_division_id"]
     : undefined
   // TODO: set up the widgets for the schema
 
@@ -29,13 +29,6 @@ const StatementForm = (props: any) => {
         classNames: 'col-xs-12 col-md-6'
       }
     },
-    knowledge_statement: {
-      "ui:widget": CustomTextArea,
-      "ui:options": {
-        placeholder: "Enter Knowledge statement",
-        rows: 5,
-      }
-    },
     apinatomy_model: {
       "ui:widget": CustomTextField,
       "ui:options": {
@@ -44,13 +37,14 @@ const StatementForm = (props: any) => {
       }
     },
     biological_sex_id: {
-      "ui:widget": CustomTextField,
+      "ui:widget": CustomMultipleSelectChip,
       "ui:options": {
         label: 'Biological Sex',
         placeholder: "Enter Biological Sex",
       }
     },
     ans_division_id: {
+      "ui:widget": CustomMultipleSelectChip,
       "ui:options": {
         label: 'ANS Division',
         placeholder: "Select ANS Division",
@@ -66,12 +60,10 @@ const StatementForm = (props: any) => {
       "ui:options": {
         submit: false
       }
-    }
+    },
   };
-
   return (
     <FormBase
-      data={extraData}
       service={statementService}
       schema={customSchema}
       uiSchema={customUiSchema}

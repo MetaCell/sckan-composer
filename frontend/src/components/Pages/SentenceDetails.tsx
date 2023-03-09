@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 import sentenceService from "../../services/SentenceService";
 import NoteForm from "../Forms/NoteForm";
 import TagForm from "../Forms/TagForm";
-import { Sentence } from "../../apiclient/backend";
+import {ConnectivityStatement, Sentence, SentenceConnectivityStatement} from "../../apiclient/backend";
 import { userProfile } from "../../services/UserService";
 import CheckDuplicates from "../CheckForDuplicates/CheckDuplicatesDialog";
 import {SentenceStateChip} from "../Widgets/StateChip";
@@ -21,15 +21,26 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import SentenceForm from '../Forms/SentenceForm'
 import SpeciesForm from "../Forms/SpeciesForm";
 import Divider from "@mui/material/Divider";
+import KnowledgeStatementsForm from "../Forms/KnowledgeStatements";
+import {Accordion, AccordionDetails, AccordionSummary} from "@mui/material";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
   const [sentence, setSentence] = useState({} as Sentence);
   const [loading, setLoading] = useState(true);
-  const [extraStatementForm, setExtraStatementForm] = useState<string[]>([""]);
+  const [extraStatementForm, setExtraStatementForm] = useState<SentenceConnectivityStatement[]>([]);
+  const [numForms, setNumForms] = useState(1);
+
   const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
+  // const [expanded, setExpanded] = React.useState<number>(0);
+  const [expanded, setExpanded] = React.useState<string | false>('panel-0');
+
+  const handleChange =
+    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpanded(isExpanded ? panel : false);
+    };
 
   const handleClick = () => {
     const transition = sentence?.available_transitions[selectedIndex]
@@ -41,6 +52,10 @@ const SentencesDetails = () => {
       });
   };
 
+  const onAddNewStatement = () => {
+    setNumForms(numForms + 1);
+  }
+
   const handleMenuItemClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
     index: number,
@@ -48,7 +63,7 @@ const SentencesDetails = () => {
     setSelectedIndex(index);
     setOpen(false);
   };
-
+  console.log(sentence)
   useEffect(() => {
     if (sentenceId) {
       sentenceService
@@ -132,31 +147,44 @@ const SentencesDetails = () => {
                     <CheckDuplicates />
                   </Stack>
                 </Grid>
-            {
-              extraStatementForm?.map((row, key) =>
 
+            {
+              Array.from({ length: numForms })?.map((_, key) =>
                     <Grid item xs={12}>
                       <Box p={1} mb={2} sx={{background: '#F2F4F7', borderRadius: '12px'}}>
                         <Grid container spacing={1} alignItems='center'>
                           <Grid item xs={11}>
+
                             <Paper>
                               <DoisForm
                                 data={sentence}
-                                extraData={{ parentId: sentence.id }}
                                 setter={setSentence}
                               />
-                              <StatementForm
-                                data={sentence}
-                                disabled={disabled}
-                                format="small"
-                                setter={setSentence}
-                                extraData={{sentence_id: sentence.id}}
-                              />
-                              <SpeciesForm
-                                data={sentence}
-                                extraData={{ parentId: sentence.id }}
-                                setter={setSentence}
-                              />
+                              <Accordion expanded={expanded === `panel-${key}`} onChange={handleChange(`panel-${key}`)}>
+                                <AccordionSummary
+                                  expandIcon={<ExpandMoreIcon />}
+                                  aria-controls="panel1bh-content"
+                                  id="panel1bh-header"
+                                >
+                                  <Typography>
+                                    Statement Details
+                                  </Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                  <StatementForm
+                                    data={sentence}
+                                    disabled={disabled}
+                                    format="small"
+                                    setter={setSentence}
+                                    extraData={{parentId: sentence.id}}
+                                  />
+                                  <SpeciesForm
+                                    data={sentence}
+                                    extraData={{ parentId: sentence.id }}
+                                    setter={setSentence}
+                                  />
+                                </AccordionDetails>
+                              </Accordion>
                             </Paper>
 
                           </Grid>
@@ -170,7 +198,7 @@ const SentencesDetails = () => {
                     </Grid>
               )
             }
-            <Button onClick={() => setExtraStatementForm((prev) => [...prev, ""])}>
+            <Button onClick={onAddNewStatement}>
               Add Statement
             </Button>
               </Grid>
