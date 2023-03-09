@@ -9,7 +9,7 @@ import StatementForm from "../Forms/StatementForm";
 import statementService from "../../services/StatementService";
 import NoteForm from "../Forms/NoteForm";
 import TagForm from "../Forms/TagForm";
-import { ConnectivityStatement } from "../../apiclient/backend/api";
+import { ConnectivityStatement } from "../../apiclient/backend";
 import { Button } from "@mui/material";
 import { userProfile } from "../../services/UserService";
 import CheckDuplicates from "../CheckForDuplicates/CheckDuplicatesDialog";
