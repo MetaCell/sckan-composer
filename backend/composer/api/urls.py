@@ -11,7 +11,7 @@ from .views import (
     SentenceViewSet,
     SpecieViewSet,
     TagViewSet,
-    ViaViewSet,
+    ViaViewSet, BiologicalSexViewSet,
 )
 
 # Create a router and register our viewsets with it.
@@ -20,6 +20,7 @@ router.register(
     r"anatomical-entity", AnatomicalEntityViewSet, basename="anatomical-entity"
 )
 router.register(r"ans-division", AnsDivisionViewSet, basename="ans-division")
+router.register(r"biological-sex", BiologicalSexViewSet, basename="biological-sex")
 router.register(
     r"connectivity-statement",
     ConnectivityStatementViewSet,

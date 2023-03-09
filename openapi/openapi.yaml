@@ -120,6 +120,62 @@ paths:
               schema:
                 $ref: '#/components/schemas/AnsDivision'
           description: ''
+  /api/composer/biological-sex/:
+    get:
+      operationId: composer_biological_sex_list
+      description: BiologicalSex
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBiologicalSexList'
+          description: ''
+  /api/composer/biological-sex/{id}/:
+    get:
+      operationId: composer_biological_sex_retrieve
+      description: BiologicalSex
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this biological sex.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiologicalSex'
+          description: ''
   /api/composer/connectivity-statement/:
     get:
       operationId: composer_connectivity_statement_list
@@ -353,16 +409,11 @@ paths:
       responses:
         '204':
           description: No response body
-  /api/composer/connectivity-statement/{id}/add_doi/{doi}/:
+  /api/composer/connectivity-statement/{id}/add_dois/:
     post:
-      operationId: composer_connectivity_statement_add_doi_create
+      operationId: composer_connectivity_statement_add_dois_create
       description: ConnectivityStatement
       parameters:
-      - in: path
-        name: doi
-        schema:
-          type: integer
-        required: true
       - in: path
         name: id
         schema:
@@ -371,6 +422,24 @@ paths:
         required: true
       tags:
       - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Doi'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Doi'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Doi'
+        required: true
       security:
       - tokenAuth: []
       - basicAuth: []
@@ -1759,6 +1828,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnsDivision'
+    PaginatedBiologicalSexList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BiologicalSex'
     PaginatedConnectivityStatementList:
       type: object
       properties:
@@ -2252,11 +2341,11 @@ components:
           readOnly: true
         name:
           type: string
-          readOnly: true
+          maxLength: 200
         ontology_uri:
           type: string
           format: uri
-          readOnly: true
+          maxLength: 200
       required:
       - id
       - name
