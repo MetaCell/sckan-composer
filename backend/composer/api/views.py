@@ -26,7 +26,7 @@ from .serializers import (
     SentenceSerializer,
     SpecieSerializer,
     TagSerializer,
-    ViaSerializer, DoiSerializer,
+    ViaSerializer, DoiSerializer, BiologicalSexSerializer,
 )
 from ..models import (
     AnatomicalEntity,
@@ -37,7 +37,7 @@ from ..models import (
     Sentence,
     Specie,
     Tag,
-    Via, Doi,
+    Via, Doi, BiologicalSex,
 )
 from ..services import ConnectivityStatementService, SentenceService
 
@@ -227,6 +227,18 @@ class AnsDivisionViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = AnsDivision.objects.all()
     serializer_class = AnsDivisionSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+    ]
+
+
+class BiologicalSexViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    BiologicalSex
+    """
+
+    queryset = BiologicalSex.objects.all()
+    serializer_class = BiologicalSexSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
