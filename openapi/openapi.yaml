@@ -353,16 +353,11 @@ paths:
       responses:
         '204':
           description: No response body
-  /api/composer/connectivity-statement/{id}/add_doi/{doi}/:
+  /api/composer/connectivity-statement/{id}/add_dois/:
     post:
-      operationId: composer_connectivity_statement_add_doi_create
+      operationId: composer_connectivity_statement_add_dois_create
       description: ConnectivityStatement
       parameters:
-      - in: path
-        name: doi
-        schema:
-          type: integer
-        required: true
       - in: path
         name: id
         schema:
@@ -371,6 +366,24 @@ paths:
         required: true
       tags:
       - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Doi'
+          application/x-www-form-urlencoded:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Doi'
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Doi'
+        required: true
       security:
       - tokenAuth: []
       - basicAuth: []
@@ -2252,11 +2265,11 @@ components:
           readOnly: true
         name:
           type: string
-          readOnly: true
+          maxLength: 200
         ontology_uri:
           type: string
           format: uri
-          readOnly: true
+          maxLength: 200
       required:
       - id
       - name
