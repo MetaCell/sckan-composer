@@ -3214,11 +3214,12 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * Specie
          * @param {number} [limit] Number of results to return per page.
+         * @param {string} [name] 
          * @param {number} [offset] The initial index from which to return the results.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSpecieList: async (limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSpecieList: async (limit?: number, name?: string, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/specie/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3242,6 +3243,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
+            }
+
+            if (name !== undefined) {
+                localVarQueryParameter['name'] = name;
             }
 
             if (offset !== undefined) {
@@ -4088,12 +4093,13 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         /**
          * Specie
          * @param {number} [limit] Number of results to return per page.
+         * @param {string} [name] 
          * @param {number} [offset] The initial index from which to return the results.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSpecieList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSpecieList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSpecieList(limit, offset, options);
+        async composerSpecieList(limit?: number, name?: string, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSpecieList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSpecieList(limit, name, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4576,12 +4582,13 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         /**
          * Specie
          * @param {number} [limit] Number of results to return per page.
+         * @param {string} [name] 
          * @param {number} [offset] The initial index from which to return the results.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSpecieList(limit?: number, offset?: number, options?: any): AxiosPromise<PaginatedSpecieList> {
-            return localVarFp.composerSpecieList(limit, offset, options).then((request) => request(axios, basePath));
+        composerSpecieList(limit?: number, name?: string, offset?: number, options?: any): AxiosPromise<PaginatedSpecieList> {
+            return localVarFp.composerSpecieList(limit, name, offset, options).then((request) => request(axios, basePath));
         },
         /**
          * Specie
@@ -5128,13 +5135,14 @@ export class ComposerApi extends BaseAPI {
     /**
      * Specie
      * @param {number} [limit] Number of results to return per page.
+     * @param {string} [name] 
      * @param {number} [offset] The initial index from which to return the results.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSpecieList(limit?: number, offset?: number, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerSpecieList(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    public composerSpecieList(limit?: number, name?: string, offset?: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSpecieList(limit, name, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
