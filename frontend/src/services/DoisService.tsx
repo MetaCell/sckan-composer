@@ -4,8 +4,8 @@ import { AbstractService } from "./AbstractService"
 
 
 class DoiService extends AbstractService {
-  async save({doi, parentId}: {doi: number, parentId: number}) {
-    return composerApi.composerConnectivityStatementAddDoiCreate(doi, parentId).then((response: any) => response.data)
+  async save({id, doi}: {id: number, doi: Doi[]}) {
+    return composerApi.composerConnectivityStatementAddDoisCreate(id, doi).then((response: any) => response.data)
   }
   async getObject(id: string): Promise<Doi> {
     return {} as Doi
