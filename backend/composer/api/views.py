@@ -15,7 +15,7 @@ from .filtersets import (
     ConnectivityStatementFilter,
     AnatomicalEntityFilter,
     NoteFilter,
-    ViaFilter,
+    ViaFilter, SpecieFilter,
 )
 from .serializers import (
     AnatomicalEntitySerializer,
@@ -313,6 +313,7 @@ class SpecieViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
+    filterset_class = SpecieFilter
 
 
 class ProfileViewSet(viewsets.GenericViewSet):
@@ -359,19 +360,21 @@ class ViaViewSet(viewsets.ModelViewSet):
 @api_view(["GET"])
 def jsonschemas(request):
     serializers = [
-        ConnectivityStatementSerializer,
-        SentenceSerializer,
-        ViaSerializer,
-        TagSerializer,
-        DoiSerializer,
-        SpecieSerializer,
-        NoteSerializer,
+        (ConnectivityStatementSerializer, {}),
+        (SentenceSerializer, {}),
+        (ViaSerializer, {}),
+        (TagSerializer, {}),
+        (DoiSerializer, {}),
+        (SpecieSerializer, {'only_id': True}),
+        (NoteSerializer, {}),
     ]
 
     schema = {}
     for s in serializers:
-        obj = s({})
-        schema[s.Meta.model.__name__] = {
+        serializer = s[0]
+        context = s[1]
+        obj = serializer(**context)
+        schema[serializer.Meta.model.__name__] = {
             "schema": SchemaProcessor(obj, {}).get_schema(),
             "uiSchema": UiSchemaProcessor(obj, {}).get_ui_schema(),
         }

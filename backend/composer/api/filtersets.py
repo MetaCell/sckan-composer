@@ -8,7 +8,7 @@ from composer.models import (
     AnatomicalEntity,
     Note,
     Tag,
-    Via,
+    Via, Specie,
 )
 
 
@@ -83,6 +83,14 @@ class AnatomicalEntityFilter(django_filters.FilterSet):
 
     class Meta:
         model = AnatomicalEntity
+        fields = []
+
+
+class SpecieFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(field_name="name", lookup_expr="icontains")
+
+    class Meta:
+        model = Specie
         fields = []
 
 
