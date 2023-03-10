@@ -13,7 +13,7 @@ const log = (type: string) => console.log.bind(console, type)
 
 export const FormBase = (props: any) => {
 
-    const {service, data, schema, setter, extraData, formData : extraFormData = {}, uiSchema, uiFields, enableAutoSave, disabled=false,  clearOnSave=false, children = false} = props
+    const {service, data, schema, setter, extraData, uiSchema, uiFields, enableAutoSave, disabled=false,  clearOnSave=false, children = false, widgets, isUpdate} = props
     const [localData, setLocalData] = useState<any>(data)
     const [isSaving, setIsSaving] = useState<boolean>(false)
     const triggerAutoSave = useDebouncedCallback(() => onSave(), EDIT_DEBOUNCE);
@@ -39,22 +39,39 @@ export const FormBase = (props: any) => {
     }
 
     const handleSubmit = async (event: IChangeEvent) => {
-        const formData = {...event.formData, ...extraData, ...extraFormData}
+        const formData = {...event.formData, ...extraData}
         setIsSaving(true)
         setLocalData(formData)
-        service.save(formData).then((newData: any) => {
-            setter(newData)
-            // todo: Add UI feedback
-            log("Saved")
-        }).catch((error: any) => {
-            // todo: handle errors here
-            log("Something went wrong")
-        }).finally(() => {
-            setIsSaving(false)
-            if(clearOnSave){
-                setLocalData({})
-            }
-        })
+        if (isUpdate) {
+            service.update(formData).then((newData: any) => {
+                setter(newData)
+                // todo: Add UI feedback
+                log("Saved")
+            }).catch((error: any) => {
+                // todo: handle errors here
+                log("Something went wrong")
+            }).finally(() => {
+                setIsSaving(false)
+                if(clearOnSave){
+                    setLocalData({})
+                }
+            })
+        } else {
+            service.save(formData).then((newData: any) => {
+                setter(newData)
+                // todo: Add UI feedback
+                log("Saved")
+            }).catch((error: any) => {
+                // todo: handle errors here
+                log("Something went wrong")
+            }).finally(() => {
+                setIsSaving(false)
+                if(clearOnSave){
+                    setLocalData({})
+                }
+            })
+        }
+
     }
 
     const handleUpdate = async (event: IChangeEvent) => {
@@ -62,6 +79,7 @@ export const FormBase = (props: any) => {
             return triggerAutoSave()
         }
     }
+
     return (
       <>
         {(!data || isSaving) && <Backdrop
@@ -82,6 +100,7 @@ export const FormBase = (props: any) => {
                 onSubmit={handleSubmit}
                 onError={onError}
                 children={children}
+                widgets={widgets}
             />
         </Box>
       </>

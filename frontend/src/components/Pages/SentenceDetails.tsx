@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 import sentenceService from "../../services/SentenceService";
 import NoteForm from "../Forms/NoteForm";
 import TagForm from "../Forms/TagForm";
-import {ConnectivityStatement, Sentence, SentenceConnectivityStatement} from "../../apiclient/backend";
+import { Sentence, SentenceConnectivityStatement} from "../../apiclient/backend";
 import { userProfile } from "../../services/UserService";
 import CheckDuplicates from "../CheckForDuplicates/CheckDuplicatesDialog";
 import {SentenceStateChip} from "../Widgets/StateChip";
@@ -21,22 +21,28 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import SentenceForm from '../Forms/SentenceForm'
 import SpeciesForm from "../Forms/SpeciesForm";
 import Divider from "@mui/material/Divider";
-import KnowledgeStatementsForm from "../Forms/KnowledgeStatements";
 import {Accordion, AccordionDetails, AccordionSummary} from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import CustomTextArea from "../Widgets/CustomTextArea";
+
+const initialConnectivityStatement = {knowledge_statement: "", biological_sex: null, ans_division: null}
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
   const [sentence, setSentence] = useState({} as Sentence);
   const [loading, setLoading] = useState(true);
-  const [extraStatementForm, setExtraStatementForm] = useState<SentenceConnectivityStatement[]>([]);
-  const [numForms, setNumForms] = useState(1);
+  let connectivityStatements: SentenceConnectivityStatement[],
+    setConnectivityStatements: (value: (SentenceConnectivityStatement | { ans_division: null; biological_sex: null; knowledge_statement: string })[]) => void;
+  // @ts-ignore
+  [connectivityStatements, setConnectivityStatements] = useState<SentenceConnectivityStatement[]>([initialConnectivityStatement]);
 
   const [open, setOpen] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
-  // const [expanded, setExpanded] = React.useState<number>(0);
   const [expanded, setExpanded] = React.useState<string | false>('panel-0');
-
+  const [statementText, setStatementText] = React.useState("")
+  const onAddStatementText = (value: string) => {
+    setStatementText(value)
+  }
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
       setExpanded(isExpanded ? panel : false);
@@ -53,7 +59,7 @@ const SentencesDetails = () => {
   };
 
   const onAddNewStatement = () => {
-    setNumForms(numForms + 1);
+    setConnectivityStatements([...connectivityStatements, initialConnectivityStatement]);
   }
 
   const handleMenuItemClick = (
@@ -63,13 +69,13 @@ const SentencesDetails = () => {
     setSelectedIndex(index);
     setOpen(false);
   };
-  console.log(sentence)
   useEffect(() => {
     if (sentenceId) {
       sentenceService
         .getObject(sentenceId)
         .then((sentence: Sentence) => {
           setSentence(sentence);
+          setConnectivityStatements(sentence.connectivity_statements)
           if (
             sentence.owner &&
             sentence.owner?.id !== userProfile.getUser().id
@@ -149,21 +155,15 @@ const SentencesDetails = () => {
                 </Grid>
 
             {
-              Array.from({ length: numForms })?.map((_, key) =>
+              connectivityStatements?.map((statement, key) =>
                     <Grid item xs={12}>
                       <Box p={1} mb={2} sx={{background: '#F2F4F7', borderRadius: '12px'}}>
                         <Grid container spacing={1} alignItems='center'>
                           <Grid item xs={11}>
-
                             <Paper>
-                              <KnowledgeStatementsForm
-                                data={sentence}
-                                disabled={disabled}
-                                format="small"
-                                setter={setSentence}
-                                extraData={{parentId: sentence.id}}
-                              />
+                              <CustomTextArea value={statement?.knowledge_statement} options={{rows: 4}} onChange={onAddStatementText} />
                               <DoisForm
+                                doisData={statement?.dois}
                                 data={sentence}
                                 setter={setSentence}
                               />
@@ -179,11 +179,13 @@ const SentencesDetails = () => {
                                 </AccordionSummary>
                                 <AccordionDetails>
                                   <StatementForm
+                                    statement={statement}
                                     data={sentence}
                                     disabled={disabled}
                                     format="small"
                                     setter={setSentence}
-                                    extraData={{parentId: sentence.id}}
+                                    extraData={{sentence_id: sentence.id, knowledge_statement: statementText}}
+                                    uiFields={["biological_sex_id", "apinatomy_model", "circuit_type", "laterality", "ans_division_id"]}
                                   />
                                   <SpeciesForm
                                     data={sentence}

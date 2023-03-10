@@ -120,3 +120,19 @@ export const formatTime = (date: string) => {
     hour12: true
   });
 }
+
+export const timeAgo = (timestamp : string) => {
+  const now = new Date();
+  const timeDiff = now.getTime() - new Date(timestamp).getTime();
+  const seconds = Math.floor(timeDiff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+
+  if (hours > 0) {
+    return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  } else if (minutes > 0) {
+    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+  } else {
+    return `${seconds} second${seconds > 1 ? 's' : ''} ago`;
+  }
+}

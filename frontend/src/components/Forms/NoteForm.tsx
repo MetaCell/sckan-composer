@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import { Box } from '@mui/material'
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
@@ -15,6 +15,9 @@ import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import MessageIcon from '@mui/icons-material/Message';
 import Typography from "@mui/material/Typography";
+import {Note} from "../../apiclient/backend";
+import {timeAgo} from "../../helpers/helpers";
+
 const TimeLineIcon = () => {
   return <Box sx={{
     padding: 8,
@@ -30,9 +33,10 @@ const TimeLineIcon = () => {
   </Box>
 }
 const NoteForm = (props: any) => {
-  const { setter } = props
+  const { setter, extraData } = props
   const { schema, uiSchema } = jsonSchemas.getNoteSchema()
-  const [data, setData] = React.useState({})
+  const [data, setData] = useState({})
+  const [noteList, setNoteList] = useState([])
 
   const clearNoteForm = (newData: any) => {
     setData({})
@@ -56,6 +60,14 @@ const NoteForm = (props: any) => {
       }
     },
   };
+
+  useEffect(() => {
+    if (extraData?.sentence_id) {
+      noteService.getNotesList(undefined, extraData?.sentence_id).then(result => {
+        setNoteList(result?.results)
+      })
+    }
+  }, [extraData?.sentence_id])
 
 
   return (
@@ -111,50 +123,29 @@ const NoteForm = (props: any) => {
           }
         }
       }}>
-        <TimelineItem>
-          <TimelineSeparator>
-            <TimeLineIcon />
-            <TimelineConnector sx={{margin: '8px 0'}} />
-          </TimelineSeparator>
-          <TimelineContent>
-            <Typography variant="h6">
-              Eat
-            </Typography>
-            <Typography fontSize={12}>
-              2 hours ago
-            </Typography>
-            <Typography variant="subtitle2" fontSize={14}>Because you need strength</Typography>
-          </TimelineContent>
-        </TimelineItem>
-        <TimelineItem>
-          <TimelineSeparator>
-            <TimeLineIcon />
-            <TimelineConnector sx={{margin: '8px 0'}} />
-          </TimelineSeparator>
-          <TimelineContent>
-            <Typography variant="h6">
-              Eat
-            </Typography>
-            <Typography fontSize={12}>
-              2 hours ago
-            </Typography>
-            <Typography  variant="subtitle2" fontSize={14}>Because you need strength</Typography>
-          </TimelineContent>
-        </TimelineItem>
-        <TimelineItem>
-          <TimelineSeparator>
-            <TimeLineIcon />
-          </TimelineSeparator>
-          <TimelineContent>
-            <Typography variant="h6">
-              Eat
-            </Typography>
-            <Typography fontSize={12}>
-              2 hours ago
-            </Typography>
-            <Typography  variant="subtitle2" fontSize={14}>Because you need strength</Typography>
-          </TimelineContent>
-        </TimelineItem>
+        {
+          noteList?.map((note: Note, index: number) =>
+            <TimelineItem>
+              <TimelineSeparator>
+                <TimeLineIcon />
+                {
+                  index !== noteList?.length - 1 &&  <TimelineConnector sx={{margin: '8px 0'}} />
+                }
+              </TimelineSeparator>
+              <TimelineContent>
+                <Typography variant="h6">
+                  {note?.user}
+                </Typography>
+                <Typography fontSize={12}>
+                  {
+                    timeAgo(note?.created_at)
+                  }
+                </Typography>
+                <Typography variant="subtitle2" fontSize={14}>{note?.note}</Typography>
+              </TimelineContent>
+            </TimelineItem>
+          )
+        }
       </Timeline>
     </Box>
 

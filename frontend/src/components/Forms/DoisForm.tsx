@@ -9,7 +9,7 @@ import {Doi, Tag} from "../../apiclient/backend";
 
 
 const DoisForm = (props: any) => {
-  const { data } = props
+  const { data, doisData } = props
 
   const { schema, uiSchema } = jsonSchemas.getDoiSchema()
 
@@ -26,7 +26,7 @@ const DoisForm = (props: any) => {
     doi: {
       "ui:widget": ChipsInput,
       "ui:options": {
-        data: data?.connectivity_statements?.dois?.map((row: Doi) => ({id: row.id, label: row.doi})),
+        data: doisData?.map((row: Doi) => ({id: row.id, label: row.doi})),
         placeholder: 'Enter DOIs (Press Enter to add a DOI)',
       }
     },
