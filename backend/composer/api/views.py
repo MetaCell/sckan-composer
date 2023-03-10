@@ -360,21 +360,19 @@ class ViaViewSet(viewsets.ModelViewSet):
 @api_view(["GET"])
 def jsonschemas(request):
     serializers = [
-        (ConnectivityStatementSerializer, {}),
-        (SentenceSerializer, {}),
-        (ViaSerializer, {}),
-        (TagSerializer, {}),
-        (DoiSerializer, {}),
-        (SpecieSerializer, {'only_id': True}),
-        (NoteSerializer, {}),
+        ConnectivityStatementSerializer,
+        SentenceSerializer,
+        ViaSerializer,
+        TagSerializer,
+        DoiSerializer,
+        SpecieSerializer,
+        NoteSerializer
     ]
 
     schema = {}
     for s in serializers:
-        serializer = s[0]
-        context = s[1]
-        obj = serializer(**context)
-        schema[serializer.Meta.model.__name__] = {
+        obj = s(**{})
+        schema[s.Meta.model.__name__] = {
             "schema": SchemaProcessor(obj, {}).get_schema(),
             "uiSchema": UiSchemaProcessor(obj, {}).get_ui_schema(),
         }
