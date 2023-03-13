@@ -36,6 +36,29 @@ const ArrowDot = (props: any) => {
   );
 };
 
+const NodeLabel = (props: any) => {
+  const { x, y, stroke, value } = props;
+  const splitValue = value?.split(" ");
+  const yDrift = 8;
+  const initialY = y - yDrift * (splitValue?.length - 1);
+  return (
+    <>
+      {splitValue?.map((label: string, index: number) => (
+        <text
+          x={x}
+          y={initialY + index * 20}
+          fill="#344054"
+          fontSize={14}
+          fontWeight={600}
+          textAnchor="middle"
+        >
+          {label}
+        </text>
+      ))}
+    </>
+  );
+};
+
 const StatementChart = (props: { statement: ConnectivityStatement }) => {
   const { statement } = props;
   const [vias, setVias] = useState<any[]>([]);
@@ -93,7 +116,11 @@ const StatementChart = (props: { statement: ConnectivityStatement }) => {
           stroke="#98A2B3"
           dot={{ r: 50, stroke: "#D0D5DD", strokeWidth: 1 }}
         >
-          <LabelList dataKey="label" position="center" />
+          <LabelList
+            dataKey="label"
+            position="center"
+            content={<NodeLabel />}
+          />
         </Line>
         <Line type="monotone" dataKey="via" stroke="#98A2B3" dot={ArrowDot}>
           <LabelList dataKey="label" position="insideBottomLeft" offset={20} />
