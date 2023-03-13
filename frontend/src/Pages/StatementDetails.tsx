@@ -93,13 +93,12 @@ const StatementDetails = () => {
         {statement?.available_transitions.map((transition) => (
           <Button onClick={() => doTransition(transition)}>{transition}</Button>
         ))}
-        <CheckDuplicates />
       </Grid>
       <Grid item xl={7}>
         <Box>
           <Tabs
             value={activeTab}
-            variant="fullWidth"
+            variant="standard"
             onChange={(e, i: number) => setActiveTab(i)}
           >
             <Tab label="Distillation" />

@@ -355,6 +355,24 @@ const theme = createTheme({
         },
       },
     },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+        },
+        textColorPrimary: ({ theme }) => ({
+          "&.Mui-selected": { color: theme.palette.primary.dark },
+          fontWeight: 600,
+        }),
+      },
+    },
+    MuiTabs: {
+      styleOverrides: {
+        indicator: ({ theme }) => ({
+          backgroundColor: theme.palette.primary.dark,
+        }),
+      },
+    },
   },
 });
 
