@@ -1,16 +1,26 @@
 import * as React from "react";
 import TextField from "@mui/material/TextField";
+import FormControl from "@mui/material/FormControl";
+import {useDebouncedCallback} from "use-debounce";
+import {EDIT_DEBOUNCE} from "../../settings";
 
 
-export default function TextArea({value, placeholder,onChange, options: { rows } }: any) {
+export default function TextArea({defaultValue, placeholder,onChange, options: { rows } }: any) {
+
+  const debouncedChangeHandler = useDebouncedCallback(
+    (event) => onChange(event.target.value),
+    EDIT_DEBOUNCE
+  );
+
   return (
+    <FormControl variant="standard">
     <TextField
-      value={value}
+      defaultValue={defaultValue}
       multiline
       rows={rows}
       placeholder={placeholder}
       fullWidth
-      onChange={(event) => onChange(event.target.value)}
+      onChange={debouncedChangeHandler}
       sx={{
         "& .Mui-focused": {
           border: '0 !important',
@@ -35,5 +45,6 @@ export default function TextArea({value, placeholder,onChange, options: { rows }
 
       }}
     />
+    </FormControl>
   );
 }

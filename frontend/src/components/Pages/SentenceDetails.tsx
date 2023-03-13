@@ -25,24 +25,21 @@ import {Accordion, AccordionDetails, AccordionSummary} from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CustomTextArea from "../Widgets/CustomTextArea";
 
-const initialConnectivityStatement = {knowledge_statement: "", biological_sex: null, ans_division: null}
+const initialConnectivityStatement = {knowledge_statement: "", biological_sex: null, ans_division: null, species: [] , dois: []}
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
   const [sentence, setSentence] = useState({} as Sentence);
   const [loading, setLoading] = useState(true);
   let connectivityStatements: SentenceConnectivityStatement[],
-    setConnectivityStatements: (value: (SentenceConnectivityStatement | { ans_division: null; biological_sex: null; knowledge_statement: string })[]) => void;
+    setConnectivityStatements: (value: (SentenceConnectivityStatement | { ans_division: null; biological_sex: null; knowledge_statement: string, species: [] , dois: [] })[]) => void;
   // @ts-ignore
   [connectivityStatements, setConnectivityStatements] = useState<SentenceConnectivityStatement[]>([initialConnectivityStatement]);
 
   const [open, setOpen] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [expanded, setExpanded] = React.useState<string | false>('panel-0');
-  const [statementText, setStatementText] = React.useState("")
-  const onAddStatementText = (value: string) => {
-    setStatementText(value)
-  }
+
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
       setExpanded(isExpanded ? panel : false);
@@ -59,7 +56,14 @@ const SentencesDetails = () => {
   };
 
   const onAddNewStatement = () => {
+    // @ts-ignore
     setConnectivityStatements([...connectivityStatements, initialConnectivityStatement]);
+  }
+
+  const onChangeKnowledgeStatement = (e: any, key: number) => {
+    console.log(connectivityStatements[key], key)
+    connectivityStatements[key].knowledge_statement = e
+    setConnectivityStatements(connectivityStatements)
   }
 
   const handleMenuItemClick = (
@@ -161,10 +165,9 @@ const SentencesDetails = () => {
                         <Grid container spacing={1} alignItems='center'>
                           <Grid item xs={11}>
                             <Paper>
-                              <CustomTextArea value={statement?.knowledge_statement} options={{rows: 4}} onChange={onAddStatementText} />
+                              <CustomTextArea onChange={(e: any) => onChangeKnowledgeStatement(e, key)} options={{rows: 4}} defaultValue={statement.knowledge_statement} />
                               <DoisForm
                                 doisData={statement?.dois}
-                                data={sentence}
                                 setter={setSentence}
                               />
                               <Accordion expanded={expanded === `panel-${key}`} onChange={handleChange(`panel-${key}`)}>
@@ -180,11 +183,9 @@ const SentencesDetails = () => {
                                 <AccordionDetails>
                                   <StatementForm
                                     statement={statement}
-                                    data={sentence}
-                                    disabled={disabled}
                                     format="small"
                                     setter={setSentence}
-                                    extraData={{sentence_id: sentence.id, knowledge_statement: statementText}}
+                                    extraData={{sentence_id: sentence.id, knowledge_statement: connectivityStatements[key].knowledge_statement}}
                                     uiFields={["biological_sex_id", "apinatomy_model", "circuit_type", "laterality", "ans_division_id"]}
                                   />
                                   <SpeciesForm

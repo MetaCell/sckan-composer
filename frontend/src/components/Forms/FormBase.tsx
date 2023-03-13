@@ -42,6 +42,7 @@ export const FormBase = (props: any) => {
         const formData = {...event.formData, ...extraData}
         setIsSaving(true)
         setLocalData(formData)
+        console.log(formData)
         if (isUpdate) {
             service.update(formData).then((newData: any) => {
                 setter(newData)

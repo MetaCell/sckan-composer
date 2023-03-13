@@ -9,7 +9,7 @@ import CustomTextArea from "../Widgets/CustomTextArea";
 const StatementForm = (props: any) => {
   const [divisionList,setDivisionList] = useState([])
   const [biologicalSex,setBiologicalSexList] = useState([])
-  const { data, extraData, uiFields, statement } = props
+  const { extraData, uiFields, statement } = props
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema()
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
@@ -60,7 +60,8 @@ const StatementForm = (props: any) => {
 
   const widgets = {
     CustomSingleSelect,
-    CustomTextField
+    CustomTextField,
+    CustomTextArea
   }
 
   useEffect(() => {
@@ -72,8 +73,7 @@ const StatementForm = (props: any) => {
     })
   }, [])
 
-  data['sentence_id'] = extraData.sentence_id
-  data['knowledge_statement'] = extraData.knowledge_statement
+  statement['sentence_id'] = extraData.sentence_id
 
   return (
     <FormBase

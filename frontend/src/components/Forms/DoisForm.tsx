@@ -9,7 +9,7 @@ import {Doi, Tag} from "../../apiclient/backend";
 
 
 const DoisForm = (props: any) => {
-  const { data, doisData } = props
+  const { doisData } = props
 
   const { schema, uiSchema } = jsonSchemas.getDoiSchema()
 
@@ -32,9 +32,14 @@ const DoisForm = (props: any) => {
     },
   };
 
+  const data = {
+    id: 1,
+    doi: doisData
+  }
+
   return (
     <FormBase
-      data={{}}
+      data={data}
       service={doiService}
       schema={customSchema}
       uiSchema={customUiSchema}
