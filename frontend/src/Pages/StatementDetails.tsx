@@ -13,6 +13,7 @@ import { ConnectivityStatement } from "../apiclient/backend";
 import { Button } from "@mui/material";
 import { userProfile } from "../services/UserService";
 import CheckDuplicates from "../components/CheckForDuplicates/CheckDuplicatesDialog";
+import ProofingTab from "../components/ProofingTab";
 
 const StatementDetails = () => {
   const { statementId } = useParams();
@@ -33,7 +34,6 @@ const StatementDetails = () => {
         .getObject(statementId)
         .then((statement: ConnectivityStatement) => {
           setStatement(statement);
-
           if (
             statement.owner &&
             statement.owner?.id !== userProfile.getUser().id
@@ -103,6 +103,9 @@ const StatementDetails = () => {
       </Grid>
       <Grid item xl={5}>
         <NoteForm extraData={{ connectivity_statement_id: statement.id }} />
+      </Grid>
+      <Grid item xl={5}>
+        <ProofingTab statement={statement} />
       </Grid>
     </Grid>
   );

@@ -3,6 +3,8 @@ import { StatementStateToColor, SentenceStateToColor } from "./helpers";
 
 export const duplicatesRowsPerPage = 10;
 export const duplicatesSelectRowsPerPage = 100;
+export const chartHeight = 360;
+export const chartWidth = 700;
 
 export const statementStateToColor: StatementStateToColor = {
     compose_now: "error", //red
