@@ -10,6 +10,9 @@ class ConnectivityStatementService extends AbstractService {
   async update(connectivityStatement: ConnectivityStatement) {
     return composerApi.composerConnectivityStatementUpdate(connectivityStatement.id, connectivityStatement).then((response: any) => response.data)
   }
+  async remove(id: number) {
+    return composerApi.composerConnectivityStatementDestroy(id).then((response: any) => response.data)
+  }
   async getObject(id: string): Promise<ConnectivityStatement> {
     return composerApi.composerConnectivityStatementRetrieve(Number(id)).then((response: any) => response.data)
   }

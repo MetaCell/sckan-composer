@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 import sentenceService from "../../services/SentenceService";
 import NoteForm from "../Forms/NoteForm";
 import TagForm from "../Forms/TagForm";
-import { Sentence, SentenceConnectivityStatement} from "../../apiclient/backend";
+import {ConnectivityStatement, Sentence, SentenceConnectivityStatement} from "../../apiclient/backend";
 import { userProfile } from "../../services/UserService";
 import CheckDuplicates from "../CheckForDuplicates/CheckDuplicatesDialog";
 import {SentenceStateChip} from "../Widgets/StateChip";
@@ -89,6 +89,10 @@ const SentencesDetails = () => {
     setSelectedIndex(index);
     setOpen(false);
   };
+
+  const onDeleteStatement = (id: number) => {
+    statementService.remove(id)
+  }
 
   useEffect(() => {
     if (sentenceId) {
@@ -186,11 +190,10 @@ const SentencesDetails = () => {
                     <CheckDuplicates />
                   </Stack>
                 </Grid>
-
-            {
-              connectivityStatements?.map((statement, key) =>
+                {
+                  connectivityStatements?.map((statement, key) =>
                     <Grid item xs={12}>
-                      <Box p={1} mb={2} sx={{background: '#F2F4F7', borderRadius: '12px'}}>
+                      <Box p={1} mb={2} sx={{background: bodyBgColor, borderRadius: '12px'}}>
                         <Grid container spacing={1} alignItems='center'>
                           <Grid item xs={11}>
                             <Paper sx={{
@@ -235,14 +238,17 @@ const SentencesDetails = () => {
                           </Grid>
                           <Grid item xs={1} textAlign='center'>
                             {
-                              key !== 0 &&  <DeleteOutlineIcon />
+                              key !== 0 &&  <DeleteOutlineIcon
+                                onClick={() => onDeleteStatement(statement.id)}
+                                sx={{ cursor: 'pointer', color:'#98A2B3' }}
+                              />
                             }
                           </Grid>
                           </Grid>
                       </Box>
                     </Grid>
-              )
-            }
+                  )
+                }
             <StyledAddStatementBtn startIcon={<AddCircleIcon />} variant="contained" fullWidth={true} onClick={onAddNewStatement}>
               Add a knowledge statement
             </StyledAddStatementBtn>
