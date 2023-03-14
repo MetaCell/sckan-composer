@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 import sentenceService from "../../services/SentenceService";
 import NoteForm from "../Forms/NoteForm";
 import TagForm from "../Forms/TagForm";
-import { Sentence, SentenceConnectivityStatement} from "../../apiclient/backend";
+import { Doi, Sentence, SentenceConnectivityStatement} from "../../apiclient/backend";
 import { userProfile } from "../../services/UserService";
 import CheckDuplicates from "../CheckForDuplicates/CheckDuplicatesDialog";
 import {SentenceStateChip} from "../Widgets/StateChip";
@@ -199,15 +199,15 @@ const SentencesDetails = () => {
                             }}>
                               <CustomTextArea onChange={(e: any) => onChangeKnowledgeStatement(e, key)} options={{rows: 4}} defaultValue={statement.knowledge_statement} />
                               {
-                                connectivityStatements?.doi.map((doi, key) =>
-                                  <Doi
-                                    doisData={[{"doi":doi}]}
-                                    extraData={{statement_id: statement.id}}
+                                statement.dois.map((doi: Doi, key: any) =>
+                                  <DoisForm
+                                    key={key}
+                                    doisData={doi}
+                                    extraData={{connectivity_statement_id: statement.id}}
                                     setter={setSentence}
                                   />
                                 )
                               }
-                              <DoiForm></DoiForm>
                               <Accordion expanded={expanded === `panel-${key}`} onChange={handleChange(`panel-${key}`)}>
                                 <AccordionSummary
                                   expandIcon={<ExpandMoreIcon />}

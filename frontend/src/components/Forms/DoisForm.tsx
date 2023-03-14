@@ -9,7 +9,7 @@ import Box from "@mui/material/Box";
 
 
 const DoisForm = (props: any) => {
-  const { doisData: doiData } = props
+  const { doisData: doiData, extraData } = props
 
   const { schema, uiSchema } = jsonSchemas.getDoiSchema()
 
@@ -26,14 +26,14 @@ const DoisForm = (props: any) => {
     doi: {
       "ui:widget": ChipsInput,
       "ui:options": {
-        data: doiData?.map((row: Doi) => ({id: row.id, label: row.doi})),
+        data: [doiData], //?.map((row: Doi) => ({id: row.id, label: row.doi})),
         placeholder: 'Enter DOIs (Press Enter to add a DOI)',
       }
     },
   };
 
   const data = {
-    id: 1,
+    connectivity_statement_id: extraData?.connectivity_statement_id,
     doi: doiData
   }
 
@@ -52,11 +52,13 @@ const DoisForm = (props: any) => {
       <FormBase
         service={doiService}
         schema={customSchema}
+        data={doiData}
         uiSchema={customUiSchema}
         uiFields={uiFields}
         enableAutoSave={false}
         clearOnSave={true}
         children={true}
+        {...props}
       />
     </Box>
   )
