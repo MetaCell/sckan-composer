@@ -7,9 +7,7 @@ import CustomSingleSelect from "../Widgets/CustomSingleSelect";
 import CustomTextArea from "../Widgets/CustomTextArea";
 
 const StatementForm = (props: any) => {
-  const [divisionList,setDivisionList] = useState([])
-  const [biologicalSex,setBiologicalSexList] = useState([])
-  const { extraData, uiFields, statement } = props
+  const { extraData, uiFields, statement , biologicalSex, divisionList} = props
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema()
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
@@ -63,15 +61,6 @@ const StatementForm = (props: any) => {
     CustomTextField,
     CustomTextArea
   }
-
-  useEffect(() => {
-    statementService.getANSDivisionList().then((result) => {
-      setDivisionList(result.results)
-    })
-    statementService.getBiologicalSexList().then((result) => {
-      setBiologicalSexList(result.results)
-    })
-  }, [])
 
   statement['sentence_id'] = extraData.sentence_id
 

@@ -1,11 +1,11 @@
 import React from 'react'
-import { Box } from '@mui/material'
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
 import doiService from '../../services/DoisService'
 import {UiSchema} from "@rjsf/utils";
 import {ChipsInput} from "../Widgets/ChipsInput";
 import {Doi, Tag} from "../../apiclient/backend";
+import Box from "@mui/material/Box";
 
 
 const DoisForm = (props: any) => {
@@ -38,17 +38,27 @@ const DoisForm = (props: any) => {
   }
 
   return (
-    <FormBase
-      data={data}
-      service={doiService}
-      schema={customSchema}
-      uiSchema={customUiSchema}
-      uiFields={uiFields}
-      enableAutoSave={false}
-      clearOnSave={true}
-      children={true}
-      {...props}
-    />
+    <Box sx={{
+      padding: 0,
+      "& .MuiBox-root": {
+        padding: 0,
+
+        "& .MuiInputBase-root": {
+          border: 0,
+          boxShadow: 'none'
+        }
+      }
+    }}>
+      <FormBase
+        service={doiService}
+        schema={customSchema}
+        uiSchema={customUiSchema}
+        uiFields={uiFields}
+        enableAutoSave={false}
+        clearOnSave={true}
+        children={true}
+      />
+    </Box>
   )
 }
 

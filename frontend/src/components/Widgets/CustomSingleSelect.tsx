@@ -12,6 +12,16 @@ const StyledSelect = styled(Select)(({ theme }) => ({
   'label + &': {
     marginTop: theme.spacing(4),
   },
+
+  "&:hover": {
+    border: '1px solid #EAECF0',
+    boxShadow: '0px 1px 2px rgba(16, 24, 40, 0.05)',
+  },
+
+  "& .MuiOutlinedInput-notchedOutline": {
+    border: 0,
+    boxShadow: 'none',
+  }
 }));
 
 const CustomSingleSelect = ( {onChange, placeholder,value, options: { label, data }} : any) => {

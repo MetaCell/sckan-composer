@@ -21,11 +21,26 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import SentenceForm from '../Forms/SentenceForm'
 import SpeciesForm from "../Forms/SpeciesForm";
 import Divider from "@mui/material/Divider";
-import {Accordion, AccordionDetails, AccordionSummary} from "@mui/material";
+import {Accordion, AccordionDetails, AccordionSummary, styled} from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CustomTextArea from "../Widgets/CustomTextArea";
+import statementService from "../../services/StatementService";
+import { vars } from "../../theme/variables";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 const initialConnectivityStatement = {knowledge_statement: "", biological_sex: null, ans_division: null, species: [] , dois: []}
+const { bodyBgColor, darkBlue } = vars
+
+const StyledAddStatementBtn = styled(Button)(({ theme }) => ({
+  height: '60px',
+  background: bodyBgColor,
+  borderRadius: '16px',
+  color: darkBlue,
+
+  "&:hover": {
+    color: bodyBgColor
+  }
+}));
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
@@ -39,6 +54,8 @@ const SentencesDetails = () => {
   const [open, setOpen] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [expanded, setExpanded] = React.useState<string | false>('panel-0');
+  const [divisionList,setDivisionList] = useState([])
+  const [biologicalSex,setBiologicalSexList] = useState([])
 
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
@@ -61,7 +78,6 @@ const SentencesDetails = () => {
   }
 
   const onChangeKnowledgeStatement = (e: any, key: number) => {
-    console.log(connectivityStatements[key], key)
     connectivityStatements[key].knowledge_statement = e
     setConnectivityStatements(connectivityStatements)
   }
@@ -73,6 +89,7 @@ const SentencesDetails = () => {
     setSelectedIndex(index);
     setOpen(false);
   };
+
   useEffect(() => {
     if (sentenceId) {
       sentenceService
@@ -102,6 +119,15 @@ const SentencesDetails = () => {
         });
     }
   }, [sentenceId]);
+
+  useEffect(() => {
+    statementService.getANSDivisionList().then((result) => {
+      setDivisionList(result.results)
+    })
+    statementService.getBiologicalSexList().then((result) => {
+      setBiologicalSexList(result.results)
+    })
+  }, [])
 
   if (loading) {
     return <div>Loading...</div>;
@@ -142,7 +168,10 @@ const SentencesDetails = () => {
       <Grid item xs={12}>
         <Grid container spacing={1}>
           <Grid item xs={12} md={7}>
-            <Paper>
+            <Paper sx={{
+              border: 0,
+              boxShadow: 'none'
+            }}>
               <Grid container p={3}  mb={2}>
                 <Grid item xs={12}>
                   <Stack direction="row" justifyContent="space-between"
@@ -164,7 +193,10 @@ const SentencesDetails = () => {
                       <Box p={1} mb={2} sx={{background: '#F2F4F7', borderRadius: '12px'}}>
                         <Grid container spacing={1} alignItems='center'>
                           <Grid item xs={11}>
-                            <Paper>
+                            <Paper sx={{
+                              border: 0,
+                              boxShadow: 'none'
+                            }}>
                               <CustomTextArea onChange={(e: any) => onChangeKnowledgeStatement(e, key)} options={{rows: 4}} defaultValue={statement.knowledge_statement} />
                               {
                                 connectivityStatements?.doi.map((doi, key) =>
@@ -188,6 +220,8 @@ const SentencesDetails = () => {
                                 </AccordionSummary>
                                 <AccordionDetails>
                                   <StatementForm
+                                    divisionList={divisionList}
+                                    biologicalSex={biologicalSex}
                                     statement={statement}
                                     format="small"
                                     setter={setSentence}
@@ -214,9 +248,9 @@ const SentencesDetails = () => {
                     </Grid>
               )
             }
-            <Button onClick={onAddNewStatement}>
-              Add Statement
-            </Button>
+            <StyledAddStatementBtn startIcon={<AddCircleIcon />} variant="contained" fullWidth={true} onClick={onAddNewStatement}>
+              Add a knowledge statement
+            </StyledAddStatementBtn>
               </Grid>
             </Paper>
             <SentenceForm
@@ -229,6 +263,11 @@ const SentencesDetails = () => {
 
           <Grid item xs={12} md={5} p={1}>
             <Paper sx={{padding: '24px', "& .MuiBox-root": {padding: 0}}}>
+              <Box>
+                <Typography variant="h5" mb={1}>
+                  Notes
+                </Typography>
+              </Box>
               <TagForm
                 data={sentence.tags}
                 extraData={{ parentId: sentence.id, service: sentenceService }}

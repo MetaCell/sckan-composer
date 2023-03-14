@@ -41,7 +41,7 @@ const TagForm = (props: any) => {
 
   return (
     <FormBase
-      data={{}}
+      {...props}
       service={tagService}
       schema={customSchema}
       uiSchema={customUiSchema}
@@ -49,7 +49,6 @@ const TagForm = (props: any) => {
       enableAutoSave={false}
       clearOnSave={true}
       children={true}
-      {...props}
     />
   )
 }
