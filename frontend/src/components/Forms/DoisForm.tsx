@@ -1,15 +1,15 @@
 import React from 'react'
-import { Box } from '@mui/material'
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
 import doiService from '../../services/DoisService'
 import {UiSchema} from "@rjsf/utils";
 import {ChipsInput} from "../Widgets/ChipsInput";
 import {Doi, Tag} from "../../apiclient/backend";
+import Box from "@mui/material/Box";
 
 
 const DoisForm = (props: any) => {
-  const { doisData } = props
+  const { doisData, extraData } = props
 
   const { schema, uiSchema } = jsonSchemas.getDoiSchema()
 
@@ -26,29 +26,35 @@ const DoisForm = (props: any) => {
     doi: {
       "ui:widget": ChipsInput,
       "ui:options": {
-        data: doisData?.map((row: Doi) => ({id: row.id, label: row.doi})),
+        data: doisData?.map((row: Doi) => ({ id: row.id, label: row.doi })),
         placeholder: 'Enter DOIs (Press Enter to add a DOI)',
       }
     },
   };
 
-  const data = {
-    id: 1,
-    doi: doisData
-  }
 
   return (
-    <FormBase
-      data={data}
-      service={doiService}
-      schema={customSchema}
-      uiSchema={customUiSchema}
-      uiFields={uiFields}
-      enableAutoSave={false}
-      clearOnSave={true}
-      children={true}
-      {...props}
-    />
+    <Box sx={{
+      padding: 0,
+      "& .MuiBox-root": {
+        padding: 0,
+
+        "& .MuiInputBase-root": {
+          border: 0,
+          boxShadow: 'none'
+        }
+      }
+    }}>
+      <FormBase
+        service={doiService}
+        schema={customSchema}
+        uiSchema={customUiSchema}
+        uiFields={uiFields}
+        enableAutoSave={false}
+        clearOnSave={true}
+        children={true}
+      />
+    </Box>
   )
 }
 
