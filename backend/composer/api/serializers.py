@@ -133,10 +133,11 @@ class TagSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
 
 class SpecieSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
     """Specie"""
+    ontology_uri = serializers.CharField(required=False, allow_null=True)
 
     class Meta:
         model = Specie
-        fields = ("id", "name", "ontology_uri")
+        fields = ("id", "name", "ontology_uri",)
 
 
 class BiologicalSexSerializer(serializers.ModelSerializer):
