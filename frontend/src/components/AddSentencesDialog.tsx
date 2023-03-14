@@ -7,9 +7,18 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import SentenceForm from "./Forms/SentenceForm";
+import { useNavigate } from "react-router";
+import { Sentence } from "../apiclient/backend";
 
 const AddSentencesDialog = (props: any) => {
   const { open, handleClose } = props;
+  const navigate = useNavigate();
+
+  const handleSucessfulSubmission = (newSentence: Sentence) => {
+    handleClose();
+    navigate(`sentence/${newSentence.id}`);
+  };
+
   return (
     <Dialog fullWidth open={open} onClose={handleClose} maxWidth="xs">
       <DialogTitle component="div">
@@ -36,7 +45,7 @@ const AddSentencesDialog = (props: any) => {
           format="create"
           clearOnSave
           enableAutoSave={false}
-          action={handleClose}
+          action={handleSucessfulSubmission}
         />
       </DialogContent>
     </Dialog>

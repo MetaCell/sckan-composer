@@ -91,7 +91,7 @@ export const FormBase = (props: any) => {
         setter && setter(newData);
         // todo: improve UI feedback
         if (action) {
-          action();
+          action(newData);
         }
         log("Saved");
       })
