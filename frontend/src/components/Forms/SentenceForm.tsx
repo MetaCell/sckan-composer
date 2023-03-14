@@ -22,13 +22,21 @@ const SentenceForm = (props: any) => {
 
   const customSchema = format === "create" ? { ...schema, title: "" } : schema;
 
+  const formIsValid = (formData: any) => {
+    const { pmid, pmcid, title, text } = formData;
+    if ((pmid || pmcid) && title && text) {
+      return true;
+    }
+    return false;
+  };
+
   const customUiSchema: UiSchema = {
     ...uiSchema,
     "ui:submitButtonOptions": {
       submitText: "Done",
       norender: false,
       props: {
-        disabled: true,
+        disabled: false,
         fullWidth: true,
       },
     },
@@ -79,6 +87,7 @@ const SentenceForm = (props: any) => {
         uiSchema={customUiSchema}
         uiFields={uiFields}
         enableAutoSave={true}
+        formIsValid={format === "create" && formIsValid}
         {...props}
       />
     </Box>

@@ -23,6 +23,7 @@ export const FormBase = (props: any) => {
     disabled = false,
     clearOnSave = false,
     action,
+    formIsValid,
     sx,
   } = props;
   const [localData, setLocalData] = useState<any>(data);
@@ -68,18 +69,21 @@ export const FormBase = (props: any) => {
     }
   };
 
-  const disableSubmitButton = (toggle: boolean) => {
+  const toggleSubmitButton = (disable: boolean) => {
     setCustomUiSchema({
       ...customUiSchema,
       "ui:submitButtonOptions": {
         ...customUiSchema["ui:submitButtonOptions"],
         props: {
           ...customUiSchema["ui:submitButtonOptions"].props,
-          disabled: toggle,
+          disabled: disable,
         },
       },
     });
   };
+
+  const enableSubmitButton = () => toggleSubmitButton(false);
+  const disableSubmitButton = () => toggleSubmitButton(true);
 
   const handleSubmit = async (event: IChangeEvent) => {
     const formData = { ...event.formData, ...extraData };
@@ -108,16 +112,15 @@ export const FormBase = (props: any) => {
   };
 
   const handleUpdate = async (event: IChangeEvent) => {
-    const { pmid, pmcid, title, text } = event.formData;
     const formData = { ...event.formData, ...extraData };
     setLocalData(formData);
-    if ((pmid || pmcid) && title && text) {
-      disableSubmitButton(false);
+    if (formIsValid && !formIsValid(formData)) {
+      disableSubmitButton();
     } else {
-      disableSubmitButton(true);
-    }
-    if (enableAutoSave) {
-      return triggerAutoSave();
+      enableSubmitButton();
+      if (enableAutoSave) {
+        return triggerAutoSave();
+      }
     }
   };
 
