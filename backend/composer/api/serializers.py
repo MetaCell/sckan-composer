@@ -133,10 +133,11 @@ class TagSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
 
 class SpecieSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
     """Specie"""
+    ontology_uri = serializers.CharField(required=False, allow_null=True)
 
     class Meta:
         model = Specie
-        fields = ("id", "name", "ontology_uri")
+        fields = ("id", "name", "ontology_uri",)
 
 
 class BiologicalSexSerializer(serializers.ModelSerializer):
@@ -166,15 +167,15 @@ class DoiSerializer(serializers.ModelSerializer):
     """Doi"""
 
     doi = serializers.CharField(required=True)
-
-    # connectivity_statement_id = serializers.IntegerField(required=True)
+    connectivity_statement_id = serializers.IntegerField(required=True)
 
     class Meta:
         model = Doi
         fields = (
             "id",
             "doi",
-        )  # , "connectivity_statement_id")
+            "connectivity_statement_id"
+        )
 
 
 class SentenceConnectivityStatement(serializers.ModelSerializer):
@@ -282,8 +283,8 @@ class ConnectivityStatementSerializer(
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
     origin_id = serializers.IntegerField(required=False)
     destination_id = serializers.IntegerField(required=False)
-    ans_division_id = serializers.IntegerField()
-    biological_sex_id = serializers.IntegerField()
+    ans_division_id = serializers.IntegerField(required=False)
+    biological_sex_id = serializers.IntegerField(required=False)
     tags = TagSerializer(many=True, read_only=True)
     species = SpecieSerializer(many=True, read_only=False)
     dois = DoiSerializer(source="doi_set", many=True, read_only=False)

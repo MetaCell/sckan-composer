@@ -409,11 +409,16 @@ paths:
       responses:
         '204':
           description: No response body
-  /api/composer/connectivity-statement/{id}/add_dois/:
+  /api/composer/connectivity-statement/{id}/add_doi/{doi}/:
     post:
-      operationId: composer_connectivity_statement_add_dois_create
+      operationId: composer_connectivity_statement_add_doi_create
       description: ConnectivityStatement
       parameters:
+      - in: path
+        name: doi
+        schema:
+          type: string
+        required: true
       - in: path
         name: id
         schema:
@@ -422,24 +427,6 @@ paths:
         required: true
       tags:
       - composer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/Doi'
-          application/x-www-form-urlencoded:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/Doi'
-          multipart/form-data:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/Doi'
-        required: true
       security:
       - tokenAuth: []
       - basicAuth: []
@@ -509,13 +496,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConnectivityStatement'
           description: ''
-  /api/composer/connectivity-statement/{id}/del_doi/{doi}/:
-    post:
-      operationId: composer_connectivity_statement_del_doi_create
+  /api/composer/connectivity-statement/{id}/del_doi/{doi_id}/:
+    delete:
+      operationId: composer_connectivity_statement_del_doi_destroy
       description: ConnectivityStatement
       parameters:
       - in: path
-        name: doi
+        name: doi_id
         schema:
           type: integer
         required: true
@@ -532,12 +519,8 @@ paths:
       - basicAuth: []
       - cookieAuth: []
       responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConnectivityStatement'
-          description: ''
+        '204':
+          description: No response body
   /api/composer/connectivity-statement/{id}/del_specie/{specie_id}/:
     post:
       operationId: composer_connectivity_statement_del_specie_create
@@ -1691,10 +1674,8 @@ components:
           readOnly: true
       required:
       - ans_division
-      - ans_division_id
       - available_transitions
       - biological_sex
-      - biological_sex_id
       - destination
       - dois
       - has_notes
@@ -1738,7 +1719,10 @@ components:
           readOnly: true
         doi:
           type: string
+        connectivity_statement_id:
+          type: integer
       required:
+      - connectivity_statement_id
       - doi
       - id
     LateralityEnum:

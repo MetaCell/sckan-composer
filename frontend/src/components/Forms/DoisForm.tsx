@@ -9,7 +9,7 @@ import Box from "@mui/material/Box";
 
 
 const DoisForm = (props: any) => {
-  const { doisData, extraData } = props
+  const { doisData: doiData } = props
 
   const { schema, uiSchema } = jsonSchemas.getDoiSchema()
 
@@ -26,12 +26,16 @@ const DoisForm = (props: any) => {
     doi: {
       "ui:widget": ChipsInput,
       "ui:options": {
-        data: doisData?.map((row: Doi) => ({ id: row.id, label: row.doi })),
+        data: doiData?.map((row: Doi) => ({id: row.id, label: row.doi})),
         placeholder: 'Enter DOIs (Press Enter to add a DOI)',
       }
     },
   };
 
+  const data = {
+    id: 1,
+    doi: doiData
+  }
 
   return (
     <Box sx={{

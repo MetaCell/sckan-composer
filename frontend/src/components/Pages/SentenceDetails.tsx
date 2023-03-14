@@ -201,11 +201,16 @@ const SentencesDetails = () => {
                               boxShadow: 'none'
                             }}>
                               <CustomTextArea onChange={(e: any) => onChangeKnowledgeStatement(e, key)} options={{rows: 4}} defaultValue={statement.knowledge_statement} />
-                              <DoisForm
-                                doisData={statement?.dois}
-                                setter={setSentence}
-                                extraData={{id: statement?.id}}
-                              />
+                              {
+                                connectivityStatements?.doi.map((doi, key) =>
+                                  <Doi
+                                    doisData={[{"doi":doi}]}
+                                    extraData={{statement_id: statement.id}}
+                                    setter={setSentence}
+                                  />
+                                )
+                              }
+                              <DoiForm></DoiForm>
                               <Accordion expanded={expanded === `panel-${key}`} onChange={handleChange(`panel-${key}`)}>
                                 <AccordionSummary
                                   expandIcon={<ExpandMoreIcon />}
