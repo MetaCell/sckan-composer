@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { ConnectivityStatement } from "../../apiclient/backend";
-import { useAppSelector } from "../../redux/hooks";
-import connectivityStatementService from "../../services/StatementService";
-import EntityDataGrid from "../EntityDataGrid";
-import DataGridHeader from "../DataGridHeader";
-import Header from "../Header";
-import { useGutters } from "../../styles/styles";
+import { ConnectivityStatement } from "../apiclient/backend";
+import { useAppSelector } from "../redux/hooks";
+import connectivityStatementService from "../services/StatementService";
+import EntityDataGrid from "../components/EntityDataGrid";
+import DataGridHeader from "../components/DataGridHeader";
+import Header from "../components/Header";
+import { useGutters } from "../styles/styles";
 import { Typography } from "@mui/material";
 
 const StatementList = () => {

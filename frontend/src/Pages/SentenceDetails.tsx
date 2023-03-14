@@ -5,27 +5,27 @@ import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import { useParams } from "react-router-dom";
-import sentenceService from "../../services/SentenceService";
-import NoteForm from "../Forms/NoteForm";
-import TagForm from "../Forms/TagForm";
-import {ConnectivityStatement, Sentence, SentenceConnectivityStatement} from "../../apiclient/backend";
-import { userProfile } from "../../services/UserService";
-import CheckDuplicates from "../CheckForDuplicates/CheckDuplicatesDialog";
-import {SentenceStateChip} from "../Widgets/StateChip";
-import {SentenceLabels, formatDate, formatTime} from "../../helpers/helpers";
+import sentenceService from "../services/SentenceService";
+import NoteForm from "../components/Forms/NoteForm";
+import TagForm from "../components/Forms/TagForm";
+import { Sentence, SentenceConnectivityStatement} from "../apiclient/backend";
+import { userProfile } from "../services/UserService";
+import CheckDuplicates from "../components/CheckForDuplicates/CheckDuplicatesDialog";
+import {SentenceStateChip} from "../components/Widgets/StateChip";
+import {SentenceLabels, formatDate, formatTime} from "../helpers/helpers";
 import Stack from "@mui/material/Stack";
-import GroupedButtons from "../Widgets/CustomGroupedButtons";
-import StatementForm from "../Forms/StatementForm";
-import DoisForm from "../Forms/DoisForm";
+import GroupedButtons from "../components/Widgets/CustomGroupedButtons";
+import StatementForm from "../components/Forms/StatementForm";
+import DoisForm from "../components/Forms/DoisForm";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import SentenceForm from '../Forms/SentenceForm'
-import SpeciesForm from "../Forms/SpeciesForm";
+import SentenceForm from '../components/Forms/SentenceForm'
+import SpeciesForm from "../components/Forms/SpeciesForm";
 import Divider from "@mui/material/Divider";
 import {Accordion, AccordionDetails, AccordionSummary, styled} from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import CustomTextArea from "../Widgets/CustomTextArea";
-import statementService from "../../services/StatementService";
-import { vars } from "../../theme/variables";
+import CustomTextArea from "../components/Widgets/CustomTextArea";
+import statementService from "../services/StatementService";
+import { vars } from "../theme/variables";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 const initialConnectivityStatement = {knowledge_statement: "", biological_sex: null, ans_division: null, species: [] , dois: []}
@@ -201,16 +201,11 @@ const SentencesDetails = () => {
                               boxShadow: 'none'
                             }}>
                               <CustomTextArea onChange={(e: any) => onChangeKnowledgeStatement(e, key)} options={{rows: 4}} defaultValue={statement.knowledge_statement} />
-                              {
-                                connectivityStatements?.doi.map((doi, key) =>
-                                  <Doi
-                                    doisData={[{"doi":doi}]}
-                                    extraData={{statement_id: statement.id}}
-                                    setter={setSentence}
-                                  />
-                                )
-                              }
-                              <DoiForm></DoiForm>
+                              <DoisForm
+                                doisData={statement?.dois}
+                                setter={setSentence}
+                                extraData={{id: statement?.id}}
+                              />
                               <Accordion expanded={expanded === `panel-${key}`} onChange={handleChange(`panel-${key}`)}>
                                 <AccordionSummary
                                   expandIcon={<ExpandMoreIcon />}

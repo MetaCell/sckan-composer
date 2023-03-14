@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { useAppSelector } from "../../redux/hooks";
+import { useAppSelector } from "../redux/hooks";
 import Box from "@mui/material/Box";
 import AddIcon from "@mui/icons-material/Add";
-import { useGutters } from "../../styles/styles";
-import Header from "../Header";
-import { Sentence } from "../../apiclient/backend";
-import sentenceService from "../../services/SentenceService";
-import EntityDataGrid from "../EntityDataGrid";
-import DataGridHeader from "../DataGridHeader";
+import { useGutters } from "../styles/styles";
+import Header from "../components/Header";
+import { Sentence } from "../apiclient/backend";
+import sentenceService from "../services/SentenceService";
+import EntityDataGrid from "../components/EntityDataGrid";
+import DataGridHeader from "../components/DataGridHeader";
 
 const SentenceList = () => {
   const [sentenceList, setSentenceList] = useState<Sentence[]>();

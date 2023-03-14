@@ -17,6 +17,10 @@ import MessageIcon from '@mui/icons-material/Message';
 import Typography from "@mui/material/Typography";
 import {Note} from "../../apiclient/backend";
 import {timeAgo} from "../../helpers/helpers";
+import {useDispatch, useSelector} from "react-redux";
+import {setCount} from "../../redux/notesSlice";
+import {useAppSelector} from "../../redux/hooks";
+import {RootState} from "../../redux/store";
 
 const TimeLineIcon = () => {
   return <Box sx={{
@@ -33,16 +37,16 @@ const TimeLineIcon = () => {
   </Box>
 }
 const NoteForm = (props: any) => {
+  const dispatch = useDispatch()
   const { setter, extraData } = props
   const { schema, uiSchema } = jsonSchemas.getNoteSchema()
   const [data, setData] = useState({})
-  const [noteList, setNoteList] = useState([])
+  const [noteList, setNoteList] = useState<Note[]>([])
 
   const clearNoteForm = (newData: any) => {
     setData({})
     setter(newData)
   }
-
   // TODO: set up the widgets for the schema
   const uiFields = ["note",]
   const customSchema = {
@@ -63,12 +67,17 @@ const NoteForm = (props: any) => {
 
   useEffect(() => {
     if (extraData?.sentence_id) {
-      noteService.getNotesList(undefined, extraData?.sentence_id).then(result => {
+      noteService.getNotesList(undefined,undefined, undefined, extraData?.sentence_id).then(result => {
         setNoteList(result?.results)
+        dispatch({
+          type: 'notes/setCount',
+          payload: {
+            count: result?.count
+          }
+        });
       })
     }
   }, [extraData?.sentence_id])
-
 
   return (
     <Box display='flex' flexDirection='column' >
@@ -89,12 +98,12 @@ const NoteForm = (props: any) => {
         <FormBase
           data={data}
           service={noteService}
-          setter={clearNoteForm}
           schema={customSchema}
           uiSchema={customUiSchema}
           uiFields={uiFields}
           enableAutoSave={false}
           clearOnSave={true}
+          setter={setter}
           {...props}
         >
           <Button
