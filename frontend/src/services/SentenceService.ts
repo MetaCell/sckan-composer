@@ -6,7 +6,12 @@ import { QueryParams } from "../redux/sentenceSlice";
 
 class SentenceService extends AbstractService {
   async save(sentence: Sentence) {
-    return composerApi.composerSentenceUpdate(sentence.id, sentence).then((response: any) => response.data)
+    if (!sentence.id) {
+      return composerApi.composerSentenceCreate(sentence).then((response: any) => response.data)
+    }
+    else {
+      return composerApi.composerSentenceUpdate(sentence.id, sentence).then((response: any) => response.data)
+    }
   }
   async getObject(id: string): Promise<Sentence> {
     return composerApi.composerSentenceRetrieve(Number(id)).then((response: any) => response.data)
@@ -23,9 +28,6 @@ class SentenceService extends AbstractService {
   async getList(queryOptions: QueryParams): Promise<PaginatedSentenceList> {
     const { limit, ordering, index, title, stateFilter, tagFilter } = queryOptions
     return composerApi.composerSentenceList(limit, undefined, index, ordering, stateFilter, tagFilter, title).then((res: any) => res.data)
-  }
-  async post(sentence: Sentence) {
-    return composerApi.composerSentenceCreate(sentence).then((response: any) => response.data)
   }
 }
 

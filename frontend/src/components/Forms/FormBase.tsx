@@ -81,13 +81,16 @@ export const FormBase = (props: any) => {
     });
   };
 
-  const sendRequest = (serviceMethod: any, formData: any) => {
-    serviceMethod(formData)
+  const handleSubmit = async (event: IChangeEvent) => {
+    const formData = { ...event.formData, ...extraData };
+    setIsSaving(true);
+    setLocalData(formData);
+    service
+      .save(formData)
       .then((newData: any) => {
         setter && setter(newData);
         // todo: improve UI feedback
-        if (serviceMethod === service.post) {
-          alert("The sentence has been saved");
+        if (action) {
           action();
         }
         log("Saved");
@@ -102,15 +105,6 @@ export const FormBase = (props: any) => {
           setLocalData({});
         }
       });
-  };
-
-  const handleSubmit = async (event: IChangeEvent) => {
-    const formData = { ...event.formData, ...extraData };
-    setIsSaving(true);
-    setLocalData(formData);
-    !formData.id
-      ? sendRequest(service.post, formData)
-      : sendRequest(service.save, formData);
   };
 
   const handleUpdate = async (event: IChangeEvent) => {
