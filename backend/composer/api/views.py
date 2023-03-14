@@ -1,6 +1,6 @@
 import json
 
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from drf_react_template.schema_form_encoder import SchemaProcessor, UiSchemaProcessor
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -93,24 +93,30 @@ class DoiMixin(
     viewsets.GenericViewSet,
 ):
     @extend_schema(
-        parameters=None,
-        request=DoiSerializer(many=True),
-    )
-    @action(detail=True, methods=["post"])
-    def add_dois(self, request, pk=None):
-        instance = self.get_object()
-        for entry in request.data:
-            doi = entry['doi']
-            _, _ = Doi.objects.get_or_create(
-                connectivity_statement=instance,
-                doi=doi,
+        parameters=[
+            OpenApiParameter(
+                "doi",
+                OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                required=True,
             )
+        ],
+        request=None,
+    )
+    @action(detail=True, methods=["post"], url_path="add_doi/(?P<doi>.*)")
+    def add_doi(self, request, pk=None, doi=None):
+        doi_instance, created = Doi.objects.get_or_create(
+            connectivity_statement_id=pk,
+            doi=doi,
+        )
+        doi_instance.save()
+        instance = self.get_object()
         return Response(self.get_serializer(instance).data)
 
     @extend_schema(
         parameters=[
             OpenApiParameter(
-                "doi",
+                "doi_id",
                 OpenApiTypes.INT,
                 location=OpenApiParameter.PATH,
                 required=True,
@@ -118,14 +124,12 @@ class DoiMixin(
         ],
         request=None,
     )
-    @action(detail=True, methods=["post"], url_path="del_doi/(?P<doi>\w+)")
-    def del_doi(self, request, pk=None, doi=None):
+    @action(detail=True, methods=["delete"], url_path="del_doi/(?P<doi_id>\d+)")
+    def del_doi(self, request, pk=None, doi_id=None):
+        count, deleted = Doi.objects.filter(id=doi_id, connectivity_statement_id=pk).delete()
+        if count == 0:
+            raise Http404
         instance = self.get_object()
-        doi_instance = Doi.objects.get(connectivity_statement=instance.id,
-                                       doi=doi
-                                       )
-        if doi_instance:
-            doi_instance.delete()
         return Response(self.get_serializer(instance).data)
 
 
@@ -272,7 +276,7 @@ class ConnectivityStatementViewSet(DoiMixin, SpecieMixin, TagMixin, TransitionMi
     service = ConnectivityStatementService
 
     def get_queryset(self):
-        if self.action == "list" and "sentence_id" in self.request.query_params:
+        if (self.action == "list" and "sentence_id" in self.request.query_params) or (self.action == "delete"):
             return super().get_queryset()
         return ConnectivityStatement.objects.excluding_draft()
 
