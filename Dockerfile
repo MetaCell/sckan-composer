@@ -14,7 +14,7 @@ COPY frontend/package-lock.json ${APP_DIR}
 RUN npm ci
 
 COPY frontend ${APP_DIR}
-RUN npm run build
+#RUN npm run build
 
 ####
 FROM ${PARENT}
@@ -41,7 +41,7 @@ RUN ontutils set ontology-local-repo ./NIF-Ontology/
 COPY backend ${APP_DIR}
 RUN python3 manage.py collectstatic --noinput
 
-COPY --from=frontend /app/build/* ${APP_DIR}/static/
+##COPY --from=frontend /app/build/* ${APP_DIR}/static/
 
 EXPOSE ${PORT}
 COPY scripts/runserver.sh /usr/local/bin

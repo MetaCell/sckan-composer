@@ -55,6 +55,15 @@ const StatementForm = (props: any) => {
     },
     value: statement?.ans_division_id ?? ""
   }
+  copiedUISchema.knowledge_statement = {
+    "ui:widget": "CustomTextArea",
+      "ui:options": {
+      label: 'Knowledge Statement',
+        placeholder: "Knowledge Statement",
+        rows: 4
+    },
+    value: statement?.knowledge_statement ?? ""
+  }
 
   const widgets = {
     CustomSingleSelect,

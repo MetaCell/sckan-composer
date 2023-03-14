@@ -276,7 +276,7 @@ class ConnectivityStatementViewSet(DoiMixin, SpecieMixin, TagMixin, TransitionMi
     service = ConnectivityStatementService
 
     def get_queryset(self):
-        if (self.action == "list" and "sentence_id" in self.request.query_params) or (self.action == "delete"):
+        if (self.action == "list" and "sentence_id" in self.request.query_params) or (self.action == "destroy"):
             return super().get_queryset()
         return ConnectivityStatement.objects.excluding_draft()
 

@@ -17,10 +17,7 @@ import MessageIcon from '@mui/icons-material/Message';
 import Typography from "@mui/material/Typography";
 import {Note} from "../../apiclient/backend";
 import {timeAgo} from "../../helpers/helpers";
-import {useDispatch, useSelector} from "react-redux";
-import {setCount} from "../../redux/notesSlice";
-import {useAppSelector} from "../../redux/hooks";
-import {RootState} from "../../redux/store";
+import {useDispatch} from "react-redux";
 
 const TimeLineIcon = () => {
   return <Box sx={{

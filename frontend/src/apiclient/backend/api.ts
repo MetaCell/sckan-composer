@@ -13,13 +13,15 @@
  */
 
 
-import { Configuration } from './configuration';
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { Configuration } from './configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
  * Anatomical Entity
@@ -277,6 +279,8 @@ export interface ConnectivityStatement {
      */
     'has_notes': boolean;
 }
+
+
 /**
  * 
  * @export
@@ -890,6 +894,8 @@ export interface PatchedConnectivityStatement {
      */
     'has_notes'?: boolean;
 }
+
+
 /**
  * Note
  * @export
@@ -1357,7 +1363,7 @@ export interface Specie {
      * @type {string}
      * @memberof Specie
      */
-    'ontology_uri': string;
+    'ontology_uri'?: string | null;
 }
 /**
  * Note Tag
@@ -1478,10 +1484,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -1532,10 +1538,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1572,10 +1578,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -1622,10 +1628,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1662,10 +1668,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -1712,10 +1718,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1758,10 +1764,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1804,10 +1810,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1850,10 +1856,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1891,10 +1897,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1940,10 +1946,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1986,10 +1992,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2032,10 +2038,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2074,10 +2080,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2123,10 +2129,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2174,10 +2180,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (destination !== undefined) {
                 localVarQueryParameter['destination'] = destination;
@@ -2257,10 +2263,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2302,10 +2308,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2347,10 +2353,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2388,10 +2394,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2429,10 +2435,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2474,10 +2480,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2516,10 +2522,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (connectivityStatementId !== undefined) {
                 localVarQueryParameter['connectivity_statement_id'] = connectivityStatementId;
@@ -2575,10 +2581,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2620,10 +2626,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2660,10 +2666,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -2710,10 +2716,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2755,10 +2761,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2796,10 +2802,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2842,10 +2848,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2883,10 +2889,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2932,10 +2938,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2981,10 +2987,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3029,10 +3035,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -3100,10 +3106,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3145,10 +3151,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3190,10 +3196,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3234,10 +3240,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -3288,10 +3294,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3328,10 +3334,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -3378,10 +3384,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3419,10 +3425,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3464,10 +3470,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3505,10 +3511,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (connectivityStatementId !== undefined) {
                 localVarQueryParameter['connectivity_statement_id'] = connectivityStatementId;
@@ -3560,10 +3566,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3605,10 +3611,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3650,10 +3656,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -5277,10 +5283,10 @@ export const MetacellAuthApiAxiosParamCreator = function (configuration?: Config
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -5315,10 +5321,10 @@ export const MetacellAuthApiAxiosParamCreator = function (configuration?: Config
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     

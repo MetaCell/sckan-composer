@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 import sentenceService from "../services/SentenceService";
 import NoteForm from "../components/Forms/NoteForm";
 import TagForm from "../components/Forms/TagForm";
-import { Sentence, SentenceConnectivityStatement} from "../apiclient/backend";
+import {Doi, Sentence, SentenceConnectivityStatement} from "../apiclient/backend";
 import { userProfile } from "../services/UserService";
 import CheckDuplicates from "../components/CheckForDuplicates/CheckDuplicatesDialog";
 import {SentenceStateChip} from "../components/Widgets/StateChip";
@@ -56,6 +56,7 @@ const SentencesDetails = () => {
   const [expanded, setExpanded] = React.useState<string | false>('panel-0');
   const [divisionList,setDivisionList] = useState([])
   const [biologicalSex,setBiologicalSexList] = useState([])
+  const [refetch, setRefetch] = useState(false)
 
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
@@ -77,11 +78,6 @@ const SentencesDetails = () => {
     setConnectivityStatements([...connectivityStatements, initialConnectivityStatement]);
   }
 
-  const onChangeKnowledgeStatement = (e: any, key: number) => {
-    connectivityStatements[key].knowledge_statement = e
-    setConnectivityStatements(connectivityStatements)
-  }
-
   const handleMenuItemClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
     index: number,
@@ -91,7 +87,7 @@ const SentencesDetails = () => {
   };
 
   const onDeleteStatement = (id: number) => {
-    statementService.remove(id)
+    statementService.remove(id).then(() => setRefetch(true))
   }
 
   useEffect(() => {
@@ -119,10 +115,11 @@ const SentencesDetails = () => {
           }
         })
         .finally(() => {
+          setRefetch(false)
           setLoading(false);
         });
     }
-  }, [sentenceId]);
+  }, [sentenceId, refetch]);
 
   useEffect(() => {
     statementService.getANSDivisionList().then((result) => {
@@ -200,11 +197,20 @@ const SentencesDetails = () => {
                               border: 0,
                               boxShadow: 'none'
                             }}>
-                              <CustomTextArea onChange={(e: any) => onChangeKnowledgeStatement(e, key)} options={{rows: 4}} defaultValue={statement.knowledge_statement} />
-                              <DoisForm
-                                doisData={statement?.dois}
+                              <StatementForm
+                                divisionList={divisionList}
+                                biologicalSex={biologicalSex}
+                                statement={statement}
+                                format="small"
                                 setter={setSentence}
-                                extraData={{id: statement?.id}}
+                                extraData={{sentence_id: sentence.id}}
+                                uiFields={["knowledge_statement"]}
+                              />
+                              <DoisForm
+                                key={key}
+                                doisData={statement.dois}
+                                extraData={{connectivity_statement_id: statement.id}}
+                                setter={setSentence}
                               />
                               <Accordion expanded={expanded === `panel-${key}`} onChange={handleChange(`panel-${key}`)}>
                                 <AccordionSummary

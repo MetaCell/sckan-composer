@@ -5,7 +5,7 @@ import {useDebouncedCallback} from "use-debounce";
 import {EDIT_DEBOUNCE} from "../../settings";
 
 
-export default function TextArea({defaultValue, placeholder,onChange, options: { rows } }: any) {
+export default function TextArea({value, placeholder,onChange, options: { rows } }: any) {
 
   const debouncedChangeHandler = useDebouncedCallback(
     (event) => onChange(event.target.value),
@@ -15,7 +15,7 @@ export default function TextArea({defaultValue, placeholder,onChange, options: {
   return (
     <FormControl variant="standard">
     <TextField
-      defaultValue={defaultValue}
+      defaultValue={value}
       multiline
       rows={rows}
       placeholder={placeholder}

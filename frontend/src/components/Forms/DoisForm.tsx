@@ -2,39 +2,35 @@ import React from 'react'
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
 import doiService from '../../services/DoisService'
-import {UiSchema} from "@rjsf/utils";
 import {ChipsInput} from "../Widgets/ChipsInput";
-import {Doi, Tag} from "../../apiclient/backend";
+import {Doi} from "../../apiclient/backend";
 import Box from "@mui/material/Box";
 
 
 const DoisForm = (props: any) => {
-  const { doisData: doiData } = props
+  const { doisData: doiData, extraData } = props
 
   const { schema, uiSchema } = jsonSchemas.getDoiSchema()
+  const copiedSchema = JSON.parse(JSON.stringify(schema));
+  const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
 
   // TODO: set up the widgets for the schema
-  const uiFields = ["doi",]
+  copiedSchema.title = ""
 
-  const customSchema = {
-    ...schema,
-    "title": ""
+  copiedUISchema.doi = {
+    "ui:widget": ChipsInput,
+    "ui:options": {
+      data: doiData?.map((row: Doi) => ({id: row.id, label: row.doi})),
+      placeholder: 'Enter DOIs (Press Enter to add a DOI)',
+    }
+  }
+  copiedUISchema.connectivity_statement_id = {
+    "ui:widget": 'hidden',
   }
 
-  const customUiSchema: UiSchema = {
-    ...uiSchema,
-    doi: {
-      "ui:widget": ChipsInput,
-      "ui:options": {
-        data: doiData?.map((row: Doi) => ({id: row.id, label: row.doi})),
-        placeholder: 'Enter DOIs (Press Enter to add a DOI)',
-      }
-    },
-  };
-
-  const data = {
-    id: 1,
-    doi: doiData
+  copiedSchema.properties.connectivity_statement_id = {
+    ...copiedSchema.properties.connectivity_statement_id,
+    default: extraData.connectivity_statement_id
   }
 
   return (
@@ -51,12 +47,12 @@ const DoisForm = (props: any) => {
     }}>
       <FormBase
         service={doiService}
-        schema={customSchema}
-        uiSchema={customUiSchema}
-        uiFields={uiFields}
+        schema={copiedSchema}
+        uiSchema={copiedUISchema}
         enableAutoSave={false}
         clearOnSave={true}
         children={true}
+        extraData={extraData}
       />
     </Box>
   )
