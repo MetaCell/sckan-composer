@@ -287,7 +287,6 @@ const SentencesDetails = () => {
               <Divider sx={{margin: '36px 0'}} />
               <NoteForm
                 extraData={{ sentence_id: sentence.id }}
-                setter={setSentence}
               />
             </Paper>
           </Grid>

@@ -35,14 +35,15 @@ const TimeLineIcon = () => {
 }
 const NoteForm = (props: any) => {
   const dispatch = useDispatch()
-  const { setter, extraData } = props
+  const { extraData } = props
   const { schema, uiSchema } = jsonSchemas.getNoteSchema()
   const [data, setData] = useState({})
   const [noteList, setNoteList] = useState<Note[]>([])
+  const [refresh, setRefresh] = useState(false)
 
   const clearNoteForm = (newData: any) => {
     setData({})
-    setter(newData)
+    setRefresh(true)
   }
   // TODO: set up the widgets for the schema
   const uiFields = ["note",]
@@ -66,15 +67,9 @@ const NoteForm = (props: any) => {
     if (extraData?.sentence_id) {
       noteService.getNotesList(undefined,undefined, undefined, extraData?.sentence_id).then(result => {
         setNoteList(result?.results)
-        dispatch({
-          type: 'notes/setCount',
-          payload: {
-            count: result?.count
-          }
-        });
       })
     }
-  }, [extraData?.sentence_id])
+  }, [extraData?.sentence_id, refresh])
 
   return (
     <Box display='flex' flexDirection='column' >
@@ -93,6 +88,7 @@ const NoteForm = (props: any) => {
         }
       }}>
         <FormBase
+          {...props}
           data={data}
           service={noteService}
           schema={customSchema}
@@ -100,8 +96,7 @@ const NoteForm = (props: any) => {
           uiFields={uiFields}
           enableAutoSave={false}
           clearOnSave={true}
-          setter={setter}
-          {...props}
+          setter={clearNoteForm}
         >
           <Button
             type="submit"
