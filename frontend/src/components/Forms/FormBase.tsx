@@ -47,6 +47,8 @@ export const FormBase = (props: any) => {
   //as it was mutating the original object at the jsonschema singleton
 
   useEffect(() => {
+    setCustomSchema(schema)
+    setCustomUiSchema(uiSchema)
     if (uiFields) {
       Object.entries(uiSchema).forEach((p) => {
         if (!p[0].startsWith("ui:") && !uiFields.includes(p[0])) {
@@ -60,7 +62,7 @@ export const FormBase = (props: any) => {
         }
       });
     }
-  }, []);
+  }, [data]);
 
   const onError = (errors: any) => {
     log("errors");
