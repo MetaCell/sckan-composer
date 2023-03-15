@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from 'react';
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
 import {Box, Stack, styled} from "@mui/material";
@@ -22,6 +22,7 @@ const StyledInput = styled(TextField)(({ theme }) => ({
 }));
 
 export const ChipsInput = ({onChange,placeholder, options: { data, removeChip, label }}: any) => {
+
   const handleDelete = (id: number) => {
     removeChip(id)
   }

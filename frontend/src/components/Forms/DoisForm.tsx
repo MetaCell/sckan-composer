@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
 import doiService from '../../services/DoisService'
+import connectivityStatementService from "../../services/StatementService";
 import {ChipsInput} from "../Widgets/ChipsInput";
 import {Doi} from "../../apiclient/backend";
 import Box from "@mui/material/Box";
@@ -9,11 +10,23 @@ import { setTextRange } from 'typescript';
 
 
 const DoisForm = (props: any) => {
-  const { doisData: doiData, extraData, setter } = props
+  const { extraData } = props
+
+  const [chipsData, setChipsData] = useState([])
+  const [refetch, setRefetch] = useState(true)
 
   const { schema, uiSchema } = jsonSchemas.getDoiSchema()
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
+
+  useEffect(() => {
+    if(refetch) {
+      connectivityStatementService.getObject(extraData.connectivity_statement_id).then((response: any) => {
+        setChipsData(response.dois)
+        setRefetch(false)
+      })
+    }
+  }, [extraData, refetch])
 
   // TODO: set up the widgets for the schema
   copiedSchema.title = ""
@@ -21,11 +34,11 @@ const DoisForm = (props: any) => {
   copiedUISchema.doi = {
     "ui:widget": ChipsInput,
     "ui:options": {
-      data: doiData?.map((row: Doi) => ({id: row.id, label: row.doi})),
+      data: chipsData?.map((row: Doi) => ({id: row.id, label: row.doi})),
       placeholder: 'Enter DOIs (Press Enter to add a DOI)',
       removeChip: function(doiId: any) {
         doiService.delete(doiId, extraData.connectivity_statement_id)
-        setter()
+        setChipsData(chipsData.filter((row: Doi) => row.id !== doiId))
       },
     }
   }
@@ -58,7 +71,7 @@ const DoisForm = (props: any) => {
         clearOnSave={true}
         children={true}
         extraData={extraData}
-        {...props}
+        setter={() => setRefetch(true)}
       />
     </Box>
   )
