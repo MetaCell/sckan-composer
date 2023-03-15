@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
 import doiService from '../../services/DoisService'
-import connectivityStatementService from "../../services/StatementService";
 import {ChipsInput} from "../Widgets/ChipsInput";
 import {Doi} from "../../apiclient/backend";
 import Box from "@mui/material/Box";
@@ -10,23 +9,15 @@ import { setTextRange } from 'typescript';
 
 
 const DoisForm = (props: any) => {
-  const { extraData } = props
-
-  const [chipsData, setChipsData] = useState([])
-  const [refetch, setRefetch] = useState(true)
+  const { doisData, setter, extraData } = props
 
   const { schema, uiSchema } = jsonSchemas.getDoiSchema()
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
 
-  useEffect(() => {
-    if(refetch) {
-      connectivityStatementService.getObject(extraData.connectivity_statement_id).then((response: any) => {
-        setChipsData(response.dois)
-        setRefetch(false)
-      })
-    }
-  }, [extraData, refetch])
+  const refresh = () => {
+    setter({refresh: true})
+  }
 
   // TODO: set up the widgets for the schema
   copiedSchema.title = ""
@@ -34,11 +25,11 @@ const DoisForm = (props: any) => {
   copiedUISchema.doi = {
     "ui:widget": ChipsInput,
     "ui:options": {
-      data: chipsData?.map((row: Doi) => ({id: row.id, label: row.doi})),
+      data: doisData?.map((row: Doi) => ({id: row.id, label: row.doi})),
       placeholder: 'Enter DOIs (Press Enter to add a DOI)',
       removeChip: function(doiId: any) {
         doiService.delete(doiId, extraData.connectivity_statement_id)
-        setChipsData(chipsData.filter((row: Doi) => row.id !== doiId))
+        refresh()
       },
     }
   }
@@ -71,7 +62,7 @@ const DoisForm = (props: any) => {
         clearOnSave={true}
         children={true}
         extraData={extraData}
-        setter={() => setRefetch(true)}
+        {...props}
       />
     </Box>
   )
