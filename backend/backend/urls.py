@@ -24,7 +24,6 @@ from drf_spectacular.views import (
 )
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
     # API browser
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
@@ -45,6 +44,8 @@ urlpatterns = [
     # path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # Social auth
     path("", include("social_django.urls", namespace="social")),
+    # admin
+    path("admin/", admin.site.urls),
 ]
 
 if not settings.PRODUCTION:
