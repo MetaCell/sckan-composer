@@ -90,6 +90,10 @@ const SentencesDetails = () => {
     statementService.remove(id).then(() => setRefetch(true))
   }
 
+  const refreshSentence = () => {
+    setRefetch(true)
+  }
+
   useEffect(() => {
     if (sentenceId) {
       sentenceService
@@ -202,7 +206,7 @@ const SentencesDetails = () => {
                                 biologicalSex={biologicalSex}
                                 statement={statement}
                                 format="small"
-                                setter={setSentence}
+                                setter={refreshSentence}
                                 extraData={{sentence_id: sentence.id}}
                                 uiFields={["knowledge_statement"]}
                               />
@@ -210,7 +214,7 @@ const SentencesDetails = () => {
                                 key={key}
                                 doisData={statement.dois}
                                 extraData={{connectivity_statement_id: statement.id}}
-                                setter={setSentence}
+                                setter={refreshSentence}
                               />
                               <Accordion expanded={expanded === `panel-${key}`} onChange={handleChange(`panel-${key}`)}>
                                 <AccordionSummary

@@ -84,6 +84,7 @@ const StatementForm = (props: any) => {
       children={true}
       widgets={widgets}
       isUpdate={!!statement?.id}
+      {...props}
     />
   )
 }

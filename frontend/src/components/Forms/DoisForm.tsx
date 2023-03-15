@@ -53,6 +53,7 @@ const DoisForm = (props: any) => {
         clearOnSave={true}
         children={true}
         extraData={extraData}
+        {...props}
       />
     </Box>
   )
