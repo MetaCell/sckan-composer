@@ -42,6 +42,7 @@ const TagForm = (props: any) => {
   return (
     <FormBase
       {...props}
+      data={{}}
       service={tagService}
       schema={customSchema}
       uiSchema={customUiSchema}

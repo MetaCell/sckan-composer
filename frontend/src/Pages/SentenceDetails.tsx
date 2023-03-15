@@ -28,6 +28,7 @@ import statementService from "../services/StatementService";
 import { vars } from "../theme/variables";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import NoteDetails from "../components/Widgets/NotesFomList";
+import IconButton from "@mui/material/IconButton";
 
 const initialConnectivityStatement = {knowledge_statement: "", biological_sex: null, ans_division: null, species: [] , dois: []}
 const { bodyBgColor, darkBlue } = vars
@@ -249,10 +250,12 @@ const SentencesDetails = () => {
                           </Grid>
                           <Grid item xs={1} textAlign='center'>
                             {
-                              key !== 0 &&  <DeleteOutlineIcon
-                                onClick={() => onDeleteStatement(statement.id)}
-                                sx={{ cursor: 'pointer', color:'#98A2B3' }}
-                              />
+                              key !== 0 &&
+                              <IconButton disabled={!statement.id} onClick={() => onDeleteStatement(statement.id)}>
+                                <DeleteOutlineIcon
+                                  sx={{ color:'#98A2B3' }}
+                                />
+                              </IconButton>
                             }
                           </Grid>
                           </Grid>
