@@ -66,7 +66,7 @@ const StatementDetails = () => {
   }
 
   return (
-    <Grid p={12} container justifyContent="center">
+    <Grid p={12} container justifyContent="space-between">
       <Grid item xl={12}>
         <Paper elevation={0} sx={{ padding: 8 }}>
           <Stack alignItems="center" spacing={4}>

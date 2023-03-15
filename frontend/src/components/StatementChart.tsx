@@ -8,11 +8,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { Box } from "@mui/material";
 import SvgIcon from "@mui/material/SvgIcon";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Typography from "@mui/material/Typography";
 import { ConnectivityStatement } from "../apiclient/backend/api";
 import { chartHeight, chartWidth } from "../helpers/settings";
+import { useTheme } from "@mui/system";
 
 const ArrowDot = (props: any) => {
   const { cx, cy, stroke, payload, value } = props;
@@ -61,6 +63,7 @@ const NodeLabel = (props: any) => {
 
 const StatementChart = (props: { statement: ConnectivityStatement }) => {
   const { statement } = props;
+  const theme = useTheme();
   const [vias, setVias] = useState<any[]>([]);
   const displayChart =
     statement.origin && statement.destination && statement.path.length > 0;
@@ -105,33 +108,47 @@ const StatementChart = (props: { statement: ConnectivityStatement }) => {
     },
   ];
 
-  return displayChart ? (
-    <ResponsiveContainer width={chartWidth} height={chartHeight}>
-      <LineChart data={data} margin={{ right: 76, left: 76 }}>
-        <YAxis hide domain={[0, 2]} />
-        <XAxis hide />
-        <Line
-          type="monotone"
-          dataKey="node"
-          stroke="#98A2B3"
-          dot={{ r: 50, stroke: "#D0D5DD", strokeWidth: 1 }}
-        >
-          <LabelList
-            dataKey="label"
-            position="center"
-            content={<NodeLabel />}
-          />
-        </Line>
-        <Line type="monotone" dataKey="via" stroke="#98A2B3" dot={ArrowDot}>
-          <LabelList dataKey="label" position="insideBottomLeft" offset={20} />
-        </Line>
-      </LineChart>
-    </ResponsiveContainer>
-  ) : (
-    <Typography>
-      Add Origin, Destination and Via entities to visualize the statement
-      preview
-    </Typography>
+  return (
+    <Box
+      display="flex"
+      justifyContent="center"
+      sx={{ background: theme.palette.grey[100], borderRadius: 1 }}
+    >
+      {displayChart ? (
+        <ResponsiveContainer width={chartWidth} height={chartHeight}>
+          <LineChart data={data} margin={{ right: 76, left: 76 }}>
+            <YAxis hide domain={[0, 2]} />
+            <XAxis hide />
+            <Line
+              type="monotone"
+              dataKey="node"
+              stroke="#98A2B3"
+              dot={{ r: 50, stroke: "#D0D5DD", strokeWidth: 1 }}
+            >
+              <LabelList
+                dataKey="label"
+                position="center"
+                content={<NodeLabel />}
+              />
+            </Line>
+            <Line type="monotone" dataKey="via" stroke="#98A2B3" dot={ArrowDot}>
+              <LabelList
+                dataKey="label"
+                position="insideBottomLeft"
+                offset={20}
+              />
+            </Line>
+          </LineChart>
+        </ResponsiveContainer>
+      ) : (
+        <Box p={3}>
+          <Typography>
+            Add Origin, Destination and Via entities to visualize the statement
+            preview
+          </Typography>
+        </Box>
+      )}
+    </Box>
   );
 };
 

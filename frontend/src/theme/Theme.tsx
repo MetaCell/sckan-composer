@@ -51,6 +51,10 @@ const theme = createTheme({
       primary: "#475467",
       disabled: "",
     },
+    grey: {
+      100: "#F2F4F7",
+      200: "#EAECF0",
+    },
   },
   shape: {
     borderRadius,
