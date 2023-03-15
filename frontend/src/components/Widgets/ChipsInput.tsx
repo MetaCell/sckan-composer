@@ -21,7 +21,7 @@ const StyledInput = styled(TextField)(({ theme }) => ({
   },
 }));
 
-export const ChipsInput = ({onChange,placeholder, options: { data, removeChip, label }}: any) => {
+export const ChipsInput = ({onChange,placeholder, options: { data, removeChip, label, disabled = false }}: any) => {
 
   const handleDelete = (id: number) => {
     removeChip(id)
@@ -37,37 +37,44 @@ export const ChipsInput = ({onChange,placeholder, options: { data, removeChip, l
       }
 
       <StyledInput
+        disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
         id='custom-input'
         placeholder={placeholder}
         InputProps={{
           startAdornment: (
-            <Stack direction='row' flexWrap='wrap'>
-              {data?.map(({ id, label }: any) => {
-                return (
-                  <Chip
-                    deleteIcon={<ClearOutlinedIcon />}
-                    variant="outlined"
-                    label={label}
-                    key={id}
-                    onDelete={() => handleDelete(id)}
-                    sx={{
-                      border: `1px solid ${buttonOutlinedBorderColor}`,
-                      borderRadius: '6px',
-                      margin: '4px',
+            <Stack direction='row'>
+              <div style={{
+                display: 'flex',
+                flexWrap: 'wrap'
+              }}>
+                {data?.map(({ id, label }: any) => {
+                  return (
+                    <Chip
+                      deleteIcon={<ClearOutlinedIcon />}
+                      variant="outlined"
+                      label={label}
+                      key={id}
+                      onDelete={() => handleDelete(id)}
+                      sx={{
+                        border: `1px solid ${buttonOutlinedBorderColor}`,
+                        borderRadius: '6px',
+                        margin: '4px',
 
-                      "& .MuiChip-label": {
-                        color: buttonOutlinedColor,
-                        fontSize: '14px'
-                      },
-                      "& .MuiChip-deleteIcon": {
-                        color: grey400,
-                        fontSize: '14px'
-                      }
-                    }}
-                  />
-                );
-              })}
+                        "& .MuiChip-label": {
+                          color: buttonOutlinedColor,
+                          fontSize: '14px'
+                        },
+                        "& .MuiChip-deleteIcon": {
+                          color: grey400,
+                          fontSize: '14px'
+                        }
+                      }}
+                    />
+                  );
+                })}
+              </div>
+
             </Stack>
           ),
         }}

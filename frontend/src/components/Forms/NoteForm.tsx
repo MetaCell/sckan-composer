@@ -34,14 +34,11 @@ const TimeLineIcon = () => {
   </Box>
 }
 const NoteForm = (props: any) => {
-  const dispatch = useDispatch()
-  const { extraData } = props
+  const { setRefresh, extraData } = props
   const { schema, uiSchema } = jsonSchemas.getNoteSchema()
   const [data, setData] = useState({})
-  const [noteList, setNoteList] = useState<Note[]>([])
-  const [refresh, setRefresh] = useState(false)
 
-  const clearNoteForm = (newData: any) => {
+  const clearNoteForm = () => {
     setData({})
     setRefresh(true)
   }
@@ -63,92 +60,36 @@ const NoteForm = (props: any) => {
     },
   };
 
-  useEffect(() => {
-    if (extraData?.sentence_id) {
-      noteService.getNotesList(undefined,undefined, undefined, extraData?.sentence_id).then(result => {
-        setNoteList(result?.results)
-      })
-    }
-  }, [extraData?.sentence_id, refresh])
 
   return (
-    <Box display='flex' flexDirection='column' >
-      <Box sx={{
-        background: '#F2F4F7',
-        borderRadius: '12px',
-        padding: '0 8px 8px !important',
-        textAlign: 'center',
-        "& .MuiGrid-item":
-          {
-            paddingTop: 0
-          },
-        "& .MuiInputBase-root": {
-          background: '#fff',
-          borderRadius: '12px'
-        }
-      }}>
-        <FormBase
-          {...props}
-          data={data}
-          service={noteService}
-          schema={customSchema}
-          uiSchema={customUiSchema}
-          uiFields={uiFields}
-          enableAutoSave={false}
-          clearOnSave={true}
-          setter={clearNoteForm}
-        >
-          <Button
-            type="submit"
-            className="btn btn-primary"
-            sx={{
-              padding: 0,
-              color: vars.darkBlue,
+    <FormBase
+      data={data}
+      service={noteService}
+      schema={customSchema}
+      uiSchema={customUiSchema}
+      uiFields={uiFields}
+      enableAutoSave={false}
+      clearOnSave={true}
+      setter={clearNoteForm}
+      extraData={extraData}
+    >
+      <Button
+        type="submit"
+        className="btn btn-primary"
+        sx={{
+          padding: 0,
+          color: vars.darkBlue,
 
-              "&:hover": {
-                background: 'transparent',
-                color: vars.mediumBlue
-              }
-            }}
-            startIcon={<SendIcon />}
-          >
-            Send
-          </Button>
-        </FormBase>
-      </Box>
-
-      <Timeline sx={{
-        "& .MuiTimelineItem-root": {
-          "&:before": {
-            display: 'none'
+          "&:hover": {
+            background: 'transparent',
+            color: vars.mediumBlue
           }
-        }
-      }}>
-        {
-          noteList?.map((note: Note, index: number) =>
-            <TimelineItem>
-              <TimelineSeparator>
-                <TimeLineIcon />
-                {
-                  index !== noteList?.length - 1 &&  <TimelineConnector sx={{margin: '8px 0'}} />
-                }
-              </TimelineSeparator>
-              <TimelineContent>
-                <Typography variant="h6">
-                  {note?.user}
-                </Typography>
-                <Typography fontSize={12}>
-                  {
-                    timeAgo(note?.created_at)
-                  }
-                </Typography>
-                <Typography variant="subtitle2" fontSize={14}>{note?.note}</Typography>
-              </TimelineContent>
-            </TimelineItem>
-          )
-        }
-      </Timeline>
-    </Box>
+        }}
+        startIcon={<SendIcon />}
+      >
+        Send
+      </Button>
+    </FormBase>
 
   )
 }

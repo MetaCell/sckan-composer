@@ -27,6 +27,7 @@ import CustomTextArea from "../components/Widgets/CustomTextArea";
 import statementService from "../services/StatementService";
 import { vars } from "../theme/variables";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import NoteDetails from "../components/Widgets/NotesFomList";
 
 const initialConnectivityStatement = {knowledge_statement: "", biological_sex: null, ans_division: null, species: [] , dois: []}
 const { bodyBgColor, darkBlue } = vars
@@ -155,7 +156,7 @@ const SentencesDetails = () => {
             </Box>
           </Grid>
           <Grid item xs={12} md={6} display='flex' justifyContent='flex-end'>
-            {!disabled &&
+            {!disabled && sentence?.available_transitions?.length !== 0 &&
               <GroupedButtons
                 handleClick={handleClick}
                 selectedOption={SentenceLabels[sentence?.available_transitions[selectedIndex]]}
@@ -285,7 +286,7 @@ const SentencesDetails = () => {
                 setter={setSentence}
               />
               <Divider sx={{margin: '36px 0'}} />
-              <NoteForm
+              <NoteDetails
                 extraData={{ sentence_id: sentence.id }}
               />
             </Paper>

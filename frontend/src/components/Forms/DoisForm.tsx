@@ -25,6 +25,7 @@ const DoisForm = (props: any) => {
   copiedUISchema.doi = {
     "ui:widget": ChipsInput,
     "ui:options": {
+      disabled: !extraData.connectivity_statement_id,
       data: doisData?.map((row: Doi) => ({id: row.id, label: row.doi})),
       placeholder: 'Enter DOIs (Press Enter to add a DOI)',
       removeChip: function(doiId: any) {
