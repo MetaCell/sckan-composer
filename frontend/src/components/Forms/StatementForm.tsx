@@ -71,8 +71,6 @@ const StatementForm = (props: any) => {
     CustomTextArea
   }
 
-  statement['sentence_id'] = extraData.sentence_id
-
   return (
     <FormBase
       data={statement}
@@ -83,7 +81,6 @@ const StatementForm = (props: any) => {
       enableAutoSave={true}
       children={true}
       widgets={widgets}
-      isUpdate={!!statement?.id}
       {...props}
     />
   )

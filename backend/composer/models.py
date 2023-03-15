@@ -177,7 +177,7 @@ class Sentence(models.Model):
 
     title = models.CharField(max_length=200, db_index=True)
     text = models.TextField()
-    external_ref = models.CharField(max_length=20, db_index=True)
+    external_ref = models.CharField(max_length=20, db_index=True, null=True, blank=True)
     state = FSMField(default=SentenceState.OPEN, protected=True)
     pmid = PmIdField(db_index=True, null=True, blank=True)
     pmcid = PmcIdField(max_length=20, db_index=True, null=True, blank=True)
@@ -282,6 +282,9 @@ class Sentence(models.Model):
                       ),
                 name="sentence_pmid_pmcd_valid",
             ),
+            models.CheckConstraint(
+                check=(Q(external_ref__isnull=True) & Q(batch_name__isnull=True)) | Q(external_ref__isnull=False) & Q(batch_name__isnull=False),
+                name='sentence_externalref_and_batch_valid')
         ]
 
 

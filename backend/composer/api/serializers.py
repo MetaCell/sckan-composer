@@ -181,11 +181,13 @@ class DoiSerializer(serializers.ModelSerializer):
 class SentenceConnectivityStatement(serializers.ModelSerializer):
     """Connectivity Statement"""
     sentence_id = serializers.IntegerField()
-    biological_sex_id = serializers.IntegerField()
-    ans_division_id = serializers.IntegerField()
+    owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
+    biological_sex_id = serializers.IntegerField(required=False, default=None, allow_null=True)
+    ans_division_id = serializers.IntegerField(required=False, default=None, allow_null=True)
     dois = DoiSerializer(source="doi_set", many=True, read_only=False)
     biological_sex = BiologicalSexSerializer(required=False, read_only=True)
     species = SpecieSerializer(many=True, read_only=True)
+    owner = UserSerializer(required=False, read_only=True)
     ans_division = AnsDivisionSerializer(required=False, read_only=True)
 
     class Meta:
@@ -203,6 +205,8 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "biological_sex_id",
             "biological_sex",
             "apinatomy_model",
+            "owner_id",
+            "owner"
         )
         read_only_fields = (
             "id",
@@ -217,6 +221,8 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "biological_sex_id",
             "biological_sex",
             "apinatomy_model",
+            "owner_id",
+            "owner"
         )
 
 
@@ -283,8 +289,8 @@ class ConnectivityStatementSerializer(
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
     origin_id = serializers.IntegerField(required=False)
     destination_id = serializers.IntegerField(required=False)
-    ans_division_id = serializers.IntegerField(required=False)
-    biological_sex_id = serializers.IntegerField(required=False)
+    ans_division_id = serializers.IntegerField(required=False, allow_null=True)
+    biological_sex_id = serializers.IntegerField(required=False, allow_null=True)
     tags = TagSerializer(many=True, read_only=True)
     species = SpecieSerializer(many=True, read_only=False)
     dois = DoiSerializer(source="doi_set", many=True, read_only=False)

@@ -76,6 +76,11 @@ const theme = createTheme({
       fontSize: "1.875rem",
       color: titleFontColor,
     },
+    h4: {
+      fontWeight: 600,
+      fontSize: "1.125rem",
+      color: titleFontColor,
+    },
     h5: {
       fontWeight: 600,
       fontSize: "1.25rem",
@@ -306,12 +311,12 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           "& .costume-dois": {
-            "& .MuiPaper-root":{
-              boxShadow: 'none'
-            }
-          }
-        }
-      }
+            "& .MuiPaper-root": {
+              boxShadow: "none",
+            },
+          },
+        },
+      },
     },
     MuiFormLabel: {
       styleOverrides: {
@@ -319,36 +324,36 @@ const theme = createTheme({
           color: labelColor,
           fontWeight: 500,
         },
-      }
-    } ,
+      },
+    },
     MuiRadio: {
       styleOverrides: {
         root: {
           "& .MuiSvgIcon-root": {
-             fontSize: '1rem',
-            color: radioBorderColor
+            fontSize: "1rem",
+            color: radioBorderColor,
           },
-        }
-      }
+        },
+      },
     },
     MuiFormGroup: {
       styleOverrides: {
         root: {
-          "& .MuiFormControlLabel-root":{
-            color: labelColor
-          }
-        }
-      }
+          "& .MuiFormControlLabel-root": {
+            color: labelColor,
+          },
+        },
+      },
     },
     MuiInputLabel: {
       styleOverrides: {
         root: {
-          fontWeight: '500',
-          fontSize: '0.875rem',
-          lineHeight: '20px',
-          color: '#344054'
-        }
-      }
+          fontWeight: "500",
+          fontSize: "0.875rem",
+          lineHeight: "20px",
+          color: "#344054",
+        },
+      },
     },
   },
 });

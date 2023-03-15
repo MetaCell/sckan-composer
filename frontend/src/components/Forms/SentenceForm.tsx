@@ -19,6 +19,7 @@ const SentenceForm = (props: any) => {
     ? ["title"]
     : undefined
 
+  const uiOrder = format === "create" ? ["*", "text"] : undefined;
   // TODO: set up the widgets for the schema
 
   const handleOpenPmid = () => {

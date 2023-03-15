@@ -6,7 +6,12 @@ import { QueryParams } from "../redux/sentenceSlice";
 
 class SentenceService extends AbstractService {
   async save(sentence: Sentence) {
-    return composerApi.composerSentenceUpdate(sentence.id, sentence).then((response: any) => response.data)
+    if (!sentence.id) {
+      return composerApi.composerSentenceCreate(sentence).then((response: any) => response.data)
+    }
+    else {
+      return composerApi.composerSentenceUpdate(sentence.id, sentence).then((response: any) => response.data)
+    }
   }
   async getObject(id: string): Promise<Sentence> {
     return composerApi.composerSentenceRetrieve(Number(id)).then((response: any) => response.data)

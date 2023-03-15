@@ -56,12 +56,14 @@ const DoisForm = (props: any) => {
     }}>
       <FormBase
         service={doiService}
+        data={doisData}
         schema={copiedSchema}
         uiSchema={copiedUISchema}
         enableAutoSave={false}
         clearOnSave={true}
         children={true}
         extraData={extraData}
+        setter={() => refresh()}
         {...props}
       />
     </Box>

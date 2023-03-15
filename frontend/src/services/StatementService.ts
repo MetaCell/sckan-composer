@@ -5,6 +5,9 @@ import { QueryParams } from "../redux/statementSlice"
 
 class ConnectivityStatementService extends AbstractService {
   async save(connectivityStatement: ConnectivityStatement) {
+    if (connectivityStatement.id) {
+      return this.update(connectivityStatement)
+    }
     return composerApi.composerConnectivityStatementCreate(connectivityStatement).then((response: any) => response.data)
   }
   async update(connectivityStatement: ConnectivityStatement) {
