@@ -1633,6 +1633,7 @@ components:
           readOnly: true
         ans_division_id:
           type: integer
+          nullable: true
         ans_division:
           allOf:
           - $ref: '#/components/schemas/AnsDivision'
@@ -1657,6 +1658,7 @@ components:
             $ref: '#/components/schemas/Specie'
         biological_sex_id:
           type: integer
+          nullable: true
         biological_sex:
           allOf:
           - $ref: '#/components/schemas/BiologicalSex'
@@ -2009,6 +2011,7 @@ components:
           readOnly: true
         ans_division_id:
           type: integer
+          nullable: true
         ans_division:
           allOf:
           - $ref: '#/components/schemas/AnsDivision'
@@ -2033,6 +2036,7 @@ components:
             $ref: '#/components/schemas/Specie'
         biological_sex_id:
           type: integer
+          nullable: true
         biological_sex:
           allOf:
           - $ref: '#/components/schemas/BiologicalSex'
@@ -2093,6 +2097,7 @@ components:
           maxLength: 100
         external_ref:
           type: string
+          nullable: true
           maxLength: 20
         tags:
           type: array
@@ -2196,6 +2201,7 @@ components:
           maxLength: 100
         external_ref:
           type: string
+          nullable: true
           maxLength: 20
         tags:
           type: array
@@ -2242,7 +2248,6 @@ components:
       - available_transitions
       - connectivity_statements
       - doi_uri
-      - external_ref
       - has_notes
       - id
       - modified_date
@@ -2280,6 +2285,7 @@ components:
             $ref: '#/components/schemas/Doi'
         ans_division_id:
           type: integer
+          nullable: true
         ans_division:
           allOf:
           - $ref: '#/components/schemas/AnsDivision'
@@ -2299,6 +2305,7 @@ components:
           readOnly: true
         biological_sex_id:
           type: integer
+          nullable: true
         biological_sex:
           allOf:
           - $ref: '#/components/schemas/BiologicalSex'
@@ -2307,17 +2314,23 @@ components:
           type: string
           readOnly: true
           nullable: true
+        owner_id:
+          type: integer
+          nullable: true
+        owner:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
       required:
       - ans_division
-      - ans_division_id
       - apinatomy_model
       - biological_sex
-      - biological_sex_id
       - circuit_type
       - dois
       - id
       - knowledge_statement
       - laterality
+      - owner
       - sentence_id
       - species
     Specie:

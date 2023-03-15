@@ -16,7 +16,7 @@ const DoisForm = (props: any) => {
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
 
   const refresh = () => {
-    setter({refresh: true})
+    setter()
   }
 
   // TODO: set up the widgets for the schema

@@ -205,7 +205,7 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'ans_division_id'?: number;
+    'ans_division_id'?: number | null;
     /**
      * 
      * @type {AnsDivision}
@@ -253,7 +253,7 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'biological_sex_id'?: number;
+    'biological_sex_id'?: number | null;
     /**
      * 
      * @type {BiologicalSex}
@@ -820,7 +820,7 @@ export interface PatchedConnectivityStatement {
      * @type {number}
      * @memberof PatchedConnectivityStatement
      */
-    'ans_division_id'?: number;
+    'ans_division_id'?: number | null;
     /**
      * 
      * @type {AnsDivision}
@@ -868,7 +868,7 @@ export interface PatchedConnectivityStatement {
      * @type {number}
      * @memberof PatchedConnectivityStatement
      */
-    'biological_sex_id'?: number;
+    'biological_sex_id'?: number | null;
     /**
      * 
      * @type {BiologicalSex}
@@ -986,7 +986,7 @@ export interface PatchedSentence {
      * @type {string}
      * @memberof PatchedSentence
      */
-    'external_ref'?: string;
+    'external_ref'?: string | null;
     /**
      * 
      * @type {Array<Tag>}
@@ -1175,7 +1175,7 @@ export interface Sentence {
      * @type {string}
      * @memberof Sentence
      */
-    'external_ref': string;
+    'external_ref'?: string | null;
     /**
      * 
      * @type {Array<Tag>}
@@ -1296,7 +1296,7 @@ export interface SentenceConnectivityStatement {
      * @type {number}
      * @memberof SentenceConnectivityStatement
      */
-    'ans_division_id': number;
+    'ans_division_id'?: number | null;
     /**
      * 
      * @type {AnsDivision}
@@ -1326,7 +1326,7 @@ export interface SentenceConnectivityStatement {
      * @type {number}
      * @memberof SentenceConnectivityStatement
      */
-    'biological_sex_id': number;
+    'biological_sex_id'?: number | null;
     /**
      * 
      * @type {BiologicalSex}
@@ -1339,6 +1339,18 @@ export interface SentenceConnectivityStatement {
      * @memberof SentenceConnectivityStatement
      */
     'apinatomy_model': string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof SentenceConnectivityStatement
+     */
+    'owner_id'?: number | null;
+    /**
+     * 
+     * @type {User}
+     * @memberof SentenceConnectivityStatement
+     */
+    'owner': User;
 }
 /**
  * Specie
