@@ -5,10 +5,11 @@ import doiService from '../../services/DoisService'
 import {ChipsInput} from "../Widgets/ChipsInput";
 import {Doi} from "../../apiclient/backend";
 import Box from "@mui/material/Box";
+import { setTextRange } from 'typescript';
 
 
 const DoisForm = (props: any) => {
-  const { doisData: doiData, extraData } = props
+  const { doisData: doiData, extraData, setter } = props
 
   const { schema, uiSchema } = jsonSchemas.getDoiSchema()
   const copiedSchema = JSON.parse(JSON.stringify(schema));
@@ -22,6 +23,10 @@ const DoisForm = (props: any) => {
     "ui:options": {
       data: doiData?.map((row: Doi) => ({id: row.id, label: row.doi})),
       placeholder: 'Enter DOIs (Press Enter to add a DOI)',
+      removeChip: function(doiId: any) {
+        doiService.delete(doiId, extraData.connectivity_statement_id)
+        setter()
+      },
     }
   }
   copiedUISchema.connectivity_statement_id = {
