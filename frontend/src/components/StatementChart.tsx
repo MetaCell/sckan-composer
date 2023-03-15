@@ -30,7 +30,6 @@ const ArrowDot = (props: any) => {
       y={cy - 10}
       width={20}
       height={20}
-      fill="red"
       viewBox="0 0 1024 1024"
     >
       <ChevronRightIcon />
@@ -73,18 +72,24 @@ const StatementChart = (props: { statement: ConnectivityStatement }) => {
     if (statement.path.length === 0) {
       return vias;
     }
+    vias.push({ noDot: true });
     for (const v of statement.path) {
       vias.push(
         { noDot: true },
         {
           noDot: true,
           via: 1,
-          label: v.anatomical_entity.name,
+          viaLabel: v.anatomical_entity.name,
         },
         { noDot: true, via: 1 },
+        { via: 1, noDot: true },
+        { via: 1, noDot: true },
+        { via: 1, noDot: true },
+        { via: 1, noDot: true },
         { via: 1 }
       );
     }
+    vias.push({ noDot: true });
     return vias;
   };
 
@@ -133,9 +138,9 @@ const StatementChart = (props: { statement: ConnectivityStatement }) => {
             </Line>
             <Line type="monotone" dataKey="via" stroke="#98A2B3" dot={ArrowDot}>
               <LabelList
-                dataKey="label"
+                dataKey="viaLabel"
                 position="insideBottomLeft"
-                offset={20}
+                offset={8}
               />
             </Line>
           </LineChart>
