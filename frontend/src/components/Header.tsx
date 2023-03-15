@@ -16,7 +16,12 @@ const Header = (props: any) => {
       </Box>
       <Box>
         {actions?.map((a: any, i: any) => (
-          <Button variant="contained" key={i} startIcon={<a.icon />}>
+          <Button
+            variant="contained"
+            key={i}
+            startIcon={<a.icon />}
+            onClick={a.handleClick}
+          >
             {a.label}
           </Button>
         ))}
