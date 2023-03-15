@@ -47,6 +47,7 @@ export const FormBase = (props: any) => {
   //as it was mutating the original object at the jsonschema singleton
 
   useEffect(() => {
+    setLocalData(data)
     setCustomSchema(schema)
     setCustomUiSchema(uiSchema)
     if (uiFields) {
