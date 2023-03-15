@@ -23,8 +23,8 @@ const SentenceForm = (props: any) => {
   const customSchema = format === "create" ? { ...schema, title: "" } : schema;
 
   const formIsValid = (formData: any) => {
-    const { pmid, pmcid, title, text } = formData;
-    if ((pmid || pmcid) && title && text) {
+    const { pmid, pmcid, doi, title, text } = formData;
+    if ((pmid || pmcid || doi) && title && text) {
       return true;
     }
     return false;
