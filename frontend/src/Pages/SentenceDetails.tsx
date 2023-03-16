@@ -220,7 +220,6 @@ const SentencesDetails = () => {
                                 extraData={{connectivity_statement_id: statement.id}}
                                 setter={refreshSentence}
                               />
-<<<<<<< HEAD
                               {
                                 statement.id &&
                                 <Accordion expanded={expanded === `panel-${key}`} onChange={handleChange(`panel-${key}`)}>
@@ -244,6 +243,7 @@ const SentencesDetails = () => {
                                       uiFields={["biological_sex_id", "apinatomy_model", "circuit_type", "laterality", "ans_division_id"]}
                                     />
                                     <SpeciesForm
+                                      speciesList={speciesList}
                                       data={sentence}
                                       extraData={{ parentId: sentence.id }}
                                       setter={setSentence}
@@ -251,36 +251,6 @@ const SentencesDetails = () => {
                                   </AccordionDetails>
                                 </Accordion>
                               }
-=======
-                              <Accordion expanded={expanded === `panel-${key}`} onChange={handleChange(`panel-${key}`)}>
-                                <AccordionSummary
-                                  expandIcon={<ExpandMoreIcon />}
-                                  aria-controls="panel1bh-content"
-                                  id="panel1bh-header"
-                                >
-                                  <Typography>
-                                    Statement Details
-                                  </Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                  <StatementForm
-                                    divisionList={divisionList}
-                                    biologicalSex={biologicalSex}
-                                    statement={statement}
-                                    format="small"
-                                    setter={setSentence}
-                                    extraData={{sentence_id: sentence.id, knowledge_statement: connectivityStatements[key].knowledge_statement}}
-                                    uiFields={["biological_sex_id", "apinatomy_model", "circuit_type", "laterality", "ans_division_id"]}
-                                  />
-                                  <SpeciesForm
-                                    speciesList={speciesList}
-                                    data={sentence}
-                                    extraData={{ parentId: sentence.id }}
-                                    setter={setSentence}
-                                  />
-                                </AccordionDetails>
-                              </Accordion>
->>>>>>> 6be94e035d0bff7b65e3b30625e87b8fe5225eb5
                             </Paper>
 
                           </Grid>
