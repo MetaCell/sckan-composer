@@ -5,7 +5,7 @@ import {useDebouncedCallback} from "use-debounce";
 import {EDIT_DEBOUNCE} from "../../settings";
 
 
-export default function TextArea({value, placeholder,onChange, options: { rows } }: any) {
+export default function TextArea({value, placeholder, required, onChange, options: { rows } }: any) {
 
   const debouncedChangeHandler = useDebouncedCallback(
     (event) => onChange(event.target.value),
@@ -20,6 +20,7 @@ export default function TextArea({value, placeholder,onChange, options: { rows }
       rows={rows}
       placeholder={placeholder}
       fullWidth
+      required
       onChange={debouncedChangeHandler}
       sx={{
         "& .Mui-focused": {

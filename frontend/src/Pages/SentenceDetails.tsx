@@ -30,7 +30,6 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import NoteDetails from "../components/Widgets/NotesFomList";
 import IconButton from "@mui/material/IconButton";
 
-const initialConnectivityStatement = {knowledge_statement: "", biological_sex: null, ans_division: null, species: [] , dois: []}
 const { bodyBgColor, darkBlue } = vars
 
 const StyledAddStatementBtn = styled(Button)(({ theme }) => ({
@@ -48,10 +47,11 @@ const SentencesDetails = () => {
   const { sentenceId } = useParams();
   const [sentence, setSentence] = useState({} as Sentence);
   const [loading, setLoading] = useState(true);
-  let connectivityStatements: SentenceConnectivityStatement[],
-    setConnectivityStatements: (value: (SentenceConnectivityStatement | { ans_division: null; biological_sex: null; knowledge_statement: string, species: [] , dois: [] })[]) => void;
-  // @ts-ignore
-  [connectivityStatements, setConnectivityStatements] = useState<SentenceConnectivityStatement[]>([initialConnectivityStatement]);
+  // let connectivityStatements: SentenceConnectivityStatement[],
+  //   setConnectivityStatements: (value: (SentenceConnectivityStatement | { ans_division: null; biological_sex: null; knowledge_statement: string, species: [] , dois: [] })[]) => void;
+  //  // @ts-ignore
+  const initialConnectivityStatement = {knowledge_statement: "", biological_sex: null, ans_division: null, species: [] , dois: []}
+  const [connectivityStatements, setConnectivityStatements] = useState<SentenceConnectivityStatement[]>();
 
   const [open, setOpen] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
@@ -77,7 +77,9 @@ const SentencesDetails = () => {
 
   const onAddNewStatement = () => {
     // @ts-ignore
-    setConnectivityStatements([...connectivityStatements, initialConnectivityStatement]);
+    setConnectivityStatements([...connectivityStatements, 
+      {sentence_id: sentence.id, knowledge_statement: "", biological_sex: null, ans_division: null, species: [] , dois: []}
+    ]);
   }
 
   const handleMenuItemClick = (
@@ -218,33 +220,36 @@ const SentencesDetails = () => {
                                 extraData={{connectivity_statement_id: statement.id}}
                                 setter={refreshSentence}
                               />
-                              <Accordion expanded={expanded === `panel-${key}`} onChange={handleChange(`panel-${key}`)}>
-                                <AccordionSummary
-                                  expandIcon={<ExpandMoreIcon />}
-                                  aria-controls="panel1bh-content"
-                                  id="panel1bh-header"
-                                >
-                                  <Typography>
-                                    Statement Details
-                                  </Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                  <StatementForm
-                                    divisionList={divisionList}
-                                    biologicalSex={biologicalSex}
-                                    statement={statement}
-                                    format="small"
-                                    setter={setSentence}
-                                    extraData={{sentence_id: sentence.id, knowledge_statement: connectivityStatements[key].knowledge_statement}}
-                                    uiFields={["biological_sex_id", "apinatomy_model", "circuit_type", "laterality", "ans_division_id"]}
-                                  />
-                                  <SpeciesForm
-                                    data={sentence}
-                                    extraData={{ parentId: sentence.id }}
-                                    setter={setSentence}
-                                  />
-                                </AccordionDetails>
-                              </Accordion>
+                              {
+                                statement.id &&
+                                <Accordion expanded={expanded === `panel-${key}`} onChange={handleChange(`panel-${key}`)}>
+                                  <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="panel1bh-content"
+                                    id="panel1bh-header"
+                                  >
+                                    <Typography>
+                                      Statement Details
+                                    </Typography>
+                                  </AccordionSummary>
+                                  <AccordionDetails>
+                                    <StatementForm
+                                      divisionList={divisionList}
+                                      biologicalSex={biologicalSex}
+                                      statement={statement}
+                                      format="small"
+                                      setter={setSentence}
+                                      extraData={{sentence_id: sentence.id, knowledge_statement: connectivityStatements[key].knowledge_statement}}
+                                      uiFields={["biological_sex_id", "apinatomy_model", "circuit_type", "laterality", "ans_division_id"]}
+                                    />
+                                    <SpeciesForm
+                                      data={sentence}
+                                      extraData={{ parentId: sentence.id }}
+                                      setter={setSentence}
+                                    />
+                                  </AccordionDetails>
+                                </Accordion>
+                              }
                             </Paper>
 
                           </Grid>
