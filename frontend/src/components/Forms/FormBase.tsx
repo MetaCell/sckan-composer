@@ -25,10 +25,8 @@ export const FormBase = (props: any) => {
     clearOnSave = false,
     action,
     formIsValid,
-    sx,
     children = false,
     widgets,
-    isUpdate
   } = props;
   const [localData, setLocalData] = useState<any>(data);
   const [isSaving, setIsSaving] = useState<boolean>(false);

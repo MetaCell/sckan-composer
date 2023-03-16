@@ -6,9 +6,8 @@ import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import { useParams } from "react-router-dom";
 import sentenceService from "../services/SentenceService";
-import NoteForm from "../components/Forms/NoteForm";
 import TagForm from "../components/Forms/TagForm";
-import {Doi, Sentence, SentenceConnectivityStatement} from "../apiclient/backend";
+import {Sentence, SentenceConnectivityStatement} from "../apiclient/backend";
 import { userProfile } from "../services/UserService";
 import CheckDuplicates from "../components/CheckForDuplicates/CheckDuplicatesDialog";
 import {SentenceStateChip} from "../components/Widgets/StateChip";
@@ -23,12 +22,12 @@ import SpeciesForm from "../components/Forms/SpeciesForm";
 import Divider from "@mui/material/Divider";
 import {Accordion, AccordionDetails, AccordionSummary, styled} from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import CustomTextArea from "../components/Widgets/CustomTextArea";
 import statementService from "../services/StatementService";
 import { vars } from "../theme/variables";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import NoteDetails from "../components/Widgets/NotesFomList";
 import IconButton from "@mui/material/IconButton";
+import specieService from "../services/SpecieService";
 
 const { bodyBgColor, darkBlue } = vars
 
@@ -47,10 +46,6 @@ const SentencesDetails = () => {
   const { sentenceId } = useParams();
   const [sentence, setSentence] = useState({} as Sentence);
   const [loading, setLoading] = useState(true);
-  // let connectivityStatements: SentenceConnectivityStatement[],
-  //   setConnectivityStatements: (value: (SentenceConnectivityStatement | { ans_division: null; biological_sex: null; knowledge_statement: string, species: [] , dois: [] })[]) => void;
-  //  // @ts-ignore
-  const initialConnectivityStatement = {knowledge_statement: "", biological_sex: null, ans_division: null, species: [] , dois: []}
   const [connectivityStatements, setConnectivityStatements] = useState<SentenceConnectivityStatement[]>();
 
   const [open, setOpen] = React.useState(false);
@@ -58,6 +53,7 @@ const SentencesDetails = () => {
   const [expanded, setExpanded] = React.useState<string | false>('panel-0');
   const [divisionList,setDivisionList] = useState([])
   const [biologicalSex,setBiologicalSexList] = useState([])
+  const [speciesList,setSpeciesList] = useState([])
   const [refetch, setRefetch] = useState(false)
 
   const handleChange =
@@ -135,6 +131,10 @@ const SentencesDetails = () => {
     })
     statementService.getBiologicalSexList().then((result) => {
       setBiologicalSexList(result.results)
+    })
+    specieService.getList({}).then(result => {
+      // @ts-ignore
+      setSpeciesList(result.results)
     })
   }, [])
 
@@ -220,6 +220,7 @@ const SentencesDetails = () => {
                                 extraData={{connectivity_statement_id: statement.id}}
                                 setter={refreshSentence}
                               />
+<<<<<<< HEAD
                               {
                                 statement.id &&
                                 <Accordion expanded={expanded === `panel-${key}`} onChange={handleChange(`panel-${key}`)}>
@@ -250,6 +251,36 @@ const SentencesDetails = () => {
                                   </AccordionDetails>
                                 </Accordion>
                               }
+=======
+                              <Accordion expanded={expanded === `panel-${key}`} onChange={handleChange(`panel-${key}`)}>
+                                <AccordionSummary
+                                  expandIcon={<ExpandMoreIcon />}
+                                  aria-controls="panel1bh-content"
+                                  id="panel1bh-header"
+                                >
+                                  <Typography>
+                                    Statement Details
+                                  </Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                  <StatementForm
+                                    divisionList={divisionList}
+                                    biologicalSex={biologicalSex}
+                                    statement={statement}
+                                    format="small"
+                                    setter={setSentence}
+                                    extraData={{sentence_id: sentence.id, knowledge_statement: connectivityStatements[key].knowledge_statement}}
+                                    uiFields={["biological_sex_id", "apinatomy_model", "circuit_type", "laterality", "ans_division_id"]}
+                                  />
+                                  <SpeciesForm
+                                    speciesList={speciesList}
+                                    data={sentence}
+                                    extraData={{ parentId: sentence.id }}
+                                    setter={setSentence}
+                                  />
+                                </AccordionDetails>
+                              </Accordion>
+>>>>>>> 6be94e035d0bff7b65e3b30625e87b8fe5225eb5
                             </Paper>
 
                           </Grid>

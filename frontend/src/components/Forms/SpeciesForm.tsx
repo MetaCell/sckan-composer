@@ -23,7 +23,7 @@ const SpeciesForm = (props: any) => {
   const customUiSchema: UiSchema = {
     ...uiSchema,
     name: {
-      "ui:widget": ChipsInput,
+      "ui:widget": 'select',
       "ui:options": {
         label: 'Species',
         placeholder: 'Select Species',
