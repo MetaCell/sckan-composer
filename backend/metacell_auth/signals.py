@@ -21,3 +21,14 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
         Token.objects.get(user=instance)
     except Token.DoesNotExist:
         Token.objects.create(user=instance)
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def set_at_least_one_superuser(sender, instance=None, created=False, **kwargs):
+    if not instance.is_superuser:
+        # if the user is not a superuser, check if there is at least one superuser that is not the admin
+        num_super_users = User.objects.filter(is_superuser=True).exclude(username="admin").count()
+        if num_super_users < 1:
+            instance.is_superuser = True
+            instance.is_staff = True
+            instance.save()
