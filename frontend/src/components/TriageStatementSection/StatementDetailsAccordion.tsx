@@ -15,7 +15,7 @@ const StatementDetailsAccordion = (props: any) => {
     divisionList,
     biologicalSex,
     statement,
-    setSentence,
+    setter,
     sentence,
     speciesList,
   } = props;
@@ -51,7 +51,7 @@ const StatementDetailsAccordion = (props: any) => {
           biologicalSex={biologicalSex}
           statement={statement}
           format="small"
-          setter={setSentence}
+          setter={setter}
           extraData={{
             sentence_id: sentence.id,
             knowledge_statement: statement.knowledge_statement,
@@ -68,7 +68,7 @@ const StatementDetailsAccordion = (props: any) => {
           speciesList={speciesList}
           data={sentence}
           extraData={{ parentId: sentence.id }}
-          setter={setSentence}
+          setter={setter}
         />
       </AccordionDetails>
     </Accordion>

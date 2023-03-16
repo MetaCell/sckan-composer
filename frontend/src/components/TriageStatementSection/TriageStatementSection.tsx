@@ -69,6 +69,7 @@ const TriageStatementSection = (props: any) => {
                   speciesList={speciesList}
                   divisionList={divisionList}
                   biologicalSex={biologicalSex}
+                  setter={refreshSentence}
                   {...props}
                 />
               )}
