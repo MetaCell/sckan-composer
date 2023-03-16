@@ -15,6 +15,7 @@ const StyledInput = styled(TextField)(({ theme }) => ({
 }));
 
 export default function CustomTextField({
+  value,
   placeholder,
   onChange,
   options: { label, multiline, rows },
@@ -32,6 +33,7 @@ export default function CustomTextField({
         placeholder={placeholder}
         multiline={multiline}
         rows={rows}
+        value={value}
       />
     </FormControl>
   );
