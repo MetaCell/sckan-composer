@@ -7,92 +7,81 @@ import Button from "@mui/material/Button";
 import { useParams } from "react-router-dom";
 import sentenceService from "../services/SentenceService";
 import TagForm from "../components/Forms/TagForm";
-import {Sentence, SentenceConnectivityStatement} from "../apiclient/backend";
+import { Sentence, SentenceConnectivityStatement } from "../apiclient/backend";
 import { userProfile } from "../services/UserService";
 import CheckDuplicates from "../components/CheckForDuplicates/CheckDuplicatesDialog";
-import {SentenceStateChip} from "../components/Widgets/StateChip";
-import {SentenceLabels, formatDate, formatTime} from "../helpers/helpers";
+import { SentenceStateChip } from "../components/Widgets/StateChip";
+import { SentenceLabels, formatDate, formatTime } from "../helpers/helpers";
 import Stack from "@mui/material/Stack";
 import GroupedButtons from "../components/Widgets/CustomGroupedButtons";
-import StatementForm from "../components/Forms/StatementForm";
-import DoisForm from "../components/Forms/DoisForm";
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import SentenceForm from '../components/Forms/SentenceForm'
-import SpeciesForm from "../components/Forms/SpeciesForm";
+import SentenceForm from "../components/Forms/SentenceForm";
 import Divider from "@mui/material/Divider";
-import {Accordion, AccordionDetails, AccordionSummary, styled} from "@mui/material";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import statementService from "../services/StatementService";
+import { styled } from "@mui/material";
 import { vars } from "../theme/variables";
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import NoteDetails from "../components/Widgets/NotesFomList";
-import IconButton from "@mui/material/IconButton";
-import specieService from "../services/SpecieService";
+import TriageStatementSection from "../components/TriageStatementSection/TriageStatementSection";
 
-const { bodyBgColor, darkBlue } = vars
+const { bodyBgColor, darkBlue } = vars;
 
 const StyledAddStatementBtn = styled(Button)(({ theme }) => ({
-  height: '60px',
+  height: "60px",
   background: bodyBgColor,
-  borderRadius: '16px',
+  borderRadius: "16px",
   color: darkBlue,
 
   "&:hover": {
-    color: bodyBgColor
-  }
+    color: bodyBgColor,
+  },
 }));
 
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
   const [sentence, setSentence] = useState({} as Sentence);
   const [loading, setLoading] = useState(true);
-  const [connectivityStatements, setConnectivityStatements] = useState<SentenceConnectivityStatement[]>();
+  const [connectivityStatements, setConnectivityStatements] =
+    useState<SentenceConnectivityStatement[]>();
 
   const [open, setOpen] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
-  const [expanded, setExpanded] = React.useState<string | false>('panel-0');
-  const [divisionList,setDivisionList] = useState([])
-  const [biologicalSex,setBiologicalSexList] = useState([])
-  const [speciesList,setSpeciesList] = useState([])
-  const [refetch, setRefetch] = useState(false)
-
-  const handleChange =
-    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpanded(isExpanded ? panel : false);
-    };
+  const [refetch, setRefetch] = useState(false);
 
   const handleClick = () => {
-    const transition = sentence?.available_transitions[selectedIndex]
+    const transition = sentence?.available_transitions[selectedIndex];
     sentenceService
       .doTransition(sentence, transition)
       .then((sentence: Sentence) => {
         setSentence(sentence);
-        setSelectedIndex(0)
+        setSelectedIndex(0);
       });
   };
 
   const onAddNewStatement = () => {
-    // @ts-ignore
-    setConnectivityStatements([...connectivityStatements, 
-      {sentence_id: sentence.id, knowledge_statement: "", biological_sex: null, ans_division: null, species: [] , dois: []}
+    setConnectivityStatements([
+      // @ts-ignore
+      ...connectivityStatements,
+      {
+        sentence_id: sentence.id,
+        knowledge_statement: "",
+        biological_sex: null,
+        ans_division: null,
+        species: [],
+        dois: [],
+      },
     ]);
-  }
+  };
 
   const handleMenuItemClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
-    index: number,
+    index: number
   ) => {
     setSelectedIndex(index);
     setOpen(false);
   };
 
-  const onDeleteStatement = (id: number) => {
-    statementService.remove(id).then(() => setRefetch(true))
-  }
-
   const refreshSentence = () => {
-    setRefetch(true)
-  }
+    setRefetch(true);
+  };
 
   useEffect(() => {
     if (sentenceId) {
@@ -100,7 +89,7 @@ const SentencesDetails = () => {
         .getObject(sentenceId)
         .then((sentence: Sentence) => {
           setSentence(sentence);
-          setConnectivityStatements(sentence.connectivity_statements)
+          setConnectivityStatements(sentence.connectivity_statements);
           if (
             sentence.owner &&
             sentence.owner?.id !== userProfile.getUser().id
@@ -119,24 +108,11 @@ const SentencesDetails = () => {
           }
         })
         .finally(() => {
-          setRefetch(false)
+          setRefetch(false);
           setLoading(false);
         });
     }
   }, [sentenceId, refetch]);
-
-  useEffect(() => {
-    statementService.getANSDivisionList().then((result) => {
-      setDivisionList(result.results)
-    })
-    statementService.getBiologicalSexList().then((result) => {
-      setBiologicalSexList(result.results)
-    })
-    specieService.getList({}).then(result => {
-      // @ts-ignore
-      setSpeciesList(result.results)
-    })
-  }, [])
 
   if (loading) {
     return <div>Loading...</div>;
@@ -151,25 +127,34 @@ const SentencesDetails = () => {
           <Grid item xs={12} md={6}>
             <Box>
               <Typography variant="h3" mb={1}>
-                Sentence Details #{sentenceId} <span><SentenceStateChip key={sentence?.state} value={sentence?.state} /></span>
+                Sentence Details #{sentenceId}{" "}
+                <span>
+                  <SentenceStateChip
+                    key={sentence?.state}
+                    value={sentence?.state}
+                  />
+                </span>
               </Typography>
               <span>
-                Last Edited on  {formatDate(sentence?.modified_date)}, {formatTime(sentence?.modified_date)}
+                Last Edited on {formatDate(sentence?.modified_date)},{" "}
+                {formatTime(sentence?.modified_date)}
               </span>
             </Box>
           </Grid>
-          <Grid item xs={12} md={6} display='flex' justifyContent='flex-end'>
-            {!disabled && sentence?.available_transitions?.length !== 0 &&
+          <Grid item xs={12} md={6} display="flex" justifyContent="flex-end">
+            {!disabled && sentence?.available_transitions?.length !== 0 && (
               <GroupedButtons
                 handleClick={handleClick}
-                selectedOption={SentenceLabels[sentence?.available_transitions[selectedIndex]]}
+                selectedOption={
+                  SentenceLabels[sentence?.available_transitions[selectedIndex]]
+                }
                 options={sentence?.available_transitions}
                 selectedIndex={selectedIndex}
                 handleMenuItemClick={handleMenuItemClick}
                 hasFormat={true}
                 format={SentenceLabels}
               />
-            }
+            )}
           </Grid>
         </Grid>
       </Grid>
@@ -177,101 +162,48 @@ const SentencesDetails = () => {
       <Grid item xs={12}>
         <Grid container spacing={1}>
           <Grid item xs={12} md={7}>
-            <Paper sx={{
-              border: 0,
-              boxShadow: 'none'
-            }}>
-              <Grid container p={3}  mb={2}>
+            <Paper
+              sx={{
+                border: 0,
+                boxShadow: "none",
+              }}
+            >
+              <Grid container p={3} mb={2}>
                 <Grid item xs={12}>
-                  <Stack direction="row" justifyContent="space-between"
-                         sx={{
-                           "& .MuiButtonBase-root": {
-                             padding: 0
-                           }
-                         }}>
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    sx={{
+                      "& .MuiButtonBase-root": {
+                        padding: 0,
+                      },
+                    }}
+                  >
                     <Typography variant="h5" mb={1}>
                       Knowledge Statements
                     </Typography>
                     <CheckDuplicates />
                   </Stack>
                 </Grid>
-                {
-                  connectivityStatements?.map((statement, key) =>
-                    <Grid item xs={12}>
-                      <Box p={1} mb={2} sx={{background: bodyBgColor, borderRadius: '12px'}}>
-                        <Grid container spacing={1} alignItems='center'>
-                          <Grid item xs={11}>
-                            <Paper sx={{
-                              border: 0,
-                              boxShadow: 'none'
-                            }}>
-                              <StatementForm
-                                divisionList={divisionList}
-                                biologicalSex={biologicalSex}
-                                statement={statement}
-                                format="small"
-                                setter={refreshSentence}
-                                extraData={{sentence_id: sentence.id}}
-                                uiFields={["knowledge_statement"]}
-                              />
-                              <DoisForm
-                                key={key}
-                                doisData={statement.dois}
-                                extraData={{connectivity_statement_id: statement.id}}
-                                setter={refreshSentence}
-                              />
-                              {
-                                statement.id &&
-                                <Accordion expanded={expanded === `panel-${key}`} onChange={handleChange(`panel-${key}`)}>
-                                  <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel1bh-content"
-                                    id="panel1bh-header"
-                                  >
-                                    <Typography>
-                                      Statement Details
-                                    </Typography>
-                                  </AccordionSummary>
-                                  <AccordionDetails>
-                                    <StatementForm
-                                      divisionList={divisionList}
-                                      biologicalSex={biologicalSex}
-                                      statement={statement}
-                                      format="small"
-                                      setter={setSentence}
-                                      extraData={{sentence_id: sentence.id, knowledge_statement: connectivityStatements[key].knowledge_statement}}
-                                      uiFields={["biological_sex_id", "apinatomy_model", "circuit_type", "laterality", "ans_division_id"]}
-                                    />
-                                    <SpeciesForm
-                                      speciesList={speciesList}
-                                      data={sentence}
-                                      extraData={{ parentId: sentence.id }}
-                                      setter={setSentence}
-                                    />
-                                  </AccordionDetails>
-                                </Accordion>
-                              }
-                            </Paper>
-
-                          </Grid>
-                          <Grid item xs={1} textAlign='center'>
-                            {
-                              key !== 0 &&
-                              <IconButton disabled={!statement.id} onClick={() => onDeleteStatement(statement.id)}>
-                                <DeleteOutlineIcon
-                                  sx={{ color:'#98A2B3' }}
-                                />
-                              </IconButton>
-                            }
-                          </Grid>
-                          </Grid>
-                      </Box>
-                    </Grid>
-                  )
-                }
-            <StyledAddStatementBtn startIcon={<AddCircleIcon />} variant="contained" fullWidth={true} onClick={onAddNewStatement}>
-              Add a knowledge statement
-            </StyledAddStatementBtn>
+                {connectivityStatements?.map((statement, key) => (
+                  <TriageStatementSection
+                    statement={statement}
+                    key={key}
+                    index={key}
+                    refreshSentence={refreshSentence}
+                    setRefresh={setRefetch}
+                    setSentence={setSentence}
+                    sentence={sentence}
+                  />
+                ))}
+                <StyledAddStatementBtn
+                  startIcon={<AddCircleIcon />}
+                  variant="contained"
+                  fullWidth={true}
+                  onClick={onAddNewStatement}
+                >
+                  Add a knowledge statement
+                </StyledAddStatementBtn>
               </Grid>
             </Paper>
             <SentenceForm
@@ -283,7 +215,7 @@ const SentencesDetails = () => {
           </Grid>
 
           <Grid item xs={12} md={5} p={1}>
-            <Paper sx={{padding: '24px', "& .MuiBox-root": {padding: 0}}}>
+            <Paper sx={{ padding: "24px", "& .MuiBox-root": { padding: 0 } }}>
               <Box>
                 <Typography variant="h5" mb={1}>
                   Notes
@@ -294,13 +226,11 @@ const SentencesDetails = () => {
                 extraData={{ parentId: sentence.id, service: sentenceService }}
                 setter={setSentence}
               />
-              <Divider sx={{margin: '36px 0'}} />
-              <NoteDetails
-                extraData={{ sentence_id: sentence.id }}
-              />
+              <Divider sx={{ margin: "36px 0" }} />
+              <NoteDetails extraData={{ sentence_id: sentence.id }} />
             </Paper>
           </Grid>
-          </Grid>
+        </Grid>
       </Grid>
     </Grid>
   );
