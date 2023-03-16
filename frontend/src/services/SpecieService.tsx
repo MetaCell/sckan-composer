@@ -26,8 +26,8 @@ class SpecieService extends AbstractService {
     }
     return specie.service.getObject(specie.parentId).then((response: any) => response)
   }
-  async getList(specie: any): Promise<PaginatedSentenceList> {
-    return composerApi.composerSpecieList(specie).then((res: any) => res.data)
+  async getList() {
+    return composerApi.composerSpecieList(undefined).then((res: any) => res.data)
   }
   async getObject(id: string): Promise<Specie> {
     return {} as Specie

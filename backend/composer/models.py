@@ -319,7 +319,7 @@ class ConnectivityStatement(models.Model):
     sentence = models.ForeignKey(
         Sentence, verbose_name="Sentence", on_delete=models.DO_NOTHING
     )
-    knowledge_statement = models.TextField(db_index=True)
+    knowledge_statement = models.TextField(db_index=True, blank=True)
     state = FSMField(default=CSState.DRAFT, protected=True)
     origin = models.ForeignKey(
         AnatomicalEntity,

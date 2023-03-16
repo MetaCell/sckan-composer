@@ -20,7 +20,7 @@ export default function TextArea({value, placeholder, required, onChange, option
       rows={rows}
       placeholder={placeholder}
       fullWidth
-      required
+      required={required}
       onChange={debouncedChangeHandler}
       sx={{
         "& .Mui-focused": {

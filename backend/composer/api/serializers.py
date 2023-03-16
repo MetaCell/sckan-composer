@@ -286,6 +286,7 @@ class ConnectivityStatementSerializer(
     """Connectivity Statement"""
 
     sentence_id = serializers.IntegerField()
+    knowledge_statement = serializers.CharField(allow_blank=True, required=False)
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
     origin_id = serializers.IntegerField(required=False)
     destination_id = serializers.IntegerField(required=False)

@@ -29,8 +29,7 @@ const TriageStatementSection = (props: any) => {
     statementService.getBiologicalSexList().then((result) => {
       setBiologicalSexList(result.results);
     });
-    specieService.getList({}).then((result) => {
-      // @ts-ignore
+    specieService.getList().then((result) => {
       setSpeciesList(result.results);
     });
   }, []);
