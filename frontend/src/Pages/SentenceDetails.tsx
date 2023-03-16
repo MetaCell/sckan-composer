@@ -6,9 +6,8 @@ import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import { useParams } from "react-router-dom";
 import sentenceService from "../services/SentenceService";
-import NoteForm from "../components/Forms/NoteForm";
 import TagForm from "../components/Forms/TagForm";
-import {Doi, Sentence, SentenceConnectivityStatement} from "../apiclient/backend";
+import {Sentence, SentenceConnectivityStatement} from "../apiclient/backend";
 import { userProfile } from "../services/UserService";
 import CheckDuplicates from "../components/CheckForDuplicates/CheckDuplicatesDialog";
 import {SentenceStateChip} from "../components/Widgets/StateChip";
@@ -23,12 +22,12 @@ import SpeciesForm from "../components/Forms/SpeciesForm";
 import Divider from "@mui/material/Divider";
 import {Accordion, AccordionDetails, AccordionSummary, styled} from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import CustomTextArea from "../components/Widgets/CustomTextArea";
 import statementService from "../services/StatementService";
 import { vars } from "../theme/variables";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import NoteDetails from "../components/Widgets/NotesFomList";
 import IconButton from "@mui/material/IconButton";
+import specieService from "../services/SpecieService";
 
 const initialConnectivityStatement = {knowledge_statement: "", biological_sex: null, ans_division: null, species: [] , dois: []}
 const { bodyBgColor, darkBlue } = vars
@@ -58,6 +57,7 @@ const SentencesDetails = () => {
   const [expanded, setExpanded] = React.useState<string | false>('panel-0');
   const [divisionList,setDivisionList] = useState([])
   const [biologicalSex,setBiologicalSexList] = useState([])
+  const [speciesList,setSpeciesList] = useState([])
   const [refetch, setRefetch] = useState(false)
 
   const handleChange =
@@ -77,7 +77,7 @@ const SentencesDetails = () => {
 
   const onAddNewStatement = () => {
     // @ts-ignore
-    setConnectivityStatements([...connectivityStatements, initialConnectivityStatement]);
+    setConnectivityStatements([...connectivityStatements, {...initialConnectivityStatement, sentence_id: sentence?.id}]);
   }
 
   const handleMenuItemClick = (
@@ -133,6 +133,10 @@ const SentencesDetails = () => {
     })
     statementService.getBiologicalSexList().then((result) => {
       setBiologicalSexList(result.results)
+    })
+    specieService.getList({}).then(result => {
+      // @ts-ignore
+      setSpeciesList(result.results)
     })
   }, [])
 
@@ -239,6 +243,7 @@ const SentencesDetails = () => {
                                     uiFields={["biological_sex_id", "apinatomy_model", "circuit_type", "laterality", "ans_division_id"]}
                                   />
                                   <SpeciesForm
+                                    speciesList={speciesList}
                                     data={sentence}
                                     extraData={{ parentId: sentence.id }}
                                     setter={setSentence}
