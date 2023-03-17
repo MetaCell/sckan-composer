@@ -12,6 +12,8 @@ const SpeciesForm = (props: any) => {
 
   const { schema, uiSchema } = jsonSchemas.getSpeciesSchema()
 
+  const availableOptions = speciesList.filter((s:Specie)=> !data.some(({id}:any)=> id === s.id))
+
   const delSpecie = (specieId:number) =>{
     extraData.service.removeSpecie(extraData.parentId, specieId).then((newData: any) => {
       setter(newData)
@@ -41,7 +43,7 @@ const SpeciesForm = (props: any) => {
         data: data?.map((row: Specie)=>({id:row.id, label: row.name})),
         label: 'Species',
         placeholder: 'Select Species',
-        options: speciesList.map((row: Specie)=>({id:row.id, label: row.name})),
+        options: availableOptions.map((row: Specie)=>({id:row.id, label: row.name})),
         removeChip: delSpecie,
         onAutocompleteChange: handleAutocompleteChange
       },
