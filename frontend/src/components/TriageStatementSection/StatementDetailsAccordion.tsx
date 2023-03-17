@@ -8,6 +8,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import StatementForm from "../Forms/StatementForm";
 import SpeciesForm from "../Forms/SpeciesForm";
+import statementService from '../../services/StatementService'
 
 const StatementDetailsAccordion = (props: any) => {
   const {
@@ -46,6 +47,12 @@ const StatementDetailsAccordion = (props: any) => {
         <Typography>Statement Details</Typography>
       </AccordionSummary>
       <AccordionDetails>
+      <SpeciesForm
+          //speciesList={speciesList}
+          data={statement.species}
+          extraData={{ parentId: statement.id, service: statementService }}
+          setter={setter}
+        />
         <StatementForm
           divisionList={divisionList}
           biologicalSex={biologicalSex}
@@ -63,12 +70,6 @@ const StatementDetailsAccordion = (props: any) => {
             "laterality",
             "ans_division_id",
           ]}
-        />
-        <SpeciesForm
-          speciesList={speciesList}
-          data={sentence}
-          extraData={{ parentId: sentence.id }}
-          setter={setter}
         />
       </AccordionDetails>
     </Accordion>

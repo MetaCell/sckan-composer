@@ -25,8 +25,14 @@ class ConnectivityStatementService extends AbstractService {
   async addTag(id: number, tagId: number): Promise<ConnectivityStatement> {
     return composerApi.composerConnectivityStatementAddTagCreate(id, tagId).then((response: any) => response.data)
   }
+  async addSpecie(id: number, specieId: number): Promise<ConnectivityStatement> {
+    return composerApi.composerConnectivityStatementAddSpecieCreate(id, specieId).then((response: any) => response.data)
+  }
   async removeTag(id: number, tagId: number): Promise<ConnectivityStatement> {
     return composerApi.composerConnectivityStatementDelTagCreate(id, tagId).then((response: any) => response.data)
+  }
+  async removeSpecie(id: number, specieId: number): Promise<ConnectivityStatement> {
+    return composerApi.composerConnectivityStatementDelSpecieCreate(id, specieId).then((response: any) => response.data)
   }
   async getList(queryOptions: QueryParams): Promise<PaginatedConnectivityStatementList> {
     const { limit, ordering, index, knowledgeStatement, stateFilter, tagFilter } = queryOptions
