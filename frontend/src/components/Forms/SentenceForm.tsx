@@ -46,13 +46,13 @@ const SentenceForm = (props: any) => {
   }
 
   return (
-    <Paper sx={{padding: '24px 14px'}}>
-      <Box pl={2} mb={3}>
+    <Paper sx={{padding: 3}}>
+      <Box mb={3}>
         <Typography variant='h5' color={vars.darkTextColor}>
           NLP Sentence
         </Typography>
       </Box>
-      <Box pl={2}>
+      <Box>
         <Typography variant='subtitle1' color={vars.darkTextColor}>
           {data?.text}
         </Typography>
@@ -66,7 +66,7 @@ const SentenceForm = (props: any) => {
         children={true}
         {...props}
       />
-      <Box pl={2}>
+      <Box mt={2}>
         <Typography color={vars.labelColor} fontWeight={500} mb={1}>
           PMID (PubMed identifier)
         </Typography>

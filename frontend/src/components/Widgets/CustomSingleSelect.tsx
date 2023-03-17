@@ -6,6 +6,7 @@ import FormControl from '@mui/material/FormControl';
 import Select  from '@mui/material/Select';
 import Typography from "@mui/material/Typography";
 import {styled} from "@mui/material";
+import { vars } from '../../theme/variables';
 
 
 const StyledSelect = styled(Select)(({ theme }) => ({
@@ -27,9 +28,9 @@ const StyledSelect = styled(Select)(({ theme }) => ({
 const CustomSingleSelect = ( {onChange, placeholder,value, options: { label, data }} : any) => {
   return (
     <FormControl variant="standard">
-      <InputLabel shrink htmlFor="custom-select" id="custom-select-label">
-        <Typography variant="h5" fontWeight={500}>{label}</Typography>
-      </InputLabel>
+        <Typography variant="h6" fontWeight={500} marginBottom={2} color={vars.titleFontColor}>
+          {label}
+        </Typography>
       <StyledSelect
         value={value}
         onChange={(event) => onChange(event.target.value)}
