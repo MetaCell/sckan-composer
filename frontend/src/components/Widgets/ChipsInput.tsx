@@ -21,11 +21,13 @@ const StyledInput = styled(TextField)(({ theme }) => ({
   },
 }));
 
-export const ChipsInput = ({onChange,placeholder, options: { data, removeChip, label, disabled = false }}: any) => {
+export const ChipsInput = ({onChange,placeholder, value, options: { data, removeChip, label, disabled = false }}: any) => {
 
   const handleDelete = (id: number) => {
     removeChip(id)
   }
+
+  const inputValue = value ? value : ''
 
   return (
     <FormControl variant="standard">
@@ -41,6 +43,7 @@ export const ChipsInput = ({onChange,placeholder, options: { data, removeChip, l
         onChange={(event) => onChange(event.target.value)}
         id='custom-input'
         placeholder={placeholder}
+        value={inputValue}
         InputProps={{
           startAdornment: (
             <Stack direction='row'>
