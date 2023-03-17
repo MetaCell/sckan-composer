@@ -1,21 +1,27 @@
 import React from 'react'
-import { Box } from '@mui/material'
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
 import specieService from "../../services/SpecieService";
 import {UiSchema} from "@rjsf/utils";
-import {ChipsInput} from "../Widgets/ChipsInput";
 import { Specie } from '../../apiclient/backend';
+import { AutocompleteWithChips } from '../Widgets/AutocompleteWithChips';
 
 
 const SpeciesForm = (props: any) => {
-  const { data, extraData, setter } = props
+  const { data, extraData, setter, speciesList } = props
 
   const { schema, uiSchema } = jsonSchemas.getSpeciesSchema()
 
   const delSpecie = (specieId:number) =>{
     extraData.service.removeSpecie(extraData.parentId, specieId).then((newData: any) => {
       setter(newData)
+    })
+  }
+
+  const handleAutocompleteChange = (e:any, value:any)=>{
+    const selectedSpecie = value.pop()
+    extraData.service.addSpecie(extraData.parentId,selectedSpecie.id).then((newData:any)=>{
+      setter()
     })
   }
 
@@ -30,15 +36,18 @@ const SpeciesForm = (props: any) => {
   const customUiSchema: UiSchema = {
     ...uiSchema,
     name: {
-      "ui:widget": ChipsInput,
+      "ui:widget": AutocompleteWithChips,
       "ui:options": {
-        data: data.map((row: Specie)=>({id:row.id, label: row.name})),
+        data: data?.map((row: Specie)=>({id:row.id, label: row.name})),
         label: 'Species',
         placeholder: 'Select Species',
+        options: speciesList.map((row: Specie)=>({id:row.id, label: row.name})),
         removeChip: delSpecie,
-      }
+        onAutocompleteChange: handleAutocompleteChange
+      },
     },
   };
+
 
   return (
     <FormBase

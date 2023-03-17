@@ -48,7 +48,7 @@ const StatementDetailsAccordion = (props: any) => {
       </AccordionSummary>
       <AccordionDetails>
       <SpeciesForm
-          //speciesList={speciesList}
+          speciesList={speciesList}
           data={statement.species}
           extraData={{ parentId: statement.id, service: statementService }}
           setter={setter}
