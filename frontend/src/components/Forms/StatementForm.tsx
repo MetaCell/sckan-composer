@@ -61,9 +61,9 @@ const StatementForm = (props: any) => {
       label: 'Knowledge Statement',
         placeholder: "Knowledge Statement",
         rows: 4,
-        hasDebouncedOnChange:true
+        hasDebouncedOnChange:true,
+        value: statement?.knowledge_statement ?? ""
     },
-    value: statement?.knowledge_statement ?? ""
   }
 
   const widgets = {
