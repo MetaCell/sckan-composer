@@ -60,7 +60,8 @@ const StatementForm = (props: any) => {
       "ui:options": {
       label: 'Knowledge Statement',
         placeholder: "Knowledge Statement",
-        rows: 4
+        rows: 4,
+        hasDebouncedOnChange:true
     },
     value: statement?.knowledge_statement ?? ""
   }

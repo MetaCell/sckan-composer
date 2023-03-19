@@ -35,6 +35,7 @@ const NoteDetails = (props: any) => {
     if (extraData?.sentence_id) {
       noteService.getNotesList(undefined,undefined, undefined, extraData?.sentence_id).then(result => {
         setNoteList(result?.results)
+        setRefresh(false)
       })
     }
   }, [extraData?.sentence_id, refresh])
