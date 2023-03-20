@@ -90,9 +90,7 @@ const SentencesDetails = () => {
         .then((sentence: Sentence) => {
           setSentence(sentence);
           const foundToBeReviewed = sentence.available_transitions.findIndex((transition) => transition === SentenceAvailableTransitionsEnum.ToBeReviewed)
-          if(foundToBeReviewed && foundToBeReviewed !== -1) {
-            setSelectedIndex(foundToBeReviewed)
-          }
+          setSelectedIndex(foundToBeReviewed && foundToBeReviewed !== -1 ? foundToBeReviewed : 0)
           setConnectivityStatements(sentence.connectivity_statements);
           if (
             sentence.owner &&
