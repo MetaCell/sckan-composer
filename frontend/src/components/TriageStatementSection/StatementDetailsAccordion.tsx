@@ -1,0 +1,66 @@
+import React from "react";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Typography,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import StatementForm from "../Forms/StatementForm";
+import SpeciesForm from "../Forms/SpeciesForm";
+import statementService from '../../services/StatementService'
+
+const StatementDetailsAccordion = (props: any) => {
+  const {
+    index,
+    statement,
+    setter,
+    sentence,
+  } = props;
+
+  const [expanded, setExpanded] = React.useState<string | false>("panel-0");
+
+  const handleChange =
+    (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpanded(isExpanded ? panel : false);
+    };
+  return (
+    <Accordion
+      expanded={expanded === `panel-${index}`}
+      onChange={handleChange(`panel-${index}`)}
+    >
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        aria-controls="panel1bh-content"
+        id="panel1bh-header"
+      >
+        <Typography>Statement Details</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+      <SpeciesForm
+          data={statement.species}
+          extraData={{ parentId: statement.id, service: statementService }}
+          setter={setter}
+        />
+        <StatementForm
+          statement={statement}
+          format="small"
+          setter={setter}
+          extraData={{
+            sentence_id: sentence.id,
+            knowledge_statement: statement.knowledge_statement,
+          }}
+          uiFields={[
+            "biological_sex_id",
+            "apinatomy_model",
+            "circuit_type",
+            "laterality",
+            "ans_division_id",
+          ]}
+        />
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+export default StatementDetailsAccordion;

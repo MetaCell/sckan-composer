@@ -1,30 +1,28 @@
 import React from 'react'
-import { Box } from '@mui/material'
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
-import tagService, { tags } from '../../services/TagService'
+import specieService, { species } from "../../services/SpecieService";
 import {UiSchema} from "@rjsf/utils";
-import {ChipsInput} from "../Widgets/ChipsInput";
-import {Tag} from "../../apiclient/backend";
+import { Specie } from '../../apiclient/backend';
 import { AutocompleteWithChips } from '../Widgets/AutocompleteWithChips';
 
 
-const TagForm = (props: any) => {
+const SpeciesForm = (props: any) => {
   const { data, extraData, setter } = props
 
   const { schema, uiSchema } = jsonSchemas.getSpeciesSchema()
 
-  const availableOptions = tags.getTagList().filter((t:Tag)=> !data.some(({id}:any)=> id === t.id))
+  const availableOptions = species.getSpecieList().filter((s:Specie)=> !data.some(({id}:any)=> id === s.id))
 
-  const delTag = (tagId:number) =>{
-    extraData.service.removeTag(extraData.parentId, tagId).then((newData: any) => {
+  const delSpecie = (specieId:number) =>{
+    extraData.service.removeSpecie(extraData.parentId, specieId).then((newData: any) => {
       setter(newData)
     })
   }
 
   const handleAutocompleteChange = (e:any, value:any)=>{
-    const selectedTag = value.pop()
-    extraData.service.addTag(extraData.parentId,selectedTag.id).then((newData:any)=>{
+    const selectedSpecie = value.pop()
+    extraData.service.addSpecie(extraData.parentId,selectedSpecie.id).then((newData:any)=>{
       setter()
     })
   }
@@ -42,11 +40,11 @@ const TagForm = (props: any) => {
     name: {
       "ui:widget": AutocompleteWithChips,
       "ui:options": {
-        data: data?.map((row: Tag)=>({id:row.id, label: row.tag})),
-        label: 'Tags',
-        placeholder: 'Select Tags',
-        options: availableOptions.map((row: Tag)=>({id:row.id, label: row.tag})),
-        removeChip: delTag,
+        data: data?.map((row: Specie)=>({id:row.id, label: row.name})),
+        label: 'Species',
+        placeholder: 'Select Species',
+        options: availableOptions.map((row: Specie)=>({id:row.id, label: row.name})),
+        removeChip: delSpecie,
         onAutocompleteChange: handleAutocompleteChange
       },
     },
@@ -56,7 +54,7 @@ const TagForm = (props: any) => {
   return (
     <FormBase
       data={{}}
-      service={tagService}
+      service={specieService}
       schema={customSchema}
       uiSchema={customUiSchema}
       uiFields={uiFields}
@@ -68,4 +66,4 @@ const TagForm = (props: any) => {
   )
 }
 
-export default TagForm
+export default SpeciesForm

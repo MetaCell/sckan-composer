@@ -6,7 +6,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import SentenceForm from "./Forms/SentenceForm";
+import SentenceAddForm from "./Forms/SentenceAddForm";
 import { useNavigate } from "react-router";
 import { Sentence } from "../apiclient/backend";
 
@@ -41,7 +41,7 @@ const AddSentencesDialog = (props: any) => {
         </Box>
       </DialogTitle>
       <DialogContent>
-        <SentenceForm
+        <SentenceAddForm
           format="create"
           clearOnSave
           enableAutoSave={false}

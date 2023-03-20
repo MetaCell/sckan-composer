@@ -5,7 +5,7 @@ import statementReducer from './statementSlice'
 export const store = configureStore({
   reducer: {
     sentence: sentenceReducer,
-    statement: statementReducer
+    statement: statementReducer,
   },
 })
 

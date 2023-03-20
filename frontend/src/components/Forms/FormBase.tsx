@@ -5,6 +5,7 @@ import { Backdrop, Box, CircularProgress } from "@mui/material";
 import { Theme } from "@rjsf/mui";
 import { useDebouncedCallback } from "use-debounce";
 import { EDIT_DEBOUNCE } from "../../settings";
+import { isEqual } from "../../helpers/helpers";
 
 const Form = withTheme(Theme);
 
@@ -24,7 +25,8 @@ export const FormBase = (props: any) => {
     clearOnSave = false,
     action,
     formIsValid,
-    sx,
+    children = false,
+    widgets,
   } = props;
   const [localData, setLocalData] = useState<any>(data);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -43,6 +45,9 @@ export const FormBase = (props: any) => {
   //as it was mutating the original object at the jsonschema singleton
 
   useEffect(() => {
+    setLocalData(data)
+    setCustomSchema(schema)
+    setCustomUiSchema(uiSchema)
     if (uiFields) {
       Object.entries(uiSchema).forEach((p) => {
         if (!p[0].startsWith("ui:") && !uiFields.includes(p[0])) {
@@ -56,7 +61,7 @@ export const FormBase = (props: any) => {
         }
       });
     }
-  }, []);
+  }, [data]);
 
   const onError = (errors: any) => {
     log("errors");
@@ -75,7 +80,7 @@ export const FormBase = (props: any) => {
       "ui:submitButtonOptions": {
         ...customUiSchema["ui:submitButtonOptions"],
         props: {
-          ...customUiSchema["ui:submitButtonOptions"].props,
+          ...customUiSchema["ui:submitButtonOptions"]?.props,
           disabled: disable,
         },
       },
@@ -142,6 +147,8 @@ export const FormBase = (props: any) => {
           onChange={handleUpdate}
           onSubmit={handleSubmit}
           onError={onError}
+          children={children}
+          widgets={widgets}
         />
       </Box>
     </>

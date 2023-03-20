@@ -4,6 +4,7 @@ import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import { styled } from "@mui/material";
 import Typography from "@mui/material/Typography";
+import { vars } from "../../theme/variables";
 
 const StyledInput = styled(TextField)(({ theme }) => ({
   "label + &": {
@@ -15,23 +16,24 @@ const StyledInput = styled(TextField)(({ theme }) => ({
 }));
 
 export default function CustomTextField({
+  value,
   placeholder,
   onChange,
   options: { label, multiline, rows },
 }: any) {
   return (
     <FormControl variant="standard">
-      <InputLabel shrink htmlFor="custom-input">
-        <Typography variant="h4" fontWeight={500}>
+        <Typography variant="h6" fontWeight={500} marginBottom={2} color={vars.titleFontColor}>
           {label}
         </Typography>
-      </InputLabel>
+
       <StyledInput
         onChange={(event) => onChange(event.target.value)}
         id="custom-input"
         placeholder={placeholder}
         multiline={multiline}
         rows={rows}
+        value={value}
       />
     </FormControl>
   );

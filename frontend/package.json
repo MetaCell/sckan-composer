@@ -8,6 +8,7 @@
     "@emotion/react": "11.10.5",
     "@emotion/styled": "11.10.5",
     "@mui/icons-material": "5.11.0",
+    "@mui/lab": "^5.0.0-alpha.122",
     "@mui/material": "5.11.4",
     "@mui/x-data-grid": "^5.17.21",
     "@openapi-contrib/openapi-schema-to-json-schema": "^3.2.0",

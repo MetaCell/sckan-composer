@@ -1,6 +1,6 @@
 import json
 
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from drf_react_template.schema_form_encoder import SchemaProcessor, UiSchemaProcessor
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -15,7 +15,7 @@ from .filtersets import (
     ConnectivityStatementFilter,
     AnatomicalEntityFilter,
     NoteFilter,
-    ViaFilter,
+    ViaFilter, SpecieFilter,
 )
 from .serializers import (
     AnatomicalEntitySerializer,
@@ -26,7 +26,7 @@ from .serializers import (
     SentenceSerializer,
     SpecieSerializer,
     TagSerializer,
-    ViaSerializer, DoiSerializer,
+    ViaSerializer, DoiSerializer, BiologicalSexSerializer,
 )
 from ..models import (
     AnatomicalEntity,
@@ -37,7 +37,7 @@ from ..models import (
     Sentence,
     Specie,
     Tag,
-    Via, Doi,
+    Via, Doi, BiologicalSex,
 )
 from ..services import ConnectivityStatementService, SentenceService
 
@@ -96,26 +96,27 @@ class DoiMixin(
         parameters=[
             OpenApiParameter(
                 "doi",
-                OpenApiTypes.INT,
+                OpenApiTypes.STR,
                 location=OpenApiParameter.PATH,
                 required=True,
             )
         ],
         request=None,
     )
-    @action(detail=True, methods=["post"], url_path="add_doi/(?P<doi>\w+)")
+    @action(detail=True, methods=["post"], url_path="add_doi/(?P<doi>.*)")
     def add_doi(self, request, pk=None, doi=None):
-        instance = self.get_object()
-        _, _ = Doi.objects.get_or_create(
-            connectivity_statement=instance,
+        doi_instance, created = Doi.objects.get_or_create(
+            connectivity_statement_id=pk,
             doi=doi,
         )
+        doi_instance.save()
+        instance = self.get_object()
         return Response(self.get_serializer(instance).data)
 
     @extend_schema(
         parameters=[
             OpenApiParameter(
-                "doi",
+                "doi_id",
                 OpenApiTypes.INT,
                 location=OpenApiParameter.PATH,
                 required=True,
@@ -123,14 +124,12 @@ class DoiMixin(
         ],
         request=None,
     )
-    @action(detail=True, methods=["post"], url_path="del_doi/(?P<doi>\w+)")
-    def del_doi(self, request, pk=None, doi=None):
+    @action(detail=True, methods=["delete"], url_path="del_doi/(?P<doi_id>\d+)")
+    def del_doi(self, request, pk=None, doi_id=None):
+        count, deleted = Doi.objects.filter(id=doi_id, connectivity_statement_id=pk).delete()
+        if count == 0:
+            raise Http404
         instance = self.get_object()
-        doi_instance = Doi.objects.get(connectivity_statement=instance.id,
-                                       doi=doi
-                                       )
-        if doi_instance:
-            doi_instance.delete()
         return Response(self.get_serializer(instance).data)
 
 
@@ -237,6 +236,18 @@ class AnsDivisionViewSet(viewsets.ReadOnlyModelViewSet):
     ]
 
 
+class BiologicalSexViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    BiologicalSex
+    """
+
+    queryset = BiologicalSex.objects.all()
+    serializer_class = BiologicalSexSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+    ]
+
+
 class NoteViewSet(viewsets.ModelViewSet):
     """
     Note
@@ -265,9 +276,9 @@ class ConnectivityStatementViewSet(DoiMixin, SpecieMixin, TagMixin, TransitionMi
     service = ConnectivityStatementService
 
     def get_queryset(self):
-        if self.action == "list" and "sentence_id" in self.request.query_params:
-            return super().get_queryset()
-        return ConnectivityStatement.objects.excluding_draft()
+        if (self.action == "list" and "sentence_id" not in self.request.query_params):
+            return ConnectivityStatement.objects.excluding_draft()
+        return super().get_queryset()
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -306,6 +317,7 @@ class SpecieViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
+    filterset_class = SpecieFilter
 
 
 class ProfileViewSet(viewsets.GenericViewSet):
@@ -317,6 +329,9 @@ class ProfileViewSet(viewsets.GenericViewSet):
     serializer_class = ProfileSerializer
 
     def get_queryset(self):
+        user = self.request.user
+        if user.is_anonymous:
+            return super().get_queryset().none()
         return super().get_queryset().filter(user=self.request.user)
 
     @action(detail=False, methods=["get"])
@@ -355,12 +370,12 @@ def jsonschemas(request):
         TagSerializer,
         DoiSerializer,
         SpecieSerializer,
-        NoteSerializer,
+        NoteSerializer
     ]
 
     schema = {}
     for s in serializers:
-        obj = s({})
+        obj = s(**{})
         schema[s.Meta.model.__name__] = {
             "schema": SchemaProcessor(obj, {}).get_schema(),
             "uiSchema": UiSchemaProcessor(obj, {}).get_ui_schema(),

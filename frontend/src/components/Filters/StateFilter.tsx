@@ -17,13 +17,13 @@ const statementLabels = {}
 const StateFilter = (props: any) => {
   const { selectedStates, setSelectedStates, entity } = props
 
-  const generateDataForCheckbox = (labels: any) => {
+  const generateDataForCheckbox = (e: any) => {
     let mappedItems: any[] = []
     let i: keyof typeof selectedStates
     for (i in selectedStates) {
       const item = {
         name: i,
-        label: labels[i],
+        label: selectedStates[i],
         checked: selectedStates[i],
       }
       mappedItems.push(item)

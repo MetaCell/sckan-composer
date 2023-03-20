@@ -1,5 +1,5 @@
 import { composerApi } from "./apis";
-import { Specie } from "../apiclient/backend";
+import {PaginatedSentenceList, Specie} from "../apiclient/backend";
 import { AbstractService } from "./AbstractService";
 
 export let species = (function () {
@@ -8,7 +8,7 @@ export let species = (function () {
   return {
     // public interface
     setSpecieList: async function () {
-      return composerApi.composerSpecieList(9999).then((resp: any) => {
+      return composerApi.composerSpecieList(undefined).then((resp: any) => {
         specieList = resp.data.results;
       });
     },
@@ -25,6 +25,9 @@ class SpecieService extends AbstractService {
       return specie.service.addSpecie(specie.parentId, specieId).then((response: any) => response)
     }
     return specie.service.getObject(specie.parentId).then((response: any) => response)
+  }
+  async getList() {
+    return composerApi.composerSpecieList(undefined).then((res: any) => res.data)
   }
   async getObject(id: string): Promise<Specie> {
     return {} as Specie

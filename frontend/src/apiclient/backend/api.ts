@@ -181,7 +181,7 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'origin_id': number;
+    'origin_id'?: number;
     /**
      * 
      * @type {AnatomicalEntity}
@@ -193,7 +193,7 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'destination_id': number;
+    'destination_id'?: number;
     /**
      * 
      * @type {AnatomicalEntity}
@@ -205,7 +205,7 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'ans_division_id': number;
+    'ans_division_id'?: number | null;
     /**
      * 
      * @type {AnsDivision}
@@ -253,7 +253,7 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'biological_sex_id': number;
+    'biological_sex_id'?: number | null;
     /**
      * 
      * @type {BiologicalSex}
@@ -336,6 +336,12 @@ export interface Doi {
      * @memberof Doi
      */
     'doi': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Doi
+     */
+    'connectivity_statement_id': number;
 }
 /**
  * 
@@ -501,6 +507,37 @@ export interface PaginatedAnsDivisionList {
      * @memberof PaginatedAnsDivisionList
      */
     'results'?: Array<AnsDivision>;
+}
+/**
+ * 
+ * @export
+ * @interface PaginatedBiologicalSexList
+ */
+export interface PaginatedBiologicalSexList {
+    /**
+     * 
+     * @type {number}
+     * @memberof PaginatedBiologicalSexList
+     */
+    'count'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedBiologicalSexList
+     */
+    'next'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedBiologicalSexList
+     */
+    'previous'?: string | null;
+    /**
+     * 
+     * @type {Array<BiologicalSex>}
+     * @memberof PaginatedBiologicalSexList
+     */
+    'results'?: Array<BiologicalSex>;
 }
 /**
  * 
@@ -783,7 +820,7 @@ export interface PatchedConnectivityStatement {
      * @type {number}
      * @memberof PatchedConnectivityStatement
      */
-    'ans_division_id'?: number;
+    'ans_division_id'?: number | null;
     /**
      * 
      * @type {AnsDivision}
@@ -831,7 +868,7 @@ export interface PatchedConnectivityStatement {
      * @type {number}
      * @memberof PatchedConnectivityStatement
      */
-    'biological_sex_id'?: number;
+    'biological_sex_id'?: number | null;
     /**
      * 
      * @type {BiologicalSex}
@@ -949,7 +986,7 @@ export interface PatchedSentence {
      * @type {string}
      * @memberof PatchedSentence
      */
-    'external_ref'?: string;
+    'external_ref'?: string | null;
     /**
      * 
      * @type {Array<Tag>}
@@ -1138,7 +1175,7 @@ export interface Sentence {
      * @type {string}
      * @memberof Sentence
      */
-    'external_ref': string;
+    'external_ref'?: string | null;
     /**
      * 
      * @type {Array<Tag>}
@@ -1259,7 +1296,7 @@ export interface SentenceConnectivityStatement {
      * @type {number}
      * @memberof SentenceConnectivityStatement
      */
-    'ans_division_id': number;
+    'ans_division_id'?: number | null;
     /**
      * 
      * @type {AnsDivision}
@@ -1289,7 +1326,7 @@ export interface SentenceConnectivityStatement {
      * @type {number}
      * @memberof SentenceConnectivityStatement
      */
-    'biological_sex_id': number;
+    'biological_sex_id'?: number | null;
     /**
      * 
      * @type {BiologicalSex}
@@ -1302,6 +1339,18 @@ export interface SentenceConnectivityStatement {
      * @memberof SentenceConnectivityStatement
      */
     'apinatomy_model': string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof SentenceConnectivityStatement
+     */
+    'owner_id'?: number | null;
+    /**
+     * 
+     * @type {User}
+     * @memberof SentenceConnectivityStatement
+     */
+    'owner': User;
 }
 /**
  * Specie
@@ -1326,7 +1375,7 @@ export interface Specie {
      * @type {string}
      * @memberof Specie
      */
-    'ontology_uri': string;
+    'ontology_uri'?: string | null;
 }
 /**
  * Note Tag
@@ -1447,10 +1496,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -1501,10 +1550,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1541,10 +1590,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -1591,10 +1640,100 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
             // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * BiologicalSex
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerBiologicalSexList: async (limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/biological-sex/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
 
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * BiologicalSex
+         * @param {number} id A unique integer value identifying this biological sex.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerBiologicalSexRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerBiologicalSexRetrieve', 'id', id)
+            const localVarPath = `/api/composer/biological-sex/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1609,12 +1748,12 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * ConnectivityStatement
-         * @param {number} doi 
+         * @param {string} doi 
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAddDoiCreate: async (doi: number, id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementAddDoiCreate: async (doi: string, id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'doi' is not null or undefined
             assertParamExists('composerConnectivityStatementAddDoiCreate', 'doi', doi)
             // verify required parameter 'id' is not null or undefined
@@ -1637,10 +1776,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1683,10 +1822,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1729,10 +1868,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1770,10 +1909,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1791,18 +1930,18 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * ConnectivityStatement
-         * @param {number} doi 
+         * @param {number} doiId 
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDelDoiCreate: async (doi: number, id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'doi' is not null or undefined
-            assertParamExists('composerConnectivityStatementDelDoiCreate', 'doi', doi)
+        composerConnectivityStatementDelDoiDestroy: async (doiId: number, id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'doiId' is not null or undefined
+            assertParamExists('composerConnectivityStatementDelDoiDestroy', 'doiId', doiId)
             // verify required parameter 'id' is not null or undefined
-            assertParamExists('composerConnectivityStatementDelDoiCreate', 'id', id)
-            const localVarPath = `/api/composer/connectivity-statement/{id}/del_doi/{doi}/`
-                .replace(`{${"doi"}}`, encodeURIComponent(String(doi)))
+            assertParamExists('composerConnectivityStatementDelDoiDestroy', 'id', id)
+            const localVarPath = `/api/composer/connectivity-statement/{id}/del_doi/{doi_id}/`
+                .replace(`{${"doi_id"}}`, encodeURIComponent(String(doiId)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1811,7 +1950,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -1819,10 +1958,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1865,10 +2004,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1911,10 +2050,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1953,10 +2092,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2002,10 +2141,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2053,10 +2192,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (destination !== undefined) {
                 localVarQueryParameter['destination'] = destination;
@@ -2136,10 +2275,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2181,10 +2320,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2226,10 +2365,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2267,10 +2406,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2308,10 +2447,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2353,10 +2492,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2395,10 +2534,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (connectivityStatementId !== undefined) {
                 localVarQueryParameter['connectivity_statement_id'] = connectivityStatementId;
@@ -2454,10 +2593,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2499,10 +2638,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2539,10 +2678,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -2589,10 +2728,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2634,10 +2773,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2675,10 +2814,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2721,10 +2860,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2762,10 +2901,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2811,10 +2950,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2860,10 +2999,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2908,10 +3047,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -2979,10 +3118,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3024,10 +3163,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3069,10 +3208,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3091,11 +3230,12 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * Specie
          * @param {number} [limit] Number of results to return per page.
+         * @param {string} [name] 
          * @param {number} [offset] The initial index from which to return the results.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSpecieList: async (limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSpecieList: async (limit?: number, name?: string, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/specie/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3112,13 +3252,17 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
 
+            // authentication cookieAuth required
+
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
+            }
+
+            if (name !== undefined) {
+                localVarQueryParameter['name'] = name;
             }
 
             if (offset !== undefined) {
@@ -3162,10 +3306,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3202,10 +3346,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -3252,10 +3396,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3293,10 +3437,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3338,10 +3482,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3379,10 +3523,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (connectivityStatementId !== undefined) {
                 localVarQueryParameter['connectivity_statement_id'] = connectivityStatementId;
@@ -3434,10 +3578,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3479,10 +3623,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3524,10 +3668,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3597,13 +3741,34 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * BiologicalSex
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerBiologicalSexList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedBiologicalSexList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerBiologicalSexList(limit, offset, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * BiologicalSex
+         * @param {number} id A unique integer value identifying this biological sex.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerBiologicalSexRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BiologicalSex>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerBiologicalSexRetrieve(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * ConnectivityStatement
-         * @param {number} doi 
+         * @param {string} doi 
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementAddDoiCreate(doi: number, id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementAddDoiCreate(doi: string, id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAddDoiCreate(doi, id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -3641,13 +3806,13 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * ConnectivityStatement
-         * @param {number} doi 
+         * @param {number} doiId 
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementDelDoiCreate(doi: number, id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementDelDoiCreate(doi, id, options);
+        async composerConnectivityStatementDelDoiDestroy(doiId: number, id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementDelDoiDestroy(doiId, id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3944,12 +4109,13 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         /**
          * Specie
          * @param {number} [limit] Number of results to return per page.
+         * @param {string} [name] 
          * @param {number} [offset] The initial index from which to return the results.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSpecieList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSpecieList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSpecieList(limit, offset, options);
+        async composerSpecieList(limit?: number, name?: string, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSpecieList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSpecieList(limit, name, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4097,13 +4263,32 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerAnsDivisionRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
+         * BiologicalSex
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerBiologicalSexList(limit?: number, offset?: number, options?: any): AxiosPromise<PaginatedBiologicalSexList> {
+            return localVarFp.composerBiologicalSexList(limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * BiologicalSex
+         * @param {number} id A unique integer value identifying this biological sex.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerBiologicalSexRetrieve(id: number, options?: any): AxiosPromise<BiologicalSex> {
+            return localVarFp.composerBiologicalSexRetrieve(id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * ConnectivityStatement
-         * @param {number} doi 
+         * @param {string} doi 
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAddDoiCreate(doi: number, id: number, options?: any): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementAddDoiCreate(doi: string, id: number, options?: any): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementAddDoiCreate(doi, id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -4137,13 +4322,13 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * ConnectivityStatement
-         * @param {number} doi 
+         * @param {number} doiId 
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDelDoiCreate(doi: number, id: number, options?: any): AxiosPromise<ConnectivityStatement> {
-            return localVarFp.composerConnectivityStatementDelDoiCreate(doi, id, options).then((request) => request(axios, basePath));
+        composerConnectivityStatementDelDoiDestroy(doiId: number, id: number, options?: any): AxiosPromise<void> {
+            return localVarFp.composerConnectivityStatementDelDoiDestroy(doiId, id, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -4413,12 +4598,13 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         /**
          * Specie
          * @param {number} [limit] Number of results to return per page.
+         * @param {string} [name] 
          * @param {number} [offset] The initial index from which to return the results.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSpecieList(limit?: number, offset?: number, options?: any): AxiosPromise<PaginatedSpecieList> {
-            return localVarFp.composerSpecieList(limit, offset, options).then((request) => request(axios, basePath));
+        composerSpecieList(limit?: number, name?: string, offset?: number, options?: any): AxiosPromise<PaginatedSpecieList> {
+            return localVarFp.composerSpecieList(limit, name, offset, options).then((request) => request(axios, basePath));
         },
         /**
          * Specie
@@ -4564,14 +4750,37 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
+     * BiologicalSex
+     * @param {number} [limit] Number of results to return per page.
+     * @param {number} [offset] The initial index from which to return the results.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerBiologicalSexList(limit?: number, offset?: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerBiologicalSexList(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * BiologicalSex
+     * @param {number} id A unique integer value identifying this biological sex.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerBiologicalSexRetrieve(id: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerBiologicalSexRetrieve(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * ConnectivityStatement
-     * @param {number} doi 
+     * @param {string} doi 
      * @param {number} id A unique integer value identifying this connectivity statement.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementAddDoiCreate(doi: number, id: number, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementAddDoiCreate(doi: string, id: number, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementAddDoiCreate(doi, id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -4612,14 +4821,14 @@ export class ComposerApi extends BaseAPI {
 
     /**
      * ConnectivityStatement
-     * @param {number} doi 
+     * @param {number} doiId 
      * @param {number} id A unique integer value identifying this connectivity statement.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementDelDoiCreate(doi: number, id: number, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementDelDoiCreate(doi, id, options).then((request) => request(this.axios, this.basePath));
+    public composerConnectivityStatementDelDoiDestroy(doiId: number, id: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementDelDoiDestroy(doiId, id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4942,13 +5151,14 @@ export class ComposerApi extends BaseAPI {
     /**
      * Specie
      * @param {number} [limit] Number of results to return per page.
+     * @param {string} [name] 
      * @param {number} [offset] The initial index from which to return the results.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSpecieList(limit?: number, offset?: number, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerSpecieList(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    public composerSpecieList(limit?: number, name?: string, offset?: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSpecieList(limit, name, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -5085,10 +5295,10 @@ export const MetacellAuthApiAxiosParamCreator = function (configuration?: Config
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -5123,10 +5333,10 @@ export const MetacellAuthApiAxiosParamCreator = function (configuration?: Config
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     

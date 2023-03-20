@@ -18,7 +18,7 @@ const {
   buttonOutlinedBorderColor,
   buttonOutlinedHoverBg,
   labelColor,
-  radioBorderColor,
+  radioBorderColor
 } = vars;
 
 const theme = createTheme({
@@ -152,7 +152,6 @@ const theme = createTheme({
           padding: theme.spacing(1.25, 2),
           fontSize: "0.875rem",
           fontWeight: 600,
-          lineHeight: "normal",
         }),
         containedSecondary: {
           fontWeight: "600",
@@ -164,6 +163,21 @@ const theme = createTheme({
           "&:hover": {
             background: "#F9FAFB",
             borderColor: buttonOutlinedBorderColor,
+          },
+        },
+      },
+    },
+    MuiButtonGroup: {
+      styleOverrides: {
+        root: {
+          boxShadow: 'none',
+        },
+        groupedContained: {
+          '&:not(:last-of-type)': {
+            borderRight: 'none',
+          },
+          '&:not(:first-of-type)': {
+            padding: 0
           },
         },
       },

@@ -5,14 +5,14 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import { useParams } from "react-router-dom";
-import StatementForm from "../Forms/StatementForm";
-import statementService from "../../services/StatementService";
-import NoteForm from "../Forms/NoteForm";
-import TagForm from "../Forms/TagForm";
-import { ConnectivityStatement } from "../../apiclient/backend/api";
+import StatementForm from "../components/Forms/StatementForm";
+import statementService from "../services/StatementService";
+import NoteForm from "../components/Forms/NoteForm";
+import TagForm from "../components/Forms/TagForm";
+import { ConnectivityStatement } from "../apiclient/backend";
 import { Button } from "@mui/material";
-import { userProfile } from "../../services/UserService";
-import CheckDuplicates from "../CheckForDuplicates/CheckDuplicatesDialog";
+import { userProfile } from "../services/UserService";
+import CheckDuplicates from "../components/CheckForDuplicates/CheckDuplicatesDialog";
 
 const StatementDetails = () => {
   const { statementId } = useParams();

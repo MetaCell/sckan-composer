@@ -29,12 +29,17 @@ export const renderTitle = (params: GridRenderCellParams) => (
 );
 
 export const renderDate = (params: GridRenderCellParams) => {
-  const date = new Date(params.value).toLocaleString(undefined, {
-    dateStyle: "long",
+  const date = new Date(params.value).toLocaleString("en-UK", {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
-  const time = new Date(params.value).toLocaleString(undefined, {
-    timeStyle: "short",
+  const time = new Date(params.value).toLocaleString("en-UK", {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true
   });
+
   return (
     <Box maxWidth="100%">
       <Typography color={vars.darkTextColor} noWrap>

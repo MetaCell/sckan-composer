@@ -1,3 +1,5 @@
+import {SentenceAvailableTransitionsEnum as sentenceStates} from "../apiclient/backend";
+
 export const hiddenWidget = (fields: string[]) => {
   let hiddenSchema = {}
   for (const f of fields) {
@@ -60,7 +62,7 @@ export const mapTagFilterSelectionToCheckbox = (tags: any[], currentSelection: a
 }
 
 export const snakeToSpace = (str: string) => {
-  return str.replaceAll('_', ' ').split(' ').map((word) => {
+  return str?.replaceAll('_', ' ').split(' ').map((word) => {
     return word[0].toUpperCase() + word.substring(1)
   }).join(" ")
 }
@@ -93,3 +95,69 @@ export interface StatementStateToColor {
   npo_approved: StateColor
   approved: StateColor
 }
+
+export const SentenceLabels = {
+  [sentenceStates.Open]: "Open",
+  [sentenceStates.ToBeReviewed]: "To be reviewed",
+  [sentenceStates.ComposeLater]: "Compose later",
+  [sentenceStates.ComposeNow]: "Compose now",
+  [sentenceStates.Duplicate]: "Duplicate",
+  [sentenceStates.Excluded]: "Excluded",
+}
+
+export const formatDate = (date: string) => {
+  return new Date(date).toLocaleDateString("en-UK", {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+export const formatTime = (date: string) => {
+  return new Date(date).toLocaleDateString("en-UK", {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true
+  });
+}
+
+export const timeAgo = (timestamp : string) => {
+  const now = new Date();
+  const timeDiff = now.getTime() - new Date(timestamp).getTime();
+  const seconds = Math.floor(timeDiff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+
+  if (hours > 0) {
+    return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  } else if (minutes > 0) {
+    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+  } else {
+    return `${seconds} second${seconds > 1 ? 's' : ''} ago`;
+  }
+}
+
+
+export const isEqual = function(obj1: any, obj2: any) {
+  const obj1Keys = Object.keys(obj1);
+  const obj2Keys = Object.keys(obj2);
+
+  if(obj1Keys.length !== obj2Keys.length) {
+      return false;
+  }
+
+  for (let objKey of obj1Keys) {
+      if (obj1[objKey] !== obj2[objKey]) {
+          if(typeof obj1[objKey] == "object" && typeof obj2[objKey] == "object") {
+              if(!isEqual(obj1[objKey], obj2[objKey])) {
+                  return false;
+              }
+          } 
+          else {
+              return false;
+          }
+      }
+  }
+
+  return true;
+};

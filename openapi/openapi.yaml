@@ -120,6 +120,62 @@ paths:
               schema:
                 $ref: '#/components/schemas/AnsDivision'
           description: ''
+  /api/composer/biological-sex/:
+    get:
+      operationId: composer_biological_sex_list
+      description: BiologicalSex
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBiologicalSexList'
+          description: ''
+  /api/composer/biological-sex/{id}/:
+    get:
+      operationId: composer_biological_sex_retrieve
+      description: BiologicalSex
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this biological sex.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiologicalSex'
+          description: ''
   /api/composer/connectivity-statement/:
     get:
       operationId: composer_connectivity_statement_list
@@ -361,7 +417,7 @@ paths:
       - in: path
         name: doi
         schema:
-          type: integer
+          type: string
         required: true
       - in: path
         name: id
@@ -440,13 +496,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConnectivityStatement'
           description: ''
-  /api/composer/connectivity-statement/{id}/del_doi/{doi}/:
-    post:
-      operationId: composer_connectivity_statement_del_doi_create
+  /api/composer/connectivity-statement/{id}/del_doi/{doi_id}/:
+    delete:
+      operationId: composer_connectivity_statement_del_doi_destroy
       description: ConnectivityStatement
       parameters:
       - in: path
-        name: doi
+        name: doi_id
         schema:
           type: integer
         required: true
@@ -463,12 +519,8 @@ paths:
       - basicAuth: []
       - cookieAuth: []
       responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConnectivityStatement'
-          description: ''
+        '204':
+          description: No response body
   /api/composer/connectivity-statement/{id}/del_specie/{specie_id}/:
     post:
       operationId: composer_connectivity_statement_del_specie_create
@@ -1153,6 +1205,10 @@ paths:
         description: Number of results to return per page.
         schema:
           type: integer
+      - in: query
+        name: name
+        schema:
+          type: string
       - name: offset
         required: false
         in: query
@@ -1577,6 +1633,7 @@ components:
           readOnly: true
         ans_division_id:
           type: integer
+          nullable: true
         ans_division:
           allOf:
           - $ref: '#/components/schemas/AnsDivision'
@@ -1601,6 +1658,7 @@ components:
             $ref: '#/components/schemas/Specie'
         biological_sex_id:
           type: integer
+          nullable: true
         biological_sex:
           allOf:
           - $ref: '#/components/schemas/BiologicalSex'
@@ -1618,12 +1676,9 @@ components:
           readOnly: true
       required:
       - ans_division
-      - ans_division_id
       - available_transitions
       - biological_sex
-      - biological_sex_id
       - destination
-      - destination_id
       - dois
       - has_notes
       - id
@@ -1631,7 +1686,6 @@ components:
       - knowledge_statement
       - modified_date
       - origin
-      - origin_id
       - owner
       - path
       - sentence
@@ -1667,7 +1721,10 @@ components:
           readOnly: true
         doi:
           type: string
+        connectivity_statement_id:
+          type: integer
       required:
+      - connectivity_statement_id
       - doi
       - id
     LateralityEnum:
@@ -1761,6 +1818,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnsDivision'
+    PaginatedBiologicalSexList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BiologicalSex'
     PaginatedConnectivityStatementList:
       type: object
       properties:
@@ -1934,6 +2011,7 @@ components:
           readOnly: true
         ans_division_id:
           type: integer
+          nullable: true
         ans_division:
           allOf:
           - $ref: '#/components/schemas/AnsDivision'
@@ -1958,6 +2036,7 @@ components:
             $ref: '#/components/schemas/Specie'
         biological_sex_id:
           type: integer
+          nullable: true
         biological_sex:
           allOf:
           - $ref: '#/components/schemas/BiologicalSex'
@@ -2018,6 +2097,7 @@ components:
           maxLength: 100
         external_ref:
           type: string
+          nullable: true
           maxLength: 20
         tags:
           type: array
@@ -2121,6 +2201,7 @@ components:
           maxLength: 100
         external_ref:
           type: string
+          nullable: true
           maxLength: 20
         tags:
           type: array
@@ -2167,7 +2248,6 @@ components:
       - available_transitions
       - connectivity_statements
       - doi_uri
-      - external_ref
       - has_notes
       - id
       - modified_date
@@ -2205,6 +2285,7 @@ components:
             $ref: '#/components/schemas/Doi'
         ans_division_id:
           type: integer
+          nullable: true
         ans_division:
           allOf:
           - $ref: '#/components/schemas/AnsDivision'
@@ -2224,6 +2305,7 @@ components:
           readOnly: true
         biological_sex_id:
           type: integer
+          nullable: true
         biological_sex:
           allOf:
           - $ref: '#/components/schemas/BiologicalSex'
@@ -2232,17 +2314,23 @@ components:
           type: string
           readOnly: true
           nullable: true
+        owner_id:
+          type: integer
+          nullable: true
+        owner:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
       required:
       - ans_division
-      - ans_division_id
       - apinatomy_model
       - biological_sex
-      - biological_sex_id
       - circuit_type
       - dois
       - id
       - knowledge_statement
       - laterality
+      - owner
       - sentence_id
       - species
     Specie:
@@ -2254,15 +2342,13 @@ components:
           readOnly: true
         name:
           type: string
-          readOnly: true
+          maxLength: 200
         ontology_uri:
           type: string
-          format: uri
-          readOnly: true
+          nullable: true
       required:
       - id
       - name
-      - ontology_uri
     Tag:
       type: object
       description: Note Tag
