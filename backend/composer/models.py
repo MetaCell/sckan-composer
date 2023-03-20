@@ -494,7 +494,7 @@ class Note(models.Model):
         return self.note
 
     class Meta:
-        ordering = ["note"]
+        ordering = ["-created_at"]
         verbose_name_plural = "Notes"
         constraints = [
             models.CheckConstraint(
