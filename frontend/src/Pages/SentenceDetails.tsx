@@ -7,7 +7,7 @@ import Button from "@mui/material/Button";
 import { useParams } from "react-router-dom";
 import sentenceService from "../services/SentenceService";
 import TagForm from "../components/Forms/TagForm";
-import { Sentence, SentenceConnectivityStatement } from "../apiclient/backend";
+import { Sentence, SentenceConnectivityStatement, SentenceAvailableTransitionsEnum } from "../apiclient/backend";
 import { userProfile } from "../services/UserService";
 import CheckDuplicates from "../components/CheckForDuplicates/CheckDuplicatesDialog";
 import { SentenceStateChip } from "../components/Widgets/StateChip";
@@ -89,6 +89,10 @@ const SentencesDetails = () => {
         .getObject(sentenceId)
         .then((sentence: Sentence) => {
           setSentence(sentence);
+          const foundToBeReviewed = sentence.available_transitions.findIndex((transition) => transition === SentenceAvailableTransitionsEnum.ToBeReviewed)
+          if(foundToBeReviewed && foundToBeReviewed !== -1) {
+            setSelectedIndex(foundToBeReviewed)
+          }
           setConnectivityStatements(sentence.connectivity_statements);
           if (
             sentence.owner &&
