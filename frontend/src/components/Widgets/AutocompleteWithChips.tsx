@@ -44,7 +44,7 @@ export const AutocompleteWithChips = ({
         options={options}
         onChange={(e, value) => onAutocompleteChange(e, value)}
         freeSolo
-        defaultValue={[options[0].label]}
+        defaultValue={options.length>0 ? [options[0].label]: [{}]}
         renderTags={(value:any, getTagProps) => data.map((ele:{id:number, label:string}, index: number) => (
             <Chip
               {...getTagProps({ index })}
