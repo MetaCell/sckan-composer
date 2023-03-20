@@ -1,18 +1,18 @@
 import React from 'react'
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
-import specieService from "../../services/SpecieService";
+import specieService, { species } from "../../services/SpecieService";
 import {UiSchema} from "@rjsf/utils";
 import { Specie } from '../../apiclient/backend';
 import { AutocompleteWithChips } from '../Widgets/AutocompleteWithChips';
 
 
 const SpeciesForm = (props: any) => {
-  const { data, extraData, setter, speciesList } = props
+  const { data, extraData, setter } = props
 
   const { schema, uiSchema } = jsonSchemas.getSpeciesSchema()
 
-  const availableOptions = speciesList.filter((s:Specie)=> !data.some(({id}:any)=> id === s.id))
+  const availableOptions = species.getSpecieList().filter((s:Specie)=> !data.some(({id}:any)=> id === s.id))
 
   const delSpecie = (specieId:number) =>{
     extraData.service.removeSpecie(extraData.parentId, specieId).then((newData: any) => {

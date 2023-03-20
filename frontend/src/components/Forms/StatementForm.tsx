@@ -5,9 +5,11 @@ import statementService from '../../services/StatementService'
 import CustomTextField from "../Widgets/CustomTextField";
 import CustomSingleSelect from "../Widgets/CustomSingleSelect";
 import CustomTextArea from "../Widgets/CustomTextArea";
+import { biologicalSexes } from '../../services/BiologicalSexService';
+import { ansDivisions } from '../../services/AnsDivisionService';
 
 const StatementForm = (props: any) => {
-  const { extraData, uiFields, statement , biologicalSex, divisionList} = props
+  const { extraData, uiFields, statement} = props
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema()
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
@@ -41,7 +43,7 @@ const StatementForm = (props: any) => {
       "ui:options": {
       label: 'Biological Sex',
         placeholder: "Enter Biological Sex",
-        data: biologicalSex?.map((row: any) => ({id: row.id, label: row.name})),
+        data: biologicalSexes.getBiologicalSexes().map((row: any) => ({id: row.id, label: row.name})),
     },
     value: statement?.biological_sex_id ?? ""
   }
@@ -51,7 +53,7 @@ const StatementForm = (props: any) => {
       "ui:options": {
       label: 'ANS Division',
         placeholder: "Select ANS Division",
-        data: divisionList?.map((row: any) => ({id: row.id, label: row.name})),
+        data: ansDivisions.getAnsDivisions().map((row: any) => ({id: row.id, label: row.name})),
     },
     value: statement?.ans_division_id ?? ""
   }

@@ -7,32 +7,15 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import StatementDetailsAccordion from "./StatementDetailsAccordion";
 import { vars } from "../../theme/variables";
 import statementService from "../../services/StatementService";
-import specieService from "../../services/SpecieService";
 import StatementForm from "../Forms/StatementForm";
 import DoisForm from "../Forms/DoisForm";
 
 const TriageStatementSection = (props: any) => {
   const { statement, refreshSentence, sentence } = props;
 
-  const [divisionList, setDivisionList] = useState([]);
-  const [biologicalSex, setBiologicalSexList] = useState([]);
-  const [speciesList, setSpeciesList] = useState([]);
-
   const onDeleteStatement = (id: number) => {
     statementService.remove(id).then(() => refreshSentence());
   };
-
-  useEffect(() => {
-    statementService.getANSDivisionList().then((result) => {
-      setDivisionList(result.results);
-    });
-    statementService.getBiologicalSexList().then((result) => {
-      setBiologicalSexList(result.results);
-    });
-    specieService.getList().then((result) => {
-      setSpeciesList(result.results);
-    });
-  }, []);
 
   return (
     <Grid item xs={12}>
@@ -50,8 +33,6 @@ const TriageStatementSection = (props: any) => {
               }}
             >
               <StatementForm
-                divisionList={divisionList}
-                biologicalSex={biologicalSex}
                 statement={statement}
                 format="small"
                 setter={refreshSentence}
@@ -66,9 +47,6 @@ const TriageStatementSection = (props: any) => {
               />
               {statement.id && (
                 <StatementDetailsAccordion
-                  speciesList={speciesList}
-                  divisionList={divisionList}
-                  biologicalSex={biologicalSex}
                   setter={refreshSentence}
                   {...props}
                 />

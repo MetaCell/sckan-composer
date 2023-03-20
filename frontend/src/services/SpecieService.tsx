@@ -8,7 +8,7 @@ export let species = (function () {
   return {
     // public interface
     setSpecieList: async function () {
-      return composerApi.composerSpecieList(9999).then((resp: any) => {
+      return composerApi.composerSpecieList(undefined).then((resp: any) => {
         specieList = resp.data.results;
       });
     },

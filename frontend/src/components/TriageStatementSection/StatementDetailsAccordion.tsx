@@ -13,22 +13,12 @@ import statementService from '../../services/StatementService'
 const StatementDetailsAccordion = (props: any) => {
   const {
     index,
-    divisionList,
-    biologicalSex,
     statement,
     setter,
     sentence,
-    speciesList,
   } = props;
 
   const [expanded, setExpanded] = React.useState<string | false>("panel-0");
-
-  if (
-    divisionList.length === 0 ||
-    biologicalSex.length === 0 ||
-    speciesList.length === 0
-  )
-    return null;
 
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
@@ -48,14 +38,11 @@ const StatementDetailsAccordion = (props: any) => {
       </AccordionSummary>
       <AccordionDetails>
       <SpeciesForm
-          speciesList={speciesList}
           data={statement.species}
           extraData={{ parentId: statement.id, service: statementService }}
           setter={setter}
         />
         <StatementForm
-          divisionList={divisionList}
-          biologicalSex={biologicalSex}
           statement={statement}
           format="small"
           setter={setter}

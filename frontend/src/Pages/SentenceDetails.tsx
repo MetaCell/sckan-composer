@@ -224,7 +224,7 @@ const SentencesDetails = () => {
               <TagForm
                 data={sentence.tags}
                 extraData={{ parentId: sentence.id, service: sentenceService }}
-                setter={setSentence}
+                setter={refreshSentence}
               />
               <Divider sx={{ margin: "36px 0" }} />
               <NoteDetails extraData={{ sentence_id: sentence.id }} />
