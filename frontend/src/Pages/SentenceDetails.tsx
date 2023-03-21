@@ -91,7 +91,7 @@ const SentencesDetails = () => {
           setSentence(sentence);
           const foundToBeReviewed = sentence.available_transitions.findIndex((transition) => transition === SentenceAvailableTransitionsEnum.ToBeReviewed)
           setSelectedIndex(foundToBeReviewed && foundToBeReviewed !== -1 ? foundToBeReviewed : 0)
-          setConnectivityStatements(sentence.connectivity_statements);
+          setConnectivityStatements(sentence.connectivity_statements.sort((a,b)=>a.id-b.id));
           if (
             sentence.owner &&
             sentence.owner?.id !== userProfile.getUser().id
