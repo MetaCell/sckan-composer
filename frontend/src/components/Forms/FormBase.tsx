@@ -5,7 +5,7 @@ import { Backdrop, Box, CircularProgress } from "@mui/material";
 import { Theme } from "@rjsf/mui";
 import { useDebouncedCallback } from "use-debounce";
 import { EDIT_DEBOUNCE } from "../../settings";
-import { isEqual } from "../../helpers/helpers";
+import Button from "@mui/material/Button";
 
 const Form = withTheme(Theme);
 
@@ -35,6 +35,7 @@ export const FormBase = (props: any) => {
   const [customUiSchema, setCustomUiSchema] = useState<any>(uiSchema);
 
   const formRef = useRef<any>(null);
+  const hiddenButtonRef = useRef<any>(null);
 
   const removeProp = (obj: any, prop: string) => {
     const { [prop]: removedProp, ...newObj } = obj;
@@ -69,8 +70,8 @@ export const FormBase = (props: any) => {
   };
 
   const onSave = () => {
-    if (formRef.current != null) {
-      return formRef.current.submit();
+    if (hiddenButtonRef.current != null) {
+      return hiddenButtonRef.current.click();
     }
   };
 
@@ -138,7 +139,7 @@ export const FormBase = (props: any) => {
       )}
       <Box>
         <Form
-          ref={formRef}
+          //ref={formRef}
           schema={customSchema}
           uiSchema={customUiSchema}
           formData={localData}
@@ -147,9 +148,10 @@ export const FormBase = (props: any) => {
           onChange={handleUpdate}
           onSubmit={handleSubmit}
           onError={onError}
-          children={children}
-          widgets={widgets}
-        />
+          widgets={widgets}>
+            {children}
+            <Button ref={hiddenButtonRef} type='submit' sx={{display:'none'}}/>
+          </Form>
       </Box>
     </>
   );
