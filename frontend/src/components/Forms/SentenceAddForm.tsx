@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { FormBase } from "./FormBase";
 import { jsonSchemas } from "../../services/JsonSchema";
 import sentenceService from "../../services/SentenceService";
@@ -9,6 +9,8 @@ import CustomTextField from "../Widgets/CustomTextField";
 const SentenceAddForm = (props: any) => {
   const { format } = props;
   const { schema, uiSchema } = jsonSchemas.getSentenceSchema();
+
+  const [disabled, setDisabled] = React.useState(true)
 
   const uiFields =
     format === "small"
@@ -32,14 +34,6 @@ const SentenceAddForm = (props: any) => {
 
   const customUiSchema: UiSchema = {
     ...uiSchema,
-    "ui:submitButtonOptions": {
-      submitText: "Done",
-      norender: false,
-      props: {
-        disabled: false,
-        fullWidth: true,
-      },
-    },
     title: {
       "ui:widget": CustomTextField,
       "ui:options": {
@@ -88,8 +82,11 @@ const SentenceAddForm = (props: any) => {
         uiFields={uiFields}
         enableAutoSave={true}
         formIsValid={format === "create" && formIsValid}
+        disableSubmitButton={setDisabled}
         {...props}
-      />
+      >
+        <Button type='submit' variant='contained' fullWidth disabled={disabled}>Done</Button>
+      </FormBase>
     </Box>
   );
 };

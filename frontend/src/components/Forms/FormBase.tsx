@@ -27,6 +27,7 @@ export const FormBase = (props: any) => {
     formIsValid,
     children = false,
     widgets,
+    disableSubmitButton,
   } = props;
   const [localData, setLocalData] = useState<any>(data);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -34,7 +35,6 @@ export const FormBase = (props: any) => {
   const [customSchema, setCustomSchema] = useState<any>(schema);
   const [customUiSchema, setCustomUiSchema] = useState<any>(uiSchema);
 
-  const formRef = useRef<any>(null);
   const hiddenButtonRef = useRef<any>(null);
 
   const removeProp = (obj: any, prop: string) => {
@@ -75,22 +75,6 @@ export const FormBase = (props: any) => {
     }
   };
 
-  const toggleSubmitButton = (disable: boolean) => {
-    setCustomUiSchema({
-      ...customUiSchema,
-      "ui:submitButtonOptions": {
-        ...customUiSchema["ui:submitButtonOptions"],
-        props: {
-          ...customUiSchema["ui:submitButtonOptions"]?.props,
-          disabled: disable,
-        },
-      },
-    });
-  };
-
-  const enableSubmitButton = () => toggleSubmitButton(false);
-  const disableSubmitButton = () => toggleSubmitButton(true);
-
   const handleSubmit = async (event: IChangeEvent) => {
     const formData = { ...event.formData, ...extraData };
     setIsSaving(true);
@@ -121,9 +105,9 @@ export const FormBase = (props: any) => {
     const formData = { ...event.formData, ...extraData };
     setLocalData(formData);
     if (formIsValid && !formIsValid(formData)) {
-      disableSubmitButton();
+      disableSubmitButton && disableSubmitButton(true);
     } else {
-      enableSubmitButton();
+      disableSubmitButton && disableSubmitButton(false);
       if (enableAutoSave) {
         return triggerAutoSave();
       }
@@ -139,7 +123,6 @@ export const FormBase = (props: any) => {
       )}
       <Box>
         <Form
-          //ref={formRef}
           schema={customSchema}
           uiSchema={customUiSchema}
           formData={localData}
