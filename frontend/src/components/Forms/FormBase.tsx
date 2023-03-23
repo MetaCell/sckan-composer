@@ -27,15 +27,17 @@ export const FormBase = (props: any) => {
     formIsValid,
     children = false,
     widgets,
-    disableSubmitButton,
+    submitButtonProps,
   } = props;
   const [localData, setLocalData] = useState<any>(data);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const triggerAutoSave = useDebouncedCallback(() => onSave(), EDIT_DEBOUNCE);
+  const [isSubmitButtonDisabled, setIsSubmitButtonDisabled] =
+    useState<boolean>(false);
   const [customSchema, setCustomSchema] = useState<any>(schema);
   const [customUiSchema, setCustomUiSchema] = useState<any>(uiSchema);
 
-  const hiddenButtonRef = useRef<any>(null);
+  const submitButtonRef = useRef<any>(null);
 
   const removeProp = (obj: any, prop: string) => {
     const { [prop]: removedProp, ...newObj } = obj;
@@ -46,9 +48,9 @@ export const FormBase = (props: any) => {
   //as it was mutating the original object at the jsonschema singleton
 
   useEffect(() => {
-    setLocalData(data)
-    setCustomSchema(schema)
-    setCustomUiSchema(uiSchema)
+    setLocalData(data);
+    setCustomSchema(schema);
+    setCustomUiSchema(uiSchema);
     if (uiFields) {
       Object.entries(uiSchema).forEach((p) => {
         if (!p[0].startsWith("ui:") && !uiFields.includes(p[0])) {
@@ -70,8 +72,8 @@ export const FormBase = (props: any) => {
   };
 
   const onSave = () => {
-    if (hiddenButtonRef.current != null) {
-      return hiddenButtonRef.current.click();
+    if (submitButtonRef.current != null) {
+      return submitButtonRef.current.click();
     }
   };
 
@@ -105,9 +107,9 @@ export const FormBase = (props: any) => {
     const formData = { ...event.formData, ...extraData };
     setLocalData(formData);
     if (formIsValid && !formIsValid(formData)) {
-      disableSubmitButton && disableSubmitButton(true);
+      setIsSubmitButtonDisabled(true);
     } else {
-      disableSubmitButton && disableSubmitButton(false);
+      setIsSubmitButtonDisabled(false);
       if (enableAutoSave) {
         return triggerAutoSave();
       }
@@ -131,10 +133,22 @@ export const FormBase = (props: any) => {
           onChange={handleUpdate}
           onSubmit={handleSubmit}
           onError={onError}
-          widgets={widgets}>
-            {children}
-            <Button ref={hiddenButtonRef} type='submit' sx={{display:'none'}}/>
-          </Form>
+          widgets={widgets}
+        >
+          {children}
+
+          <Button
+            ref={submitButtonRef}
+            type="submit"
+            disabled={isSubmitButtonDisabled}
+            sx={{
+              display: (enableAutoSave || !submitButtonProps) && "none",
+            }}
+            {...submitButtonProps}
+          >
+            {submitButtonProps?.label ? submitButtonProps.label : "Submit"}
+          </Button>
+        </Form>
       </Box>
     </>
   );

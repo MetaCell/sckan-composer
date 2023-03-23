@@ -10,7 +10,7 @@ const SentenceAddForm = (props: any) => {
   const { format } = props;
   const { schema, uiSchema } = jsonSchemas.getSentenceSchema();
 
-  const [disabled, setDisabled] = React.useState(true)
+  const [disabled, setDisabled] = React.useState(true);
 
   const uiFields =
     format === "small"
@@ -73,6 +73,13 @@ const SentenceAddForm = (props: any) => {
     },
     "ui:order": uiOrder,
   };
+
+  const submitButtonProps = {
+    fullWidth: true,
+    variant: "contained",
+    label: "Done",
+  };
+
   return (
     <Box>
       <FormBase
@@ -83,10 +90,9 @@ const SentenceAddForm = (props: any) => {
         enableAutoSave={true}
         formIsValid={format === "create" && formIsValid}
         disableSubmitButton={setDisabled}
+        submitButtonProps={submitButtonProps}
         {...props}
-      >
-        <Button type='submit' variant='contained' fullWidth disabled={disabled}>Done</Button>
-      </FormBase>
+      />
     </Box>
   );
 };
