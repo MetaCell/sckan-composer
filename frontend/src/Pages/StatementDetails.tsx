@@ -105,6 +105,7 @@ const StatementDetails = () => {
             <Tab label="Proofing" />
           </Tabs>
           <TabPanel value={activeTab} index={0}>
+            <CheckDuplicates/>
             <StatementForm
               data={statement}
               format="full"

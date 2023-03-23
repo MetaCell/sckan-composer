@@ -15,6 +15,7 @@ import Typography from "@mui/material/Typography";
 import { ConnectivityStatement } from "../apiclient/backend/api";
 import { chartHeight, chartWidth } from "../helpers/settings";
 import { useTheme } from "@mui/system";
+import PlotlyCharts from "./PlotlyChart";
 
 const ArrowDot = (props: any) => {
   const { cx, cy, stroke, payload, value } = props;
@@ -120,31 +121,39 @@ const StatementChart = (props: { statement: ConnectivityStatement }) => {
       sx={{ background: theme.palette.grey[100], borderRadius: 1 }}
     >
       {displayChart ? (
-        <ResponsiveContainer width={chartWidth} height={chartHeight}>
-          <LineChart data={data} margin={{ right: 76, left: 76 }}>
-            <YAxis hide domain={[0, 2]} />
-            <XAxis hide />
-            <Line
-              type="monotone"
-              dataKey="node"
-              stroke="#98A2B3"
-              dot={{ r: 50, stroke: "#D0D5DD", strokeWidth: 1 }}
-            >
-              <LabelList
-                dataKey="label"
-                position="center"
-                content={<NodeLabel />}
-              />
-            </Line>
-            <Line type="monotone" dataKey="via" stroke="#98A2B3" dot={ArrowDot}>
-              <LabelList
-                dataKey="viaLabel"
-                position="insideBottomLeft"
-                offset={8}
-              />
-            </Line>
-          </LineChart>
-        </ResponsiveContainer>
+        <Box display="flex" flexDirection="column">
+          <ResponsiveContainer width={chartWidth} height={chartHeight}>
+            <LineChart data={data} margin={{ right: 76, left: 76 }}>
+              <YAxis hide domain={[0, 2]} />
+              <XAxis hide />
+              <Line
+                type="monotone"
+                dataKey="node"
+                stroke="#98A2B3"
+                dot={{ r: 50, stroke: "#D0D5DD", strokeWidth: 1 }}
+              >
+                <LabelList
+                  dataKey="label"
+                  position="center"
+                  content={<NodeLabel />}
+                />
+              </Line>
+              <Line
+                type="monotone"
+                dataKey="via"
+                stroke="#98A2B3"
+                dot={ArrowDot}
+              >
+                <LabelList
+                  dataKey="viaLabel"
+                  position="insideBottomLeft"
+                  offset={8}
+                />
+              </Line>
+            </LineChart>
+          </ResponsiveContainer>
+          <PlotlyCharts statement={statement} />
+        </Box>
       ) : (
         <Box p={3}>
           <Typography>
