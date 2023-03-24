@@ -5,7 +5,7 @@ import { chartHeight, chartWidth } from "../../helpers/settings";
 import { useTheme } from "@mui/system";
 import { Box } from "@mui/material";
 
-const axes_config = {
+const axis_config = {
   showgrid: false,
   zeroline: false,
   showline: false,
@@ -17,20 +17,32 @@ const margins_config = {
   r: 0, //right margin
 };
 const layout = {
-  autosize: true,
-  //width: chartWidth,
-  //height: chartHeight,
+  autosize: false,
+  width: chartWidth,
+  height: chartHeight,
+  xaxis2: { ...axis_config, domain: [0.2, 0.8] },
   showlegend: false,
   plot_bgcolor: "transparent",
   paper_bgcolor: "transparent",
-  xaxis: axes_config,
-  yaxis: axes_config,
+  xaxis: axis_config,
+  yaxis: axis_config,
   margin: margins_config,
   annotations: [{}],
+  hoverlabel: { bgcolor: "#fff" },
+};
+
+const truncateString = (text: string, numberOfChars: number) => {
+  if (text.length >= numberOfChars)
+    return text.slice(0, numberOfChars) + " ...";
+  return text;
 };
 
 const styledLabels = (text: string) => {
-  const splitText = text.split(" ");
+  let splitText = text.split(" ");
+  if (splitText.length > 4) {
+    splitText = splitText.slice(0, 5);
+    splitText[4] = splitText[4] + " ...";
+  }
   const formattedTextArray = splitText.map(
     (word) => `<span style="
     font-weight: 600;
@@ -45,13 +57,15 @@ const styledLabels = (text: string) => {
 
 const generateAnnotations = (path: (Via | null)[]) =>
   path.map((via, i) => ({
-    x: i + 1,
+    x: i,
     y: 1,
-    text: via?.anatomical_entity.name,
+    text: via && truncateString(via.anatomical_entity.name, 20),
+    font: { size: 12 },
     showarrow: false,
     textangle: -45,
     yanchor: "bottom",
     xanchor: "left",
+    xref: "x2",
   }));
 
 function PlotlyChart(props: { statement: ConnectivityStatement }) {
@@ -63,18 +77,18 @@ function PlotlyChart(props: { statement: ConnectivityStatement }) {
   const data = [
     {
       name: "Via",
-      x: [0, ...statement.path.map((v, i) => i + 1), statement.path.length + 1],
-      y: [1, ...statement.path.map(() => 1), 1],
+      x: [0, ...statement.path.map((v, i) => i + 1)],
+      y: [1, ...statement.path.map(() => 1)],
       type: "scatter",
       mode: "lines+markers",
-      text: ["", ...statement.path.map((v) => v.anatomical_entity.name), ""],
-      textposition: "top",
+      text: [...statement.path.map((v) => v.anatomical_entity.name), ""],
       line: { color: "#98A2B3", width: 1 },
       marker: { symbol: "arrow", angleref: "previous", size: 10 },
-      hoverinfo: "skip",
+      xaxis: "x2",
+      hovertemplate: "%{text}<extra></extra>",
     },
     {
-      x: [0, statement.path.length + 1],
+      x: [0, statement.path.length],
       y: [1, 1],
       type: "scatter",
       mode: "markers+text",
@@ -90,7 +104,11 @@ function PlotlyChart(props: { statement: ConnectivityStatement }) {
       hoverinfo: "skip",
     },
   ];
-  return <Box flexGrow={1}><Plot useResizeHandler style={{height:'100%', width:'100%'}} data={data} layout={layout} config={{ displaylogo: false }} /></Box>;
+  return (
+    <Box flexGrow={1} display="flex" justifyContent="center">
+      <Plot data={data} layout={layout} config={{ displaylogo: false }} />
+    </Box>
+  );
 }
 
 export default PlotlyChart;

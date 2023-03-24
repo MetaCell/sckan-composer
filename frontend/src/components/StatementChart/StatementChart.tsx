@@ -20,10 +20,7 @@ const StatementChart = (props: { statement: ConnectivityStatement }) => {
       sx={{ background: theme.palette.grey[100], borderRadius: 1 }}
     >
       {displayChart ? (
-        <Box display="flex" flexDirection="column">
-          <Recharts statement={statement} />
-          <PlotlyChart statement={statement} />
-        </Box>
+        <PlotlyChart statement={statement} />
       ) : (
         <Box p={3}>
           <Typography>
