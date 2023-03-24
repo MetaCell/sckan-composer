@@ -4,7 +4,6 @@ import Typography from "@mui/material/Typography";
 import { ConnectivityStatement } from "../../apiclient/backend/api";
 import { useTheme } from "@mui/system";
 import PlotlyChart from "./PlotlyChart";
-import Recharts from "./Recharts";
 
 const StatementChart = (props: { statement: ConnectivityStatement }) => {
   const { statement } = props;
