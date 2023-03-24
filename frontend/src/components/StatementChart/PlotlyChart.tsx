@@ -1,7 +1,6 @@
 import React from "react";
 import Plot from "react-plotly.js";
 import { ConnectivityStatement, Via } from "../../apiclient/backend";
-import { chartHeight, chartWidth } from "../../helpers/settings";
 import { useTheme } from "@mui/system";
 import { Box } from "@mui/material";
 
@@ -17,10 +16,8 @@ const margins_config = {
   r: 0, //right margin
 };
 const layout = {
-  autosize: false,
-  width: chartWidth,
-  height: chartHeight,
-  xaxis2: { ...axis_config, domain: [0.2, 0.8] },
+  autosize: true,
+  xaxis2: { ...axis_config, domain: [0.15, 0.85] },
   showlegend: false,
   plot_bgcolor: "transparent",
   paper_bgcolor: "transparent",
@@ -105,8 +102,14 @@ function PlotlyChart(props: { statement: ConnectivityStatement }) {
     },
   ];
   return (
-    <Box flexGrow={1} display="flex" justifyContent="center">
-      <Plot data={data} layout={layout} config={{ displaylogo: false }} />
+    <Box width="100%" display="flex" justifyContent="center">
+      <Plot
+        data={data}
+        layout={layout}
+        config={{ displaylogo: false }}
+        style={{ height: "100%", width: "100%" }}
+        useResizeHandler
+      />
     </Box>
   );
 }
