@@ -4,6 +4,9 @@ import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import TabPanel from "../components/Widgets/TabPanel";
 import { useParams } from "react-router-dom";
 import StatementForm from "../components/Forms/StatementForm";
 import statementService from "../services/StatementService";
@@ -13,11 +16,13 @@ import { ConnectivityStatement } from "../apiclient/backend";
 import { Button } from "@mui/material";
 import { userProfile } from "../services/UserService";
 import CheckDuplicates from "../components/CheckForDuplicates/CheckDuplicatesDialog";
+import ProofingTab from "../components/ProofingTab";
 
 const StatementDetails = () => {
   const { statementId } = useParams();
   const [statement, setStatement] = useState({} as ConnectivityStatement);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState(0);
 
   const doTransition = (transition: string) => {
     statementService
@@ -33,7 +38,6 @@ const StatementDetails = () => {
         .getObject(statementId)
         .then((statement: ConnectivityStatement) => {
           setStatement(statement);
-
           if (
             statement.owner &&
             statement.owner?.id !== userProfile.getUser().id
@@ -62,7 +66,7 @@ const StatementDetails = () => {
   }
 
   return (
-    <Grid p={12} container justifyContent="center">
+    <Grid p={12} container justifyContent="space-between">
       <Grid item xl={12}>
         <Paper elevation={0} sx={{ padding: 8 }}>
           <Stack alignItems="center" spacing={4}>
@@ -82,24 +86,43 @@ const StatementDetails = () => {
             </Box>
           </Stack>
         </Paper>
-      </Grid>
-      <Grid item xl={7}>
         <Typography>
           Last modified by {statement?.owner?.first_name} on{" "}
           {statement?.modified_date}
         </Typography>
         {statement?.available_transitions.map((transition) => (
-          <Button onClick={() => doTransition(transition)}>{transition}</Button>
+          <Button key={transition} onClick={() => doTransition(transition)}>
+            {transition}
+          </Button>
         ))}
-        <CheckDuplicates />
-        <StatementForm data={statement} format="full" setter={setStatement} />
       </Grid>
-      <Grid item xl={5}>
-        <TagForm
-          data={statement.tags}
-          extraData={{ parentId: statement.id, service: statementService }}
-          setter={setStatement}
-        />
+      <Grid item xl={7}>
+        <Box>
+          <Tabs
+            value={activeTab}
+            variant="standard"
+            onChange={(e, i: number) => setActiveTab(i)}
+          >
+            <Tab label="Distillation" />
+            <Tab label="Proofing" />
+          </Tabs>
+          <TabPanel value={activeTab} index={0}>
+            <CheckDuplicates />
+            <StatementForm
+              data={statement}
+              format="full"
+              setter={setStatement}
+            />
+            <TagForm
+              data={statement.tags}
+              extraData={{ parentId: statement.id, service: statementService }}
+              setter={setStatement}
+            />
+          </TabPanel>
+          <TabPanel value={activeTab} index={1}>
+            <ProofingTab statement={statement} />
+          </TabPanel>
+        </Box>
       </Grid>
       <Grid item xl={5}>
         <NoteForm extraData={{ connectivity_statement_id: statement.id }} />

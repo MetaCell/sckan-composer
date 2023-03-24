@@ -33,7 +33,7 @@ export default function CustomTextField({
         placeholder={placeholder}
         multiline={multiline}
         rows={rows}
-        value={value}
+        value={value ? value : ''}
       />
     </FormControl>
   );

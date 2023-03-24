@@ -32,7 +32,7 @@ const CustomSingleSelect = ( {onChange, placeholder,value, options: { label, dat
           {label}
         </Typography>
       <StyledSelect
-        value={value}
+        value={value ? value : ''}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         id="custom-select"
