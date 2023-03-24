@@ -150,8 +150,8 @@ export default function CheckDuplicates() {
                             Use smart search tool to find eventual duplicates of a record.
                         </Typography>
                     </Box>
-                    <IconButton sx={{ml: 'auto'}}>
-                        <CloseIcon onClick={() => handleClose()}/>
+                    <IconButton sx={{ml: 'auto'}} onClick={() => handleClose()}>
+                        <CloseIcon />
                     </IconButton>
                 </DialogTitle>
 

@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import Plot from "react-plotly.js";
-import { ConnectivityStatement, Via } from "../apiclient/backend";
-import { chartHeight, chartWidth } from "../helpers/settings";
-import { Box } from "@mui/material";
-import Typography from "@mui/material/Typography";
+import { ConnectivityStatement, Via } from "../../apiclient/backend";
+import { chartHeight, chartWidth } from "../../helpers/settings";
 import { useTheme } from "@mui/system";
+import { Box } from "@mui/material";
 
 const axes_config = {
   showgrid: false,
@@ -15,12 +14,12 @@ const axes_config = {
 
 const margins_config = {
   l: 0, //left margin
-  r: 0, //right <margin></margin>
+  r: 0, //right margin
 };
 const layout = {
-  autosize: false,
-  width: chartWidth,
-  height: chartHeight,
+  autosize: true,
+  //width: chartWidth,
+  //height: chartHeight,
   showlegend: false,
   plot_bgcolor: "transparent",
   paper_bgcolor: "transparent",
@@ -28,14 +27,6 @@ const layout = {
   yaxis: axes_config,
   margin: margins_config,
   annotations: [{}],
-  // annotations: [{
-  //     x:2,
-  //     y:2,
-  //     xref:"x",
-  //     yref:"y",
-  //     text:"",
-  //     showarrow:true,
-  //     }]
 };
 
 const styledLabels = (text: string) => {
@@ -63,7 +54,7 @@ const generateAnnotations = (path: (Via | null)[]) =>
     xanchor: "left",
   }));
 
-function PlotlyCharts(props: { statement: ConnectivityStatement }) {
+function PlotlyChart(props: { statement: ConnectivityStatement }) {
   const { statement } = props;
   const theme = useTheme();
 
@@ -81,7 +72,6 @@ function PlotlyCharts(props: { statement: ConnectivityStatement }) {
       line: { color: "#98A2B3", width: 1 },
       marker: { symbol: "arrow", angleref: "previous", size: 10 },
       hoverinfo: "skip",
-      //hovertemplate: "<b>Via</b>: %{text}",
     },
     {
       x: [0, statement.path.length + 1],
@@ -92,11 +82,6 @@ function PlotlyCharts(props: { statement: ConnectivityStatement }) {
         styledLabels(statement.origin?.name),
         styledLabels(statement.destination?.name),
       ],
-      textfont: {
-        size: 14,
-        weight: 600,
-        family: "Inter Bold, sans-serif, ",
-      },
       marker: {
         color: theme.palette.common.white,
         size: 100,
@@ -105,7 +90,7 @@ function PlotlyCharts(props: { statement: ConnectivityStatement }) {
       hoverinfo: "skip",
     },
   ];
-  return <Plot data={data} layout={layout} config={{ displaylogo: false }} />;
+  return <Box flexGrow={1}><Plot useResizeHandler style={{height:'100%', width:'100%'}} data={data} layout={layout} config={{ displaylogo: false }} /></Box>;
 }
 
-export default PlotlyCharts;
+export default PlotlyChart;

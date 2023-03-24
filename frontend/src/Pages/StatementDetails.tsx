@@ -91,7 +91,9 @@ const StatementDetails = () => {
           {statement?.modified_date}
         </Typography>
         {statement?.available_transitions.map((transition) => (
-          <Button onClick={() => doTransition(transition)}>{transition}</Button>
+          <Button key={transition} onClick={() => doTransition(transition)}>
+            {transition}
+          </Button>
         ))}
       </Grid>
       <Grid item xl={7}>
@@ -105,7 +107,7 @@ const StatementDetails = () => {
             <Tab label="Proofing" />
           </Tabs>
           <TabPanel value={activeTab} index={0}>
-            <CheckDuplicates/>
+            <CheckDuplicates />
             <StatementForm
               data={statement}
               format="full"

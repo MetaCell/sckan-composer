@@ -1,13 +1,12 @@
 import React from "react";
 import { ConnectivityStatement } from "../apiclient/backend/api";
 import { Grid, Typography, Box, Stack, Divider } from "@mui/material";
-import StatementChart from "./StatementChart";
+import StatementChart from "./StatementChart/StatementChart";
 import { useTheme } from "@mui/system";
 import { useSectionStyle } from "../styles/styles";
 
 const ProofingTab = (props: { statement: ConnectivityStatement }) => {
   const { statement } = props;
-  console.log(statement);
   const theme = useTheme();
   const sectionStyle = useSectionStyle(theme);
   return (
