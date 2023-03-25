@@ -51,6 +51,10 @@ const theme = createTheme({
       primary: "#475467",
       disabled: "",
     },
+    grey: {
+      100: "#F2F4F7",
+      200: "#EAECF0",
+    },
   },
   shape: {
     borderRadius,
@@ -353,6 +357,24 @@ const theme = createTheme({
           lineHeight: "20px",
           color: "#344054",
         },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+        },
+        textColorPrimary: ({ theme }) => ({
+          "&.Mui-selected": { color: theme.palette.primary.dark },
+          fontWeight: 600,
+        }),
+      },
+    },
+    MuiTabs: {
+      styleOverrides: {
+        indicator: ({ theme }) => ({
+          backgroundColor: theme.palette.primary.dark,
+        }),
       },
     },
   },
