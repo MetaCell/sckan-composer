@@ -39,7 +39,7 @@ from ..models import (
     Tag,
     Via, Doi, BiologicalSex,
 )
-from ..services import ConnectivityStatementService, SentenceService
+from composer.services.state_services import ConnectivityStatementService, SentenceService
 
 
 # Mixins

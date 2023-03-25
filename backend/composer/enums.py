@@ -18,6 +18,12 @@ class CircuitType(models.TextChoices):
     UNKNOWN = "UNKNOWN", "Not specified"
 
 
+class ViaType(models.TextChoices):
+    # axon sensory ending, axon terminal, axon sensory terminal
+    AXON = "AXON", "Axon"
+    DENDRITE = "DENDRITE", "Dendrite"
+
+
 class DestinationType(models.TextChoices):
     # axon sensory ending, axon terminal, axon sensory terminal
     AXON_SE = "AXON-SE", "Axon sensory ending"
@@ -46,3 +52,8 @@ class CSState(models.TextChoices):
     CONNECTION_MISSING = "connection_missing"
     NPO_APPROVED = "npo_approved"
     APPROVED = "approved"
+
+
+class NoteType(models.TextChoices):
+    PLAIN = "plain"
+    SPECIES_DIFFERENT = 'species_different'

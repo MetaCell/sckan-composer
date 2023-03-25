@@ -1,7 +1,6 @@
 from django.db import transaction
-from django.db.models import Q
 
-from .enums import CSState, SentenceState
+from composer.enums import CSState
 
 
 class BaseServiceMixin:
@@ -75,10 +74,10 @@ class SentenceService(StateServiceMixin):
         # return True if the sentence can go to state to_be_reviewed
         # it should have at least one provenance (pmid, pmcid, doi) and at least one connectivity statement
         return (
-            sentence.pmid is not None
-            or sentence.pmcid is not None
-            or sentence.doi is not None
-        ) and (sentence.connectivitystatement_set.count() > 0)
+                       sentence.pmid is not None
+                       or sentence.pmcid is not None
+                       or sentence.doi is not None
+               ) and (sentence.connectivitystatement_set.count() > 0)
 
     @staticmethod
     def can_be_composed(sentence):
@@ -92,6 +91,6 @@ class ConnectivityStatementService(StateServiceMixin):
     def compile_journey(connectivity_statement):
         origin = connectivity_statement.origin
         destination = connectivity_statement.destination
-        journey =  f"{origin} to {destination}"
+        journey = f"{origin} to {destination}"
         journey += " via ".join(str(path) for path in connectivity_statement.path.all())
         return journey.lower().capitalize()

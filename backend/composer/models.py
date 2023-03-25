@@ -4,8 +4,8 @@ from django.db.models import Q
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
 
-from .enums import CircuitType, CSState, DestinationType, Laterality, SentenceState
-from .services import ConnectivityStatementService, SentenceService
+from .enums import CircuitType, CSState, DestinationType, Laterality, SentenceState, NoteType, ViaType
+from composer.services.state_services import ConnectivityStatementService, SentenceService
 from .utils import doi_uri, pmcid_uri, pmid_uri
 
 
@@ -77,7 +77,7 @@ class ConnectivityStatementManager(models.Manager):
             )
             .prefetch_related("notes", "tags", "species")
         )
-    
+
     def excluding_draft(self):
         return self.get_queryset().exclude(state=CSState.DRAFT)
 
@@ -161,6 +161,7 @@ class Tag(models.Model):
     """Tag"""
 
     tag = models.CharField(max_length=200, db_index=True, unique=True)
+    exportable = models.BooleanField(default=False)
 
     def __str__(self):
         return self.tag
@@ -283,7 +284,8 @@ class Sentence(models.Model):
                 name="sentence_pmid_pmcd_valid",
             ),
             models.CheckConstraint(
-                check=(Q(external_ref__isnull=True) & Q(batch_name__isnull=True)) | Q(external_ref__isnull=False) & Q(batch_name__isnull=False),
+                check=(Q(external_ref__isnull=True) & Q(batch_name__isnull=True)) | Q(external_ref__isnull=False) & Q(
+                    batch_name__isnull=False),
                 name='sentence_externalref_and_batch_valid')
         ]
 
@@ -300,6 +302,9 @@ class Via(models.Model):
         default=0,
         blank=False,
         null=False,
+    )
+    type = models.CharField(
+        max_length=8, default=ViaType.AXON, choices=ViaType.choices
     )
 
     def __str__(self):
@@ -411,7 +416,7 @@ class ConnectivityStatement(models.Model):
     @transition(field=state, source=CSState.NPO_APPROVED, target=CSState.APPROVED)
     def approved(self):
         pass
-    
+
     @property
     def journey(self):
         return ConnectivityStatementService.compile_journey(self)
@@ -428,6 +433,10 @@ class ConnectivityStatement(models.Model):
         if ConnectivityStatementService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
+
+    @property
+    def approved_by_sawg(self):
+        return self.state in [CSState.NPO_APPROVED, CSState.APPROVED]
 
     class Meta:
         ordering = ["knowledge_statement"]
@@ -488,6 +497,9 @@ class Note(models.Model):
         null=True,
         blank=True,
         related_name="notes",
+    )
+    type = models.CharField(
+        max_length=20, default=NoteType.PLAIN, choices=NoteType.choices
     )
 
     def __str__(self):
