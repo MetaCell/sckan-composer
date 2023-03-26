@@ -69,7 +69,7 @@ const NoteDetails = (props: any) => {
       }}>
         {
           noteList?.map((note: Note, index: number) =>
-            <TimelineItem>
+            <TimelineItem key={index}>
               <TimelineSeparator>
                 <TimeLineIcon />
                 {
