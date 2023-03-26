@@ -1,4 +1,5 @@
 import {SentenceAvailableTransitionsEnum as sentenceStates} from "../apiclient/backend";
+import {ConnectivityStatementAvailableTransitionsEnum as statementStates} from "../apiclient/backend";
 
 export const hiddenWidget = (fields: string[]) => {
   let hiddenSchema = {}
@@ -104,6 +105,17 @@ export const SentenceLabels = {
   [sentenceStates.Duplicate]: "Duplicate",
   [sentenceStates.Excluded]: "Excluded",
 }
+export const StatementsLabels = {
+  [statementStates.ToBeReviewed]: "To be reviewed",
+  [statementStates.ComposeNow]: "Compose now",
+  [statementStates.Excluded]: "Exclude",
+  [statementStates.Draft]: "Draft",
+  [statementStates.Curated]: "Curate",
+  [statementStates.Rejected]: "Reject",
+  [statementStates.ConnectionMissing]: "Connection Missing",
+  [statementStates.NpoApproved]: "Npo Approved",
+  [statementStates.Approved]: "Approved",
+}
 
 export const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString("en-UK", {
@@ -152,7 +164,7 @@ export const isEqual = function(obj1: any, obj2: any) {
               if(!isEqual(obj1[objKey], obj2[objKey])) {
                   return false;
               }
-          } 
+          }
           else {
               return false;
           }

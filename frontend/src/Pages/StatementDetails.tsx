@@ -8,22 +8,15 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import TabPanel from "../components/Widgets/TabPanel";
 import { useParams } from "react-router-dom";
-import StatementForm from "../components/Forms/StatementForm";
 import statementService from "../services/StatementService";
-import NoteForm from "../components/Forms/NoteForm";
 import TagForm from "../components/Forms/TagForm";
 import { ConnectivityStatement } from "../apiclient/backend";
-import { Button } from "@mui/material";
 import { userProfile } from "../services/UserService";
-import CheckDuplicates from "../components/CheckForDuplicates/CheckDuplicatesDialog";
 import ProofingTab from "../components/ProofingTab";
 import {SentenceStateChip} from "../components/Widgets/StateChip";
-import {formatDate, formatTime, SentenceLabels} from "../helpers/helpers";
+import {formatDate, formatTime, SentenceLabels, StatementsLabels} from "../helpers/helpers";
 import GroupedButtons from "../components/Widgets/CustomGroupedButtons";
-import TriageStatementSection from "../components/TriageStatementSection/TriageStatementSection";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SentenceForm from "../components/Forms/SentenceForm";
-import sentenceService from "../services/SentenceService";
 import Divider from "@mui/material/Divider";
 import NoteDetails from "../components/Widgets/NotesFomList";
 
@@ -32,6 +25,8 @@ const StatementDetails = () => {
   const [statement, setStatement] = useState({} as ConnectivityStatement);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [open, setOpen] = React.useState(false);
 
   const doTransition = (transition: string) => {
     statementService
@@ -39,6 +34,14 @@ const StatementDetails = () => {
       .then((statement: ConnectivityStatement) => {
         setStatement(statement);
       });
+  };
+
+  const handleMenuItemClick = (
+    event: React.MouseEvent<HTMLLIElement, MouseEvent>,
+    index: number
+  ) => {
+    setSelectedIndex(index);
+    setOpen(false);
   };
 
   useEffect(() => {
@@ -96,7 +99,17 @@ const StatementDetails = () => {
             </Box>
           </Grid>
           <Grid item xs={12} md={6} display="flex" justifyContent="flex-end">
-            <Button>status</Button>
+            <GroupedButtons
+              handleClick={doTransition}
+              selectedOption={
+                StatementsLabels[statement?.available_transitions[selectedIndex]]
+              }
+              options={statement?.available_transitions}
+              selectedIndex={selectedIndex}
+              handleMenuItemClick={handleMenuItemClick}
+              hasFormat={true}
+              format={StatementsLabels}
+            />
           </Grid>
         </Grid>
       </Grid>
