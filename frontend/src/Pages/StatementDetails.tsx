@@ -169,7 +169,7 @@ const StatementDetails = () => {
                 setter={setStatement}
               />
               <Divider sx={{ margin: "36px 0" }} />
-              <NoteDetails extraData={{ sentence_id: statement.id }} />
+              <NoteDetails extraData={{ connectivity_statement_id: statement.id }} />
             </Paper>
           </Grid>
         </Grid>
