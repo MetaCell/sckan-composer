@@ -9,13 +9,20 @@ import { biologicalSexes } from '../../services/BiologicalSexService';
 import { ansDivisions } from '../../services/AnsDivisionService';
 
 const StatementForm = (props: any) => {
-  const { extraData, uiFields, statement} = props
+  const {  uiFields, statement} = props
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema()
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
   // TODO: set up the widgets for the schema
   copiedSchema.title = ""
   copiedUISchema.circuit_type =  {
+    "ui:widget": "radio",
+    "ui:options": {
+      classNames: 'col-xs-12 col-md-6'
+    }
+  }
+
+  copiedUISchema.destination_type =  {
     "ui:widget": "radio",
     "ui:options": {
       classNames: 'col-xs-12 col-md-6'

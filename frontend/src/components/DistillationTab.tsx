@@ -51,6 +51,7 @@ const DistillationTab = ({ statement, setStatement } : any) => {
               "circuit_type",
               "laterality",
               "ans_division_id",
+              "destination_type"
             ]}
           />
         </Paper>

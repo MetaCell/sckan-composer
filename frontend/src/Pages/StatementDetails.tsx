@@ -134,7 +134,7 @@ const StatementDetails = () => {
       </Grid>
 
       <Grid item xs={12}>
-        <Grid container spacing={1}>
+        <Grid container spacing={2}>
           <Grid item xs={12} md={7}>
             <TabPanel value={activeTab} index={0}>
               <DistillationTab statement={statement} />
