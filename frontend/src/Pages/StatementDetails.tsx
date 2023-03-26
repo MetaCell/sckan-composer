@@ -19,6 +19,9 @@ import GroupedButtons from "../components/Widgets/CustomGroupedButtons";
 import SentenceForm from "../components/Forms/SentenceForm";
 import Divider from "@mui/material/Divider";
 import NoteDetails from "../components/Widgets/NotesFomList";
+import SpeciesForm from "../components/Forms/SpeciesForm";
+import StatementForm from "../components/Forms/StatementForm";
+import DistillationTab from "../components/DistillationTab";
 
 const StatementDetails = () => {
   const { statementId } = useParams();
@@ -134,34 +137,7 @@ const StatementDetails = () => {
         <Grid container spacing={1}>
           <Grid item xs={12} md={7}>
             <TabPanel value={activeTab} index={0}>
-              <Paper
-                sx={{
-                  border: 0,
-                  boxShadow: "none",
-                }}
-              >
-                <Grid container p={3} mb={2}>
-                  <Grid item xs={12}>
-                    <Stack
-                      direction="row"
-                      justifyContent="space-between"
-                      sx={{
-                        "& .MuiButtonBase-root": {
-                          padding: 0,
-                        },
-                      }}
-                    >
-                      <Typography variant="h5" mb={1}>
-                        Knowledge Statements
-                      </Typography>
-                    </Stack>
-                  </Grid>
-                </Grid>
-              </Paper>
-              <SentenceForm
-                data={statement.sentence}
-                format="small"
-              />
+              <DistillationTab statement={statement} />
             </TabPanel>
             <TabPanel value={activeTab} index={1}>
               <ProofingTab statement={statement} />
@@ -169,8 +145,8 @@ const StatementDetails = () => {
 
           </Grid>
 
-          <Grid item xs={12} md={5} p={1}>
-            <Paper sx={{ padding: "24px", "& .MuiBox-root": { padding: 0 } }}>
+          <Grid item xs={12} md={5}>
+            <Paper sx={{ "& .MuiBox-root": { padding: 0 } }}>
               <Box>
                 <Typography variant="h5" mb={1}>
                   Notes

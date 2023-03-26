@@ -189,8 +189,10 @@ const theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          boxShadow: paperShadow,
           borderRadius: "12px",
+          border: 0,
+          boxShadow: "none",
+          padding: '24px'
         },
       },
     },
