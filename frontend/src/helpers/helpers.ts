@@ -133,7 +133,7 @@ export const timeAgo = (timestamp : string) => {
   } else if (minutes > 0) {
     return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
   } else {
-    return `${seconds} second${seconds > 1 ? 's' : ''} ago`;
+    return `${seconds} second${seconds > 0 ? 's' : ''} ago`;
   }
 }
 

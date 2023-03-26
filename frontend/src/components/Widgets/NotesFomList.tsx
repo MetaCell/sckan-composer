@@ -32,13 +32,14 @@ const NoteDetails = (props: any) => {
   const [refresh, setRefresh] = useState(false)
 
   useEffect(() => {
-    if (extraData?.sentence_id) {
-      noteService.getNotesList(undefined,undefined, undefined, extraData?.sentence_id).then(result => {
+    const { connectivity_statement_id, sentence_id } = extraData
+    if (connectivity_statement_id || sentence_id) {
+      noteService.getNotesList(connectivity_statement_id, undefined,undefined, sentence_id).then(result => {
         setNoteList(result?.results)
         setRefresh(false)
       })
     }
-  }, [extraData?.sentence_id, refresh])
+  }, [extraData?.connectivity_statement_id, extraData?.sentence_id, refresh])
 
   return (
     <Box display='flex' flexDirection='column' >
