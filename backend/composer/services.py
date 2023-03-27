@@ -106,6 +106,6 @@ class ConnectivityStatementService(StateServiceMixin):
             and connectivity_statement.ans_division is not None
             and connectivity_statement.biological_sex is not None
             and connectivity_statement.path.count() > 0
-            and connectivity_statement.species_set.count() > 0
+            and connectivity_statement.species.count() > 0
             and connectivity_statement.doi_set.count() > 0
         )
