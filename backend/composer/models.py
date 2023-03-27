@@ -382,6 +382,7 @@ class ConnectivityStatement(models.Model):
         field=state,
         source=[CSState.COMPOSE_NOW, CSState.CONNECTION_MISSING],
         target=CSState.CURATED,
+        conditions=[ConnectivityStatementService.can_be_reviewed],
     )
     def curated(self):
         pass
