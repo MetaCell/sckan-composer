@@ -518,3 +518,4 @@ class Note(models.Model):
                 name="only_sentence_or_connectivity_statement",
             ),
         ]
+
