@@ -47,6 +47,10 @@ def get_curation_notes(cs, row):
     return row.curation_notes
 
 
+def get_review_notes(cs, row):
+    return row.review_notes
+
+
 def get_reference(cs, row):
     return ', '.join([doi.doi for doi in cs.doi_set.all()])
 
@@ -65,18 +69,18 @@ def get_added_to_sckan_timestamp(cs, row):
 
 def get_tag_filter(tag_name):
     def tag_filter(cs, row):
-        return cs.tags.filter(name=tag_name).exists()
+        return cs.tags.filter(tag=tag_name).exists()
 
     return tag_filter
 
 
 class Row:
-    def __init__(self, structure: str, identifier: str, relationship: str, curation_notes: str, reviewer_notes: str):
+    def __init__(self, structure: str, identifier: str, relationship: str, curation_notes: str, review_notes: str):
         self.structure = structure
         self.identifier = identifier
         self.relationship = relationship
         self.curation_notes = curation_notes
-        self.reviewer_notes = reviewer_notes
+        self.review_notes = review_notes
 
 
 def generate_csv_attributes_mapping() -> Dict[str, Callable]:
@@ -93,28 +97,29 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
         "Curation notes": get_curation_notes,
         "Reference (pubmed ID, DOI or text)": get_reference,
         "Approved by SAWG": is_approved_by_sawg,
+        "Review notes": get_review_notes,
         "Proposed action": get_proposed_action,
         "Added to SCKAN (time stamp)": get_added_to_sckan_timestamp,
     }
     exportable_tags = Tag.objects.filter(exportable=True)
     for tag in exportable_tags:
-        attributes_map[tag.name] = get_tag_filter(tag.name)
+        attributes_map[tag.tag] = get_tag_filter(tag.tag)
 
     return attributes_map
 
 
 def get_origin_row(cs: ConnectivityStatement):
-    curation_notes = '\n'.join([note.note for note in cs.notes.all()])
-    reviewer_notes = '\n'.join([note.note for note in cs.sentence.notes.all()])
-    return Row(cs.origin.name, cs.origin.ontology_uri, 'Soma', curation_notes, reviewer_notes)
+    review_notes = '\n'.join([note.note for note in cs.notes.all()])
+    curation_notes = '\n'.join([note.note for note in cs.sentence.notes.all()])
+    return Row(cs.origin.name, cs.origin.ontology_uri, 'Soma', curation_notes, review_notes)
 
 
 def get_destination_row(cs: ConnectivityStatement):
-    return Row(cs.destination.name, cs.destination.ontology_uri, cs.destination_type, '', '')
+    return Row(cs.destination.name, cs.destination.ontology_uri, cs.get_destination_type_display(), '', '')
 
 
 def get_via_row(via: Via):
-    return Row(via.anatomical_entity.name, via.anatomical_entity.ontology_uri, via.type, '', '')
+    return Row(via.anatomical_entity.name, via.anatomical_entity.ontology_uri, via.get_type_display(), '', '')
 
 
 def get_specie_row(specie: Specie):

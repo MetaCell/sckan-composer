@@ -1,5 +1,7 @@
 import csv
 import datetime
+import logging
+
 from django.core.management.base import BaseCommand
 
 from composer.exceptions import UnexportableConnectivityStatement
@@ -27,7 +29,8 @@ class Command(BaseCommand):
             for obj in qs:
                 try:
                     rows = get_rows(obj)
-                except UnexportableConnectivityStatement:
+                except UnexportableConnectivityStatement as e:
+                    logging.warning(f"Connectivity Statement with id {obj.id} skipped due to {e}")
                     continue
                 for row in rows:
                     row_content = []
