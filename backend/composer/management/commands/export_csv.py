@@ -2,6 +2,7 @@ import csv
 import datetime
 from django.core.management.base import BaseCommand
 
+from composer.exceptions import UnexportableConnectivityStatement
 from composer.models import ConnectivityStatement
 from composer.services.export_services import generate_csv_attributes_mapping, get_rows
 
@@ -24,7 +25,10 @@ class Command(BaseCommand):
 
             # Write data rows
             for obj in qs:
-                rows = get_rows(obj)
+                try:
+                    rows = get_rows(obj)
+                except UnexportableConnectivityStatement:
+                    continue
                 for row in rows:
                     row_content = []
                     for key in csv_attributes_mapping:
