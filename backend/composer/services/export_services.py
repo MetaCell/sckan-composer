@@ -5,73 +5,7 @@ from composer.exceptions import UnexportableConnectivityStatement
 from composer.models import Tag, ConnectivityStatement, Via, Specie, Note
 
 SPECIES_TYPE = 'hasInstanceInTaxon'
-
-
-def get_sentence_number(cs, row):
-    return cs.sentence.id
-
-
-def get_nlp_id(cs, row):
-    return cs.id
-
-
-def get_neuron_population_label(cs, row):
-    return cs.journey
-
-
-def get_type(cs, row):
-    return cs.ans_division.name
-
-
-def get_structure(cs, row):
-    return row.structure
-
-
-def get_identifier(cs, row):
-    return row.identifier
-
-
-def get_relationship(cs, row):
-    return row.relationship
-
-
-def get_observed_in_species(cs, row):
-    return ', '.join([specie.name for specie in cs.species.all()])
-
-
-def is_different_from_existing(cs, row):
-    return cs.notes.filter(type=NoteType.SPECIES_DIFFERENT).exists()
-
-
-def get_curation_notes(cs, row):
-    return row.curation_notes
-
-
-def get_review_notes(cs, row):
-    return row.review_notes
-
-
-def get_reference(cs, row):
-    return ', '.join([doi.doi for doi in cs.doi_set.all()])
-
-
-def is_approved_by_sawg(cs, row):
-    return 'Yes'
-
-
-def get_proposed_action(cs, row):
-    return 'Add'
-
-
-def get_added_to_sckan_timestamp(cs, row):
-    return cs.modified_date
-
-
-def get_tag_filter(tag_name):
-    def tag_filter(cs, row):
-        return cs.tags.filter(tag=tag_name).exists()
-
-    return tag_filter
+HAS_NERVE_BRANCHES_TAG = "Has nerve branches"
 
 
 class Row:
@@ -81,6 +15,77 @@ class Row:
         self.relationship = relationship
         self.curation_notes = curation_notes
         self.review_notes = review_notes
+
+
+def get_sentence_number(cs: ConnectivityStatement, row: Row):
+    return cs.sentence.id
+
+
+def get_nlp_id(cs: ConnectivityStatement, row: Row):
+    return cs.id
+
+
+def get_neuron_population_label(cs: ConnectivityStatement, row: Row):
+    return cs.journey
+
+
+def get_type(cs: ConnectivityStatement, row: Row):
+    return cs.ans_division.name
+
+
+def get_structure(cs: ConnectivityStatement, row: Row):
+    return row.structure
+
+
+def get_identifier(cs: ConnectivityStatement, row: Row):
+    return row.identifier
+
+
+def get_relationship(cs: ConnectivityStatement, row: Row):
+    return row.relationship
+
+
+def get_observed_in_species(cs: ConnectivityStatement, row: Row):
+    return ', '.join([specie.name for specie in cs.species.all()])
+
+
+def is_different_from_existing(cs: ConnectivityStatement, row: Row):
+    return cs.notes.filter(type=NoteType.SPECIES_DIFFERENT).exists()
+
+
+def get_curation_notes(cs: ConnectivityStatement, row: Row):
+    return row.curation_notes
+
+
+def get_review_notes(cs: ConnectivityStatement, row: Row):
+    return row.review_notes
+
+
+def get_reference(cs: ConnectivityStatement, row: Row):
+    return ', '.join([doi.doi for doi in cs.doi_set.all()])
+
+
+def is_approved_by_sawg(cs: ConnectivityStatement, row: Row):
+    return 'Yes'
+
+
+def get_proposed_action(cs: ConnectivityStatement, row: Row):
+    return 'Add'
+
+
+def get_added_to_sckan_timestamp(cs: ConnectivityStatement, row: Row):
+    return cs.modified_date
+
+
+def has_nerve_branches(cs: ConnectivityStatement, row: Row) -> bool:
+    return cs.tags.filter(tag=HAS_NERVE_BRANCHES_TAG).exists()
+
+
+def get_tag_filter(tag_name):
+    def tag_filter(cs, row):
+        return cs.tags.filter(tag=tag_name).exists()
+
+    return tag_filter
 
 
 def generate_csv_attributes_mapping() -> Dict[str, Callable]:
@@ -96,6 +101,7 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
         "Different from existing": is_different_from_existing,
         "Curation notes": get_curation_notes,
         "Reference (pubmed ID, DOI or text)": get_reference,
+        "Has nerve branches": has_nerve_branches,
         "Approved by SAWG": is_approved_by_sawg,
         "Review notes": get_review_notes,
         "Proposed action": get_proposed_action,
