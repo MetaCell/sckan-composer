@@ -133,6 +133,7 @@ def get_specie_row(specie: Specie):
 
 
 def get_biological_sex_row(cs: ConnectivityStatement):
+    # todo: add relationship key
     return Row(cs.biological_sex.name, cs.biological_sex.ontology_uri, '', '', '')
 
 
