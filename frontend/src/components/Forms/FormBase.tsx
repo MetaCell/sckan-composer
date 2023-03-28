@@ -5,7 +5,7 @@ import { Backdrop, Box, CircularProgress } from "@mui/material";
 import { Theme } from "@rjsf/mui";
 import { useDebouncedCallback } from "use-debounce";
 import { EDIT_DEBOUNCE } from "../../settings";
-import { isEqual } from "../../helpers/helpers";
+import Button from "@mui/material/Button";
 
 const Form = withTheme(Theme);
 
@@ -27,14 +27,17 @@ export const FormBase = (props: any) => {
     formIsValid,
     children = false,
     widgets,
+    submitButtonProps,
   } = props;
   const [localData, setLocalData] = useState<any>(data);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const triggerAutoSave = useDebouncedCallback(() => onSave(), EDIT_DEBOUNCE);
+  const [isSubmitButtonDisabled, setIsSubmitButtonDisabled] =
+    useState<boolean>(false);
   const [customSchema, setCustomSchema] = useState<any>(schema);
   const [customUiSchema, setCustomUiSchema] = useState<any>(uiSchema);
 
-  const formRef = useRef<any>(null);
+  const submitButtonRef = useRef<any>(null);
 
   const removeProp = (obj: any, prop: string) => {
     const { [prop]: removedProp, ...newObj } = obj;
@@ -45,9 +48,9 @@ export const FormBase = (props: any) => {
   //as it was mutating the original object at the jsonschema singleton
 
   useEffect(() => {
-    setLocalData(data)
-    setCustomSchema(schema)
-    setCustomUiSchema(uiSchema)
+    setLocalData(data);
+    setCustomSchema(schema);
+    setCustomUiSchema(uiSchema);
     if (uiFields) {
       Object.entries(uiSchema).forEach((p) => {
         if (!p[0].startsWith("ui:") && !uiFields.includes(p[0])) {
@@ -69,26 +72,10 @@ export const FormBase = (props: any) => {
   };
 
   const onSave = () => {
-    if (formRef.current != null) {
-      return formRef.current.submit();
+    if (submitButtonRef.current != null) {
+      return submitButtonRef.current.click();
     }
   };
-
-  const toggleSubmitButton = (disable: boolean) => {
-    setCustomUiSchema({
-      ...customUiSchema,
-      "ui:submitButtonOptions": {
-        ...customUiSchema["ui:submitButtonOptions"],
-        props: {
-          ...customUiSchema["ui:submitButtonOptions"]?.props,
-          disabled: disable,
-        },
-      },
-    });
-  };
-
-  const enableSubmitButton = () => toggleSubmitButton(false);
-  const disableSubmitButton = () => toggleSubmitButton(true);
 
   const handleSubmit = async (event: IChangeEvent) => {
     const formData = { ...event.formData, ...extraData };
@@ -120,9 +107,9 @@ export const FormBase = (props: any) => {
     const formData = { ...event.formData, ...extraData };
     setLocalData(formData);
     if (formIsValid && !formIsValid(formData)) {
-      disableSubmitButton();
+      setIsSubmitButtonDisabled(true);
     } else {
-      enableSubmitButton();
+      setIsSubmitButtonDisabled(false);
       if (enableAutoSave) {
         return triggerAutoSave();
       }
@@ -138,7 +125,6 @@ export const FormBase = (props: any) => {
       )}
       <Box>
         <Form
-          ref={formRef}
           schema={customSchema}
           uiSchema={customUiSchema}
           formData={localData}
@@ -147,9 +133,22 @@ export const FormBase = (props: any) => {
           onChange={handleUpdate}
           onSubmit={handleSubmit}
           onError={onError}
-          children={children}
           widgets={widgets}
-        />
+        >
+          {children}
+
+          <Button
+            ref={submitButtonRef}
+            type="submit"
+            disabled={isSubmitButtonDisabled}
+            sx={{
+              display: (enableAutoSave || !submitButtonProps) && "none",
+            }}
+            {...submitButtonProps}
+          >
+            {submitButtonProps?.label ? submitButtonProps.label : "Submit"}
+          </Button>
+        </Form>
       </Box>
     </>
   );
