@@ -77,7 +77,7 @@ class ConnectivityStatementManager(models.Manager):
             )
             .prefetch_related("notes", "tags", "species")
         )
-    
+
     def excluding_draft(self):
         return self.get_queryset().exclude(state=CSState.DRAFT)
 
@@ -272,19 +272,21 @@ class Sentence(models.Model):
             ),
             models.CheckConstraint(
                 check=~Q(state=SentenceState.COMPOSE_NOW)
-                      | (
-                              Q(state=SentenceState.COMPOSE_NOW)
-                              & (
-                                      Q(pmid__isnull=False)
-                                      | Q(pmcid__isnull=False)
-                                      | Q(doi__isnull=False)
-                              )
-                      ),
+                | (
+                    Q(state=SentenceState.COMPOSE_NOW)
+                    & (
+                        Q(pmid__isnull=False)
+                        | Q(pmcid__isnull=False)
+                        | Q(doi__isnull=False)
+                    )
+                ),
                 name="sentence_pmid_pmcd_valid",
             ),
             models.CheckConstraint(
-                check=(Q(external_ref__isnull=True) & Q(batch_name__isnull=True)) | Q(external_ref__isnull=False) & Q(batch_name__isnull=False),
-                name='sentence_externalref_and_batch_valid')
+                check=(Q(external_ref__isnull=True) & Q(batch_name__isnull=True))
+                | Q(external_ref__isnull=False) & Q(batch_name__isnull=False),
+                name="sentence_externalref_and_batch_valid",
+            ),
         ]
 
 
@@ -359,7 +361,9 @@ class ConnectivityStatement(models.Model):
     )
     species = models.ManyToManyField(Specie, verbose_name="Species", blank=True)
     tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
-    biological_sex = models.ForeignKey(BiologicalSex, on_delete=models.DO_NOTHING, null=True, blank=True)
+    biological_sex = models.ForeignKey(
+        BiologicalSex, on_delete=models.DO_NOTHING, null=True, blank=True
+    )
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
     modified_date = models.DateTimeField(auto_now=True)
 
@@ -392,7 +396,12 @@ class ConnectivityStatement(models.Model):
     def connection_missing(self):
         pass
 
-    @transition(field=state, source=CSState.CURATED, target=CSState.TO_BE_REVIEWED)
+    @transition(
+        field=state,
+        source=CSState.CURATED,
+        target=CSState.TO_BE_REVIEWED,
+        conditions=[ConnectivityStatementService.can_be_reviewed],
+    )
     def to_be_reviewed(self):
         pass
 
@@ -411,7 +420,7 @@ class ConnectivityStatement(models.Model):
     @transition(field=state, source=CSState.NPO_APPROVED, target=CSState.APPROVED)
     def approved(self):
         pass
-    
+
     @property
     def journey(self):
         return ConnectivityStatementService.compile_journey(self)
@@ -502,10 +511,11 @@ class Note(models.Model):
                     sentence__isnull=False,
                     connectivity_statement__isnull=True,
                 )
-                      | models.Q(
+                | models.Q(
                     sentence__isnull=True,
                     connectivity_statement__isnull=False,
                 ),
                 name="only_sentence_or_connectivity_statement",
             ),
         ]
+

@@ -1683,7 +1683,6 @@ components:
       - has_notes
       - id
       - journey
-      - knowledge_statement
       - modified_date
       - origin
       - owner
@@ -1721,6 +1720,9 @@ components:
           readOnly: true
         doi:
           type: string
+        doi_uri:
+          type: string
+          nullable: true
         connectivity_statement_id:
           type: integer
       required:

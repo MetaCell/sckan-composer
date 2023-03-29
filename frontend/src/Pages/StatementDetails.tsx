@@ -31,11 +31,13 @@ const StatementDetails = () => {
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [open, setOpen] = React.useState(false);
 
-  const doTransition = (transition: string) => {
+  const doTransition = () => {
+    const transition = statement?.available_transitions[selectedIndex];
     statementService
       .doTransition(statement, transition)
       .then((statement: ConnectivityStatement) => {
         setStatement(statement);
+        setSelectedIndex(0);
       });
   };
 
