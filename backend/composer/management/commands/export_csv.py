@@ -12,6 +12,7 @@ from composer.services.export_services import (
     get_rows,
     get_connectivity_statements_to_export,
 )
+from composer.services.filesystem_service import create_dir_if_not_exists
 
 
 class Command(BaseCommand):
@@ -27,7 +28,9 @@ class Command(BaseCommand):
 
         now = datetime.datetime.now()
         filename = f'export_{now.strftime("%Y-%m-%d_%H-%M-%S")}.csv'
-        filepath = os.path.join(options.get("folder"), filename)
+        folder = options.get("folder")
+        filepath = os.path.join(folder, filename)
+        create_dir_if_not_exists(folder)
 
         csv_attributes_mapping = generate_csv_attributes_mapping()
 
