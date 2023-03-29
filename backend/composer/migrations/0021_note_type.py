@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 choices=[
                     ("plain", "Plain"),
-                    ("species_different", "Species Different"),
+                    ("different", "Different"),
                 ],
                 default="plain",
                 max_length=20,

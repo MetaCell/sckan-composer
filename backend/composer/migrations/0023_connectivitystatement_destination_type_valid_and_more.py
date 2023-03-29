@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="note",
             constraint=models.CheckConstraint(
-                check=models.Q(("type__in", ["plain", "species_different"])),
+                check=models.Q(("type__in", ["plain", "different"])),
                 name="note_type_valid",
             ),
         ),
