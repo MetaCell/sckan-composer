@@ -38,7 +38,6 @@ export const FormBase = (props: any) => {
   const [customUiSchema, setCustomUiSchema] = useState<any>(uiSchema);
 
   const submitButtonRef = useRef<any>(null);
-
   const removeProp = (obj: any, prop: string) => {
     const { [prop]: removedProp, ...newObj } = obj;
     return newObj;

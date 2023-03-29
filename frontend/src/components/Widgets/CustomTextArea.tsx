@@ -30,7 +30,7 @@ const StyledInput = styled(TextField)(({ theme }) => ({
 }));
 
 
-export default function TextArea({value, placeholder, required, onChange, options: { rows, hasDebouncedOnChange } }: any) {
+export default function TextArea({value, placeholder, required, disabled, onChange, options: { rows, hasDebouncedOnChange } }: any) {
 
   const debouncedChangeHandler = useDebouncedCallback(
     (event) => onChange(event.target.value),
@@ -46,6 +46,7 @@ export default function TextArea({value, placeholder, required, onChange, option
       placeholder={placeholder}
       fullWidth
       required={required}
+      disabled={disabled}
       onChange={debouncedChangeHandler}/>
       :<StyledInput
       value={value?value:''}

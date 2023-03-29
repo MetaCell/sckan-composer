@@ -12,13 +12,12 @@ const StyledAutoComplete = styled(Autocomplete)(({ theme }) => ({
   'label + &': {
     marginTop: theme.spacing(4),
   },
-  "&.Mui-focused .MuiOutlinedInput-root":{
-    border: "1px solid #8DB2EE",
-    boxShadow: '0px 1px 2px rgba(16, 24, 40, 0.05), 0px 0px 0px 4px #CEDDED'
+  "& .MuiOutlinedInput-notchedOutline": {
+    border: 0
   }
 }));
 
-export default function AutoComplete({placeholder, value, setValue, fetch, noOptionsText}: any) {
+export default function AutoComplete({onChange, placeholder, disabled, value, setValue, fetch, noOptionsText, label}: any) {
     const [inputValue, setInputValue] = useState<string>("")
     const [options, setOptions] = useState<readonly any[]>([]);
 
@@ -52,6 +51,11 @@ export default function AutoComplete({placeholder, value, setValue, fetch, noOpt
 
     return (
       <FormControl variant="standard">
+        {
+          label && <InputLabel shrink htmlFor="custom-select" id="custom-select-label">
+            <Typography variant="h5" fontWeight={500}>{label}</Typography>
+          </InputLabel>
+        }
         <StyledAutoComplete
           id='custom-AutoComplete'
             fullWidth
@@ -63,12 +67,14 @@ export default function AutoComplete({placeholder, value, setValue, fetch, noOpt
             filterOptions={(x) => x}
             options={options}
             autoComplete
+            disabled={disabled}
             includeInputInList
             filterSelectedOptions
             defaultValue={null}
             value={value || null}
             noOptionsText={noOptionsText}
             onChange={(event: any, newValue: any | null) => {
+                onChange(newValue)
                 setOptions(newValue ? [newValue, ...options] : options);
                 setValue(newValue)
             }}

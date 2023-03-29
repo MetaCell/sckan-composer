@@ -25,7 +25,7 @@ const StyledSelect = styled(Select)(({ theme }) => ({
   }
 }));
 
-const CustomSingleSelect = ( {onChange, placeholder,value, options: { label, data }} : any) => {
+const CustomSingleSelect = ( {onChange, placeholder, disabled, value, options: { label, data }} : any) => {
   return (
     <FormControl variant="standard">
         <Typography variant="h6" fontWeight={500} marginBottom={2} color={vars.titleFontColor}>
@@ -35,6 +35,7 @@ const CustomSingleSelect = ( {onChange, placeholder,value, options: { label, dat
         value={value ? value : ''}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
+        disabled={disabled}
         id="custom-select"
         input={<OutlinedInput placeholder={placeholder} id="select-multiple-chip" />}
       >

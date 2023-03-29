@@ -172,11 +172,12 @@ class DoiSerializer(serializers.ModelSerializer):
     """Doi"""
 
     doi = serializers.CharField(required=True)
+    doi_uri = serializers.CharField(required=False, allow_null=True)
     connectivity_statement_id = serializers.IntegerField(required=True)
 
     class Meta:
         model = Doi
-        fields = ("id", "doi", "connectivity_statement_id")
+        fields = ("id", "doi", "doi_uri", "connectivity_statement_id")
 
 
 class SentenceConnectivityStatement(serializers.ModelSerializer):
