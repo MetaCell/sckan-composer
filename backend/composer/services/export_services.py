@@ -1,14 +1,37 @@
+import csv
+import datetime
+import logging
+import os
+
 from typing import Dict, Callable, List
 
-from composer.enums import NoteType, ExportRelationships
+from backend.settings import EXPORT_FOLDER
+from composer.enums import NoteType, ExportRelationships, CircuitType, Laterality
 from composer.exceptions import UnexportableConnectivityStatement
 from composer.models import Tag, ConnectivityStatement, Via, Specie
+from composer.services.filesystem_service import create_dir_if_not_exists
 
 HAS_NERVE_BRANCHES_TAG = "Has nerve branches"
+TEMP_CIRCUIT_MAP = {
+    CircuitType.INTRINSIC: "http://uri.interlex.org/tgbugs/uris/readable/IntrinsicPhenotype",
+    CircuitType.PROJECTION: "http://uri.interlex.org/tgbugs/uris/readable/ProjectionPhenotype",
+    CircuitType.MOTOR: "http://uri.interlex.org/tgbugs/uris/readable/MotorPhenotype",
+    CircuitType.SENSORY: "http://uri.interlex.org/tgbugs/uris/readable/SensoryPhenotype",
+}
 
+TEMP_LATERALITY_MAP = {
+    Laterality.IPSI: "http://purl.obolibrary.org/obo/PATO_0002035",
+    Laterality.CONTRAT: "http://uri.interlex.org/base/ilx_0793864",
+    Laterality.BI: "http://purl.obolibrary.org/obo/PATO_0000618",
+}
 
-def get_connectivity_statements_to_export():
-    return ConnectivityStatement.objects.all()
+TEMP_PHENOTYPE_MAP = {
+    "enteric": "http://uri.interlex.org/tgbugs/uris/readable/EntericPhenotype",
+    "sympathetic post-ganglionic phenotype": "http://uri.interlex.org/tgbugs/uris/readable/neuron-phenotype-sym-post",
+    "sympathetic pre-ganglionic phenotype": "http://uri.interlex.org/tgbugs/uris/readable/neuron-phenotype-sym-pre",
+    "parasympathetic post-ganglionic phenotype": "http://uri.interlex.org/tgbugs/uris/readable/neuron-phenotype-para-post",
+    "parasympathetic pre-ganglionic phenotype": "http://uri.interlex.org/tgbugs/uris/readable/neuron-phenotype-para-pre",
+}
 
 
 class Row:
@@ -59,8 +82,8 @@ def get_observed_in_species(cs: ConnectivityStatement, row: Row):
     return ", ".join([specie.name for specie in cs.species.all()])
 
 
-def is_different_from_existing(cs: ConnectivityStatement, row: Row):
-    return cs.notes.filter(type=NoteType.SPECIES_DIFFERENT).exists()
+def get_different_from_existing(cs: ConnectivityStatement, row: Row):
+    return "\n".join([note.note for note in cs.notes.filter(type=NoteType.DIFFERENT)])
 
 
 def get_curation_notes(cs: ConnectivityStatement, row: Row):
@@ -108,7 +131,7 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
         "Identifier": get_identifier,
         "Relationship": get_relationship,
         "Observed in species": get_observed_in_species,
-        "Different from existing": is_different_from_existing,
+        "Different from existing": get_different_from_existing,
         "Curation notes": get_curation_notes,
         "Reference (pubmed ID, DOI or text)": get_reference,
         "Has nerve branches": has_nerve_branches,
@@ -125,7 +148,9 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
 
 
 def get_origin_row(cs: ConnectivityStatement):
-    review_notes = "\n".join([note.note for note in cs.notes.all()])
+    review_notes = "\n".join(
+        [note.note for note in cs.notes.filter(type=NoteType.PLAIN)]
+    )
     curation_notes = "\n".join([note.note for note in cs.sentence.notes.all()])
     return Row(
         cs.origin.name,
@@ -176,6 +201,36 @@ def get_biological_sex_row(cs: ConnectivityStatement):
     )
 
 
+def get_circuit_role_row(cs: ConnectivityStatement):
+    return Row(
+        cs.get_circuit_type_display(),
+        TEMP_CIRCUIT_MAP.get(cs.circuit_type, ""),
+        ExportRelationships.hasCircuitRolePhenotype.name,
+        "",
+        "",
+    )
+
+
+def get_laterality_row(cs: ConnectivityStatement):
+    return Row(
+        cs.get_laterality_display(),
+        TEMP_LATERALITY_MAP.get(cs.laterality, ""),
+        ExportRelationships.hasProjectionLaterality.name,
+        "",
+        "",
+    )
+
+
+def get_phenotype_row(cs: ConnectivityStatement):
+    return Row(
+        cs.ans_division.name,
+        TEMP_PHENOTYPE_MAP.get(cs.ans_division.name, ""),
+        ExportRelationships.hasPhenotype.name,
+        "",
+        "",
+    )
+
+
 def get_rows(cs: ConnectivityStatement) -> List:
     rows = []
     try:
@@ -205,6 +260,52 @@ def get_rows(cs: ConnectivityStatement) -> List:
     except Exception:
         raise UnexportableConnectivityStatement("Error getting biological sex row")
 
-    # todo: add phenotypes
+    try:
+        rows.append(get_circuit_role_row(cs))
+    except Exception:
+        raise UnexportableConnectivityStatement("Error getting circuit role row")
+
+    try:
+        rows.append(get_laterality_row(cs))
+    except Exception:
+        raise UnexportableConnectivityStatement("Error getting laterality row")
+
+    try:
+        rows.append(get_phenotype_row(cs))
+    except Exception:
+        raise UnexportableConnectivityStatement("Error getting phenotype row")
 
     return rows
+
+
+def export_connectivity_statements(folder_path: str = EXPORT_FOLDER):
+    qs = ConnectivityStatement.objects.to_be_exported()
+
+    now = datetime.datetime.now()
+    filename = f'export_{now.strftime("%Y-%m-%d_%H-%M-%S")}.csv'
+    filepath = os.path.join(folder_path, filename)
+    create_dir_if_not_exists(folder_path)
+
+    csv_attributes_mapping = generate_csv_attributes_mapping()
+
+    with open(filepath, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+
+        # Write header row
+        headers = csv_attributes_mapping.keys()
+        writer.writerow(headers)
+
+        # Write data rows
+        for obj in qs:
+            try:
+                rows = get_rows(obj)
+            except UnexportableConnectivityStatement as e:
+                logging.warning(
+                    f"Connectivity Statement with id {obj.id} skipped due to {e}"
+                )
+                continue
+            for row in rows:
+                row_content = []
+                for key in csv_attributes_mapping:
+                    row_content.append(csv_attributes_mapping[key](obj, row))
+                writer.writerow(row_content)
