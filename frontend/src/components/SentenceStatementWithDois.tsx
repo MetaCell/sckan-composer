@@ -17,7 +17,7 @@ const SentenceStatementWithDois = ({ statement } : any) => {
     })
   }
 
-  const sentences = statement?.sentence?.connectivity_statements.filter((row: any) => row?.id !== statement?.id)
+  const otherStatements = statement?.sentence?.connectivity_statements.filter((row: any) => row?.id !== statement?.id)
   return (
     <Paper>
       <Typography variant="h5" mb={3}>
@@ -34,13 +34,13 @@ const SentenceStatementWithDois = ({ statement } : any) => {
       <Divider sx={{margin: '24px 0'}}>Records from the same NLP Sentence</Divider>
       <Stack spacing={2}>
         {
-          sentences?.map((row: any )=>
+          otherStatements?.map((row: any )=>
             <Stack
               direction={{ xs: 'column', sm: 'row' }}
               spacing={{ xs: 1, sm: 2 }}
               alignItems='center'
             >
-              <StatementWithDois background={"#F9FAFB"} statement={statement} />
+              <StatementWithDois background={"#F9FAFB"} statement={row} />
               <Box>
                 <OpenInNewIcon
                   onClick={() => openStatement(row)}
