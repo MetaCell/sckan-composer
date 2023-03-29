@@ -24,7 +24,7 @@ export const AutocompleteWithChips = ({
     data,
     removeChip,
     label,
-    disabled = false,
+    disabled,
     options,
     onAutocompleteChange,
   },
@@ -41,6 +41,7 @@ export const AutocompleteWithChips = ({
       <Autocomplete
         multiple
         disableClearable
+        disabled={disabled}
         options={options}
         onChange={(e, value) => onAutocompleteChange(e, value)}
         freeSolo

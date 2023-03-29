@@ -88,6 +88,7 @@ const StatementForm = (props: any) => {
     "ui:widget": (props: any) => {
       return (
         <AutoComplete
+          disabled={props.disabled}
           onChange={(event: any) => props.onChange(event.id)}
           placeholder="Select destination"
           noOptionsText={autoCompleteNoOptionsText}
@@ -107,6 +108,7 @@ const StatementForm = (props: any) => {
     "ui:widget": (props: any) => {
       return (
         <AutoComplete
+          disabled={props.disabled}
           onChange={(event: any) => props.onChange(event.id)}
           placeholder="Select origin"
           noOptionsText={autoCompleteNoOptionsText}

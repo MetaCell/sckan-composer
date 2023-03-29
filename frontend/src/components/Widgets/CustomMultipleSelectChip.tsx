@@ -29,7 +29,7 @@ const MenuProps = {
 };
 
 
-const CustomMultipleSelectChip = ({onChange, options: { label, data }} : any) => {
+const CustomMultipleSelectChip = ({onChange, disabled, options: { label, data }} : any) => {
 
   return (
     <FormControl variant="standard">
@@ -41,6 +41,7 @@ const CustomMultipleSelectChip = ({onChange, options: { label, data }} : any) =>
         id="custom-select"
         multiple
         value={[]}
+        disabled={disabled}
         input={<OutlinedInput id="select-multiple-chip" />}
         renderValue={(selected: any) => (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>

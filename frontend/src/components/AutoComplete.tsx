@@ -17,7 +17,7 @@ const StyledAutoComplete = styled(Autocomplete)(({ theme }) => ({
   }
 }));
 
-export default function AutoComplete({onChange, placeholder, value, setValue, fetch, noOptionsText, label}: any) {
+export default function AutoComplete({onChange, placeholder, disabled, value, setValue, fetch, noOptionsText, label}: any) {
     const [inputValue, setInputValue] = useState<string>("")
     const [options, setOptions] = useState<readonly any[]>([]);
 
@@ -67,6 +67,7 @@ export default function AutoComplete({onChange, placeholder, value, setValue, fe
             filterOptions={(x) => x}
             options={options}
             autoComplete
+            disabled={disabled}
             includeInputInList
             filterSelectedOptions
             defaultValue={null}

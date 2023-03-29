@@ -20,6 +20,7 @@ const DistillationTab = ({ statement, setStatement } : any) => {
         <SentenceForm
           data={statement.sentence}
           format="small"
+          disabled={true}
         />
       </Grid>
 
@@ -32,10 +33,12 @@ const DistillationTab = ({ statement, setStatement } : any) => {
             data={statement.species}
             extraData={{ parentId: statement.id, service: statementService }}
             setter={setStatement}
+            disabled={true}
           />
           <StatementForm
             statement={statement}
             format="small"
+            // disabled={false}
             setter={setStatement}
             extraData={{
               statement_id: statement.id,
