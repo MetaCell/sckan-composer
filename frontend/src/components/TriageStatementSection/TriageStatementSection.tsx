@@ -26,12 +26,7 @@ const TriageStatementSection = (props: any) => {
       >
         <Grid container spacing={1} alignItems="center">
           <Grid item xs={11}>
-            <Paper
-              sx={{
-                border: 0,
-                boxShadow: "none",
-              }}
-            >
+            <Paper>
               <StatementForm
                 statement={statement}
                 format="small"

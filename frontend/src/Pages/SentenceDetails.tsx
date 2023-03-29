@@ -164,12 +164,7 @@ const SentencesDetails = () => {
       <Grid item xs={12}>
         <Grid container spacing={1}>
           <Grid item xs={12} md={7}>
-            <Paper
-              sx={{
-                border: 0,
-                boxShadow: "none",
-              }}
-            >
+            <Paper>
               <Grid container p={3} mb={2}>
                 <Grid item xs={12}>
                   <Stack
@@ -217,7 +212,7 @@ const SentencesDetails = () => {
           </Grid>
 
           <Grid item xs={12} md={5} p={1}>
-            <Paper sx={{ padding: "24px", "& .MuiBox-root": { padding: 0 } }}>
+            <Paper sx={{ "& .MuiBox-root": { padding: 0 } }}>
               <Box>
                 <Typography variant="h5" mb={1}>
                   Notes

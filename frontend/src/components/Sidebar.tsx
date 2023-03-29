@@ -33,6 +33,7 @@ const Sidebar = () => {
       borderRadius: 0,
       boxShadow: "none",
       background: vars.sidebarBg,
+      padding: 0,
     },
   };
 

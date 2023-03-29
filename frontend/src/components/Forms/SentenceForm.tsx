@@ -76,7 +76,7 @@ const SentenceForm = (props: any) => {
   }
 
   return (
-    <Paper sx={{padding: 3}}>
+    <Paper>
       <Box mb={3}>
         <Typography variant='h5' color={vars.darkTextColor}>
           NLP Sentence
@@ -100,13 +100,13 @@ const SentenceForm = (props: any) => {
         {/* <Typography color={vars.labelColor} fontWeight={500} mb={1}>
           PMID (PubMed identifier)
         </Typography> */}
-        { 
+        {
           linkedChip({id: data?.pmid, uri: data?.pmid_uri, label: "PMID"})
         }
-        { 
+        {
           linkedChip({id: data?.pmcid, uri: data?.pmcid_uri, label: "PMCID"})
         }
-        { 
+        {
           linkedChip({id: data?.doi, uri: data?.doi_uri, label: "DOI"})
         }
       </Box>
