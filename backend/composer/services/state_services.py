@@ -63,7 +63,8 @@ class SentenceService(StateServiceMixin):
     @transaction.atomic
     def do_transition_compose_now(self):
         sentence = self.obj
-        # when a Sentence record goes to compose_now state we need to set the state of all ConnectivityStatements to compose_now
+        # when a Sentence record goes to compose_now state we need to set the state of all ConnectivityStatements to
+        # compose_now
         for cs in sentence.connectivitystatement_set.all():
             if cs.state == CSState.DRAFT:
                 cs.compose_now()
@@ -74,10 +75,10 @@ class SentenceService(StateServiceMixin):
         # return True if the sentence can go to state to_be_reviewed
         # it should have at least one provenance (pmid, pmcid, doi) and at least one connectivity statement
         return (
-                       sentence.pmid is not None
-                       or sentence.pmcid is not None
-                       or sentence.doi is not None
-               ) and (sentence.connectivitystatement_set.count() > 0)
+            sentence.pmid is not None
+            or sentence.pmcid is not None
+            or sentence.doi is not None
+        ) and (sentence.connectivitystatement_set.count() > 0)
 
     @staticmethod
     def can_be_composed(sentence):
@@ -97,8 +98,8 @@ class ConnectivityStatementService(StateServiceMixin):
 
     @staticmethod
     def can_be_reviewed(connectivity_statement):
-        # return True if the state,emt can go to state to_be_reviewed
-        # it should have at least one provenance (doi), origin, destination, ans division, biological sex, path and species
+        # return True if the state,emt can go to state to_be_reviewed it should have at least one provenance (doi),
+        # origin, destination, ans division, biological sex, path and species
         return (
             connectivity_statement.origin is not None
             and connectivity_statement.destination is not None

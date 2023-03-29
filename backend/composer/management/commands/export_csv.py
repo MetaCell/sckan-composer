@@ -1,24 +1,37 @@
 import csv
 import datetime
 import logging
+import os
 
 from django.core.management.base import BaseCommand
 
+from backend.settings import EXPORT_FOLDER
 from composer.exceptions import UnexportableConnectivityStatement
-from composer.models import ConnectivityStatement
-from composer.services.export_services import generate_csv_attributes_mapping, get_rows
+from composer.services.export_services import (
+    generate_csv_attributes_mapping,
+    get_rows,
+    get_connectivity_statements_to_export,
+)
 
 
 class Command(BaseCommand):
-    help = 'Export queryset to CSV file'
+    help = "Export queryset to CSV file"
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--folder", type=str, help="Folder to store CSV file", default=EXPORT_FOLDER
+        )
 
     def handle(self, *args, **options):
-        qs = ConnectivityStatement.objects.all()
+        qs = get_connectivity_statements_to_export()
+
         now = datetime.datetime.now()
         filename = f'export_{now.strftime("%Y-%m-%d_%H-%M-%S")}.csv'
+        filepath = os.path.join(options.get("folder"), filename)
+
         csv_attributes_mapping = generate_csv_attributes_mapping()
 
-        with open(filename, 'w', newline='') as csvfile:
+        with open(filepath, "w", newline="") as csvfile:
             writer = csv.writer(csvfile)
 
             # Write header row
@@ -30,11 +43,12 @@ class Command(BaseCommand):
                 try:
                     rows = get_rows(obj)
                 except UnexportableConnectivityStatement as e:
-                    logging.warning(f"Connectivity Statement with id {obj.id} skipped due to {e}")
+                    logging.warning(
+                        f"Connectivity Statement with id {obj.id} skipped due to {e}"
+                    )
                     continue
                 for row in rows:
                     row_content = []
                     for key in csv_attributes_mapping:
                         row_content.append(csv_attributes_mapping[key](obj, row))
                     writer.writerow(row_content)
-

@@ -378,6 +378,9 @@ if not PRODUCTION:
         "sslserver",
     ]
 
+PERSISTENT_ROOT = os.path.join(BASE_DIR, "persistent")
+EXPORT_FOLDER = os.path.join(PERSISTENT_ROOT, "exported")
+
 if PRODUCTION:
     # we are behind a rev proxy, so we need to set this
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

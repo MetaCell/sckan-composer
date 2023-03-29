@@ -1,3 +1,5 @@
+from enum import Enum
+
 from django.db import models
 
 
@@ -56,4 +58,16 @@ class CSState(models.TextChoices):
 
 class NoteType(models.TextChoices):
     PLAIN = "plain"
-    SPECIES_DIFFERENT = 'species_different'
+    SPECIES_DIFFERENT = "species_different"
+
+
+class ExportRelationships(Enum):
+    hasBiologicalSex = "hasBiologicalSex"
+    hasCircuitRolePhenotype = "hasCircuitRolePhenotype"
+    hasPhenotype = "hasPhenotype"
+    hasFunctionalCircuitRolePhenotype = "hasFunctionalCircuitRolePhenotype"
+    hasInstanceInTaxon = "hasInstanceInTaxon"
+    hasProjectionLaterality = "hasProjectionLaterality"
+    hasSomaPhenotype = "hasSomaPhenotype"
+    hasAlert = "hasAlert"
+    soma = "Soma"

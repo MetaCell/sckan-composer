@@ -8,7 +8,8 @@ from composer.models import (
     AnatomicalEntity,
     Note,
     Tag,
-    Via, Specie,
+    Via,
+    Specie,
 )
 
 
@@ -58,10 +59,14 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
         field_name="tags", queryset=Tag.objects.all()
     )
     origin = django_filters.ModelChoiceFilter(
-        field_name="origin", queryset=AnatomicalEntity.objects.all(), method=filter_by_ontology_uri
+        field_name="origin",
+        queryset=AnatomicalEntity.objects.all(),
+        method=filter_by_ontology_uri,
     )
     destination = django_filters.ModelChoiceFilter(
-        field_name="destination", queryset=AnatomicalEntity.objects.all(), method=filter_by_ontology_uri
+        field_name="destination",
+        queryset=AnatomicalEntity.objects.all(),
+        method=filter_by_ontology_uri,
     )
     notes = django_filters.BooleanFilter(
         field_name="notes", label="Checks if entity has notes", method=field_has_content

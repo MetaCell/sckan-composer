@@ -1,15 +1,25 @@
 from typing import Dict, Callable, List
 
-from composer.enums import NoteType
+from composer.enums import NoteType, ExportRelationships
 from composer.exceptions import UnexportableConnectivityStatement
-from composer.models import Tag, ConnectivityStatement, Via, Specie, Note
+from composer.models import Tag, ConnectivityStatement, Via, Specie
 
-SPECIES_TYPE = 'hasInstanceInTaxon'
 HAS_NERVE_BRANCHES_TAG = "Has nerve branches"
 
 
+def get_connectivity_statements_to_export():
+    return ConnectivityStatement.objects.all()
+
+
 class Row:
-    def __init__(self, structure: str, identifier: str, relationship: str, curation_notes: str, review_notes: str):
+    def __init__(
+        self,
+        structure: str,
+        identifier: str,
+        relationship: str,
+        curation_notes: str,
+        review_notes: str,
+    ):
         self.structure = structure
         self.identifier = identifier
         self.relationship = relationship
@@ -46,7 +56,7 @@ def get_relationship(cs: ConnectivityStatement, row: Row):
 
 
 def get_observed_in_species(cs: ConnectivityStatement, row: Row):
-    return ', '.join([specie.name for specie in cs.species.all()])
+    return ", ".join([specie.name for specie in cs.species.all()])
 
 
 def is_different_from_existing(cs: ConnectivityStatement, row: Row):
@@ -62,15 +72,15 @@ def get_review_notes(cs: ConnectivityStatement, row: Row):
 
 
 def get_reference(cs: ConnectivityStatement, row: Row):
-    return ', '.join([doi.doi for doi in cs.doi_set.all()])
+    return ", ".join([doi.doi for doi in cs.doi_set.all()])
 
 
 def is_approved_by_sawg(cs: ConnectivityStatement, row: Row):
-    return 'Yes'
+    return "Yes"
 
 
 def get_proposed_action(cs: ConnectivityStatement, row: Row):
-    return 'Add'
+    return "Add"
 
 
 def get_added_to_sckan_timestamp(cs: ConnectivityStatement, row: Row):
@@ -115,26 +125,55 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
 
 
 def get_origin_row(cs: ConnectivityStatement):
-    review_notes = '\n'.join([note.note for note in cs.notes.all()])
-    curation_notes = '\n'.join([note.note for note in cs.sentence.notes.all()])
-    return Row(cs.origin.name, cs.origin.ontology_uri, 'Soma', curation_notes, review_notes)
+    review_notes = "\n".join([note.note for note in cs.notes.all()])
+    curation_notes = "\n".join([note.note for note in cs.sentence.notes.all()])
+    return Row(
+        cs.origin.name,
+        cs.origin.ontology_uri,
+        ExportRelationships.soma.name,
+        curation_notes,
+        review_notes,
+    )
 
 
 def get_destination_row(cs: ConnectivityStatement):
-    return Row(cs.destination.name, cs.destination.ontology_uri, cs.get_destination_type_display(), '', '')
+    return Row(
+        cs.destination.name,
+        cs.destination.ontology_uri,
+        cs.get_destination_type_display(),
+        "",
+        "",
+    )
 
 
 def get_via_row(via: Via):
-    return Row(via.anatomical_entity.name, via.anatomical_entity.ontology_uri, via.get_type_display(), '', '')
+    return Row(
+        via.anatomical_entity.name,
+        via.anatomical_entity.ontology_uri,
+        via.get_type_display(),
+        "",
+        "",
+    )
 
 
 def get_specie_row(specie: Specie):
-    return Row(specie.name, specie.ontology_uri, SPECIES_TYPE, '', '')
+    return Row(
+        specie.name,
+        specie.ontology_uri,
+        ExportRelationships.hasInstanceInTaxon.name,
+        "",
+        "",
+    )
 
 
 def get_biological_sex_row(cs: ConnectivityStatement):
-    # todo: add relationship key
-    return Row(cs.biological_sex.name, cs.biological_sex.ontology_uri, '', '', '')
+    return Row(
+        cs.biological_sex.name,
+        cs.biological_sex.ontology_uri,
+        ExportRelationships.hasBiologicalSex.name,
+        "",
+        "",
+    )
 
 
 def get_rows(cs: ConnectivityStatement) -> List:
@@ -149,7 +188,7 @@ def get_rows(cs: ConnectivityStatement) -> List:
     except Exception:
         raise UnexportableConnectivityStatement("Error getting destination row")
 
-    for via in cs.via_set.all().order_by('display_order'):
+    for via in cs.via_set.all().order_by("display_order"):
         try:
             rows.append(get_via_row(via))
         except Exception:

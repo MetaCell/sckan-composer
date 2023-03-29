@@ -133,11 +133,16 @@ class TagSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
 
 class SpecieSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
     """Specie"""
+
     ontology_uri = serializers.CharField(required=False, allow_null=True)
 
     class Meta:
         model = Specie
-        fields = ("id", "name", "ontology_uri",)
+        fields = (
+            "id",
+            "name",
+            "ontology_uri",
+        )
 
 
 class BiologicalSexSerializer(serializers.ModelSerializer):
@@ -171,19 +176,20 @@ class DoiSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doi
-        fields = (
-            "id",
-            "doi",
-            "connectivity_statement_id"
-        )
+        fields = ("id", "doi", "connectivity_statement_id")
 
 
 class SentenceConnectivityStatement(serializers.ModelSerializer):
     """Connectivity Statement"""
+
     sentence_id = serializers.IntegerField()
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
-    biological_sex_id = serializers.IntegerField(required=False, default=None, allow_null=True)
-    ans_division_id = serializers.IntegerField(required=False, default=None, allow_null=True)
+    biological_sex_id = serializers.IntegerField(
+        required=False, default=None, allow_null=True
+    )
+    ans_division_id = serializers.IntegerField(
+        required=False, default=None, allow_null=True
+    )
     dois = DoiSerializer(source="doi_set", many=True, read_only=False)
     biological_sex = BiologicalSexSerializer(required=False, read_only=True)
     species = SpecieSerializer(many=True, read_only=True)
@@ -206,7 +212,7 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "biological_sex",
             "apinatomy_model",
             "owner_id",
-            "owner"
+            "owner",
         )
         read_only_fields = (
             "id",
@@ -222,7 +228,7 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "biological_sex",
             "apinatomy_model",
             "owner_id",
-            "owner"
+            "owner",
         )
 
 
@@ -234,8 +240,9 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
     pmcid = serializers.CharField(required=False, default=None, allow_null=True)
     doi = serializers.CharField(required=False, default=None, allow_null=True)
     tags = TagSerializer(many=True, read_only=True)
-    connectivity_statements = SentenceConnectivityStatement(source="connectivitystatement_set", many=True,
-                                                            read_only=True)
+    connectivity_statements = SentenceConnectivityStatement(
+        source="connectivitystatement_set", many=True, read_only=True
+    )
     owner = UserSerializer(required=False, read_only=True)
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
     available_transitions = serializers.SerializerMethodField(read_only=True)
