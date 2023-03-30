@@ -80,7 +80,7 @@ class SentenceAdmin(
     list_per_page = 10
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
-    readonly_fields = ("state","batch_name", "external_ref")
+    readonly_fields = ("state", "batch_name", "external_ref")
     list_display = ("title", "pmid", "pmcid", "doi", "tag_list", "state", "owner")
     list_display_links = ("title", "pmid", "pmcid")
     list_filter = ("state", "owner", "tags__tag")

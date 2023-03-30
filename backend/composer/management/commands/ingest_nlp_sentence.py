@@ -23,6 +23,7 @@ OUT_OF_SCOPE = "out_of_scope"
 
 MAX_PARALLEL_JOBS = 10
 
+
 def to_none(value):
     return None if value == "0" or len(str(value)) == 0 else value
 
@@ -31,14 +32,15 @@ async def pmcid_title_extractor(session, url):
     title = None
     async with session.get(url) as resp:
         xml = await resp.text()
-        parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+        parser = etree.XMLParser(ns_clean=True, recover=True, encoding="utf-8")
         try:
-            root = etree.fromstring(bytes(xml, encoding='utf-8'), parser)
+            root = etree.fromstring(bytes(xml, encoding="utf-8"), parser)
             metadata = root.findall("GetRecord/record/metadata/", root.nsmap)[0]
             title = metadata.findall("dc:title", metadata.nsmap)[0].text
         except:
             pass
     return title
+
 
 async def pmid_title_extractor(session, url):
     title = None
@@ -51,12 +53,14 @@ async def pmid_title_extractor(session, url):
             pass
     return title
 
+
 async def doi_title_extractor(session, doi):
     try:
         doc = crossref_commons.retrieval.get_publication_as_json(doi)
         return doc["title"][0]
     except:
         return None
+
 
 async def save_sentence(session, row, default_batch_name):
     rowid = row[ID]
@@ -73,7 +77,13 @@ async def save_sentence(session, row, default_batch_name):
         sentence, created = await Sentence.objects.aget_or_create(
             external_ref=external_ref,
             batch_name=batch_name,
-            defaults={"title": title, "text": text, "doi": doi, "pmid": pmid, "pmcid": pmcid},
+            defaults={
+                "title": title,
+                "text": text,
+                "doi": doi,
+                "pmid": pmid,
+                "pmcid": pmcid,
+            },
         )
         if created:
             url = None
@@ -96,7 +106,9 @@ async def save_sentence(session, row, default_batch_name):
                 f"{rowid}: sentence created: batch {batch_name}, ref {external_ref}, pmid {pmid}, pmcid {pmcid}, doi {doi}."
             )
     except Exception as e:
-        print(f"{rowid}: batch {batch_name}, ref {external_ref} ... skipped! Exception {e}")
+        print(
+            f"{rowid}: batch {batch_name}, ref {external_ref} ... skipped! Exception {e}"
+        )
 
 
 class Command(BaseCommand):
@@ -128,17 +140,21 @@ class Command(BaseCommand):
                     rows.append(row)
 
                 row_counter = 0
-                while (row_counter < len(rows)):
+                while row_counter < len(rows):
                     async with aiohttp.ClientSession() as session:
                         tasks = []
-                        for i in range(0,MAX_PARALLEL_JOBS): # max parallel
+                        for i in range(0, MAX_PARALLEL_JOBS):  # max parallel
                             row = rows[row_counter]
-                            row_counter += 1                            
+                            row_counter += 1
                             rowid = row[ID]
                             out_of_scope = row[OUT_OF_SCOPE].lower()
                             if out_of_scope and out_of_scope.lower() == "yes":
                                 # skip out of scope records
                                 self.stdout.write(f"{rowid}: out of scope.")
                                 continue
-                            tasks.append(asyncio.create_task(save_sentence(session, row, default_batch_name)))
+                            tasks.append(
+                                asyncio.create_task(
+                                    save_sentence(session, row, default_batch_name)
+                                )
+                            )
                         await asyncio.gather(*tasks)

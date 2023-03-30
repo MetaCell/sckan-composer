@@ -6,5 +6,5 @@ urlpatterns = [
     path("api/composer/", include("composer.api.urls")),
     path("login", views.index, name="index"),
     path("logged-out/", views.logout_landing, name="logged-out"),
-    re_path("admin/login/?$", views.admin_login, name='admin:login'),
+    re_path("admin/login/?$", views.admin_login, name="admin:login"),
 ]

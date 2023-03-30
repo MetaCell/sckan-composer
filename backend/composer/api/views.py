@@ -15,7 +15,8 @@ from .filtersets import (
     ConnectivityStatementFilter,
     AnatomicalEntityFilter,
     NoteFilter,
-    ViaFilter, SpecieFilter,
+    ViaFilter,
+    SpecieFilter,
 )
 from .serializers import (
     AnatomicalEntitySerializer,
@@ -26,7 +27,9 @@ from .serializers import (
     SentenceSerializer,
     SpecieSerializer,
     TagSerializer,
-    ViaSerializer, DoiSerializer, BiologicalSexSerializer,
+    ViaSerializer,
+    DoiSerializer,
+    BiologicalSexSerializer,
 )
 from ..models import (
     AnatomicalEntity,
@@ -37,9 +40,14 @@ from ..models import (
     Sentence,
     Specie,
     Tag,
-    Via, Doi, BiologicalSex,
+    Via,
+    Doi,
+    BiologicalSex,
 )
-from ..services import ConnectivityStatementService, SentenceService
+from composer.services.state_services import (
+    ConnectivityStatementService,
+    SentenceService,
+)
 
 
 # Mixins
@@ -126,7 +134,9 @@ class DoiMixin(
     )
     @action(detail=True, methods=["delete"], url_path="del_doi/(?P<doi_id>\d+)")
     def del_doi(self, request, pk=None, doi_id=None):
-        count, deleted = Doi.objects.filter(id=doi_id, connectivity_statement_id=pk).delete()
+        count, deleted = Doi.objects.filter(
+            id=doi_id, connectivity_statement_id=pk
+        ).delete()
         if count == 0:
             raise Http404
         instance = self.get_object()
@@ -184,6 +194,7 @@ class TransitionMixin(viewsets.GenericViewSet):
 
 
 # Viewsets
+
 
 class ModelRetrieveViewSet(
     # mixins.CreateModelMixin,
@@ -261,8 +272,14 @@ class NoteViewSet(viewsets.ModelViewSet):
     filterset_class = NoteFilter
 
 
-class ConnectivityStatementViewSet(DoiMixin, SpecieMixin, TagMixin, TransitionMixin, AssignOwnerMixin,
-                                   viewsets.ModelViewSet):
+class ConnectivityStatementViewSet(
+    DoiMixin,
+    SpecieMixin,
+    TagMixin,
+    TransitionMixin,
+    AssignOwnerMixin,
+    viewsets.ModelViewSet,
+):
     """
     ConnectivityStatement
     """
@@ -276,7 +293,7 @@ class ConnectivityStatementViewSet(DoiMixin, SpecieMixin, TagMixin, TransitionMi
     service = ConnectivityStatementService
 
     def get_queryset(self):
-        if (self.action == "list" and "sentence_id" not in self.request.query_params):
+        if self.action == "list" and "sentence_id" not in self.request.query_params:
             return ConnectivityStatement.objects.excluding_draft()
         return super().get_queryset()
 
@@ -293,7 +310,9 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     ]
 
 
-class SentenceViewSet(TagMixin, TransitionMixin, AssignOwnerMixin, ModelNoDeleteViewSet):
+class SentenceViewSet(
+    TagMixin, TransitionMixin, AssignOwnerMixin, ModelNoDeleteViewSet
+):
     """
     Sentence
     """
@@ -370,7 +389,7 @@ def jsonschemas(request):
         TagSerializer,
         DoiSerializer,
         SpecieSerializer,
-        NoteSerializer
+        NoteSerializer,
     ]
 
     schema = {}

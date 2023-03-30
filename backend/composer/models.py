@@ -4,8 +4,19 @@ from django.db.models import Q
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
 
-from .enums import CircuitType, CSState, DestinationType, Laterality, SentenceState
-from .services import ConnectivityStatementService, SentenceService
+from .enums import (
+    CircuitType,
+    CSState,
+    DestinationType,
+    Laterality,
+    SentenceState,
+    NoteType,
+    ViaType,
+)
+from composer.services.state_services import (
+    ConnectivityStatementService,
+    SentenceService,
+)
 from .utils import doi_uri, pmcid_uri, pmid_uri
 
 
@@ -80,6 +91,9 @@ class ConnectivityStatementManager(models.Manager):
 
     def excluding_draft(self):
         return self.get_queryset().exclude(state=CSState.DRAFT)
+
+    def to_be_exported(self):
+        return super().get_queryset()
 
 
 class SentenceStatementManager(models.Manager):
@@ -161,6 +175,7 @@ class Tag(models.Model):
     """Tag"""
 
     tag = models.CharField(max_length=200, db_index=True, unique=True)
+    exportable = models.BooleanField(default=False)
 
     def __str__(self):
         return self.tag
@@ -303,6 +318,7 @@ class Via(models.Model):
         blank=False,
         null=False,
     )
+    type = models.CharField(max_length=8, default=ViaType.AXON, choices=ViaType.choices)
 
     def __str__(self):
         return f"{self.connectivity_statement} - {self.anatomical_entity}"
@@ -310,6 +326,12 @@ class Via(models.Model):
     class Meta:
         ordering = ["display_order"]
         verbose_name_plural = "Via"
+        constraints = [
+            models.CheckConstraint(
+                check=Q(type__in=[vt[0] for vt in ViaType.choices]),
+                name="via_type_valid",
+            ),
+        ]
 
 
 class ConnectivityStatement(models.Model):
@@ -453,6 +475,10 @@ class ConnectivityStatement(models.Model):
                 check=Q(circuit_type__in=[c[0] for c in CircuitType.choices]),
                 name="circuit_type_valid",
             ),
+            models.CheckConstraint(
+                check=Q(destination_type__in=[dt[0] for dt in DestinationType.choices]),
+                name="destination_type_valid",
+            ),
         ]
 
 
@@ -498,6 +524,9 @@ class Note(models.Model):
         blank=True,
         related_name="notes",
     )
+    type = models.CharField(
+        max_length=20, default=NoteType.PLAIN, choices=NoteType.choices
+    )
 
     def __str__(self):
         return self.note
@@ -517,5 +546,8 @@ class Note(models.Model):
                 ),
                 name="only_sentence_or_connectivity_statement",
             ),
+            models.CheckConstraint(
+                check=Q(type__in=[nt[0] for nt in NoteType.choices]),
+                name="note_type_valid",
+            ),
         ]
-

@@ -11,7 +11,8 @@ from .views import (
     SentenceViewSet,
     SpecieViewSet,
     TagViewSet,
-    ViaViewSet, BiologicalSexViewSet,
+    ViaViewSet,
+    BiologicalSexViewSet,
 )
 
 # Create a router and register our viewsets with it.

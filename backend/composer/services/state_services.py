@@ -1,7 +1,6 @@
 from django.db import transaction
-from django.db.models import Q
 
-from .enums import CSState, SentenceState
+from composer.enums import CSState
 
 
 class BaseServiceMixin:
@@ -64,7 +63,8 @@ class SentenceService(StateServiceMixin):
     @transaction.atomic
     def do_transition_compose_now(self):
         sentence = self.obj
-        # when a Sentence record goes to compose_now state we need to set the state of all ConnectivityStatements to compose_now
+        # when a Sentence record goes to compose_now state we need to set the state of all ConnectivityStatements to
+        # compose_now
         for cs in sentence.connectivitystatement_set.all():
             if cs.state == CSState.DRAFT:
                 cs.compose_now()
@@ -98,8 +98,8 @@ class ConnectivityStatementService(StateServiceMixin):
 
     @staticmethod
     def can_be_reviewed(connectivity_statement):
-        # return True if the state,emt can go to state to_be_reviewed
-        # it should have at least one provenance (doi), origin, destination, ans division, biological sex, path and species
+        # return True if the state,emt can go to state to_be_reviewed it should have at least one provenance (doi),
+        # origin, destination, ans division, biological sex, path and species
         return (
             connectivity_statement.origin is not None
             and connectivity_statement.destination is not None
