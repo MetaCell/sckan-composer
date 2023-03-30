@@ -172,7 +172,7 @@ class DoiSerializer(serializers.ModelSerializer):
     """Doi"""
 
     doi = serializers.CharField(required=True)
-    doi_uri = serializers.CharField(required=False, allow_null=True)
+    doi_uri = serializers.CharField(required=False, allow_null=True, read_only=True)
     connectivity_statement_id = serializers.IntegerField(required=True)
 
     class Meta:
@@ -293,6 +293,7 @@ class ConnectivityStatementSerializer(
 ):
     """Connectivity Statement"""
 
+    id = serializers.IntegerField(required=False, default=None, allow_null=True, read_only=True)
     sentence_id = serializers.IntegerField()
     knowledge_statement = serializers.CharField(allow_blank=True, required=False)
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
@@ -300,10 +301,10 @@ class ConnectivityStatementSerializer(
     destination_id = serializers.IntegerField(required=False)
     ans_division_id = serializers.IntegerField(required=False, allow_null=True)
     biological_sex_id = serializers.IntegerField(required=False, allow_null=True)
-    tags = TagSerializer(many=True, read_only=True)
-    species = SpecieSerializer(many=True, read_only=False)
-    dois = DoiSerializer(source="doi_set", many=True, read_only=False)
-    path = ViaSerializer(source="via_set", many=True, read_only=True)
+    tags = TagSerializer(many=True, read_only=True, required=False)
+    species = SpecieSerializer(many=True, read_only=False, required=False)
+    dois = DoiSerializer(source="doi_set", many=True, read_only=False, required=False)
+    path = ViaSerializer(source="via_set", many=True, read_only=True, required=False)
     owner = UserSerializer(required=False, read_only=True)
     origin = AnatomicalEntitySerializer(required=False, read_only=True)
     destination = AnatomicalEntitySerializer(required=False, read_only=True)

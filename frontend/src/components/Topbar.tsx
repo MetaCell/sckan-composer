@@ -31,7 +31,7 @@ const Topbar = () => {
   return (
     <AppBar
       position="fixed"
-      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, padding: 1 }}
+      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, p:0 }}
       color="inherit"
     >
       <Toolbar>

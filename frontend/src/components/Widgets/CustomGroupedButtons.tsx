@@ -62,7 +62,7 @@ export default function GroupedButtons({handleClick, selectedOption, options, se
                 placement === 'bottom' ? 'center top' : 'center bottom',
             }}
           >
-            <Paper>
+            <Paper sx={{p:3}}>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList id="split-button-menu" autoFocusItem>
                   {options.map((option: string, index: number) => (

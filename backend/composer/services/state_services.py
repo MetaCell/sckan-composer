@@ -92,9 +92,9 @@ class ConnectivityStatementService(StateServiceMixin):
     def compile_journey(connectivity_statement):
         origin = connectivity_statement.origin
         destination = connectivity_statement.destination
-        journey = f"{origin} to {destination}"
-        journey += " via ".join(str(path) for path in connectivity_statement.path.all())
-        return journey.lower().capitalize()
+        journey = f"{origin} to {destination} via "
+        journey += " via ".join(str(path) for path in connectivity_statement.path.order_by('via'))
+        return journey
 
     @staticmethod
     def can_be_reviewed(connectivity_statement):

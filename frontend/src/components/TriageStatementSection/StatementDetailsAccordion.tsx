@@ -28,15 +28,22 @@ const StatementDetailsAccordion = (props: any) => {
     <Accordion
       expanded={expanded === `panel-${index}`}
       onChange={handleChange(`panel-${index}`)}
+      elevation={0}
+      sx={{
+        '&:before': {
+            display: 'none',
+        }
+      }}
     >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         aria-controls="panel1bh-content"
-        id="panel1bh-header"
+        className="panel1bh-header"
+        sx={{p:0, display:'flex', flexDirection:'row-reverse'}}
       >
-        <Typography>Statement Details</Typography>
+        <Typography variant="h6" ml={1}>Statement Details</Typography>
       </AccordionSummary>
-      <AccordionDetails>
+      <AccordionDetails sx={{px:4, py:0}}>
       <SpeciesForm
           data={statement.species}
           extraData={{ parentId: statement.id, service: statementService }}

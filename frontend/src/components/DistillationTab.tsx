@@ -7,8 +7,12 @@ import SpeciesForm from "../components/Forms/SpeciesForm";
 import StatementForm from "../components/Forms/StatementForm";
 import Paper from "@mui/material/Paper";
 import SentenceStatementWithDois from "./SentenceStatementWithDois";
+import { useSectionStyle } from "../styles/styles";
+import { useTheme } from "@mui/system";
 
 const DistillationTab = ({ statement, setStatement } : any) => {
+  const theme = useTheme()
+  const sectionStyle = useSectionStyle(theme)
 
   return (
     <Grid container mb={2} spacing={2}>
@@ -25,7 +29,7 @@ const DistillationTab = ({ statement, setStatement } : any) => {
       </Grid>
 
       <Grid item xs={12}>
-        <Paper>
+        <Paper sx={sectionStyle}>
           <Typography variant="h5" mb={1}>
             Statements Details
           </Typography>

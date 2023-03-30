@@ -50,14 +50,14 @@ export default function AutoComplete({onChange, placeholder, disabled, value, se
     }, [inputValue, fetchEntities])
 
     return (
-      <FormControl variant="standard">
+      <FormControl variant="standard" fullWidth>
         {
           label && <InputLabel shrink htmlFor="custom-select" id="custom-select-label">
             <Typography variant="h5" fontWeight={500}>{label}</Typography>
           </InputLabel>
         }
         <StyledAutoComplete
-          id='custom-AutoComplete'
+          className='custom-AutoComplete'
             fullWidth
             popupIcon={<ExpandMoreIcon/>}
             getOptionLabel={(option: any) =>
@@ -74,7 +74,7 @@ export default function AutoComplete({onChange, placeholder, disabled, value, se
             value={value || null}
             noOptionsText={noOptionsText}
             onChange={(event: any, newValue: any | null) => {
-                onChange(newValue)
+                onChange && onChange(newValue)
                 setOptions(newValue ? [newValue, ...options] : options);
                 setValue(newValue)
             }}
