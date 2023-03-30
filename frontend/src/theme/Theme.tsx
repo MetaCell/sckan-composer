@@ -190,9 +190,6 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: "12px",
-          border: 0,
-          boxShadow: "none",
-          padding: '24px'
         },
       },
     },

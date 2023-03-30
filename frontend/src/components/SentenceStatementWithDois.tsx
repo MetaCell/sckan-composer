@@ -7,9 +7,13 @@ import {Box} from "@mui/material";
 import Divider from "@mui/material/Divider";
 import {useNavigate} from "react-router";
 import StatementWithDois from "./StatementWithDois";
+import { useSectionStyle } from "../styles/styles";
+import { useTheme } from "@mui/system";
 
 const SentenceStatementWithDois = ({ statement } : any) => {
   const navigate = useNavigate();
+  const theme = useTheme()
+  const sectionStyle = useSectionStyle(theme)
 
   const openStatement = (statement: any) => {
     navigate(`/statement/${statement?.id}`, {
@@ -19,7 +23,7 @@ const SentenceStatementWithDois = ({ statement } : any) => {
 
   const otherStatements = statement?.sentence?.connectivity_statements.filter((row: any) => row?.id !== statement?.id)
   return (
-    <Paper>
+    <Paper sx={sectionStyle}>
       <Typography variant="h5" mb={3}>
         Knowledge Statements
       </Typography>
@@ -36,6 +40,7 @@ const SentenceStatementWithDois = ({ statement } : any) => {
         {
           otherStatements?.map((row: any )=>
             <Stack
+              key={row.id}
               direction={{ xs: 'column', sm: 'row' }}
               spacing={{ xs: 1, sm: 2 }}
               alignItems='center'

@@ -5,6 +5,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
@@ -156,13 +157,13 @@ export default function CheckDuplicates() {
                 </DialogTitle>
 
                 <DialogContent sx={{backgroundColor: "#F9FAFB", display: "flex", flexDirection: "column"}}>
-                    <Box sx={{
+                    <Stack direction='row' 
+                        spacing={1}
+                        sx={{
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        paddingTop: "1em",
-                        paddingBottom: "1em",
-                        paddingRight: "1em",
+                        p: 2,
                         marginTop: "1em",
                         marginBottom: "1em",
                         borderRadius: "1em",
@@ -203,7 +204,7 @@ export default function CheckDuplicates() {
                                 onClick={() => fetchDuplicates()}>
                             Check for duplicates
                         </Button>
-                    </Box>
+                    </Stack>
 
                     {results}
                 </DialogContent>

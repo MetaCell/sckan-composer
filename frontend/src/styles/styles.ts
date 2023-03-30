@@ -9,4 +9,6 @@ export const useSectionStyle = (theme: any) => ({
   background: theme.palette.common.white,
   border: `1px solid ${theme.palette.grey[200]}`,
   borderRadius: "12px",
+  boxShadow: "none",
+  padding: theme.spacing(3)
 })

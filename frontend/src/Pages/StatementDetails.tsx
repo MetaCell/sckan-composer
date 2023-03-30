@@ -22,6 +22,8 @@ import NoteDetails from "../components/Widgets/NotesFomList";
 import SpeciesForm from "../components/Forms/SpeciesForm";
 import StatementForm from "../components/Forms/StatementForm";
 import DistillationTab from "../components/DistillationTab";
+import { useSectionStyle } from "../styles/styles";
+import { useTheme } from "@mui/system";
 
 const StatementDetails = () => {
   const { statementId } = useParams();
@@ -30,6 +32,9 @@ const StatementDetails = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [open, setOpen] = React.useState(false);
+
+  const theme = useTheme()
+  const sectionStyle = useSectionStyle(theme)
 
   const doTransition = () => {
     const transition = statement?.available_transitions[selectedIndex];
@@ -103,6 +108,7 @@ const StatementDetails = () => {
               </span>
             </Box>
           </Grid>
+          {statement.available_transitions.length > 0 &&
           <Grid item xs={12} md={6} display="flex" justifyContent="flex-end">
             <GroupedButtons
               handleClick={doTransition}
@@ -116,6 +122,7 @@ const StatementDetails = () => {
               format={StatementsLabels}
             />
           </Grid>
+          }
         </Grid>
       </Grid>
 
@@ -148,7 +155,7 @@ const StatementDetails = () => {
           </Grid>
 
           <Grid item xs={12} md={5}>
-            <Paper sx={{ "& .MuiBox-root": { padding: 0 } }}>
+            <Paper sx={{...sectionStyle, "& .MuiBox-root": { padding: 0 } }}>
               <Box>
                 <Typography variant="h5" mb={1}>
                   Notes

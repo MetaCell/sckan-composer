@@ -21,6 +21,8 @@ import { vars } from "../theme/variables";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import NoteDetails from "../components/Widgets/NotesFomList";
 import TriageStatementSection from "../components/TriageStatementSection/TriageStatementSection";
+import { useSectionStyle } from "../styles/styles";
+import { useTheme } from "@mui/system";
 
 const { bodyBgColor, darkBlue } = vars;
 
@@ -45,6 +47,9 @@ const SentencesDetails = () => {
   const [open, setOpen] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [refetch, setRefetch] = useState(false);
+
+  const theme = useTheme()
+  const sectionStyle = useSectionStyle(theme)
 
   const handleClick = () => {
     const transition = sentence?.available_transitions[selectedIndex];
@@ -162,10 +167,10 @@ const SentencesDetails = () => {
       </Grid>
 
       <Grid item xs={12}>
-        <Grid container spacing={1}>
+        <Grid container spacing={2}>
           <Grid item xs={12} md={7}>
-            <Paper>
-              <Grid container p={3} mb={2}>
+            <Paper sx={{mb:2, ...sectionStyle}}>
+              <Grid container>
                 <Grid item xs={12}>
                   <Stack
                     direction="row"
@@ -176,7 +181,7 @@ const SentencesDetails = () => {
                       },
                     }}
                   >
-                    <Typography variant="h5" mb={1}>
+                    <Typography variant="h5" mb={3}>
                       Knowledge Statements
                     </Typography>
                     <CheckDuplicates />
@@ -211,8 +216,8 @@ const SentencesDetails = () => {
             />
           </Grid>
 
-          <Grid item xs={12} md={5} p={1}>
-            <Paper sx={{ "& .MuiBox-root": { padding: 0 } }}>
+          <Grid item xs={12} md={5}>
+            <Paper sx={{...sectionStyle , "& .MuiBox-root": { padding: 0 }}}>
               <Box>
                 <Typography variant="h5" mb={1}>
                   Notes

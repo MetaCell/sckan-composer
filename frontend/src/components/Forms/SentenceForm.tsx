@@ -11,8 +11,12 @@ import {vars} from "../../theme/variables";
 import Chip from "@mui/material/Chip";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {useNavigate} from "react-router";
+import { useSectionStyle } from "../../styles/styles";
+import { useTheme } from "@mui/system";
 
 const linkedChip = (data: any) => {
+
+ 
   if (data.id === undefined || data.id === null) {
     return null
   }
@@ -46,6 +50,8 @@ const SentenceForm = (props: any) => {
   const { format, data } = props
   const { schema, uiSchema } = jsonSchemas.getSentenceSchema()
   const navigate = useNavigate();
+  const theme = useTheme()
+  const sectionStyle = useSectionStyle(theme)
 
   const uiFields = format === 'small'
     ? ["title"]
@@ -76,7 +82,7 @@ const SentenceForm = (props: any) => {
   }
 
   return (
-    <Paper>
+    <Paper sx={sectionStyle}>
       <Box mb={3}>
         <Typography variant='h5' color={vars.darkTextColor}>
           NLP Sentence

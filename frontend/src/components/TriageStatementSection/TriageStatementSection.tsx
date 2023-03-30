@@ -9,9 +9,14 @@ import { vars } from "../../theme/variables";
 import statementService from "../../services/StatementService";
 import StatementForm from "../Forms/StatementForm";
 import DoisForm from "../Forms/DoisForm";
+import { useSectionStyle } from "../../styles/styles";
+import { useTheme } from "@mui/system";
 
 const TriageStatementSection = (props: any) => {
   const { statement, refreshSentence, sentence } = props;
+
+  const theme = useTheme()
+  const sectionStyle = useSectionStyle(theme)
 
   const onDeleteStatement = (id: number) => {
     statementService.remove(id).then(() => refreshSentence());
@@ -26,7 +31,7 @@ const TriageStatementSection = (props: any) => {
       >
         <Grid container spacing={1} alignItems="center">
           <Grid item xs={11}>
-            <Paper>
+            <Paper sx={sectionStyle}>
               <StatementForm
                 statement={statement}
                 format="small"
