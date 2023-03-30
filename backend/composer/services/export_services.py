@@ -2,10 +2,12 @@ import csv
 import datetime
 import logging
 import os
+import tempfile
 
 from typing import Dict, Callable, List
 
-from backend.settings import EXPORT_FOLDER
+from django.db.models import QuerySet
+
 from composer.enums import NoteType, ExportRelationships, CircuitType, Laterality
 from composer.exceptions import UnexportableConnectivityStatement
 from composer.models import Tag, ConnectivityStatement, Via, Specie
@@ -278,9 +280,9 @@ def get_rows(cs: ConnectivityStatement) -> List:
     return rows
 
 
-def export_connectivity_statements(folder_path: str = EXPORT_FOLDER):
-    qs = ConnectivityStatement.objects.to_be_exported()
-
+def export_connectivity_statements(qs: QuerySet, folder_path: str = None):
+    if folder_path is None:
+        folder_path = tempfile.gettempdir()
     now = datetime.datetime.now()
     filename = f'export_{now.strftime("%Y-%m-%d_%H-%M-%S")}.csv'
     filepath = os.path.join(folder_path, filename)
