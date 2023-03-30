@@ -32,6 +32,7 @@ const StatementDetails = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [open, setOpen] = React.useState(false);
+  const [refetch, setRefetch] = useState(false);
 
   const theme = useTheme()
   const sectionStyle = useSectionStyle(theme)
@@ -52,6 +53,10 @@ const StatementDetails = () => {
   ) => {
     setSelectedIndex(index);
     setOpen(false);
+  };
+
+  const refreshStatement = () => {
+    setRefetch(true);
   };
 
   useEffect(() => {
@@ -79,9 +84,10 @@ const StatementDetails = () => {
         })
         .finally(() => {
           setLoading(false);
+          setRefetch(false);
         });
     }
-  }, [statementId]);
+  }, [statementId, refetch]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -108,7 +114,7 @@ const StatementDetails = () => {
               </span>
             </Box>
           </Grid>
-          {statement.available_transitions.length > 0 &&
+          {statement.available_transitions && statement.available_transitions.length > 0 &&
           <Grid item xs={12} md={6} display="flex" justifyContent="flex-end">
             <GroupedButtons
               handleClick={doTransition}
@@ -164,7 +170,7 @@ const StatementDetails = () => {
               <TagForm
                 data={statement.tags}
                 extraData={{ parentId: statement.id, service: statementService }}
-                setter={setStatement}
+                setter={refreshStatement}
               />
               <Divider sx={{ margin: "36px 0" }} />
               <NoteDetails extraData={{ connectivity_statement_id: statement.id }} />
