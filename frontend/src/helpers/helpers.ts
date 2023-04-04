@@ -94,7 +94,7 @@ export interface StatementStateToColor {
   rejected: StateColor
   connection_missing: StateColor
   npo_approved: StateColor
-  approved: StateColor
+  exported: StateColor
 }
 
 export const SentenceLabels = {
@@ -114,7 +114,7 @@ export const StatementsLabels = {
   [statementStates.Rejected]: "Reject",
   [statementStates.ConnectionMissing]: "Connection Missing",
   [statementStates.NpoApproved]: "Npo Approved",
-  [statementStates.Approved]: "Approved",
+  [statementStates.Exported]: "Exported",
 }
 
 export const formatDate = (date: string) => {

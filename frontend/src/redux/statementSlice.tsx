@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { ROWS_PER_PAGE } from "../settings";
 
 export type StateFilter = Array<
-  | "approved"
+  | "exported"
   | "compose_now"
   | "connection_missing"
   | "curated"

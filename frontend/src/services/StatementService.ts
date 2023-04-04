@@ -11,7 +11,8 @@ class ConnectivityStatementService extends AbstractService {
     return composerApi.composerConnectivityStatementCreate(connectivityStatement).then((response: any) => response.data)
   }
   async update(connectivityStatement: ConnectivityStatement) {
-    return composerApi.composerConnectivityStatementUpdate(connectivityStatement.id, connectivityStatement).then((response: any) => response.data)
+    const id = connectivityStatement.id || -1
+    return composerApi.composerConnectivityStatementUpdate(id, connectivityStatement).then((response: any) => response.data)
   }
   async remove(id: number) {
     return composerApi.composerConnectivityStatementDestroy(id).then((response: any) => response.data)
@@ -20,7 +21,8 @@ class ConnectivityStatementService extends AbstractService {
     return composerApi.composerConnectivityStatementRetrieve(Number(id)).then((response: any) => response.data)
   }
   async doTransition(connectivityStatement: ConnectivityStatement, transition: string) {
-    return composerApi.composerConnectivityStatementDoTransitionCreate(connectivityStatement.id, transition, connectivityStatement).then((response: any) => response.data)
+    const id = connectivityStatement.id || -1
+    return composerApi.composerConnectivityStatementDoTransitionCreate(id, transition, connectivityStatement).then((response: any) => response.data)
   }
   async addTag(id: number, tagId: number): Promise<ConnectivityStatement> {
     return composerApi.composerConnectivityStatementAddTagCreate(id, tagId).then((response: any) => response.data)

@@ -119,7 +119,7 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'id': number;
+    'id': number | null;
     /**
      * 
      * @type {number}
@@ -149,7 +149,7 @@ export interface ConnectivityStatement {
      * @type {Array<Doi>}
      * @memberof ConnectivityStatement
      */
-    'dois': Array<Doi>;
+    'dois'?: Array<Doi>;
     /**
      * 
      * @type {User}
@@ -245,7 +245,7 @@ export interface ConnectivityStatement {
      * @type {Array<Specie>}
      * @memberof ConnectivityStatement
      */
-    'species': Array<Specie>;
+    'species'?: Array<Specie>;
     /**
      * 
      * @type {number}
@@ -292,7 +292,7 @@ export const ConnectivityStatementAvailableTransitionsEnum = {
     ToBeReviewed: 'to_be_reviewed',
     ConnectionMissing: 'connection_missing',
     NpoApproved: 'npo_approved',
-    Approved: 'approved'
+    Exported: 'exported'
 } as const;
 
 export type ConnectivityStatementAvailableTransitionsEnum = typeof ConnectivityStatementAvailableTransitionsEnum[keyof typeof ConnectivityStatementAvailableTransitionsEnum];
@@ -337,7 +337,7 @@ export interface Doi {
      * @type {string}
      * @memberof Doi
      */
-    'doi_uri'?: string | null;
+    'doi_uri': string | null;
     /**
      * 
      * @type {number}
@@ -738,7 +738,7 @@ export interface PatchedConnectivityStatement {
      * @type {number}
      * @memberof PatchedConnectivityStatement
      */
-    'id'?: number;
+    'id'?: number | null;
     /**
      * 
      * @type {number}
@@ -2170,12 +2170,12 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
          * @param {number} [origin] 
          * @param {number} [sentenceId] 
-         * @param {Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
+         * @param {Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList: async (destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementList: async (destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/connectivity-statement/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3869,12 +3869,12 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
          * @param {number} [origin] 
          * @param {number} [sentenceId] 
-         * @param {Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
+         * @param {Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementList>> {
+        async composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destination, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -4380,12 +4380,12 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
          * @param {number} [origin] 
          * @param {number} [sentenceId] 
-         * @param {Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
+         * @param {Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementList> {
+        composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementList> {
             return localVarFp.composerConnectivityStatementList(destination, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options).then((request) => request(axios, basePath));
         },
         /**
@@ -4889,13 +4889,13 @@ export class ComposerApi extends BaseAPI {
      * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
      * @param {number} [origin] 
      * @param {number} [sentenceId] 
-     * @param {Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
+     * @param {Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
      * @param {Array<number>} [tags] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'approved' | 'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementList(destination, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
     }
 

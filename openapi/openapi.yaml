@@ -235,12 +235,12 @@ paths:
           items:
             type: string
             enum:
-            - approved
             - compose_now
             - connection_missing
             - curated
             - draft
             - excluded
+            - exported
             - npo_approved
             - rejected
             - to_be_reviewed
@@ -1587,6 +1587,7 @@ components:
         id:
           type: integer
           readOnly: true
+          nullable: true
         sentence_id:
           type: integer
         sentence:
@@ -1679,7 +1680,6 @@ components:
       - available_transitions
       - biological_sex
       - destination
-      - dois
       - has_notes
       - id
       - journey
@@ -1689,7 +1689,6 @@ components:
       - path
       - sentence
       - sentence_id
-      - species
       - state
       - tags
     ConnectivityStatementAvailableTransitionsEnum:
@@ -1702,7 +1701,7 @@ components:
       - to_be_reviewed
       - connection_missing
       - npo_approved
-      - approved
+      - exported
       type: string
     DestinationTypeEnum:
       enum:
@@ -1722,12 +1721,14 @@ components:
           type: string
         doi_uri:
           type: string
+          readOnly: true
           nullable: true
         connectivity_statement_id:
           type: integer
       required:
       - connectivity_statement_id
       - doi
+      - doi_uri
       - id
     LateralityEnum:
       enum:
@@ -1967,6 +1968,7 @@ components:
         id:
           type: integer
           readOnly: true
+          nullable: true
         sentence_id:
           type: integer
         sentence:
