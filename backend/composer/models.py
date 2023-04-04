@@ -398,7 +398,15 @@ class ConnectivityStatement(models.Model):
     # states
     @transition(
         field=state,
-        source=[CSState.DRAFT, CSState.REJECTED],
+        source=[
+            CSState.DRAFT,
+            CSState.REJECTED,
+            CSState.NPO_APPROVED,
+            CSState.EXPORTED,
+        ],
+        permission=lambda instance, user: ConnectivityStatementService.has_permission_to_transition_to_compose_now(
+            instance, user
+        ),
         target=CSState.COMPOSE_NOW,
     )
     def compose_now(self):
@@ -439,8 +447,15 @@ class ConnectivityStatement(models.Model):
     def npo_approved(self):
         pass
 
-    @transition(field=state, source=CSState.NPO_APPROVED, target=CSState.APPROVED)
-    def approved(self):
+    @transition(
+        field=state,
+        source=CSState.NPO_APPROVED,
+        permission=lambda instance, user: ConnectivityStatementService.has_permission_to_transition_to_exported(
+            instance, user
+        ),
+        target=CSState.EXPORTED,
+    )
+    def exported(self):
         pass
 
     @property
