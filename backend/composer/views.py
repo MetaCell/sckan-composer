@@ -1,6 +1,12 @@
-from django.http import HttpResponse, HttpResponseRedirect
+import os
+
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import loader
 from django.urls import reverse
+
+from composer.enums import CSState
+from composer.models import ConnectivityStatement
+from composer.services.export_services import export_connectivity_statements
 
 
 def index(request):
@@ -27,3 +33,20 @@ def admin_login(request):
     Assuming the name of the external system's login url is "login"
     """
     return index(request)
+
+
+def export(request):
+    """
+    Exporting all connectivity statements that have state NPO Approved
+    """
+    if request.user.is_staff:
+        # only staff users can export connectivity statements
+        qs = ConnectivityStatement.objects.filter(state=CSState.NPO_APPROVED)
+        file_path = export_connectivity_statements(qs)
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(fh.read(), content_type="application/text")
+                response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
+                return response
+        raise Http404
+    return HttpResponse('Unauthorized', status=401)
