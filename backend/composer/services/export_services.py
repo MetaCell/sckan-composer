@@ -6,12 +6,18 @@ import tempfile
 
 from typing import Dict, Callable, List
 
+from django.contrib.auth.models import User
 from django.db.models import QuerySet
 
 from composer.enums import NoteType, ExportRelationships, CircuitType, Laterality
 from composer.exceptions import UnexportableConnectivityStatement
 from composer.models import Tag, ConnectivityStatement, Via, Specie
+from composer.services.state_services import ConnectivityStatementService
 from composer.services.filesystem_service import create_dir_if_not_exists
+
+from django_fsm import has_transition_perm
+
+from composer.enums import CSState
 
 HAS_NERVE_BRANCHES_TAG = "Has nerve branches"
 TEMP_CIRCUIT_MAP = {
@@ -311,3 +317,12 @@ def export_connectivity_statements(qs: QuerySet, folder_path: str = None):
                 for key in csv_attributes_mapping:
                     row_content.append(csv_attributes_mapping[key](obj, row))
                 writer.writerow(row_content)
+
+        # do transition to EXPORTED state
+        system_user = User.objects.get(username="system")
+        for connectivity_statement in qs:
+            available_transitions = [available_state.target for available_state in connectivity_statement.get_available_user_state_transitions(system_user)]
+            if CSState.EXPORTED in available_transitions:
+                # we need to update the state to exported when we are in the NP0 approved state and the system user has the permission to do so
+                ConnectivityStatementService(connectivity_statement).do_transition(CSState.EXPORTED, system_user).save()
+            pass

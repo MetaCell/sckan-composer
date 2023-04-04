@@ -253,7 +253,9 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
         return instance.has_notes
 
     def get_available_transitions(self, instance) -> list[SentenceState]:
-        return [t.name for t in instance.get_available_state_transitions()]
+        request = self.context.get('request', None)
+        user = request.user if request else None
+        return [t.name for t in instance.get_available_user_state_transitions(user)]
 
     class Meta:
         model = Sentence
@@ -316,7 +318,9 @@ class ConnectivityStatementSerializer(
     journey = serializers.CharField(read_only=True)
 
     def get_available_transitions(self, instance) -> list[CSState]:
-        return [t.name for t in instance.get_available_state_transitions()]
+        request = self.context.get('request', None)
+        user = request.user if request else None
+        return [t.name for t in instance.get_available_user_state_transitions(user)]
 
     def get_has_notes(self, instance) -> bool:
         return instance.has_notes
