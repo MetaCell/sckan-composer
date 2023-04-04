@@ -53,7 +53,7 @@ class CSState(models.TextChoices):
     TO_BE_REVIEWED = "to_be_reviewed"
     CONNECTION_MISSING = "connection_missing"
     NPO_APPROVED = "npo_approved"
-    APPROVED = "approved"
+    EXPORTED = "exported"
 
 
 class NoteType(models.TextChoices):
