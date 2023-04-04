@@ -286,7 +286,8 @@ def get_rows(cs: ConnectivityStatement) -> List:
     return rows
 
 
-def export_connectivity_statements(qs: QuerySet, folder_path: str = None):
+def export_connectivity_statements(qs: QuerySet, folder_path: str = None) -> str:
+    # returns the path of the exported file
     if folder_path is None:
         folder_path = tempfile.gettempdir()
     now = datetime.datetime.now()
@@ -326,3 +327,4 @@ def export_connectivity_statements(qs: QuerySet, folder_path: str = None):
                 # we need to update the state to exported when we are in the NP0 approved state and the system user has the permission to do so
                 ConnectivityStatementService(connectivity_statement).do_transition(CSState.EXPORTED, system_user).save()
             pass
+    return filepath
