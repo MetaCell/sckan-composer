@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 
+from composer.enums import CSState
 from composer.models import ConnectivityStatement
 from composer.services.export_services import (
     export_connectivity_statements,
@@ -13,7 +14,12 @@ class Command(BaseCommand):
         parser.add_argument(
             "--folder", type=str, help="Folder to store CSV file",
         )
+        parser.add_argument(
+            "--state", type=str, default=CSState.NPO_APPROVED, help=f"Export only statements with this state, default={CSState.NPO_APPROVED}",
+        )
 
     def handle(self, *args, **options):
-        folder = options.get("folder", None)
-        export_connectivity_statements(ConnectivityStatement.objects.to_be_exported(), folder)
+        folder: str = options.get("folder", None)
+        state = options.get("state", CSState.NPO_APPROVED)
+        qs = ConnectivityStatement.objects.filter(state=state)
+        export_connectivity_statements(qs, folder)

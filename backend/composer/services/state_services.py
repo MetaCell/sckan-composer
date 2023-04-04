@@ -114,7 +114,7 @@ class ConnectivityStatementService(StateServiceMixin):
     def has_permission_to_transition_to_compose_now(connectivity_statement, user):
         # if state in NPO APPROVED or EXPORTED and use is a staff user then also allow transition to COMPOSE NOW
         # other users should not be able to transition to COMPOSE NOW from these 2 states
-        return connectivity_statement.state not in (CSState.NPO_APPROVED, CSState.EXPORTED) or user.is_staff
+        return user and (connectivity_statement.state not in (CSState.NPO_APPROVED, CSState.EXPORTED) or user.is_staff)
     
     @staticmethod
     def has_permission_to_transition_to_exported(connectivity_statement, user):
