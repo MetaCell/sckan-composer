@@ -3,15 +3,18 @@ import datetime
 import logging
 import os
 import tempfile
+import typing
 
 from typing import Dict, Callable, List
 
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.db.models import QuerySet
+from django.utils import timezone
 
 from composer.enums import NoteType, ExportRelationships, CircuitType, Laterality
 from composer.exceptions import UnexportableConnectivityStatement
-from composer.models import Tag, ConnectivityStatement, Via, Specie
+from composer.models import Tag, ConnectivityStatement, ExportBatch, Via, Specie
 from composer.services.state_services import ConnectivityStatementService
 from composer.services.filesystem_service import create_dir_if_not_exists
 
@@ -90,16 +93,19 @@ def get_observed_in_species(cs: ConnectivityStatement, row: Row):
     return ", ".join([specie.name for specie in cs.species.all()])
 
 
+def escape_newlines(value):
+    return value.replace("\\","\\\\").replace("\n","\\n")
+
 def get_different_from_existing(cs: ConnectivityStatement, row: Row):
-    return "\n".join([note.note for note in cs.notes.filter(type=NoteType.DIFFERENT)])
+    return escape_newlines("\n".join([note.note for note in cs.notes.filter(type=NoteType.DIFFERENT)]))
 
 
 def get_curation_notes(cs: ConnectivityStatement, row: Row):
-    return row.curation_notes
+    return escape_newlines(row.curation_notes.replace("\\","\\\\"))
 
 
 def get_review_notes(cs: ConnectivityStatement, row: Row):
-    return row.review_notes
+    return escape_newlines(row.review_notes.replace("\\","\\\\"))
 
 
 def get_reference(cs: ConnectivityStatement, row: Row):
@@ -286,10 +292,38 @@ def get_rows(cs: ConnectivityStatement) -> List:
     return rows
 
 
-def export_connectivity_statements(qs: QuerySet, folder_path: str = None) -> str:
+def create_export_batch(qs: QuerySet, user: User) -> ExportBatch:
+    # do transition to EXPORTED state
+    export_batch = ExportBatch.objects.create(user=user)
+    export_batch.connectivity_statements.set(qs)
+    export_batch.save()
+    return export_batch
+
+
+def do_transition_to_exported(export_batch: ExportBatch, user: User):
+    system_user = User.objects.get(username="system")
+    for connectivity_statement in export_batch.connectivity_statements.all():
+        available_transitions = [
+            available_state.target
+            for available_state in connectivity_statement.get_available_user_state_transitions(
+                system_user
+            )
+        ]
+        if CSState.EXPORTED in available_transitions:
+            # we need to update the state to exported when we are in the NP0 approved state and the system user has the permission to do so
+            cs = ConnectivityStatementService(connectivity_statement).do_transition(
+                CSState.EXPORTED, system_user, user
+            )
+            cs.save()
+    # export_batch.created_at = timezone.now() # update the created_at field so all CS updated before are not counted for the CS modified since statistic
+    # export_batch.save()
+
+
+def dump_export_batch(export_batch, folder_path: typing.Optional[str] = None) -> str:
     # returns the path of the exported file
     if folder_path is None:
         folder_path = tempfile.gettempdir()
+
     now = datetime.datetime.now()
     filename = f'export_{now.strftime("%Y-%m-%d_%H-%M-%S")}.csv'
     filepath = os.path.join(folder_path, filename)
@@ -299,13 +333,12 @@ def export_connectivity_statements(qs: QuerySet, folder_path: str = None) -> str
 
     with open(filepath, "w", newline="") as csvfile:
         writer = csv.writer(csvfile)
-
         # Write header row
         headers = csv_attributes_mapping.keys()
         writer.writerow(headers)
 
         # Write data rows
-        for obj in qs:
+        for obj in export_batch.connectivity_statements.all():
             try:
                 rows = get_rows(obj)
             except UnexportableConnectivityStatement as e:
@@ -318,13 +351,14 @@ def export_connectivity_statements(qs: QuerySet, folder_path: str = None) -> str
                 for key in csv_attributes_mapping:
                     row_content.append(csv_attributes_mapping[key](obj, row))
                 writer.writerow(row_content)
-
-        # do transition to EXPORTED state
-        system_user = User.objects.get(username="system")
-        for connectivity_statement in qs:
-            available_transitions = [available_state.target for available_state in connectivity_statement.get_available_user_state_transitions(system_user)]
-            if CSState.EXPORTED in available_transitions:
-                # we need to update the state to exported when we are in the NP0 approved state and the system user has the permission to do so
-                ConnectivityStatementService(connectivity_statement).do_transition(CSState.EXPORTED, system_user).save()
-            pass
     return filepath
+
+
+def export_connectivity_statements(
+    qs: QuerySet, user: User, folder_path: typing.Optional[str]) -> typing.Tuple[str, ExportBatch]:
+    with transaction.atomic():
+        # make sure create_export_batch and do_transition_to_exported are in one database transaction
+        export_batch = create_export_batch(qs, user)
+        do_transition_to_exported(export_batch, user)
+    export_file = dump_export_batch(export_batch, folder_path)
+    return export_file, export_batch

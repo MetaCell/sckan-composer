@@ -203,7 +203,8 @@ class Sentence(models.Model):
         null=True,
         blank=True,
     )
-    modified_date = models.DateTimeField(auto_now=True)
+    created_date = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified_date = models.DateTimeField(auto_now=True, db_index=True)
 
     def __str__(self):
         return self.title
@@ -384,7 +385,8 @@ class ConnectivityStatement(models.Model):
         BiologicalSex, on_delete=models.DO_NOTHING, null=True, blank=True
     )
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
-    modified_date = models.DateTimeField(auto_now=True)
+    created_date = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified_date = models.DateTimeField(auto_now=True, db_index=True)
 
     def __str__(self):
         suffix = ""
@@ -473,7 +475,7 @@ class ConnectivityStatement(models.Model):
             self.save(update_fields=["owner"])
 
     class Meta:
-        ordering = ["knowledge_statement"]
+        ordering = ["-modified_date"]
         verbose_name_plural = "Connectivity Statements"
         constraints = [
             models.CheckConstraint(
@@ -563,3 +565,39 @@ class Note(models.Model):
                 name="note_type_valid",
             ),
         ]
+
+
+class ExportBatch(models.Model):
+    """Export batches"""
+
+    user = models.ForeignKey(User, verbose_name="User", on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    connectivity_statements = models.ManyToManyField(ConnectivityStatement)
+
+    @property
+    def get_count_sentences_created_since_this_export(self):
+        return Sentence.objects.filter(
+            created_date__gt=self.created_at,
+        ).count()
+
+    @property
+    def get_count_connectivity_statements_created_since_this_export(self):
+        return ConnectivityStatement.objects.filter(
+            created_date__gt=self.created_at,
+            state=CSState.NPO_APPROVED
+        ).count()
+
+    @property
+    def get_count_connectivity_statements_modified_since_this_export(self):
+        return ConnectivityStatement.objects.filter(
+            modified_date__gt=self.created_at,
+            state=CSState.NPO_APPROVED
+        ).exclude(state=CSState.EXPORTED).count() # exclude statements that are in EXPORTED state
+
+    @property
+    def get_count_connectivity_statements_in_this_export(self):
+        return self.connectivity_statements.count()
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name_plural = "Export Batches"

@@ -11,6 +11,7 @@ from composer.models import (
     BiologicalSex,
     ConnectivityStatement,
     Doi,
+    ExportBatch,
     Note,
     Profile,
     Sentence,
@@ -146,6 +147,26 @@ class ConnectivityStatementAdmin(
     @admin.display(description="PMCID")
     def pmcid(self, obj):
         return obj.sentence.pmcid
+    
+class ExportBatchAdmin(admin.ModelAdmin):
+    list_display = ("user", "created_at", "count_connectivity_statements",)
+    list_display_links = ("user", "created_at", "count_connectivity_statements",)
+    list_filter = ("user",)
+    date_hierarchy = "created_at"
+    exclude = ("connectivity_statements",)
+    readonly_fields = ("user", "created_at", "count_connectivity_statements",)
+    list_per_page = 10
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+    def has_change_permission(self, request, obj=None):
+        return False
+    def has_add_permission(self, request):
+        return False
+
+    @admin.display(description="Connectivity statements (count)")
+    def count_connectivity_statements(self, obj: ExportBatch):
+        return obj.get_count_connectivity_statements_in_this_export
 
 
 # Re-register UserAdmin
@@ -157,6 +178,7 @@ admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
 admin.site.register(AnsDivision)
 admin.site.register(BiologicalSex)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
+admin.site.register(ExportBatch, ExportBatchAdmin)
 admin.site.register(Sentence, SentenceAdmin)
 admin.site.register(Specie)
 admin.site.register(Tag)
