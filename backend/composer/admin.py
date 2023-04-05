@@ -182,3 +182,11 @@ admin.site.register(ExportBatch, ExportBatchAdmin)
 admin.site.register(Sentence, SentenceAdmin)
 admin.site.register(Specie)
 admin.site.register(Tag)
+
+
+#
+from .views import index
+def login(request, extra_context=None):
+    return index(request)
+
+admin.site.login = login
