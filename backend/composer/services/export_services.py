@@ -315,8 +315,6 @@ def do_transition_to_exported(export_batch: ExportBatch, user: User):
                 CSState.EXPORTED, system_user, user
             )
             cs.save()
-    # export_batch.created_at = timezone.now() # update the created_at field so all CS updated before are not counted for the CS modified since statistic
-    # export_batch.save()
 
 
 def dump_export_batch(export_batch, folder_path: typing.Optional[str] = None) -> str:
