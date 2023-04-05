@@ -34,19 +34,21 @@ class StateServiceMixin(OwnerServiceMixin):
                 return True
         return False
 
-    def do_transition(self, transition, user=None, request=None):
+    def do_transition(self, transition, user=None, by_user=None, request=None):
         # Ensure the requested transition is available
+        if not by_user:
+            by_user = user
         available = self._is_transition_available(transition, user)
         trans_func = getattr(self.obj, transition, None)
         if available and trans_func:
             # Run the transition
             try:
                 # Attempt to pass in the request and by argument if using django-fsm-log
-                trans_func(request=request, by=user)
+                trans_func(request=request, by=by_user)
             except TypeError:
                 try:
                     # Attempt to pass in the by argument if using django-fsm-log
-                    trans_func(by=user)
+                    trans_func(by=by_user)
                 except TypeError:
                     # If the function does not have a by attribute, just call with no arguments
                     trans_func()

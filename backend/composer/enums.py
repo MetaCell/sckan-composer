@@ -59,6 +59,7 @@ class CSState(models.TextChoices):
 class NoteType(models.TextChoices):
     PLAIN = "plain"
     DIFFERENT = "different"
+    TRANSITION = "transition"
 
 
 class ExportRelationships(Enum):

@@ -1,12 +1,27 @@
-from django.conf import settings
-from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from django_fsm.signals import post_transition
 
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_profile(sender, instance=None, created=False, **kwargs):
-    if created:
-        # Create a profile for the user is the user was created
-        from .models import Profile
+from .enums import NoteType
+from .models import ConnectivityStatement, Note, Sentence
 
-        Profile.objects.get_or_create(user=instance)
+
+@receiver(post_transition)
+def post_transition_callback(sender, instance, name, source, target, **kwargs):
+    method_kwargs = kwargs.get("method_kwargs", {})
+    user = method_kwargs.get("by")
+    if issubclass(sender, ConnectivityStatement):
+        connectivity_statement = instance
+    else:
+        connectivity_statement = None
+    if issubclass(sender, Sentence):
+        sentence = instance
+    else:
+        sentence = None
+    Note.objects.create(
+        user=user,
+        type=NoteType.TRANSITION,
+        connectivity_statement=connectivity_statement,
+        sentence=sentence,
+        note=f"Transitioned from {source} to {target}",
+    )
