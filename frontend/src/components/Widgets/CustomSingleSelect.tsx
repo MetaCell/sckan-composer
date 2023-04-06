@@ -22,33 +22,44 @@ const StyledSelect = styled(Select)(({ theme }) => ({
   "& .MuiOutlinedInput-notchedOutline": {
     border: 0,
     boxShadow: 'none',
-  }
+  },
 }));
 
 const CustomSingleSelect = ( {onChange, placeholder, disabled, value, options: { label, data }} : any) => {
   return (
-    <FormControl variant="standard">
-        <Typography variant="h6" fontWeight={500} marginBottom={2} color={vars.titleFontColor}>
-          {label}
-        </Typography>
-      <StyledSelect
-        value={value ? value : ''}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        disabled={disabled}
-        id="custom-select"
-        input={<OutlinedInput placeholder={placeholder} id="select-multiple-chip" />}
-      >
-        {data?.map(({label : optionLabel, id}: any) => (
-          <MenuItem
-            key={id}
-            value={id}
-          >
-            {optionLabel}
-          </MenuItem>
-        ))}
-      </StyledSelect>
-    </FormControl>
+    <>
+      <Typography variant="h6" fontWeight={500} color={vars.titleFontColor}>
+        {label}
+      </Typography>
+      <FormControl variant="standard" sx={{
+        "& .MuiInputLabel-root": {
+          top: 'calc(50% - 0.9em)',
+          color:"#667085",
+          fontWeight: '400',
+          fontSize: '14px',
+          marginLeft: '14px'
+        }
+      }}>
+        <InputLabel shrink={false} htmlFor="custom-select">{!value && placeholder}</InputLabel>
+        <StyledSelect
+          value={value ? value : ''}
+          onChange={(event) => onChange(event.target.value)}
+          disabled={disabled}
+          id="custom-select"
+          input={<OutlinedInput id="custom-select-input" />}
+        >
+          {data?.map(({label : optionLabel, id}: any) => (
+            <MenuItem
+              key={id}
+              value={id}
+            >
+              {optionLabel}
+            </MenuItem>
+          ))}
+        </StyledSelect>
+      </FormControl>
+    </>
+
   );
 }
 
