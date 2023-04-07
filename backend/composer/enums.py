@@ -28,10 +28,9 @@ class ViaType(models.TextChoices):
 
 class DestinationType(models.TextChoices):
     # axon sensory ending, axon terminal, axon sensory terminal
-    AXON_SE = "AXON-SE", "Axon sensory ending"
     AXON_T = "AXON-T", "Axon terminal"
-    AXON_ST = "AXON-ST", "Axon sensory terminal"
-    UNKNOWN = "UNKNOW", "Not specified"
+    AFFERENT_T = "AFFERENT-T", "Afferent terminal"
+    UNKNOWN = "UNKNOWN", "Not specified"
 
 
 class SentenceState(models.TextChoices):

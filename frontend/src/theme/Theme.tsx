@@ -18,7 +18,8 @@ const {
   buttonOutlinedBorderColor,
   buttonOutlinedHoverBg,
   labelColor,
-  radioBorderColor
+  radioBorderColor,
+  inputPlaceholderColor
 } = vars;
 
 const theme = createTheme({
@@ -234,6 +235,7 @@ const theme = createTheme({
         root: {
           border: "1px solid #EAECF0;",
           boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
+          filter: "contrast(.9)",
           "&:focus-within fieldset, &:focus-visible fieldset": {
             border: "1px solid #8DB2EE !important",
             boxShadow:
@@ -335,6 +337,11 @@ const theme = createTheme({
           "& .MuiSvgIcon-root": {
             fontSize: "1rem",
             color: radioBorderColor,
+            filter: "contrast(.7)",
+
+            "&:nth-child(2)": {
+              fill: inputPlaceholderColor,
+            }
           },
         },
       },
@@ -356,6 +363,19 @@ const theme = createTheme({
           lineHeight: "20px",
           color: "#344054",
         },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {},
+        input: {
+          '&::placeholder': {
+            color: inputPlaceholderColor,
+            opacity: 1,
+            fontWeight: '400',
+            fontSize: '14px',
+          }
+        }
       },
     },
     MuiTab: {

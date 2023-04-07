@@ -21,5 +21,6 @@ export const vars = {
     radioBorderColor: '#D0D5DD',
     darkBlue: "#184EA2",
     lightBlue: "#E2ECFB",
-    mediumBlue: "#548CE5"
-  };
+    mediumBlue: "#548CE5",
+    inputPlaceholderColor:'#667085',
+};
