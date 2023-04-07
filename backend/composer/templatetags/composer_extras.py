@@ -1,5 +1,6 @@
 from typing import Optional, Dict
 from django import template
+from django.db.models import Sum
 from django.template.defaultfilters import stringfilter
 
 from composer.models import ExportBatch
@@ -47,3 +48,31 @@ def get_last_export(context: template.Context, using: str = "available_apps"):
                 "count_sentences_created_since": last_export_batch.get_count_sentences_created_since_this_export                
             }
     return {}
+
+@register.filter
+def count_entity(qs_exportmetrics, entity):
+    return qs_exportmetrics.filter(entity=entity).aggregate(Sum("count"))["count__sum"]
+
+@register.filter
+def filter_entity(qs_exportmetrics, entity):
+    return qs_exportmetrics.filter(entity=entity)
+
+@register.filter(name='split')
+def split(value, key):
+    """
+        Returns the value turned into a list.
+    """
+    return value.split(key)
+
+@register.filter
+def pct( value, arg ):
+    '''
+    Divides the value; argument is the divisor.
+    Returns empty string on any error.
+    '''
+    try:
+        value = int( value )
+        arg = int( arg )
+        if arg: return max((value / arg) * 100, 1)
+    except: pass
+    return ''

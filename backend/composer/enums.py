@@ -71,3 +71,8 @@ class ExportRelationships(Enum):
     hasSomaPhenotype = "hasSomaPhenotype"
     hasAlert = "hasAlert"
     soma = "Soma"
+
+
+class MetricEntity(models.TextChoices):
+    SENTENCE = "sentence"
+    CONNECTIVITY_STATEMENT = "connectivity statement"

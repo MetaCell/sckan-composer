@@ -9,17 +9,22 @@ from typing import Dict, Callable, List
 
 from django.contrib.auth.models import User
 from django.db import transaction
-from django.db.models import QuerySet
+from django.db.models import Count, QuerySet
 from django.utils import timezone
 
-from composer.enums import NoteType, ExportRelationships, CircuitType, Laterality
+from composer.enums import NoteType, ExportRelationships, CircuitType, Laterality, MetricEntity, SentenceState, CSState
 from composer.exceptions import UnexportableConnectivityStatement
-from composer.models import Tag, ConnectivityStatement, ExportBatch, Via, Specie
+from composer.models import (
+    Tag,
+    ConnectivityStatement,
+    ExportBatch,
+    ExportMetrics,
+    Sentence,
+    Specie,
+    Via,
+)
 from composer.services.state_services import ConnectivityStatementService
 from composer.services.filesystem_service import create_dir_if_not_exists
-
-from django_fsm import has_transition_perm
-
 from composer.enums import CSState
 
 HAS_NERVE_BRANCHES_TAG = "Has nerve branches"
@@ -94,18 +99,21 @@ def get_observed_in_species(cs: ConnectivityStatement, row: Row):
 
 
 def escape_newlines(value):
-    return value.replace("\\","\\\\").replace("\n","\\n")
+    return value.replace("\\", "\\\\").replace("\n", "\\n")
+
 
 def get_different_from_existing(cs: ConnectivityStatement, row: Row):
-    return escape_newlines("\n".join([note.note for note in cs.notes.filter(type=NoteType.DIFFERENT)]))
+    return escape_newlines(
+        "\n".join([note.note for note in cs.notes.filter(type=NoteType.DIFFERENT)])
+    )
 
 
 def get_curation_notes(cs: ConnectivityStatement, row: Row):
-    return escape_newlines(row.curation_notes.replace("\\","\\\\"))
+    return escape_newlines(row.curation_notes.replace("\\", "\\\\"))
 
 
 def get_review_notes(cs: ConnectivityStatement, row: Row):
-    return escape_newlines(row.review_notes.replace("\\","\\\\"))
+    return escape_newlines(row.review_notes.replace("\\", "\\\\"))
 
 
 def get_reference(cs: ConnectivityStatement, row: Row):
@@ -300,6 +308,52 @@ def create_export_batch(qs: QuerySet, user: User) -> ExportBatch:
     return export_batch
 
 
+def compute_metrics(export_batch: ExportBatch):
+    # will be executed by post_save signal on ExportBatch
+    last_export_batch = ExportBatch.objects.all().order_by("-created_at").first()
+    if last_export_batch:
+        last_export_batch_created_at = last_export_batch.created_at
+    else:
+        last_export_batch_created_at = None
+
+    # compute the metrics for this export
+    sentences_created_qs = Sentence.objects.all()
+    if last_export_batch_created_at:
+        sentences_created_qs = Sentence.objects.filter(
+            created_date__gt=last_export_batch_created_at,
+        )
+    export_batch.sentences_created = sentences_created_qs.count()
+
+    connectivity_statements_created_qs = ConnectivityStatement.objects.all().exclude(state=CSState.DRAFT) # skip draft statements
+    if last_export_batch_created_at:
+        connectivity_statements_created_qs = ConnectivityStatement.objects.filter(
+            created_date__gt=last_export_batch_created_at,
+        )
+    export_batch.connectivity_statements_created = connectivity_statements_created_qs.count()
+
+    export_batch.save()
+
+    # compute the state metrics for this export
+    connectivity_statement_metrics = ConnectivityStatement.objects.values("state").annotate(count=Count("state"))
+    for metric in connectivity_statement_metrics:
+        ExportMetrics.objects.create(
+            export_batch=export_batch,
+            entity=MetricEntity.CONNECTIVITY_STATEMENT,
+            state=CSState(metric["state"]),
+            count=metric["count"],
+        )
+    sentence_metrics = Sentence.objects.values("state").annotate(count=Count("state"))
+    for metric in sentence_metrics:
+        ExportMetrics.objects.create(
+            export_batch=export_batch,
+            entity=MetricEntity.SENTENCE,
+            state=SentenceState(metric["state"]),
+            count=metric["count"],
+        )
+    # ExportMetrics
+    return export_batch
+
+
 def do_transition_to_exported(export_batch: ExportBatch, user: User):
     system_user = User.objects.get(username="system")
     for connectivity_statement in export_batch.connectivity_statements.all():
@@ -353,7 +407,8 @@ def dump_export_batch(export_batch, folder_path: typing.Optional[str] = None) ->
 
 
 def export_connectivity_statements(
-    qs: QuerySet, user: User, folder_path: typing.Optional[str]) -> typing.Tuple[str, ExportBatch]:
+    qs: QuerySet, user: User, folder_path: typing.Optional[str]
+) -> typing.Tuple[str, ExportBatch]:
     with transaction.atomic():
         # make sure create_export_batch and do_transition_to_exported are in one database transaction
         export_batch = create_export_batch(qs, user)

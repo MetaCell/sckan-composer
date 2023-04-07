@@ -1,3 +1,5 @@
+import typing
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
@@ -9,6 +11,7 @@ from .enums import (
     CSState,
     DestinationType,
     Laterality,
+    MetricEntity,
     SentenceState,
     NoteType,
     ViaType,
@@ -572,7 +575,9 @@ class ExportBatch(models.Model):
 
     user = models.ForeignKey(User, verbose_name="User", on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
-    connectivity_statements = models.ManyToManyField(ConnectivityStatement)
+    sentences_created = models.IntegerField(default=0, help_text="Number of sentences created since the previous export")
+    connectivity_statements_created = models.IntegerField(default=0, help_text="Number of connectivity statements created since the previous export")
+    connectivity_statements = models.ManyToManyField(ConnectivityStatement, help_text="Connectivity statements in this export batch")
 
     @property
     def get_count_sentences_created_since_this_export(self):
@@ -601,3 +606,22 @@ class ExportBatch(models.Model):
     class Meta:
         ordering = ["-created_at"]
         verbose_name_plural = "Export Batches"
+
+
+class ExportMetrics(models.Model):
+    """Export Metrics"""
+
+    export_batch = models.ForeignKey(ExportBatch, on_delete=models.CASCADE)
+    entity = models.CharField(
+        max_length=max((len(state[1]) for state in MetricEntity.choices)), choices=MetricEntity.choices
+    )
+    state = models.CharField(
+        max_length=max((len(state[1]) for state in CSState.choices + SentenceState.choices))
+    )
+    count = models.IntegerField()
+
+    class Meta:
+        verbose_name_plural = "Export Metrics"
+        constraints = [
+            models.UniqueConstraint(fields=["export_batch", "entity", "state"], name="unique_state_per_export_batch"),
+        ]

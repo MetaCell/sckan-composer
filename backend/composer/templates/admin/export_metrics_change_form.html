@@ -1,0 +1,85 @@
+{% extends "admin/change_form.html" %}
+{% load composer_extras %}
+
+{% block content_title %}
+<h1>Export Batch and Metrics</h1>
+{% endblock %}
+{% block after_related_objects %}
+
+<style>
+.bar-chart {
+    display: flex;
+    justify-content: space-around;
+    height: 160px;
+    overflow: hidden;
+  }
+  .bar-chart .bar {
+      flex: 100%;
+      align-self: flex-end;
+      margin-right: 2px;
+      position: relative;
+      background-color: #79aec8;
+  }
+  .bar-chart .bar:last-child {
+      margin: 0;
+  }
+  .bar-chart .bar:hover {
+      background-color: #417690;
+  }    .bar-chart .bar .bar-tooltip {
+      position: relative;
+      z-index: 999;
+  }
+  .bar-chart .bar .bar-tooltip {
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      font-weight: bold;
+      opacity: 0;
+  }
+  .bar-chart .bar:hover .bar-tooltip {
+      opacity: 1;
+  }
+  .bar-chart .bar .bar-count {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    text-align: center;
+    font-weight: bold;
+  }
+</style>
+
+{% with entities='sentence,connectivity statement' %}
+{% for entity in entities|split:',' %}
+<div class="col-12 col-lg-9">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="m-0">Export statistics {{ entity }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="bar-chart">
+                            {% with total=original.exportmetrics_set.all|count_entity:entity %}
+                                {% for row in original.exportmetrics_set.all|filter_entity:entity %}
+                                <div class="bar" style="height:{{row.count|pct:total}}%">
+                                    <!-- <div class="bar-tooltip">{{row.count}} {{row.state}}</div> -->
+                                    <div class="bar-count">{{row.count}} {{row.state}}</div>
+                                </div>
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endwith %}
+{% endblock %}
+{% block pagination %}
+{% endblock %}
