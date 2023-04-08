@@ -7,7 +7,7 @@
 {% block after_related_objects %}
 
 <style>
-.bar-chart {
+  .bar-chart {
     display: flex;
     justify-content: space-around;
     height: 160px;
@@ -23,28 +23,25 @@
   .bar-chart .bar:last-child {
       margin: 0;
   }
-  .bar-chart .bar:hover {
-      background-color: #417690;
-  }    .bar-chart .bar .bar-tooltip {
-      position: relative;
-      z-index: 999;
+  .barx-chart {
+    display: flex;
+    justify-content: space-around;
+    height: 64px;
+    overflow: hidden;
   }
-  .bar-chart .bar .bar-tooltip {
-      position: absolute;
-      top: -60px;
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
-      font-weight: bold;
-      opacity: 0;
+  .barx-chart .barx {
+    flex: 100%;
+    align-self: flex-end;
+    margin-right: 2px;
+    position: relative;
   }
-  .bar-chart .bar:hover .bar-tooltip {
-      opacity: 1;
+  .barx-chart .barx:last-child {
+    margin: 0;
   }
-  .bar-chart .bar .bar-count {
+  .barx-chart .barx .barx-count {
     position: absolute;
     left: 50%;
-    bottom: 0;
+    top: -64px;
     transform: translateX(-50%);
     text-align: center;
     font-weight: bold;
@@ -61,18 +58,27 @@
         <div class="card-body">
             <div class="form-group">
                 <div class="row">
+                    {% with total=original.exportmetrics_set.all|count_entity:entity %}
+                    {% with rows=original.exportmetrics_set.all|filter_entity:entity %}
                     <div class="col-sm-12">
                         <div class="bar-chart">
-                            {% with total=original.exportmetrics_set.all|count_entity:entity %}
-                                {% for row in original.exportmetrics_set.all|filter_entity:entity %}
+                                {% for row in rows %}
                                 <div class="bar" style="height:{{row.count|pct:total}}%">
-                                    <!-- <div class="bar-tooltip">{{row.count}} {{row.state}}</div> -->
-                                    <div class="bar-count">{{row.count}} {{row.state}}</div>
                                 </div>
                                 {% endfor %}
-                            {% endwith %}
                         </div>
                     </div>
+                    <div class="col-sm-12">
+                        <div class="barx-chart">
+                            {% for row in rows %}
+                            <div class="barx">
+                                <div class="barx-count">{{row.count}}<br />{{row.state}}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endwith %}
+                    {% endwith %}
                 </div>
             </div>
         </div>

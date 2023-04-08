@@ -310,40 +310,51 @@ def create_export_batch(qs: QuerySet, user: User) -> ExportBatch:
 
 def compute_metrics(export_batch: ExportBatch):
     # will be executed by post_save signal on ExportBatch
-    last_export_batch = ExportBatch.objects.all().order_by("-created_at").first()
+    last_export_batch = ExportBatch.objects.exclude(id=export_batch.id).order_by("-created_at").first()
     if last_export_batch:
         last_export_batch_created_at = last_export_batch.created_at
     else:
         last_export_batch_created_at = None
 
     # compute the metrics for this export
-    sentences_created_qs = Sentence.objects.all()
     if last_export_batch_created_at:
         sentences_created_qs = Sentence.objects.filter(
             created_date__gt=last_export_batch_created_at,
         )
+    else:
+        sentences_created_qs = Sentence.objects.all()
     export_batch.sentences_created = sentences_created_qs.count()
 
-    connectivity_statements_created_qs = ConnectivityStatement.objects.all().exclude(state=CSState.DRAFT) # skip draft statements
     if last_export_batch_created_at:
         connectivity_statements_created_qs = ConnectivityStatement.objects.filter(
             created_date__gt=last_export_batch_created_at,
         )
+    else:
+        connectivity_statements_created_qs = ConnectivityStatement.objects.all()
+    connectivity_statements_created_qs.exclude(state=CSState.DRAFT) # skip draft statements
     export_batch.connectivity_statements_created = connectivity_statements_created_qs.count()
 
-    export_batch.save()
+    # export_batch.save()
 
     # compute the state metrics for this export
-    connectivity_statement_metrics = ConnectivityStatement.objects.values("state").annotate(count=Count("state"))
-    for metric in connectivity_statement_metrics:
+    connectivity_statement_metrics = list(ConnectivityStatement.objects.values("state").annotate(count=Count("state")))
+    for state in CSState:
+        try:
+            metric = [x for x in connectivity_statement_metrics if x.get("state") == state][0]
+        except IndexError:
+            metric = {"state": state.value, "count": 0}
         ExportMetrics.objects.create(
             export_batch=export_batch,
             entity=MetricEntity.CONNECTIVITY_STATEMENT,
             state=CSState(metric["state"]),
             count=metric["count"],
         )
-    sentence_metrics = Sentence.objects.values("state").annotate(count=Count("state"))
-    for metric in sentence_metrics:
+    sentence_metrics = list(Sentence.objects.values("state").annotate(count=Count("state")))
+    for state in SentenceState:
+        try:
+            metric = [x for x in sentence_metrics if x.get("state") == state][0]
+        except IndexError:
+            metric = {"state": state.value, "count": 0}
         ExportMetrics.objects.create(
             export_batch=export_batch,
             entity=MetricEntity.SENTENCE,

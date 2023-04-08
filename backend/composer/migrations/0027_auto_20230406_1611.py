@@ -17,7 +17,7 @@ def update_destination_type(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("composer", "0026_remove_connectivitystatement_destination_type_valid"),  # Replace with the name of your previous migration
+        ("composer", "0027_alter_connectivitystatement_options_and_more"),  # Replace with the name of your previous migration
     ]
 
     operations = [

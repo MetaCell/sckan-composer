@@ -6,7 +6,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("composer", "0028_alter_sentence_created_date_and_more"),
+        ("composer", "0029_alter_connectivitystatement_options_and_more"),
     ]
 
     operations = [

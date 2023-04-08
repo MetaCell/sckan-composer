@@ -5,6 +5,7 @@ from django.db import models
 from django.db.models import Q
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
+# from django_fsm_log.decorators import fsm_log_by
 
 from .enums import (
     CircuitType,
@@ -218,7 +219,7 @@ class Sentence(models.Model):
         source=[SentenceState.TO_BE_REVIEWED, SentenceState.COMPOSE_LATER],
         target=SentenceState.OPEN,
     )
-    def open(self):
+    def open(self, *args, **kwargs):
         ...
 
     @transition(
@@ -227,13 +228,13 @@ class Sentence(models.Model):
         target=SentenceState.TO_BE_REVIEWED,
         conditions=[SentenceService.can_be_reviewed],
     )
-    def to_be_reviewed(self):
+    def to_be_reviewed(self, *args, **kwargs):
         ...
 
     @transition(
         field=state, source=SentenceState.OPEN, target=SentenceState.COMPOSE_LATER
     )
-    def compose_later(self):
+    def compose_later(self, *args, **kwargs):
         ...
 
     @transition(
@@ -242,15 +243,15 @@ class Sentence(models.Model):
         target=SentenceState.COMPOSE_NOW,
         conditions=[SentenceService.can_be_composed],
     )
-    def compose_now(self):
+    def compose_now(self, *args, **kwargs):
         SentenceService(self).do_transition_compose_now()
 
     @transition(field=state, source=SentenceState.OPEN, target=SentenceState.EXCLUDED)
-    def excluded(self):
+    def excluded(self, *args, **kwargs):
         ...
 
     @transition(field=state, source=SentenceState.OPEN, target=SentenceState.DUPLICATE)
-    def duplicate(self):
+    def duplicate(self, *args, **kwargs):
         ...
 
     def assign_owner(self, request):
@@ -411,22 +412,22 @@ class ConnectivityStatement(models.Model):
         ),
         target=CSState.COMPOSE_NOW,
     )
-    def compose_now(self):
-        pass
+    def compose_now(self, *args, **kwargs):
+        ...
 
     @transition(
         field=state,
         source=[CSState.COMPOSE_NOW, CSState.CONNECTION_MISSING],
         target=CSState.CURATED,
     )
-    def curated(self):
-        pass
+    def curated(self, *args, **kwargs):
+        ...
 
     @transition(
         field=state, source=CSState.COMPOSE_NOW, target=CSState.CONNECTION_MISSING
     )
-    def connection_missing(self):
-        pass
+    def connection_missing(self, *args, **kwargs):
+        ...
 
     @transition(
         field=state,
@@ -434,20 +435,20 @@ class ConnectivityStatement(models.Model):
         target=CSState.TO_BE_REVIEWED,
         conditions=[ConnectivityStatementService.can_be_reviewed],
     )
-    def to_be_reviewed(self):
-        pass
+    def to_be_reviewed(self, *args, **kwargs):
+        ...
 
     @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.EXCLUDED)
-    def excluded(self):
-        pass
+    def excluded(self, *args, **kwargs):
+        ...
 
     @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.REJECTED)
-    def rejected(self):
-        pass
+    def rejected(self, *args, **kwargs):
+        ...
 
     @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.NPO_APPROVED)
-    def npo_approved(self):
-        pass
+    def npo_approved(self, *args, **kwargs):
+        ...
 
     @transition(
         field=state,
@@ -457,8 +458,8 @@ class ConnectivityStatement(models.Model):
         ),
         target=CSState.EXPORTED,
     )
-    def exported(self):
-        pass
+    def exported(self, *args, **kwargs):
+        ...
 
     @property
     def journey(self):
@@ -622,6 +623,7 @@ class ExportMetrics(models.Model):
 
     class Meta:
         verbose_name_plural = "Export Metrics"
+        ordering = ["id"]
         constraints = [
             models.UniqueConstraint(fields=["export_batch", "entity", "state"], name="unique_state_per_export_batch"),
         ]

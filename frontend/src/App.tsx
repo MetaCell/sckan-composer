@@ -36,11 +36,11 @@ function App() {
 
     const defaultStateFilter = []
     if (user.is_curator) {
-      defaultStateFilter.push("compose_now")
+      defaultStateFilter.push("compose now")
     }
 
     if (user.is_reviewer) {
-      defaultStateFilter.push("to_be_reviewed")
+      defaultStateFilter.push("to be reviewed")
     }
 
     if (defaultStateFilter.length > 0) {

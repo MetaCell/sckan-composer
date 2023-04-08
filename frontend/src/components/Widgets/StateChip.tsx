@@ -4,7 +4,7 @@ import { statementStateToColor, sentenceStateToColor } from "../../helpers/setti
 import { snakeToSpace, StateColor } from "../../helpers/helpers"
 
 const renderState = (state: string, colorStates: any) => {
-  const i: keyof typeof colorStates = state
+  const i: keyof typeof colorStates = state.replaceAll(" ", "_")
   const color: StateColor = colorStates[i]
   const label: string = snakeToSpace(state)
   return <Chip variant="filled" size="small" color={color} label={label} />
