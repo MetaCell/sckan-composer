@@ -9,7 +9,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("composer", "0025_remove_connectivitystatement_state_valid_and_more"),
+        ("composer", "0026_remove_connectivitystatement_destination_type_valid"),
     ]
 
     operations = [

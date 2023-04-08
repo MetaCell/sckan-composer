@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("composer", "0026_connectivitystatement_created_date_and_more"),
+        ("composer", "0025_remove_connectivitystatement_state_valid_and_more"),
     ]
 
     operations = [
