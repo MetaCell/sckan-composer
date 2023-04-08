@@ -144,7 +144,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "CET"
 
 USE_I18N = True
 
@@ -204,8 +204,6 @@ JAZZMIN_SETTINGS = {
     "topmenu_links": [
         # Url that gets reversed (Permissions can be added)
         {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
-        # export of the connectivity statements
-        {"name": "Export Statements", "url": "export", },
         # model admin to link to (Permissions checked against model)
         {"model": "auth.User"},
         # App with dropdown menu to all its models pages (Permissions checked against models)

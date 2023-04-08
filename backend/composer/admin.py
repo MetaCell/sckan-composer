@@ -11,6 +11,8 @@ from composer.models import (
     BiologicalSex,
     ConnectivityStatement,
     Doi,
+    ExportBatch,
+    ExportMetrics,
     Note,
     Profile,
     Sentence,
@@ -146,6 +148,33 @@ class ConnectivityStatementAdmin(
     @admin.display(description="PMCID")
     def pmcid(self, obj):
         return obj.sentence.pmcid
+    
+class ExportBatchAdmin(admin.ModelAdmin):
+    list_display = ("user", "created_at", "count_connectivity_statements",)
+    list_display_links = ("user", "created_at", "count_connectivity_statements",)
+    list_filter = ("user",)
+    date_hierarchy = "created_at"
+    exclude = ("connectivity_statements",)
+    readonly_fields = ("user", "created_at", "count_connectivity_statements", "sentences_created", "connectivity_statements_created",)
+    list_per_page = 10
+    change_form_template = "admin/export_metrics_change_form.html"
+    
+    def has_delete_permission(self, request, obj=None):
+        return False
+    def has_change_permission(self, request, obj=None):
+        return False
+    def has_add_permission(self, request):
+        return False
+
+    @admin.display(description="Connectivity statements")
+    def count_connectivity_statements(self, obj: ExportBatch):
+        return obj.get_count_connectivity_statements_in_this_export
+
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        # add help text to the count_connectivity_statements computed field
+        help_texts = {'count_connectivity_statements': 'Number of connectivity statements exported in this export batch'}
+        kwargs.update({'help_texts': help_texts})
+        return super().get_form(request, obj=obj, change=change, **kwargs)
 
 
 # Re-register UserAdmin
@@ -157,6 +186,16 @@ admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
 admin.site.register(AnsDivision)
 admin.site.register(BiologicalSex)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
+admin.site.register(ExportBatch, ExportBatchAdmin)
 admin.site.register(Sentence, SentenceAdmin)
 admin.site.register(Specie)
 admin.site.register(Tag)
+admin.site.register(ExportMetrics)
+
+
+#
+from .views import index
+def login(request, extra_context=None):
+    return index(request)
+
+admin.site.login = login

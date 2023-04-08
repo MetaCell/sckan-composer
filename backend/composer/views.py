@@ -42,7 +42,9 @@ def export(request):
     if request.user.is_staff:
         # only staff users can export connectivity statements
         qs = ConnectivityStatement.objects.filter(state=CSState.NPO_APPROVED)
-        file_path = export_connectivity_statements(qs)
+        file_path, export_batch = export_connectivity_statements(qs=qs, user=request.user, folder_path=None)
+        from django.contrib import messages
+        messages.add_message(request, messages.INFO, f"Exported {export_batch.get_count_connectivity_statements_in_this_export} connectivity statements.")
         if os.path.exists(file_path):
             with open(file_path, 'rb') as fh:
                 response = HttpResponse(fh.read(), content_type="application/text")

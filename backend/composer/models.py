@@ -1,14 +1,18 @@
+import typing
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
+# from django_fsm_log.decorators import fsm_log_by
 
 from .enums import (
     CircuitType,
     CSState,
     DestinationType,
     Laterality,
+    MetricEntity,
     SentenceState,
     NoteType,
     ViaType,
@@ -203,7 +207,8 @@ class Sentence(models.Model):
         null=True,
         blank=True,
     )
-    modified_date = models.DateTimeField(auto_now=True)
+    created_date = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified_date = models.DateTimeField(auto_now=True, db_index=True)
 
     def __str__(self):
         return self.title
@@ -214,7 +219,7 @@ class Sentence(models.Model):
         source=[SentenceState.TO_BE_REVIEWED, SentenceState.COMPOSE_LATER],
         target=SentenceState.OPEN,
     )
-    def open(self):
+    def open(self, *args, **kwargs):
         ...
 
     @transition(
@@ -223,13 +228,13 @@ class Sentence(models.Model):
         target=SentenceState.TO_BE_REVIEWED,
         conditions=[SentenceService.can_be_reviewed],
     )
-    def to_be_reviewed(self):
+    def to_be_reviewed(self, *args, **kwargs):
         ...
 
     @transition(
         field=state, source=SentenceState.OPEN, target=SentenceState.COMPOSE_LATER
     )
-    def compose_later(self):
+    def compose_later(self, *args, **kwargs):
         ...
 
     @transition(
@@ -238,15 +243,15 @@ class Sentence(models.Model):
         target=SentenceState.COMPOSE_NOW,
         conditions=[SentenceService.can_be_composed],
     )
-    def compose_now(self):
+    def compose_now(self, *args, **kwargs):
         SentenceService(self).do_transition_compose_now()
 
     @transition(field=state, source=SentenceState.OPEN, target=SentenceState.EXCLUDED)
-    def excluded(self):
+    def excluded(self, *args, **kwargs):
         ...
 
     @transition(field=state, source=SentenceState.OPEN, target=SentenceState.DUPLICATE)
-    def duplicate(self):
+    def duplicate(self, *args, **kwargs):
         ...
 
     def assign_owner(self, request):
@@ -384,7 +389,8 @@ class ConnectivityStatement(models.Model):
         BiologicalSex, on_delete=models.DO_NOTHING, null=True, blank=True
     )
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
-    modified_date = models.DateTimeField(auto_now=True)
+    created_date = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified_date = models.DateTimeField(auto_now=True, db_index=True)
 
     def __str__(self):
         suffix = ""
@@ -406,22 +412,22 @@ class ConnectivityStatement(models.Model):
         ),
         target=CSState.COMPOSE_NOW,
     )
-    def compose_now(self):
-        pass
+    def compose_now(self, *args, **kwargs):
+        ...
 
     @transition(
         field=state,
         source=[CSState.COMPOSE_NOW, CSState.CONNECTION_MISSING],
         target=CSState.CURATED,
     )
-    def curated(self):
-        pass
+    def curated(self, *args, **kwargs):
+        ...
 
     @transition(
         field=state, source=CSState.COMPOSE_NOW, target=CSState.CONNECTION_MISSING
     )
-    def connection_missing(self):
-        pass
+    def connection_missing(self, *args, **kwargs):
+        ...
 
     @transition(
         field=state,
@@ -429,20 +435,20 @@ class ConnectivityStatement(models.Model):
         target=CSState.TO_BE_REVIEWED,
         conditions=[ConnectivityStatementService.can_be_reviewed],
     )
-    def to_be_reviewed(self):
-        pass
+    def to_be_reviewed(self, *args, **kwargs):
+        ...
 
     @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.EXCLUDED)
-    def excluded(self):
-        pass
+    def excluded(self, *args, **kwargs):
+        ...
 
     @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.REJECTED)
-    def rejected(self):
-        pass
+    def rejected(self, *args, **kwargs):
+        ...
 
     @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.NPO_APPROVED)
-    def npo_approved(self):
-        pass
+    def npo_approved(self, *args, **kwargs):
+        ...
 
     @transition(
         field=state,
@@ -452,8 +458,8 @@ class ConnectivityStatement(models.Model):
         ),
         target=CSState.EXPORTED,
     )
-    def exported(self):
-        pass
+    def exported(self, *args, **kwargs):
+        ...
 
     @property
     def journey(self):
@@ -473,7 +479,7 @@ class ConnectivityStatement(models.Model):
             self.save(update_fields=["owner"])
 
     class Meta:
-        ordering = ["knowledge_statement"]
+        ordering = ["-modified_date"]
         verbose_name_plural = "Connectivity Statements"
         constraints = [
             models.CheckConstraint(
@@ -562,4 +568,62 @@ class Note(models.Model):
                 check=Q(type__in=[nt[0] for nt in NoteType.choices]),
                 name="note_type_valid",
             ),
+        ]
+
+
+class ExportBatch(models.Model):
+    """Export batches"""
+
+    user = models.ForeignKey(User, verbose_name="User", on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    sentences_created = models.IntegerField(default=0, help_text="Number of sentences created since the previous export")
+    connectivity_statements_created = models.IntegerField(default=0, help_text="Number of connectivity statements created since the previous export")
+    connectivity_statements = models.ManyToManyField(ConnectivityStatement, help_text="Connectivity statements in this export batch")
+
+    @property
+    def get_count_sentences_created_since_this_export(self):
+        return Sentence.objects.filter(
+            created_date__gt=self.created_at,
+        ).count()
+
+    @property
+    def get_count_connectivity_statements_created_since_this_export(self):
+        return ConnectivityStatement.objects.filter(
+            created_date__gt=self.created_at,
+            state=CSState.NPO_APPROVED
+        ).count()
+
+    @property
+    def get_count_connectivity_statements_modified_since_this_export(self):
+        return ConnectivityStatement.objects.filter(
+            modified_date__gt=self.created_at,
+            state=CSState.NPO_APPROVED
+        ).exclude(state=CSState.EXPORTED).count() # exclude statements that are in EXPORTED state
+
+    @property
+    def get_count_connectivity_statements_in_this_export(self):
+        return self.connectivity_statements.count()
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name_plural = "Export Batches"
+
+
+class ExportMetrics(models.Model):
+    """Export Metrics"""
+
+    export_batch = models.ForeignKey(ExportBatch, on_delete=models.CASCADE)
+    entity = models.CharField(
+        max_length=max((len(state[1]) for state in MetricEntity.choices)), choices=MetricEntity.choices
+    )
+    state = models.CharField(
+        max_length=max((len(state[1]) for state in CSState.choices + SentenceState.choices))
+    )
+    count = models.IntegerField()
+
+    class Meta:
+        verbose_name_plural = "Export Metrics"
+        ordering = ["id"]
+        constraints = [
+            models.UniqueConstraint(fields=["export_batch", "entity", "state"], name="unique_state_per_export_batch"),
         ]

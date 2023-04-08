@@ -35,9 +35,9 @@ class DestinationType(models.TextChoices):
 
 class SentenceState(models.TextChoices):
     OPEN = "open"
-    TO_BE_REVIEWED = "to_be_reviewed"
-    COMPOSE_LATER = "compose_later"
-    COMPOSE_NOW = "compose_now"
+    TO_BE_REVIEWED = "to be reviewed"
+    COMPOSE_LATER = "compose later"
+    COMPOSE_NOW = "compose now"
     EXCLUDED = "excluded"
     DUPLICATE = "duplicate"
 
@@ -45,19 +45,20 @@ class SentenceState(models.TextChoices):
 class CSState(models.TextChoices):
     # Connectivity Statement States
     DRAFT = "draft"
-    COMPOSE_NOW = "compose_now"
+    COMPOSE_NOW = "compose now"
     CURATED = "curated"
     EXCLUDED = "excluded"
     REJECTED = "rejected"
-    TO_BE_REVIEWED = "to_be_reviewed"
-    CONNECTION_MISSING = "connection_missing"
-    NPO_APPROVED = "npo_approved"
+    TO_BE_REVIEWED = "to be reviewed"
+    CONNECTION_MISSING = "connection missing"
+    NPO_APPROVED = "npo approved"
     EXPORTED = "exported"
 
 
 class NoteType(models.TextChoices):
     PLAIN = "plain"
     DIFFERENT = "different"
+    TRANSITION = "transition"
 
 
 class ExportRelationships(Enum):
@@ -70,3 +71,8 @@ class ExportRelationships(Enum):
     hasSomaPhenotype = "hasSomaPhenotype"
     hasAlert = "hasAlert"
     soma = "Soma"
+
+
+class MetricEntity(models.TextChoices):
+    SENTENCE = "sentence"
+    CONNECTIVITY_STATEMENT = "connectivity statement"

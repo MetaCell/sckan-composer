@@ -235,15 +235,15 @@ paths:
           items:
             type: string
             enum:
-            - compose_now
-            - connection_missing
+            - compose now
+            - connection missing
             - curated
             - draft
             - excluded
             - exported
-            - npo_approved
+            - npo approved
             - rejected
-            - to_be_reviewed
+            - to be reviewed
         explode: true
         style: form
       - in: query
@@ -938,12 +938,12 @@ paths:
           items:
             type: string
             enum:
-            - compose_later
-            - compose_now
+            - compose later
+            - compose now
             - duplicate
             - excluded
             - open
-            - to_be_reviewed
+            - to be reviewed
         explode: true
         style: form
       - in: query
@@ -1694,21 +1694,20 @@ components:
     ConnectivityStatementAvailableTransitionsEnum:
       enum:
       - draft
-      - compose_now
+      - compose now
       - curated
       - excluded
       - rejected
-      - to_be_reviewed
-      - connection_missing
-      - npo_approved
+      - to be reviewed
+      - connection missing
+      - npo approved
       - exported
       type: string
     DestinationTypeEnum:
       enum:
-      - AXON-SE
       - AXON-T
-      - AXON-ST
-      - UNKNOW
+      - AFFERENT-T
+      - UNKNOWN
       type: string
     Doi:
       type: object
@@ -2265,9 +2264,9 @@ components:
     SentenceAvailableTransitionsEnum:
       enum:
       - open
-      - to_be_reviewed
-      - compose_later
-      - compose_now
+      - to be reviewed
+      - compose later
+      - compose now
       - excluded
       - duplicate
       type: string
