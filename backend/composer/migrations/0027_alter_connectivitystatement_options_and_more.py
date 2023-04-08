@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("composer", "0027_auto_20230406_1611"),
+        ("composer", "0026_connectivitystatement_created_date_and_more"),
     ]
 
     operations = [
