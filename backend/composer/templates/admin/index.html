@@ -36,7 +36,7 @@
                         <script type="text/javascript">
                             jQuery('#exportData').on('click', function () {
                                 jQuery.ajax({
-                                    url: '/export',
+                                    url: '/composer/export',
                                     method: 'GET',
                                     success: function (data, textStatus, request) {
                                         var output = request.getResponseHeader('output');
