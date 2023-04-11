@@ -5,17 +5,17 @@ from django.db.models import CheckConstraint, Q, F, Value
 from django.db.models.functions import Replace
 
 
-def replace_underscore_space(apps, schema_editor):
+def replace_space_underscore(apps, schema_editor):
     ConnectivityStatement = apps.get_model('composer', 'ConnectivityStatement')
     Sentence =  apps.get_model('composer', 'Sentence')
 
-    ConnectivityStatement.objects.all().update(state=Replace(F('state'),Value("_"), Value(" ")))
-    Sentence.objects.all().update(state=Replace(F('state'),Value("_"), Value(" ")))
+    ConnectivityStatement.objects.all().update(state=Replace(F('state'),Value(" "), Value("_")))
+    Sentence.objects.all().update(state=Replace(F('state'),Value(" "), Value("_")))
 
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("composer", "0032_exportbatch_connectivity_statements_created_and_more"),
+        ("composer", "0034_alter_exportmetrics_options_and_more"),
     ]
 
     operations = [
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
             model_name="sentence",
             name="sentence_pmid_pmcd_valid",
         ),
-        migrations.RunPython(replace_underscore_space),
+        migrations.RunPython(replace_space_underscore),
         migrations.AddConstraint(
             model_name="connectivitystatement",
             constraint=CheckConstraint(
