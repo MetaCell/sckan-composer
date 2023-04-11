@@ -235,15 +235,15 @@ paths:
           items:
             type: string
             enum:
-            - compose now
-            - connection missing
+            - compose_now
+            - connection_missing
             - curated
             - draft
             - excluded
             - exported
-            - npo approved
+            - npo_approved
             - rejected
-            - to be reviewed
+            - to_be_reviewed
         explode: true
         style: form
       - in: query
@@ -938,12 +938,12 @@ paths:
           items:
             type: string
             enum:
-            - compose later
-            - compose now
+            - compose_later
+            - compose_now
             - duplicate
             - excluded
             - open
-            - to be reviewed
+            - to_be_reviewed
         explode: true
         style: form
       - in: query
@@ -1694,13 +1694,13 @@ components:
     ConnectivityStatementAvailableTransitionsEnum:
       enum:
       - draft
-      - compose now
+      - compose_now
       - curated
       - excluded
       - rejected
-      - to be reviewed
-      - connection missing
-      - npo approved
+      - to_be_reviewed
+      - connection_missing
+      - npo_approved
       - exported
       type: string
     DestinationTypeEnum:
@@ -2264,9 +2264,9 @@ components:
     SentenceAvailableTransitionsEnum:
       enum:
       - open
-      - to be reviewed
-      - compose later
-      - compose now
+      - to_be_reviewed
+      - compose_later
+      - compose_now
       - excluded
       - duplicate
       type: string

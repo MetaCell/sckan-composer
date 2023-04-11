@@ -190,7 +190,7 @@ admin.site.register(ExportBatch, ExportBatchAdmin)
 admin.site.register(Sentence, SentenceAdmin)
 admin.site.register(Specie)
 admin.site.register(Tag)
-admin.site.register(ExportMetrics)
+# admin.site.register(ExportMetrics)
 
 
 #

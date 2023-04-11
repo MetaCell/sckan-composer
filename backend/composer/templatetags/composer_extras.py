@@ -55,7 +55,7 @@ def count_entity(qs_exportmetrics, entity):
 
 @register.filter
 def filter_entity(qs_exportmetrics, entity):
-    return qs_exportmetrics.filter(entity=entity)
+    return [{"count":row.count,"state":row.state.replace("_"," ")} for row in qs_exportmetrics.filter(entity=entity)]
 
 @register.filter(name='split')
 def split(value, key):
