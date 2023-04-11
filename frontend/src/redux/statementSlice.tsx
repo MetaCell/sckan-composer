@@ -3,14 +3,14 @@ import { ROWS_PER_PAGE } from "../settings";
 
 export type StateFilter = Array<
   | "exported"
-  | "compose now"
-  | "connection missing"
+  | "compose_now"
+  | "connection_missing"
   | "curated"
   | "draft"
   | "excluded"
-  | "npo approved"
+  | "npo_approved"
   | "rejected"
-  | "to be reviewed"
+  | "to_be_reviewed"
 >;
 
 export interface QueryParams {

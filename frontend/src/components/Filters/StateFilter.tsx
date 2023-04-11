@@ -5,9 +5,9 @@ import { SentenceAvailableTransitionsEnum as sentenceStates } from "../../apicli
 
 const sentenceLabels = {
   [sentenceStates.Open]: "Open",
-  [sentenceStates.ToBeReviewed]: "To be reviewed",
+  [sentenceStates.ToBeReviewed]: "to_be_reviewed",
   [sentenceStates.ComposeLater]: "Compose later",
-  [sentenceStates.ComposeNow]: "Compose now",
+  [sentenceStates.ComposeNow]: "compose_now",
   [sentenceStates.Duplicate]: "Duplicate",
   [sentenceStates.Excluded]: "Excluded",
 }

@@ -244,7 +244,7 @@ class Sentence(models.Model):
         conditions=[SentenceService.can_be_composed],
     )
     def compose_now(self, *args, **kwargs):
-        SentenceService(self).do_transition_compose_now()
+        SentenceService(self).do_transition_compose_now(*args, **kwargs)
 
     @transition(field=state, source=SentenceState.OPEN, target=SentenceState.EXCLUDED)
     def excluded(self, *args, **kwargs):

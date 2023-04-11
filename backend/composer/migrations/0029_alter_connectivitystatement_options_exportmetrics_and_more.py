@@ -34,11 +34,11 @@ class Migration(migrations.Migration):
                     models.CharField(
                         choices=[
                             ("draft", "Draft"),
-                            ("compose_now", "Compose Now"),
+                            ("compose_now", "compose_now"),
                             ("curated", "Curated"),
                             ("excluded", "Excluded"),
                             ("rejected", "Rejected"),
-                            ("to_be_reviewed", "To Be Reviewed"),
+                            ("to_be_reviewed", "to_be_reviewed"),
                             ("connection_missing", "Connection Missing"),
                             ("npo_approved", "Npo Approved"),
                             ("exported", "Exported"),

@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { ROWS_PER_PAGE } from '../settings'
 
-export type StateFilter = Array<'compose later' | 'compose now' | 'duplicate' | 'excluded' | 'open' | 'to be reviewed'>
+export type StateFilter = Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>
 export interface QueryParams {
   limit: number,
   notes: boolean | undefined,

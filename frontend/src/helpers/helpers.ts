@@ -112,8 +112,8 @@ export const StatementsLabels = {
   [statementStates.Draft]: "Draft",
   [statementStates.Curated]: "Curate",
   [statementStates.Rejected]: "Reject",
-  [statementStates.ConnectionMissing]: "Connection Missing",
-  [statementStates.NpoApproved]: "Npo Approved",
+  [statementStates.ConnectionMissing]: "Connection missing",
+  [statementStates.NpoApproved]: "NPO approved",
   [statementStates.Exported]: "Exported",
 }
 

@@ -63,13 +63,13 @@ class StateServiceMixin(OwnerServiceMixin):
 
 class SentenceService(StateServiceMixin):
     @transaction.atomic
-    def do_transition_compose_now(self):
+    def do_transition_compose_now(self, *args, **kwargs):
         sentence = self.obj
         # when a Sentence record goes to compose_now state we need to set the state of all ConnectivityStatements to
         # compose_now
         for cs in sentence.connectivitystatement_set.all():
             if cs.state == CSState.DRAFT:
-                cs.compose_now()
+                cs.compose_now(*args, **kwargs)
                 cs.save()
 
     @staticmethod
@@ -114,8 +114,8 @@ class ConnectivityStatementService(StateServiceMixin):
 
     @staticmethod
     def has_permission_to_transition_to_compose_now(connectivity_statement, user):
-        # if state in NPO APPROVED or EXPORTED and use is a staff user then also allow transition to COMPOSE NOW
-        # other users should not be able to transition to COMPOSE NOW from these 2 states
+        # if state in NPO APPROVED or EXPORTED and use is a staff user then also allow transition to compose_now
+        # other users should not be able to transition to compose_now from these 2 states
         return user and (connectivity_statement.state not in (CSState.NPO_APPROVED, CSState.EXPORTED) or user.is_staff)
     
     @staticmethod
