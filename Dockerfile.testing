@@ -1,0 +1,16 @@
+FROM ghcr.io/puppeteer/puppeteer:16.1.0
+
+
+
+COPY frontend/test/package.json .
+COPY frontend/test/package-lock.json .
+
+RUN npm ci
+
+USER pptruser
+COPY --chown=pptruser:pptruser frontend/test frontend/test
+	
+ENV TEST_URL=https://composer.sckan.dev.metacell.us/
+
+
+
