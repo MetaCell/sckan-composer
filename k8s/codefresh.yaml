@@ -52,7 +52,6 @@ steps:
       services:
         app:
           image: '${{buildComposer}}'
-          working_dir: /home/pptruser
           ports:
             - 80
     composition_candidates:
