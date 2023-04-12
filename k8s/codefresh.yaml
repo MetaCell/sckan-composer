@@ -51,7 +51,7 @@ steps:
       version: '2'
       services:
         app:
-          image: '${{buildComposer}}'
+          image: '${{buildNginx}}'
           ports:
             - 80
     composition_candidates:
