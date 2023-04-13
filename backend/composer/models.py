@@ -277,7 +277,7 @@ class Sentence(models.Model):
 
     @property
     def has_notes(self):
-        return self.notes.exists()
+        return self.notes.exclude(type=NoteType.TRANSITION).exists()
 
     class Meta:
         ordering = ["title"]
@@ -467,7 +467,7 @@ class ConnectivityStatement(models.Model):
 
     @property
     def has_notes(self):
-        return self.notes.exists()
+        return self.notes.exclude(type=NoteType.TRANSITION).exists()
 
     @property
     def tag_list(self):
