@@ -1,16 +1,17 @@
 import React from "react";
-import { ConnectivityStatement } from "../apiclient/backend/api";
+import { ConnectivityStatement } from "../../apiclient/backend/api";
 import { Grid, Typography, Box, Stack, Divider, Paper } from "@mui/material";
-import StatementChart from "./StatementChart/StatementChart";
-import StatementWithDois from "./StatementWithDois";
-import CheckDuplicates from "./CheckForDuplicates/CheckDuplicatesDialog";
-import { useSectionStyle } from "../styles/styles";
+import StatementChart from "./StatementChart";
+import StatementWithDois from "../StatementWithDois";
+import CheckDuplicates from "../CheckForDuplicates/CheckDuplicatesDialog";
+import { useSectionStyle } from "../../styles/styles";
 import { useTheme } from "@mui/system";
+import PathsBuilder from "./PathsBuilder";
 
-const ProofingTab = (props: { statement: ConnectivityStatement }) => {
+const ProofingTab = (props: any) => {
   const { statement } = props;
-  const theme = useTheme()
-  const sectionStyle = useSectionStyle(theme)
+  const theme = useTheme();
+  const sectionStyle = useSectionStyle(theme);
 
   const hasJourney =
     statement.origin && statement.destination && statement.path.length > 0;
@@ -46,6 +47,11 @@ const ProofingTab = (props: { statement: ConnectivityStatement }) => {
         </Paper>
       </Grid>
       <Grid item xs={12}>
+        <PathsBuilder
+          {...props}
+        />
+      </Grid>
+      <Grid item xs={12}>
         <Paper sx={sectionStyle}>
           <Stack spacing={2}>
             <Typography variant="h5">Statement preview</Typography>
@@ -58,7 +64,7 @@ const ProofingTab = (props: { statement: ConnectivityStatement }) => {
                 <Divider />
               </Box>
               <Stack spacing={2}>
-                <Typography variant="h4">Journey</Typography>
+                <Typography variant="h5">Journey</Typography>
                 <Typography>{statement.journey}</Typography>
               </Stack>
             </>

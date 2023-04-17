@@ -28,8 +28,8 @@ type criteria =
 
 export default function CheckDuplicates() {
     const [dialogOpen, setDialogOpen] = React.useState(false);
-    const [origin, setOrigin] = React.useState<AnatomicalEntity | undefined>(undefined);
-    const [destination, setDestination] = React.useState<AnatomicalEntity | undefined>(undefined);
+    const [origin, setOrigin] = React.useState<AnatomicalEntity | undefined | ''>("");
+    const [destination, setDestination] = React.useState<AnatomicalEntity | undefined | ''>("");
     const [statementsList, setStatementsList] = useState<PaginatedConnectivityStatementList>();
     const [currentPage, setCurrentPage] = useState(0);
     const [sorting, setSorting] = useState<criteria>(undefined);

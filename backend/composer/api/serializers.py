@@ -155,8 +155,8 @@ class BiologicalSexSerializer(serializers.ModelSerializer):
 
 class ViaSerializer(serializers.ModelSerializer):
     """Via"""
-
-    anatomical_entity = AnatomicalEntitySerializer(read_only=False)
+    anatomical_entity_id = serializers.IntegerField(required=True)
+    anatomical_entity = AnatomicalEntitySerializer(required=False, read_only=True)
 
     class Meta:
         model = Via
@@ -164,6 +164,8 @@ class ViaSerializer(serializers.ModelSerializer):
             "id",
             "display_order",
             "connectivity_statement_id",
+            "type",
+            "anatomical_entity_id",
             "anatomical_entity",
         )
 
@@ -306,7 +308,7 @@ class ConnectivityStatementSerializer(
     tags = TagSerializer(many=True, read_only=True, required=False)
     species = SpecieSerializer(many=True, read_only=False, required=False)
     dois = DoiSerializer(source="doi_set", many=True, read_only=False, required=False)
-    path = ViaSerializer(source="via_set", many=True, read_only=True, required=False)
+    path = ViaSerializer(source="via_set", many=True, read_only=False, required=False)
     owner = UserSerializer(required=False, read_only=True)
     origin = AnatomicalEntitySerializer(required=False, read_only=True)
     destination = AnatomicalEntitySerializer(required=False, read_only=True)

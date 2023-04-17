@@ -18,9 +18,8 @@ const StyledAutoComplete = styled(Autocomplete)(({ theme }) => ({
 }));
 
 export default function AutoComplete({onChange, placeholder, disabled, value, setValue, fetch, noOptionsText, label}: any) {
-    const [inputValue, setInputValue] = useState<string>("")
+    const [inputValue, setInputValue] = useState<string>(value)
     const [options, setOptions] = useState<readonly any[]>([]);
-
 
     const handleInputChange = (inputValue: string) => {
         setInputValue(inputValue)
@@ -46,7 +45,7 @@ export default function AutoComplete({onChange, placeholder, disabled, value, se
 
 
     useEffect(() => {
-        fetchEntities()
+      (inputValue !== undefined) &&  fetchEntities()
     }, [inputValue, fetchEntities])
 
     return (

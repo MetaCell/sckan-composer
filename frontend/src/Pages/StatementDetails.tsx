@@ -12,7 +12,7 @@ import statementService from "../services/StatementService";
 import TagForm from "../components/Forms/TagForm";
 import { ConnectivityStatement } from "../apiclient/backend";
 import { userProfile } from "../services/UserService";
-import ProofingTab from "../components/ProofingTab";
+import ProofingTab from "../components/ProofingTab/ProofingTab";
 import {SentenceStateChip} from "../components/Widgets/StateChip";
 import {formatDate, formatTime, SentenceLabels, StatementsLabels} from "../helpers/helpers";
 import GroupedButtons from "../components/Widgets/CustomGroupedButtons";
@@ -93,6 +93,10 @@ const StatementDetails = () => {
     return <div>Loading...</div>;
   }
 
+  //TODO add logic for disabled
+  // something like this statement.owner?.id !== userProfile.getUser().id;
+  const disabled = false
+
   return (
     <Grid p={6} container>
       <Grid item xs={12} mb={4}>
@@ -143,24 +147,24 @@ const StatementDetails = () => {
             }}
           >
             <Tab label="Distillation" />
-            <Tab label="Proofing" />
+            <Tab label="Proofing" disabled={!statement.destination_id && !statement.origin_id}/>
           </Tabs>
         </Box>
       </Grid>
 
       <Grid item xs={12}>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={7}>
+          <Grid item md={12} lg={7}>
             <TabPanel value={activeTab} index={0}>
-              <DistillationTab statement={statement} setStatement={setStatement} />
+              <DistillationTab statement={statement} setStatement={setStatement} disabled={disabled} />
             </TabPanel>
             <TabPanel value={activeTab} index={1}>
-              <ProofingTab statement={statement} />
+              <ProofingTab statement={statement} setStatement={setStatement} refreshStatement={refreshStatement} disabled={disabled}/>
             </TabPanel>
 
           </Grid>
 
-          <Grid item xs={12} md={5}>
+          <Grid item md={12} lg={5}>
             <Paper sx={{...sectionStyle, "& .MuiBox-root": { padding: 0 } }}>
               <Box>
                 <Typography variant="h5" mb={1}>
