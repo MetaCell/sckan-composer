@@ -68,8 +68,8 @@ const SentencesDetails = () => {
       {
         sentence_id: sentence.id,
         knowledge_statement: "",
-        biological_sex: null,
-        ans_division: null,
+        sex: null,
+        phenotype: null,
         species: [],
         dois: [],
       },

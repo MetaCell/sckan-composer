@@ -16,11 +16,8 @@ import ProofingTab from "../components/ProofingTab/ProofingTab";
 import {SentenceStateChip} from "../components/Widgets/StateChip";
 import {formatDate, formatTime, SentenceLabels, StatementsLabels} from "../helpers/helpers";
 import GroupedButtons from "../components/Widgets/CustomGroupedButtons";
-import SentenceForm from "../components/Forms/SentenceForm";
 import Divider from "@mui/material/Divider";
 import NoteDetails from "../components/Widgets/NotesFomList";
-import SpeciesForm from "../components/Forms/SpeciesForm";
-import StatementForm from "../components/Forms/StatementForm";
 import DistillationTab from "../components/DistillationTab";
 import { useSectionStyle } from "../styles/styles";
 import { useTheme } from "@mui/system";
@@ -156,7 +153,7 @@ const StatementDetails = () => {
         <Grid container spacing={2}>
           <Grid item md={12} lg={7}>
             <TabPanel value={activeTab} index={0}>
-              <DistillationTab statement={statement} setStatement={setStatement} disabled={disabled} />
+              <DistillationTab statement={statement} setStatement={setStatement} refreshStatement={refreshStatement} disabled={disabled} />
             </TabPanel>
             <TabPanel value={activeTab} index={1}>
               <ProofingTab statement={statement} setStatement={setStatement} refreshStatement={refreshStatement} disabled={disabled}/>

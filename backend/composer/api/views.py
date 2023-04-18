@@ -20,7 +20,7 @@ from .filtersets import (
 )
 from .serializers import (
     AnatomicalEntitySerializer,
-    AnsDivisionSerializer,
+    PhenotypeSerializer,
     ConnectivityStatementSerializer,
     NoteSerializer,
     ProfileSerializer,
@@ -29,11 +29,11 @@ from .serializers import (
     TagSerializer,
     ViaSerializer,
     DoiSerializer,
-    BiologicalSexSerializer,
+    SexSerializer,
 )
 from ..models import (
     AnatomicalEntity,
-    AnsDivision,
+    Phenotype,
     ConnectivityStatement,
     Note,
     Profile,
@@ -42,7 +42,7 @@ from ..models import (
     Tag,
     Via,
     Doi,
-    BiologicalSex,
+    Sex,
 )
 from composer.services.state_services import (
     ConnectivityStatementService,
@@ -235,25 +235,25 @@ class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = AnatomicalEntityFilter
 
 
-class AnsDivisionViewSet(viewsets.ReadOnlyModelViewSet):
+class PhenotypeViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    AnsDivision
+    Phenotype
     """
 
-    queryset = AnsDivision.objects.all()
-    serializer_class = AnsDivisionSerializer
+    queryset = Phenotype.objects.all()
+    serializer_class = PhenotypeSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
 
 
-class BiologicalSexViewSet(viewsets.ReadOnlyModelViewSet):
+class SexViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    BiologicalSex
+    Sex
     """
 
-    queryset = BiologicalSex.objects.all()
-    serializer_class = BiologicalSexSerializer
+    queryset = Sex.objects.all()
+    serializer_class = SexSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]

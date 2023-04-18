@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { ArrayFieldTemplateProps } from "@rjsf/utils";
-import { Box, Button, TableBody } from "@mui/material";
+import { Box, Button, Table, TableBody, TableContainer } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {
   arrayMove,
@@ -32,10 +32,13 @@ function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
     if (active.id !== over.id) {
       const oldIndex = sortableItems.map((e: any) => e.id).indexOf(active.id);
       const newIndex = sortableItems.map((e: any) => e.id).indexOf(over.id);
-      const sortedItems = arrayMove(sortableItems, oldIndex, newIndex )
-      sortedItems.forEach((via:any, index:number)=>via.children.props.formData.display_order = index)
+      const sortedItems = arrayMove(sortableItems, oldIndex, newIndex);
+      sortedItems.forEach(
+        (via: any, index: number) =>
+          (via.children.props.formData.display_order = index)
+      );
       const result = sortedItems[oldIndex].onReorderClick(oldIndex, newIndex)();
-      return result
+      return result;
     }
   }
 
@@ -49,17 +52,19 @@ function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
         items={sortableItems}
         strategy={verticalListSortingStrategy}
       >
-        <TableBody>
-          {sortableItems.map((element) => (
-            <SortableItem
-              key={element.key}
-              id={element.id}
-              children={element.children}
-              onDropIndexClick={element.onDropIndexClick(element.index)}
-              disabled={props.disabled}
-            />
-          ))}
-        </TableBody>
+        <Table sx={{ borderSpacing: "0 8px", borderCollapse: "separate" }}>
+          <TableBody>
+            {sortableItems.map((element) => (
+              <SortableItem
+                key={element.key}
+                id={element.id}
+                children={element.children}
+                onDropIndexClick={element.onDropIndexClick(element.index)}
+                disabled={props.disabled}
+              />
+            ))}
+          </TableBody>
+        </Table>
       </SortableContext>
       {props.canAdd && (
         <Box mt={1} ml={0.75}>

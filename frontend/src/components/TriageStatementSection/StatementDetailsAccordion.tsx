@@ -58,11 +58,12 @@ const StatementDetailsAccordion = (props: any) => {
             knowledge_statement: statement.knowledge_statement,
           }}
           uiFields={[
-            "biological_sex_id",
+            "sex_id",
             "apinatomy_model",
             "circuit_type",
             "laterality",
-            "ans_division_id",
+            "projection",
+            "phenotype_id",
           ]}
         />
       </AccordionDetails>

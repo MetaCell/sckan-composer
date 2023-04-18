@@ -360,7 +360,7 @@ const theme = createTheme({
             color: radioBorderColor,
             filter: "contrast(.7)",
 
-            "&:nth-child(2)": {
+            "&:nth-of-type(2)": {
               fill: inputPlaceholderColor,
             },
           },

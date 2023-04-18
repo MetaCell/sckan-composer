@@ -12,7 +12,7 @@ from django.db import transaction
 from django.db.models import Count, QuerySet
 from django.utils import timezone
 
-from composer.enums import NoteType, ExportRelationships, CircuitType, Laterality, MetricEntity, SentenceState, CSState
+from composer.enums import NoteType, ExportRelationships, CircuitType, Laterality, MetricEntity, SentenceState, CSState, Projection
 from composer.exceptions import UnexportableConnectivityStatement
 from composer.models import (
     Tag,
@@ -35,10 +35,15 @@ TEMP_CIRCUIT_MAP = {
     CircuitType.SENSORY: "http://uri.interlex.org/tgbugs/uris/readable/SensoryPhenotype",
 }
 
+TEMP_PROJECTION_MAP = {
+    Projection.IPSI: "http://purl.obolibrary.org/obo/PATO_0002035",
+    Projection.CONTRAT: "http://uri.interlex.org/base/ilx_0793864",
+    Projection.BI: "http://purl.obolibrary.org/obo/PATO_0000618",
+}
+
 TEMP_LATERALITY_MAP = {
-    Laterality.IPSI: "http://purl.obolibrary.org/obo/PATO_0002035",
-    Laterality.CONTRAT: "http://uri.interlex.org/base/ilx_0793864",
-    Laterality.BI: "http://purl.obolibrary.org/obo/PATO_0000618",
+    Laterality.RIGHT: "http://purl.obolibrary.org/obo/PATO_0000367",
+    Laterality.LEFT: "http://purl.obolibrary.org/obo/PATO_0000366",
 }
 
 TEMP_PHENOTYPE_MAP = {
@@ -79,7 +84,7 @@ def get_neuron_population_label(cs: ConnectivityStatement, row: Row):
 
 
 def get_type(cs: ConnectivityStatement, row: Row):
-    return cs.ans_division.name
+    return cs.phenotype.name
 
 
 def get_structure(cs: ConnectivityStatement, row: Row):
@@ -213,10 +218,10 @@ def get_specie_row(specie: Specie):
     )
 
 
-def get_biological_sex_row(cs: ConnectivityStatement):
+def get_sex_row(cs: ConnectivityStatement):
     return Row(
-        cs.biological_sex.name,
-        cs.biological_sex.ontology_uri,
+        cs.sex.name,
+        cs.sex.ontology_uri,
         ExportRelationships.hasBiologicalSex.name,
         "",
         "",
@@ -233,11 +238,20 @@ def get_circuit_role_row(cs: ConnectivityStatement):
     )
 
 
+def get_projection_row(cs: ConnectivityStatement):
+    return Row(
+        cs.get_projection_display(),
+        TEMP_PROJECTION_MAP.get(cs.projection, ""),
+        ExportRelationships.hasProjectionLaterality.name,
+        "",
+        "",
+    )
+
 def get_laterality_row(cs: ConnectivityStatement):
     return Row(
         cs.get_laterality_display(),
         TEMP_LATERALITY_MAP.get(cs.laterality, ""),
-        ExportRelationships.hasProjectionLaterality.name,
+        ExportRelationships.hasSomaPhenotype.name,
         "",
         "",
     )
@@ -245,8 +259,8 @@ def get_laterality_row(cs: ConnectivityStatement):
 
 def get_phenotype_row(cs: ConnectivityStatement):
     return Row(
-        cs.ans_division.name,
-        TEMP_PHENOTYPE_MAP.get(cs.ans_division.name, ""),
+        cs.phenotype.name,
+        TEMP_PHENOTYPE_MAP.get(cs.phenotype.name, ""),
         ExportRelationships.hasPhenotype.name,
         "",
         "",
@@ -278,15 +292,20 @@ def get_rows(cs: ConnectivityStatement) -> List:
             raise UnexportableConnectivityStatement("Error getting specie row")
 
     try:
-        rows.append(get_biological_sex_row(cs))
+        rows.append(get_sex_row(cs))
     except Exception:
-        raise UnexportableConnectivityStatement("Error getting biological sex row")
+        raise UnexportableConnectivityStatement("Error getting sex row")
 
     try:
         rows.append(get_circuit_role_row(cs))
     except Exception:
         raise UnexportableConnectivityStatement("Error getting circuit role row")
 
+    try:
+        rows.append(get_projection_row(cs))
+    except Exception:
+        raise UnexportableConnectivityStatement("Error getting projection row")
+    
     try:
         rows.append(get_laterality_row(cs))
     except Exception:
