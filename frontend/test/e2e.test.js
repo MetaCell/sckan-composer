@@ -54,6 +54,8 @@ describe('End to End Tests', () => {
     it('HomePage', async () => {
 
         await console.log(page.url())
+        const pageTitle = await page.title();
+        console.log(pageTitle);
         await page.waitForSelector('#username')
     })
 })
