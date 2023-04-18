@@ -156,7 +156,7 @@ const StatementDetails = () => {
         <Grid container spacing={2}>
           <Grid item md={12} lg={7}>
             <TabPanel value={activeTab} index={0}>
-              <DistillationTab statement={statement} setStatement={setStatement} disabled={disabled} />
+              <DistillationTab statement={statement} setStatement={setStatement} refreshStatement={refreshStatement} disabled={disabled} />
             </TabPanel>
             <TabPanel value={activeTab} index={1}>
               <ProofingTab statement={statement} setStatement={setStatement} refreshStatement={refreshStatement} disabled={disabled}/>

@@ -163,6 +163,9 @@ const theme = createTheme({
       }
       .vias > div > div > .MuiGrid-container> .MuiGrid-item{
         margin: 0 !important;
+      }
+      div[id^="root_path_"]{
+        display : none
       }`,
       
     },

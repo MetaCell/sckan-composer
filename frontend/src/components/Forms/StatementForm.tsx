@@ -104,6 +104,7 @@ const StatementForm = (props: any) => {
     "ui:options": {
       label: false,
     },
+    "ui:label": false
   };
 
   copiedUISchema.path.items.anatomical_entity_id = {
