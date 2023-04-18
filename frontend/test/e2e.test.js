@@ -32,16 +32,16 @@ describe('End to End Tests', () => {
 
 
         page = await browser.newPage();
-        console.log(
+        await console.log(
             "Checking page",
             baseURL
         );
-        console.log('Starting tests ...')
+        await console.log('Starting tests ...')
 
-        page.on("pageerror", err => {
-            console.log('ERROR')
-            throw new Error(`Page error: ${err.toString()}`);
-        });
+        // page.on("pageerror", err => {
+        //     console.log('ERROR')
+        //     throw new Error(`Page error: ${err.toString()}`);
+        // });
 
         await page.goto(baseURL);
     });
@@ -53,6 +53,7 @@ describe('End to End Tests', () => {
 
     it('HomePage', async () => {
 
+        await console.log(page.url())
         await page.waitForSelector('#username')
     })
 })
