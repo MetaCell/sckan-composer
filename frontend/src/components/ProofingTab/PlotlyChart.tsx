@@ -69,23 +69,25 @@ function PlotlyChart(props: { statement: ConnectivityStatement }) {
   const { statement } = props;
   const theme = useTheme();
 
-  layout.annotations = generateAnnotations(statement.path);
+  const path = statement.path || []
+
+  layout.annotations = generateAnnotations(path);
 
   const data = [
     {
       name: "Via",
-      x: [0, ...statement.path.map((v, i) => i + 1)],
-      y: [1, ...statement.path.map(() => 1)],
+      x: [0, ...path.map((v, i) => i + 1)],
+      y: [1, ...path.map(() => 1)],
       type: "scatter",
       mode: "lines+markers",
-      text: [...statement.path.map((v) => v.anatomical_entity.name), ""],
+      text: [...path.map((v) => v.anatomical_entity.name), ""],
       line: { color: "#98A2B3", width: 1 },
       marker: { symbol: "arrow", angleref: "previous", size: 10 },
       xaxis: "x2",
       hovertemplate: "%{text}<extra></extra>",
     },
     {
-      x: [0, statement.path.length],
+      x: [0, statement.path?.length],
       y: [1, 1],
       type: "scatter",
       mode: "markers+text",

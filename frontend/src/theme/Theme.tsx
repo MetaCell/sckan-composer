@@ -19,7 +19,7 @@ const {
   buttonOutlinedHoverBg,
   labelColor,
   radioBorderColor,
-  inputPlaceholderColor
+  inputPlaceholderColor,
 } = vars;
 
 const theme = createTheme({
@@ -53,6 +53,7 @@ const theme = createTheme({
       disabled: "",
     },
     grey: {
+      50: "#F9FAFB",
       100: "#F2F4F7",
       200: "#EAECF0",
     },
@@ -146,7 +147,24 @@ const theme = createTheme({
       },
       .MuiDataGrid-row:last-child > .MuiDataGrid-cell {
         border-bottom: 0;
+      },
+      .inLineForm > div > div > .MuiGrid-container{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+        margin-top: 0 !important;
+      }
+      .inLineForm > div > div > .MuiGrid-container > .MuiGrid-item{
+        padding-top: 0;
+        margin: 0 !important;
+      }
+      .vias > div > div > .MuiGrid-container{
+        margin-top: -16px !important;
+      }
+      .vias > div > div > .MuiGrid-container> .MuiGrid-item{
+        margin: 0 !important;
       }`,
+      
     },
     MuiButton: {
       styleOverrides: {
@@ -170,19 +188,22 @@ const theme = createTheme({
             borderColor: buttonOutlinedBorderColor,
           },
         },
+        textInfo:{
+          color:'#475467'
+        }
       },
     },
     MuiButtonGroup: {
       styleOverrides: {
         root: {
-          boxShadow: 'none',
+          boxShadow: "none",
         },
         groupedContained: {
-          '&:not(:last-of-type)': {
-            borderRight: 'none',
+          "&:not(:last-of-type)": {
+            borderRight: "none",
           },
-          '&:not(:first-of-type)': {
-            padding: 0
+          "&:not(:first-of-type)": {
+            padding: 0,
           },
         },
       },
@@ -341,7 +362,7 @@ const theme = createTheme({
 
             "&:nth-child(2)": {
               fill: inputPlaceholderColor,
-            }
+            },
           },
         },
       },
@@ -369,13 +390,13 @@ const theme = createTheme({
       styleOverrides: {
         root: {},
         input: {
-          '&::placeholder': {
+          "&::placeholder": {
             color: inputPlaceholderColor,
             opacity: 1,
-            fontWeight: '400',
-            fontSize: '14px',
-          }
-        }
+            fontWeight: "400",
+            fontSize: "14px",
+          },
+        },
       },
     },
     MuiTab: {
@@ -386,6 +407,7 @@ const theme = createTheme({
         textColorPrimary: ({ theme }) => ({
           "&.Mui-selected": { color: theme.palette.primary.dark },
           fontWeight: 600,
+          "&.Mui-disabled": { color: theme.palette.grey[400] },
         }),
       },
     },

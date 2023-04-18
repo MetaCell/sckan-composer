@@ -316,14 +316,18 @@ class Via(models.Model):
     )
     anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.DO_NOTHING)
     display_order = models.PositiveIntegerField(
-        default=0,
-        blank=False,
-        null=False,
+        blank=True,
+        null=True,
     )
     type = models.CharField(max_length=8, default=ViaType.AXON, choices=ViaType.choices)
 
     def __str__(self):
         return f"{self.connectivity_statement} - {self.anatomical_entity}"
+    
+    def save(self, *args, **kwargs):
+        if self.display_order is None:
+            self.display_order = self.connectivity_statement.path.all().count()
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["display_order"]
