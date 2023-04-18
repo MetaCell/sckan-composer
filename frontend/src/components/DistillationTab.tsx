@@ -10,7 +10,7 @@ import SentenceStatementWithDois from "./SentenceStatementWithDois";
 import { useSectionStyle } from "../styles/styles";
 import { useTheme } from "@mui/system";
 
-const DistillationTab = ({ statement, setStatement, disabled } : any) => {
+const DistillationTab = ({ statement, setStatement, refreshStatement, disabled } : any) => {
   const theme = useTheme()
   const sectionStyle = useSectionStyle(theme)
 
@@ -36,7 +36,7 @@ const DistillationTab = ({ statement, setStatement, disabled } : any) => {
           <SpeciesForm
             data={statement.species}
             extraData={{ parentId: statement.id, service: statementService }}
-            setter={setStatement}
+            setter={refreshStatement}
             disabled={true}
           />
           <StatementForm
