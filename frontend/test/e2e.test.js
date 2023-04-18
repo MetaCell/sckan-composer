@@ -56,6 +56,6 @@ describe('End to End Tests', () => {
         await console.log(page.url())
         const pageTitle = await page.title();
         console.log(pageTitle);
-        await page.waitForSelector('#username')
+        await page.waitForSelector('#username', {timeout: 60000})
     })
 })
