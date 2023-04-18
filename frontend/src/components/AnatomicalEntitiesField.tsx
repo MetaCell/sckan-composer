@@ -6,7 +6,7 @@ import { duplicatesSelectRowsPerPage } from "../helpers/settings";
 
 function AnatomicalEntitiesField(props: any) {
   const { label } = props.options;
-  const placeholder = "Select " + props.name.slice(0, -3);
+  const placeholder = "Select " + props.label?.slice(0, -3);
 
   const [entity, setEntity] = React.useState<AnatomicalEntity>();
   const [loading, setLoading] = React.useState(true)
@@ -41,7 +41,7 @@ function AnatomicalEntitiesField(props: any) {
             props.onChange(newValue?.id)
           }
           placeholder={
-            props.name === "anatomical_entity_id" ? "Select via" : placeholder
+            props.label === "Anatomical entity id" ? "Select Via" : placeholder
           }
           noOptionsText={autoCompleteNoOptionsText}
           setValue={(value: AnatomicalEntity) => {
