@@ -54,11 +54,14 @@ steps:
           image: '${{buildNginx}}'
           ports:
             - 80
+        composer:
+          image:  '${{buildComposer}}'
     composition_candidates:
       test:
         image: '${{test_build}}'
         links:
          - app
+         - composer
         working_dir: /home/pptruser
         environment:
         - TEST_URL=http://app:80
