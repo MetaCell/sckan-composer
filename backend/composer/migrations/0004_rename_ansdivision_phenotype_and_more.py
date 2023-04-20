@@ -2,6 +2,13 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
+from django.db.models import F
+
+
+def update_laterality(apps, schema_editor):
+        ConnectivityStatement = apps.get_model('composer', 'ConnectivityStatement')
+        ConnectivityStatement.objects.all().update(projection=F("laterality"))
+        ConnectivityStatement.objects.all().update(laterality="UNKNOWN")
 
 
 class Migration(migrations.Migration):
@@ -77,6 +84,7 @@ class Migration(migrations.Migration):
                 max_length=20,
             ),
         ),
+        migrations.RunPython(update_laterality),
         migrations.AddConstraint(
             model_name="connectivitystatement",
             constraint=models.CheckConstraint(
