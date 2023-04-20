@@ -86,20 +86,4 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunPython(update_laterality),
-        migrations.AddConstraint(
-            model_name="connectivitystatement",
-            constraint=models.CheckConstraint(
-                check=models.Q(("laterality__in", ["RIGHT", "LEFT", "UNKNOWN"])),
-                name="laterality_valid",
-            ),
-        ),
-        migrations.AddConstraint(
-            model_name="connectivitystatement",
-            constraint=models.CheckConstraint(
-                check=models.Q(
-                    ("projection__in", ["IPSI", "CONTRAT", "BI", "UNKNOWN"])
-                ),
-                name="projection_valid",
-            ),
-        ),
     ]
