@@ -7,8 +7,8 @@ from fsm_admin.mixins import FSMTransitionMixin
 
 from composer.models import (
     AnatomicalEntity,
-    AnsDivision,
-    BiologicalSex,
+    Phenotype,
+    Sex,
     ConnectivityStatement,
     Doi,
     ExportBatch,
@@ -183,8 +183,8 @@ admin.site.register(User, UserAdmin)
 
 #
 admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
-admin.site.register(AnsDivision)
-admin.site.register(BiologicalSex)
+admin.site.register(Phenotype)
+admin.site.register(Sex)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
 admin.site.register(ExportBatch, ExportBatchAdmin)
 admin.site.register(Sentence, SentenceAdmin)

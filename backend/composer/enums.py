@@ -5,8 +5,14 @@ from django.db import models
 
 # Create your enums here.
 class Laterality(models.TextChoices):
+    RIGHT = "RIGHT", "Right"
+    LEFT = "LEFT", "Left"
+    UNKNOWN = "UNKNOWN", "Not specified"
+
+
+class Projection(models.TextChoices):
     IPSI = "IPSI", "Ipsi"
-    CONTRAT = "ONTRAT", "Contrat"
+    CONTRAT = "CONTRAT", "Contrat"
     BI = "BI", "Bilateral"
     UNKNOWN = "UNKNOWN", "Not specified"
 

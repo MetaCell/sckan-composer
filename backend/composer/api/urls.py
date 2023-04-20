@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     AnatomicalEntityViewSet,
-    AnsDivisionViewSet,
+    PhenotypeViewSet,
     ConnectivityStatementViewSet,
     jsonschemas,
     NoteViewSet,
@@ -12,7 +12,7 @@ from .views import (
     SpecieViewSet,
     TagViewSet,
     ViaViewSet,
-    BiologicalSexViewSet,
+    SexViewSet,
 )
 
 # Create a router and register our viewsets with it.
@@ -20,8 +20,8 @@ router = DefaultRouter()
 router.register(
     r"anatomical-entity", AnatomicalEntityViewSet, basename="anatomical-entity"
 )
-router.register(r"ans-division", AnsDivisionViewSet, basename="ans-division")
-router.register(r"biological-sex", BiologicalSexViewSet, basename="biological-sex")
+router.register(r"phenotype", PhenotypeViewSet, basename="phenotype")
+router.register(r"sex", SexViewSet, basename="sex")
 router.register(
     r"connectivity-statement",
     ConnectivityStatementViewSet,

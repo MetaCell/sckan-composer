@@ -49,11 +49,12 @@ const DistillationTab = ({ statement, setStatement, refreshStatement, disabled }
               knowledge_statement: statement.knowledge_statement,
             }}
             uiFields={[
-              "biological_sex_id",
+              "sex_id",
               "apinatomy_model",
               "circuit_type",
               "laterality",
-              "ans_division_id",
+              "projection",
+              "phenotype_id",
               "destination_id",
               "origin_id"
             ]}

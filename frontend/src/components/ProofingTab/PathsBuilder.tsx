@@ -1,5 +1,5 @@
 import React from "react";
-import { Paper, Stack, Typography, Divider, Grid, Box } from "@mui/material";
+import { Paper, Stack, Typography, Divider, Grid, Box, Table, TableBody } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import { useSectionStyle } from "../../styles/styles";
 import StatementForm from "../Forms/StatementForm";
@@ -26,33 +26,37 @@ const PathsBuilder = (props: any) => {
       <Stack sx={{ px: 1.5, mt:1.5}}>
         <Box sx={subSectionStyle}>
           <Typography variant="subtitle1" color={vars.captionColor} sx={{mb:1, pl:1}}>Origin</Typography>
-        <TableRow  startIcon={<OutlinedFlagTwoToneIcon/>}>
-          <Grid
-            container
-            columnSpacing={2}
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              alignItems: "center",
-              "& .MuiGrid-container": { mt: "0 !important" },
-              "& .MuiGrid-item": { pt: 0, mb: "0 !important" },
-            }}
-          >
-            <Grid item>
-              <Typography>Origin</Typography>
-            </Grid>
-            <Grid item>
-              <StatementForm
-                {...props}
-                statement={statement}
-                format="noLabel"
-                setter={refreshStatement}
-                extraData={{ sentence_id: statement.sentence.id }}
-                uiFields={["origin_id"]}
-              />
-            </Grid>
-          </Grid>
-        </TableRow>
+          <Table>
+            <TableBody>
+              <TableRow  startIcon={<OutlinedFlagTwoToneIcon/>}>
+                <Grid
+                  container
+                  columnSpacing={2}
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    alignItems: "center",
+                    "& .MuiGrid-container": { mt: "0 !important" },
+                    "& .MuiGrid-item": { pt: 0, mb: "0 !important" },
+                  }}
+                >
+                  <Grid item>
+                    <Typography>Origin</Typography>
+                  </Grid>
+                  <Grid item>
+                    <StatementForm
+                      {...props}
+                      statement={statement}
+                      format="noLabel"
+                      setter={refreshStatement}
+                      extraData={{ sentence_id: statement.sentence.id }}
+                      uiFields={["origin_id"]}
+                    />
+                  </Grid>
+                </Grid>
+              </TableRow>
+            </TableBody>
+          </Table>
         </Box>
         <Box height={24} width={2} bgcolor='#D0D5DD' ml='34px'/>
         <Box sx={subSectionStyle}>
@@ -68,18 +72,22 @@ const PathsBuilder = (props: any) => {
         </Box>
         <Box height={24} width={2} bgcolor='#D0D5DD' ml='34px'/>
         <Box sx={subSectionStyle}>
-        <Typography variant="subtitle1" color={vars.captionColor} sx={{mb:1, pl:1}}>Destination</Typography>
-        <TableRow  startIcon={<FmdGoodOutlinedIcon/>}>
-          <StatementForm
-            {...props}
-            statement={statement}
-            format="noLabel"
-            setter={refreshStatement}
-            extraData={{ sentence_id: statement.sentence.id }}
-            uiFields={["destination_id", "destination_type"]}
-            className="inLineForm"
-          />
-        </TableRow>
+          <Typography variant="subtitle1" color={vars.captionColor} sx={{mb:1, pl:1}}>Destination</Typography>
+          <Table>
+            <TableBody>
+              <TableRow  startIcon={<FmdGoodOutlinedIcon/>}>
+                <StatementForm
+                  {...props}
+                  statement={statement}
+                  format="noLabel"
+                  setter={refreshStatement}
+                  extraData={{ sentence_id: statement.sentence.id }}
+                  uiFields={["destination_id", "destination_type"]}
+                  className="inLineForm"
+                />
+              </TableRow>
+            </TableBody>
+          </Table>
         </Box>
       </Stack>
     </Paper>

@@ -9,8 +9,8 @@ from django_fsm import FSMField
 
 from ..models import (
     AnatomicalEntity,
-    AnsDivision,
-    BiologicalSex,
+    Phenotype,
+    Sex,
     ConnectivityStatement,
     Doi,
     Note,
@@ -115,11 +115,11 @@ class NoteSerializer(serializers.ModelSerializer):
         )
 
 
-class AnsDivisionSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
-    """ANS Division"""
+class PhenotypeSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
+    """Phenotype"""
 
     class Meta:
-        model = AnsDivision
+        model = Phenotype
         fields = ("id", "name")
 
 
@@ -145,11 +145,11 @@ class SpecieSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
         )
 
 
-class BiologicalSexSerializer(serializers.ModelSerializer):
-    """BiologicalSex"""
+class SexSerializer(serializers.ModelSerializer):
+    """Sex"""
 
     class Meta:
-        model = BiologicalSex
+        model = Sex
         fields = ("id", "name", "ontology_uri")
 
 
@@ -187,17 +187,17 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
 
     sentence_id = serializers.IntegerField()
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
-    biological_sex_id = serializers.IntegerField(
+    sex_id = serializers.IntegerField(
         required=False, default=None, allow_null=True
     )
-    ans_division_id = serializers.IntegerField(
+    phenotype_id = serializers.IntegerField(
         required=False, default=None, allow_null=True
     )
     dois = DoiSerializer(source="doi_set", many=True, read_only=False)
-    biological_sex = BiologicalSexSerializer(required=False, read_only=True)
+    sex = SexSerializer(required=False, read_only=True)
     species = SpecieSerializer(many=True, read_only=True)
     owner = UserSerializer(required=False, read_only=True)
-    ans_division = AnsDivisionSerializer(required=False, read_only=True)
+    phenotype = PhenotypeSerializer(required=False, read_only=True)
 
     class Meta:
         model = ConnectivityStatement
@@ -206,13 +206,14 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "sentence_id",
             "knowledge_statement",
             "dois",
-            "ans_division_id",
-            "ans_division",
+            "phenotype_id",
+            "phenotype",
             "laterality",
+            "projection",
             "circuit_type",
             "species",
-            "biological_sex_id",
-            "biological_sex",
+            "sex_id",
+            "sex",
             "apinatomy_model",
             "owner_id",
             "owner",
@@ -222,13 +223,14 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "sentence_id",
             "knowledge_statement",
             "dois",
-            "ans_division_id",
-            "ans_division",
+            "phenotype_id",
+            "phenotype",
             "laterality",
+            "projection",
             "circuit_type",
             "species",
-            "biological_sex_id",
-            "biological_sex",
+            "sex_id",
+            "sex",
             "apinatomy_model",
             "owner_id",
             "owner",
@@ -303,8 +305,8 @@ class ConnectivityStatementSerializer(
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
     origin_id = serializers.IntegerField(required=False)
     destination_id = serializers.IntegerField(required=False)
-    ans_division_id = serializers.IntegerField(required=False, allow_null=True)
-    biological_sex_id = serializers.IntegerField(required=False, allow_null=True)
+    phenotype_id = serializers.IntegerField(required=False, allow_null=True)
+    sex_id = serializers.IntegerField(required=False, allow_null=True)
     tags = TagSerializer(many=True, read_only=True, required=False)
     species = SpecieSerializer(many=True, read_only=False, required=False)
     dois = DoiSerializer(source="doi_set", many=True, read_only=False, required=False)
@@ -312,8 +314,8 @@ class ConnectivityStatementSerializer(
     owner = UserSerializer(required=False, read_only=True)
     origin = AnatomicalEntitySerializer(required=False, read_only=True)
     destination = AnatomicalEntitySerializer(required=False, read_only=True)
-    ans_division = AnsDivisionSerializer(required=False, read_only=True)
-    biological_sex = BiologicalSexSerializer(required=False, read_only=True)
+    phenotype = PhenotypeSerializer(required=False, read_only=True)
+    sex = SexSerializer(required=False, read_only=True)
     sentence = SentenceSerializer(required=False, read_only=True)
     available_transitions = serializers.SerializerMethodField()
     has_notes = serializers.SerializerMethodField()
@@ -344,16 +346,17 @@ class ConnectivityStatementSerializer(
             "origin",
             "destination_id",
             "destination",
-            "ans_division_id",
-            "ans_division",
+            "phenotype_id",
+            "phenotype",
             "destination_type",
             "path",
             "journey",
             "laterality",
+            "projection",
             "circuit_type",
             "species",
-            "biological_sex_id",
-            "biological_sex",
+            "sex_id",
+            "sex",
             "apinatomy_model",
             "modified_date",
             "has_notes",

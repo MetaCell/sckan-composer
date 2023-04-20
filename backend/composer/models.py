@@ -16,6 +16,7 @@ from .enums import (
     SentenceState,
     NoteType,
     ViaType,
+    Projection
 )
 from composer.services.state_services import (
     ConnectivityStatementService,
@@ -87,7 +88,7 @@ class ConnectivityStatementManager(models.Manager):
                 "owner",
                 "origin",
                 "destination",
-                "ans_division",
+                "phenotype",
                 "sentence",
             )
             .prefetch_related("notes", "tags", "species")
@@ -117,8 +118,8 @@ class Profile(models.Model):
     is_reviewer = models.BooleanField(default=False)
 
 
-class AnsDivision(models.Model):
-    """ANS Division"""
+class Phenotype(models.Model):
+    """Phenotype"""
 
     name = models.CharField(max_length=200, db_index=True, unique=True)
 
@@ -127,7 +128,7 @@ class AnsDivision(models.Model):
 
     class Meta:
         ordering = ["name"]
-        verbose_name_plural = "ANS Divisions"
+        verbose_name_plural = "Phenotypes"
 
 
 class Specie(models.Model):
@@ -144,8 +145,8 @@ class Specie(models.Model):
         verbose_name_plural = "Species"
 
 
-class BiologicalSex(models.Model):
-    """Biological Sex"""
+class Sex(models.Model):
+    """Sex"""
 
     name = models.CharField(max_length=200, db_index=True, unique=True)
     ontology_uri = models.URLField()
@@ -155,7 +156,7 @@ class BiologicalSex(models.Model):
 
     class Meta:
         ordering = ["name"]
-        verbose_name_plural = "Biological Sex"
+        verbose_name_plural = "Sex"
 
 
 class AnatomicalEntity(models.Model):
@@ -377,20 +378,23 @@ class ConnectivityStatement(models.Model):
     laterality = models.CharField(
         max_length=20, default=Laterality.UNKNOWN, choices=Laterality.choices
     )
+    projection = models.CharField(
+        max_length=20, default=Projection.UNKNOWN, choices=Projection.choices
+    )
     circuit_type = models.CharField(
         max_length=20, default=CircuitType.UNKNOWN, choices=CircuitType.choices
     )
-    ans_division = models.ForeignKey(
-        AnsDivision,
-        verbose_name="ANS Division",
+    phenotype = models.ForeignKey(
+        Phenotype,
+        verbose_name="Phenotype",
         on_delete=models.DO_NOTHING,
         null=True,
         blank=True,
     )
     species = models.ManyToManyField(Specie, verbose_name="Species", blank=True)
     tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
-    biological_sex = models.ForeignKey(
-        BiologicalSex, on_delete=models.DO_NOTHING, null=True, blank=True
+    sex = models.ForeignKey(
+        Sex, on_delete=models.DO_NOTHING, null=True, blank=True
     )
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -500,6 +504,10 @@ class ConnectivityStatement(models.Model):
             models.CheckConstraint(
                 check=Q(destination_type__in=[dt[0] for dt in DestinationType.choices]),
                 name="destination_type_valid",
+            ),
+            models.CheckConstraint(
+                check=Q(projection__in=[p[0] for p in Projection.choices]),
+                name="projection_valid",
             ),
         ]
 

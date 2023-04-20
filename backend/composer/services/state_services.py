@@ -101,12 +101,12 @@ class ConnectivityStatementService(StateServiceMixin):
     @staticmethod
     def can_be_reviewed(connectivity_statement):
         # return True if the state,emt can go to state to_be_reviewed it should have at least one provenance (doi),
-        # origin, destination, ans division, biological sex, path and species
+        # origin, destination, phenotype, sex, path and species
         return (
             connectivity_statement.origin is not None
             and connectivity_statement.destination is not None
-            and connectivity_statement.ans_division is not None
-            and connectivity_statement.biological_sex is not None
+            and connectivity_statement.phenotype is not None
+            and connectivity_statement.sex is not None
             and connectivity_statement.path.count() > 0
             and connectivity_statement.species.count() > 0
             and connectivity_statement.doi_set.count() > 0

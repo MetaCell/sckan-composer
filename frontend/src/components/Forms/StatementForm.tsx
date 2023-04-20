@@ -5,10 +5,10 @@ import statementService from "../../services/StatementService";
 import CustomTextField from "../Widgets/CustomTextField";
 import CustomSingleSelect from "../Widgets/CustomSingleSelect";
 import CustomTextArea from "../Widgets/CustomTextArea";
-import { biologicalSexes } from "../../services/BiologicalSexService";
-import { ansDivisions } from "../../services/AnsDivisionService";
 import ArrayFieldTemplate from "../Widgets/ArrayFieldTemplate";
 import AnatomicalEntitiesField from "../AnatomicalEntitiesField";
+import { sexes } from '../../services/SexService';
+import { phenotypes } from '../../services/PhenotypeService';
 
 const StatementForm = (props: any) => {
   const { uiFields, statement, setter, format } = props;
@@ -34,7 +34,14 @@ const StatementForm = (props: any) => {
     },
   };
 
-  copiedUISchema.apinatomy_model = {
+  copiedUISchema.projection= {
+    "ui:widget": "radio",
+      "ui:options": {
+      classNames: 'col-xs-12 col-md-6'
+    }
+  }
+
+  copiedUISchema.apinatomy_model= {
     "ui:widget": "CustomTextField",
     "ui:options": {
       label: "Apinatomy Model Name",
@@ -43,29 +50,25 @@ const StatementForm = (props: any) => {
     value: statement?.apinatomy_model ?? "",
   };
 
-  copiedUISchema.biological_sex_id = {
+  copiedUISchema.sex_id = {
     "ui:widget": "CustomSingleSelect",
-    "ui:options": {
-      label: "Biological Sex",
-      placeholder: "Enter Biological Sex",
-      data: biologicalSexes
-        .getBiologicalSexes()
-        .map((row: any) => ({ label: row.name, value: row.id })),
+      "ui:options": {
+      label: 'Sex',
+        placeholder: "Enter Sex",
+        data: sexes.getSexes().map((row: any) => ({ label: row.name, value: row.id })),
     },
-    value: statement?.biological_sex_id ?? "",
-  };
+    value: statement?.sex_id ?? ""
+  }
 
-  copiedUISchema.ans_division_id = {
+  copiedUISchema.phenotype_id = {
     "ui:widget": "CustomSingleSelect",
-    "ui:options": {
-      label: "ANS Division",
-      placeholder: "Select ANS Division",
-      data: ansDivisions
-        .getAnsDivisions()
-        .map((row: any) => ({ label: row.name, value: row.id })),
+      "ui:options": {
+      label: 'Phenotype',
+        placeholder: "Select Phenotype",
+        data: phenotypes.getPhenotypes().map((row: any) => ({ label: row.name, value: row.id })),
     },
-    value: statement?.ans_division_id ?? "",
-  };
+    value: statement?.phenotype_id ?? ""
+  }
 
   copiedUISchema.knowledge_statement = {
     "ui:widget": "CustomTextArea",
