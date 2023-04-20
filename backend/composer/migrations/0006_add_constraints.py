@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("composer", "0004_rename_ansdivision_phenotype_and_more"),
+        ("composer", "0005_update_laterality"),
     ]
 
     operations = [

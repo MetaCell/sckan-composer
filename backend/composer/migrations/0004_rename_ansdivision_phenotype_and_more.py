@@ -85,5 +85,4 @@ class Migration(migrations.Migration):
                 max_length=20,
             ),
         ),
-        migrations.RunPython(update_laterality),
     ]
