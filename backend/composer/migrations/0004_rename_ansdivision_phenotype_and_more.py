@@ -8,6 +8,7 @@ from django.db.models import F
 def update_laterality(apps, schema_editor):
         ConnectivityStatement = apps.get_model('composer', 'ConnectivityStatement')
         ConnectivityStatement.objects.all().update(projection=F("laterality"))
+        ConnectivityStatement.objects.filter(projection='ONTRAT').update(projection='CONTRAT')
         ConnectivityStatement.objects.all().update(laterality="UNKNOWN")
 
 
