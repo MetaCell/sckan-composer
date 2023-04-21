@@ -397,6 +397,7 @@ class ConnectivityStatement(models.Model):
         Sex, on_delete=models.DO_NOTHING, null=True, blank=True
     )
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
+    additional_information = models.TextField(null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True, db_index=True)
     modified_date = models.DateTimeField(auto_now=True, db_index=True)
 

@@ -51,6 +51,7 @@ const DistillationTab = ({ statement, setStatement, refreshStatement, disabled }
             uiFields={[
               "sex_id",
               "apinatomy_model",
+              "additional_information",
               "circuit_type",
               "laterality",
               "projection",

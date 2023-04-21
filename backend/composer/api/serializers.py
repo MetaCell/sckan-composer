@@ -214,6 +214,7 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "sex_id",
             "sex",
             "apinatomy_model",
+            "additional_information",
             "owner_id",
             "owner",
         )
@@ -231,6 +232,7 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "sex_id",
             "sex",
             "apinatomy_model",
+            "additional_information",
             "owner_id",
             "owner",
         )
@@ -357,6 +359,7 @@ class ConnectivityStatementSerializer(
             "sex_id",
             "sex",
             "apinatomy_model",
+            "additional_information",
             "modified_date",
             "has_notes",
         )
