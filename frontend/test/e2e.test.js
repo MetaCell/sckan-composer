@@ -9,10 +9,10 @@ const baseURL = process.env.TEST_URL || 'https://composer.sckan.dev.metacell.us/
 
 
 //TESTS:
+
+jest.setTimeout(60000 * 2);
 let page;
 let browser;
-jest.setTimeout(60000 * 2);
-
 describe('End to End Tests', () => {
 
     beforeAll(async () => {
@@ -20,8 +20,6 @@ describe('End to End Tests', () => {
         browser = await puppeteer.launch({
             args: [
                 "--no-sandbox",
-                `--window-size=1600,1000`,
-                "--ignore-certificate-errors"
             ],
             headless: false,
             defaultViewport: {
