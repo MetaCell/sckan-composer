@@ -56,6 +56,7 @@ describe('End to End Tests', () => {
         await console.log(page.url())
         const pageTitle = await page.title();
         console.log(pageTitle);
+        console.log(page)
         await page.waitForSelector('#root', { timeout: 60000 })
         // await page.waitForSelector('.MuiDrawer-docked', { timeout: 60000 })
 
