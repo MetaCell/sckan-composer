@@ -121,6 +121,17 @@ const StatementForm = (props: any) => {
     "ui:widget": "hidden",
   };
 
+  copiedUISchema.additional_information = {
+    "ui:widget": "CustomTextField",
+    "ui:options": {
+      label: "Additional Information",
+      placeholder: "Enter additional information on the knowledge statement",
+      multiline: true, 
+      rows: 4
+    },
+    value: statement?.additional_information ?? "",
+  };
+
   const widgets = {
     AnatomicalEntitiesField,
     CustomSingleSelect,

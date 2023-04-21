@@ -231,6 +231,12 @@ export interface ConnectivityStatement {
      * @type {string}
      * @memberof ConnectivityStatement
      */
+    'additional_information'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatement
+     */
     'modified_date': string;
     /**
      * 
@@ -823,6 +829,12 @@ export interface PatchedConnectivityStatement {
      * @type {string}
      * @memberof PatchedConnectivityStatement
      */
+    'additional_information'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
     'modified_date'?: string;
     /**
      * 
@@ -1121,7 +1133,7 @@ export interface Provenance {
      * @type {string}
      * @memberof Provenance
      */
-    'uri': string | null;
+    'uri': string;
     /**
      * 
      * @type {number}
@@ -1352,6 +1364,12 @@ export interface SentenceConnectivityStatement {
      * @memberof SentenceConnectivityStatement
      */
     'apinatomy_model': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SentenceConnectivityStatement
+     */
+    'additional_information': string | null;
     /**
      * 
      * @type {number}

@@ -64,6 +64,7 @@ const StatementDetailsAccordion = (props: any) => {
             "laterality",
             "projection",
             "phenotype_id",
+            "additional_information"
           ]}
         />
       </AccordionDetails>

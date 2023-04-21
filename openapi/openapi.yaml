@@ -1640,6 +1640,9 @@ components:
           type: string
           nullable: true
           maxLength: 200
+        additional_information:
+          type: string
+          nullable: true
         modified_date:
           type: string
           format: date-time
@@ -2001,6 +2004,9 @@ components:
           type: string
           nullable: true
           maxLength: 200
+        additional_information:
+          type: string
+          nullable: true
         modified_date:
           type: string
           format: date-time
@@ -2166,8 +2172,6 @@ components:
           readOnly: true
         uri:
           type: string
-          readOnly: true
-          nullable: true
         connectivity_statement_id:
           type: integer
       required:
@@ -2318,6 +2322,10 @@ components:
           type: string
           readOnly: true
           nullable: true
+        additional_information:
+          type: string
+          readOnly: true
+          nullable: true
         owner_id:
           type: integer
           nullable: true
@@ -2326,6 +2334,7 @@ components:
           - $ref: '#/components/schemas/User'
           readOnly: true
       required:
+      - additional_information
       - apinatomy_model
       - circuit_type
       - id
