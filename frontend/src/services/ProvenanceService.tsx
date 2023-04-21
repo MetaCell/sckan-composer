@@ -8,7 +8,7 @@ class ProvenanceService extends AbstractService {
       return composerApi.composerConnectivityStatementAddProvenanceCreate(provenance.connectivity_statement_id, provenance.uri || '' ).then((response: any) => response.data)
   }
   async delete(provenanceId: number, connectivityStatementId: number) {
-    return await composerApi.composerConnectivityStatementDelProvenanceDestroy(provenanceId, connectivityStatementId).then((response: any) => response.data)
+    return await composerApi.composerConnectivityStatementDelProvenanceDestroy(connectivityStatementId, provenanceId).then((response: any) => response.data)
   }
   async getObject(id: string): Promise<Provenance> {
     return {} as Provenance
