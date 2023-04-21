@@ -38,6 +38,7 @@ const TriageStatementSection = (props: any) => {
                 setter={refreshSentence}
                 extraData={{ sentence_id: sentence.id }}
                 uiFields={["knowledge_statement"]}
+                className='ks'
               />
 
               <DoisForm

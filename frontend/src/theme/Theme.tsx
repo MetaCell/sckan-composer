@@ -164,8 +164,14 @@ const theme = createTheme({
       .vias > div > div > .MuiGrid-container> .MuiGrid-item{
         margin: 0 !important;
       }
+      .ks > div > div > .MuiGrid-container{
+        margin-top: -16px !important;
+      }
       div[id^="root_path_"]{
         display : none
+      }
+      .MuiFormLabel-root{
+        margin-bottom: 16px;
       }`,
       
     },
@@ -259,7 +265,6 @@ const theme = createTheme({
         root: {
           border: "1px solid #EAECF0;",
           boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
-          filter: "contrast(.9)",
           "&:focus-within fieldset, &:focus-visible fieldset": {
             border: "1px solid #8DB2EE !important",
             boxShadow:
