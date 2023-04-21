@@ -43,7 +43,7 @@ describe('End to End Tests', () => {
         //     throw new Error(`Page error: ${err.toString()}`);
         // });
 
-        await page.goto(baseURL);
+        await page.goto(baseURL, {waitUntil: 'domcontentloaded'})
     });
 
     afterAll(() => {
