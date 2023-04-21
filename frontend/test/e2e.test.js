@@ -23,7 +23,7 @@ describe('End to End Tests', () => {
                 `--window-size=1600,1000`,
                 "--ignore-certificate-errors"
             ],
-            headless: !process.env.PUPPETEER_DISPLAY,
+            headless: false,
             defaultViewport: {
                 width: 1600,
                 height: 1000,
@@ -57,9 +57,10 @@ describe('End to End Tests', () => {
         const pageTitle = await page.title();
         console.log(pageTitle);
         console.log(page)
-        await page.waitForSelector('#root', { timeout: 60000 })
+        // await page.waitForSelector('#root', { timeout: 60000 })
         // await page.waitForSelector('.MuiDrawer-docked', { timeout: 60000 })
+        await page.waitForSelector('.mat-form-field-infix', { timeout: 60000 })
 
-        await page.waitForSelector('input[formcontrolname="username"]', { timeout: 60000 })
+        // await page.waitForSelector('input[formcontrolname="username"]', { timeout: 60000 })
     })
 })
