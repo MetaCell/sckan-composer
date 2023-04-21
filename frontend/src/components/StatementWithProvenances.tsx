@@ -8,7 +8,8 @@ import Chip from "@mui/material/Chip";
 const StatementWithProvenances = ({ statement, background = "#fff" } : any) => {
 
   const onClickProvenance = (uri: string) => {
-    window.open(uri, '_blank')
+    const url = uri.includes("://") ? uri : `https://${uri}`
+    window.open(url, '_blank')
   }
 
   return (
