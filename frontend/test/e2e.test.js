@@ -36,10 +36,6 @@ describe('End to End Tests', () => {
             "Checking page",
             baseURL
         );
-
-        await console.log(page.url())
-        const pageTitle = await page.title();
-        console.log(pageTitle);
         await console.log('Starting tests ...')
 
         // page.on("pageerror", err => {
