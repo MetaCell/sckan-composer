@@ -265,7 +265,6 @@ const theme = createTheme({
         root: {
           border: "1px solid #EAECF0;",
           boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
-          filter: "contrast(.9)",
           "&:focus-within fieldset, &:focus-visible fieldset": {
             border: "1px solid #8DB2EE !important",
             boxShadow:
