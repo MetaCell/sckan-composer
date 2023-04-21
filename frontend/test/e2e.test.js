@@ -57,7 +57,7 @@ describe('End to End Tests', () => {
         const pageTitle = await page.title();
         console.log(pageTitle);
         await page.waitForSelector('#root', { timeout: 60000 })
-        await page.waitForSelector('svg[data-testid="SearchIcon"]', { timeout: 60000 })
+        await page.waitForSelector('.MuiDrawer-docked', { timeout: 60000 })
 
         await page.waitForSelector('#username', { timeout: 60000 })
     })
