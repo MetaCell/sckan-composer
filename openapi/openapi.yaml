@@ -1591,12 +1591,14 @@ components:
           readOnly: true
         origin_id:
           type: integer
+          nullable: true
         origin:
           allOf:
           - $ref: '#/components/schemas/AnatomicalEntity'
           readOnly: true
         destination_id:
           type: integer
+          nullable: true
         destination:
           allOf:
           - $ref: '#/components/schemas/AnatomicalEntity'
@@ -1970,12 +1972,14 @@ components:
           readOnly: true
         origin_id:
           type: integer
+          nullable: true
         origin:
           allOf:
           - $ref: '#/components/schemas/AnatomicalEntity'
           readOnly: true
         destination_id:
           type: integer
+          nullable: true
         destination:
           allOf:
           - $ref: '#/components/schemas/AnatomicalEntity'

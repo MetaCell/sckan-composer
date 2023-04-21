@@ -46,13 +46,9 @@ const DoisForm = (props: any) => {
   return (
     <Box sx={{
       padding: 0,
+      marginBottom: 2,
       "& .MuiBox-root": {
         padding: 0,
-
-        "& .MuiInputBase-root": {
-          border: 0,
-          boxShadow: 'none'
-        }
       }
     }}>
       <FormBase

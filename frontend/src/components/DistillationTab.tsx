@@ -55,8 +55,6 @@ const DistillationTab = ({ statement, setStatement, refreshStatement, disabled }
               "laterality",
               "projection",
               "phenotype_id",
-              "destination_id",
-              "origin_id"
             ]}
           />
         </Paper>

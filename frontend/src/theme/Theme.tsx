@@ -164,8 +164,14 @@ const theme = createTheme({
       .vias > div > div > .MuiGrid-container> .MuiGrid-item{
         margin: 0 !important;
       }
+      .ks > div > div > .MuiGrid-container{
+        margin-top: -16px !important;
+      }
       div[id^="root_path_"]{
         display : none
+      }
+      .MuiFormLabel-root{
+        margin-bottom: 16px;
       }`,
       
     },

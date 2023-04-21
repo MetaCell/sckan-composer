@@ -6,27 +6,11 @@ import {EDIT_DEBOUNCE} from "../../settings";
 import { styled } from "@mui/material";
 
 const StyledInput = styled(TextField)(({ theme }) => ({
-  "& .Mui-focused": {
-    border: '0 !important',
-    boxShadow: 'none',
-    borderShadow: 'none',
-  },
   "& .MuiInputBase-root": {
-    border: 0,
-    boxShadow: 'none',
-
     "& .MuiOutlinedInput-notchedOutline": {
       border: 0,
-      boxShadow: 'none',
     },
-    "& .Mui-focused, &:focus-visible": {
-      border: '0 !important',
-      boxShadow: 'none',
-      borderShadow: 'none',
-    },
-
   },
-
 }));
 
 

@@ -135,7 +135,7 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'origin_id'?: number;
+    'origin_id'?: number | null;
     /**
      * 
      * @type {AnatomicalEntity}
@@ -147,7 +147,7 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'destination_id'?: number;
+    'destination_id'?: number | null;
     /**
      * 
      * @type {AnatomicalEntity}
@@ -758,7 +758,7 @@ export interface PatchedConnectivityStatement {
      * @type {number}
      * @memberof PatchedConnectivityStatement
      */
-    'origin_id'?: number;
+    'origin_id'?: number | null;
     /**
      * 
      * @type {AnatomicalEntity}
@@ -770,7 +770,7 @@ export interface PatchedConnectivityStatement {
      * @type {number}
      * @memberof PatchedConnectivityStatement
      */
-    'destination_id'?: number;
+    'destination_id'?: number | null;
     /**
      * 
      * @type {AnatomicalEntity}

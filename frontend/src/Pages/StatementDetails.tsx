@@ -144,7 +144,7 @@ const StatementDetails = () => {
             }}
           >
             <Tab label="Distillation" />
-            <Tab label="Proofing" disabled={!statement.destination_id && !statement.origin_id}/>
+            <Tab label="Proofing" />
           </Tabs>
         </Box>
       </Grid>
