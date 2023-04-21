@@ -21,7 +21,7 @@ describe('End to End Tests', () => {
             args: [
                 "--no-sandbox",
             ],
-            headless: false,
+            headless: 'new',
             defaultViewport: {
                 width: 1600,
                 height: 1000,
@@ -44,9 +44,9 @@ describe('End to End Tests', () => {
         await page.goto(baseURL, {waitUntil: 'domcontentloaded'})
     });
 
-    afterAll(() => {
+    afterAll(async() => {
 
-        browser.close()
+        await browser.close()
     })
 
     it('HomePage', async () => {
