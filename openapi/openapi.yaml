@@ -297,21 +297,21 @@ paths:
       responses:
         '204':
           description: No response body
-  /api/composer/connectivity-statement/{id}/add_doi/{doi}/:
+  /api/composer/connectivity-statement/{id}/add_provenance/{uri}/:
     post:
-      operationId: composer_connectivity_statement_add_doi_create
+      operationId: composer_connectivity_statement_add_provenance_create
       description: ConnectivityStatement
       parameters:
-      - in: path
-        name: doi
-        schema:
-          type: string
-        required: true
       - in: path
         name: id
         schema:
           type: integer
         description: A unique integer value identifying this connectivity statement.
+        required: true
+      - in: path
+        name: uri
+        schema:
+          type: string
         required: true
       tags:
       - composer
@@ -384,21 +384,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConnectivityStatement'
           description: ''
-  /api/composer/connectivity-statement/{id}/del_doi/{doi_id}/:
+  /api/composer/connectivity-statement/{id}/del_provenance/{provenance_id}/:
     delete:
-      operationId: composer_connectivity_statement_del_doi_destroy
+      operationId: composer_connectivity_statement_del_provenance_destroy
       description: ConnectivityStatement
       parameters:
-      - in: path
-        name: doi_id
-        schema:
-          type: integer
-        required: true
       - in: path
         name: id
         schema:
           type: integer
         description: A unique integer value identifying this connectivity statement.
+        required: true
+      - in: path
+        name: provenance_id
+        schema:
+          type: integer
         required: true
       tags:
       - composer
@@ -1570,10 +1570,10 @@ components:
           items:
             $ref: '#/components/schemas/Tag'
           readOnly: true
-        dois:
+        provenances:
           type: array
           items:
-            $ref: '#/components/schemas/Doi'
+            $ref: '#/components/schemas/Provenance'
         owner:
           allOf:
           - $ref: '#/components/schemas/User'
@@ -1680,26 +1680,6 @@ components:
       - AFFERENT-T
       - UNKNOWN
       type: string
-    Doi:
-      type: object
-      description: Doi
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        doi:
-          type: string
-        doi_uri:
-          type: string
-          readOnly: true
-          nullable: true
-        connectivity_statement_id:
-          type: integer
-      required:
-      - connectivity_statement_id
-      - doi
-      - doi_uri
-      - id
     LateralityEnum:
       enum:
       - RIGHT
@@ -1951,10 +1931,10 @@ components:
           items:
             $ref: '#/components/schemas/Tag'
           readOnly: true
-        dois:
+        provenances:
           type: array
           items:
-            $ref: '#/components/schemas/Doi'
+            $ref: '#/components/schemas/Provenance'
         owner:
           allOf:
           - $ref: '#/components/schemas/User'
@@ -2177,6 +2157,23 @@ components:
       - BI
       - UNKNOWN
       type: string
+    Provenance:
+      type: object
+      description: Provenance
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uri:
+          type: string
+          readOnly: true
+          nullable: true
+        connectivity_statement_id:
+          type: integer
+      required:
+      - connectivity_statement_id
+      - id
+      - uri
     Sentence:
       type: object
       description: Sentence
@@ -2282,10 +2279,10 @@ components:
         knowledge_statement:
           type: string
           readOnly: true
-        dois:
+        provenances:
           type: array
           items:
-            $ref: '#/components/schemas/Doi'
+            $ref: '#/components/schemas/Provenance'
         phenotype_id:
           type: integer
           nullable: true
@@ -2331,13 +2328,13 @@ components:
       required:
       - apinatomy_model
       - circuit_type
-      - dois
       - id
       - knowledge_statement
       - laterality
       - owner
       - phenotype
       - projection
+      - provenances
       - sentence_id
       - sex
       - species

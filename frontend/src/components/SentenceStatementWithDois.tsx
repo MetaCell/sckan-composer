@@ -6,7 +6,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {Box} from "@mui/material";
 import Divider from "@mui/material/Divider";
 import {useNavigate} from "react-router";
-import StatementWithDois from "./StatementWithDois";
+import StatementWithProvenances from "./StatementWithProvenances";
 import { useSectionStyle } from "../styles/styles";
 import { useTheme } from "@mui/system";
 
@@ -33,7 +33,7 @@ const SentenceStatementWithDois = ({ statement } : any) => {
         padding: '8px !important',
         textAlign: 'center',
       }}>
-        <StatementWithDois statement={statement} />
+        <StatementWithProvenances statement={statement} />
       </Box>
       <Divider sx={{margin: '24px 0'}}>Records from the same NLP Sentence</Divider>
       <Stack spacing={2}>
@@ -45,7 +45,7 @@ const SentenceStatementWithDois = ({ statement } : any) => {
               spacing={{ xs: 1, sm: 2 }}
               alignItems='center'
             >
-              <StatementWithDois background={"#F9FAFB"} statement={row} />
+              <StatementWithProvenances background={"#F9FAFB"} statement={row} />
               <Box>
                 <OpenInNewIcon
                   onClick={() => openStatement(row)}

@@ -102,10 +102,10 @@ export interface ConnectivityStatement {
     'tags': Array<Tag>;
     /**
      * 
-     * @type {Array<Doi>}
+     * @type {Array<Provenance>}
      * @memberof ConnectivityStatement
      */
-    'dois'?: Array<Doi>;
+    'provenances'?: Array<Provenance>;
     /**
      * 
      * @type {User}
@@ -275,37 +275,6 @@ export const DestinationTypeEnum = {
 export type DestinationTypeEnum = typeof DestinationTypeEnum[keyof typeof DestinationTypeEnum];
 
 
-/**
- * Doi
- * @export
- * @interface Doi
- */
-export interface Doi {
-    /**
-     * 
-     * @type {number}
-     * @memberof Doi
-     */
-    'id': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof Doi
-     */
-    'doi': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Doi
-     */
-    'doi_uri': string | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof Doi
-     */
-    'connectivity_statement_id': number;
-}
 /**
  * 
  * @export
@@ -725,10 +694,10 @@ export interface PatchedConnectivityStatement {
     'tags'?: Array<Tag>;
     /**
      * 
-     * @type {Array<Doi>}
+     * @type {Array<Provenance>}
      * @memberof PatchedConnectivityStatement
      */
-    'dois'?: Array<Doi>;
+    'provenances'?: Array<Provenance>;
     /**
      * 
      * @type {User}
@@ -1136,6 +1105,31 @@ export type ProjectionEnum = typeof ProjectionEnum[keyof typeof ProjectionEnum];
 
 
 /**
+ * Provenance
+ * @export
+ * @interface Provenance
+ */
+export interface Provenance {
+    /**
+     * 
+     * @type {number}
+     * @memberof Provenance
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Provenance
+     */
+    'uri': string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof Provenance
+     */
+    'connectivity_statement_id': number;
+}
+/**
  * Sentence
  * @export
  * @interface Sentence
@@ -1300,10 +1294,10 @@ export interface SentenceConnectivityStatement {
     'knowledge_statement': string;
     /**
      * 
-     * @type {Array<Doi>}
+     * @type {Array<Provenance>}
      * @memberof SentenceConnectivityStatement
      */
-    'dois': Array<Doi>;
+    'provenances': Array<Provenance>;
     /**
      * 
      * @type {number}
@@ -1638,19 +1632,19 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * ConnectivityStatement
-         * @param {string} doi 
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {string} uri 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAddDoiCreate: async (doi: string, id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'doi' is not null or undefined
-            assertParamExists('composerConnectivityStatementAddDoiCreate', 'doi', doi)
+        composerConnectivityStatementAddProvenanceCreate: async (id: number, uri: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
-            assertParamExists('composerConnectivityStatementAddDoiCreate', 'id', id)
-            const localVarPath = `/api/composer/connectivity-statement/{id}/add_doi/{doi}/`
-                .replace(`{${"doi"}}`, encodeURIComponent(String(doi)))
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            assertParamExists('composerConnectivityStatementAddProvenanceCreate', 'id', id)
+            // verify required parameter 'uri' is not null or undefined
+            assertParamExists('composerConnectivityStatementAddProvenanceCreate', 'uri', uri)
+            const localVarPath = `/api/composer/connectivity-statement/{id}/add_provenance/{uri}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"uri"}}`, encodeURIComponent(String(uri)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1820,19 +1814,19 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * ConnectivityStatement
-         * @param {number} doiId 
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {number} provenanceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDelDoiDestroy: async (doiId: number, id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'doiId' is not null or undefined
-            assertParamExists('composerConnectivityStatementDelDoiDestroy', 'doiId', doiId)
+        composerConnectivityStatementDelProvenanceDestroy: async (id: number, provenanceId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
-            assertParamExists('composerConnectivityStatementDelDoiDestroy', 'id', id)
-            const localVarPath = `/api/composer/connectivity-statement/{id}/del_doi/{doi_id}/`
-                .replace(`{${"doi_id"}}`, encodeURIComponent(String(doiId)))
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            assertParamExists('composerConnectivityStatementDelProvenanceDestroy', 'id', id)
+            // verify required parameter 'provenanceId' is not null or undefined
+            assertParamExists('composerConnectivityStatementDelProvenanceDestroy', 'provenanceId', provenanceId)
+            const localVarPath = `/api/composer/connectivity-statement/{id}/del_provenance/{provenance_id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"provenance_id"}}`, encodeURIComponent(String(provenanceId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -3791,13 +3785,13 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * ConnectivityStatement
-         * @param {string} doi 
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {string} uri 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementAddDoiCreate(doi: string, id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAddDoiCreate(doi, id, options);
+        async composerConnectivityStatementAddProvenanceCreate(id: number, uri: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAddProvenanceCreate(id, uri, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3834,13 +3828,13 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * ConnectivityStatement
-         * @param {number} doiId 
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {number} provenanceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementDelDoiDestroy(doiId: number, id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementDelDoiDestroy(doiId, id, options);
+        async composerConnectivityStatementDelProvenanceDestroy(id: number, provenanceId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementDelProvenanceDestroy(id, provenanceId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4315,13 +4309,13 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * ConnectivityStatement
-         * @param {string} doi 
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {string} uri 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAddDoiCreate(doi: string, id: number, options?: any): AxiosPromise<ConnectivityStatement> {
-            return localVarFp.composerConnectivityStatementAddDoiCreate(doi, id, options).then((request) => request(axios, basePath));
+        composerConnectivityStatementAddProvenanceCreate(id: number, uri: string, options?: any): AxiosPromise<ConnectivityStatement> {
+            return localVarFp.composerConnectivityStatementAddProvenanceCreate(id, uri, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -4354,13 +4348,13 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * ConnectivityStatement
-         * @param {number} doiId 
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {number} provenanceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDelDoiDestroy(doiId: number, id: number, options?: any): AxiosPromise<void> {
-            return localVarFp.composerConnectivityStatementDelDoiDestroy(doiId, id, options).then((request) => request(axios, basePath));
+        composerConnectivityStatementDelProvenanceDestroy(id: number, provenanceId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.composerConnectivityStatementDelProvenanceDestroy(id, provenanceId, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -4798,14 +4792,14 @@ export class ComposerApi extends BaseAPI {
 
     /**
      * ConnectivityStatement
-     * @param {string} doi 
      * @param {number} id A unique integer value identifying this connectivity statement.
+     * @param {string} uri 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementAddDoiCreate(doi: string, id: number, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementAddDoiCreate(doi, id, options).then((request) => request(this.axios, this.basePath));
+    public composerConnectivityStatementAddProvenanceCreate(id: number, uri: string, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementAddProvenanceCreate(id, uri, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4845,14 +4839,14 @@ export class ComposerApi extends BaseAPI {
 
     /**
      * ConnectivityStatement
-     * @param {number} doiId 
      * @param {number} id A unique integer value identifying this connectivity statement.
+     * @param {number} provenanceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementDelDoiDestroy(doiId: number, id: number, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementDelDoiDestroy(doiId, id, options).then((request) => request(this.axios, this.basePath));
+    public composerConnectivityStatementDelProvenanceDestroy(id: number, provenanceId: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementDelProvenanceDestroy(id, provenanceId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

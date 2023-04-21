@@ -1,17 +1,17 @@
 import React from "react";
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
-import doiService from '../../services/DoisService'
+import provenanceService from '../../services/ProvenanceService'
 import {ChipsInput} from "../Widgets/ChipsInput";
-import {Doi} from "../../apiclient/backend";
+import {Provenance} from "../../apiclient/backend";
 import Box from "@mui/material/Box";
 import { setTextRange } from 'typescript';
 
 
-const DoisForm = (props: any) => {
-  const { doisData, setter, extraData } = props
+const ProvenancesForm = (props: any) => {
+  const { provenancesData, setter, extraData } = props
 
-  const { schema, uiSchema } = jsonSchemas.getDoiSchema()
+  const { schema, uiSchema } = jsonSchemas.getProvenanceSchema()
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
 
@@ -22,14 +22,16 @@ const DoisForm = (props: any) => {
   // TODO: set up the widgets for the schema
   copiedSchema.title = ""
 
-  copiedUISchema.doi = {
+  const data = provenancesData?.map((row: Provenance) => ({id: row.id, label: row.uri}))
+
+  copiedUISchema.uri = {
     "ui:widget": ChipsInput,
     "ui:options": {
       disabled: !extraData.connectivity_statement_id,
-      data: doisData?.map((row: Doi) => ({id: row.id, label: row.doi})),
-      placeholder: 'Enter DOIs (Press Enter to add a DOI)',
-      removeChip: function(doiId: any) {
-        doiService.delete(doiId, extraData.connectivity_statement_id)
+      data: provenancesData?.map((row: Provenance) => ({id: row.id, label: row.uri})),
+      placeholder: 'Enter Provenances (Press Enter to add a Provenance)',
+      removeChip: function(provenanceId: any) {
+        provenanceService.delete(provenanceId, extraData.connectivity_statement_id)
         refresh()
       },
     }
@@ -52,8 +54,8 @@ const DoisForm = (props: any) => {
       }
     }}>
       <FormBase
-        service={doiService}
-        data={doisData}
+        service={provenanceService}
+        data={provenancesData}
         schema={copiedSchema}
         uiSchema={copiedUISchema}
         enableAutoSave={false}
@@ -67,4 +69,4 @@ const DoisForm = (props: any) => {
   )
 }
 
-export default DoisForm
+export default ProvenancesForm

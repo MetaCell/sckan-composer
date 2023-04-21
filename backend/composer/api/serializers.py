@@ -12,7 +12,7 @@ from ..models import (
     Phenotype,
     Sex,
     ConnectivityStatement,
-    Doi,
+    Provenance,
     Note,
     Profile,
     Sentence,
@@ -170,16 +170,15 @@ class ViaSerializer(serializers.ModelSerializer):
         )
 
 
-class DoiSerializer(serializers.ModelSerializer):
-    """Doi"""
+class ProvenanceSerializer(serializers.ModelSerializer):
+    """Provenance"""
 
-    doi = serializers.CharField(required=True)
-    doi_uri = serializers.CharField(required=False, allow_null=True, read_only=True)
+    uri = serializers.CharField()
     connectivity_statement_id = serializers.IntegerField(required=True)
 
     class Meta:
-        model = Doi
-        fields = ("id", "doi", "doi_uri", "connectivity_statement_id")
+        model = Provenance
+        fields = ("id", "uri", "connectivity_statement_id")
 
 
 class SentenceConnectivityStatement(serializers.ModelSerializer):
@@ -193,7 +192,7 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
     phenotype_id = serializers.IntegerField(
         required=False, default=None, allow_null=True
     )
-    dois = DoiSerializer(source="doi_set", many=True, read_only=False)
+    provenances = ProvenanceSerializer(source="provenance_set", many=True, read_only=False)
     sex = SexSerializer(required=False, read_only=True)
     species = SpecieSerializer(many=True, read_only=True)
     owner = UserSerializer(required=False, read_only=True)
@@ -205,7 +204,7 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "id",
             "sentence_id",
             "knowledge_statement",
-            "dois",
+            "provenances",
             "phenotype_id",
             "phenotype",
             "laterality",
@@ -222,7 +221,7 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "id",
             "sentence_id",
             "knowledge_statement",
-            "dois",
+            "provenances",
             "phenotype_id",
             "phenotype",
             "laterality",
@@ -309,7 +308,7 @@ class ConnectivityStatementSerializer(
     sex_id = serializers.IntegerField(required=False, allow_null=True)
     tags = TagSerializer(many=True, read_only=True, required=False)
     species = SpecieSerializer(many=True, read_only=False, required=False)
-    dois = DoiSerializer(source="doi_set", many=True, read_only=False, required=False)
+    provenances = ProvenanceSerializer(source="provenance_set", many=True, read_only=False, required=False)
     path = ViaSerializer(source="via_set", many=True, read_only=False, required=False)
     owner = UserSerializer(required=False, read_only=True)
     origin = AnatomicalEntitySerializer(required=False, read_only=True)
@@ -337,7 +336,7 @@ class ConnectivityStatementSerializer(
             "sentence",
             "knowledge_statement",
             "tags",
-            "dois",
+            "provenances",
             "owner",
             "owner_id",
             "state",
