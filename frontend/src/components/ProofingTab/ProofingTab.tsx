@@ -2,7 +2,7 @@ import React from "react";
 import { ConnectivityStatement } from "../../apiclient/backend/api";
 import { Grid, Typography, Box, Stack, Divider, Paper } from "@mui/material";
 import StatementChart from "./StatementChart";
-import StatementWithDois from "../StatementWithDois";
+import StatementWithProvenances from "../StatementWithProvenances";
 import CheckDuplicates from "../CheckForDuplicates/CheckDuplicatesDialog";
 import { useSectionStyle } from "../../styles/styles";
 import { useTheme } from "@mui/system";
@@ -42,7 +42,7 @@ const ProofingTab = (props: any) => {
               textAlign: "center",
             }}
           >
-            <StatementWithDois statement={statement} />
+            <StatementWithProvenances statement={statement} />
           </Box>
         </Paper>
       </Grid>

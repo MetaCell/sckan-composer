@@ -8,7 +8,7 @@ import StatementDetailsAccordion from "./StatementDetailsAccordion";
 import { vars } from "../../theme/variables";
 import statementService from "../../services/StatementService";
 import StatementForm from "../Forms/StatementForm";
-import DoisForm from "../Forms/DoisForm";
+import ProvenancesForm from "../Forms/ProvenanceForm";
 import { useSectionStyle } from "../../styles/styles";
 import { useTheme } from "@mui/system";
 
@@ -41,8 +41,8 @@ const TriageStatementSection = (props: any) => {
                 className='ks'
               />
 
-              <DoisForm
-                doisData={statement.dois}
+              <ProvenancesForm
+                provenancesData={statement.provenances}
                 extraData={{ connectivity_statement_id: statement.id }}
                 setter={refreshSentence}
               />

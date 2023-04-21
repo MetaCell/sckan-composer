@@ -5,10 +5,11 @@ import {Box} from "@mui/material";
 import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
 
-const StatementWithDois = ({ statement, background = "#fff" } : any) => {
+const StatementWithProvenances = ({ statement, background = "#fff" } : any) => {
 
-  const onClickDoi = (uri: string) => {
-    window.open(uri, '_blank')
+  const onClickProvenance = (uri: string) => {
+    const url = uri.includes("://") ? uri : `https://${uri}`
+    window.open(url, '_blank')
   }
 
   return (
@@ -24,7 +25,7 @@ const StatementWithDois = ({ statement, background = "#fff" } : any) => {
       }
     }}>
       <Typography>{statement?.knowledge_statement}</Typography>
-      { statement?.dois.length > 0 &&
+      { statement?.provenances.length > 0 &&
        <>
         <Divider sx={{borderColor: '#EAECF0'}} />
         <Box sx={{padding: '12px', border: 0}}>
@@ -34,12 +35,12 @@ const StatementWithDois = ({ statement, background = "#fff" } : any) => {
             alignItems='center'
           >
             {
-              statement?.dois?.map((doi:any) => <Chip
-                key={doi.id}
+              statement?.provenances?.map((provenance:any) => <Chip
+                key={provenance.id}
                 variant="outlined"
-                label={doi?.doi}
+                label={provenance?.uri}
                 sx={{borderRadius: '6px', border: '1px solid #D0D5DD'}}
-                onClick={() => onClickDoi(doi?.doi_uri)}
+                onClick={() => onClickProvenance(provenance?.uri)}
               />)
             }
           </Stack>
@@ -50,4 +51,4 @@ const StatementWithDois = ({ statement, background = "#fff" } : any) => {
   );
 };
 
-export default StatementWithDois;
+export default StatementWithProvenances;

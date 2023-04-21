@@ -512,24 +512,19 @@ class ConnectivityStatement(models.Model):
         ]
 
 
-class Doi(models.Model):
-    """DOI see https://doi.org/"""
+class Provenance(models.Model):
+    """Provenance"""
 
     connectivity_statement = models.ForeignKey(
         ConnectivityStatement, on_delete=models.CASCADE
     )
-    doi = DoiField(max_length=100)
-
-    @property
-    def doi_uri(self):
-        return doi_uri(self.doi)
+    uri = models.URLField()
 
     def __str__(self):
-        return self.doi
+        return self.uri
 
     class Meta:
-        ordering = ["doi"]
-        verbose_name_plural = "D.O.I.s"
+        verbose_name_plural = "Provenances"
 
 
 class Note(models.Model):

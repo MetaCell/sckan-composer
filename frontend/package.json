@@ -67,7 +67,7 @@
     ]
   },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.5.2",
+    "@openapitools/openapi-generator-cli": "^2.6.0",
     "@types/react": "^18.0.28",
     "eslint-config-react-app": "^7.0.1"
   }
