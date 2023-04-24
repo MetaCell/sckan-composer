@@ -469,6 +469,10 @@ class ConnectivityStatement(models.Model):
     )
     def exported(self, *args, **kwargs):
         ...
+    
+    @property
+    def export_id(self):
+        return f"CPR:{self.id:06d}"
 
     @property
     def journey(self):
