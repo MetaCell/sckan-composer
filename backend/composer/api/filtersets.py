@@ -17,9 +17,13 @@ def field_has_content(queryset, name, value):
     lookup = "__".join([name, "isnull"])
     return queryset.filter(**{lookup: not value})
 
+def filter_by_title_or_text(queryset, name, value):
+    return queryset.filter(Q(title__icontains=value) | Q(text__icontains=value))
+
 
 class SentenceFilter(django_filters.FilterSet):
-    title = django_filters.CharFilter(field_name="title", lookup_expr="icontains")
+    title = django_filters.CharFilter( method=filter_by_title_or_text)
+
     state = django_filters.MultipleChoiceFilter(
         field_name="state", choices=SentenceState.choices
     )
