@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
@@ -31,7 +31,7 @@ const TriageStatementSection = (props: any) => {
       >
         <Grid container spacing={1} alignItems="center">
           <Grid item xs={11}>
-            <Paper sx={sectionStyle}>
+            <Paper sx={{...sectionStyle, p:0}}>
               <StatementForm
                 statement={statement}
                 format="small"
@@ -45,6 +45,7 @@ const TriageStatementSection = (props: any) => {
                 provenancesData={statement.provenances}
                 extraData={{ connectivity_statement_id: statement.id }}
                 setter={refreshSentence}
+                className='provenance'
               />
               {statement.id && (
                 <StatementDetailsAccordion

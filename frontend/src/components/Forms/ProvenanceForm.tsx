@@ -2,14 +2,12 @@ import React from "react";
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
 import provenanceService from '../../services/ProvenanceService'
-import {ChipsInput} from "../Widgets/ChipsInput";
 import {Provenance} from "../../apiclient/backend";
-import Box from "@mui/material/Box";
-import { setTextRange } from 'typescript';
+import TextfieldWithChips from "../Widgets/TextfieldWithChips";
 
 
 const ProvenancesForm = (props: any) => {
-  const { provenancesData, setter, extraData } = props
+  const { provenancesData, setter, extraData, disabled } = props
 
   const { schema, uiSchema } = jsonSchemas.getProvenanceSchema()
   const copiedSchema = JSON.parse(JSON.stringify(schema));
@@ -22,18 +20,35 @@ const ProvenancesForm = (props: any) => {
   // TODO: set up the widgets for the schema
   copiedSchema.title = ""
 
-  const data = provenancesData?.map((row: Provenance) => ({id: row.id, label: row.uri}))
+  const handleAutocompleteChange = (e:any, value:any)=>{
+    const newValue = value.pop()
+    provenanceService.save({statementId: extraData.connectivity_statement_id, uri: newValue}).then((newData:any)=>{
+      setter()
+    })
+  }
+
+  const isValidUrl = (uri: string) =>{
+    var urlPattern = new RegExp('^(https?:\\/\\/)?'+ 
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ 
+    '((\\d{1,3}\\.){3}\\d{1,3}))'+ 
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ 
+    '(\\?[;&a-z\\d%_.~+=-]*)?'+ 
+    '(\\#[-a-z\\d_]*)?$','i')
+    if (!uri.match(urlPattern)) return false
+    return true
+  }
 
   copiedUISchema.uri = {
-    "ui:widget": ChipsInput,
+    "ui:widget": TextfieldWithChips,
     "ui:options": {
-      disabled: !extraData.connectivity_statement_id,
-      data: provenancesData?.map((row: Provenance) => ({id: row.id, label: row.uri})),
+      disabled: !extraData.connectivity_statement_id || disabled,
+      data: provenancesData?.map((row: Provenance) => ({id: row.id, label: row.uri, enableClick: isValidUrl(row.uri) })) || [],
       placeholder: 'Enter Provenances (Press Enter to add a Provenance)',
       removeChip: function(provenanceId: any) {
         provenanceService.delete(provenanceId, extraData.connectivity_statement_id)
         refresh()
       },
+      onAutocompleteChange: handleAutocompleteChange,
     }
   }
   copiedUISchema.connectivity_statement_id = {
@@ -46,14 +61,9 @@ const ProvenancesForm = (props: any) => {
   }
 
   return (
-    <Box sx={{
-      padding: 0,
-      marginBottom: 2,
-      "& .MuiBox-root": {
-        padding: 0,
-      }
-    }}>
+
       <FormBase
+        {...props}
         service={provenanceService}
         data={provenancesData}
         schema={copiedSchema}
@@ -63,9 +73,7 @@ const ProvenancesForm = (props: any) => {
         children={true}
         extraData={extraData}
         setter={() => refresh()}
-        {...props}
       />
-    </Box>
   )
 }
 

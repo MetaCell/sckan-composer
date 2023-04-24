@@ -74,7 +74,7 @@ const StatementForm = (props: any) => {
     "ui:widget": "CustomTextArea",
     "ui:options": {
       label: "Knowledge Statement",
-      placeholder: "Knowledge Statement",
+      placeholder: "Enter Knowledge Statement",
       rows: 4,
       hasDebouncedOnChange: true,
       value: statement?.knowledge_statement ?? "",

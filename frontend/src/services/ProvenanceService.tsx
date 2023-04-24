@@ -4,8 +4,8 @@ import { AbstractService } from "./AbstractService"
 
 
 class ProvenanceService extends AbstractService {
-    async save(provenance: Provenance) {
-      return composerApi.composerConnectivityStatementAddProvenanceCreate(provenance.connectivity_statement_id, provenance.uri || '' ).then((response: any) => response.data)
+    async save(provenance:any) {
+      return composerApi.composerConnectivityStatementAddProvenanceCreate(provenance.statementId, provenance.uri ).then((response: any) => response.data)
   }
   async delete(provenanceId: number, connectivityStatementId: number) {
     return await composerApi.composerConnectivityStatementDelProvenanceDestroy(connectivityStatementId, provenanceId).then((response: any) => response.data)
