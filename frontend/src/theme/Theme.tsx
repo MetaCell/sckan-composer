@@ -167,6 +167,15 @@ const theme = createTheme({
       .ks > div > div > .MuiGrid-container{
         margin-top: -16px !important;
       }
+      .ks > div > div > .MuiGrid-container> .MuiGrid-item{
+        margin: 0 !important;
+      }
+      .provenance > div > div > .MuiGrid-container{
+        margin-top: -16px !important;
+      }
+      .provenance > div > div > .MuiGrid-container> .MuiGrid-item{
+        margin: 0 !important;
+      }
       div[id^="root_path_"]{
         display : none
       }

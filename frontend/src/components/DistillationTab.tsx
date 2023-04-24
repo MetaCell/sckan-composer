@@ -17,7 +17,7 @@ const DistillationTab = ({ statement, setStatement, refreshStatement, disabled }
   return (
     <Grid container mb={2} spacing={2}>
       <Grid item xs={12}>
-        <SentenceStatementWithDois statement={statement} />
+        <SentenceStatementWithDois statement={statement} setStatement={setStatement} refreshStatement={refreshStatement}/>
       </Grid>
 
       <Grid item xs={12}>

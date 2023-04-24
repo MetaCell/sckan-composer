@@ -7,9 +7,17 @@ import { styled } from "@mui/material";
 
 const StyledInput = styled(TextField)(({ theme }) => ({
   "& .MuiInputBase-root": {
+    boxShadow: 'none',
+    border:0,
     "& .MuiOutlinedInput-notchedOutline": {
       border: 0,
     },
+    "& .Mui-focused, &:focus-visible": {
+      border: '0 !important',
+      boxShadow: 'none',
+      borderShadow: 'none',
+    },
+
   },
 }));
 

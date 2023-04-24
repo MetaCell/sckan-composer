@@ -1,10 +1,8 @@
 import React from 'react'
-import { Box } from '@mui/material'
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
 import tagService, { tags } from '../../services/TagService'
 import {UiSchema} from "@rjsf/utils";
-import {ChipsInput} from "../Widgets/ChipsInput";
 import {Tag} from "../../apiclient/backend";
 import { AutocompleteWithChips } from '../Widgets/AutocompleteWithChips';
 
