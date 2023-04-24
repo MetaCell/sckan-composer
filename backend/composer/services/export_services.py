@@ -76,7 +76,7 @@ def get_sentence_number(cs: ConnectivityStatement, row: Row):
 
 
 def get_nlp_id(cs: ConnectivityStatement, row: Row):
-    return cs.id
+    return cs.export_id
 
 
 def get_neuron_population_label(cs: ConnectivityStatement, row: Row):
@@ -122,7 +122,7 @@ def get_review_notes(cs: ConnectivityStatement, row: Row):
 
 
 def get_reference(cs: ConnectivityStatement, row: Row):
-    return ", ".join([doi.doi for doi in cs.doi_set.all()])
+    return ", ".join([procenance.uri for procenance in cs.provenance_set.all()])
 
 
 def is_approved_by_sawg(cs: ConnectivityStatement, row: Row):
