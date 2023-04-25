@@ -133,5 +133,5 @@ class ConnectivityStatementService(StateServiceMixin):
             important_tag = Tag.objects.get(tag__iexact="important")
         except Tag.DoesNotExist:
             important_tag = Tag.objects.create(tag="important")
-        connectivity_statement.tags.add(*[important_tag.id])
+        connectivity_statement.tags.add(important_tag)
         return connectivity_statement
