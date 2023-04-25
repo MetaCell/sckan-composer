@@ -122,3 +122,16 @@ class ConnectivityStatementService(StateServiceMixin):
     def has_permission_to_transition_to_exported(connectivity_statement, user):
         # only system users can transition to EXPORTED
         return user.username == 'system'
+
+    @staticmethod
+    def add_important_tag(connectivity_statement):
+        # when a ConnectivityStatement record goes to compose_now state and the previous
+        # state is in NPO Approved or Exported then flag the CS with Tag IMPORTANT
+        # if connectivity_statement.state in (CSState.NPO_APPROVED, CSState.EXPORTED):
+        from composer.models import Tag
+        try:
+            important_tag = Tag.objects.get(tag__iexact="important")
+        except Tag.DoesNotExist:
+            important_tag = Tag.objects.create(tag="important")
+        connectivity_statement.tags.add(*[important_tag.id])
+        return connectivity_statement
