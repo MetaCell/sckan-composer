@@ -110,6 +110,16 @@ class SentenceStatementManager(models.Manager):
         )
 
 
+class NoteManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related(
+                "user", "sentence", "connectivity_statement")
+        )
+
+
 # Create your models here.
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -259,7 +269,7 @@ class Sentence(models.Model):
         if SentenceService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
-
+            
     @property
     def pmid_uri(self) -> str:
         return pmid_uri(self.pmid)
@@ -557,6 +567,9 @@ class Note(models.Model):
     type = models.CharField(
         max_length=20, default=NoteType.PLAIN, choices=NoteType.choices
     )
+    
+    objects = NoteManager()
+    all_objects = models.Manager()
 
     def __str__(self):
         return self.note
