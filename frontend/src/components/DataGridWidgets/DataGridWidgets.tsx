@@ -6,6 +6,7 @@ import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutline
 import { vars } from "../../theme/variables"
 import Tag from "../Widgets/Tag"
 import {SentenceStateChip, StatementStateChip} from "../Widgets/StateChip"
+import { Tooltip } from "@mui/material"
 
 export const renderPMID = (params: GridRenderCellParams) => (
   <Typography variant="subtitle1" color={vars.darkTextColor}>
@@ -13,20 +14,22 @@ export const renderPMID = (params: GridRenderCellParams) => (
   </Typography>
 );
 
-export const renderTitle = (params: GridRenderCellParams) => (
-  <Typography
-    variant="body1"
-    sx={{
-      display: "-webkit-box",
-      WebkitLineClamp: 2,
-      WebkitBoxOrient: "vertical",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-    }}
-  >
-    {params.value}
-  </Typography>
-);
+export const renderTitle = (params: GridRenderCellParams) => (  
+  <Tooltip title={params.field === 'text' && params.value}>
+    <Typography
+      variant="body1"
+      sx={{
+        display: "-webkit-box",
+        WebkitLineClamp: 2,
+        WebkitBoxOrient: "vertical",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+      }}
+    >
+      {params.value}
+    </Typography>
+  </Tooltip>
+)
 
 export const renderDate = (params: GridRenderCellParams) => {
   const date = new Date(params.value).toLocaleString("en-UK", {
