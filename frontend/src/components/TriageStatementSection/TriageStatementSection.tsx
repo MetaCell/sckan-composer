@@ -9,6 +9,7 @@ import { vars } from "../../theme/variables";
 import statementService from "../../services/StatementService";
 import StatementForm from "../Forms/StatementForm";
 import ProvenancesForm from "../Forms/ProvenanceForm";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useSectionStyle } from "../../styles/styles";
 import { useTheme } from "@mui/system";
 
@@ -21,6 +22,10 @@ const TriageStatementSection = (props: any) => {
   const onDeleteStatement = (id: number) => {
     statementService.remove(id).then(() => refreshSentence());
   };
+
+  const onCloneStatement = (id: number) =>{
+    statementService.clone(id).then(()=>refreshSentence())
+  }
 
   return (
     <Grid item xs={12}>
@@ -56,6 +61,14 @@ const TriageStatementSection = (props: any) => {
             </Paper>
           </Grid>
           <Grid item xs={1} textAlign="center">
+
+            <IconButton
+              disabled={!statement.id}
+              onClick={() => onCloneStatement(statement.id)}
+              sx={{mb:1}}
+            >
+              <ContentCopyIcon sx={{ color: "#98A2B3" }}  />
+            </IconButton>
             <IconButton
               disabled={!statement.id}
               onClick={() => onDeleteStatement(statement.id)}

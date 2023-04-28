@@ -1,5 +1,5 @@
 import React from "react";
-import { ConnectivityStatement } from "../../apiclient/backend/api";
+import { ConnectivityStatement } from "../../apiclient/backend";
 import { Grid, Typography, Box, Stack, Divider, Paper } from "@mui/material";
 import StatementChart from "./StatementChart";
 import StatementWithProvenances from "../StatementWithProvenances";

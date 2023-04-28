@@ -194,7 +194,7 @@ class TransitionMixin(viewsets.GenericViewSet):
 
 
 class CSCloningMixin(viewsets.GenericViewSet):
-    @action(detail=True, methods=["post"], url_path="clone_statement")
+    @action(detail=True, methods=["get"], url_path="clone_statement")
     def clone_statement(self, request, pk=None, statement_id=None):
         instance = self.get_object()
         instance.pk = None
