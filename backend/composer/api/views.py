@@ -199,6 +199,10 @@ class CSCloningMixin(viewsets.GenericViewSet):
         instance = self.get_object()
         instance.pk = None
         instance.save()
+        provenances = (Provenance(connectivity_statement = instance, uri=provenance.uri) for provenance in self.get_object().provenance_set.all())
+        path = (Via(connectivity_statement = instance, anatomical_entity = via.anatomical_entity, display_order = via.display_order, type = via.type ) for via in self.get_object().via_set.all())
+        Provenance.objects.bulk_create(provenances)
+        Via.objects.bulk_create(path)
         return Response(self.get_serializer(instance).data)
 
 
