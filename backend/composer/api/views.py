@@ -193,6 +193,15 @@ class TransitionMixin(viewsets.GenericViewSet):
         return Response(self.get_serializer(instance).data)
 
 
+class CSCloningMixin(viewsets.GenericViewSet):
+    @action(detail=True, methods=["post"], url_path="clone_statement")
+    def clone_statement(self, request, pk=None, statement_id=None):
+        instance = self.get_object()
+        instance.pk = None
+        instance.save()
+        return Response(self.get_serializer(instance).data)
+
+
 # Viewsets
 
 
@@ -278,6 +287,7 @@ class ConnectivityStatementViewSet(
     TagMixin,
     TransitionMixin,
     AssignOwnerMixin,
+    CSCloningMixin,
     viewsets.ModelViewSet,
 ):
     """
