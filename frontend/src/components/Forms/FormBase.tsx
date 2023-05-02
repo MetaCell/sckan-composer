@@ -30,7 +30,9 @@ export const FormBase = (props: any) => {
     templates,
     submitButtonProps,
     className = false,
-    showErrorList
+    showErrorList,
+    submitOnChangeFields = [], 
+    submitOnBlurFields = []
   } = props;
   const [localData, setLocalData] = useState<any>(data);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -39,6 +41,9 @@ export const FormBase = (props: any) => {
     useState<boolean>(false);
   const [customSchema, setCustomSchema] = useState<any>(schema);
   const [customUiSchema, setCustomUiSchema] = useState<any>(uiSchema);
+  const [timer, setTimer] = useState<number>(0)
+
+  const interval = useRef<any>(null)
 
   const submitButtonRef = useRef<any>(null);
   const removeProp = (obj: any, prop: string) => {
@@ -68,6 +73,25 @@ export const FormBase = (props: any) => {
     }
   }, [data]);
 
+  const startTimer = () => interval.current = setInterval(()=>setTimer((timer)=>timer + 1000), 1000)
+  const stopTimer = () =>{
+    clearInterval(interval.current)
+    setTimer(0)
+  }
+
+
+  useEffect(() => {
+    if(timer === EDIT_DEBOUNCE && enableAutoSave){
+      onSave()
+      setTimer(0)
+    }
+  }, [timer])
+
+  useEffect(() => {
+    return () => stopTimer()
+  }, [])
+  
+  
   const onError = (errors: any) => {
     log("errors");
     log(errors);
@@ -105,18 +129,34 @@ export const FormBase = (props: any) => {
       });
   };
 
-  const handleUpdate = async (event: IChangeEvent) => {
+  const handleUpdate = async (event: IChangeEvent, id: any) => {
     const formData = { ...event.formData, ...extraData };
+    if(submitOnBlurFields.some((field:string)=> id.includes(field))){
+      setTimer(0)
+    }
+    if(submitOnChangeFields.some((field:string)=> id.includes(field))){
+      return onSave()
+    }
     setLocalData(formData);
     if (formIsValid && !formIsValid(formData)) {
       setIsSubmitButtonDisabled(true);
     } else {
       setIsSubmitButtonDisabled(false);
-      if (enableAutoSave) {
-        return triggerAutoSave();
-      }
     }
   };
+
+  const handleBlur = async (id: string) => {
+    if(submitOnBlurFields.some((field:string)=> id.includes(field))){
+      stopTimer()
+      return onSave()
+    }
+  }
+
+  const handleFocus = (id: string) => {
+    if(submitOnBlurFields.some((field:string)=> id.includes(field))){
+      startTimer()
+    }
+  }
 
   return (
     <>
@@ -135,6 +175,8 @@ export const FormBase = (props: any) => {
           onChange={handleUpdate}
           onSubmit={handleSubmit}
           onError={onError}
+          onBlur={handleBlur}
+          onFocus={handleFocus}
           widgets={widgets}
           className={className}
           templates={templates}

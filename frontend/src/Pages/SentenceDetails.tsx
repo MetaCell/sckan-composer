@@ -213,6 +213,7 @@ const SentencesDetails = () => {
               disabled={disabled}
               format="small"
               setter={setSentence}
+              enableAutoSave={true}
             />
           </Grid>
 

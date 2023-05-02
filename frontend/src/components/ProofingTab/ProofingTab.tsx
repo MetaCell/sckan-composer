@@ -1,5 +1,4 @@
 import React from "react";
-import { ConnectivityStatement } from "../../apiclient/backend/api";
 import { Grid, Typography, Box, Stack, Divider, Paper } from "@mui/material";
 import StatementChart from "./StatementChart";
 import StatementWithProvenances from "../StatementWithProvenances";
@@ -9,7 +8,7 @@ import { useTheme } from "@mui/system";
 import PathsBuilder from "./PathsBuilder";
 
 const ProofingTab = (props: any) => {
-  const { statement } = props;
+  const { statement, refreshStatement, setStatement } = props;
   const theme = useTheme();
   const sectionStyle = useSectionStyle(theme);
 
@@ -42,7 +41,7 @@ const ProofingTab = (props: any) => {
               textAlign: "center",
             }}
           >
-            <StatementWithProvenances statement={statement} />
+            <StatementWithProvenances statement={statement} refreshStatement={refreshStatement} setStatement={setStatement}/>
           </Box>
         </Paper>
       </Grid>

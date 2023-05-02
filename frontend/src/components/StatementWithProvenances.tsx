@@ -26,6 +26,7 @@ const StatementWithProvenances = ({ statement, background = "#fff", refreshState
             uiFields={["knowledge_statement"]}
             className='ks'
             disabled={disabled}
+            enableAutoSave={true}
           />
 
           <ProvenancesForm

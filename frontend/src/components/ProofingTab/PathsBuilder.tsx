@@ -51,6 +51,8 @@ const PathsBuilder = (props: any) => {
                       setter={refreshStatement}
                       extraData={{ sentence_id: statement.sentence.id }}
                       uiFields={["origin_id"]}
+                      enableAutoSave={false}
+                      submitOnChangeFields={['origin_id']}
                     />
                   </Grid>
                 </Grid>
@@ -68,6 +70,8 @@ const PathsBuilder = (props: any) => {
           extraData={{ sentence_id: statement.sentence.id }}
           uiFields={["path"]}
           className="vias"
+          enableAutoSave={false}
+          submitOnChangeFields={['path']}
         />
         </Box>
         <Box height={24} width={2} bgcolor='#D0D5DD' ml='34px'/>
@@ -84,6 +88,8 @@ const PathsBuilder = (props: any) => {
                   extraData={{ sentence_id: statement.sentence.id }}
                   uiFields={["destination_id", "destination_type"]}
                   className="inLineForm"
+                  enableAutoSave={false}
+                  submitOnChangeFields={["destination_id", "destination_type"]}
                 />
               </TableRow>
             </TableBody>

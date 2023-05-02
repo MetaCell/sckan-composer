@@ -87,7 +87,7 @@ const SentenceAddForm = (props: any) => {
         schema={customSchema}
         uiSchema={customUiSchema}
         uiFields={uiFields}
-        enableAutoSave={true}
+        enableAutoSave={false}
         formIsValid={format === "create" && formIsValid}
         disableSubmitButton={setDisabled}
         submitButtonProps={submitButtonProps}

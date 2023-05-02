@@ -48,6 +48,7 @@ const DistillationTab = ({ statement, setStatement, refreshStatement, disabled }
               statement_id: statement.id,
               knowledge_statement: statement.knowledge_statement,
             }}
+            enableAutoSave={true}
             uiFields={[
               "sex_id",
               "apinatomy_model",

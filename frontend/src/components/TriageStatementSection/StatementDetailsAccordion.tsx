@@ -55,6 +55,7 @@ const StatementDetailsAccordion = (props: any) => {
           statement={statement}
           format="small"
           setter={setter}
+          enableAutoSave={true}
           extraData={{
             sentence_id: sentence.id,
             knowledge_statement: statement.knowledge_statement,
