@@ -20,7 +20,7 @@ const PathsBuilder = (props: any) => {
   return (
     <Paper sx={{ ...sectionStyle, px: 0 }}>
         <Typography variant="h5" sx={{ px: 3, pb: 2 }}>
-          Paths Builder
+          Path Builder
         </Typography>
         <Divider/>
       <Stack sx={{ px: 1.5, mt:1.5}}>

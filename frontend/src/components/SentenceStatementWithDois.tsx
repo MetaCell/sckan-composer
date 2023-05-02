@@ -35,7 +35,7 @@ const SentenceStatementWithDois = ({ statement, setStatement, refreshStatement }
       }}>
         <StatementWithProvenances statement={statement} setStatement={setStatement} refreshStatement={refreshStatement} />
       </Box>
-      <Divider sx={{margin: '24px 0'}}>Records from the same NLP Sentence</Divider>
+      <Divider sx={{margin: '24px 0'}}>Knowledge Statements from the same input Sentence</Divider>
       <Stack spacing={2}>
         {
           otherStatements?.map((row: any )=>
