@@ -17,6 +17,8 @@ class Projection(models.TextChoices):
     UNKNOWN = "UNKNOWN", "Not specified"
 
 
+# todo: motor and sensory should move to phenotype options per csv
+# also anaxonic is not set as option in the csv
 class CircuitType(models.TextChoices):
     SENSORY = "SENSORY", "Sensory"
     MOTOR = "MOTOR", "Motor"
