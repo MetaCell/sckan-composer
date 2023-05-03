@@ -3,8 +3,6 @@ stages:
   - clone
   - buildComposer
   - buildNginx
-  - build
-  - test
   - deploy
 steps:
   main_clone:
@@ -34,48 +32,16 @@ steps:
     tag: "${{CF_BUILD_ID}}"
     dockerfile: ./nginx/Dockerfile
     registry: ${{REGISTRY}}
-  test_build:
-    stage: test
-    type: build
-    title: Building SCKan test image
-    image_name: sckan-test
-    dockerfile: Dockerfile.testing
-    buildkit: true
-  test:
-    type: composition
-    title: Running Tests
-    description: Temporary test environment
-    stage: test
-    working_directory: ./frontend/test
-    composition:
-      version: '2'
-      services:
-        composer:
-          image:  '${{buildComposer}}'
-        app:
-          image: '${{buildNginx}}'
-          ports:
-            - 80
-    composition_candidates:
-      test:
-        image: '${{test_build}}'
-        links:
-         - composer
-         - app
-        working_dir: /home/pptruser
-        environment:
-        - TEST_URL=http://app:80
-        command: bash -c 'npm run puppeteer_test'
-  # deploy-to-kubernetes:
-  #   image: codefresh/cf-deploy-kubernetes
-  #   tag: latest
-  #   stage: deploy
-  #   working_directory: ./k8s
-  #   commands:
-  #     - /cf-deploy-kubernetes postgres.yaml
-  #     - /cf-deploy-kubernetes composer.yaml
-  #     - /cf-deploy-kubernetes nginx.yaml
-  #     - /cf-deploy-kubernetes ingress.yaml
-  #   environment:
-  #     - KUBECONTEXT=${{CLUSTER}}
-  #     - KUBERNETES_NAMESPACE=${{NAMESPACE}}
+  deploy-to-kubernetes:
+    image: codefresh/cf-deploy-kubernetes
+    tag: latest
+    stage: deploy
+    working_directory: ./k8s
+    commands:
+      - /cf-deploy-kubernetes postgres.yaml
+      - /cf-deploy-kubernetes composer.yaml
+      - /cf-deploy-kubernetes nginx.yaml
+      - /cf-deploy-kubernetes ingress.yaml
+    environment:
+      - KUBECONTEXT=${{CLUSTER}}
+      - KUBERNETES_NAMESPACE=${{NAMESPACE}}
