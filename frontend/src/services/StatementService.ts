@@ -17,6 +17,9 @@ class ConnectivityStatementService extends AbstractService {
   async remove(id: number) {
     return composerApi.composerConnectivityStatementDestroy(id).then((response: any) => response.data)
   }
+  async clone(id: number) {
+    return composerApi.composerConnectivityStatementCloneStatementRetrieve(id).then((response: any) => response.data)
+  }
   async getObject(id: string): Promise<ConnectivityStatement> {
     return composerApi.composerConnectivityStatementRetrieve(Number(id)).then((response: any) => response.data)
   }

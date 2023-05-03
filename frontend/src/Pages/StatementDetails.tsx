@@ -115,8 +115,8 @@ const StatementDetails = () => {
               </span>
             </Box>
           </Grid>
-          {statement.available_transitions && statement.available_transitions.length > 0 &&
           <Grid item xs={12} md={6} display="flex" justifyContent="flex-end">
+          {statement.available_transitions && statement.available_transitions.length > 0 ?
             <GroupedButtons
               handleClick={doTransition}
               selectedOption={
@@ -128,8 +128,13 @@ const StatementDetails = () => {
               hasFormat={true}
               format={StatementsLabels}
             />
-          </Grid>
+            :
+            <GroupedButtons
+            disabled
+            selectedOption='Missing data'
+          />
           }
+          </Grid>
         </Grid>
       </Grid>
 

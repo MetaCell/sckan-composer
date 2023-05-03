@@ -15,7 +15,7 @@ import { useAppDispatch } from "../../redux/hooks";
 import {
   SentenceAvailableTransitionsEnum as sentenceStates,
   ConnectivityStatementAvailableTransitionsEnum as statementStates,
-} from "../../apiclient/backend";
+} from "../../apiclient/backend/api";
 import { setFilters as setSentenceFilters } from "../../redux/sentenceSlice";
 import { setFilters as setStatementFilters } from "../../redux/statementSlice";
 import StateFilter from "./StateFilter";

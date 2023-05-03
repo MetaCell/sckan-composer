@@ -9,7 +9,7 @@ import MenuList from "@mui/material/MenuList";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 
-export default function GroupedButtons({handleClick, selectedOption, options, selectedIndex, handleMenuItemClick , hasFormat = false, format}: any) {
+export default function GroupedButtons({handleClick, selectedOption, options, selectedIndex, handleMenuItemClick , hasFormat = false, format, disabled}: any) {
   const anchorRef = React.useRef<HTMLDivElement>(null);
   const [open, setOpen] = React.useState(false);
 
@@ -31,7 +31,7 @@ export default function GroupedButtons({handleClick, selectedOption, options, se
 
   return (
     <FormControl>
-      <ButtonGroup variant="contained" ref={anchorRef}>
+      <ButtonGroup variant="contained" ref={anchorRef} disabled={disabled}>
         <Button onClick={handleClick}>{selectedOption}</Button>
         <Button
           size="small"

@@ -1788,6 +1788,48 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * ConnectivityStatement
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementCloneStatementRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementCloneStatementRetrieve', 'id', id)
+            const localVarPath = `/api/composer/connectivity-statement/{id}/clone_statement/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication cookieAuth required
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatement
          * @param {ConnectivityStatement} connectivityStatement 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3836,6 +3878,16 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * ConnectivityStatement
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementCloneStatementRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementCloneStatementRetrieve(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * ConnectivityStatement
          * @param {ConnectivityStatement} connectivityStatement 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4357,6 +4409,15 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * ConnectivityStatement
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementCloneStatementRetrieve(id: number, options?: any): AxiosPromise<ConnectivityStatement> {
+            return localVarFp.composerConnectivityStatementCloneStatementRetrieve(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatement
          * @param {ConnectivityStatement} connectivityStatement 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4842,6 +4903,17 @@ export class ComposerApi extends BaseAPI {
      */
     public composerConnectivityStatementAddTagCreate(id: number, tagId: number, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementAddTagCreate(id, tagId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatement
+     * @param {number} id A unique integer value identifying this connectivity statement.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementCloneStatementRetrieve(id: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementCloneStatementRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

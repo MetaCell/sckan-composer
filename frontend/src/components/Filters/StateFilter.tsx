@@ -1,7 +1,7 @@
 import React from "react"
 import { Stack, Typography } from "@mui/material"
 import ControlledCheckbox from "../Widgets/ControlledCheckbox"
-import { SentenceAvailableTransitionsEnum as sentenceStates } from "../../apiclient/backend"
+import { SentenceAvailableTransitionsEnum as sentenceStates } from "../../apiclient/backend/api"
 
 const sentenceLabels = {
   [sentenceStates.Open]: "Open",

@@ -1,5 +1,5 @@
-import {SentenceAvailableTransitionsEnum as sentenceStates} from "../apiclient/backend";
-import {ConnectivityStatementAvailableTransitionsEnum as statementStates} from "../apiclient/backend";
+import { SentenceAvailableTransitionsEnum as sentenceStates } from "../apiclient/backend/api";
+import { ConnectivityStatementAvailableTransitionsEnum as statementStates } from "../apiclient/backend/api";
 
 export const hiddenWidget = (fields: string[]) => {
   let hiddenSchema = {}
@@ -133,7 +133,7 @@ export const formatTime = (date: string) => {
   });
 }
 
-export const timeAgo = (timestamp : string) => {
+export const timeAgo = (timestamp: string) => {
   const now = new Date();
   const timeDiff = now.getTime() - new Date(timestamp).getTime();
   const seconds = Math.floor(timeDiff / 1000);
@@ -159,25 +159,25 @@ export const timeAgo = (timestamp : string) => {
 }
 
 
-export const isEqual = function(obj1: any, obj2: any) {
+export const isEqual = function (obj1: any, obj2: any) {
   const obj1Keys = Object.keys(obj1);
   const obj2Keys = Object.keys(obj2);
 
-  if(obj1Keys.length !== obj2Keys.length) {
-      return false;
+  if (obj1Keys.length !== obj2Keys.length) {
+    return false;
   }
 
   for (let objKey of obj1Keys) {
-      if (obj1[objKey] !== obj2[objKey]) {
-          if(typeof obj1[objKey] == "object" && typeof obj2[objKey] == "object") {
-              if(!isEqual(obj1[objKey], obj2[objKey])) {
-                  return false;
-              }
-          }
-          else {
-              return false;
-          }
+    if (obj1[objKey] !== obj2[objKey]) {
+      if (typeof obj1[objKey] == "object" && typeof obj2[objKey] == "object") {
+        if (!isEqual(obj1[objKey], obj2[objKey])) {
+          return false;
+        }
       }
+      else {
+        return false;
+      }
+    }
   }
 
   return true;
