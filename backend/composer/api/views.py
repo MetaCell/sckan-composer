@@ -202,6 +202,7 @@ class CSCloningMixin(viewsets.GenericViewSet):
         instance.destination = None
         instance.destination_type = 'UNKNOWN'
         instance.save()
+        instance.species.add(*self.get_object().species.all())
         provenances = (Provenance(connectivity_statement = instance, uri=provenance.uri) for provenance in self.get_object().provenance_set.all())
         Provenance.objects.bulk_create(provenances)
         return Response(self.get_serializer(instance).data)
