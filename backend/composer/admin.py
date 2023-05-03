@@ -7,12 +7,11 @@ from fsm_admin.mixins import FSMTransitionMixin
 
 from composer.models import (
     AnatomicalEntity,
-    AnsDivision,
-    BiologicalSex,
+    Phenotype,
+    Sex,
     ConnectivityStatement,
-    Doi,
+    Provenance,
     ExportBatch,
-    ExportMetrics,
     Note,
     Profile,
     Sentence,
@@ -38,13 +37,13 @@ class PathInline(SortableStackedInline):
     default_order_field = "display_order"
 
 
-class DoiInline(admin.StackedInline):
-    model = Doi
+class ProvenanceInline(admin.StackedInline):
+    model = Provenance
     extra = 1
 
 
-class DoiNestedInline(nested_admin.NestedStackedInline):
-    model = Doi
+class ProvenanceNestedInline(nested_admin.NestedStackedInline):
+    model = Provenance
     extra = 1
 
 
@@ -68,7 +67,7 @@ class ConnectivityStatementInline(nested_admin.NestedStackedInline):
     model = ConnectivityStatement
     extra = 1
     fields = ("sentence", "knowledge_statement")
-    inlines = (DoiNestedInline,)
+    inlines = (ProvenanceNestedInline,)
 
 
 # Define a new User admin
@@ -135,7 +134,7 @@ class ConnectivityStatementAdmin(
 
     fieldsets = ()
 
-    inlines = (DoiInline, PathInline, NoteConnectivityStatementInline)
+    inlines = (ProvenanceInline, PathInline, NoteConnectivityStatementInline)
 
     @admin.display(description="Knowledge Statement")
     def short_ks(self, obj):
@@ -183,8 +182,8 @@ admin.site.register(User, UserAdmin)
 
 #
 admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
-admin.site.register(AnsDivision)
-admin.site.register(BiologicalSex)
+admin.site.register(Phenotype)
+admin.site.register(Sex)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
 admin.site.register(ExportBatch, ExportBatchAdmin)
 admin.site.register(Sentence, SentenceAdmin)

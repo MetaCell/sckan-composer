@@ -10,14 +10,14 @@ import SentenceStatementWithDois from "./SentenceStatementWithDois";
 import { useSectionStyle } from "../styles/styles";
 import { useTheme } from "@mui/system";
 
-const DistillationTab = ({ statement, setStatement } : any) => {
+const DistillationTab = ({ statement, setStatement, refreshStatement, disabled } : any) => {
   const theme = useTheme()
   const sectionStyle = useSectionStyle(theme)
 
   return (
     <Grid container mb={2} spacing={2}>
       <Grid item xs={12}>
-        <SentenceStatementWithDois statement={statement} />
+        <SentenceStatementWithDois statement={statement} setStatement={setStatement} refreshStatement={refreshStatement}/>
       </Grid>
 
       <Grid item xs={12}>
@@ -36,26 +36,26 @@ const DistillationTab = ({ statement, setStatement } : any) => {
           <SpeciesForm
             data={statement.species}
             extraData={{ parentId: statement.id, service: statementService }}
-            setter={setStatement}
+            setter={refreshStatement}
             disabled={true}
           />
           <StatementForm
+            disabled={disabled}
             statement={statement}
             format="small"
-            // disabled={false}
             setter={setStatement}
             extraData={{
               statement_id: statement.id,
               knowledge_statement: statement.knowledge_statement,
             }}
             uiFields={[
-              "biological_sex_id",
+              "sex_id",
               "apinatomy_model",
+              "additional_information",
               "circuit_type",
               "laterality",
-              "ans_division_id",
-              "destination_id",
-              "origin_id"
+              "projection",
+              "phenotype_id",
             ]}
           />
         </Paper>

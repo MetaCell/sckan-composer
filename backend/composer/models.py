@@ -16,6 +16,7 @@ from .enums import (
     SentenceState,
     NoteType,
     ViaType,
+    Projection
 )
 from composer.services.state_services import (
     ConnectivityStatementService,
@@ -87,7 +88,7 @@ class ConnectivityStatementManager(models.Manager):
                 "owner",
                 "origin",
                 "destination",
-                "ans_division",
+                "phenotype",
                 "sentence",
             )
             .prefetch_related("notes", "tags", "species")
@@ -109,6 +110,16 @@ class SentenceStatementManager(models.Manager):
         )
 
 
+class NoteManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related(
+                "user", "sentence", "connectivity_statement")
+        )
+
+
 # Create your models here.
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -117,8 +128,8 @@ class Profile(models.Model):
     is_reviewer = models.BooleanField(default=False)
 
 
-class AnsDivision(models.Model):
-    """ANS Division"""
+class Phenotype(models.Model):
+    """Phenotype"""
 
     name = models.CharField(max_length=200, db_index=True, unique=True)
 
@@ -127,7 +138,7 @@ class AnsDivision(models.Model):
 
     class Meta:
         ordering = ["name"]
-        verbose_name_plural = "ANS Divisions"
+        verbose_name_plural = "Phenotypes"
 
 
 class Specie(models.Model):
@@ -144,8 +155,8 @@ class Specie(models.Model):
         verbose_name_plural = "Species"
 
 
-class BiologicalSex(models.Model):
-    """Biological Sex"""
+class Sex(models.Model):
+    """Sex"""
 
     name = models.CharField(max_length=200, db_index=True, unique=True)
     ontology_uri = models.URLField()
@@ -155,7 +166,7 @@ class BiologicalSex(models.Model):
 
     class Meta:
         ordering = ["name"]
-        verbose_name_plural = "Biological Sex"
+        verbose_name_plural = "Sex"
 
 
 class AnatomicalEntity(models.Model):
@@ -258,7 +269,7 @@ class Sentence(models.Model):
         if SentenceService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
-
+            
     @property
     def pmid_uri(self) -> str:
         return pmid_uri(self.pmid)
@@ -277,7 +288,7 @@ class Sentence(models.Model):
 
     @property
     def has_notes(self):
-        return self.notes.exists()
+        return self.notes.exclude(type=NoteType.TRANSITION).exists()
 
     class Meta:
         ordering = ["title"]
@@ -316,14 +327,18 @@ class Via(models.Model):
     )
     anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.DO_NOTHING)
     display_order = models.PositiveIntegerField(
-        default=0,
-        blank=False,
-        null=False,
+        blank=True,
+        null=True,
     )
     type = models.CharField(max_length=8, default=ViaType.AXON, choices=ViaType.choices)
 
     def __str__(self):
         return f"{self.connectivity_statement} - {self.anatomical_entity}"
+    
+    def save(self, *args, **kwargs):
+        if self.display_order is None:
+            self.display_order = self.connectivity_statement.path.all().count()
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["display_order"]
@@ -373,22 +388,26 @@ class ConnectivityStatement(models.Model):
     laterality = models.CharField(
         max_length=20, default=Laterality.UNKNOWN, choices=Laterality.choices
     )
+    projection = models.CharField(
+        max_length=20, default=Projection.UNKNOWN, choices=Projection.choices
+    )
     circuit_type = models.CharField(
         max_length=20, default=CircuitType.UNKNOWN, choices=CircuitType.choices
     )
-    ans_division = models.ForeignKey(
-        AnsDivision,
-        verbose_name="ANS Division",
+    phenotype = models.ForeignKey(
+        Phenotype,
+        verbose_name="Phenotype",
         on_delete=models.DO_NOTHING,
         null=True,
         blank=True,
     )
     species = models.ManyToManyField(Specie, verbose_name="Species", blank=True)
     tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
-    biological_sex = models.ForeignKey(
-        BiologicalSex, on_delete=models.DO_NOTHING, null=True, blank=True
+    sex = models.ForeignKey(
+        Sex, on_delete=models.DO_NOTHING, null=True, blank=True
     )
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
+    additional_information = models.TextField(null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True, db_index=True)
     modified_date = models.DateTimeField(auto_now=True, db_index=True)
 
@@ -460,6 +479,10 @@ class ConnectivityStatement(models.Model):
     )
     def exported(self, *args, **kwargs):
         ...
+    
+    @property
+    def export_id(self):
+        return f"CPR:{self.id:06d}"
 
     @property
     def journey(self):
@@ -467,7 +490,7 @@ class ConnectivityStatement(models.Model):
 
     @property
     def has_notes(self):
-        return self.notes.exists()
+        return self.notes.exclude(type=NoteType.TRANSITION).exists()
 
     @property
     def tag_list(self):
@@ -497,27 +520,26 @@ class ConnectivityStatement(models.Model):
                 check=Q(destination_type__in=[dt[0] for dt in DestinationType.choices]),
                 name="destination_type_valid",
             ),
+            models.CheckConstraint(
+                check=Q(projection__in=[p[0] for p in Projection.choices]),
+                name="projection_valid",
+            ),
         ]
 
 
-class Doi(models.Model):
-    """DOI see https://doi.org/"""
+class Provenance(models.Model):
+    """Provenance"""
 
     connectivity_statement = models.ForeignKey(
         ConnectivityStatement, on_delete=models.CASCADE
     )
-    doi = DoiField(max_length=100)
-
-    @property
-    def doi_uri(self):
-        return doi_uri(self.doi)
+    uri = models.URLField()
 
     def __str__(self):
-        return self.doi
+        return self.uri
 
     class Meta:
-        ordering = ["doi"]
-        verbose_name_plural = "D.O.I.s"
+        verbose_name_plural = "Provenances"
 
 
 class Note(models.Model):
@@ -545,6 +567,9 @@ class Note(models.Model):
     type = models.CharField(
         max_length=20, default=NoteType.PLAIN, choices=NoteType.choices
     )
+    
+    objects = NoteManager()
+    all_objects = models.Manager()
 
     def __str__(self):
         return self.note

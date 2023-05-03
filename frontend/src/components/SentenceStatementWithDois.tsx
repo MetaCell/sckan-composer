@@ -6,11 +6,11 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {Box} from "@mui/material";
 import Divider from "@mui/material/Divider";
 import {useNavigate} from "react-router";
-import StatementWithDois from "./StatementWithDois";
+import StatementWithProvenances from "./StatementWithProvenances";
 import { useSectionStyle } from "../styles/styles";
 import { useTheme } from "@mui/system";
 
-const SentenceStatementWithDois = ({ statement } : any) => {
+const SentenceStatementWithDois = ({ statement, setStatement, refreshStatement } : any) => {
   const navigate = useNavigate();
   const theme = useTheme()
   const sectionStyle = useSectionStyle(theme)
@@ -33,9 +33,9 @@ const SentenceStatementWithDois = ({ statement } : any) => {
         padding: '8px !important',
         textAlign: 'center',
       }}>
-        <StatementWithDois statement={statement} />
+        <StatementWithProvenances statement={statement} setStatement={setStatement} refreshStatement={refreshStatement} />
       </Box>
-      <Divider sx={{margin: '24px 0'}}>Records from the same NLP Sentence</Divider>
+      <Divider sx={{margin: '24px 0'}}>Knowledge Statements from the same input Sentence</Divider>
       <Stack spacing={2}>
         {
           otherStatements?.map((row: any )=>
@@ -45,7 +45,7 @@ const SentenceStatementWithDois = ({ statement } : any) => {
               spacing={{ xs: 1, sm: 2 }}
               alignItems='center'
             >
-              <StatementWithDois background={"#F9FAFB"} statement={row} />
+              <StatementWithProvenances background={"#F9FAFB"} statement={row} disabled/>
               <Box>
                 <OpenInNewIcon
                   onClick={() => openStatement(row)}

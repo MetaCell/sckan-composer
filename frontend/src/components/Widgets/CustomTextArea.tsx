@@ -6,18 +6,11 @@ import {EDIT_DEBOUNCE} from "../../settings";
 import { styled } from "@mui/material";
 
 const StyledInput = styled(TextField)(({ theme }) => ({
-  "& .Mui-focused": {
-    border: '0 !important',
-    boxShadow: 'none',
-    borderShadow: 'none',
-  },
   "& .MuiInputBase-root": {
-    border: 0,
     boxShadow: 'none',
-
+    border:0,
     "& .MuiOutlinedInput-notchedOutline": {
       border: 0,
-      boxShadow: 'none',
     },
     "& .Mui-focused, &:focus-visible": {
       border: '0 !important',
@@ -26,16 +19,25 @@ const StyledInput = styled(TextField)(({ theme }) => ({
     },
 
   },
-
 }));
 
 
 export default function TextArea({value, placeholder, required, disabled, onChange, options: { rows, hasDebouncedOnChange } }: any) {
 
+  const [inputValue, setInputValue] = React.useState(value)
+
   const debouncedChangeHandler = useDebouncedCallback(
     (event) => onChange(event.target.value),
     EDIT_DEBOUNCE
   );
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement|HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    setInputValue(inputValue);
+    debouncedChangeHandler(e);
+  };
+
+  React.useEffect(()=>setInputValue(value), [value])
 
   return (
     <FormControl variant="standard">
@@ -47,7 +49,8 @@ export default function TextArea({value, placeholder, required, disabled, onChan
       fullWidth
       required={required}
       disabled={disabled}
-      onChange={debouncedChangeHandler}/>
+      value={inputValue}
+      onChange={handleChange}/>
       :<StyledInput
       value={value?value:''}
       multiline

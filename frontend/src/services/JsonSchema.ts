@@ -5,7 +5,7 @@ export let jsonSchemas = (function () {
   let connectivityStatementSchema:any = null;
   let noteSchema:any = null;
   let tagSchema:any = null;
-  let doiSchema:any = null;
+  let provenanceSchema:any = null;
   let viaSchema:any = null;
   let speciesSchema:any = null;
 
@@ -16,7 +16,7 @@ export let jsonSchemas = (function () {
         connectivityStatementSchema = resp.data.ConnectivityStatement
         noteSchema = resp.data.Note
         tagSchema = resp.data.Tag
-        doiSchema = resp.data.Doi
+        provenanceSchema = resp.data.Provenance
         viaSchema = resp.data.Via
         speciesSchema = resp.data.Specie
       })
@@ -33,8 +33,8 @@ export let jsonSchemas = (function () {
     getTagSchema: function () {
       return tagSchema
     },
-    getDoiSchema: function () {
-      return doiSchema
+    getProvenanceSchema: function () {
+      return provenanceSchema
     },
     getViaSchema: function () {
       return viaSchema

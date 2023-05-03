@@ -100,16 +100,16 @@ class ConnectivityStatementService(StateServiceMixin):
 
     @staticmethod
     def can_be_reviewed(connectivity_statement):
-        # return True if the state,emt can go to state to_be_reviewed it should have at least one provenance (doi),
-        # origin, destination, ans division, biological sex, path and species
+        # return True if the state,emt can go to state to_be_reviewed it should have at least one provenance,
+        # origin, destination, phenotype, sex, path and species
         return (
             connectivity_statement.origin is not None
             and connectivity_statement.destination is not None
-            and connectivity_statement.ans_division is not None
-            and connectivity_statement.biological_sex is not None
+            and connectivity_statement.phenotype is not None
+            and connectivity_statement.sex is not None
             and connectivity_statement.path.count() > 0
             and connectivity_statement.species.count() > 0
-            and connectivity_statement.doi_set.count() > 0
+            and connectivity_statement.provenance_set.count() > 0
         )
 
     @staticmethod
@@ -122,3 +122,16 @@ class ConnectivityStatementService(StateServiceMixin):
     def has_permission_to_transition_to_exported(connectivity_statement, user):
         # only system users can transition to EXPORTED
         return user.username == 'system'
+
+    @staticmethod
+    def add_important_tag(connectivity_statement):
+        # when a ConnectivityStatement record goes to compose_now state and the previous
+        # state is in NPO Approved or Exported then flag the CS with Tag IMPORTANT
+        # if connectivity_statement.state in (CSState.NPO_APPROVED, CSState.EXPORTED):
+        from composer.models import Tag
+        try:
+            important_tag = Tag.objects.get(tag__iexact="important")
+        except Tag.DoesNotExist:
+            important_tag = Tag.objects.create(tag="important")
+        connectivity_statement.tags.add(important_tag)
+        return connectivity_statement

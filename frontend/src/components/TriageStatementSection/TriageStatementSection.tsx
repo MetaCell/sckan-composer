@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
@@ -8,7 +8,7 @@ import StatementDetailsAccordion from "./StatementDetailsAccordion";
 import { vars } from "../../theme/variables";
 import statementService from "../../services/StatementService";
 import StatementForm from "../Forms/StatementForm";
-import DoisForm from "../Forms/DoisForm";
+import ProvenancesForm from "../Forms/ProvenanceForm";
 import { useSectionStyle } from "../../styles/styles";
 import { useTheme } from "@mui/system";
 
@@ -31,19 +31,21 @@ const TriageStatementSection = (props: any) => {
       >
         <Grid container spacing={1} alignItems="center">
           <Grid item xs={11}>
-            <Paper sx={sectionStyle}>
+            <Paper sx={{...sectionStyle, p:0}}>
               <StatementForm
                 statement={statement}
                 format="small"
                 setter={refreshSentence}
                 extraData={{ sentence_id: sentence.id }}
                 uiFields={["knowledge_statement"]}
+                className='ks'
               />
 
-              <DoisForm
-                doisData={statement.dois}
+              <ProvenancesForm
+                provenancesData={statement.provenances}
                 extraData={{ connectivity_statement_id: statement.id }}
                 setter={refreshSentence}
+                className='provenance'
               />
               {statement.id && (
                 <StatementDetailsAccordion

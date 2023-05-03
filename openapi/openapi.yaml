@@ -64,118 +64,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/AnatomicalEntity'
           description: ''
-  /api/composer/ans-division/:
-    get:
-      operationId: composer_ans_division_list
-      description: AnsDivision
-      parameters:
-      - name: limit
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
-      - name: offset
-        required: false
-        in: query
-        description: The initial index from which to return the results.
-        schema:
-          type: integer
-      tags:
-      - composer
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedAnsDivisionList'
-          description: ''
-  /api/composer/ans-division/{id}/:
-    get:
-      operationId: composer_ans_division_retrieve
-      description: AnsDivision
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this ans division.
-        required: true
-      tags:
-      - composer
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AnsDivision'
-          description: ''
-  /api/composer/biological-sex/:
-    get:
-      operationId: composer_biological_sex_list
-      description: BiologicalSex
-      parameters:
-      - name: limit
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
-      - name: offset
-        required: false
-        in: query
-        description: The initial index from which to return the results.
-        schema:
-          type: integer
-      tags:
-      - composer
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedBiologicalSexList'
-          description: ''
-  /api/composer/biological-sex/{id}/:
-    get:
-      operationId: composer_biological_sex_retrieve
-      description: BiologicalSex
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this biological sex.
-        required: true
-      tags:
-      - composer
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BiologicalSex'
-          description: ''
   /api/composer/connectivity-statement/:
     get:
       operationId: composer_connectivity_statement_list
@@ -409,21 +297,21 @@ paths:
       responses:
         '204':
           description: No response body
-  /api/composer/connectivity-statement/{id}/add_doi/{doi}/:
+  /api/composer/connectivity-statement/{id}/add_provenance/{uri}/:
     post:
-      operationId: composer_connectivity_statement_add_doi_create
+      operationId: composer_connectivity_statement_add_provenance_create
       description: ConnectivityStatement
       parameters:
-      - in: path
-        name: doi
-        schema:
-          type: string
-        required: true
       - in: path
         name: id
         schema:
           type: integer
         description: A unique integer value identifying this connectivity statement.
+        required: true
+      - in: path
+        name: uri
+        schema:
+          type: string
         required: true
       tags:
       - composer
@@ -496,21 +384,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConnectivityStatement'
           description: ''
-  /api/composer/connectivity-statement/{id}/del_doi/{doi_id}/:
+  /api/composer/connectivity-statement/{id}/del_provenance/{provenance_id}/:
     delete:
-      operationId: composer_connectivity_statement_del_doi_destroy
+      operationId: composer_connectivity_statement_del_provenance_destroy
       description: ConnectivityStatement
       parameters:
-      - in: path
-        name: doi_id
-        schema:
-          type: integer
-        required: true
       - in: path
         name: id
         schema:
           type: integer
         description: A unique integer value identifying this connectivity statement.
+        required: true
+      - in: path
+        name: provenance_id
+        schema:
+          type: integer
         required: true
       tags:
       - composer
@@ -877,6 +765,62 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/composer/phenotype/:
+    get:
+      operationId: composer_phenotype_list
+      description: Phenotype
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPhenotypeList'
+          description: ''
+  /api/composer/phenotype/{id}/:
+    get:
+      operationId: composer_phenotype_retrieve
+      description: Phenotype
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this phenotype.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Phenotype'
+          description: ''
   /api/composer/profile/my/:
     get:
       operationId: composer_profile_my_retrieve
@@ -1193,6 +1137,62 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Sentence'
+          description: ''
+  /api/composer/sex/:
+    get:
+      operationId: composer_sex_list
+      description: Sex
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSexList'
+          description: ''
+  /api/composer/sex/{id}/:
+    get:
+      operationId: composer_sex_retrieve
+      description: Sex
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sex.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sex'
           description: ''
   /api/composer/specie/:
     get:
@@ -1540,37 +1540,6 @@ components:
       - id
       - name
       - ontology_uri
-    AnsDivision:
-      type: object
-      description: ANS Division
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          maxLength: 200
-      required:
-      - id
-      - name
-    BiologicalSex:
-      type: object
-      description: BiologicalSex
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          maxLength: 200
-        ontology_uri:
-          type: string
-          format: uri
-          maxLength: 200
-      required:
-      - id
-      - name
-      - ontology_uri
     CircuitTypeEnum:
       enum:
       - SENSORY
@@ -1601,10 +1570,10 @@ components:
           items:
             $ref: '#/components/schemas/Tag'
           readOnly: true
-        dois:
+        provenances:
           type: array
           items:
-            $ref: '#/components/schemas/Doi'
+            $ref: '#/components/schemas/Provenance'
         owner:
           allOf:
           - $ref: '#/components/schemas/User'
@@ -1622,22 +1591,24 @@ components:
           readOnly: true
         origin_id:
           type: integer
+          nullable: true
         origin:
           allOf:
           - $ref: '#/components/schemas/AnatomicalEntity'
           readOnly: true
         destination_id:
           type: integer
+          nullable: true
         destination:
           allOf:
           - $ref: '#/components/schemas/AnatomicalEntity'
           readOnly: true
-        ans_division_id:
+        phenotype_id:
           type: integer
           nullable: true
-        ans_division:
+        phenotype:
           allOf:
-          - $ref: '#/components/schemas/AnsDivision'
+          - $ref: '#/components/schemas/Phenotype'
           readOnly: true
         destination_type:
           $ref: '#/components/schemas/DestinationTypeEnum'
@@ -1645,29 +1616,33 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Via'
-          readOnly: true
         journey:
           type: string
           readOnly: true
         laterality:
           $ref: '#/components/schemas/LateralityEnum'
+        projection:
+          $ref: '#/components/schemas/ProjectionEnum'
         circuit_type:
           $ref: '#/components/schemas/CircuitTypeEnum'
         species:
           type: array
           items:
             $ref: '#/components/schemas/Specie'
-        biological_sex_id:
+        sex_id:
           type: integer
           nullable: true
-        biological_sex:
+        sex:
           allOf:
-          - $ref: '#/components/schemas/BiologicalSex'
+          - $ref: '#/components/schemas/Sex'
           readOnly: true
         apinatomy_model:
           type: string
           nullable: true
           maxLength: 200
+        additional_information:
+          type: string
+          nullable: true
         modified_date:
           type: string
           format: date-time
@@ -1676,9 +1651,7 @@ components:
           type: boolean
           readOnly: true
       required:
-      - ans_division
       - available_transitions
-      - biological_sex
       - destination
       - has_notes
       - id
@@ -1686,9 +1659,10 @@ components:
       - modified_date
       - origin
       - owner
-      - path
+      - phenotype
       - sentence
       - sentence_id
+      - sex
       - state
       - tags
     ConnectivityStatementAvailableTransitionsEnum:
@@ -1709,31 +1683,10 @@ components:
       - AFFERENT-T
       - UNKNOWN
       type: string
-    Doi:
-      type: object
-      description: Doi
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        doi:
-          type: string
-        doi_uri:
-          type: string
-          readOnly: true
-          nullable: true
-        connectivity_statement_id:
-          type: integer
-      required:
-      - connectivity_statement_id
-      - doi
-      - doi_uri
-      - id
     LateralityEnum:
       enum:
-      - IPSI
-      - ONTRAT
-      - BI
+      - RIGHT
+      - LEFT
       - UNKNOWN
       type: string
     Login:
@@ -1800,46 +1753,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnatomicalEntity'
-    PaginatedAnsDivisionList:
-      type: object
-      properties:
-        count:
-          type: integer
-          example: 123
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?offset=400&limit=100
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?offset=200&limit=100
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/AnsDivision'
-    PaginatedBiologicalSexList:
-      type: object
-      properties:
-        count:
-          type: integer
-          example: 123
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?offset=400&limit=100
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?offset=200&limit=100
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/BiologicalSex'
     PaginatedConnectivityStatementList:
       type: object
       properties:
@@ -1880,6 +1793,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Note'
+    PaginatedPhenotypeList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Phenotype'
     PaginatedSentenceList:
       type: object
       properties:
@@ -1900,6 +1833,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Sentence'
+    PaginatedSexList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sex'
     PaginatedSpecieList:
       type: object
       properties:
@@ -1981,10 +1934,10 @@ components:
           items:
             $ref: '#/components/schemas/Tag'
           readOnly: true
-        dois:
+        provenances:
           type: array
           items:
-            $ref: '#/components/schemas/Doi'
+            $ref: '#/components/schemas/Provenance'
         owner:
           allOf:
           - $ref: '#/components/schemas/User'
@@ -2002,22 +1955,24 @@ components:
           readOnly: true
         origin_id:
           type: integer
+          nullable: true
         origin:
           allOf:
           - $ref: '#/components/schemas/AnatomicalEntity'
           readOnly: true
         destination_id:
           type: integer
+          nullable: true
         destination:
           allOf:
           - $ref: '#/components/schemas/AnatomicalEntity'
           readOnly: true
-        ans_division_id:
+        phenotype_id:
           type: integer
           nullable: true
-        ans_division:
+        phenotype:
           allOf:
-          - $ref: '#/components/schemas/AnsDivision'
+          - $ref: '#/components/schemas/Phenotype'
           readOnly: true
         destination_type:
           $ref: '#/components/schemas/DestinationTypeEnum'
@@ -2025,29 +1980,33 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Via'
-          readOnly: true
         journey:
           type: string
           readOnly: true
         laterality:
           $ref: '#/components/schemas/LateralityEnum'
+        projection:
+          $ref: '#/components/schemas/ProjectionEnum'
         circuit_type:
           $ref: '#/components/schemas/CircuitTypeEnum'
         species:
           type: array
           items:
             $ref: '#/components/schemas/Specie'
-        biological_sex_id:
+        sex_id:
           type: integer
           nullable: true
-        biological_sex:
+        sex:
           allOf:
-          - $ref: '#/components/schemas/BiologicalSex'
+          - $ref: '#/components/schemas/Sex'
           readOnly: true
         apinatomy_model:
           type: string
           nullable: true
           maxLength: 200
+        additional_information:
+          type: string
+          nullable: true
         modified_date:
           type: string
           format: date-time
@@ -2152,11 +2111,31 @@ components:
           readOnly: true
         display_order:
           type: integer
+          nullable: true
         connectivity_statement_id:
           type: integer
           readOnly: true
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        anatomical_entity_id:
+          type: integer
         anatomical_entity:
-          $ref: '#/components/schemas/AnatomicalEntity'
+          allOf:
+          - $ref: '#/components/schemas/AnatomicalEntity'
+          readOnly: true
+    Phenotype:
+      type: object
+      description: Phenotype
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+      required:
+      - id
+      - name
     Profile:
       type: object
       description: Profile
@@ -2177,6 +2156,28 @@ components:
       required:
       - id
       - user
+    ProjectionEnum:
+      enum:
+      - IPSI
+      - CONTRAT
+      - BI
+      - UNKNOWN
+      type: string
+    Provenance:
+      type: object
+      description: Provenance
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uri:
+          type: string
+        connectivity_statement_id:
+          type: integer
+      required:
+      - connectivity_statement_id
+      - id
+      - uri
     Sentence:
       type: object
       description: Sentence
@@ -2282,20 +2283,24 @@ components:
         knowledge_statement:
           type: string
           readOnly: true
-        dois:
+        provenances:
           type: array
           items:
-            $ref: '#/components/schemas/Doi'
-        ans_division_id:
+            $ref: '#/components/schemas/Provenance'
+        phenotype_id:
           type: integer
           nullable: true
-        ans_division:
+        phenotype:
           allOf:
-          - $ref: '#/components/schemas/AnsDivision'
+          - $ref: '#/components/schemas/Phenotype'
           readOnly: true
         laterality:
           allOf:
           - $ref: '#/components/schemas/LateralityEnum'
+          readOnly: true
+        projection:
+          allOf:
+          - $ref: '#/components/schemas/ProjectionEnum'
           readOnly: true
         circuit_type:
           allOf:
@@ -2306,14 +2311,18 @@ components:
           items:
             $ref: '#/components/schemas/Specie'
           readOnly: true
-        biological_sex_id:
+        sex_id:
           type: integer
           nullable: true
-        biological_sex:
+        sex:
           allOf:
-          - $ref: '#/components/schemas/BiologicalSex'
+          - $ref: '#/components/schemas/Sex'
           readOnly: true
         apinatomy_model:
+          type: string
+          readOnly: true
+          nullable: true
+        additional_information:
           type: string
           readOnly: true
           nullable: true
@@ -2325,17 +2334,37 @@ components:
           - $ref: '#/components/schemas/User'
           readOnly: true
       required:
-      - ans_division
+      - additional_information
       - apinatomy_model
-      - biological_sex
       - circuit_type
-      - dois
       - id
       - knowledge_statement
       - laterality
       - owner
+      - phenotype
+      - projection
+      - provenances
       - sentence_id
+      - sex
       - species
+    Sex:
+      type: object
+      description: Sex
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        ontology_uri:
+          type: string
+          format: uri
+          maxLength: 200
+      required:
+      - id
+      - name
+      - ontology_uri
     Specie:
       type: object
       description: Specie
@@ -2365,6 +2394,11 @@ components:
       required:
       - id
       - tag
+    TypeEnum:
+      enum:
+      - AXON
+      - DENDRITE
+      type: string
     User:
       type: object
       description: User
@@ -2401,13 +2435,21 @@ components:
           readOnly: true
         display_order:
           type: integer
+          nullable: true
         connectivity_statement_id:
           type: integer
           readOnly: true
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        anatomical_entity_id:
+          type: integer
         anatomical_entity:
-          $ref: '#/components/schemas/AnatomicalEntity'
+          allOf:
+          - $ref: '#/components/schemas/AnatomicalEntity'
+          readOnly: true
       required:
       - anatomical_entity
+      - anatomical_entity_id
       - connectivity_statement_id
       - id
   securitySchemes:

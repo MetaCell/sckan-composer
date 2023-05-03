@@ -13,7 +13,6 @@ spec:
     metadata:
       labels:
         app: nginx
-        usesvolume: composer-media
     spec:
       containers:
       - name: nginx
@@ -21,24 +20,6 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
-        volumeMounts:
-        - name: composer-media
-          mountPath: /usr/share/nginx/html/media/
-          readOnly: true
-      volumes:
-      - name: composer-media
-        persistentVolumeClaim:
-          claimName: composer-media
-      affinity:
-        podAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: usesvolume
-                  operator: In
-                  values:
-                    - composer-media
-            topologyKey: "kubernetes.io/hostname"
 ---
 apiVersion: v1
 kind: Service

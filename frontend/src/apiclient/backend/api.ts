@@ -47,50 +47,6 @@ export interface AnatomicalEntity {
     'ontology_uri': string;
 }
 /**
- * ANS Division
- * @export
- * @interface AnsDivision
- */
-export interface AnsDivision {
-    /**
-     * 
-     * @type {number}
-     * @memberof AnsDivision
-     */
-    'id': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof AnsDivision
-     */
-    'name': string;
-}
-/**
- * BiologicalSex
- * @export
- * @interface BiologicalSex
- */
-export interface BiologicalSex {
-    /**
-     * 
-     * @type {number}
-     * @memberof BiologicalSex
-     */
-    'id': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof BiologicalSex
-     */
-    'name': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof BiologicalSex
-     */
-    'ontology_uri': string;
-}
-/**
  * 
  * @export
  * @enum {string}
@@ -146,10 +102,10 @@ export interface ConnectivityStatement {
     'tags': Array<Tag>;
     /**
      * 
-     * @type {Array<Doi>}
+     * @type {Array<Provenance>}
      * @memberof ConnectivityStatement
      */
-    'dois'?: Array<Doi>;
+    'provenances'?: Array<Provenance>;
     /**
      * 
      * @type {User}
@@ -179,7 +135,7 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'origin_id'?: number;
+    'origin_id'?: number | null;
     /**
      * 
      * @type {AnatomicalEntity}
@@ -191,7 +147,7 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'destination_id'?: number;
+    'destination_id'?: number | null;
     /**
      * 
      * @type {AnatomicalEntity}
@@ -203,13 +159,13 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'ans_division_id'?: number | null;
+    'phenotype_id'?: number | null;
     /**
      * 
-     * @type {AnsDivision}
+     * @type {Phenotype}
      * @memberof ConnectivityStatement
      */
-    'ans_division': AnsDivision;
+    'phenotype': Phenotype;
     /**
      * 
      * @type {DestinationTypeEnum}
@@ -221,7 +177,7 @@ export interface ConnectivityStatement {
      * @type {Array<Via>}
      * @memberof ConnectivityStatement
      */
-    'path': Array<Via>;
+    'path'?: Array<Via>;
     /**
      * 
      * @type {string}
@@ -234,6 +190,12 @@ export interface ConnectivityStatement {
      * @memberof ConnectivityStatement
      */
     'laterality'?: LateralityEnum;
+    /**
+     * 
+     * @type {ProjectionEnum}
+     * @memberof ConnectivityStatement
+     */
+    'projection'?: ProjectionEnum;
     /**
      * 
      * @type {CircuitTypeEnum}
@@ -251,19 +213,25 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'biological_sex_id'?: number | null;
+    'sex_id'?: number | null;
     /**
      * 
-     * @type {BiologicalSex}
+     * @type {Sex}
      * @memberof ConnectivityStatement
      */
-    'biological_sex': BiologicalSex;
+    'sex': Sex;
     /**
      * 
      * @type {string}
      * @memberof ConnectivityStatement
      */
     'apinatomy_model'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatement
+     */
+    'additional_information'?: string | null;
     /**
      * 
      * @type {string}
@@ -314,46 +282,14 @@ export type DestinationTypeEnum = typeof DestinationTypeEnum[keyof typeof Destin
 
 
 /**
- * Doi
- * @export
- * @interface Doi
- */
-export interface Doi {
-    /**
-     * 
-     * @type {number}
-     * @memberof Doi
-     */
-    'id': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof Doi
-     */
-    'doi': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Doi
-     */
-    'doi_uri': string | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof Doi
-     */
-    'connectivity_statement_id': number;
-}
-/**
  * 
  * @export
  * @enum {string}
  */
 
 export const LateralityEnum = {
-    Ipsi: 'IPSI',
-    Ontrat: 'ONTRAT',
-    Bi: 'BI',
+    Right: 'RIGHT',
+    Left: 'LEFT',
     Unknown: 'UNKNOWN'
 } as const;
 
@@ -481,68 +417,6 @@ export interface PaginatedAnatomicalEntityList {
 /**
  * 
  * @export
- * @interface PaginatedAnsDivisionList
- */
-export interface PaginatedAnsDivisionList {
-    /**
-     * 
-     * @type {number}
-     * @memberof PaginatedAnsDivisionList
-     */
-    'count'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof PaginatedAnsDivisionList
-     */
-    'next'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof PaginatedAnsDivisionList
-     */
-    'previous'?: string | null;
-    /**
-     * 
-     * @type {Array<AnsDivision>}
-     * @memberof PaginatedAnsDivisionList
-     */
-    'results'?: Array<AnsDivision>;
-}
-/**
- * 
- * @export
- * @interface PaginatedBiologicalSexList
- */
-export interface PaginatedBiologicalSexList {
-    /**
-     * 
-     * @type {number}
-     * @memberof PaginatedBiologicalSexList
-     */
-    'count'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof PaginatedBiologicalSexList
-     */
-    'next'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof PaginatedBiologicalSexList
-     */
-    'previous'?: string | null;
-    /**
-     * 
-     * @type {Array<BiologicalSex>}
-     * @memberof PaginatedBiologicalSexList
-     */
-    'results'?: Array<BiologicalSex>;
-}
-/**
- * 
- * @export
  * @interface PaginatedConnectivityStatementList
  */
 export interface PaginatedConnectivityStatementList {
@@ -605,6 +479,37 @@ export interface PaginatedNoteList {
 /**
  * 
  * @export
+ * @interface PaginatedPhenotypeList
+ */
+export interface PaginatedPhenotypeList {
+    /**
+     * 
+     * @type {number}
+     * @memberof PaginatedPhenotypeList
+     */
+    'count'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedPhenotypeList
+     */
+    'next'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedPhenotypeList
+     */
+    'previous'?: string | null;
+    /**
+     * 
+     * @type {Array<Phenotype>}
+     * @memberof PaginatedPhenotypeList
+     */
+    'results'?: Array<Phenotype>;
+}
+/**
+ * 
+ * @export
  * @interface PaginatedSentenceList
  */
 export interface PaginatedSentenceList {
@@ -632,6 +537,37 @@ export interface PaginatedSentenceList {
      * @memberof PaginatedSentenceList
      */
     'results'?: Array<Sentence>;
+}
+/**
+ * 
+ * @export
+ * @interface PaginatedSexList
+ */
+export interface PaginatedSexList {
+    /**
+     * 
+     * @type {number}
+     * @memberof PaginatedSexList
+     */
+    'count'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedSexList
+     */
+    'next'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedSexList
+     */
+    'previous'?: string | null;
+    /**
+     * 
+     * @type {Array<Sex>}
+     * @memberof PaginatedSexList
+     */
+    'results'?: Array<Sex>;
 }
 /**
  * 
@@ -764,10 +700,10 @@ export interface PatchedConnectivityStatement {
     'tags'?: Array<Tag>;
     /**
      * 
-     * @type {Array<Doi>}
+     * @type {Array<Provenance>}
      * @memberof PatchedConnectivityStatement
      */
-    'dois'?: Array<Doi>;
+    'provenances'?: Array<Provenance>;
     /**
      * 
      * @type {User}
@@ -797,7 +733,7 @@ export interface PatchedConnectivityStatement {
      * @type {number}
      * @memberof PatchedConnectivityStatement
      */
-    'origin_id'?: number;
+    'origin_id'?: number | null;
     /**
      * 
      * @type {AnatomicalEntity}
@@ -809,7 +745,7 @@ export interface PatchedConnectivityStatement {
      * @type {number}
      * @memberof PatchedConnectivityStatement
      */
-    'destination_id'?: number;
+    'destination_id'?: number | null;
     /**
      * 
      * @type {AnatomicalEntity}
@@ -821,13 +757,13 @@ export interface PatchedConnectivityStatement {
      * @type {number}
      * @memberof PatchedConnectivityStatement
      */
-    'ans_division_id'?: number | null;
+    'phenotype_id'?: number | null;
     /**
      * 
-     * @type {AnsDivision}
+     * @type {Phenotype}
      * @memberof PatchedConnectivityStatement
      */
-    'ans_division'?: AnsDivision;
+    'phenotype'?: Phenotype;
     /**
      * 
      * @type {DestinationTypeEnum}
@@ -854,6 +790,12 @@ export interface PatchedConnectivityStatement {
     'laterality'?: LateralityEnum;
     /**
      * 
+     * @type {ProjectionEnum}
+     * @memberof PatchedConnectivityStatement
+     */
+    'projection'?: ProjectionEnum;
+    /**
+     * 
      * @type {CircuitTypeEnum}
      * @memberof PatchedConnectivityStatement
      */
@@ -869,19 +811,25 @@ export interface PatchedConnectivityStatement {
      * @type {number}
      * @memberof PatchedConnectivityStatement
      */
-    'biological_sex_id'?: number | null;
+    'sex_id'?: number | null;
     /**
      * 
-     * @type {BiologicalSex}
+     * @type {Sex}
      * @memberof PatchedConnectivityStatement
      */
-    'biological_sex'?: BiologicalSex;
+    'sex'?: Sex;
     /**
      * 
      * @type {string}
      * @memberof PatchedConnectivityStatement
      */
     'apinatomy_model'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'additional_information'?: string | null;
     /**
      * 
      * @type {string}
@@ -1070,7 +1018,7 @@ export interface PatchedVia {
      * @type {number}
      * @memberof PatchedVia
      */
-    'display_order'?: number;
+    'display_order'?: number | null;
     /**
      * 
      * @type {number}
@@ -1079,10 +1027,41 @@ export interface PatchedVia {
     'connectivity_statement_id'?: number;
     /**
      * 
+     * @type {TypeEnum}
+     * @memberof PatchedVia
+     */
+    'type'?: TypeEnum;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedVia
+     */
+    'anatomical_entity_id'?: number;
+    /**
+     * 
      * @type {AnatomicalEntity}
      * @memberof PatchedVia
      */
     'anatomical_entity'?: AnatomicalEntity;
+}
+/**
+ * Phenotype
+ * @export
+ * @interface Phenotype
+ */
+export interface Phenotype {
+    /**
+     * 
+     * @type {number}
+     * @memberof Phenotype
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Phenotype
+     */
+    'name': string;
 }
 /**
  * Profile
@@ -1120,6 +1099,47 @@ export interface Profile {
      * @memberof Profile
      */
     'is_reviewer'?: boolean;
+}
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const ProjectionEnum = {
+    Ipsi: 'IPSI',
+    Contrat: 'CONTRAT',
+    Bi: 'BI',
+    Unknown: 'UNKNOWN'
+} as const;
+
+export type ProjectionEnum = typeof ProjectionEnum[keyof typeof ProjectionEnum];
+
+
+/**
+ * Provenance
+ * @export
+ * @interface Provenance
+ */
+export interface Provenance {
+    /**
+     * 
+     * @type {number}
+     * @memberof Provenance
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Provenance
+     */
+    'uri': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Provenance
+     */
+    'connectivity_statement_id': number;
 }
 /**
  * Sentence
@@ -1286,28 +1306,34 @@ export interface SentenceConnectivityStatement {
     'knowledge_statement': string;
     /**
      * 
-     * @type {Array<Doi>}
+     * @type {Array<Provenance>}
      * @memberof SentenceConnectivityStatement
      */
-    'dois': Array<Doi>;
+    'provenances': Array<Provenance>;
     /**
      * 
      * @type {number}
      * @memberof SentenceConnectivityStatement
      */
-    'ans_division_id'?: number | null;
+    'phenotype_id'?: number | null;
     /**
      * 
-     * @type {AnsDivision}
+     * @type {Phenotype}
      * @memberof SentenceConnectivityStatement
      */
-    'ans_division': AnsDivision;
+    'phenotype': Phenotype;
     /**
      * 
      * @type {LateralityEnum}
      * @memberof SentenceConnectivityStatement
      */
     'laterality': LateralityEnum;
+    /**
+     * 
+     * @type {ProjectionEnum}
+     * @memberof SentenceConnectivityStatement
+     */
+    'projection': ProjectionEnum;
     /**
      * 
      * @type {CircuitTypeEnum}
@@ -1325,19 +1351,25 @@ export interface SentenceConnectivityStatement {
      * @type {number}
      * @memberof SentenceConnectivityStatement
      */
-    'biological_sex_id'?: number | null;
+    'sex_id'?: number | null;
     /**
      * 
-     * @type {BiologicalSex}
+     * @type {Sex}
      * @memberof SentenceConnectivityStatement
      */
-    'biological_sex': BiologicalSex;
+    'sex': Sex;
     /**
      * 
      * @type {string}
      * @memberof SentenceConnectivityStatement
      */
     'apinatomy_model': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof SentenceConnectivityStatement
+     */
+    'additional_information': string | null;
     /**
      * 
      * @type {number}
@@ -1350,6 +1382,31 @@ export interface SentenceConnectivityStatement {
      * @memberof SentenceConnectivityStatement
      */
     'owner': User;
+}
+/**
+ * Sex
+ * @export
+ * @interface Sex
+ */
+export interface Sex {
+    /**
+     * 
+     * @type {number}
+     * @memberof Sex
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Sex
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Sex
+     */
+    'ontology_uri': string;
 }
 /**
  * Specie
@@ -1395,6 +1452,20 @@ export interface Tag {
      */
     'tag': string;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const TypeEnum = {
+    Axon: 'AXON',
+    Dendrite: 'DENDRITE'
+} as const;
+
+export type TypeEnum = typeof TypeEnum[keyof typeof TypeEnum];
+
+
 /**
  * User
  * @export
@@ -1449,13 +1520,25 @@ export interface Via {
      * @type {number}
      * @memberof Via
      */
-    'display_order'?: number;
+    'display_order'?: number | null;
     /**
      * 
      * @type {number}
      * @memberof Via
      */
     'connectivity_statement_id': number;
+    /**
+     * 
+     * @type {TypeEnum}
+     * @memberof Via
+     */
+    'type'?: TypeEnum;
+    /**
+     * 
+     * @type {number}
+     * @memberof Via
+     */
+    'anatomical_entity_id': number;
     /**
      * 
      * @type {AnatomicalEntity}
@@ -1566,200 +1649,20 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * AnsDivision
-         * @param {number} [limit] Number of results to return per page.
-         * @param {number} [offset] The initial index from which to return the results.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerAnsDivisionList: async (limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/composer/ans-division/`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication cookieAuth required
-
-            // authentication tokenAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
-
-            if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
-            }
-
-            if (offset !== undefined) {
-                localVarQueryParameter['offset'] = offset;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * AnsDivision
-         * @param {number} id A unique integer value identifying this ans division.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerAnsDivisionRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('composerAnsDivisionRetrieve', 'id', id)
-            const localVarPath = `/api/composer/ans-division/{id}/`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication cookieAuth required
-
-            // authentication tokenAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * BiologicalSex
-         * @param {number} [limit] Number of results to return per page.
-         * @param {number} [offset] The initial index from which to return the results.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerBiologicalSexList: async (limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/composer/biological-sex/`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication cookieAuth required
-
-            // authentication tokenAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
-
-            if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
-            }
-
-            if (offset !== undefined) {
-                localVarQueryParameter['offset'] = offset;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * BiologicalSex
-         * @param {number} id A unique integer value identifying this biological sex.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerBiologicalSexRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('composerBiologicalSexRetrieve', 'id', id)
-            const localVarPath = `/api/composer/biological-sex/{id}/`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication cookieAuth required
-
-            // authentication tokenAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * ConnectivityStatement
-         * @param {string} doi 
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {string} uri 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAddDoiCreate: async (doi: string, id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'doi' is not null or undefined
-            assertParamExists('composerConnectivityStatementAddDoiCreate', 'doi', doi)
+        composerConnectivityStatementAddProvenanceCreate: async (id: number, uri: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
-            assertParamExists('composerConnectivityStatementAddDoiCreate', 'id', id)
-            const localVarPath = `/api/composer/connectivity-statement/{id}/add_doi/{doi}/`
-                .replace(`{${"doi"}}`, encodeURIComponent(String(doi)))
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            assertParamExists('composerConnectivityStatementAddProvenanceCreate', 'id', id)
+            // verify required parameter 'uri' is not null or undefined
+            assertParamExists('composerConnectivityStatementAddProvenanceCreate', 'uri', uri)
+            const localVarPath = `/api/composer/connectivity-statement/{id}/add_provenance/{uri}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"uri"}}`, encodeURIComponent(String(uri)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1929,19 +1832,19 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * ConnectivityStatement
-         * @param {number} doiId 
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {number} provenanceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDelDoiDestroy: async (doiId: number, id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'doiId' is not null or undefined
-            assertParamExists('composerConnectivityStatementDelDoiDestroy', 'doiId', doiId)
+        composerConnectivityStatementDelProvenanceDestroy: async (id: number, provenanceId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
-            assertParamExists('composerConnectivityStatementDelDoiDestroy', 'id', id)
-            const localVarPath = `/api/composer/connectivity-statement/{id}/del_doi/{doi_id}/`
-                .replace(`{${"doi_id"}}`, encodeURIComponent(String(doiId)))
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            assertParamExists('composerConnectivityStatementDelProvenanceDestroy', 'id', id)
+            // verify required parameter 'provenanceId' is not null or undefined
+            assertParamExists('composerConnectivityStatementDelProvenanceDestroy', 'provenanceId', provenanceId)
+            const localVarPath = `/api/composer/connectivity-statement/{id}/del_provenance/{provenance_id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"provenance_id"}}`, encodeURIComponent(String(provenanceId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2792,6 +2695,96 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Phenotype
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerPhenotypeList: async (limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/phenotype/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication cookieAuth required
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Phenotype
+         * @param {number} id A unique integer value identifying this phenotype.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerPhenotypeRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerPhenotypeRetrieve', 'id', id)
+            const localVarPath = `/api/composer/phenotype/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication cookieAuth required
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Profile
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3220,6 +3213,96 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(sentence, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Sex
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSexList: async (limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/sex/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication cookieAuth required
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Sex
+         * @param {number} id A unique integer value identifying this sex.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSexRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerSexRetrieve', 'id', id)
+            const localVarPath = `/api/composer/sex/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication cookieAuth required
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -3719,56 +3802,14 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * AnsDivision
-         * @param {number} [limit] Number of results to return per page.
-         * @param {number} [offset] The initial index from which to return the results.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async composerAnsDivisionList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedAnsDivisionList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerAnsDivisionList(limit, offset, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * AnsDivision
-         * @param {number} id A unique integer value identifying this ans division.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async composerAnsDivisionRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AnsDivision>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerAnsDivisionRetrieve(id, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * BiologicalSex
-         * @param {number} [limit] Number of results to return per page.
-         * @param {number} [offset] The initial index from which to return the results.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async composerBiologicalSexList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedBiologicalSexList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerBiologicalSexList(limit, offset, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * BiologicalSex
-         * @param {number} id A unique integer value identifying this biological sex.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async composerBiologicalSexRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BiologicalSex>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerBiologicalSexRetrieve(id, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
          * ConnectivityStatement
-         * @param {string} doi 
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {string} uri 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementAddDoiCreate(doi: string, id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAddDoiCreate(doi, id, options);
+        async composerConnectivityStatementAddProvenanceCreate(id: number, uri: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAddProvenanceCreate(id, uri, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3805,13 +3846,13 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * ConnectivityStatement
-         * @param {number} doiId 
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {number} provenanceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementDelDoiDestroy(doiId: number, id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementDelDoiDestroy(doiId, id, options);
+        async composerConnectivityStatementDelProvenanceDestroy(id: number, provenanceId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementDelProvenanceDestroy(id, provenanceId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4005,6 +4046,27 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Phenotype
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerPhenotypeList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedPhenotypeList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerPhenotypeList(limit, offset, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Phenotype
+         * @param {number} id A unique integer value identifying this phenotype.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerPhenotypeRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Phenotype>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerPhenotypeRetrieve(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Profile
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4103,6 +4165,27 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          */
         async composerSentenceUpdate(id: number, sentence: Sentence, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceUpdate(id, sentence, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Sex
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerSexList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSexList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSexList(limit, offset, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Sex
+         * @param {number} id A unique integer value identifying this sex.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerSexRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sex>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSexRetrieve(id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4243,52 +4326,14 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerAnatomicalEntityRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * AnsDivision
-         * @param {number} [limit] Number of results to return per page.
-         * @param {number} [offset] The initial index from which to return the results.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerAnsDivisionList(limit?: number, offset?: number, options?: any): AxiosPromise<PaginatedAnsDivisionList> {
-            return localVarFp.composerAnsDivisionList(limit, offset, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * AnsDivision
-         * @param {number} id A unique integer value identifying this ans division.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerAnsDivisionRetrieve(id: number, options?: any): AxiosPromise<AnsDivision> {
-            return localVarFp.composerAnsDivisionRetrieve(id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * BiologicalSex
-         * @param {number} [limit] Number of results to return per page.
-         * @param {number} [offset] The initial index from which to return the results.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerBiologicalSexList(limit?: number, offset?: number, options?: any): AxiosPromise<PaginatedBiologicalSexList> {
-            return localVarFp.composerBiologicalSexList(limit, offset, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * BiologicalSex
-         * @param {number} id A unique integer value identifying this biological sex.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerBiologicalSexRetrieve(id: number, options?: any): AxiosPromise<BiologicalSex> {
-            return localVarFp.composerBiologicalSexRetrieve(id, options).then((request) => request(axios, basePath));
-        },
-        /**
          * ConnectivityStatement
-         * @param {string} doi 
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {string} uri 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAddDoiCreate(doi: string, id: number, options?: any): AxiosPromise<ConnectivityStatement> {
-            return localVarFp.composerConnectivityStatementAddDoiCreate(doi, id, options).then((request) => request(axios, basePath));
+        composerConnectivityStatementAddProvenanceCreate(id: number, uri: string, options?: any): AxiosPromise<ConnectivityStatement> {
+            return localVarFp.composerConnectivityStatementAddProvenanceCreate(id, uri, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -4321,13 +4366,13 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * ConnectivityStatement
-         * @param {number} doiId 
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {number} provenanceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDelDoiDestroy(doiId: number, id: number, options?: any): AxiosPromise<void> {
-            return localVarFp.composerConnectivityStatementDelDoiDestroy(doiId, id, options).then((request) => request(axios, basePath));
+        composerConnectivityStatementDelProvenanceDestroy(id: number, provenanceId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.composerConnectivityStatementDelProvenanceDestroy(id, provenanceId, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -4503,6 +4548,25 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerNoteUpdate(id, note, options).then((request) => request(axios, basePath));
         },
         /**
+         * Phenotype
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerPhenotypeList(limit?: number, offset?: number, options?: any): AxiosPromise<PaginatedPhenotypeList> {
+            return localVarFp.composerPhenotypeList(limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Phenotype
+         * @param {number} id A unique integer value identifying this phenotype.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerPhenotypeRetrieve(id: number, options?: any): AxiosPromise<Phenotype> {
+            return localVarFp.composerPhenotypeRetrieve(id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Profile
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4593,6 +4657,25 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          */
         composerSentenceUpdate(id: number, sentence: Sentence, options?: any): AxiosPromise<Sentence> {
             return localVarFp.composerSentenceUpdate(id, sentence, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Sex
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSexList(limit?: number, offset?: number, options?: any): AxiosPromise<PaginatedSexList> {
+            return localVarFp.composerSexList(limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Sex
+         * @param {number} id A unique integer value identifying this sex.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSexRetrieve(id: number, options?: any): AxiosPromise<Sex> {
+            return localVarFp.composerSexRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
          * Specie
@@ -4726,61 +4809,15 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * AnsDivision
-     * @param {number} [limit] Number of results to return per page.
-     * @param {number} [offset] The initial index from which to return the results.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComposerApi
-     */
-    public composerAnsDivisionList(limit?: number, offset?: number, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerAnsDivisionList(limit, offset, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * AnsDivision
-     * @param {number} id A unique integer value identifying this ans division.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComposerApi
-     */
-    public composerAnsDivisionRetrieve(id: number, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerAnsDivisionRetrieve(id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * BiologicalSex
-     * @param {number} [limit] Number of results to return per page.
-     * @param {number} [offset] The initial index from which to return the results.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComposerApi
-     */
-    public composerBiologicalSexList(limit?: number, offset?: number, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerBiologicalSexList(limit, offset, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * BiologicalSex
-     * @param {number} id A unique integer value identifying this biological sex.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComposerApi
-     */
-    public composerBiologicalSexRetrieve(id: number, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerBiologicalSexRetrieve(id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * ConnectivityStatement
-     * @param {string} doi 
      * @param {number} id A unique integer value identifying this connectivity statement.
+     * @param {string} uri 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementAddDoiCreate(doi: string, id: number, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementAddDoiCreate(doi, id, options).then((request) => request(this.axios, this.basePath));
+    public composerConnectivityStatementAddProvenanceCreate(id: number, uri: string, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementAddProvenanceCreate(id, uri, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4820,14 +4857,14 @@ export class ComposerApi extends BaseAPI {
 
     /**
      * ConnectivityStatement
-     * @param {number} doiId 
      * @param {number} id A unique integer value identifying this connectivity statement.
+     * @param {number} provenanceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementDelDoiDestroy(doiId: number, id: number, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementDelDoiDestroy(doiId, id, options).then((request) => request(this.axios, this.basePath));
+    public composerConnectivityStatementDelProvenanceDestroy(id: number, provenanceId: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementDelProvenanceDestroy(id, provenanceId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -5038,6 +5075,29 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
+     * Phenotype
+     * @param {number} [limit] Number of results to return per page.
+     * @param {number} [offset] The initial index from which to return the results.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerPhenotypeList(limit?: number, offset?: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerPhenotypeList(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Phenotype
+     * @param {number} id A unique integer value identifying this phenotype.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerPhenotypeRetrieve(id: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerPhenotypeRetrieve(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Profile
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -5145,6 +5205,29 @@ export class ComposerApi extends BaseAPI {
      */
     public composerSentenceUpdate(id: number, sentence: Sentence, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentenceUpdate(id, sentence, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Sex
+     * @param {number} [limit] Number of results to return per page.
+     * @param {number} [offset] The initial index from which to return the results.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerSexList(limit?: number, offset?: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSexList(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Sex
+     * @param {number} id A unique integer value identifying this sex.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerSexRetrieve(id: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSexRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

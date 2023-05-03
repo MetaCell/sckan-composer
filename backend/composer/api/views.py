@@ -20,7 +20,7 @@ from .filtersets import (
 )
 from .serializers import (
     AnatomicalEntitySerializer,
-    AnsDivisionSerializer,
+    PhenotypeSerializer,
     ConnectivityStatementSerializer,
     NoteSerializer,
     ProfileSerializer,
@@ -28,12 +28,12 @@ from .serializers import (
     SpecieSerializer,
     TagSerializer,
     ViaSerializer,
-    DoiSerializer,
-    BiologicalSexSerializer,
+    ProvenanceSerializer,
+    SexSerializer,
 )
 from ..models import (
     AnatomicalEntity,
-    AnsDivision,
+    Phenotype,
     ConnectivityStatement,
     Note,
     Profile,
@@ -41,8 +41,8 @@ from ..models import (
     Specie,
     Tag,
     Via,
-    Doi,
-    BiologicalSex,
+    Provenance,
+    Sex,
 )
 from composer.services.state_services import (
     ConnectivityStatementService,
@@ -97,13 +97,13 @@ class TagMixin(
         return Response(self.get_serializer(instance).data)
 
 
-class DoiMixin(
+class ProvenanceMixin(
     viewsets.GenericViewSet,
 ):
     @extend_schema(
         parameters=[
             OpenApiParameter(
-                "doi",
+                "uri",
                 OpenApiTypes.STR,
                 location=OpenApiParameter.PATH,
                 required=True,
@@ -111,20 +111,20 @@ class DoiMixin(
         ],
         request=None,
     )
-    @action(detail=True, methods=["post"], url_path="add_doi/(?P<doi>.*)")
-    def add_doi(self, request, pk=None, doi=None):
-        doi_instance, created = Doi.objects.get_or_create(
+    @action(detail=True, methods=["post"], url_path="add_provenance/(?P<uri>.*)")
+    def add_provenance(self, request, pk=None, uri=None):
+        procenance, created = Provenance.objects.get_or_create(
             connectivity_statement_id=pk,
-            doi=doi,
+            uri=uri,
         )
-        doi_instance.save()
+        procenance.save()
         instance = self.get_object()
         return Response(self.get_serializer(instance).data)
 
     @extend_schema(
         parameters=[
             OpenApiParameter(
-                "doi_id",
+                "provenance_id",
                 OpenApiTypes.INT,
                 location=OpenApiParameter.PATH,
                 required=True,
@@ -132,10 +132,10 @@ class DoiMixin(
         ],
         request=None,
     )
-    @action(detail=True, methods=["delete"], url_path="del_doi/(?P<doi_id>\d+)")
-    def del_doi(self, request, pk=None, doi_id=None):
-        count, deleted = Doi.objects.filter(
-            id=doi_id, connectivity_statement_id=pk
+    @action(detail=True, methods=["delete"], url_path="del_provenance/(?P<provenance_id>\d+)")
+    def del_provenance(self, request, pk=None, provenance_id=None):
+        count, deleted = Provenance.objects.filter(
+            id=provenance_id, connectivity_statement_id=pk
         ).delete()
         if count == 0:
             raise Http404
@@ -235,25 +235,25 @@ class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = AnatomicalEntityFilter
 
 
-class AnsDivisionViewSet(viewsets.ReadOnlyModelViewSet):
+class PhenotypeViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    AnsDivision
+    Phenotype
     """
 
-    queryset = AnsDivision.objects.all()
-    serializer_class = AnsDivisionSerializer
+    queryset = Phenotype.objects.all()
+    serializer_class = PhenotypeSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
 
 
-class BiologicalSexViewSet(viewsets.ReadOnlyModelViewSet):
+class SexViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    BiologicalSex
+    Sex
     """
 
-    queryset = BiologicalSex.objects.all()
-    serializer_class = BiologicalSexSerializer
+    queryset = Sex.objects.all()
+    serializer_class = SexSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
@@ -273,7 +273,7 @@ class NoteViewSet(viewsets.ModelViewSet):
 
 
 class ConnectivityStatementViewSet(
-    DoiMixin,
+    ProvenanceMixin,
     SpecieMixin,
     TagMixin,
     TransitionMixin,
@@ -387,7 +387,7 @@ def jsonschemas(request):
         SentenceSerializer,
         ViaSerializer,
         TagSerializer,
-        DoiSerializer,
+        ProvenanceSerializer,
         SpecieSerializer,
         NoteSerializer,
     ]

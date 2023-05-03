@@ -27,7 +27,10 @@ export const FormBase = (props: any) => {
     formIsValid,
     children = false,
     widgets,
+    templates,
     submitButtonProps,
+    className = false,
+    showErrorList
   } = props;
   const [localData, setLocalData] = useState<any>(data);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -133,6 +136,9 @@ export const FormBase = (props: any) => {
           onSubmit={handleSubmit}
           onError={onError}
           widgets={widgets}
+          className={className}
+          templates={templates}
+          showErrorList={showErrorList}
         >
           {children}
 

@@ -13,6 +13,8 @@ const Searchbar = (props: any) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const dispatch = useAppDispatch();
 
+  const placeholder = entityType === 'sentence' ? 'Search for Sentences' : 'Search for Knowledge Statements' 
+
   const handleInputChange = (e: any) => {
     entityType === "sentence" && dispatch(setTitleQuery(e.target.value));
     entityType === "statement" &&
@@ -53,7 +55,7 @@ const Searchbar = (props: any) => {
         inputRef={inputRef}
         onChange={debouncedChangeHandler}
         variant="outlined"
-        placeholder="Search for Sentences"
+        placeholder={placeholder}
         size="small"
         defaultValue={
           entityType === "sentence"

@@ -4,6 +4,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Typography,
+  Box
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import StatementForm from "../Forms/StatementForm";
@@ -25,6 +26,7 @@ const StatementDetailsAccordion = (props: any) => {
       setExpanded(isExpanded ? panel : false);
     };
   return (
+    <Box px={2} py={0.5}>
     <Accordion
       expanded={expanded === `panel-${index}`}
       onChange={handleChange(`panel-${index}`)}
@@ -43,7 +45,7 @@ const StatementDetailsAccordion = (props: any) => {
       >
         <Typography variant="h6" ml={1}>Statement Details</Typography>
       </AccordionSummary>
-      <AccordionDetails sx={{px:4, py:0}}>
+      <AccordionDetails sx={{px:4, pt:0, pb:2}}>
       <SpeciesForm
           data={statement.species}
           extraData={{ parentId: statement.id, service: statementService }}
@@ -58,15 +60,18 @@ const StatementDetailsAccordion = (props: any) => {
             knowledge_statement: statement.knowledge_statement,
           }}
           uiFields={[
-            "biological_sex_id",
+            "sex_id",
             "apinatomy_model",
             "circuit_type",
             "laterality",
-            "ans_division_id",
+            "projection",
+            "phenotype_id",
+            "additional_information"
           ]}
         />
       </AccordionDetails>
     </Accordion>
+    </Box>
   );
 };
 
