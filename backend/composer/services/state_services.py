@@ -1,6 +1,7 @@
 from django.db import transaction
 
 from composer.enums import CSState
+from django.db.models import Q, Count
 
 
 class BaseServiceMixin:
@@ -86,7 +87,14 @@ class SentenceService(StateServiceMixin):
     def can_be_composed(sentence):
         # return True if the sentence can go to state compose_now
         # it should at least pass the can_be_reviewed test
-        return SentenceService.can_be_reviewed(sentence)
+        # all statements related to the sentence must have knowledge_statement text and at least one provenance
+        return (
+            SentenceService.can_be_reviewed(sentence)
+            ) and (sentence.connectivitystatement_set.annotate(num_prov=Count('provenance')).filter(
+                    Q(knowledge_statement__isnull=True) 
+                    | Q(knowledge_statement__exact="") 
+                    | Q(num_prov__lte=0)).count() == 0)
+
 
 
 class ConnectivityStatementService(StateServiceMixin):
