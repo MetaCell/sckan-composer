@@ -6,6 +6,8 @@
   "proxy": "https://localhost:8000/",
   "dependencies": {
     "@babel/preset-env": "^7.21.5",
+    "@dnd-kit/core": "^6.0.8",
+    "@dnd-kit/sortable": "^7.0.2",
     "@emotion/react": "11.10.5",
     "@emotion/styled": "11.10.5",
     "@mui/icons-material": "5.11.0",
