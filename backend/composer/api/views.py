@@ -193,6 +193,20 @@ class TransitionMixin(viewsets.GenericViewSet):
         return Response(self.get_serializer(instance).data)
 
 
+class CSCloningMixin(viewsets.GenericViewSet):
+    @action(detail=True, methods=["get"], url_path="clone_statement")
+    def clone_statement(self, request, pk=None, statement_id=None):
+        instance = self.get_object()
+        instance.pk = None
+        instance.origin = None
+        instance.destination = None
+        instance.destination_type = 'UNKNOWN'
+        instance.save()
+        provenances = (Provenance(connectivity_statement = instance, uri=provenance.uri) for provenance in self.get_object().provenance_set.all())
+        Provenance.objects.bulk_create(provenances)
+        return Response(self.get_serializer(instance).data)
+
+
 # Viewsets
 
 
@@ -278,6 +292,7 @@ class ConnectivityStatementViewSet(
     TagMixin,
     TransitionMixin,
     AssignOwnerMixin,
+    CSCloningMixin,
     viewsets.ModelViewSet,
 ):
     """

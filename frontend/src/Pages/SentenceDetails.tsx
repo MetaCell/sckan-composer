@@ -7,7 +7,7 @@ import Button from "@mui/material/Button";
 import { useParams } from "react-router-dom";
 import sentenceService from "../services/SentenceService";
 import TagForm from "../components/Forms/TagForm";
-import { Sentence, SentenceConnectivityStatement, SentenceAvailableTransitionsEnum } from "../apiclient/backend";
+import { Sentence, SentenceConnectivityStatement, SentenceAvailableTransitionsEnum } from "../apiclient/backend/api";
 import { userProfile } from "../services/UserService";
 import CheckDuplicates from "../components/CheckForDuplicates/CheckDuplicatesDialog";
 import { SentenceStateChip } from "../components/Widgets/StateChip";

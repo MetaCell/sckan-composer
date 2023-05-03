@@ -384,6 +384,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConnectivityStatement'
           description: ''
+  /api/composer/connectivity-statement/{id}/clone_statement/:
+    get:
+      operationId: composer_connectivity_statement_clone_statement_retrieve
+      description: ConnectivityStatement
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatement'
+          description: ''
   /api/composer/connectivity-statement/{id}/del_provenance/{provenance_id}/:
     delete:
       operationId: composer_connectivity_statement_del_provenance_destroy
