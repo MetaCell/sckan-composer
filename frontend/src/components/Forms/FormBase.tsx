@@ -41,9 +41,8 @@ export const FormBase = (props: any) => {
     useState<boolean>(false);
   const [customSchema, setCustomSchema] = useState<any>(schema);
   const [customUiSchema, setCustomUiSchema] = useState<any>(uiSchema);
-  const [timer, setTimer] = useState<number>(0)
 
-  const interval = useRef<any>(null)
+  const timer = useRef<any>(null)
 
   const submitButtonRef = useRef<any>(null);
   const removeProp = (obj: any, prop: string) => {
@@ -73,19 +72,21 @@ export const FormBase = (props: any) => {
     }
   }, [data]);
 
-  const startTimer = () => interval.current = setInterval(()=>setTimer((timer)=>timer + 1000), 1000)
+  const startTimer = () => timer.current = setTimeout(()=>{
+    if(enableAutoSave){
+      onSave()
+    }
+  },EDIT_DEBOUNCE)
+
   const stopTimer = () =>{
-    clearInterval(interval.current)
-    setTimer(0)
+    clearTimeout(timer.current)
   }
 
+  const resetTimer = () =>{
+    stopTimer()
+    startTimer()
+  }
 
-  useEffect(() => {
-    if(timer === EDIT_DEBOUNCE && enableAutoSave){
-      onSave()
-      setTimer(0)
-    }
-  }, [timer])
 
   useEffect(() => {
     return () => stopTimer()
@@ -132,7 +133,7 @@ export const FormBase = (props: any) => {
   const handleUpdate = async (event: IChangeEvent, id: any) => {
     const formData = { ...event.formData, ...extraData };
     if(submitOnBlurFields.some((field:string)=> id.includes(field))){
-      setTimer(0)
+      resetTimer()
     }
     if(submitOnChangeFields.some((field:string)=> id.includes(field))){
       return onSave()
