@@ -1,6 +1,5 @@
 import * as React from "react";
 import TextField from "@mui/material/TextField";
-import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import { styled } from "@mui/material";
 import Typography from "@mui/material/Typography";
@@ -16,12 +15,17 @@ const StyledInput = styled(TextField)(({ theme }) => ({
 }));
 
 export default function CustomTextField({
+  id,
   value,
   placeholder,
   disabled,
   onChange,
+  onBlur,
+  onFocus,
   options: { label, multiline, rows },
 }: any) {
+
+
   return (
     <FormControl variant="standard">
         <Typography variant="h6" fontWeight={500} marginBottom={2} color={vars.titleFontColor}>
@@ -36,6 +40,8 @@ export default function CustomTextField({
         rows={rows}
         value={value ? value : ''}
         disabled={disabled}
+        onBlur={(e=>onBlur(id,e.target.value))}
+        onFocus={(e=>onFocus(id,e.target.value))}
       />
     </FormControl>
   );

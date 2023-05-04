@@ -45,6 +45,7 @@ const TriageStatementSection = (props: any) => {
                 extraData={{ sentence_id: sentence.id }}
                 uiFields={["knowledge_statement"]}
                 className='ks'
+                enableAutoSave={true}
               />
 
               <ProvenancesForm

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { FormBase } from "./FormBase";
 import { jsonSchemas } from "../../services/JsonSchema";
 import statementService from "../../services/StatementService";
@@ -9,6 +9,7 @@ import ArrayFieldTemplate from "../Widgets/ArrayFieldTemplate";
 import AnatomicalEntitiesField from "../AnatomicalEntitiesField";
 import { sexes } from '../../services/SexService';
 import { phenotypes } from '../../services/PhenotypeService';
+
 
 const StatementForm = (props: any) => {
   const { uiFields, statement, setter, format } = props;
@@ -37,7 +38,7 @@ const StatementForm = (props: any) => {
   copiedUISchema.projection= {
     "ui:widget": "radio",
       "ui:options": {
-      classNames: 'col-xs-12 col-md-6'
+      classNames: 'col-xs-12 col-md-6',
     }
   }
 
@@ -67,7 +68,7 @@ const StatementForm = (props: any) => {
         placeholder: "Select Phenotype",
         data: phenotypes.getPhenotypes().map((row: any) => ({ label: row.name, value: row.id })),
     },
-    value: statement?.phenotype_id ?? ""
+    value: statement?.phenotype_id ?? "",
   }
 
   copiedUISchema.knowledge_statement = {
@@ -76,7 +77,6 @@ const StatementForm = (props: any) => {
       label: "Knowledge Statement",
       placeholder: "Enter Knowledge Statement",
       rows: 4,
-      hasDebouncedOnChange: true,
       value: statement?.knowledge_statement ?? "",
     },
   };
@@ -127,7 +127,7 @@ const StatementForm = (props: any) => {
       label: "Additional Information",
       placeholder: "Enter additional information on the knowledge statement",
       multiline: true, 
-      rows: 4
+      rows: 4,
     },
     value: statement?.additional_information ?? "",
   };
@@ -146,17 +146,19 @@ const StatementForm = (props: any) => {
 
   return (
     <FormBase
-      {...props}
       data={statement}
       service={statementService}
       schema={copiedSchema}
       uiSchema={copiedUISchema}
       uiFields={uiFields}
-      enableAutoSave={true}
+      enableAutoSave={false}
       children={true}
       widgets={widgets}
       templates={templates}
       showErrorList={false}
+      submitOnBlurFields={['knowledge_statement', 'additional_information', 'apinatomy_model']}
+      submitOnChangeFields={['phenotype_id', 'sex_id', 'laterality', 'circuit_type', 'projection', 'destination_type', 'path_type']}
+      {...props}
     />
   );
 };

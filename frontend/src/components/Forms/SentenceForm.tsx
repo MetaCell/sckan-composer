@@ -98,14 +98,12 @@ const SentenceForm = (props: any) => {
         schema={customSchema}
         uiSchema={customUiSchema}
         uiFields={uiFields}
-        enableAutoSave={true}
+        enableAutoSave={false}
         children={true}
+        submitOnBlurFields={['title']}
         {...props}
       />
       <Box mt={2}>
-        {/* <Typography color={vars.labelColor} fontWeight={500} mb={1}>
-          PMID (PubMed identifier)
-        </Typography> */}
         {
           linkedChip({id: data?.pmid, uri: data?.pmid_uri, label: "PMID"})
         }
