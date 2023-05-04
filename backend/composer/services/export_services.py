@@ -1,10 +1,8 @@
 import csv
-import datetime
 import logging
 import os
 import tempfile
 import typing
-
 from typing import Dict, Callable, List
 
 from django.contrib.auth.models import User
@@ -12,7 +10,9 @@ from django.db import transaction
 from django.db.models import Count, QuerySet
 from django.utils import timezone
 
-from composer.enums import NoteType, ExportRelationships, CircuitType, Laterality, MetricEntity, SentenceState, CSState, Projection
+from composer.enums import CSState
+from composer.enums import NoteType, ExportRelationships, CircuitType, Laterality, MetricEntity, SentenceState, \
+    Projection
 from composer.exceptions import UnexportableConnectivityStatement
 from composer.models import (
     Tag,
@@ -23,9 +23,8 @@ from composer.models import (
     Specie,
     Via,
 )
-from composer.services.state_services import ConnectivityStatementService
 from composer.services.filesystem_service import create_dir_if_not_exists
-from composer.enums import CSState
+from composer.services.state_services import ConnectivityStatementService
 
 HAS_NERVE_BRANCHES_TAG = "Has nerve branches"
 TEMP_CIRCUIT_MAP = {
@@ -46,23 +45,15 @@ TEMP_LATERALITY_MAP = {
     Laterality.LEFT: "http://purl.obolibrary.org/obo/PATO_0000366",
 }
 
-TEMP_PHENOTYPE_MAP = {
-    "enteric": "http://uri.interlex.org/tgbugs/uris/readable/EntericPhenotype",
-    "sympathetic post-ganglionic phenotype": "http://uri.interlex.org/tgbugs/uris/readable/neuron-phenotype-sym-post",
-    "sympathetic pre-ganglionic phenotype": "http://uri.interlex.org/tgbugs/uris/readable/neuron-phenotype-sym-pre",
-    "parasympathetic post-ganglionic phenotype": "http://uri.interlex.org/tgbugs/uris/readable/neuron-phenotype-para-post",
-    "parasympathetic pre-ganglionic phenotype": "http://uri.interlex.org/tgbugs/uris/readable/neuron-phenotype-para-pre",
-}
-
 
 class Row:
     def __init__(
-        self,
-        structure: str,
-        identifier: str,
-        relationship: str,
-        curation_notes: str,
-        review_notes: str,
+            self,
+            structure: str,
+            identifier: str,
+            relationship: str,
+            curation_notes: str,
+            review_notes: str,
     ):
         self.structure = structure
         self.identifier = identifier
@@ -247,6 +238,7 @@ def get_projection_row(cs: ConnectivityStatement):
         "",
     )
 
+
 def get_laterality_row(cs: ConnectivityStatement):
     return Row(
         cs.get_laterality_display(),
@@ -260,7 +252,7 @@ def get_laterality_row(cs: ConnectivityStatement):
 def get_phenotype_row(cs: ConnectivityStatement):
     return Row(
         cs.phenotype.name,
-        TEMP_PHENOTYPE_MAP.get(cs.phenotype.name, ""),
+        cs.phenotype.ontology_uri,
         ExportRelationships.hasPhenotype.name,
         "",
         "",
@@ -305,7 +297,7 @@ def get_rows(cs: ConnectivityStatement) -> List:
         rows.append(get_projection_row(cs))
     except Exception:
         raise UnexportableConnectivityStatement("Error getting projection row")
-    
+
     try:
         rows.append(get_laterality_row(cs))
     except Exception:
@@ -350,7 +342,7 @@ def compute_metrics(export_batch: ExportBatch):
         )
     else:
         connectivity_statements_created_qs = ConnectivityStatement.objects.all()
-    connectivity_statements_created_qs.exclude(state=CSState.DRAFT) # skip draft statements
+    connectivity_statements_created_qs.exclude(state=CSState.DRAFT)  # skip draft statements
     export_batch.connectivity_statements_created = connectivity_statements_created_qs.count()
 
     # export_batch.save()
@@ -406,7 +398,7 @@ def dump_export_batch(export_batch, folder_path: typing.Optional[str] = None) ->
     if folder_path is None:
         folder_path = tempfile.gettempdir()
 
-    now = datetime.datetime.now()
+    now = timezone.now()
     filename = f'export_{now.strftime("%Y-%m-%d_%H-%M-%S")}.csv'
     filepath = os.path.join(folder_path, filename)
     create_dir_if_not_exists(folder_path)
@@ -437,7 +429,7 @@ def dump_export_batch(export_batch, folder_path: typing.Optional[str] = None) ->
 
 
 def export_connectivity_statements(
-    qs: QuerySet, user: User, folder_path: typing.Optional[str]
+        qs: QuerySet, user: User, folder_path: typing.Optional[str]
 ) -> typing.Tuple[str, ExportBatch]:
     with transaction.atomic():
         # make sure create_export_batch and do_transition_to_exported are in one database transaction

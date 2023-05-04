@@ -132,6 +132,7 @@ class Phenotype(models.Model):
     """Phenotype"""
 
     name = models.CharField(max_length=200, db_index=True, unique=True)
+    ontology_uri = models.URLField(default="")
 
     def __str__(self):
         return self.name
