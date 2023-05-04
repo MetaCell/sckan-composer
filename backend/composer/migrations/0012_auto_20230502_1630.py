@@ -14,7 +14,10 @@ DEFAULT_PHENOTYPES = {
 def add_default_phenotypes(apps, schema_editor):
     Phenotype = apps.get_model('composer', 'Phenotype')
     for name, ontology_uri in DEFAULT_PHENOTYPES.items():
-        Phenotype.objects.create(name=name, ontology_uri=ontology_uri)
+        phenotype, created = Phenotype.objects.get_or_create(name=name)
+        if not created:
+            phenotype.ontology_uri = ontology_uri
+            phenotype.save()
 
 
 def remove_default_phenotypes(apps, schema_editor):
