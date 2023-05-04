@@ -68,7 +68,7 @@ const StatementDetails = () => {
           ) {
             if (
               window.confirm(
-                `This statement is assigned to ${statement.owner.first_name}, assign to yourself?`
+                `This statement is assigned to ${statement.owner.first_name}, assign to yourself? To view the record without assigning ownership, select Cancel.`
               )
             ) {
               statementService

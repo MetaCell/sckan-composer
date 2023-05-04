@@ -21,8 +21,7 @@ export default function NoResults({handleClearSearch}: any) {
             flexDirection: "column"
         }}>
             <Typography variant="h6">No duplicates found</Typography>
-            <Typography sx={{textAlign: "center"}}>We couldn’t find any record with these origin and destination in the
-                database.</Typography>
+            <Typography sx={{textAlign: "center"}}>We couldn't find any records with this origin and destination in the database.</Typography>
             <Button sx={{margin: "3em", color: "#344054", border: "1px solid #D0D5DD"}} variant="outlined"
                     onClick={() => handleClearSearch()}>
                 Clear Search
