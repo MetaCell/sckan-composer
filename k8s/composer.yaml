@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: composer
-        image: us.gcr.io/metacellllc/sckan/composer:{{CF_BUILD_ID}}
+        image: us.gcr.io/metacellllc/sckan/composer:{{CF_SHORT_REVISION}}
         imagePullPolicy: IfNotPresent
         env:
         - name: DB_USER

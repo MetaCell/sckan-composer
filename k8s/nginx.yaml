@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: us.gcr.io/metacellllc/sckan/nginx:{{CF_BUILD_ID}}
+        image: us.gcr.io/metacellllc/sckan/nginx:{{CF_SHORT_REVISION}}
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
