@@ -42,7 +42,14 @@ const Topbar = () => {
           </Typography>
         </Box>
         <Box ml={2.5} mr="auto" px={2.5} sx={descriptionStyle}>
-          <Typography>Workspace Admin</Typography>
+          <Typography
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              window.open(window.location.origin + "/admin/", "_blank");
+            }}
+          >
+            Admin Workspace
+          </Typography>
         </Box>
         <Box display="flex" alignItems="center">
           <Typography variant="h6">
