@@ -21,6 +21,8 @@ import { setFilters as setStatementFilters } from "../../redux/statementSlice";
 import StateFilter from "./StateFilter";
 import TagFilter from "./TagFilter";
 
+const {Draft, ...statementStatesExDraft } = statementStates
+
 const FilterDrawer = (props: any) => {
   const { toggleDrawer, queryOptions, entity } = props;
 
@@ -37,7 +39,7 @@ const FilterDrawer = (props: any) => {
       );
     } else if (entity === "statement") {
       return mapStateFilterSelectionToCheckbox(
-        statementStates,
+        statementStatesExDraft,
         currentSelection
       );
     }
