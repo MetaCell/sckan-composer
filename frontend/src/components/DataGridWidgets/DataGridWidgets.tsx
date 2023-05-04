@@ -15,7 +15,7 @@ export const renderPMID = (params: GridRenderCellParams) => (
 );
 
 export const renderTitle = (params: GridRenderCellParams) => (  
-  <Tooltip title={params.field === 'text' && params.value}>
+  <Tooltip title={params.value}>
     <Typography
       variant="body1"
       sx={{
