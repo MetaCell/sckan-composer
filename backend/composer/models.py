@@ -398,7 +398,7 @@ class ConnectivityStatement(models.Model):
     phenotype = models.ForeignKey(
         Phenotype,
         verbose_name="Phenotype",
-        on_delete=models.DO_NOTHING,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
