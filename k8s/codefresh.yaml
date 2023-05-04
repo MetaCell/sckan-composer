@@ -18,7 +18,7 @@ steps:
     stage: buildComposer
     buildkit: true
     image_name: "sckan/composer"
-    tag: "${{CF_BUILD_ID}}"
+    tag: "${{CF_SHORT_REVISION}}"
     dockerfile: Dockerfile
     registry: ${{REGISTRY}}
   buildNginx:
@@ -27,9 +27,9 @@ steps:
     stage: buildNginx
     buildkit: true
     build_arguments:
-    - COMPOSER=us.gcr.io/metacellllc/sckan/composer:${{CF_BUILD_ID}}
+    - COMPOSER=us.gcr.io/metacellllc/sckan/composer:${{CF_SHORT_REVISION}}
     image_name: "sckan/nginx"
-    tag: "${{CF_BUILD_ID}}"
+    tag: "${{CF_SHORT_REVISION}}"
     dockerfile: ./nginx/Dockerfile
     registry: ${{REGISTRY}}
   deploy-to-kubernetes:

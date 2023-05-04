@@ -103,7 +103,7 @@ const SentencesDetails = () => {
           ) {
             if (
               window.confirm(
-                `This sentence is assigned to ${sentence.owner.first_name}, assign to yourself?`
+                `This sentence is assigned to ${sentence.owner.first_name}, assign to yourself? To view the record without assigning ownership, select Cancel.`
               )
             ) {
               sentenceService
