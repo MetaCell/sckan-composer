@@ -67,6 +67,7 @@ class NoteType(models.TextChoices):
     PLAIN = "plain"
     DIFFERENT = "different"
     TRANSITION = "transition"
+    ALERT = "alert"
 
 
 class ExportRelationships(Enum):

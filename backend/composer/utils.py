@@ -8,3 +8,6 @@ def pmcid_uri(pmcid):
 
 def doi_uri(doi):
     return f"https://doi.org/{doi}" if doi else ""
+
+def create_reference_uri(id):
+    return f"http://uri.interlex.org/tgbugs/uris/readable/sparc-nlp/composer/{id}"

@@ -35,6 +35,7 @@ class Command(BaseCommand):
                     quotechar='"',
                 )
                 for row in aereader:
+                    import pdb; pdb.set_trace()
                     ontology_uri = row[URI]
                     name = row[NAME]
                     synonym = row[SYNONYM] or None

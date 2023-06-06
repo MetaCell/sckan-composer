@@ -22,7 +22,7 @@ from composer.services.state_services import (
     ConnectivityStatementService,
     SentenceService,
 )
-from .utils import doi_uri, pmcid_uri, pmid_uri
+from .utils import doi_uri, pmcid_uri, pmid_uri, create_reference_uri
 
 
 # some django user overwrite
@@ -169,6 +169,32 @@ class Sex(models.Model):
         ordering = ["name"]
         verbose_name_plural = "Sex"
 
+class FunctionalCircuitRole(models.Model):
+    """FunctionalCircuitRole"""
+
+    name = models.CharField(max_length=200, db_index=True, unique=True)
+    ontology_uri = models.URLField()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Funtional Circuit Roles"
+
+
+class ProjectionPhenotype(models.Model):
+    """ProjectionPhenotype"""
+
+    name = models.CharField(max_length=200, db_index=True, unique=True)
+    ontology_uri = models.URLField()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Projection Phenotypes"
 
 class AnatomicalEntity(models.Model):
     """Anatomical Entity"""
@@ -251,7 +277,8 @@ class Sentence(models.Model):
 
     @transition(
         field=state,
-        source=SentenceState.TO_BE_REVIEWED,
+        source=[SentenceState.TO_BE_REVIEWED, SentenceState.OPEN],
+        permission=lambda instance, user: SentenceService.has_permission_to_transition_to_compose_now(instance, user),
         target=SentenceState.COMPOSE_NOW,
         conditions=[SentenceService.can_be_composed],
     )
@@ -395,6 +422,7 @@ class ConnectivityStatement(models.Model):
     circuit_type = models.CharField(
         max_length=20, default=CircuitType.UNKNOWN, choices=CircuitType.choices
     )
+    #TODO for next releases we could have only 1 field for phenotype + an intermediate table with the phenotype's categories such as circuit_type, laterality, projection, functional_circuit_role, projection_phenotype among others
     phenotype = models.ForeignKey(
         Phenotype,
         verbose_name="Phenotype",
@@ -409,6 +437,9 @@ class ConnectivityStatement(models.Model):
     )
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
     additional_information = models.TextField(null=True, blank=True)
+    reference_uri = models.URLField(null=True, blank=True)
+    functional_circuit_role = models.ForeignKey(FunctionalCircuitRole, on_delete=models.DO_NOTHING, null=True, blank=True,)
+    projection_phenotype = models.ForeignKey(ProjectionPhenotype, on_delete=models.DO_NOTHING, null=True,blank=True,)
     created_date = models.DateTimeField(auto_now_add=True, db_index=True)
     modified_date = models.DateTimeField(auto_now=True, db_index=True)
 
@@ -501,6 +532,12 @@ class ConnectivityStatement(models.Model):
         if ConnectivityStatementService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.reference_uri is None:
+            self.reference_uri = create_reference_uri(self.pk)
+            self.save(update_fields=["reference_uri"])
 
     class Meta:
         ordering = ["-modified_date"]

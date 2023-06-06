@@ -18,6 +18,8 @@ from composer.models import (
     Specie,
     Tag,
     Via,
+    FunctionalCircuitRole,
+    ProjectionPhenotype
 )
 
 # Define Inlines
@@ -118,6 +120,7 @@ class ConnectivityStatementAdmin(
         "state",
         "has_notes",
         "owner",
+        "reference_uri",
     )
     list_display_links = ("sentence", "pmid", "pmcid", "short_ks", "state")
     list_filter = ("state", "owner", "tags__tag")
@@ -147,6 +150,11 @@ class ConnectivityStatementAdmin(
     @admin.display(description="PMCID")
     def pmcid(self, obj):
         return obj.sentence.pmcid
+    
+    @admin.display(description="REFERENCE")
+    def reference(self, obj):
+        return str(obj)
+
     
 class ExportBatchAdmin(admin.ModelAdmin):
     list_display = ("user", "created_at", "count_connectivity_statements",)
@@ -189,6 +197,8 @@ admin.site.register(ExportBatch, ExportBatchAdmin)
 admin.site.register(Sentence, SentenceAdmin)
 admin.site.register(Specie)
 admin.site.register(Tag)
+admin.site.register(FunctionalCircuitRole)
+admin.site.register(ProjectionPhenotype)
 # admin.site.register(ExportMetrics)
 
 
