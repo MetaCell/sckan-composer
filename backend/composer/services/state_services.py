@@ -2,6 +2,7 @@ from django.db import transaction
 
 from composer.enums import CSState
 from django.db.models import Q, Count
+from ..enums import SentenceState
 
 
 class BaseServiceMixin:
@@ -94,7 +95,13 @@ class SentenceService(StateServiceMixin):
                     Q(knowledge_statement__isnull=True) 
                     | Q(knowledge_statement__exact="") 
                     | Q(num_prov__lte=0)).count() == 0)
-
+    
+    @staticmethod
+    def has_permission_to_transition_to_compose_now(sentence, user):
+        # only system users can transition from OPEN to COMPOSE_NOW for the statement ingestion process
+        if sentence.state == SentenceState.OPEN:
+            return user.username == 'system'
+        return True
 
 
 class ConnectivityStatementService(StateServiceMixin):
