@@ -7,10 +7,11 @@ from ...enums import (
     CircuitType,
     NoteType, 
     DestinationType,
-    SentenceState
+    SentenceState,
+    CSState
 )
 
-from ..state_services import SentenceService
+from ..state_services import SentenceService, ConnectivityStatementService
 
 
 
@@ -151,7 +152,7 @@ def get_value_or_none(model, prop):
         else:
             return model.objects.get(ontology_uri=prop[0])
     else:
-        return None
+        return None 
 
 
 def do_transition_to_compose_now(sentence: Sentence):
@@ -168,6 +169,27 @@ def do_transition_to_compose_now(sentence: Sentence):
             SentenceState.COMPOSE_NOW, system_user
         )
         sentence.save()
+    return sentence
+
+
+def do_transition_to_exported(statement: ConnectivityStatement):
+    system_user = User.objects.get(username="system")
+    available_transitions = [
+            available_state.target
+            for available_state in statement.get_available_user_state_transitions(
+                system_user
+            )
+    ]
+    if CSState.EXPORTED in available_transitions:
+        # after the sentence and statement transitioned to compose_now, we need to update the statement state to exported 
+        cs = ConnectivityStatementService(statement).do_transition(
+            CSState.EXPORTED, system_user
+        )
+        cs.save()
+
+def do_state_transitions(sentence: Sentence):
+   s = do_transition_to_compose_now(sentence)
+   do_transition_to_exported(s.connectivitystatement_set.first())
 
 
 def ingest_statements():
@@ -225,7 +247,5 @@ def ingest_statements():
                 Note.objects.create(connectivity_statement = connectivity_statement, user=User.objects.get(username="system"), type=NoteType.ALERT, note=statement[NOTE_ALERT][0])
             connectivity_statement.save()
 
-            # transition to compose_now
-            do_transition_to_compose_now(sentence)
-
-
+            # transitions sentence from  open --> compose_now, and statement from draft --> compose_now --> exported 
+            do_state_transitions(sentence)

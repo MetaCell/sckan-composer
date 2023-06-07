@@ -503,7 +503,7 @@ class ConnectivityStatement(models.Model):
 
     @transition(
         field=state,
-        source=CSState.NPO_APPROVED,
+        source=[CSState.NPO_APPROVED, CSState.COMPOSE_NOW],
         permission=lambda instance, user: ConnectivityStatementService.has_permission_to_transition_to_exported(
             instance, user
         ),
