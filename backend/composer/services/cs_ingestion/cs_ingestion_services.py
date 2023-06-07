@@ -30,6 +30,13 @@ OTHER_PHENOTYPE = 'other_phenotype'
 SPECIES = 'species'
 PROVENANCE = 'provenance'
 NOTE_ALERT = 'note_alert' 
+CIRCUIT_TYPE_MAPPING = {
+        "http://uri.interlex.org/tgbugs/uris/readable/IntrinsicPhenotype": CircuitType.INTRINSIC,
+        "http://uri.interlex.org/tgbugs/uris/readable/ProjectionPhenotype": CircuitType.PROJECTION,
+        "http://uri.interlex.org/tgbugs/uris/readable/MotorPhenotype": CircuitType.MOTOR,
+        "http://uri.interlex.org/tgbugs/uris/readable/SensoryPhenotype": CircuitType.SENSORY,
+        "": CircuitType.UNKNOWN
+    }
 
 NOW = datetime.now().strftime("%Y%m%d%H%M%S")
 
@@ -147,17 +154,6 @@ def get_value_or_none(model, prop):
         return None
 
 
-
-def map_circuit_type_uri_with_model(uri):
-    circuit_type = {
-        "http://uri.interlex.org/tgbugs/uris/readable/IntrinsicPhenotype": CircuitType.INTRINSIC,
-        "http://uri.interlex.org/tgbugs/uris/readable/ProjectionPhenotype": CircuitType.PROJECTION,
-        "http://uri.interlex.org/tgbugs/uris/readable/MotorPhenotype": CircuitType.MOTOR,
-        "http://uri.interlex.org/tgbugs/uris/readable/SensoryPhenotype": CircuitType.SENSORY
-    }
-    return circuit_type[uri]
-
-
 def do_transition_to_compose_now(sentence: Sentence):
     system_user = User.objects.get(username="system")
     available_transitions = [
@@ -193,7 +189,8 @@ def ingest_statements():
         origin = get_value_or_none(AnatomicalEntity, statement[ORIGIN])
         destination = AnatomicalEntity.objects.filter(ontology_uri=statement[DESTINATION][0][ENTITY_URI])[0] if has_prop(statement[DESTINATION]) else None
         destination_type = statement[DESTINATION][0][TYPE] if has_prop(statement[DESTINATION]) else DestinationType.UNKNOWN
-        circuit_type = map_circuit_type_uri_with_model(statement[CIRCUIT_TYPE][0]) if has_prop(statement[CIRCUIT_TYPE]) else CircuitType.UNKNOWN
+        circuit_type_uri = statement[CIRCUIT_TYPE][0] if has_prop(statement[CIRCUIT_TYPE]) else ""
+        circuit_type = CIRCUIT_TYPE_MAPPING[circuit_type_uri]
         sex =  get_value_or_none(Sex, statement[SEX])
         functional_circuit_role = get_value_or_none(FunctionalCircuitRole, statement[FUNCTIONAL_CIRCUIT_ROLE])
         #some values from neurondm's phenotype field are not mapped in composer db. Add only the first one founded in composer db, if any
