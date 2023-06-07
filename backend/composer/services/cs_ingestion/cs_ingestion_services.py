@@ -155,41 +155,41 @@ def get_value_or_none(model, prop):
         return None 
 
 
-def do_transition_to_compose_now(sentence: Sentence):
-    system_user = User.objects.get(username="system")
+def do_transition_to_compose_now(sentence: Sentence, user: User):
     available_transitions = [
         available_state.target
             for available_state in sentence.get_available_user_state_transitions(
-                system_user
+                user
             )
     ]
     if SentenceState.COMPOSE_NOW in available_transitions:
         # we need to update the state to compose_now when the system user has the permission to do so
         sentence = SentenceService(sentence).do_transition(
-            SentenceState.COMPOSE_NOW, system_user
+            SentenceState.COMPOSE_NOW, user
         )
         sentence.save()
     return sentence
 
 
-def do_transition_to_exported(statement: ConnectivityStatement):
+def do_transition_to_exported(statement: ConnectivityStatement, user: User):
+    cs = ConnectivityStatementService(statement).do_transition(
+        CSState.EXPORTED, user
+    )
+    cs.save()
+
+def do_state_transitions(sentence: Sentence):
     system_user = User.objects.get(username="system")
-    available_transitions = [
+    s = do_transition_to_compose_now(sentence, system_user)
+    for statement in s.connectivitystatement_set.all():
+        available_transitions = [
             available_state.target
             for available_state in statement.get_available_user_state_transitions(
                 system_user
             )
-    ]
-    if CSState.EXPORTED in available_transitions:
+        ]
         # after the sentence and statement transitioned to compose_now, we need to update the statement state to exported 
-        cs = ConnectivityStatementService(statement).do_transition(
-            CSState.EXPORTED, system_user
-        )
-        cs.save()
-
-def do_state_transitions(sentence: Sentence):
-   s = do_transition_to_compose_now(sentence)
-   do_transition_to_exported(s.connectivitystatement_set.first())
+        if CSState.EXPORTED in available_transitions:
+            do_transition_to_exported(statement, system_user)
 
 
 def ingest_statements():
