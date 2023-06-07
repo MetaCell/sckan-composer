@@ -220,7 +220,7 @@ def ingest_statements():
             #TODO add display_order criteria on neurondm update
             vias = (Via(connectivity_statement = connectivity_statement, anatomical_entity=AnatomicalEntity.objects.filter(ontology_uri=via[ENTITY_URI])[0], type=via[TYPE]) for via in statement[VIAS])
             Via.objects.bulk_create(vias)
-            provenances_list = statement[PROVENANCE][0].split(", ") if has_prop(statement[PROVENANCE]) else []
+            provenances_list = statement[PROVENANCE][0].split(", ") if has_prop(statement[PROVENANCE]) else [statement[ID]]
             provenances = (Provenance(connectivity_statement = connectivity_statement, uri=provenance) for provenance in provenances_list)
             Provenance.objects.bulk_create(provenances)
             # only 5 statements have a note_alert but they were all filtered out since at least one of their anatomical entities was not found in composer db
