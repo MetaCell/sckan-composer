@@ -130,7 +130,7 @@ def create_artifact_sentence(statement):
     has_sentence_reference = len(statement[SENTENCE_NUMBER]) > 0
     sentence, created = Sentence.objects.get_or_create(
             doi__iexact=statement[ID],
-            defaults={"title": text, "text": text,
+            defaults={"title": text[0:185], "text": text,
             "doi": statement[ID],
             "external_ref": statement[SENTENCE_NUMBER][0] if has_sentence_reference else None,
             "batch_name": f"neurondm-{NOW}" if has_sentence_reference else None
