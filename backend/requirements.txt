@@ -16,6 +16,7 @@ pyontutils==0.1.31
 drf-react-template-framework==0.0.17
 aiohttp==3.8.3
 crossref-commons==0.0.7
+neurondm>=0.1.5
 
 django-debug-toolbar
 django-sslserver # ssl dev server, for testing orcid social login
