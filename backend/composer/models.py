@@ -3,6 +3,7 @@ import typing
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
+from django.db.models.functions import Upper
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
 # from django_fsm_log.decorators import fsm_log_by
@@ -208,6 +209,9 @@ class AnatomicalEntity(models.Model):
     class Meta:
         ordering = ["name"]
         verbose_name_plural = "Anatomical Entities"
+        indexes = [
+            models.Index(Upper('name'), name="anatomicalentity_upper_name")
+        ]
 
 
 class Tag(models.Model):
