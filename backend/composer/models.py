@@ -200,7 +200,7 @@ class ProjectionPhenotype(models.Model):
 class AnatomicalEntity(models.Model):
     """Anatomical Entity"""
 
-    name = models.CharField(max_length=200, db_index=True, unique=True)
+    name = models.CharField(max_length=200, db_index=True)
     ontology_uri = models.URLField()
 
     def __str__(self):
@@ -209,8 +209,8 @@ class AnatomicalEntity(models.Model):
     class Meta:
         ordering = ["name"]
         verbose_name_plural = "Anatomical Entities"
-        indexes = [
-            models.Index(Upper('name'), name="anatomicalentity_upper_name")
+        constraints = [
+            models.UniqueConstraint(Upper('name'), name="ae_unique_upper_name")
         ]
 
 

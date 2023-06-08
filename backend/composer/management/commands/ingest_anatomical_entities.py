@@ -56,9 +56,9 @@ class Command(BaseCommand):
                             bulk.append(ae)
                     if len(bulk) > 100:
                         self.stdout.write(f"{len(bulk)} new Anatomical Entities created.")
-                        AnatomicalEntity.objects.bulk_create(bulk)
+                        AnatomicalEntity.objects.bulk_create(bulk, ignore_conflicts=True)
                         bulk = []
                 if len(bulk) > 0:
                     # insert the remaining
                     self.stdout.write(f"{len(bulk)} new Anatomical Entities created.")
-                    AnatomicalEntity.objects.bulk_create(bulk)
+                    AnatomicalEntity.objects.bulk_create(bulk, ignore_conflicts=True)
