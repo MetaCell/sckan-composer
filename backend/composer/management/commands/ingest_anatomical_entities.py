@@ -51,7 +51,7 @@ class Command(BaseCommand):
                     if ae:
                         bulk.append(ae)
                     if synonym:
-                        ae = self._create_ae(name, ontology_uri)
+                        ae = self._create_ae(synonym, ontology_uri)
                         if ae:
                             bulk.append(ae)
                     if len(bulk) > 100:
