@@ -70,16 +70,17 @@ class NoteType(models.TextChoices):
     ALERT = "alert"
 
 
-class ExportRelationships(Enum):
-    hasBiologicalSex = "hasBiologicalSex"
-    hasCircuitRolePhenotype = "hasCircuitRolePhenotype"
-    hasPhenotype = "hasPhenotype"
-    hasFunctionalCircuitRolePhenotype = "hasFunctionalCircuitRolePhenotype"
-    hasInstanceInTaxon = "hasInstanceInTaxon"
-    hasProjectionLaterality = "hasProjectionLaterality"
-    hasSomaPhenotype = "hasSomaPhenotype"
-    hasAlert = "hasAlert"
-    soma = "Soma"
+class ExportRelationships(models.TextChoices):
+    hasBiologicalSex = "hasBiologicalSex", "Sex"
+    hasCircuitRolePhenotype = "hasCircuitRolePhenotype", "CircuitRole"
+    hasAnatomicalSystemPhenotype = "hasAnatomicalSystemPhenotype", "Phenotype"
+    hasFunctionalCircuitRolePhenotype = "hasFunctionalCircuitRolePhenotype", "FunctionalCircuitRole"
+    hasInstanceInTaxon = "hasInstanceInTaxon", "Species"
+    hasProjectionLaterality = "hasProjectionLaterality", "Laterality"
+    hasSomaPhenotype = "hasSomaPhenotype", "SomaPhenotype"
+    hasAlert = "hasAlert", "Alert"
+    hasSomaLocatedIn = "hasSomaLocatedIn", "Soma"
+    hasProjectionPhenotype = "hasProjectionPhenotype", "ProjectionPhenotype"
 
 
 class MetricEntity(models.TextChoices):
