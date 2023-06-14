@@ -173,7 +173,7 @@ def get_origin_row(cs: ConnectivityStatement):
     return Row(
         cs.origin.name,
         cs.origin.ontology_uri,
-        ExportRelationships.soma.name,
+        ExportRelationships.hasSomaLocatedIn.label,
         curation_notes,
         review_notes,
     )
@@ -203,7 +203,7 @@ def get_specie_row(specie: Specie):
     return Row(
         specie.name,
         specie.ontology_uri,
-        ExportRelationships.hasInstanceInTaxon.name,
+        ExportRelationships.hasInstanceInTaxon.label,
         "",
         "",
     )
@@ -213,7 +213,7 @@ def get_sex_row(cs: ConnectivityStatement):
     return Row(
         cs.sex.name,
         cs.sex.ontology_uri,
-        ExportRelationships.hasBiologicalSex.name,
+        ExportRelationships.hasBiologicalSex.label,
         "",
         "",
     )
@@ -223,17 +223,7 @@ def get_circuit_role_row(cs: ConnectivityStatement):
     return Row(
         cs.get_circuit_type_display(),
         TEMP_CIRCUIT_MAP.get(cs.circuit_type, ""),
-        ExportRelationships.hasCircuitRolePhenotype.name,
-        "",
-        "",
-    )
-
-
-def get_projection_row(cs: ConnectivityStatement):
-    return Row(
-        cs.get_projection_display(),
-        TEMP_PROJECTION_MAP.get(cs.projection, ""),
-        ExportRelationships.hasProjectionLaterality.name,
+        ExportRelationships.hasCircuitRolePhenotype.label,
         "",
         "",
     )
@@ -241,9 +231,19 @@ def get_projection_row(cs: ConnectivityStatement):
 
 def get_laterality_row(cs: ConnectivityStatement):
     return Row(
+        cs.get_projection_display(),
+        TEMP_PROJECTION_MAP.get(cs.projection, ""),
+        ExportRelationships.hasProjectionLaterality.label,
+        "",
+        "",
+    )
+
+
+def get_soma_phenotype_row(cs: ConnectivityStatement):
+    return Row(
         cs.get_laterality_display(),
         TEMP_LATERALITY_MAP.get(cs.laterality, ""),
-        ExportRelationships.hasSomaPhenotype.name,
+        ExportRelationships.hasSomaPhenotype.label,
         "",
         "",
     )
@@ -253,7 +253,27 @@ def get_phenotype_row(cs: ConnectivityStatement):
     return Row(
         cs.phenotype.name,
         cs.phenotype.ontology_uri,
-        ExportRelationships.hasPhenotype.name,
+        ExportRelationships.hasAnatomicalSystemPhenotype.label,
+        "",
+        "",
+    )
+
+
+def get_projection_phenotype_row(cs: ConnectivityStatement):
+    return Row(
+        cs.projection_phenotype,
+        cs.projection_phenotype.ontology_uri,
+        ExportRelationships.hasProjectionPhenotype.label,
+        "",
+        "",
+    )
+
+
+def get_functional_circuit_row(cs: ConnectivityStatement):
+    return Row(
+        cs.functional_circuit_role,
+        cs.functional_circuit_role.ontology_uri,
+        ExportRelationships.hasFunctionalCircuitRolePhenotype.label,
         "",
         "",
     )
@@ -291,12 +311,7 @@ def get_rows(cs: ConnectivityStatement) -> List:
     try:
         rows.append(get_circuit_role_row(cs))
     except Exception:
-        raise UnexportableConnectivityStatement("Error getting circuit role row")
-
-    try:
-        rows.append(get_projection_row(cs))
-    except Exception:
-        raise UnexportableConnectivityStatement("Error getting projection row")
+        raise UnexportableConnectivityStatement("Error getting circuit type row")
 
     try:
         rows.append(get_laterality_row(cs))
@@ -304,9 +319,25 @@ def get_rows(cs: ConnectivityStatement) -> List:
         raise UnexportableConnectivityStatement("Error getting laterality row")
 
     try:
+        rows.append(get_soma_phenotype_row(cs))
+    except Exception:
+        raise UnexportableConnectivityStatement("Error getting soma phenotype row")
+
+    try:
         rows.append(get_phenotype_row(cs))
     except Exception:
         raise UnexportableConnectivityStatement("Error getting phenotype row")
+    
+    try:
+        rows.append(get_projection_phenotype_row(cs))
+    except Exception:
+        raise UnexportableConnectivityStatement("Error getting projection phenotype row")
+
+    try:
+        rows.append(get_functional_circuit_row(cs))
+    except Exception:
+        raise UnexportableConnectivityStatement("Error getting functinal circuit role row")
+
 
     return rows
 
