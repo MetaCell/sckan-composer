@@ -11,7 +11,7 @@ from django.db.models import Count, QuerySet
 from django.utils import timezone
 
 from composer.enums import CSState
-from composer.enums import NoteType, ExportRelationships, CircuitType, Laterality, MetricEntity, SentenceState, \
+from composer.enums import NoteType, ExportRelationships, CircuitType, Laterality, MetricEntity, DestinationType, ViaType, SentenceState, \
     Projection
 from composer.exceptions import UnexportableConnectivityStatement
 from composer.models import (
@@ -45,6 +45,16 @@ TEMP_LATERALITY_MAP = {
     Laterality.LEFT: "http://purl.obolibrary.org/obo/PATO_0000366",
 }
 
+TEMP_DESTINATION_PREDICATE_MAP = {
+    DestinationType.AFFERENT_T: ExportRelationships.hasAxonSensorySubcellularElementIn,
+    DestinationType.AXON_T: ExportRelationships.hasAxonPresynapticElementIn,
+}
+
+TEMP_VIA_PREDICATE_MAP = {
+    ViaType.AXON: ExportRelationships.hasAxonLocatedIn,
+    ViaType.DENDRITE: ExportRelationships.hasDendriteLocatedIn,
+}
+
 
 class Row:
     def __init__(
@@ -52,12 +62,14 @@ class Row:
             structure: str,
             identifier: str,
             relationship: str,
+            predicate: str,
             curation_notes: str,
             review_notes: str,
     ):
         self.structure = structure
         self.identifier = identifier
         self.relationship = relationship
+        self.predicate = predicate
         self.curation_notes = curation_notes
         self.review_notes = review_notes
 
@@ -88,6 +100,10 @@ def get_identifier(cs: ConnectivityStatement, row: Row):
 
 def get_relationship(cs: ConnectivityStatement, row: Row):
     return row.relationship
+
+
+def get_predicate(cs: ConnectivityStatement, row: Row):
+    return row.predicate
 
 
 def get_observed_in_species(cs: ConnectivityStatement, row: Row):
@@ -148,6 +164,7 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
         "Structure": get_structure,
         "Identifier": get_identifier,
         "Relationship": get_relationship,
+        "Predicate": get_predicate,
         "Observed in species": get_observed_in_species,
         "Different from existing": get_different_from_existing,
         "Curation notes": get_curation_notes,
@@ -174,6 +191,7 @@ def get_origin_row(cs: ConnectivityStatement):
         cs.origin.name,
         cs.origin.ontology_uri,
         ExportRelationships.hasSomaLocatedIn.label,
+        ExportRelationships.hasSomaLocatedIn.value,
         curation_notes,
         review_notes,
     )
@@ -184,6 +202,7 @@ def get_destination_row(cs: ConnectivityStatement):
         cs.destination.name,
         cs.destination.ontology_uri,
         cs.get_destination_type_display(),
+        TEMP_DESTINATION_PREDICATE_MAP.get(cs.destination_type),
         "",
         "",
     )
@@ -194,6 +213,7 @@ def get_via_row(via: Via):
         via.anatomical_entity.name,
         via.anatomical_entity.ontology_uri,
         via.get_type_display(),
+        TEMP_VIA_PREDICATE_MAP.get(via.type),
         "",
         "",
     )
@@ -204,6 +224,7 @@ def get_specie_row(specie: Specie):
         specie.name,
         specie.ontology_uri,
         ExportRelationships.hasInstanceInTaxon.label,
+        ExportRelationships.hasInstanceInTaxon.value,
         "",
         "",
     )
@@ -214,6 +235,7 @@ def get_sex_row(cs: ConnectivityStatement):
         cs.sex.name,
         cs.sex.ontology_uri,
         ExportRelationships.hasBiologicalSex.label,
+        ExportRelationships.hasBiologicalSex.value,
         "",
         "",
     )
@@ -224,6 +246,7 @@ def get_circuit_role_row(cs: ConnectivityStatement):
         cs.get_circuit_type_display(),
         TEMP_CIRCUIT_MAP.get(cs.circuit_type, ""),
         ExportRelationships.hasCircuitRolePhenotype.label,
+        ExportRelationships.hasCircuitRolePhenotype.value,
         "",
         "",
     )
@@ -234,6 +257,7 @@ def get_laterality_row(cs: ConnectivityStatement):
         cs.get_projection_display(),
         TEMP_PROJECTION_MAP.get(cs.projection, ""),
         ExportRelationships.hasProjectionLaterality.label,
+        ExportRelationships.hasProjectionLaterality.value,
         "",
         "",
     )
@@ -244,6 +268,7 @@ def get_soma_phenotype_row(cs: ConnectivityStatement):
         cs.get_laterality_display(),
         TEMP_LATERALITY_MAP.get(cs.laterality, ""),
         ExportRelationships.hasSomaPhenotype.label,
+        ExportRelationships.hasSomaPhenotype.value,
         "",
         "",
     )
@@ -254,6 +279,7 @@ def get_phenotype_row(cs: ConnectivityStatement):
         cs.phenotype.name,
         cs.phenotype.ontology_uri,
         ExportRelationships.hasAnatomicalSystemPhenotype.label,
+        ExportRelationships.hasAnatomicalSystemPhenotype.value,
         "",
         "",
     )
@@ -264,6 +290,7 @@ def get_projection_phenotype_row(cs: ConnectivityStatement):
         cs.projection_phenotype,
         cs.projection_phenotype.ontology_uri,
         ExportRelationships.hasProjectionPhenotype.label,
+        ExportRelationships.hasProjectionPhenotype.value,
         "",
         "",
     )
@@ -274,6 +301,7 @@ def get_functional_circuit_row(cs: ConnectivityStatement):
         cs.functional_circuit_role,
         cs.functional_circuit_role.ontology_uri,
         ExportRelationships.hasFunctionalCircuitRolePhenotype.label,
+        ExportRelationships.hasFunctionalCircuitRolePhenotype.value,
         "",
         "",
     )
