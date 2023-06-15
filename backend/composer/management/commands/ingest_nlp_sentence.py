@@ -130,7 +130,7 @@ class Command(BaseCommand):
             ) as csvfile:
                 nlpreader = csv.DictReader(
                     csvfile,
-                    delimiter=";",
+                    delimiter=",",
                     quotechar='"',
                 )
                 default_batch_name = os.path.basename(csv_file_name)
@@ -144,6 +144,8 @@ class Command(BaseCommand):
                     async with aiohttp.ClientSession() as session:
                         tasks = []
                         for i in range(0, MAX_PARALLEL_JOBS):  # max parallel
+                            if row_counter>=len(rows):
+                                break
                             row = rows[row_counter]
                             row_counter += 1
                             rowid = row[ID]
