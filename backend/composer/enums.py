@@ -81,6 +81,10 @@ class ExportRelationships(models.TextChoices):
     hasAlert = "hasAlert", "Alert"
     hasSomaLocatedIn = "hasSomaLocatedIn", "Soma"
     hasProjectionPhenotype = "hasProjectionPhenotype", "ProjectionPhenotype"
+    hasAxonPresynapticElementIn = "hasAxonPresynapticElementIn", "Axon terminal"
+    hasAxonSensorySubcellularElementIn = "hasAxonSensorySubcellularElementIn", "Afferent terminal",
+    hasAxonLocatedIn = "hasAxonLocatedIn", "Axon"
+    hasDendriteLocatedIn = "hasDendriteLocatedIn", "Dendrite"
 
 
 class MetricEntity(models.TextChoices):

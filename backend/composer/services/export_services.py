@@ -356,15 +356,17 @@ def get_rows(cs: ConnectivityStatement) -> List:
     except Exception:
         raise UnexportableConnectivityStatement("Error getting phenotype row")
     
-    try:
-        rows.append(get_projection_phenotype_row(cs))
-    except Exception:
-        raise UnexportableConnectivityStatement("Error getting projection phenotype row")
-
-    try:
-        rows.append(get_functional_circuit_row(cs))
-    except Exception:
-        raise UnexportableConnectivityStatement("Error getting functinal circuit role row")
+    if cs.projection_phenotype:
+        try:
+            rows.append(get_projection_phenotype_row(cs))
+        except Exception:
+            raise UnexportableConnectivityStatement("Error getting projection phenotype row")
+    
+    if cs.functional_circuit_role:
+        try:
+            rows.append(get_functional_circuit_row(cs))
+        except Exception:
+            raise UnexportableConnectivityStatement("Error getting functinal circuit role row")
 
 
     return rows
@@ -490,9 +492,11 @@ def dump_export_batch(export_batch, folder_path: typing.Optional[str] = None) ->
 def export_connectivity_statements(
         qs: QuerySet, user: User, folder_path: typing.Optional[str]
 ) -> typing.Tuple[str, ExportBatch]:
+    
     with transaction.atomic():
         # make sure create_export_batch and do_transition_to_exported are in one database transaction
         export_batch = create_export_batch(qs, user)
         do_transition_to_exported(export_batch, user)
+  
     export_file = dump_export_batch(export_batch, folder_path)
     return export_file, export_batch
