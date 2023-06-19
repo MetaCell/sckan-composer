@@ -4,39 +4,31 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {Box} from "@mui/material";
-import Divider from "@mui/material/Divider";
-import {useNavigate} from "react-router";
 import StatementWithProvenances from "./StatementWithProvenances";
 import { useSectionStyle } from "../styles/styles";
 import { useTheme } from "@mui/system";
 
-const SentenceStatementWithDois = ({ statement, setStatement, refreshStatement } : any) => {
-  const navigate = useNavigate();
+const SentenceStatementWithDois = ({ statement } : any) => {
   const theme = useTheme()
   const sectionStyle = useSectionStyle(theme)
 
   const openStatement = (statement: any) => {
-    navigate(`/statement/${statement?.id}`, {
-      replace: false
-    })
+    window.location.href = (`/statement/${statement?.id}`)
   }
 
   const otherStatements = statement?.sentence?.connectivity_statements.filter((row: any) => row?.id !== statement?.id)
+  
+  if (otherStatements.length === 0){
+    return null
+  }
+
   return (
     <Paper sx={sectionStyle}>
       <Typography variant="h5" mb={3}>
-        Knowledge Statements
+        Other Knowledge Statements
       </Typography>
-      <Box sx={{
-        background: '#F2F4F7',
-        borderRadius: '12px',
-        padding: '8px !important',
-        textAlign: 'center',
-      }}>
-        <StatementWithProvenances statement={statement} setStatement={setStatement} refreshStatement={refreshStatement} />
-      </Box>
-      <Divider sx={{margin: '24px 0'}}>Knowledge Statements from the same input Sentence</Divider>
       <Stack spacing={2}>
+        <Typography>Knowledge Statements from the same input Sentence</Typography>
         {
           otherStatements?.map((row: any )=>
             <Stack

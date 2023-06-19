@@ -1,7 +1,7 @@
 import React from "react";
 import { Paper, Stack, Typography, Divider, Grid, Box, Table, TableBody } from "@mui/material";
 import { useTheme } from "@emotion/react";
-import { useSectionStyle } from "../../styles/styles";
+import { useSectionStyle, useGreyBgContainer } from "../../styles/styles";
 import StatementForm from "../Forms/StatementForm";
 import TableRow from "./TableRow";
 import { vars } from "../../theme/variables";
@@ -12,11 +12,7 @@ const PathsBuilder = (props: any) => {
   const { statement,  refreshStatement } = props;
   const theme = useTheme();
   const sectionStyle = useSectionStyle(theme);
-  const subSectionStyle = {
-    p:1,
-    borderRadius:'12px',
-    backgroundColor: 'info.light'
-  }
+  const subSectionStyle = useGreyBgContainer(theme)
   return (
     <Paper sx={{ ...sectionStyle, px: 0 }}>
         <Typography variant="h5" sx={{ px: 3, pb: 2 }}>

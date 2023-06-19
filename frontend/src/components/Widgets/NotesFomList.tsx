@@ -11,6 +11,8 @@ import Typography from "@mui/material/Typography";
 import {Note} from "../../apiclient/backend";
 import {timeAgo} from "../../helpers/helpers";
 import NoteForm from "../Forms/NoteForm";
+import { useGreyBgContainer } from '../../styles/styles';
+import { useTheme } from "@mui/system";
 
 const TimeLineIcon = () => {
   return <Box sx={{
@@ -31,6 +33,9 @@ const NoteDetails = (props: any) => {
   const [noteList, setNoteList] = useState<Note[]>([])
   const [refresh, setRefresh] = useState(false)
 
+  const theme = useTheme()
+  const greyBgContainer = useGreyBgContainer(theme)
+
   useEffect(() => {
     const { connectivity_statement_id, sentence_id } = extraData
     if (connectivity_statement_id || sentence_id) {
@@ -44,8 +49,7 @@ const NoteDetails = (props: any) => {
   return (
     <Box display='flex' flexDirection='column' >
       <Box sx={{
-        background: '#F2F4F7',
-        borderRadius: '12px',
+        ...greyBgContainer,
         padding: '0 8px 8px !important',
         textAlign: 'center',
         "& .MuiGrid-item":
