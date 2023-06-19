@@ -3,7 +3,7 @@ import { Grid, Typography, Box, Stack, Divider, Paper } from "@mui/material";
 import StatementChart from "./StatementChart";
 import StatementWithProvenances from "../StatementWithProvenances";
 import CheckDuplicates from "../CheckForDuplicates/CheckDuplicatesDialog";
-import { useSectionStyle } from "../../styles/styles";
+import { useSectionStyle, useGreyBgContainer } from "../../styles/styles";
 import { useTheme } from "@mui/system";
 import PathsBuilder from "./PathsBuilder";
 
@@ -11,6 +11,7 @@ const ProofingTab = (props: any) => {
   const { statement, refreshStatement, setStatement } = props;
   const theme = useTheme();
   const sectionStyle = useSectionStyle(theme);
+  const greyBgContainer = useGreyBgContainer(theme)
 
   const hasJourney =
     statement.origin && statement.destination && statement.path.length > 0;
@@ -29,17 +30,12 @@ const ProofingTab = (props: any) => {
             }}
           >
             <Typography variant="h5" mb={3}>
-              Knowledge Statements
+              Knowledge Statement
             </Typography>
             <CheckDuplicates />
           </Stack>
           <Box
-            sx={{
-              background: "#F2F4F7",
-              borderRadius: "12px",
-              padding: "8px !important",
-              textAlign: "center",
-            }}
+            sx={greyBgContainer}
           >
             <StatementWithProvenances statement={statement} refreshStatement={refreshStatement} setStatement={setStatement}/>
           </Box>

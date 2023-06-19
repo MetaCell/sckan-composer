@@ -43,7 +43,7 @@ const ProvenancesForm = (props: any) => {
     "ui:options": {
       disabled: !extraData.connectivity_statement_id || disabled,
       data: provenancesData?.map((row: Provenance) => ({id: row.id, label: row.uri, enableClick: isValidUrl(row.uri) })) || [],
-      placeholder: 'Enter Provenances (Press Enter to add a Provenance)',
+      placeholder: disabled ? null : 'Enter Provenances (Press Enter to add a Provenance)',
       removeChip: function(provenanceId: any) {
         provenanceService.delete(provenanceId, extraData.connectivity_statement_id)
         refresh()

@@ -10,7 +10,7 @@ import statementService from "../../services/StatementService";
 import StatementForm from "../Forms/StatementForm";
 import ProvenancesForm from "../Forms/ProvenanceForm";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { useSectionStyle } from "../../styles/styles";
+import { useSectionStyle, useGreyBgContainer } from "../../styles/styles";
 import { useTheme } from "@mui/system";
 import { SentenceAvailableTransitionsEnum as SentenceStates } from "../../apiclient/backend";
 
@@ -19,6 +19,7 @@ const TriageStatementSection = (props: any) => {
 
   const theme = useTheme()
   const sectionStyle = useSectionStyle(theme)
+  const greyBgContainer = useGreyBgContainer(theme)
 
   const onDeleteStatement = (id: number) => {
     statementService.remove(id).then(() => refreshSentence());
@@ -31,9 +32,8 @@ const TriageStatementSection = (props: any) => {
   return (
     <Grid item xs={12}>
       <Box
-        p={1}
         mb={2}
-        sx={{ background: vars.bodyBgColor, borderRadius: "12px" }}
+        sx={greyBgContainer}
       >
         <Grid container spacing={1} alignItems="center">
           <Grid item xs={11}>

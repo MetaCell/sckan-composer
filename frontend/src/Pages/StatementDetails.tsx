@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
-import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Tab from "@mui/material/Tab";
@@ -14,7 +13,7 @@ import { ConnectivityStatement } from "../apiclient/backend";
 import { userProfile } from "../services/UserService";
 import ProofingTab from "../components/ProofingTab/ProofingTab";
 import {SentenceStateChip} from "../components/Widgets/StateChip";
-import {formatDate, formatTime, SentenceLabels, StatementsLabels} from "../helpers/helpers";
+import {formatDate, formatTime, StatementsLabels} from "../helpers/helpers";
 import GroupedButtons from "../components/Widgets/CustomGroupedButtons";
 import Divider from "@mui/material/Divider";
 import NoteDetails from "../components/Widgets/NotesFomList";
@@ -166,7 +165,7 @@ const StatementDetails = () => {
 
           </Grid>
 
-          <Grid item md={12} lg={5}>
+          <Grid item xs={12} md={12} lg={5}>
             <Paper sx={{...sectionStyle, "& .MuiBox-root": { padding: 0 } }}>
               <Box>
                 <Typography variant="h5" mb={1}>

@@ -12,3 +12,9 @@ export const useSectionStyle = (theme: any) => ({
   boxShadow: "none",
   padding: theme.spacing(3)
 })
+
+export const useGreyBgContainer = (theme: any) => ({
+  background: theme.palette.background.default,
+  borderRadius: '12px',
+  padding: theme.spacing(1)
+})
