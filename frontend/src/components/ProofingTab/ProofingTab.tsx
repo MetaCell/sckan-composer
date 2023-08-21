@@ -6,6 +6,7 @@ import CheckDuplicates from "../CheckForDuplicates/CheckDuplicatesDialog";
 import { useSectionStyle, useGreyBgContainer } from "../../styles/styles";
 import { useTheme } from "@mui/system";
 import PathsBuilder from "./PathsBuilder";
+import StatementPreviewForm from "../Forms/StatementPreviewForm";
 
 const ProofingTab = (props: any) => {
   const { statement, refreshStatement, setStatement } = props;
@@ -34,6 +35,15 @@ const ProofingTab = (props: any) => {
             </Typography>
             <CheckDuplicates />
           </Stack>
+          <Box sx={{
+              "& .MuiGrid-container": {mt: "0 !important"},
+              "& .MuiGrid-item": { pt: 0}}
+          }>
+              <Typography variant="h6" mb={0}>
+                  Statement Preview
+              </Typography>
+              <StatementPreviewForm statement={statement} />
+          </Box>
           <Box
             sx={greyBgContainer}
           >

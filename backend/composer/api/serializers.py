@@ -347,7 +347,7 @@ class ConnectivityStatementSerializer(
         destination = instance.destination.name if instance.destination else ""
 
         via_values = [f"via {via.name}" for via in instance.path.all()]
-        via_string = f"{', '.join(via_values[:-1])}" + (f" and {via_values[-1]}" if len(via_values) > 1 else "") \
+        via_string = f" {', '.join(via_values[:-1])}" + (f" and {via_values[-1]}" if len(via_values) > 1 else "") \
             if via_values else ""
 
         circuit_type = instance.circuit_type if instance.circuit_type else ""
@@ -360,7 +360,7 @@ class ConnectivityStatementSerializer(
         apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
 
         return f"In {sex} {species}, a {phenotype} connection goes from " \
-               f"{origin} to {destination} {via_string}. " \
+               f"{origin} to {destination}{via_string}. " \
                f"This {circuit_type} projects {projection} from the {origin} and is found {laterality_description}. " \
                f"This neuron population connects to {forward_connection}. " \
                f"It is described in {apinatomy} model.".strip()
