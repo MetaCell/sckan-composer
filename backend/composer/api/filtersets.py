@@ -99,6 +99,9 @@ class AnatomicalEntityFilter(django_filters.FilterSet):
     def filter_name(queryset, name, value):
         words = value.split()
 
+        if not words:
+            return queryset
+
         queries = [Q(name__icontains=word) for word in words]
 
         query = queries.pop()
