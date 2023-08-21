@@ -38,15 +38,15 @@ export default function CheckDuplicates() {
         ordering?: criteria,
         index?: number,
     ) => {
-        if (origin && destination) {
+        if (origin || destination) {
             api.composerConnectivityStatementList(
-                destination.id,
+                destination ? destination.id : undefined,
                 undefined,
                 duplicatesRowsPerPage,
                 undefined,
                 index,
                 ordering || sorting,
-                origin.id,
+                origin ? origin.id : undefined,
             )
                 .then((res: { data: React.SetStateAction<PaginatedConnectivityStatementList | undefined>; }) => {
                     setStatementsList(res.data);
@@ -152,25 +152,25 @@ export default function CheckDuplicates() {
                         </Typography>
                     </Box>
                     <IconButton sx={{ml: 'auto'}} onClick={() => handleClose()}>
-                        <CloseIcon />
+                        <CloseIcon/>
                     </IconButton>
                 </DialogTitle>
 
                 <DialogContent sx={{backgroundColor: "#F9FAFB", display: "flex", flexDirection: "column"}}>
-                    <Stack direction='row' 
-                        spacing={1}
-                        sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        p: 2,
-                        marginTop: "1em",
-                        marginBottom: "1em",
-                        borderRadius: "1em",
-                        backgroundColor: "white",
-                        boxShadow: "0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)",
-                        border: "1px solid #EAECF0"
-                    }}>
+                    <Stack direction='row'
+                           spacing={1}
+                           sx={{
+                               display: "flex",
+                               justifyContent: "space-between",
+                               alignItems: "center",
+                               p: 2,
+                               marginTop: "1em",
+                               marginBottom: "1em",
+                               borderRadius: "1em",
+                               backgroundColor: "white",
+                               boxShadow: "0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)",
+                               border: "1px solid #EAECF0"
+                           }}>
                         <AutoComplete placeholder="Select origin"
                                       setValue={(value: AnatomicalEntity) => setOrigin(value)}
                                       value={origin}
