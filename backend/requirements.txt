@@ -1,0 +1,23 @@
+Django==4.1.4
+uvicorn==0.20.0
+psycopg2-binary==2.9.5
+djangorestframework==3.14.0
+django-filter==22.1
+django-fsm==2.8.1
+django-fsm-admin@git+https://github.com/gadventures/django-fsm-admin@master
+django-admin-sortable2==2.1.4
+django-nested-admin==4.0.2
+django-jazzmin==2.6.0
+drf-spectacular==0.25.1
+drf-spectacular-sidecar==2022.12.1
+drf-writable-nested==0.7.0
+social-auth-app-django==5.0.0
+pyontutils==0.1.31
+drf-react-template-framework==0.0.17
+aiohttp==3.8.3
+crossref-commons==0.0.7
+neurondm>=0.1.5
+
+django-debug-toolbar
+django-sslserver # ssl dev server, for testing orcid social login
+black

@@ -1,0 +1,34 @@
+h2, h3 {
+    font-size: 1rem;
+}
+
+fieldset.sortable :is(.inline-related, td.original) span.sort {
+    float: left !important;
+    margin-right: 24px !important;
+}
+
+.delete {
+    margin-left: 100px;
+    float: right;
+}
+
+.djn-fieldset .module h2, .djn-fieldset .module h3 {  
+    display: none;
+}
+
+.djn-group-nested .djn-items .inline-related {
+    padding: 0;
+}
+
+.btn-default {
+    color: red !important;
+}
+
+.select2-container {
+    min-width: 380px;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+    margin-left: 20px;
+    color: #000;
+}

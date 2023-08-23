@@ -1,0 +1,71 @@
+import React  from "react";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import SentenceForm from "../components/Forms/SentenceForm";
+import StatementForm from "../components/Forms/StatementForm";
+import Paper from "@mui/material/Paper";
+import SentenceStatementWithDois from "./SentenceStatementWithDois";
+import { useSectionStyle, useGreyBgContainer} from "../styles/styles";
+import { useTheme } from "@mui/system";
+import StatementDetailsAccordion from "./TriageStatementSection/StatementDetailsAccordion";
+import ProvenancesForm from "./Forms/ProvenanceForm";
+
+const DistillationTab = ({ statement, setStatement, refreshStatement, disabled } : any) => {
+  const theme = useTheme()
+  const sectionStyle = useSectionStyle(theme)
+  const greyBgContainer = useGreyBgContainer(theme)
+
+  return (
+    <Grid container mb={2} spacing={2}>
+      <Grid item xs={12}>
+        <Paper sx={sectionStyle}>
+          <Typography variant="h5" mb={3}>
+          Knowledge Statement
+          </Typography>
+          <Box
+           sx={greyBgContainer}
+           >
+            <Paper sx={{...sectionStyle, p:0}}>
+              <StatementForm
+                statement={statement}
+                format="small"
+                setter={refreshStatement}
+                extraData={{ sentence_id: statement.sentence.id }}
+                uiFields={["knowledge_statement"]}
+                className='ks'
+                enableAutoSave={true}
+              />
+              <ProvenancesForm
+                provenancesData={statement.provenances}
+                extraData={{ connectivity_statement_id: statement.id }}
+                setter={refreshStatement}
+                className='provenance'
+              />
+                <StatementDetailsAccordion
+                  setter={refreshStatement}
+                  index={0}
+                  statement={statement}
+                  sentence={statement.sentence}
+                />
+            </Paper>
+          </Box>
+        </Paper>
+      </Grid>
+
+      <Grid item xs={12}>
+        <SentenceStatementWithDois statement={statement} setStatement={setStatement} refreshStatement={refreshStatement}/>
+      </Grid>
+
+      <Grid item xs={12}>
+        <SentenceForm
+          data={statement.sentence}
+          format="small"
+          disabled={true}
+        />
+      </Grid>
+    </Grid>
+  );
+};
+
+export default DistillationTab;

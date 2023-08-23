@@ -1,0 +1,696 @@
+import typing
+
+from django.contrib.auth.models import User
+from django.db import models
+from django.db.models import Q
+from django.db.models.functions import Upper
+from django.forms.widgets import Input as InputWidget
+from django_fsm import FSMField, transition
+# from django_fsm_log.decorators import fsm_log_by
+
+from .enums import (
+    CircuitType,
+    CSState,
+    DestinationType,
+    Laterality,
+    MetricEntity,
+    SentenceState,
+    NoteType,
+    ViaType,
+    Projection
+)
+from composer.services.state_services import (
+    ConnectivityStatementService,
+    SentenceService,
+)
+from .utils import doi_uri, pmcid_uri, pmid_uri, create_reference_uri
+
+
+# some django user overwrite
+def get_name(self):
+    if self.first_name or self.last_name:
+        return "{} {}".format(self.first_name, self.last_name)
+    return "{}".format(self.username)
+
+
+User.add_to_class("__str__", get_name)
+
+
+# custom widget + field classes
+class DoiWidget(InputWidget):
+    template_name = "composer/forms/widgets/doi_input.html"
+
+
+class PmIdWidget(InputWidget):
+    template_name = "composer/forms/widgets/pmid_input.html"
+
+
+class PmcIdWidget(InputWidget):
+    template_name = "composer/forms/widgets/pmcid_input.html"
+
+
+class DoiField(models.CharField):
+    def formfield(self, *args, **kwargs):
+        kwargs.update(
+            {
+                "widget": DoiWidget,
+            }
+        )
+        return super().formfield(*args, **kwargs)
+
+
+class PmIdField(models.IntegerField):
+    def formfield(self, *args, **kwargs):
+        kwargs.update(
+            {
+                "widget": PmIdWidget,
+            }
+        )
+        return super().formfield(*args, **kwargs)
+
+
+class PmcIdField(models.CharField):
+    def formfield(self, *args, **kwargs):
+        kwargs.update(
+            {
+                "widget": PmcIdWidget,
+            }
+        )
+        return super().formfield(*args, **kwargs)
+
+
+# Model Managers
+class ConnectivityStatementManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related(
+                "owner",
+                "origin",
+                "destination",
+                "phenotype",
+                "sentence",
+            )
+            .prefetch_related("notes", "tags", "species")
+        )
+
+    def excluding_draft(self):
+        return self.get_queryset().exclude(state=CSState.DRAFT)
+
+
+class SentenceStatementManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related(
+                "owner",
+            )
+            .prefetch_related("notes", "tags", "connectivitystatement_set")
+        )
+
+
+class NoteManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related(
+                "user", "sentence", "connectivity_statement")
+        )
+
+
+# Create your models here.
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    is_triage_operator = models.BooleanField(default=False)
+    is_curator = models.BooleanField(default=False)
+    is_reviewer = models.BooleanField(default=False)
+
+
+class Phenotype(models.Model):
+    """Phenotype"""
+
+    name = models.CharField(max_length=200, db_index=True, unique=True)
+    ontology_uri = models.URLField(default="")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Phenotypes"
+
+
+class Specie(models.Model):
+    """Specie"""
+
+    name = models.CharField(max_length=200, db_index=True, unique=True)
+    ontology_uri = models.URLField()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Species"
+
+
+class Sex(models.Model):
+    """Sex"""
+
+    name = models.CharField(max_length=200, db_index=True, unique=True)
+    ontology_uri = models.URLField()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Sex"
+
+class FunctionalCircuitRole(models.Model):
+    """FunctionalCircuitRole"""
+
+    name = models.CharField(max_length=200, db_index=True, unique=True)
+    ontology_uri = models.URLField()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Funtional Circuit Roles"
+
+
+class ProjectionPhenotype(models.Model):
+    """ProjectionPhenotype"""
+
+    name = models.CharField(max_length=200, db_index=True, unique=True)
+    ontology_uri = models.URLField()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Projection Phenotypes"
+
+class AnatomicalEntity(models.Model):
+    """Anatomical Entity"""
+
+    name = models.CharField(max_length=200, db_index=True)
+    ontology_uri = models.URLField()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Anatomical Entities"
+        constraints = [
+            models.UniqueConstraint(Upper('name'), name="ae_unique_upper_name")
+        ]
+
+
+class Tag(models.Model):
+    """Tag"""
+
+    tag = models.CharField(max_length=200, db_index=True, unique=True)
+    exportable = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.tag
+
+    class Meta:
+        ordering = ["tag"]
+        verbose_name_plural = "Tags"
+
+
+class Sentence(models.Model):
+    """Sentence"""
+
+    objects = SentenceStatementManager()
+
+    title = models.CharField(max_length=200, db_index=True)
+    text = models.TextField()
+    external_ref = models.CharField(max_length=20, db_index=True, null=True, blank=True)
+    state = FSMField(default=SentenceState.OPEN, protected=True)
+    pmid = PmIdField(db_index=True, null=True, blank=True)
+    pmcid = PmcIdField(max_length=20, db_index=True, null=True, blank=True)
+    doi = DoiField(max_length=100, db_index=True, null=True, blank=True)
+    batch_name = models.CharField(max_length=100, null=True, blank=True)
+    tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
+    owner = models.ForeignKey(
+        User,
+        verbose_name="Triage Operator",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    created_date = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified_date = models.DateTimeField(auto_now=True, db_index=True)
+
+    def __str__(self):
+        return self.title
+
+    # states
+    @transition(
+        field=state,
+        source=[SentenceState.TO_BE_REVIEWED, SentenceState.COMPOSE_LATER],
+        target=SentenceState.OPEN,
+    )
+    def open(self, *args, **kwargs):
+        ...
+
+    @transition(
+        field=state,
+        source=SentenceState.OPEN,
+        target=SentenceState.TO_BE_REVIEWED,
+        conditions=[SentenceService.can_be_reviewed],
+    )
+    def to_be_reviewed(self, *args, **kwargs):
+        ...
+
+    @transition(
+        field=state, source=SentenceState.OPEN, target=SentenceState.COMPOSE_LATER
+    )
+    def compose_later(self, *args, **kwargs):
+        ...
+
+    @transition(
+        field=state,
+        source=[SentenceState.TO_BE_REVIEWED, SentenceState.OPEN],
+        permission=lambda instance, user: SentenceService.has_permission_to_transition_to_compose_now(instance, user),
+        target=SentenceState.COMPOSE_NOW,
+        conditions=[SentenceService.can_be_composed],
+    )
+    def compose_now(self, *args, **kwargs):
+        SentenceService(self).do_transition_compose_now(*args, **kwargs)
+
+    @transition(field=state, source=SentenceState.OPEN, target=SentenceState.EXCLUDED)
+    def excluded(self, *args, **kwargs):
+        ...
+
+    @transition(field=state, source=SentenceState.OPEN, target=SentenceState.DUPLICATE)
+    def duplicate(self, *args, **kwargs):
+        ...
+
+    def assign_owner(self, request):
+        if SentenceService(self).should_set_owner(request):
+            self.owner = request.user
+            self.save(update_fields=["owner"])
+            
+    @property
+    def pmid_uri(self) -> str:
+        return pmid_uri(self.pmid)
+
+    @property
+    def pmcid_uri(self) -> str:
+        return pmcid_uri(self.pmcid)
+
+    @property
+    def doi_uri(self) -> str:
+        return doi_uri(self.doi)
+
+    @property
+    def tag_list(self):
+        return ", ".join(self.tags.all().values_list("tag", flat=True))
+
+    @property
+    def has_notes(self):
+        return self.notes.exclude(type=NoteType.TRANSITION).exists()
+
+    class Meta:
+        ordering = ["title"]
+        verbose_name_plural = "Sentences"
+        constraints = [
+            models.CheckConstraint(
+                check=Q(state__in=[l[0] for l in SentenceState.choices]),
+                name="sentence_state_valid",
+            ),
+            models.CheckConstraint(
+                check=~Q(state=SentenceState.COMPOSE_NOW)
+                | (
+                    Q(state=SentenceState.COMPOSE_NOW)
+                    & (
+                        Q(pmid__isnull=False)
+                        | Q(pmcid__isnull=False)
+                        | Q(doi__isnull=False)
+                    )
+                ),
+                name="sentence_pmid_pmcd_valid",
+            ),
+            models.CheckConstraint(
+                check=(Q(external_ref__isnull=True) & Q(batch_name__isnull=True))
+                | Q(external_ref__isnull=False) & Q(batch_name__isnull=False),
+                name="sentence_externalref_and_batch_valid",
+            ),
+        ]
+
+
+class Via(models.Model):
+    """Via"""
+
+    connectivity_statement = models.ForeignKey(
+        "ConnectivityStatement",
+        on_delete=models.CASCADE,
+    )
+    anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.DO_NOTHING)
+    display_order = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+    )
+    type = models.CharField(max_length=8, default=ViaType.AXON, choices=ViaType.choices)
+
+    def __str__(self):
+        return f"{self.connectivity_statement} - {self.anatomical_entity}"
+    
+    def save(self, *args, **kwargs):
+        if self.display_order is None:
+            self.display_order = self.connectivity_statement.path.all().count()
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ["display_order"]
+        verbose_name_plural = "Via"
+        constraints = [
+            models.CheckConstraint(
+                check=Q(type__in=[vt[0] for vt in ViaType.choices]),
+                name="via_type_valid",
+            ),
+        ]
+
+
+class ConnectivityStatement(models.Model):
+    """Connectivity Statement"""
+
+    objects = ConnectivityStatementManager()
+    all_objects = models.Manager()
+
+    sentence = models.ForeignKey(
+        Sentence, verbose_name="Sentence", on_delete=models.DO_NOTHING
+    )
+    knowledge_statement = models.TextField(db_index=True, blank=True)
+    state = FSMField(default=CSState.DRAFT, protected=True)
+    origin = models.ForeignKey(
+        AnatomicalEntity,
+        verbose_name="Origin",
+        on_delete=models.DO_NOTHING,
+        related_name="origin",
+        null=True,
+        blank=True,
+    )
+    destination = models.ForeignKey(
+        AnatomicalEntity,
+        verbose_name="Destination",
+        on_delete=models.DO_NOTHING,
+        related_name="destination",
+        null=True,
+        blank=True,
+    )
+    destination_type = models.CharField(
+        max_length=10, default=DestinationType.UNKNOWN, choices=DestinationType.choices
+    )
+    owner = models.ForeignKey(
+        User, verbose_name="Curator", on_delete=models.SET_NULL, null=True, blank=True
+    )
+    path = models.ManyToManyField(AnatomicalEntity, through=Via, blank=True)
+    laterality = models.CharField(
+        max_length=20, default=Laterality.UNKNOWN, choices=Laterality.choices
+    )
+    projection = models.CharField(
+        max_length=20, default=Projection.UNKNOWN, choices=Projection.choices
+    )
+    circuit_type = models.CharField(
+        max_length=20, default=CircuitType.UNKNOWN, choices=CircuitType.choices
+    )
+    #TODO for next releases we could have only 1 field for phenotype + an intermediate table with the phenotype's categories such as circuit_type, laterality, projection, functional_circuit_role, projection_phenotype among others
+    phenotype = models.ForeignKey(
+        Phenotype,
+        verbose_name="Phenotype",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    species = models.ManyToManyField(Specie, verbose_name="Species", blank=True)
+    tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
+    sex = models.ForeignKey(
+        Sex, on_delete=models.DO_NOTHING, null=True, blank=True
+    )
+    apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
+    additional_information = models.TextField(null=True, blank=True)
+    reference_uri = models.URLField(null=True, blank=True)
+    functional_circuit_role = models.ForeignKey(FunctionalCircuitRole, on_delete=models.DO_NOTHING, null=True, blank=True,)
+    projection_phenotype = models.ForeignKey(ProjectionPhenotype, on_delete=models.DO_NOTHING, null=True,blank=True,)
+    created_date = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified_date = models.DateTimeField(auto_now=True, db_index=True)
+
+    def __str__(self):
+        suffix = ""
+        if len(self.knowledge_statement) > 49:
+            suffix = "..."
+        return f"{self.knowledge_statement[:50]}{suffix}"
+
+    # states
+    @transition(
+        field=state,
+        source=[
+            CSState.DRAFT,
+            CSState.REJECTED,
+            CSState.NPO_APPROVED,
+            CSState.EXPORTED,
+        ],
+        permission=lambda instance, user: ConnectivityStatementService.has_permission_to_transition_to_compose_now(
+            instance, user
+        ),
+        target=CSState.COMPOSE_NOW,
+    )
+    def compose_now(self, *args, **kwargs):
+        ...
+
+    @transition(
+        field=state,
+        source=[CSState.COMPOSE_NOW, CSState.CONNECTION_MISSING],
+        target=CSState.CURATED,
+    )
+    def curated(self, *args, **kwargs):
+        ...
+
+    @transition(
+        field=state, source=CSState.COMPOSE_NOW, target=CSState.CONNECTION_MISSING
+    )
+    def connection_missing(self, *args, **kwargs):
+        ...
+
+    @transition(
+        field=state,
+        source=CSState.CURATED,
+        target=CSState.TO_BE_REVIEWED,
+        conditions=[ConnectivityStatementService.can_be_reviewed],
+    )
+    def to_be_reviewed(self, *args, **kwargs):
+        ...
+
+    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.EXCLUDED)
+    def excluded(self, *args, **kwargs):
+        ...
+
+    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.REJECTED)
+    def rejected(self, *args, **kwargs):
+        ...
+
+    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.NPO_APPROVED)
+    def npo_approved(self, *args, **kwargs):
+        ...
+
+    @transition(
+        field=state,
+        source=[CSState.NPO_APPROVED, CSState.COMPOSE_NOW],
+        permission=lambda instance, user: ConnectivityStatementService.has_permission_to_transition_to_exported(
+            instance, user
+        ),
+        target=CSState.EXPORTED,
+    )
+    def exported(self, *args, **kwargs):
+        ...
+    
+    @property
+    def export_id(self):
+        return f"CPR:{self.id:06d}"
+
+    @property
+    def journey(self):
+        return ConnectivityStatementService.compile_journey(self)
+
+    @property
+    def has_notes(self):
+        return self.notes.exclude(type=NoteType.TRANSITION).exists()
+
+    @property
+    def tag_list(self):
+        return ", ".join(self.tags.all().values_list("tag", flat=True))
+
+    def assign_owner(self, request):
+        if ConnectivityStatementService(self).should_set_owner(request):
+            self.owner = request.user
+            self.save(update_fields=["owner"])
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.reference_uri is None:
+            self.reference_uri = create_reference_uri(self.pk)
+            self.save(update_fields=["reference_uri"])
+
+    class Meta:
+        ordering = ["-modified_date"]
+        verbose_name_plural = "Connectivity Statements"
+        constraints = [
+            models.CheckConstraint(
+                check=Q(state__in=[l[0] for l in CSState.choices]), name="state_valid"
+            ),
+            models.CheckConstraint(
+                check=Q(laterality__in=[l[0] for l in Laterality.choices]),
+                name="laterality_valid",
+            ),
+            models.CheckConstraint(
+                check=Q(circuit_type__in=[c[0] for c in CircuitType.choices]),
+                name="circuit_type_valid",
+            ),
+            models.CheckConstraint(
+                check=Q(destination_type__in=[dt[0] for dt in DestinationType.choices]),
+                name="destination_type_valid",
+            ),
+            models.CheckConstraint(
+                check=Q(projection__in=[p[0] for p in Projection.choices]),
+                name="projection_valid",
+            ),
+        ]
+
+
+class Provenance(models.Model):
+    """Provenance"""
+
+    connectivity_statement = models.ForeignKey(
+        ConnectivityStatement, on_delete=models.CASCADE
+    )
+    uri = models.URLField()
+
+    def __str__(self):
+        return self.uri
+
+    class Meta:
+        verbose_name_plural = "Provenances"
+
+
+class Note(models.Model):
+    """Note"""
+
+    note = models.TextField()
+    user = models.ForeignKey(User, verbose_name="User", on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    sentence = models.ForeignKey(
+        Sentence,
+        verbose_name="Sentence",
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        related_name="notes",
+    )
+    connectivity_statement = models.ForeignKey(
+        ConnectivityStatement,
+        verbose_name="Connectivity Statement",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="notes",
+    )
+    type = models.CharField(
+        max_length=20, default=NoteType.PLAIN, choices=NoteType.choices
+    )
+    
+    objects = NoteManager()
+    all_objects = models.Manager()
+
+    def __str__(self):
+        return self.note
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name_plural = "Notes"
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(
+                    sentence__isnull=False,
+                    connectivity_statement__isnull=True,
+                )
+                | models.Q(
+                    sentence__isnull=True,
+                    connectivity_statement__isnull=False,
+                ),
+                name="only_sentence_or_connectivity_statement",
+            ),
+            models.CheckConstraint(
+                check=Q(type__in=[nt[0] for nt in NoteType.choices]),
+                name="note_type_valid",
+            ),
+        ]
+
+
+class ExportBatch(models.Model):
+    """Export batches"""
+
+    user = models.ForeignKey(User, verbose_name="User", on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    sentences_created = models.IntegerField(default=0, help_text="Number of sentences created since the previous export")
+    connectivity_statements_created = models.IntegerField(default=0, help_text="Number of connectivity statements created since the previous export")
+    connectivity_statements = models.ManyToManyField(ConnectivityStatement, help_text="Connectivity statements in this export batch")
+
+    @property
+    def get_count_sentences_created_since_this_export(self):
+        return Sentence.objects.filter(
+            created_date__gt=self.created_at,
+        ).count()
+
+    @property
+    def get_count_connectivity_statements_created_since_this_export(self):
+        return ConnectivityStatement.objects.filter(
+            created_date__gt=self.created_at,
+            state=CSState.NPO_APPROVED
+        ).count()
+
+    @property
+    def get_count_connectivity_statements_modified_since_this_export(self):
+        return ConnectivityStatement.objects.filter(
+            modified_date__gt=self.created_at,
+            state=CSState.NPO_APPROVED
+        ).exclude(state=CSState.EXPORTED).count() # exclude statements that are in EXPORTED state
+
+    @property
+    def get_count_connectivity_statements_in_this_export(self):
+        return self.connectivity_statements.count()
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name_plural = "Export Batches"
+
+
+class ExportMetrics(models.Model):
+    """Export Metrics"""
+
+    export_batch = models.ForeignKey(ExportBatch, on_delete=models.CASCADE)
+    entity = models.CharField(
+        max_length=max((len(state[1]) for state in MetricEntity.choices)), choices=MetricEntity.choices
+    )
+    state = models.CharField(
+        max_length=max((len(state[1]) for state in CSState.choices + SentenceState.choices))
+    )
+    count = models.IntegerField()
+
+    class Meta:
+        verbose_name_plural = "Export Metrics"
+        ordering = ["id"]
+        constraints = [
+            models.UniqueConstraint(fields=["export_batch", "entity", "state"], name="unique_state_per_export_batch"),
+        ]

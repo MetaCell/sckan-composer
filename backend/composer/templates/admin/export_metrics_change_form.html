@@ -1,0 +1,91 @@
+{% extends "admin/change_form.html" %}
+{% load composer_extras %}
+
+{% block content_title %}
+<h1>Export Batch and Metrics</h1>
+{% endblock %}
+{% block after_related_objects %}
+
+<style>
+  .bar-chart {
+    display: flex;
+    justify-content: space-around;
+    height: 160px;
+    overflow: hidden;
+  }
+  .bar-chart .bar {
+      flex: 100%;
+      align-self: flex-end;
+      margin-right: 2px;
+      position: relative;
+      background-color: #79aec8;
+  }
+  .bar-chart .bar:last-child {
+      margin: 0;
+  }
+  .barx-chart {
+    display: flex;
+    justify-content: space-around;
+    height: 64px;
+    overflow: hidden;
+  }
+  .barx-chart .barx {
+    flex: 100%;
+    align-self: flex-end;
+    margin-right: 2px;
+    position: relative;
+  }
+  .barx-chart .barx:last-child {
+    margin: 0;
+  }
+  .barx-chart .barx .barx-count {
+    position: absolute;
+    left: 50%;
+    top: -64px;
+    transform: translateX(-50%);
+    text-align: center;
+    font-weight: bold;
+  }
+</style>
+
+{% with entities='sentence,connectivity statement' %}
+{% for entity in entities|split:',' %}
+<div class="col-12 col-lg-9">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="m-0">Export statistics {{ entity }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <div class="row">
+                    {% with total=original.exportmetrics_set.all|count_entity:entity %}
+                    {% with rows=original.exportmetrics_set.all|filter_entity:entity %}
+                    <div class="col-sm-12">
+                        <div class="bar-chart">
+                                {% for row in rows %}
+                                <div class="bar" style="height:{{row.count|pct:total}}%">
+                                </div>
+                                {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="barx-chart">
+                            {% for row in rows %}
+                            <div class="barx">
+                                <div class="barx-count">{{row.count}}<br />{{row.state}}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endwith %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endwith %}
+{% endblock %}
+{% block pagination %}
+{% endblock %}
