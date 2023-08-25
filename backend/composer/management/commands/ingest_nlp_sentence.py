@@ -6,20 +6,27 @@ import os
 import re
 
 from asgiref.sync import sync_to_async
+from datetime import datetime
+from typing import List
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from lxml import etree
 
-from composer.models import Sentence
+from composer.models import Note, Sentence, NoteType
 
 ID = "id"
 PMID = "pmid"
 PMCID = "pmcid"
 DOI = "doi"
 BATCH_NAME = "batch_name"
+COMMENT_SENDER_NAME = "comment_sender_name"
 EXTERNAL_REF = "sentence_id"
 SENTENCE = "sentence"
 SENTENCE_ID = "sentence_id"
+STATEMENT_ID = "statement_id"
 OUT_OF_SCOPE = "out_of_scope"
+REG_TIME = "reg_time"
+COMMENT = "comment"
 
 MAX_PARALLEL_JOBS = 10
 
@@ -125,38 +132,102 @@ class Command(BaseCommand):
 
     async def ingest(self, *args, **options):
         for csv_file_name in options["csv_files"]:
-            with open(
-                csv_file_name, newline="", encoding="utf-8", errors="ignore"
-            ) as csvfile:
-                nlpreader = csv.DictReader(
-                    csvfile,
-                    delimiter=",",
-                    quotechar='"',
-                )
-                default_batch_name = os.path.basename(csv_file_name)
+            sentences = await self.ingest_sentences(csv_file_name)
+            await self.ingest_comments(csv_file_name=csv_file_name, sentences=sentences)
 
-                rows = []
-                for row in nlpreader:
-                    rows.append(row)
+    async def ingest_sentences(self, csv_file_name) -> List[dict]:
+        sentences = []
+        with open(
+            csv_file_name, newline="", encoding="utf-8", errors="ignore"
+        ) as csvfile:
+            nlpreader = csv.DictReader(
+                csvfile,
+                delimiter=",",
+                quotechar='"',
+            )
+            default_batch_name = os.path.basename(csv_file_name)
 
-                row_counter = 0
-                while row_counter < len(rows):
-                    async with aiohttp.ClientSession() as session:
-                        tasks = []
-                        for i in range(0, MAX_PARALLEL_JOBS):  # max parallel
-                            if row_counter>=len(rows):
-                                break
-                            row = rows[row_counter]
-                            row_counter += 1
-                            rowid = row[ID]
-                            out_of_scope = row[OUT_OF_SCOPE].lower()
-                            if out_of_scope and out_of_scope.lower() == "yes":
-                                # skip out of scope records
-                                self.stdout.write(f"{rowid}: out of scope.")
-                                continue
-                            tasks.append(
-                                asyncio.create_task(
-                                    save_sentence(session, row, default_batch_name)
-                                )
+            for row in nlpreader:
+                sentences.append(row)
+
+            row_counter = 0
+            while row_counter < len(sentences):
+                async with aiohttp.ClientSession() as session:
+                    tasks = []
+                    for i in range(0, MAX_PARALLEL_JOBS):  # max parallel
+                        if row_counter>=len(sentences):
+                            break
+                        row = sentences[row_counter]
+                        row_counter += 1
+                        rowid = row[ID]
+                        out_of_scope = row[OUT_OF_SCOPE].lower()
+                        if out_of_scope and out_of_scope.lower() == "yes":
+                            # skip out of scope records
+                            self.stdout.write(f"{rowid}: out of scope.")
+                            continue
+                        tasks.append(
+                            asyncio.create_task(
+                                save_sentence(session, row, default_batch_name)
                             )
-                        await asyncio.gather(*tasks)
+                        )
+                    await asyncio.gather(*tasks)
+        return sentences
+
+    async def ingest_comments(self, csv_file_name, sentences):
+        comments_file_name = csv_file_name[0:csv_file_name.find(".csv")]+"_comments.csv"
+        with open(
+            comments_file_name, newline="", encoding="utf-8", errors="ignore"
+        ) as csvfile:
+            comments_reader = csv.DictReader(
+                csvfile,
+                delimiter=",",
+                quotechar='"',
+            )
+            default_batch_name = os.path.basename(csv_file_name)
+            
+            users = []
+            async for user in User.objects.all().order_by("id"):
+                users.append(user)
+
+            for comment in comments_reader:
+                statement_id = comment[STATEMENT_ID]
+                
+                # search the sentence from the sentence csv
+                sentence = next(sentence
+                                for sentence in sentences
+                                if sentence["id"] == statement_id
+                                and sentence[BATCH_NAME] == comment[BATCH_NAME])
+                if sentence[OUT_OF_SCOPE].lower() == "yes":
+                    # the sentence is out of scope, skip the comment
+                    continue
+
+                external_ref = sentence[EXTERNAL_REF]
+                batch_name = to_none(sentence[BATCH_NAME])
+                if not batch_name:
+                    batch_name = default_batch_name
+                # select the corresponding sentence database entity
+                db_sentence = await Sentence.objects.aget(
+                    external_ref=external_ref,
+                    batch_name=batch_name,
+                )
+
+                comment_sender_name = comment[COMMENT_SENDER_NAME]
+                try:
+                    # search the user that created the comment
+                    user = next(user for user in users if user.get_full_name() == comment_sender_name)
+                except StopIteration:
+                    # user does not exist, take the first one
+                    user = users[0]
+                reg_time = datetime.strptime(comment[REG_TIME], '%Y-%m-%d %H:%M:%S')
+                
+                note, created = await Note.objects.aget_or_create(
+                    sentence=db_sentence,
+                    user=user,
+                    note=comment[COMMENT],
+                    type=NoteType.PLAIN
+                )
+                if created:
+                    # created_at is auto set on Note creation, let's update it
+                    # to the comment's reg_time
+                    note.created_at = reg_time
+                    await sync_to_async(note.save)()
