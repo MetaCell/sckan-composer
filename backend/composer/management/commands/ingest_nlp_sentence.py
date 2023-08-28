@@ -211,6 +211,7 @@ class Command(BaseCommand):
                     batch_name=batch_name,
                 )
 
+                comment = comment[COMMENT]
                 comment_sender_name = comment[COMMENT_SENDER_NAME]
                 try:
                     # search the user that created the comment
@@ -218,12 +219,13 @@ class Command(BaseCommand):
                 except StopIteration:
                     # user does not exist, take the first one
                     user = users[0]
+                    comment = f"[{comment_sender_name}] {comment}"
                 reg_time = datetime.strptime(comment[REG_TIME], '%Y-%m-%d %H:%M:%S')
                 
                 note, created = await Note.objects.aget_or_create(
                     sentence=db_sentence,
                     user=user,
-                    note=comment[COMMENT],
+                    note=comment,
                     type=NoteType.PLAIN
                 )
                 if created:
