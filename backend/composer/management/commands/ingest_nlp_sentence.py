@@ -175,61 +175,62 @@ class Command(BaseCommand):
 
     async def ingest_comments(self, csv_file_name, sentences):
         comments_file_name = csv_file_name[0:csv_file_name.find(".csv")]+"_comments.csv"
-        with open(
-            comments_file_name, newline="", encoding="utf-8", errors="ignore"
-        ) as csvfile:
-            comments_reader = csv.DictReader(
-                csvfile,
-                delimiter=",",
-                quotechar='"',
-            )
-            default_batch_name = os.path.basename(csv_file_name)
-            
-            users = []
-            async for user in User.objects.all().order_by("id"):
-                users.append(user)
-
-            for comment in comments_reader:
-                statement_id = comment[STATEMENT_ID]
-                
-                # search the sentence from the sentence csv
-                sentence = next(sentence
-                                for sentence in sentences
-                                if sentence["id"] == statement_id
-                                and sentence[BATCH_NAME] == comment[BATCH_NAME])
-                if sentence[OUT_OF_SCOPE].lower() == "yes":
-                    # the sentence is out of scope, skip the comment
-                    continue
-
-                external_ref = sentence[EXTERNAL_REF]
-                batch_name = to_none(sentence[BATCH_NAME])
-                if not batch_name:
-                    batch_name = default_batch_name
-                # select the corresponding sentence database entity
-                db_sentence = await Sentence.objects.aget(
-                    external_ref=external_ref,
-                    batch_name=batch_name,
+        if os.path.exists(comments_file_name):
+            with open(
+                comments_file_name, newline="", encoding="utf-8", errors="ignore"
+            ) as csvfile:
+                comments_reader = csv.DictReader(
+                    csvfile,
+                    delimiter=",",
+                    quotechar='"',
                 )
-
-                note = comment[COMMENT]
-                comment_sender_name = comment[COMMENT_SENDER_NAME]
-                try:
-                    # search the user that created the comment
-                    user = next(user for user in users if user.get_full_name() == comment_sender_name)
-                except StopIteration:
-                    # user does not exist, take the first one
-                    user = users[0]
-                    note = f"[{comment_sender_name}] {note}"
-                reg_time = datetime.strptime(comment[REG_TIME], '%Y-%m-%d %H:%M:%S')
+                default_batch_name = os.path.basename(csv_file_name)
                 
-                note, created = await Note.objects.aget_or_create(
-                    sentence=db_sentence,
-                    user=user,
-                    note=note,
-                    type=NoteType.PLAIN
-                )
-                if created:
-                    # created_at is auto set on Note creation, let's update it
-                    # to the comment's reg_time
-                    note.created_at = reg_time
-                    await sync_to_async(note.save)()
+                users = []
+                async for user in User.objects.all().order_by("id"):
+                    users.append(user)
+
+                for comment in comments_reader:
+                    statement_id = comment[STATEMENT_ID]
+                    
+                    # search the sentence from the sentence csv
+                    sentence = next(sentence
+                                    for sentence in sentences
+                                    if sentence["id"] == statement_id
+                                    and sentence[BATCH_NAME] == comment[BATCH_NAME])
+                    if sentence[OUT_OF_SCOPE].lower() == "yes":
+                        # the sentence is out of scope, skip the comment
+                        continue
+
+                    external_ref = sentence[EXTERNAL_REF]
+                    batch_name = to_none(sentence[BATCH_NAME])
+                    if not batch_name:
+                        batch_name = default_batch_name
+                    # select the corresponding sentence database entity
+                    db_sentence = await Sentence.objects.aget(
+                        external_ref=external_ref,
+                        batch_name=batch_name,
+                    )
+
+                    note = comment[COMMENT]
+                    comment_sender_name = comment[COMMENT_SENDER_NAME]
+                    try:
+                        # search the user that created the comment
+                        user = next(user for user in users if user.get_full_name() == comment_sender_name)
+                    except StopIteration:
+                        # user does not exist, take the first one
+                        user = users[0]
+                        note = f"[{comment_sender_name}] {note}"
+                    reg_time = datetime.strptime(comment[REG_TIME], '%Y-%m-%d %H:%M:%S')
+                    
+                    note, created = await Note.objects.aget_or_create(
+                        sentence=db_sentence,
+                        user=user,
+                        note=note,
+                        type=NoteType.PLAIN
+                    )
+                    if created:
+                        # created_at is auto set on Note creation, let's update it
+                        # to the comment's reg_time
+                        note.created_at = reg_time
+                        await sync_to_async(note.save)()
