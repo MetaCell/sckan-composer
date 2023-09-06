@@ -1,7 +1,8 @@
-import React, { useRef, useEffect } from "react";
+import React, {useRef, useEffect, useState} from "react";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
 import { useDebouncedCallback } from "use-debounce";
 import { SEARCH_DEBOUNCE } from "../settings";
 import { useAppDispatch } from "../redux/hooks";
@@ -12,6 +13,8 @@ const Searchbar = (props: any) => {
   const { queryOptions, entityType } = props;
   const inputRef = useRef<HTMLInputElement>(null);
   const dispatch = useAppDispatch();
+  const [isFocused, setIsFocused] = useState(false);
+
 
   const placeholder = entityType === 'sentence' ? 'Search for Sentences' : 'Search for Knowledge Statements' 
 
@@ -28,11 +31,14 @@ const Searchbar = (props: any) => {
 
   const onEscapeHandler = (e: any) => {
     if (e.key === "Escape" && inputRef.current) {
-      inputRef.current.value = "";
-      entityType === "sentence" && dispatch(setTitleQuery(undefined));
-      entityType === "statement" &&
-        dispatch(setKnowledgeStatementQuery(undefined));
+      handleClear()
     }
+  };
+
+  const handleClear = () => {
+    inputRef.current!.value = "";
+    entityType === "sentence" && dispatch(setTitleQuery(undefined));
+    entityType === "statement" && dispatch(setKnowledgeStatementQuery(undefined));
   };
 
   useEffect(() => {
@@ -54,6 +60,8 @@ const Searchbar = (props: any) => {
       <TextField
         inputRef={inputRef}
         onChange={debouncedChangeHandler}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         variant="outlined"
         placeholder={placeholder}
         size="small"
@@ -67,6 +75,17 @@ const Searchbar = (props: any) => {
           startAdornment: (
             <SearchIcon color="primary" fontSize="small" sx={{ mr: 0.6 }} />
           ),
+          endAdornment: isFocused ? (
+              <CloseIcon
+                  color="action"
+                  fontSize="small"
+                  sx={{ cursor: "pointer", mr: 0.6 }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    handleClear();
+                  }}
+              />
+          ) : null,
         }}
       />
     </Box>
