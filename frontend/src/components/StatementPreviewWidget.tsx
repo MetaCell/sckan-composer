@@ -9,7 +9,7 @@ const StatementPreviewWidget: React.FC<StatementPreviewProps> = ({value}) => {
     return (
         <Box sx={{
             whiteSpace: 'pre-wrap', overflowWrap: 'break-word',
-            padding: "8px"
+            paddingTop: "8px"
         }}>
             {value}
         </Box>

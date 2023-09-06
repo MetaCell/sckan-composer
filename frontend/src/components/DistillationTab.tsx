@@ -25,6 +25,7 @@ const DistillationTab = ({ statement, setStatement, refreshStatement, disabled }
           Knowledge Statement
           </Typography>
           <Box sx={{
+              paddingLeft: "8px",
               "& .MuiGrid-container": {mt: "0 !important"},
               "& .MuiGrid-item": { pt: 0}}
           }>
