@@ -23,7 +23,7 @@ import AutoComplete from "../AutoComplete";
 
 
 type criteria =
-    | ("pmid" | "-pmid")[]
+    | ("id" | "-id")[]
     | undefined;
 
 export default function CheckDuplicates() {
@@ -71,10 +71,10 @@ export default function CheckDuplicates() {
         } else {
             const {field, sort} = model[0];
             const sortingCriteria = `${field} ${sort}`;
-            if (sortingCriteria === "pmid asc") {
-                ordering = ["pmid"];
-            } else if (sortingCriteria === "pmid desc") {
-                ordering = ["-pmid"];
+            if (sortingCriteria === "id asc") {
+                ordering = ["id"];
+            } else if (sortingCriteria === "id desc") {
+                ordering = ["-id"];
             }
         }
         fetchDuplicates(ordering);
@@ -103,7 +103,6 @@ export default function CheckDuplicates() {
             const {id, sentence, knowledge_statement, state} = statement;
             return {
                 id,
-                pmid: sentence.pmid,
                 knowledge_statement,
                 state,
             };

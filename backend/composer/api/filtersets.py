@@ -36,7 +36,7 @@ class SentenceFilter(django_filters.FilterSet):
     )
     ordering = django_filters.OrderingFilter(
         fields=(
-            ("pmid", "pmid"),
+            ("id", "id"),
             ("modified_date", "last_edited"),
         ),
     )
@@ -78,7 +78,7 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
     )
     ordering = django_filters.OrderingFilter(
         fields=(
-            ("sentence__pmid", "pmid"),
+            ("id", "id"),
             ("modified_date", "last_edited"),
         ),
     )
