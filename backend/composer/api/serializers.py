@@ -347,23 +347,33 @@ class ConnectivityStatementSerializer(
         destination = instance.destination.name if instance.destination else ""
 
         via_values = [f"via {via.name}" for via in instance.path.all()]
-        via_string = f" {', '.join(via_values[:-1])}" + (f" and {via_values[-1]}" if len(via_values) > 1 else "") \
-            if via_values else ""
+        if len(via_values) > 1:
+            via_string = f" {', '.join(via_values[:-1])} and {via_values[-1]}"
+        elif via_values:
+            via_string = f" {via_values[0]}"
+        else:
+            via_string = ""
 
         circuit_type = instance.circuit_type if instance.circuit_type else ""
         projection = instance.projection if instance.projection else ""
 
         laterality_description = instance.get_laterality_description()
 
-        forward_connection = ""
-
+        forward_connection = instance.forward_connection if hasattr(instance, 'forward_connection') and instance.forward_connection else ""
         apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
 
-        return f"In {sex} {species}, a {phenotype} connection goes from " \
-               f"{origin} to {destination}{via_string}. " \
-               f"This {circuit_type} projects {projection} from the {origin} and is found {laterality_description}. " \
-               f"This neuron population connects to {forward_connection}. " \
-               f"It is described in {apinatomy} model.".strip()
+        # Creating the statement
+        statement = f"In {sex} {species}, a {phenotype} connection goes from {origin} to {destination}{via_string}. "
+        statement += f"This {circuit_type} projects {projection} from the {origin} and is found {laterality_description}. "
+
+        if forward_connection:
+            statement += f"This neuron population connects to {forward_connection}. "
+
+        if apinatomy:
+            statement += f"It is described in {apinatomy} model."
+
+        return statement.strip()
+
 
     class Meta:
         model = ConnectivityStatement
