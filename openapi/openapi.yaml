@@ -869,6 +869,15 @@ paths:
       operationId: composer_sentence_list
       description: Sentence
       parameters:
+      - in: query
+        name: exclude
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
       - name: limit
         required: false
         in: query

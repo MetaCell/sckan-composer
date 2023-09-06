@@ -22,6 +22,10 @@ def filter_by_title_or_text(queryset, name, value):
     return queryset.filter(Q(title__icontains=value) | Q(text__icontains=value))
 
 
+def exclude_ids(queryset, name, value):
+    return queryset.exclude(id__in=value)
+
+
 class SentenceFilter(django_filters.FilterSet):
     title = django_filters.CharFilter(method=filter_by_title_or_text)
 
@@ -40,6 +44,7 @@ class SentenceFilter(django_filters.FilterSet):
             ("modified_date", "last_edited"),
         ),
     )
+    exclude = django_filters.BaseInFilter(method=exclude_ids)
 
     class Meta:
         model = Sentence
@@ -89,7 +94,7 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
 
 
 class AnatomicalEntityFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(method='filter_name')
+    name = django_filters.CharFilter(method="filter_name")
 
     class Meta:
         model = AnatomicalEntity

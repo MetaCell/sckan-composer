@@ -13,13 +13,15 @@
  */
 
 
-import { Configuration } from './configuration';
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { Configuration } from './configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
  * Anatomical Entity
@@ -245,6 +247,8 @@ export interface ConnectivityStatement {
      */
     'has_notes': boolean;
 }
+
+
 /**
  * 
  * @export
@@ -843,6 +847,8 @@ export interface PatchedConnectivityStatement {
      */
     'has_notes'?: boolean;
 }
+
+
 /**
  * Note
  * @export
@@ -1044,6 +1050,8 @@ export interface PatchedVia {
      */
     'anatomical_entity'?: AnatomicalEntity;
 }
+
+
 /**
  * Phenotype
  * @export
@@ -1546,6 +1554,8 @@ export interface Via {
      */
     'anatomical_entity': AnatomicalEntity;
 }
+
+
 
 /**
  * ComposerApi - axios parameter creator
@@ -3054,6 +3064,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * Sentence
+         * @param {Array<number>} [exclude] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
@@ -3064,7 +3075,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceList: async (limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceList: async (exclude?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/sentence/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3085,6 +3096,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
 
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (exclude) {
+                localVarQueryParameter['exclude'] = exclude.join(COLLECTION_FORMATS.csv);
+            }
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -4173,6 +4188,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * Sentence
+         * @param {Array<number>} [exclude] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
@@ -4183,8 +4199,8 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceList(limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceList(limit, notes, offset, ordering, state, tags, title, options);
+        async composerSentenceList(exclude?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceList(exclude, limit, notes, offset, ordering, state, tags, title, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4677,6 +4693,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * Sentence
+         * @param {Array<number>} [exclude] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
@@ -4687,8 +4704,8 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceList(limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: any): AxiosPromise<PaginatedSentenceList> {
-            return localVarFp.composerSentenceList(limit, notes, offset, ordering, state, tags, title, options).then((request) => request(axios, basePath));
+        composerSentenceList(exclude?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: any): AxiosPromise<PaginatedSentenceList> {
+            return localVarFp.composerSentenceList(exclude, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(axios, basePath));
         },
         /**
          * Sentence
@@ -5229,6 +5246,7 @@ export class ComposerApi extends BaseAPI {
 
     /**
      * Sentence
+     * @param {Array<number>} [exclude] Multiple values may be separated by commas.
      * @param {number} [limit] Number of results to return per page.
      * @param {boolean} [notes] Checks if entity has notes
      * @param {number} [offset] The initial index from which to return the results.
@@ -5240,8 +5258,8 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceList(limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerSentenceList(limit, notes, offset, ordering, state, tags, title, options).then((request) => request(this.axios, this.basePath));
+    public composerSentenceList(exclude?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSentenceList(exclude, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

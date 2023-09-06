@@ -23,6 +23,8 @@ import NoteDetails from "../components/Widgets/NotesFomList";
 import TriageStatementSection from "../components/TriageStatementSection/TriageStatementSection";
 import { useSectionStyle } from "../styles/styles";
 import { useTheme } from "@mui/system";
+import {useAppSelector} from "../redux/hooks";
+import {useNavigate} from "react-router";
 
 const { bodyBgColor, darkBlue } = vars;
 
@@ -51,13 +53,32 @@ const SentencesDetails = () => {
   const theme = useTheme()
   const sectionStyle = useSectionStyle(theme)
 
+  const queryOptions = useAppSelector((state) => state.sentence.queryOptions);
+  const navigate = useNavigate();
+
   const handleClick = () => {
     const transition = sentence?.available_transitions[selectedIndex];
     sentenceService
       .doTransition(sentence, transition)
       .then((sentence: Sentence) => {
-        setSentence(sentence);
-        setSelectedIndex(0);
+
+        const nextSentenceOptions = {
+          ...queryOptions,
+          stateFilter: ['open'] as ("open" | "to_be_reviewed" | "compose_later" | "compose_now" | "excluded" | "duplicate")[],
+          exclude: [sentence.id],
+          limit: 1,
+          index: 0,
+        };
+        sentenceService.getList(nextSentenceOptions).then((res) => {
+          if (res.results && res.results.length) {
+            // Navigate to the 'next' sentence's details page
+            const nextSentenceId = res.results[0].id;
+            navigate(`/sentence/${nextSentenceId}`);
+          } else {
+            // Navigate to the root/home directory
+            navigate('/');
+          }
+        });
       });
   };
 
