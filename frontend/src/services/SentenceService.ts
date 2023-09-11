@@ -26,8 +26,8 @@ class SentenceService extends AbstractService {
     return composerApi.composerSentenceDelTagCreate(id, tagId).then((response: any) => response.data)
   }
   async getList(queryOptions: QueryParams): Promise<PaginatedSentenceList> {
-    const { limit, ordering, index, title, stateFilter, tagFilter } = queryOptions
-    return composerApi.composerSentenceList(limit, undefined, index, ordering, stateFilter, tagFilter, title).then((res: any) => res.data)
+    const { exclude, limit, ordering, index, title, stateFilter, tagFilter } = queryOptions
+    return composerApi.composerSentenceList(exclude, limit, undefined, index, ordering, stateFilter, tagFilter, title).then((res: any) => res.data)
   }
 }
 
