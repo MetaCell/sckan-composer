@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 import { duplicatesRowsPerPage } from "../../helpers/settings";
 import CustomPagination from "../CustomPagination";
 import {
-  renderPMID,
+  renderID,
   renderStatementState,
   renderTitle,
 } from "../DataGridWidgets/DataGridWidgets";
@@ -19,10 +19,10 @@ export default function ResultsGrid({
 }: any) {
   const columns: GridColDef[] = [
     {
-      field: "pmid",
-      headerName: "PMID",
+      field: "id",
+      headerName: "ID",
       headerClassName: "grid--header",
-      renderCell: renderPMID,
+      renderCell: renderID,
     },
     {
       field: "state",

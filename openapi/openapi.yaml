@@ -101,10 +101,10 @@ paths:
           items:
             type: string
             enum:
+            - -id
             - -last_edited
-            - -pmid
+            - id
             - last_edited
-            - pmid
         description: Ordering
         explode: false
         style: form
@@ -893,10 +893,10 @@ paths:
           items:
             type: string
             enum:
+            - -id
             - -last_edited
-            - -pmid
+            - id
             - last_edited
-            - pmid
         description: Ordering
         explode: false
         style: form
