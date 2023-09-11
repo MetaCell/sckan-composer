@@ -2121,7 +2121,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
-         * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
+         * @param {Array<'-id' | '-last_edited' | 'id' | 'last_edited'>} [ordering] Ordering
          * @param {number} [origin] 
          * @param {number} [sentenceId] 
          * @param {Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
@@ -2129,7 +2129,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList: async (destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementList: async (destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-id' | '-last_edited' | 'id' | 'last_edited'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/connectivity-statement/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3068,7 +3068,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
-         * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
+         * @param {Array<'-id' | '-last_edited' | 'id' | 'last_edited'>} [ordering] Ordering
          * @param {Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>} [state] 
          * @param {Array<number>} [tags] 
          * @param {string} [title] 
@@ -3973,7 +3973,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
-         * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
+         * @param {Array<'-id' | '-last_edited' | 'id' | 'last_edited'>} [ordering] Ordering
          * @param {number} [origin] 
          * @param {number} [sentenceId] 
          * @param {Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
@@ -3981,7 +3981,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementList>> {
+        async composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-id' | '-last_edited' | 'id' | 'last_edited'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destination, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -4192,7 +4192,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
-         * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
+         * @param {Array<'-id' | '-last_edited' | 'id' | 'last_edited'>} [ordering] Ordering
          * @param {Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>} [state] 
          * @param {Array<number>} [tags] 
          * @param {string} [title] 
@@ -4498,7 +4498,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
-         * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
+         * @param {Array<'-id' | '-last_edited' | 'id' | 'last_edited'>} [ordering] Ordering
          * @param {number} [origin] 
          * @param {number} [sentenceId] 
          * @param {Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
@@ -4506,7 +4506,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementList> {
+        composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-id' | '-last_edited' | 'id' | 'last_edited'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementList> {
             return localVarFp.composerConnectivityStatementList(destination, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options).then((request) => request(axios, basePath));
         },
         /**
@@ -4697,7 +4697,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
-         * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
+         * @param {Array<'-id' | '-last_edited' | 'id' | 'last_edited'>} [ordering] Ordering
          * @param {Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>} [state] 
          * @param {Array<number>} [tags] 
          * @param {string} [title] 
@@ -5011,7 +5011,7 @@ export class ComposerApi extends BaseAPI {
      * @param {number} [limit] Number of results to return per page.
      * @param {boolean} [notes] Checks if entity has notes
      * @param {number} [offset] The initial index from which to return the results.
-     * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
+     * @param {Array<'-id' | '-last_edited' | 'id' | 'last_edited'>} [ordering] Ordering
      * @param {number} [origin] 
      * @param {number} [sentenceId] 
      * @param {Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
@@ -5020,7 +5020,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-id' | '-last_edited' | 'id' | 'last_edited'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementList(destination, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -5250,7 +5250,7 @@ export class ComposerApi extends BaseAPI {
      * @param {number} [limit] Number of results to return per page.
      * @param {boolean} [notes] Checks if entity has notes
      * @param {number} [offset] The initial index from which to return the results.
-     * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
+     * @param {Array<'-id' | '-last_edited' | 'id' | 'last_edited'>} [ordering] Ordering
      * @param {Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>} [state] 
      * @param {Array<number>} [tags] 
      * @param {string} [title] 
