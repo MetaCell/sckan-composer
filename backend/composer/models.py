@@ -532,6 +532,14 @@ class ConnectivityStatement(models.Model):
     def tag_list(self):
         return ", ".join(self.tags.all().values_list("tag", flat=True))
 
+    def get_laterality_description(self):
+        laterality_map = {
+            Laterality.RIGHT.value: 'on the right side of the body',
+            Laterality.LEFT.value: 'on the left side of the body',
+            Laterality.UNKNOWN.value: 'at an unknown location'
+        }
+        return laterality_map.get(self.laterality, 'at an unknown location')
+
     def assign_owner(self, request):
         if ConnectivityStatementService(self).should_set_owner(request):
             self.owner = request.user

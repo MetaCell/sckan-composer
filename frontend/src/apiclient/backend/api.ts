@@ -246,6 +246,12 @@ export interface ConnectivityStatement {
      * @memberof ConnectivityStatement
      */
     'has_notes': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatement
+     */
+    'statement_preview': string;
 }
 
 
@@ -846,6 +852,12 @@ export interface PatchedConnectivityStatement {
      * @memberof PatchedConnectivityStatement
      */
     'has_notes'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'statement_preview'?: string;
 }
 
 

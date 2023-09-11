@@ -321,6 +321,7 @@ class ConnectivityStatementSerializer(
     available_transitions = serializers.SerializerMethodField()
     has_notes = serializers.SerializerMethodField()
     journey = serializers.CharField(read_only=True)
+    statement_preview = serializers.SerializerMethodField()
 
     def get_available_transitions(self, instance) -> list[CSState]:
         request = self.context.get('request', None)
@@ -329,6 +330,50 @@ class ConnectivityStatementSerializer(
 
     def get_has_notes(self, instance) -> bool:
         return instance.has_notes
+
+    def get_statement_preview(self, instance) -> str:
+        sex = instance.sex.name if instance.sex else ""
+
+        species_list = [specie.name for specie in instance.species.all()]
+        if len(species_list) > 1:
+            species = f"{', '.join(species_list[:-1])} and {species_list[-1]}"
+        elif species_list:
+            species = species_list[0]
+        else:
+            species = ""
+
+        phenotype = instance.phenotype.name if instance.phenotype else ""
+        origin = instance.origin.name if instance.origin else ""
+        destination = instance.destination.name if instance.destination else ""
+
+        via_values = [f"via {via.name}" for via in instance.path.all()]
+        if len(via_values) > 1:
+            via_string = f" {', '.join(via_values[:-1])} and {via_values[-1]}"
+        elif via_values:
+            via_string = f" {via_values[0]}"
+        else:
+            via_string = ""
+
+        circuit_type = instance.circuit_type if instance.circuit_type else ""
+        projection = instance.projection if instance.projection else ""
+
+        laterality_description = instance.get_laterality_description()
+
+        forward_connection = instance.forward_connection if hasattr(instance, 'forward_connection') and instance.forward_connection else ""
+        apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
+
+        # Creating the statement
+        statement = f"In {sex} {species}, a {phenotype} connection goes from {origin} to {destination}{via_string}. "
+        statement += f"This {circuit_type} projects {projection} from the {origin} and is found {laterality_description}. "
+
+        if forward_connection:
+            statement += f"This neuron population connects to {forward_connection}. "
+
+        if apinatomy:
+            statement += f"It is described in {apinatomy} model."
+
+        return statement.strip()
+
 
     class Meta:
         model = ConnectivityStatement
@@ -362,5 +407,6 @@ class ConnectivityStatementSerializer(
             "additional_information",
             "modified_date",
             "has_notes",
+            "statement_preview"
         )
         read_only_fields = ("state",)

@@ -1684,6 +1684,9 @@ components:
         has_notes:
           type: boolean
           readOnly: true
+        statement_preview:
+          type: string
+          readOnly: true
       required:
       - available_transitions
       - destination
@@ -1698,6 +1701,7 @@ components:
       - sentence_id
       - sex
       - state
+      - statement_preview
       - tags
     ConnectivityStatementAvailableTransitionsEnum:
       enum:
@@ -2047,6 +2051,9 @@ components:
           readOnly: true
         has_notes:
           type: boolean
+          readOnly: true
+        statement_preview:
+          type: string
           readOnly: true
     PatchedNote:
       type: object
