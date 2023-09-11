@@ -874,7 +874,7 @@ paths:
         schema:
           type: array
           items:
-            type: integer
+            type: string
         description: Multiple values may be separated by commas.
         explode: false
         style: form

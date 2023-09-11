@@ -10,7 +10,7 @@ export interface QueryParams {
   stateFilter: StateFilter | undefined,
   tagFilter: number[] | undefined,
   title: string | undefined
-  exclude: number[] | undefined
+  exclude: string[] | undefined
 }
 
 export interface SentenceState {

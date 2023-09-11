@@ -1,3 +1,4 @@
+from typing import List
 from django.db.models import Q
 import django_filters
 
@@ -22,7 +23,7 @@ def filter_by_title_or_text(queryset, name, value):
     return queryset.filter(Q(title__icontains=value) | Q(text__icontains=value))
 
 
-def exclude_ids(queryset, name, value):
+def exclude_ids(queryset, name, value: List[int]):
     return queryset.exclude(id__in=value)
 
 

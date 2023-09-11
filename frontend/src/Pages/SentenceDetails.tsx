@@ -65,7 +65,7 @@ const SentencesDetails = () => {
         const nextSentenceOptions = {
           ...queryOptions,
           stateFilter: ['open'] as ("open" | "to_be_reviewed" | "compose_later" | "compose_now" | "excluded" | "duplicate")[],
-          exclude: [sentence.id],
+          exclude: [`${sentence.id}`],
           limit: 1,
           index: 0,
         };
