@@ -52,7 +52,7 @@ const SentencesDetails = () => {
   const [sentence, setSentence] = useState({} as Sentence);
   const [isLoading, setIsLoading] = useState(true);
   const [connectivityStatements, setConnectivityStatements] =
-      useState<SentenceConnectivityStatement[]>();
+    useState<SentenceConnectivityStatement[]>();
 
   const [open, setOpen] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
@@ -123,7 +123,7 @@ const SentencesDetails = () => {
     ]);
   };
 
-const handleMenuItemClick = (
+  const handleMenuItemClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
     index: number
   ) => {
