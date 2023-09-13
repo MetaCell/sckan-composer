@@ -99,8 +99,6 @@ const SentencesDetails = () => {
 
       } catch (error) {
         console.error("Error fetching the next sentence:", error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -169,6 +167,8 @@ const SentencesDetails = () => {
           });
     }
   }, [sentenceId, refetch]);
+
+  console.log(isLoading)
 
   if (isLoading) {
     return (
