@@ -31,6 +31,7 @@ import {
 } from "../redux/statementSlice";
 import { useAppDispatch } from "../redux/hooks";
 import { useNavigate } from "react-router";
+import Stack from "@mui/material/Stack";
 
 interface DataGridProps {
   entityType: "sentence" | "statement";
@@ -189,6 +190,11 @@ const EntityDataGrid = (props: DataGridProps) => {
         }
         components={{
           Pagination: CustomPagination,
+          NoRowsOverlay: () => (
+              <Stack height="100%" alignItems="center" justifyContent="center">
+                No sentences to display, clear your filter or modify your search criteria
+              </Stack>
+          )
         }}
       />
     </Box>
