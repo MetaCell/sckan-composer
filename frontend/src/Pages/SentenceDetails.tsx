@@ -163,7 +163,7 @@ const handleMenuItemClick = (
         })
         .finally(() => {
           setRefetch(false);
-          setLoading(false);
+          setIsLoading(false);
         });
     }
   }, [sentenceId, refetch]);
