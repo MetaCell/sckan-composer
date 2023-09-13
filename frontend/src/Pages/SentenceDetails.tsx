@@ -99,6 +99,7 @@ const SentencesDetails = () => {
 
       } catch (error) {
         console.error("Error fetching the next sentence:", error);
+        setIsLoading(false)
       }
     };
 
