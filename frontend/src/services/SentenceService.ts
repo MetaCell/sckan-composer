@@ -16,7 +16,7 @@ class SentenceService extends AbstractService {
   async getObject(id: string): Promise<Sentence> {
     return composerApi.composerSentenceRetrieve(Number(id)).then((response: any) => response.data)
   }
-  async doTransition(sentence: Sentence, transition: string) {
+  async doTransition(sentence: Sentence, transition: string): Promise<Sentence> {
     return composerApi.composerSentenceDoTransitionCreate(sentence.id, transition, sentence).then((response: any) => response.data)
   }
   async addTag(id: number, tagId: number): Promise<Sentence> {
