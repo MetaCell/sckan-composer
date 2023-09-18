@@ -1,12 +1,11 @@
 from django.contrib.auth.models import User
-from drf_spectacular.utils import extend_schema_field
-from rest_framework import serializers
-from drf_writable_nested.serializers import WritableNestedModelSerializer
-from drf_writable_nested.mixins import UniqueFieldsMixin, NestedUpdateMixin
 from django.db.models import Q
-
 from django_fsm import FSMField
+from drf_writable_nested.mixins import UniqueFieldsMixin
+from drf_writable_nested.serializers import WritableNestedModelSerializer
+from rest_framework import serializers
 
+from ..enums import SentenceState, CSState
 from ..models import (
     AnatomicalEntity,
     Phenotype,
@@ -20,7 +19,6 @@ from ..models import (
     Tag,
     Via,
 )
-from ..enums import SentenceState, CSState
 
 
 # MixIns
@@ -294,7 +292,6 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
             "available_transitions",
         )
 
-
 class ConnectivityStatementSerializer(
     FixManyToManyMixin, FixedWritableNestedModelSerializer
 ):
@@ -318,6 +315,8 @@ class ConnectivityStatementSerializer(
     phenotype = PhenotypeSerializer(required=False, read_only=True)
     sex = SexSerializer(required=False, read_only=True)
     sentence = SentenceSerializer(required=False, read_only=True)
+    forward_connection = serializers.PrimaryKeyRelatedField(many=True, queryset=ConnectivityStatement.objects.all(),
+                                                            required=False)
     available_transitions = serializers.SerializerMethodField()
     has_notes = serializers.SerializerMethodField()
     journey = serializers.CharField(read_only=True)
@@ -333,7 +332,6 @@ class ConnectivityStatementSerializer(
 
     def get_statement_preview(self, instance) -> str:
         sex = instance.sex.name if instance.sex else ""
-
         species_list = [specie.name for specie in instance.species.all()]
         if len(species_list) > 1:
             species = f"{', '.join(species_list[:-1])} and {species_list[-1]}"
@@ -374,6 +372,13 @@ class ConnectivityStatementSerializer(
 
         return statement.strip()
 
+    def to_representation(self, instance):
+        """
+        Convert the model instance `children` field to serialized data.
+        """
+        representation = super().to_representation(instance)
+        representation['forward_connection'] = ConnectivityStatementSerializer(instance.children.all(), many=True).data
+        return representation
 
     class Meta:
         model = ConnectivityStatement
@@ -403,6 +408,7 @@ class ConnectivityStatementSerializer(
             "species",
             "sex_id",
             "sex",
+            "forward_connection",
             "apinatomy_model",
             "additional_information",
             "modified_date",

@@ -439,6 +439,11 @@ class ConnectivityStatement(models.Model):
     sex = models.ForeignKey(
         Sex, on_delete=models.DO_NOTHING, null=True, blank=True
     )
+    forward_connection = models.ManyToManyField(
+        'self',
+        blank=True,
+        symmetrical=False,
+    )
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
     additional_information = models.TextField(null=True, blank=True)
     reference_uri = models.URLField(null=True, blank=True)
