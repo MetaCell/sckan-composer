@@ -153,6 +153,7 @@ class SexSerializer(serializers.ModelSerializer):
 
 class ViaSerializer(serializers.ModelSerializer):
     """Via"""
+
     anatomical_entity_id = serializers.IntegerField(required=True)
     anatomical_entity = AnatomicalEntitySerializer(required=False, read_only=True)
 
@@ -184,13 +185,13 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
 
     sentence_id = serializers.IntegerField()
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
-    sex_id = serializers.IntegerField(
-        required=False, default=None, allow_null=True
-    )
+    sex_id = serializers.IntegerField(required=False, default=None, allow_null=True)
     phenotype_id = serializers.IntegerField(
         required=False, default=None, allow_null=True
     )
-    provenances = ProvenanceSerializer(source="provenance_set", many=True, read_only=False)
+    provenances = ProvenanceSerializer(
+        source="provenance_set", many=True, read_only=False
+    )
     sex = SexSerializer(required=False, read_only=True)
     species = SpecieSerializer(many=True, read_only=True)
     owner = UserSerializer(required=False, read_only=True)
@@ -256,7 +257,7 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
         return instance.has_notes
 
     def get_available_transitions(self, instance) -> list[SentenceState]:
-        request = self.context.get('request', None)
+        request = self.context.get("request", None)
         user = request.user if request else None
         return [t.name for t in instance.get_available_user_state_transitions(user)]
 
@@ -292,12 +293,15 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
             "available_transitions",
         )
 
+
 class ConnectivityStatementSerializer(
     FixManyToManyMixin, FixedWritableNestedModelSerializer
 ):
     """Connectivity Statement"""
 
-    id = serializers.IntegerField(required=False, default=None, allow_null=True, read_only=True)
+    id = serializers.IntegerField(
+        required=False, default=None, allow_null=True, read_only=True
+    )
     sentence_id = serializers.IntegerField()
     knowledge_statement = serializers.CharField(allow_blank=True, required=False)
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
@@ -307,7 +311,9 @@ class ConnectivityStatementSerializer(
     sex_id = serializers.IntegerField(required=False, allow_null=True)
     tags = TagSerializer(many=True, read_only=True, required=False)
     species = SpecieSerializer(many=True, read_only=False, required=False)
-    provenances = ProvenanceSerializer(source="provenance_set", many=True, read_only=False, required=False)
+    provenances = ProvenanceSerializer(
+        source="provenance_set", many=True, read_only=False, required=False
+    )
     path = ViaSerializer(source="via_set", many=True, read_only=False, required=False)
     owner = UserSerializer(required=False, read_only=True)
     origin = AnatomicalEntitySerializer(required=False, read_only=True)
@@ -315,15 +321,16 @@ class ConnectivityStatementSerializer(
     phenotype = PhenotypeSerializer(required=False, read_only=True)
     sex = SexSerializer(required=False, read_only=True)
     sentence = SentenceSerializer(required=False, read_only=True)
-    forward_connection = serializers.PrimaryKeyRelatedField(many=True, queryset=ConnectivityStatement.objects.all(),
-                                                            required=False)
+    forward_connection = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=ConnectivityStatement.objects.all(), required=False
+    )
     available_transitions = serializers.SerializerMethodField()
     has_notes = serializers.SerializerMethodField()
     journey = serializers.CharField(read_only=True)
     statement_preview = serializers.SerializerMethodField()
 
     def get_available_transitions(self, instance) -> list[CSState]:
-        request = self.context.get('request', None)
+        request = self.context.get("request", None)
         user = request.user if request else None
         return [t.name for t in instance.get_available_user_state_transitions(user)]
 
@@ -357,7 +364,11 @@ class ConnectivityStatementSerializer(
 
         laterality_description = instance.get_laterality_description()
 
-        forward_connection = instance.forward_connection if hasattr(instance, 'forward_connection') and instance.forward_connection else ""
+        forward_connection = (
+            instance.forward_connection
+            if hasattr(instance, "forward_connection") and instance.forward_connection
+            else ""
+        )
         apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
 
         # Creating the statement
@@ -374,10 +385,12 @@ class ConnectivityStatementSerializer(
 
     def to_representation(self, instance):
         """
-        Convert the model instance `children` field to serialized data.
+        Convert the model instance `forward_connection` field to serialized data.
         """
         representation = super().to_representation(instance)
-        representation['forward_connection'] = ConnectivityStatementSerializer(instance.children.all(), many=True).data
+        representation["forward_connection"] = ConnectivityStatementSerializer(
+            instance.forward_connection.all(), many=True
+        ).data
         return representation
 
     class Meta:
@@ -413,6 +426,6 @@ class ConnectivityStatementSerializer(
             "additional_information",
             "modified_date",
             "has_notes",
-            "statement_preview"
+            "statement_preview",
         )
         read_only_fields = ("state",)
