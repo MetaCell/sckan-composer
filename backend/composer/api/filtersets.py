@@ -57,9 +57,8 @@ def filter_by_ontology_uri(qs, field, anatomical_entity):
 
 
 class ConnectivityStatementFilter(django_filters.FilterSet):
-    sentence_id = django_filters.ModelChoiceFilter(
-        field_name="sentence_id", queryset=Sentence.objects.all()
-    )
+    sentence_id = django_filters.CharFilter(method="filter_sentence_id")
+
     knowledge_statement = django_filters.CharFilter(
         field_name="knowledge_statement", lookup_expr="icontains"
     )
@@ -88,6 +87,16 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
             ("modified_date", "last_edited"),
         ),
     )
+
+    def filter_sentence_id(self, queryset, name, value):
+        try:
+            if value.startswith("not_"):
+                exclude_id = int(value[4:])
+                return queryset.exclude(sentence_id=exclude_id)
+            else:
+                return queryset.filter(sentence_id=int(value))
+        except ValueError:
+            return queryset
 
     class Meta:
         model = ConnectivityStatement

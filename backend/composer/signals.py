@@ -1,11 +1,13 @@
+from django.core.exceptions import ValidationError
 from django.dispatch import receiver
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, m2m_changed
 
 from django_fsm.signals import post_transition
 
 from .enums import CSState, NoteType
 from .models import ConnectivityStatement, ExportBatch, Note, Sentence
 from .services.export_services import compute_metrics, ConnectivityStatementService
+
 
 @receiver(post_save, sender=ExportBatch)
 def export_batch_post_save(sender, instance=None, created=False, **kwargs):
@@ -38,6 +40,22 @@ def post_transition_callback(sender, instance, name, source, target, **kwargs):
 @receiver(post_transition)
 def post_transition_cs(sender, instance, name, source, target, **kwargs):
     if issubclass(sender, ConnectivityStatement):
-        if target == CSState.COMPOSE_NOW and source in (CSState.NPO_APPROVED, CSState.EXPORTED):
+        if target == CSState.COMPOSE_NOW and source in (
+            CSState.NPO_APPROVED,
+            CSState.EXPORTED,
+        ):
             # add important tag to CS when transition to COMPOSE_NOW from NPO Approved or Exported
             instance = ConnectivityStatementService.add_important_tag(instance)
+
+
+@receiver(m2m_changed, sender=ConnectivityStatement.forward_connection.through)
+def validate_forward_connection(
+    sender, instance, action, reverse, model, pk_set, **kwargs
+):
+    if action == "pre_add":
+        related_statements = [model(pk=pk) for pk in pk_set]
+        for related_statement in related_statements:
+            if instance.destination != related_statement.origin:
+                raise ValidationError(
+                    "The forward_connection's origin must be the same as the current statement's destination."
+                )
