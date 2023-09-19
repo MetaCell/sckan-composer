@@ -90,11 +90,13 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
 
     def filter_sentence_id(self, queryset, name, value):
         try:
-            if value.startswith("not_"):
-                exclude_id = int(value[4:])
-                return queryset.exclude(sentence_id=exclude_id)
+            value = int(value)
+            if value < 0:
+                # If the value is negative, exclude it from the queryset
+                return queryset.exclude(sentence_id=-value)
             else:
-                return queryset.filter(sentence_id=int(value))
+                # Otherwise, filter normally
+                return queryset.filter(sentence_id=value)
         except ValueError:
             return queryset
 
