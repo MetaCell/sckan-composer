@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { FormBase } from "./FormBase";
 import { jsonSchemas } from "../../services/JsonSchema";
 import statementService from "../../services/StatementService";
@@ -9,6 +9,10 @@ import ArrayFieldTemplate from "../Widgets/ArrayFieldTemplate";
 import AnatomicalEntitiesField from "../AnatomicalEntitiesField";
 import { sexes } from '../../services/SexService';
 import { phenotypes } from '../../services/PhenotypeService';
+import {CustomAutocompleteForwardConnection} from "../Widgets/CustomAutocompleteForwardConnection";
+import { useAppSelector } from "../../redux/hooks";
+import connectivityStatementService from "../../services/StatementService";
+import {QueryParams} from "../../redux/statementSlice";
 
 
 const StatementForm = (props: any) => {
@@ -16,10 +20,10 @@ const StatementForm = (props: any) => {
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
-
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
   copiedSchema.properties.path.title = "";
+  copiedSchema.properties.forward_connection.type = ['string', 'null'];
   copiedUISchema["ui:order"] = ["destination_type", "*"];
   copiedUISchema.circuit_type = {
     "ui:widget": "radio",
@@ -132,17 +136,31 @@ const StatementForm = (props: any) => {
     value: statement?.additional_information ?? "",
   };
 
+  copiedUISchema.forward_connection = {
+    "ui:widget": CustomAutocompleteForwardConnection,
+    "ui:options": {
+      label: "",
+      placeholder: "Forward connection(s)",
+      options: [],
+      data: [],
+      statement: statement
+    },
+    value: statement?.forward_connection ?? "",
+  };
+
   const widgets = {
     AnatomicalEntitiesField,
     CustomSingleSelect,
     CustomTextField,
     CustomTextArea,
     SelectWidget: CustomSingleSelect,
+    CustomAutocompleteForwardConnection
   };
 
   const templates = {
     ArrayFieldTemplate,
   };
+  
 
   return (
     <FormBase
