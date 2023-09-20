@@ -34,12 +34,13 @@ type Option = {
 
 export const CustomAutocompleteForwardConnection = ({
   placeholder,
-  onChange,
   options: {
     removeChip,
     label,
     disabled,
-    statement
+    statement,
+    service,
+    setter
   },
 }: any) => {
   const [isInputFocused, setInputFocus] = useState(false);
@@ -51,8 +52,21 @@ export const CustomAutocompleteForwardConnection = ({
   const [restSentenceQueryOptions, setRestSentenceQueryOptions] = useState(useAppSelector((state) => state.statement.queryOptions));
   const queryOptions = useAppSelector((state) => state.statement.queryOptions);
   
-  const handleDelete = (id: number) => {
-    removeChip(id);
+  const onChange = (e: any, value: any) => {
+    const formData = {
+      ...statement,
+      forward_connection: value.map((row: any) => row.id)
+    }
+    
+    // service
+    //   .save(formData)
+    //   .then((newData: any) => {
+    //     setter && setter(newData);
+    //   })
+    //   .catch((error: any) => {
+    //     // todo: handle errors here
+    //     console.log("Something went wrong");
+    //   })
   };
   
   const fetchStatementList = (queryOptions: QueryParams, sentenceType: string) => {
@@ -78,18 +92,17 @@ export const CustomAutocompleteForwardConnection = ({
   
   useEffect(() => {
     setSamSentenceQueryOptions({ ...queryOptions, sentenceId: statement.sentence_id });
-    setRestSentenceQueryOptions({ ...queryOptions, sentenceId: -statement.sentence_id });
-  }, [statement]);
+    setRestSentenceQueryOptions({ ...queryOptions, sentenceId: -statement.sentence_id});
+  }, [queryOptions, statement]);
   
   useEffect(() => {
     fetchStatementList(samSentenceQueryOptions, "same");
     fetchStatementList(restSentenceQueryOptions, "rest");
-  }, [queryOptions]);
+  }, [queryOptions, restSentenceQueryOptions, samSentenceQueryOptions]);
   
   
   const options = [...statementLists.sameSentence, ...statementLists.restSentence];
-  console.log(statementLists)
-  console.log(options)
+
   return (
     <FormControl variant="standard">
         <Typography variant="h6" fontWeight={500} marginBottom={2} color={titleFontColor}>
@@ -101,7 +114,7 @@ export const CustomAutocompleteForwardConnection = ({
         disabled={disabled}
         options={options}
         freeSolo
-        onChange={(e, value) => console.log(value)}
+        onChange={(e, value) => onChange(e, value)}
         groupBy={(option: Option) => option.relation}
         renderOption={(props, option, { selected }) => (
           <li {...props}>

@@ -10,9 +10,6 @@ import AnatomicalEntitiesField from "../AnatomicalEntitiesField";
 import { sexes } from '../../services/SexService';
 import { phenotypes } from '../../services/PhenotypeService';
 import {CustomAutocompleteForwardConnection} from "../Widgets/CustomAutocompleteForwardConnection";
-import { useAppSelector } from "../../redux/hooks";
-import connectivityStatementService from "../../services/StatementService";
-import {QueryParams} from "../../redux/statementSlice";
 
 
 const StatementForm = (props: any) => {
@@ -143,7 +140,9 @@ const StatementForm = (props: any) => {
       placeholder: "Forward connection(s)",
       options: [],
       data: [],
-      statement: statement
+      statement: statement,
+      service: statementService,
+      setter: setter
     },
     value: statement?.forward_connection ?? "",
   };
