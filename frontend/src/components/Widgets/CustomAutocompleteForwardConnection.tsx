@@ -1,20 +1,27 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
-import {Autocomplete, Box, styled} from "@mui/material";
-import Chip from "@mui/material/Chip";
-import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
+import { Autocomplete, Box, styled } from "@mui/material";
+import Paper from "@mui/material/Paper";
 import { vars } from "../../theme/variables";
 import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
-import {useAppSelector} from "../../redux/hooks";
+import { useAppSelector } from "../../redux/hooks";
 import connectivityStatementService from "../../services/StatementService";
-import Checkbox from '@mui/material/Checkbox';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import {QueryParams} from "../../redux/statementSlice";
+import Checkbox from "@mui/material/Checkbox";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import Stack from "@mui/material/Stack";
+import ListSubheader from "@mui/material/ListSubheader";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import PlaylistRemoveOutlinedIcon from "@mui/icons-material/PlaylistRemoveOutlined";
+import PlaylistAddCheckOutlinedIcon from "@mui/icons-material/PlaylistAddCheckOutlined";
+import { ConnectivityStatement } from "../../apiclient/backend";
+import Chip from "@mui/material/Chip";
+import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 
-const { buttonOutlinedColor, grey400, buttonOutlinedBorderColor, titleFontColor } = vars;
+const { titleFontColor } = vars;
 
 const StyledInput = styled(TextField)(({ theme }) => ({
   "label + &": {
@@ -25,39 +32,29 @@ const StyledInput = styled(TextField)(({ theme }) => ({
   },
 }));
 
-type Option = {
-  id: number | null;
-  label: string | undefined;
-  sentence_id: number;
+type Option = ConnectivityStatement & {
   relation: string;
 };
 
 export const CustomAutocompleteForwardConnection = ({
   placeholder,
-  options: {
-    removeChip,
-    label,
-    disabled,
-    statement,
-    service,
-    setter
-  },
+  options: { removeChip, label, disabled, statement, service, setter },
 }: any) => {
   const [isInputFocused, setInputFocus] = useState(false);
-  const [statementLists, setStatementLists] = useState({
-    sameSentence: [],
-    restSentence: [],
-  });
-  const [samSentenceQueryOptions, setSamSentenceQueryOptions] = useState(useAppSelector((state) => state.statement.queryOptions));
-  const [restSentenceQueryOptions, setRestSentenceQueryOptions] = useState(useAppSelector((state) => state.statement.queryOptions));
+  const [sameStatementList, setSameStatementLists] = useState<Option[]>([]);
+  const [restStatementList, setRestStatementLists] = useState<Option[]>([]);
+  const [hoveredOption, setHoveredOption] = useState<Option | undefined>(
+    undefined,
+  );
+  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
+
   const queryOptions = useAppSelector((state) => state.statement.queryOptions);
-  
   const onChange = (e: any, value: any) => {
+    setSelectedOptions(value);
     const formData = {
       ...statement,
-      forward_connection: value.map((row: any) => row.id)
-    }
-    
+      forward_connection: value.map((row: any) => row.id),
+    };
     // service
     //   .save(formData)
     //   .then((newData: any) => {
@@ -68,47 +65,60 @@ export const CustomAutocompleteForwardConnection = ({
     //     console.log("Something went wrong");
     //   })
   };
-  
-  const fetchStatementList = (queryOptions: QueryParams, sentenceType: string) => {
-    connectivityStatementService.getList(queryOptions).then((res) => {
-      if (res.results) {
-        const statements = res.results.map((item) => ({
-          id: item.id,
-          label: item.knowledge_statement,
-          sentence_id: item.sentence_id,
-          relation:
-            sentenceType === "same"
-              ? "Derived from the same statement"
-              : "Other",
-        }));
-        
-        setStatementLists((prevLists) => ({
-          ...prevLists,
-          [`${sentenceType}Sentence`]: statements,
-        }));
-      }
-    });
+
+  const handleSelectAll = (group: string) => {
+    if (group === "Other") {
+      const newSelectedOptions = [...selectedOptions, ...restStatementList];
+      setSelectedOptions(newSelectedOptions);
+    }
+    if (group === "Derived from the same statement") {
+      const newSelectedOptions = [...selectedOptions, ...sameStatementList];
+      setSelectedOptions(newSelectedOptions);
+    }
   };
-  
+
   useEffect(() => {
-    setSamSentenceQueryOptions({ ...queryOptions, sentenceId: statement.sentence_id });
-    setRestSentenceQueryOptions({ ...queryOptions, sentenceId: -statement.sentence_id});
-  }, [queryOptions, statement]);
-  
-  useEffect(() => {
-    fetchStatementList(samSentenceQueryOptions, "same");
-    fetchStatementList(restSentenceQueryOptions, "rest");
-  }, [queryOptions, restSentenceQueryOptions, samSentenceQueryOptions]);
-  
-  
-  const options = [...statementLists.sameSentence, ...statementLists.restSentence];
+    connectivityStatementService
+      .getList({ ...queryOptions, sentenceId: statement.sentence_id })
+      .then((res) => {
+        if (res.results) {
+          const results = res.results.map((item) => ({
+            ...item,
+            relation: "Derived from the same statement",
+          })) as Option[];
+          setSameStatementLists(results);
+        }
+      });
+    connectivityStatementService
+      .getList({ ...queryOptions, sentenceId: -statement.sentence_id })
+      .then((res) => {
+        if (res.results) {
+          const results = res.results.map((item) => ({
+            ...item,
+            relation: "Other",
+          })) as Option[];
+          setRestStatementLists(results);
+        }
+      });
+  }, []);
+
+  const options: Option[] = [
+    ...(sameStatementList as Option[]),
+    ...(restStatementList as Option[]),
+  ];
 
   return (
     <FormControl variant="standard">
-        <Typography variant="h6" fontWeight={500} marginBottom={2} color={titleFontColor}>
-          {label}
-        </Typography>
+      <Typography
+        variant="h6"
+        fontWeight={500}
+        marginBottom={2}
+        color={titleFontColor}
+      >
+        {label}
+      </Typography>
       <Autocomplete
+        disableCloseOnSelect
         multiple
         disableClearable
         disabled={disabled}
@@ -116,6 +126,70 @@ export const CustomAutocompleteForwardConnection = ({
         freeSolo
         onChange={(e, value) => onChange(e, value)}
         groupBy={(option: Option) => option.relation}
+        value={selectedOptions}
+        getOptionLabel={(option: string | Option) => {
+          return typeof option === "string"
+            ? option
+            : (option as Option).knowledge_statement || "";
+        }}
+        renderTags={(value: Option[], getTagProps) =>
+          value.map((option, index) => (
+            <Chip
+              {...getTagProps({ index })}
+              deleteIcon={<ClearOutlinedIcon />}
+              variant="outlined"
+              label={option.knowledge_statement}
+              key={option.id}
+              sx={{
+                borderRadius: "6px",
+                margin: "4px",
+
+                "& .MuiChip-label": {
+                  fontSize: "14px",
+                },
+                "& .MuiChip-deleteIcon": {
+                  fontSize: "14px",
+                },
+              }}
+            />
+          ))
+        }
+        renderGroup={(params) => (
+          <li key={params.key}>
+            <ListSubheader
+              component="div"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography
+                sx={{
+                  color: "#344054",
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                  lineHeight: "1.125rem",
+                }}
+              >
+                {params.group}
+              </Typography>
+              <Button
+                variant="text"
+                sx={{
+                  color: "#184EA2",
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                  lineHeight: "1.125rem",
+                }}
+                onClick={() => handleSelectAll(params.group)}
+              >
+                Select all
+              </Button>
+            </ListSubheader>
+            <ul style={{ padding: 0 }}>{params.children}</ul>
+          </li>
+        )}
         renderOption={(props, option, { selected }) => (
           <li {...props}>
             <Checkbox
@@ -124,8 +198,142 @@ export const CustomAutocompleteForwardConnection = ({
               style={{ marginRight: 8 }}
               checked={selected}
             />
-            {option.label}
+            <Typography
+              onMouseEnter={() => setHoveredOption(option)}
+              onMouseLeave={() => setHoveredOption(undefined)}
+              sx={{ width: 1, height: 1, padding: "10px" }}
+            >
+              {option.knowledge_statement}
+            </Typography>
           </li>
+        )}
+        PaperComponent={(props) => (
+          <Paper
+            {...props}
+            sx={{
+              display: "flex",
+              height: "19.5rem",
+            }}
+          >
+            <Box flex={1}>
+              {props.children}
+              <Divider />
+              <Box display="flex" justifyContent="center" alignItems="center">
+                {selectedOptions.length === options.length ? (
+                  <Button
+                    startIcon={<PlaylistRemoveOutlinedIcon />}
+                    variant="text"
+                    sx={{
+                      color: "#676C74",
+                      fontSize: "0.875rem",
+                      fontWeight: 600,
+                      lineHeight: "1.25rem",
+                      zIndex: 200000,
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setSelectedOptions([]);
+                    }}
+                  >
+                    Deselect all
+                  </Button>
+                ) : (
+                  <Button
+                    startIcon={<PlaylistAddCheckOutlinedIcon />}
+                    variant="text"
+                    sx={{
+                      color: "#676C74",
+                      fontSize: "0.875rem",
+                      fontWeight: 600,
+                      lineHeight: "1.25rem",
+                      zIndex: 200000,
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setSelectedOptions(options);
+                      console.log("selected");
+                    }}
+                  >
+                    select all
+                  </Button>
+                )}
+              </Box>
+            </Box>
+            <Box flex={1}>
+              {hoveredOption?.statement_preview ? (
+                <Box
+                  width={1}
+                  height={1}
+                  display="flex"
+                  padding={"1rem"}
+                  overflow={"auto"}
+                >
+                  <Stack spacing={2}>
+                    <Stack spacing={1}>
+                      <Typography
+                        sx={{
+                          color: "#A9ACB2",
+                          fontSize: "0.75rem",
+                          fontWeight: 500,
+                          lineHeight: "1.125rem",
+                        }}
+                      >
+                        Knowledge Statement ID
+                      </Typography>
+                      <Typography>{hoveredOption.id}</Typography>
+                    </Stack>
+                    <Stack spacing={0.5}>
+                      <Typography
+                        sx={{
+                          color: "#A9ACB2",
+                          fontSize: "0.75rem",
+                          fontWeight: 500,
+                          lineHeight: "1.125rem",
+                        }}
+                      >
+                        Title
+                      </Typography>
+                      <Typography>
+                        {hoveredOption.knowledge_statement}
+                      </Typography>
+                    </Stack>
+                    <Stack spacing={0.5}>
+                      <Typography
+                        sx={{
+                          color: "#A9ACB2",
+                          fontSize: "0.75rem",
+                          fontWeight: 500,
+                          lineHeight: "1.125rem",
+                        }}
+                      >
+                        Statement
+                      </Typography>
+                      <Typography>{hoveredOption.statement_preview}</Typography>
+                    </Stack>
+                  </Stack>
+                </Box>
+              ) : (
+                <Box
+                  width={1}
+                  height={1}
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Typography
+                    sx={{
+                      color: "#A9ACB2",
+                      fontSize: "0.75rem",
+                      fontWeight: 500,
+                      lineHeight: "1.125rem",
+                    }}
+                  >
+                    Hover over each nerve to its details
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </Paper>
         )}
         renderInput={(params) => (
           <StyledInput
@@ -136,22 +344,22 @@ export const CustomAutocompleteForwardConnection = ({
             onFocus={() => setInputFocus(true)}
             onBlur={() => setInputFocus(false)}
             InputProps={{
-                ...params.InputProps,
-                endAdornment: (
-                    <>
-                        {isInputFocused ? (
-                            <CloseIcon
-                                color="action"
-                                fontSize="small"
-                                sx={{ cursor: "pointer", mr: 0.6 }}
-                                onMouseDown={(e) => {
-                                    e.preventDefault();
-                                }}
-                            />
-                        ) : null}
-                        {params.InputProps.endAdornment}
-                    </>
-                ),
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {isInputFocused ? (
+                    <CloseIcon
+                      color="action"
+                      fontSize="small"
+                      sx={{ cursor: "pointer", mr: 0.6 }}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                      }}
+                    />
+                  ) : null}
+                  {params.InputProps.endAdornment}
+                </>
+              ),
             }}
           />
         )}
