@@ -53,7 +53,7 @@ export const CustomAutocompleteForwardConnection = ({
     setSelectedOptions(value);
     const formData = {
       ...statement,
-      forward_connection: value.map((row: any) => row.id),
+      forward_connection: value,
     };
     // service
     //   .save(formData)
@@ -63,17 +63,128 @@ export const CustomAutocompleteForwardConnection = ({
     //   .catch((error: any) => {
     //     // todo: handle errors here
     //     console.log("Something went wrong");
-    //   })
+    //   });
   };
 
   const handleSelectAll = (group: string) => {
     if (group === "Other") {
-      const newSelectedOptions = [...selectedOptions, ...restStatementList];
+      const newSelectedOptions = [...selectedOptions];
+      restStatementList.forEach((item) => {
+        if (
+          !newSelectedOptions.some(
+            (selectedItem) => selectedItem.id === item.id,
+          )
+        ) {
+          newSelectedOptions.push(item);
+        }
+      });
       setSelectedOptions(newSelectedOptions);
     }
     if (group === "Derived from the same statement") {
-      const newSelectedOptions = [...selectedOptions, ...sameStatementList];
+      const newSelectedOptions = [...selectedOptions];
+      sameStatementList.forEach((item) => {
+        if (
+          !newSelectedOptions.some(
+            (selectedItem) => selectedItem.id === item.id,
+          )
+        ) {
+          newSelectedOptions.push(item);
+        }
+      });
       setSelectedOptions(newSelectedOptions);
+    }
+  };
+
+  const handleDeselectAll = (group: string) => {
+    if (group === "Other") {
+      const newSelectedOptions = selectedOptions.filter(
+        (item) =>
+          !restStatementList.some(
+            (selectedItem) => selectedItem.id === item.id,
+          ),
+      );
+      setSelectedOptions(newSelectedOptions);
+    }
+    if (group === "Derived from the same statement") {
+      const newSelectedOptions = selectedOptions.filter(
+        (item) =>
+          !sameStatementList.some(
+            (selectedItem) => selectedItem.id === item.id,
+          ),
+      );
+      setSelectedOptions(newSelectedOptions);
+    }
+  };
+
+  const getGroupButton = (group: string) => {
+    if (group === "Derived from the same statement") {
+      const allObjectsExist = sameStatementList.every((obj1) =>
+        selectedOptions.some(
+          (obj2) => JSON.stringify(obj1) === JSON.stringify(obj2),
+        ),
+      );
+
+      return allObjectsExist ? (
+        <Button
+          variant="text"
+          sx={{
+            color: "#184EA2",
+            fontSize: "0.75rem",
+            fontWeight: 600,
+            lineHeight: "1.125rem",
+          }}
+          onClick={() => handleDeselectAll(group)}
+        >
+          Deselect All
+        </Button>
+      ) : (
+        <Button
+          variant="text"
+          sx={{
+            color: "#184EA2",
+            fontSize: "0.75rem",
+            fontWeight: 600,
+            lineHeight: "1.125rem",
+          }}
+          onClick={() => handleSelectAll(group)}
+        >
+          Select All
+        </Button>
+      );
+    }
+    if (group === "Other") {
+      const allObjectsExist = restStatementList.every((obj1) =>
+        selectedOptions.some(
+          (obj2) => JSON.stringify(obj1) === JSON.stringify(obj2),
+        ),
+      );
+      return allObjectsExist ? (
+        <Button
+          variant="text"
+          sx={{
+            color: "#184EA2",
+            fontSize: "0.75rem",
+            fontWeight: 600,
+            lineHeight: "1.125rem",
+          }}
+          onClick={() => handleDeselectAll(group)}
+        >
+          Deselect All
+        </Button>
+      ) : (
+        <Button
+          variant="text"
+          sx={{
+            color: "#184EA2",
+            fontSize: "0.75rem",
+            fontWeight: 600,
+            lineHeight: "1.125rem",
+          }}
+          onClick={() => handleSelectAll(group)}
+        >
+          Select All
+        </Button>
+      );
     }
   };
 
@@ -174,18 +285,7 @@ export const CustomAutocompleteForwardConnection = ({
               >
                 {params.group}
               </Typography>
-              <Button
-                variant="text"
-                sx={{
-                  color: "#184EA2",
-                  fontSize: "0.75rem",
-                  fontWeight: 600,
-                  lineHeight: "1.125rem",
-                }}
-                onClick={() => handleSelectAll(params.group)}
-              >
-                Select all
-              </Button>
+              {getGroupButton(params.group)}
             </ListSubheader>
             <ul style={{ padding: 0 }}>{params.children}</ul>
           </li>
@@ -210,53 +310,60 @@ export const CustomAutocompleteForwardConnection = ({
         PaperComponent={(props) => (
           <Paper
             {...props}
+            onMouseDown={(event) => event.preventDefault()}
             sx={{
               display: "flex",
               height: "19.5rem",
             }}
           >
-            <Box flex={1}>
+            <Box
+              flex={1}
+              display="flex"
+              flexDirection="column"
+              justifyContent="space-between"
+            >
               {props.children}
-              <Divider />
-              <Box display="flex" justifyContent="center" alignItems="center">
-                {selectedOptions.length === options.length ? (
-                  <Button
-                    startIcon={<PlaylistRemoveOutlinedIcon />}
-                    variant="text"
-                    sx={{
-                      color: "#676C74",
-                      fontSize: "0.875rem",
-                      fontWeight: 600,
-                      lineHeight: "1.25rem",
-                      zIndex: 200000,
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setSelectedOptions([]);
-                    }}
-                  >
-                    Deselect all
-                  </Button>
-                ) : (
-                  <Button
-                    startIcon={<PlaylistAddCheckOutlinedIcon />}
-                    variant="text"
-                    sx={{
-                      color: "#676C74",
-                      fontSize: "0.875rem",
-                      fontWeight: 600,
-                      lineHeight: "1.25rem",
-                      zIndex: 200000,
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setSelectedOptions(options);
-                      console.log("selected");
-                    }}
-                  >
-                    select all
-                  </Button>
-                )}
+              <Box>
+                <Divider />
+                <Box display="flex" justifyContent="center" alignItems="center">
+                  {selectedOptions.length === options.length ? (
+                    <Button
+                      startIcon={<PlaylistRemoveOutlinedIcon />}
+                      variant="text"
+                      sx={{
+                        color: "#676C74",
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                        lineHeight: "1.25rem",
+                        zIndex: 200000,
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectedOptions([]);
+                      }}
+                    >
+                      Deselect all
+                    </Button>
+                  ) : (
+                    <Button
+                      startIcon={<PlaylistAddCheckOutlinedIcon />}
+                      variant="text"
+                      sx={{
+                        color: "#676C74",
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                        lineHeight: "1.25rem",
+                        zIndex: 200000,
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectedOptions(options);
+                      }}
+                    >
+                      select all
+                    </Button>
+                  )}
+                </Box>
               </Box>
             </Box>
             <Box flex={1}>
