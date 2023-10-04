@@ -389,7 +389,7 @@ class ConnectivityStatementSerializer(
         """
         representation = super().to_representation(instance)
         representation["forward_connection"] = ConnectivityStatementSerializer(
-            instance.forward_connection.all(), many=True
+            instance.forward_connection.all(), many=True, context=self.context
         ).data
         return representation
 

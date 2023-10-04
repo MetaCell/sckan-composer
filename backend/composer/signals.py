@@ -53,7 +53,7 @@ def validate_forward_connection(
     sender, instance, action, reverse, model, pk_set, **kwargs
 ):
     if action == "pre_add":
-        related_statements = [model(pk=pk) for pk in pk_set]
+        related_statements = [model.objects.get(pk=pk) for pk in pk_set]
         for related_statement in related_statements:
             if instance.destination != related_statement.origin:
                 raise ValidationError(

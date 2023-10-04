@@ -115,7 +115,7 @@ paths:
       - in: query
         name: sentence_id
         schema:
-          type: integer
+          type: string
       - in: query
         name: state
         schema:
@@ -1670,6 +1670,10 @@ components:
           allOf:
           - $ref: '#/components/schemas/Sex'
           readOnly: true
+        forward_connection:
+          type: array
+          items:
+            type: integer
         apinatomy_model:
           type: string
           nullable: true
@@ -2038,6 +2042,10 @@ components:
           allOf:
           - $ref: '#/components/schemas/Sex'
           readOnly: true
+        forward_connection:
+          type: array
+          items:
+            type: integer
         apinatomy_model:
           type: string
           nullable: true
