@@ -46,16 +46,3 @@ def post_transition_cs(sender, instance, name, source, target, **kwargs):
         ):
             # add important tag to CS when transition to COMPOSE_NOW from NPO Approved or Exported
             instance = ConnectivityStatementService.add_important_tag(instance)
-
-
-@receiver(m2m_changed, sender=ConnectivityStatement.forward_connection.through)
-def validate_forward_connection(
-    sender, instance, action, reverse, model, pk_set, **kwargs
-):
-    if action == "pre_add":
-        related_statements = [model.objects.get(pk=pk) for pk in pk_set]
-        for related_statement in related_statements:
-            if instance.destination != related_statement.origin:
-                raise ValidationError(
-                    "The forward_connection's origin must be the same as the current statement's destination."
-                )

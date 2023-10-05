@@ -79,9 +79,9 @@ class SentenceService(StateServiceMixin):
         # return True if the sentence can go to state to_be_reviewed
         # it should have at least one provenance (pmid, pmcid, doi) and at least one connectivity statement
         return (
-            sentence.pmid is not None
-            or sentence.pmcid is not None
-            or sentence.doi is not None
+                sentence.pmid is not None
+                or sentence.pmcid is not None
+                or sentence.doi is not None
         ) and (sentence.connectivitystatement_set.count() > 0)
 
     @staticmethod
@@ -91,11 +91,11 @@ class SentenceService(StateServiceMixin):
         # all statements related to the sentence must have knowledge_statement text and at least one provenance
         return (
             SentenceService.can_be_reviewed(sentence)
-            ) and (sentence.connectivitystatement_set.annotate(num_prov=Count('provenance')).filter(
-                    Q(knowledge_statement__isnull=True) 
-                    | Q(knowledge_statement__exact="") 
-                    | Q(num_prov__lte=0)).count() == 0)
-    
+        ) and (sentence.connectivitystatement_set.annotate(num_prov=Count('provenance')).filter(
+            Q(knowledge_statement__isnull=True)
+            | Q(knowledge_statement__exact="")
+            | Q(num_prov__lte=0)).count() == 0)
+
     @staticmethod
     def has_permission_to_transition_to_compose_now(sentence, user):
         # only system users can transition from OPEN to COMPOSE_NOW for the statement ingestion process
@@ -118,13 +118,13 @@ class ConnectivityStatementService(StateServiceMixin):
         # return True if the state,emt can go to state to_be_reviewed it should have at least one provenance,
         # origin, destination, phenotype, sex, path and species
         return (
-            connectivity_statement.origin is not None
-            and connectivity_statement.destination is not None
-            and connectivity_statement.phenotype is not None
-            and connectivity_statement.sex is not None
-            and connectivity_statement.path.count() > 0
-            and connectivity_statement.species.count() > 0
-            and connectivity_statement.provenance_set.count() > 0
+                connectivity_statement.origin is not None
+                and connectivity_statement.destination is not None
+                and connectivity_statement.phenotype is not None
+                and connectivity_statement.sex is not None
+                and connectivity_statement.path.count() > 0
+                and connectivity_statement.species.count() > 0
+                and connectivity_statement.provenance_set.count() > 0
         )
 
     @staticmethod
@@ -132,7 +132,7 @@ class ConnectivityStatementService(StateServiceMixin):
         # if state in NPO APPROVED or EXPORTED and use is a staff user then also allow transition to compose_now
         # other users should not be able to transition to compose_now from these 2 states
         return user and (connectivity_statement.state not in (CSState.NPO_APPROVED, CSState.EXPORTED) or user.is_staff)
-    
+
     @staticmethod
     def has_permission_to_transition_to_exported(connectivity_statement, user):
         # only system users can transition to EXPORTED
@@ -150,3 +150,14 @@ class ConnectivityStatementService(StateServiceMixin):
             important_tag = Tag.objects.create(tag="important")
         connectivity_statement.tags.add(important_tag)
         return connectivity_statement
+
+    @staticmethod
+    def is_valid(connectivity_statement):
+        return ConnectivityStatementService.is_forward_connection_valid(connectivity_statement)
+
+    @staticmethod
+    def is_forward_connection_valid(connectivity_statement):
+        for forward_connection in connectivity_statement.forward_connection.all():
+            if forward_connection.origin != connectivity_statement.destination:
+                return False
+        return True

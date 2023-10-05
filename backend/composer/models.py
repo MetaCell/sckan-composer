@@ -518,7 +518,8 @@ class ConnectivityStatement(models.Model):
     def rejected(self, *args, **kwargs):
         ...
 
-    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.NPO_APPROVED)
+    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.NPO_APPROVED,
+                conditions=[ConnectivityStatementService.is_valid])
     def npo_approved(self, *args, **kwargs):
         ...
 
@@ -529,6 +530,7 @@ class ConnectivityStatement(models.Model):
             instance, user
         ),
         target=CSState.EXPORTED,
+        conditions=[ConnectivityStatementService.is_valid]
     )
     def exported(self, *args, **kwargs):
         ...
