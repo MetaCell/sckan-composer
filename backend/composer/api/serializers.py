@@ -19,6 +19,7 @@ from ..models import (
     Tag,
     Via,
 )
+from ..services.errors_service import get_connectivity_errors
 
 
 # MixIns
@@ -328,6 +329,8 @@ class ConnectivityStatementSerializer(
     has_notes = serializers.SerializerMethodField()
     journey = serializers.CharField(read_only=True)
     statement_preview = serializers.SerializerMethodField()
+    errors = serializers.SerializerMethodField()
+
 
     def get_available_transitions(self, instance) -> list[CSState]:
         request = self.context.get("request", None)
@@ -383,6 +386,10 @@ class ConnectivityStatementSerializer(
 
         return statement.strip()
 
+    def get_errors(self, instance):
+        return get_connectivity_errors(instance)
+
+
     def to_representation(self, instance):
         """
         Convert the model instance `forward_connection` field to serialized data.
@@ -427,5 +434,6 @@ class ConnectivityStatementSerializer(
             "modified_date",
             "has_notes",
             "statement_preview",
+            "errors"
         )
         read_only_fields = ("state",)

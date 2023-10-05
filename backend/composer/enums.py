@@ -91,3 +91,7 @@ class ExportRelationships(models.TextChoices):
 class MetricEntity(models.TextChoices):
     SENTENCE = "sentence"
     CONNECTIVITY_STATEMENT = "connectivity statement"
+
+
+class ConnectivityErrors(Enum):
+    INVALID_FORWARD_CONNECTION = "Invalid forward connection"
