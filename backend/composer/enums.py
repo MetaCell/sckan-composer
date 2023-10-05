@@ -85,6 +85,7 @@ class ExportRelationships(models.TextChoices):
     hasAxonSensorySubcellularElementIn = "hasAxonSensorySubcellularElementIn", "Afferent terminal",
     hasAxonLocatedIn = "hasAxonLocatedIn", "Axon"
     hasDendriteLocatedIn = "hasDendriteLocatedIn", "Dendrite"
+    hasForwardConnection = "hasForwardConnection", "Forward Connection"
 
 
 class MetricEntity(models.TextChoices):
