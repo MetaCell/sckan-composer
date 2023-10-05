@@ -20,6 +20,7 @@ import {ConnectivityStatement} from "../../apiclient/backend";
 import Chip from "@mui/material/Chip";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import theme from "../../theme/Theme";
+import {autocompleteRows} from "../../helpers/settings";
 
 const {titleFontColor} = vars;
 
@@ -54,9 +55,16 @@ export const CustomAutocompleteForwardConnection = ({
     const [selectedOptions, setSelectedOptions] = useState<Option[]>(statement.forward_connection || []
     );
 
+    const options: Option[] = [
+        ...(sameSentenceList as Option[]),
+        ...(differentSentenceList as Option[]),
+    ];
+
+    const formIsDisabled = !statement.destination;
+
     const queryOptions = {
         knowledgeStatement: undefined,
-        limit: 10,
+        limit: autocompleteRows,
         notes: undefined,
         index: 0,
         ordering: undefined,
@@ -203,37 +211,31 @@ export const CustomAutocompleteForwardConnection = ({
     };
 
     useEffect(() => {
-        connectivityStatementService
-            .getList({...queryOptions, sentenceId: statement.sentence_id, origin: statement.destination.id})
-            .then((res) => {
-                if (res.results) {
-                    const results = res.results.map((item) => ({
-                        ...item,
-                        relation: Group.SameSentence,
-                    })) as Option[];
-                    setSameSentenceLists(results);
-                }
-            });
-        connectivityStatementService
-            .getList({...queryOptions, sentenceId: `-${statement.sentence_id}`, origin: statement.destination.id})
-            .then((res) => {
-                if (res.results) {
-                    const results = res.results.map((item) => ({
-                        ...item,
-                        relation: Group.Other,
-                    })) as Option[];
-                    setDifferentSentenceLists(results);
-                }
-            });
+        if (!formIsDisabled) {
+            connectivityStatementService
+                .getList({...queryOptions, sentenceId: statement.sentence_id, origin: statement.destination.id})
+                .then((res) => {
+                    if (res.results) {
+                        const results = res.results.map((item) => ({
+                            ...item,
+                            relation: Group.SameSentence,
+                        })) as Option[];
+                        setSameSentenceLists(results);
+                    }
+                });
+            connectivityStatementService
+                .getList({...queryOptions, sentenceId: `-${statement.sentence_id}`, origin: statement.destination.id})
+                .then((res) => {
+                    if (res.results) {
+                        const results = res.results.map((item) => ({
+                            ...item,
+                            relation: Group.Other,
+                        })) as Option[];
+                        setDifferentSentenceLists(results);
+                    }
+                });
+        }
     }, [statement.destination, statement.sentence_id]);
-
-    const options: Option[] = [
-        ...(sameSentenceList as Option[]),
-        ...(differentSentenceList as Option[]),
-    ];
-
-    const formIsDisabled = !statement.destination;
-
 
     return formIsDisabled ? (
         <Box sx={{background: theme.palette.grey[100], borderRadius: 1}} p={3} display="flex"

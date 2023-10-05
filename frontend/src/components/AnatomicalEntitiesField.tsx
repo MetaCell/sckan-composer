@@ -2,7 +2,7 @@ import React from "react";
 import AutoComplete from "./AutoComplete";
 import { AnatomicalEntity } from "../apiclient/backend";
 import { composerApi as api } from "../services/apis";
-import { duplicatesSelectRowsPerPage } from "../helpers/settings";
+import { autocompleteRows } from "../helpers/settings";
 
 function AnatomicalEntitiesField(props: any) {
   const { label } = props.options;
@@ -21,7 +21,7 @@ function AnatomicalEntitiesField(props: any) {
 
   const autoCompleteFetch = (inputValue: string) =>
     api.composerAnatomicalEntityList(
-      duplicatesSelectRowsPerPage,
+      autocompleteRows,
       inputValue,
       0
     );

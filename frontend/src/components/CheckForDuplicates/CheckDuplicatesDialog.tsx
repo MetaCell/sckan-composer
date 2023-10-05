@@ -14,7 +14,7 @@ import {GridRowsProp} from "@mui/x-data-grid";
 import {useState} from "react";
 import {Fab} from "@mui/material";
 import {AnatomicalEntity, PaginatedConnectivityStatementList} from "../../apiclient/backend";
-import {duplicatesRowsPerPage, duplicatesSelectRowsPerPage} from "../../helpers/settings";
+import {duplicatesRowsPerPage, autocompleteRows} from "../../helpers/settings";
 import ResultsGrid from "./ResultsGrid";
 import NoResults from "./NoResults";
 import NoSearch from "./NoSearch";
@@ -119,7 +119,7 @@ export default function CheckDuplicates() {
             }) :
         NoSearch()
 
-    const autoCompleteFetch = (inputValue: string) => api.composerAnatomicalEntityList(duplicatesSelectRowsPerPage, inputValue, 0)
+    const autoCompleteFetch = (inputValue: string) => api.composerAnatomicalEntityList(autocompleteRows, inputValue, 0)
     const autoCompleteNoOptionsText = "No entities found"
 
     return (
