@@ -5,6 +5,9 @@ import { QueryParams } from "../redux/statementSlice"
 
 class ConnectivityStatementService extends AbstractService {
   async save(connectivityStatement: ConnectivityStatement) {
+
+    connectivityStatement.forward_connection = connectivityStatement.forward_connection?.map((cs:any) => cs.id)
+
     if (connectivityStatement.id) {
       return this.update(connectivityStatement)
     }

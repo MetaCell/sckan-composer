@@ -67,7 +67,7 @@ export const CustomAutocompleteForwardConnection = ({
         setSelectedOptions(value);
         const formData = {
             ...statement,
-            forward_connection: value.map((e:any) => e.id),
+            forward_connection: value,
         };
         service
             .save(formData)
