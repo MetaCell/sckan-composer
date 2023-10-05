@@ -213,7 +213,7 @@ export const CustomAutocompleteForwardConnection = ({
     useEffect(() => {
         if (!formIsDisabled) {
             connectivityStatementService
-                .getList({...queryOptions, sentenceId: statement.sentence_id, origin: statement.destination.id})
+                .getList({...queryOptions, excludeSentenceId: undefined, sentenceId: statement.sentence_id, origin: statement.destination.id})
                 .then((res) => {
                     if (res.results) {
                         const results = res.results.map((item) => ({
@@ -224,7 +224,7 @@ export const CustomAutocompleteForwardConnection = ({
                     }
                 });
             connectivityStatementService
-                .getList({...queryOptions, sentenceId: `-${statement.sentence_id}`, origin: statement.destination.id})
+                .getList({...queryOptions, excludeSentenceId: statement.sentence_id, sentenceId: undefined, origin: statement.destination.id})
                 .then((res) => {
                     if (res.results) {
                         const results = res.results.map((item) => ({

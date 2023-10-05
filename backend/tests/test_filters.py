@@ -4,7 +4,6 @@ from django.test import RequestFactory
 from composer.api.filtersets import ConnectivityStatementFilter
 from composer.models import Sentence, ConnectivityStatement
 
-
 @pytest.mark.django_db
 def test_sentence_id_filter():
     # Create some test data
@@ -24,7 +23,7 @@ def test_sentence_id_filter():
     assert filtered.first().sentence == sentence1
 
     # Test filtering for ConnectivityStatement NOT with sentence1's id
-    request = factory.get("/", {"sentence_id": f"not_{sentence1.id}"})
+    request = factory.get("/", {"exclude_sentence_id": sentence1.id})
     qs = ConnectivityStatement.objects.all()
     filtered = ConnectivityStatementFilter(request.GET, queryset=qs).qs
     assert len(filtered) == 1
