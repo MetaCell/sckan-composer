@@ -192,7 +192,7 @@ const EntityDataGrid = (props: DataGridProps) => {
           Pagination: CustomPagination,
           NoRowsOverlay: () => (
               <Stack height="100%" alignItems="center" justifyContent="center">
-                No sentences to display, clear your filter or modify your search criteria
+                {`No ${entityType}s to display, clear your filter or modify your search criteria`}
               </Stack>
           )
         }}
