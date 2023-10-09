@@ -1,3 +1,5 @@
+from typing import List
+
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django_fsm import FSMField
@@ -331,7 +333,6 @@ class ConnectivityStatementSerializer(
     statement_preview = serializers.SerializerMethodField()
     errors = serializers.SerializerMethodField()
 
-
     def get_available_transitions(self, instance) -> list[CSState]:
         request = self.context.get("request", None)
         user = request.user if request else None
@@ -386,18 +387,22 @@ class ConnectivityStatementSerializer(
 
         return statement.strip()
 
-    def get_errors(self, instance):
+    def get_errors(self, instance) -> List:
         return get_connectivity_errors(instance)
-
 
     def to_representation(self, instance):
         """
         Convert the model instance `forward_connection` field to serialized data.
         """
         representation = super().to_representation(instance)
-        representation["forward_connection"] = ConnectivityStatementSerializer(
-            instance.forward_connection.all(), many=True, context=self.context
-        ).data
+        depth = self.context.get('depth', 0)
+
+        if depth < 1:
+            representation["forward_connection"] = ConnectivityStatementSerializer(
+                instance.forward_connection.all(),
+                many=True,
+                context={'depth': depth + 1}
+            ).data
         return representation
 
     class Meta:
