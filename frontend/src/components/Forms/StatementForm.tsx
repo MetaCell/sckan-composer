@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { FormBase } from "./FormBase";
 import { jsonSchemas } from "../../services/JsonSchema";
 import statementService from "../../services/StatementService";
@@ -7,10 +7,9 @@ import CustomSingleSelect from "../Widgets/CustomSingleSelect";
 import CustomTextArea from "../Widgets/CustomTextArea";
 import ArrayFieldTemplate from "../Widgets/ArrayFieldTemplate";
 import AnatomicalEntitiesField from "../AnatomicalEntitiesField";
-import { sexes } from '../../services/SexService';
-import { phenotypes } from '../../services/PhenotypeService';
-import {CustomAutocompleteForwardConnection} from "../Widgets/CustomAutocompleteForwardConnection";
-
+import { sexes } from "../../services/SexService";
+import { phenotypes } from "../../services/PhenotypeService";
+import { CustomAutocompleteForwardConnection } from "../Widgets/CustomAutocompleteForwardConnection";
 
 const StatementForm = (props: any) => {
   const { uiFields, statement, setter, format } = props;
@@ -20,7 +19,7 @@ const StatementForm = (props: any) => {
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
   copiedSchema.properties.path.title = "";
-  copiedSchema.properties.forward_connection.type = ['string', 'null'];
+  copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["destination_type", "*"];
   copiedUISchema.circuit_type = {
     "ui:widget": "radio",
@@ -36,14 +35,14 @@ const StatementForm = (props: any) => {
     },
   };
 
-  copiedUISchema.projection= {
+  copiedUISchema.projection = {
     "ui:widget": "radio",
-      "ui:options": {
-      classNames: 'col-xs-12 col-md-6',
-    }
-  }
+    "ui:options": {
+      classNames: "col-xs-12 col-md-6",
+    },
+  };
 
-  copiedUISchema.apinatomy_model= {
+  copiedUISchema.apinatomy_model = {
     "ui:widget": "CustomTextField",
     "ui:options": {
       label: "Apinatomy Model Name",
@@ -54,23 +53,27 @@ const StatementForm = (props: any) => {
 
   copiedUISchema.sex_id = {
     "ui:widget": "CustomSingleSelect",
-      "ui:options": {
-      label: 'Sex',
-        placeholder: "Enter Sex",
-        data: sexes.getSexes().map((row: any) => ({ label: row.name, value: row.id })),
+    "ui:options": {
+      label: "Sex",
+      placeholder: "Enter Sex",
+      data: sexes
+        .getSexes()
+        .map((row: any) => ({ label: row.name, value: row.id })),
     },
-    value: statement?.sex_id ?? ""
-  }
+    value: statement?.sex_id ?? "",
+  };
 
   copiedUISchema.phenotype_id = {
     "ui:widget": "CustomSingleSelect",
-      "ui:options": {
-      label: 'Phenotype',
-        placeholder: "Select Phenotype",
-        data: phenotypes.getPhenotypes().map((row: any) => ({ label: row.name, value: row.id })),
+    "ui:options": {
+      label: "Phenotype",
+      placeholder: "Select Phenotype",
+      data: phenotypes
+        .getPhenotypes()
+        .map((row: any) => ({ label: row.name, value: row.id })),
     },
     value: statement?.phenotype_id ?? "",
-  }
+  };
 
   copiedUISchema.knowledge_statement = {
     "ui:widget": "CustomTextArea",
@@ -86,6 +89,9 @@ const StatementForm = (props: any) => {
     "ui:widget": AnatomicalEntitiesField,
     "ui:options": {
       label: format === "noLabel" ? false : "Destination",
+      errors: statement?.errors?.includes("Invalid forward connection")
+        ? statement.errors
+        : "",
     },
   };
 
@@ -93,6 +99,7 @@ const StatementForm = (props: any) => {
     "ui:widget": AnatomicalEntitiesField,
     "ui:options": {
       label: format === "noLabel" ? false : "Origin",
+      errors: [],
     },
     default: statement.origin,
   };
@@ -100,7 +107,7 @@ const StatementForm = (props: any) => {
   copiedUISchema.destination_type = {
     "ui:options": {
       label: false,
-      placeholder: 'Select detination type'
+      placeholder: "Select detination type",
     },
   };
 
@@ -108,7 +115,7 @@ const StatementForm = (props: any) => {
     "ui:options": {
       label: false,
     },
-    "ui:label": false
+    "ui:label": false,
   };
 
   copiedUISchema.path.items.anatomical_entity_id = {
@@ -127,7 +134,7 @@ const StatementForm = (props: any) => {
     "ui:options": {
       label: "Additional Information",
       placeholder: "Enter additional information on the knowledge statement",
-      multiline: true, 
+      multiline: true,
       rows: 4,
     },
     value: statement?.additional_information ?? "",
@@ -142,7 +149,10 @@ const StatementForm = (props: any) => {
       data: [],
       statement: statement,
       service: statementService,
-      setter: setter
+      setter: setter,
+      errors: statement?.errors?.includes("Invalid forward connection")
+        ? statement.errors
+        : "",
     },
     value: statement?.forward_connection ?? "",
   };
@@ -153,13 +163,12 @@ const StatementForm = (props: any) => {
     CustomTextField,
     CustomTextArea,
     SelectWidget: CustomSingleSelect,
-    CustomAutocompleteForwardConnection
+    CustomAutocompleteForwardConnection,
   };
 
   const templates = {
     ArrayFieldTemplate,
   };
-  
 
   return (
     <FormBase
@@ -173,8 +182,20 @@ const StatementForm = (props: any) => {
       widgets={widgets}
       templates={templates}
       showErrorList={false}
-      submitOnBlurFields={['knowledge_statement', 'additional_information', 'apinatomy_model']}
-      submitOnChangeFields={['phenotype_id', 'sex_id', 'laterality', 'circuit_type', 'projection', 'destination_type', 'path_type']}
+      submitOnBlurFields={[
+        "knowledge_statement",
+        "additional_information",
+        "apinatomy_model",
+      ]}
+      submitOnChangeFields={[
+        "phenotype_id",
+        "sex_id",
+        "laterality",
+        "circuit_type",
+        "projection",
+        "destination_type",
+        "path_type",
+      ]}
       {...props}
     />
   );

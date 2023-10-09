@@ -24,15 +24,6 @@ import { autocompleteRows } from "../../helpers/settings";
 
 const { titleFontColor } = vars;
 
-const StyledInput = styled(TextField)(({ theme }) => ({
-  "label + &": {
-    marginTop: theme.spacing(4),
-  },
-  "& .MuiOutlinedInput-notchedOutline": {
-    border: 0,
-  },
-}));
-
 type Option = ConnectivityStatement & {
   relation: Group;
 };
@@ -44,7 +35,7 @@ enum Group {
 
 export const CustomAutocompleteForwardConnection = ({
   placeholder,
-  options: { removeChip, label, statement, service, setter },
+  options: { removeChip, label, statement, service, setter, errors },
 }: any) => {
   const [isInputFocused, setInputFocus] = useState(false);
   const [sameSentenceList, setSameSentenceLists] = useState<Option[]>([]);
@@ -279,6 +270,14 @@ export const CustomAutocompleteForwardConnection = ({
         {label}
       </Typography>
       <Autocomplete
+        sx={{
+          "& .MuiFormControl-root": {
+            "& .MuiInputBase-root": {
+              borderColor:
+                errors?.length !== 0 ? theme.palette.error.main : "#EAECF0",
+            },
+          },
+        }}
         disableCloseOnSelect
         multiple
         disableClearable
@@ -527,7 +526,15 @@ export const CustomAutocompleteForwardConnection = ({
           </Paper>
         )}
         renderInput={(params) => (
-          <StyledInput
+          <TextField
+            sx={{
+              "label + &": {
+                marginTop: theme.spacing(4),
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                border: 0,
+              },
+            }}
             {...params}
             id="custom-input"
             placeholder={placeholder}
@@ -557,6 +564,11 @@ export const CustomAutocompleteForwardConnection = ({
           handleInputChange(value);
         }}
       />
+      {errors && (
+        <Typography color={theme.palette.error.main} mt={1}>
+          {errors}
+        </Typography>
+      )}
     </FormControl>
   );
 };
