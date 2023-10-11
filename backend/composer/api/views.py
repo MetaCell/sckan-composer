@@ -315,16 +315,16 @@ class ConnectivityStatementViewSet(
 
     def update(self, request, *args, **kwargs):
         # Remove 'state' from the request data
-        data = request.data.copy()
-        data.pop('state', None)
+        request.data.pop('state', None)
+        return super().update(request, *args, **kwargs)
 
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+        # partial = kwargs.pop('partial', False)
+        # instance = self.get_object()
+        # serializer = self.get_serializer(instance, data=data, partial=partial)
+        # serializer.is_valid(raise_exception=True)
+        # self.perform_update(serializer)
 
-        return Response(serializer.data)
+        # return Response(serializer.data)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
