@@ -68,8 +68,8 @@ async def doi_title_extractor(session, doi):
     except:
         return None
 
-async def find_sentence(doi, pmid, pmcid):
-    sentences = Sentence.objects
+async def find_sentence(batch_name, doi, pmid, pmcid):
+    sentences = Sentence.objects.filter(batch_name=batch_name)
     if doi:
         sentences = sentences.filter(doi=doi)
     else:
@@ -100,7 +100,7 @@ async def save_sentence(session, row, default_batch_name):
     if not batch_name:
         batch_name = default_batch_name
     title = text[0:199]
-    sentence = await find_sentence(doi, pmid, pmcid)
+    sentence = await find_sentence(batch_name, doi, pmid, pmcid)
     try:
         if not sentence:
             sentence, created = await Sentence.objects.aget_or_create(
