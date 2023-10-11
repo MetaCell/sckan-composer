@@ -79,9 +79,9 @@ class SentenceService(StateServiceMixin):
         # return True if the sentence can go to state to_be_reviewed
         # it should have at least one provenance (pmid, pmcid, doi) and at least one connectivity statement
         return (
-                sentence.pmid is not None
-                or sentence.pmcid is not None
-                or sentence.doi is not None
+            sentence.pmid is not None
+            or sentence.pmcid is not None
+            or sentence.doi is not None
         ) and (sentence.connectivitystatement_set.count() > 0)
 
     @staticmethod
@@ -118,13 +118,13 @@ class ConnectivityStatementService(StateServiceMixin):
         # return True if the state,emt can go to state to_be_reviewed it should have at least one provenance,
         # origin, destination, phenotype, sex, path and species
         return (
-                connectivity_statement.origin is not None
-                and connectivity_statement.destination is not None
-                and connectivity_statement.phenotype is not None
-                and connectivity_statement.sex is not None
-                and connectivity_statement.path.count() > 0
-                and connectivity_statement.species.count() > 0
-                and connectivity_statement.provenance_set.count() > 0
+            connectivity_statement.origin is not None
+            and connectivity_statement.destination is not None
+            and connectivity_statement.phenotype is not None
+            and connectivity_statement.sex is not None
+            and connectivity_statement.path.count() > 0
+            and connectivity_statement.species.count() > 0
+            and connectivity_statement.provenance_set.count() > 0
         )
 
     @staticmethod
