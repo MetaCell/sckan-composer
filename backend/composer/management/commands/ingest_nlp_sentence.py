@@ -1,5 +1,4 @@
-import aiohttp
-import asyncio
+import requests
 import crossref_commons.retrieval
 import csv
 import os
@@ -28,47 +27,46 @@ OUT_OF_SCOPE = "out_of_scope"
 REG_TIME = "reg_time"
 COMMENT = "comment"
 
-MAX_PARALLEL_JOBS = 10
-
 
 def to_none(value):
     return None if value == "0" or len(str(value)) == 0 else value
 
 
-async def pmcid_title_extractor(session, url):
+def pmcid_title_extractor(url):
     title = None
-    async with session.get(url) as resp:
-        xml = await resp.text()
-        parser = etree.XMLParser(ns_clean=True, recover=True, encoding="utf-8")
-        try:
-            root = etree.fromstring(bytes(xml, encoding="utf-8"), parser)
-            metadata = root.findall("GetRecord/record/metadata/", root.nsmap)[0]
-            title = metadata.findall("dc:title", metadata.nsmap)[0].text
-        except:
-            pass
+    resp = requests.get(url)
+    xml = resp.text
+    parser = etree.XMLParser(ns_clean=True, recover=True, encoding="utf-8")
+    try:
+        root = etree.fromstring(bytes(xml, encoding="utf-8"), parser)
+        metadata = root.findall("GetRecord/record/metadata/", root.nsmap)[0]
+        title = metadata.findall("dc:title", metadata.nsmap)[0].text
+    except:
+        pass
     return title
 
 
-async def pmid_title_extractor(session, url):
+def pmid_title_extractor(url):
     title = None
-    async with session.get(url) as resp:
-        content = await resp.text()
-        m = re.match('.*"citation_title".*?content="(.*?)"', content, flags=re.DOTALL)
-        try:
-            title = m.group(1)
-        except:
-            pass
+    resp = requests.get(url)
+    content = resp.text
+    m = re.match('.*"citation_title".*?content="(.*?)"', content, flags=re.DOTALL)
+    try:
+        title = m.group(1)
+    except:
+        pass
     return title
 
 
-async def doi_title_extractor(session, doi):
+def doi_title_extractor(doi):
     try:
         doc = crossref_commons.retrieval.get_publication_as_json(doi)
         return doc["title"][0]
     except:
         return None
 
-async def find_sentence(batch_name, doi, pmid, pmcid):
+
+def find_sentence(batch_name, doi, pmid, pmcid):
     sentences = Sentence.objects.filter(batch_name=batch_name)
     if doi:
         sentences = sentences.filter(doi=doi)
@@ -82,14 +80,12 @@ async def find_sentence(batch_name, doi, pmid, pmcid):
         sentences = sentences.filter(pmcid=pmcid)
     else:
         sentences = sentences.filter(pmcid__isnull=True)
-    found_sentence = None
-    async for sentence in sentences:
-        found_sentence = sentence
-        break
-    return found_sentence
+    for sentence in sentences:
+        return sentence
+    return None
 
 
-async def save_sentence(session, row, default_batch_name):
+def save_sentence(row, default_batch_name):
     rowid = row[ID]
     pmid = to_none(row[PMID])
     pmcid = to_none(row[PMCID])
@@ -100,46 +96,58 @@ async def save_sentence(session, row, default_batch_name):
     if not batch_name:
         batch_name = default_batch_name
     title = text[0:199]
-    sentence = await find_sentence(batch_name, doi, pmid, pmcid)
-    try:
-        if not sentence:
-            sentence, created = await Sentence.objects.aget_or_create(
-                external_ref=external_ref,
-                batch_name=batch_name,
-                defaults={
-                    "title": title,
-                    "text": text,
-                    "doi": doi,
-                    "pmid": pmid,
-                    "pmcid": pmcid,
-                },
+    sentence = find_sentence(batch_name, doi, pmid, pmcid)
+    is_dirty = False
+    if not sentence:
+        sentence, created = Sentence.objects.get_or_create(
+            external_ref=external_ref,
+            batch_name=batch_name,
+            defaults={
+                "title": title,
+                "text": text,
+                "doi": doi,
+                "pmid": pmid,
+                "pmcid": pmcid,
+            },
+        )
+        if created:
+            url = None
+            if sentence.doi:
+                url = sentence.doi
+                title_extractor = doi_title_extractor
+            elif sentence.pmid:
+                url = sentence.pmid_uri
+                title_extractor = pmid_title_extractor
+            elif sentence.pmcid:
+                pmcid = sentence.pmcid.replace("PMC", "")
+                url = f"https://www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi?verb=GetRecord&identifier=oai:pubmedcentral.nih.gov:{pmcid}&metadataPrefix=oai_dc"
+                title_extractor = pmcid_title_extractor
+            if url:
+                new_title = title_extractor(url)
+                if new_title:
+                    sentence.title = new_title[0:199]
+            print(
+                f"{rowid}: sentence created: batch {batch_name}, ref {external_ref}, pmid {pmid}, pmcid {pmcid}, doi {doi}."
             )
-            if created:
-                url = None
-                if sentence.doi:
-                    url = sentence.doi
-                    title_extractor = doi_title_extractor
-                elif sentence.pmid:
-                    url = sentence.pmid_uri
-                    title_extractor = pmid_title_extractor
-                elif sentence.pmcid:
-                    pmcid = sentence.pmcid.replace("PMC", "")
-                    url = f"https://www.ncbi.nlm.nih.gov/pmc/oai/oai.cgi?verb=GetRecord&identifier=oai:pubmedcentral.nih.gov:{pmcid}&metadataPrefix=oai_dc"
-                    title_extractor = pmcid_title_extractor
-                if url:
-                    new_title = await title_extractor(session, url)
-                    if new_title:
-                        sentence.title = new_title[0:199]
+            is_dirty = True
         else:
+            print(
+                f"{rowid}: sentence skipped: batch {batch_name}, ref {external_ref}, pmid {pmid}, pmcid {pmcid}, doi {doi}."
+            )            
+    else:
+        if not text in sentence.text:
             sentence.text += f"\n\n\n{text}"
-        await sync_to_async(sentence.save)()
-        print(
-            f"{rowid}: sentence created: batch {batch_name}, ref {external_ref}, pmid {pmid}, pmcid {pmcid}, doi {doi}."
-        )
-    except Exception as e:
-        print(
-            f"{rowid}: batch {batch_name}, ref {external_ref} ... skipped! Exception {e}"
-        )
+            print(
+                f"{rowid}: sentence merged with {sentence.external_ref}: batch {batch_name}, ref {external_ref}, pmid {pmid}, pmcid {pmcid}, doi {doi}."
+            )
+            is_dirty = True
+        else:
+            print(
+                f"{rowid}: sentence equals with {sentence.external_ref}: batch {batch_name}, ref {external_ref}, pmid {pmid}, pmcid {pmcid}, doi {doi}."
+            )                
+    if is_dirty:
+        sentence.save()
+    return external_ref, sentence.external_ref
 
 
 class Command(BaseCommand):
@@ -152,15 +160,16 @@ class Command(BaseCommand):
         return None if value == "0" or len(str(value)) == 0 else value
 
     def handle(self, *args, **options):
-        asyncio.run(self.ingest(*args, **options))
+        self.ingest(*args, **options)
 
-    async def ingest(self, *args, **options):
+    def ingest(self, *args, **options):
         for csv_file_name in options["csv_files"]:
-            sentences = await self.ingest_sentences(csv_file_name)
-            await self.ingest_comments(csv_file_name=csv_file_name, sentences=sentences)
+            sentences, external_refs = self.ingest_sentences(csv_file_name)
+            self.ingest_comments(csv_file_name=csv_file_name, sentences=sentences, external_refs=external_refs)
 
-    async def ingest_sentences(self, csv_file_name) -> List[dict]:
+    def ingest_sentences(self, csv_file_name) -> List[dict]:
         sentences = []
+        external_refs = {}
         with open(
             csv_file_name, newline="", encoding="utf-8", errors="ignore"
         ) as csvfile:
@@ -171,33 +180,20 @@ class Command(BaseCommand):
             )
             default_batch_name = os.path.basename(csv_file_name)
 
+            sentences = []
             for row in nlpreader:
                 sentences.append(row)
+                rowid = row[ID]
+                out_of_scope = row[OUT_OF_SCOPE].lower()
+                if out_of_scope and out_of_scope.lower() == "yes":
+                    # skip out of scope records
+                    self.stdout.write(f"{rowid}: out of scope.")
+                    continue
+                ref_from, ref_to = save_sentence(row, default_batch_name)
+                external_refs.update({ref_from: ref_to})
+        return sentences, external_refs
 
-            row_counter = 0
-            while row_counter < len(sentences):
-                async with aiohttp.ClientSession() as session:
-                    tasks = []
-                    for i in range(0, MAX_PARALLEL_JOBS):  # max parallel
-                        if row_counter>=len(sentences):
-                            break
-                        row = sentences[row_counter]
-                        row_counter += 1
-                        rowid = row[ID]
-                        out_of_scope = row[OUT_OF_SCOPE].lower()
-                        if out_of_scope and out_of_scope.lower() == "yes":
-                            # skip out of scope records
-                            self.stdout.write(f"{rowid}: out of scope.")
-                            continue
-                        tasks.append(
-                            asyncio.create_task(
-                                save_sentence(session, row, default_batch_name)
-                            )
-                        )
-                    await asyncio.gather(*tasks)
-        return sentences
-
-    async def ingest_comments(self, csv_file_name, sentences):
+    def ingest_comments(self, csv_file_name, sentences, external_refs):
         comments_file_name = csv_file_name[0:csv_file_name.find(".csv")]+"_comments.csv"
         if os.path.exists(comments_file_name):
             with open(
@@ -211,7 +207,7 @@ class Command(BaseCommand):
                 default_batch_name = os.path.basename(csv_file_name)
                 
                 users = []
-                async for user in User.objects.all().order_by("id"):
+                for user in User.objects.all().order_by("id"):
                     users.append(user)
 
                 for comment in comments_reader:
@@ -226,12 +222,12 @@ class Command(BaseCommand):
                         # the sentence is out of scope, skip the comment
                         continue
 
-                    external_ref = sentence[EXTERNAL_REF]
+                    external_ref = external_refs[sentence[EXTERNAL_REF]]
                     batch_name = to_none(sentence[BATCH_NAME])
                     if not batch_name:
                         batch_name = default_batch_name
                     # select the corresponding sentence database entity
-                    db_sentence = await Sentence.objects.aget(
+                    db_sentence = Sentence.objects.get(
                         external_ref=external_ref,
                         batch_name=batch_name,
                     )
@@ -247,7 +243,7 @@ class Command(BaseCommand):
                         note = f"[{comment_sender_name}] {note}"
                     reg_time = datetime.strptime(comment[REG_TIME], '%Y-%m-%d %H:%M:%S')
                     
-                    note, created = await Note.objects.aget_or_create(
+                    note, created = Note.objects.get_or_create(
                         sentence=db_sentence,
                         user=user,
                         note=note,
@@ -257,4 +253,4 @@ class Command(BaseCommand):
                         # created_at is auto set on Note creation, let's update it
                         # to the comment's reg_time
                         note.created_at = reg_time
-                        await sync_to_async(note.save)()
+                        note.save()
