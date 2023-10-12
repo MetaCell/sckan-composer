@@ -89,7 +89,7 @@ const SentenceForm = (props: any) => {
         </Typography>
       </Box>
       <Box>
-        <Typography variant='subtitle1' color={vars.darkTextColor}>
+        <Typography variant='subtitle1' color={vars.darkTextColor} sx={{ whiteSpace: "pre-wrap"}}>
           {data?.text}
         </Typography>
       </Box>
