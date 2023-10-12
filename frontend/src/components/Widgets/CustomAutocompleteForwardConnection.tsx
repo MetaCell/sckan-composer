@@ -301,7 +301,7 @@ export const CustomAutocompleteForwardConnection = ({
               {...getTagProps({ index })}
               deleteIcon={<ClearOutlinedIcon />}
               variant="outlined"
-              label={(option?.knowledge_statement?.length !== undefined && option?.knowledge_statement?.length > 15) ? option.knowledge_statement.slice(0, 15) + "..." : option.knowledge_statement }
+              label={(option?.knowledge_statement !== undefined && option?.knowledge_statement?.length > 15) ? option.knowledge_statement.slice(0, 15) + "..." : option.knowledge_statement }
               key={option.id}
               sx={{
                 borderRadius: "6px",
