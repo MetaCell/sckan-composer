@@ -246,6 +246,9 @@ export const CustomAutocompleteForwardConnection = ({
           }
         });
     }
+    return () => {
+      setHoveredOption(undefined);
+    }
   }, [statement.destination, statement.sentence_id, searchValue]);
 
   return formIsDisabled ? (
@@ -298,7 +301,7 @@ export const CustomAutocompleteForwardConnection = ({
               {...getTagProps({ index })}
               deleteIcon={<ClearOutlinedIcon />}
               variant="outlined"
-              label={option.knowledge_statement}
+              label={(option?.knowledge_statement !== undefined && option?.knowledge_statement?.length > 15) ? option.knowledge_statement.slice(0, 15) + "..." : option.knowledge_statement }
               key={option.id}
               sx={{
                 borderRadius: "6px",
@@ -349,7 +352,6 @@ export const CustomAutocompleteForwardConnection = ({
             />
             <Typography
               onMouseEnter={() => setHoveredOption(option)}
-              onMouseLeave={() => setHoveredOption(undefined)}
               sx={{ width: 1, height: 1, padding: "10px" }}
             >
               {option.knowledge_statement}
@@ -453,7 +455,7 @@ export const CustomAutocompleteForwardConnection = ({
                               lineHeight: "1.125rem",
                             }}
                           >
-                            Title
+                            Statement
                           </Typography>
                           <Typography>
                             {hoveredOption.knowledge_statement}
@@ -468,7 +470,7 @@ export const CustomAutocompleteForwardConnection = ({
                               lineHeight: "1.125rem",
                             }}
                           >
-                            Statement
+                            Sentence
                           </Typography>
                           <Typography>
                             {hoveredOption.statement_preview}
