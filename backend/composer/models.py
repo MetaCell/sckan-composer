@@ -1,13 +1,15 @@
-import typing
-
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
+from django.db.models.expressions import RawSQL, F
 from django.db.models.functions import Upper
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
-# from django_fsm_log.decorators import fsm_log_by
 
+from composer.services.state_services import (
+    ConnectivityStatementService,
+    SentenceService,
+)
 from .enums import (
     CircuitType,
     CSState,
@@ -17,13 +19,12 @@ from .enums import (
     SentenceState,
     NoteType,
     ViaType,
-    Projection
-)
-from composer.services.state_services import (
-    ConnectivityStatementService,
-    SentenceService,
+    Projection,
 )
 from .utils import doi_uri, pmcid_uri, pmid_uri, create_reference_uri
+
+
+# from django_fsm_log.decorators import fsm_log_by
 
 
 # some django user overwrite
@@ -116,8 +117,7 @@ class NoteManager(models.Manager):
         return (
             super()
             .get_queryset()
-            .select_related(
-                "user", "sentence", "connectivity_statement")
+            .select_related("user", "sentence", "connectivity_statement")
         )
 
 
@@ -170,6 +170,7 @@ class Sex(models.Model):
         ordering = ["name"]
         verbose_name_plural = "Sex"
 
+
 class FunctionalCircuitRole(models.Model):
     """FunctionalCircuitRole"""
 
@@ -197,6 +198,7 @@ class ProjectionPhenotype(models.Model):
         ordering = ["name"]
         verbose_name_plural = "Projection Phenotypes"
 
+
 class AnatomicalEntity(models.Model):
     """Anatomical Entity"""
 
@@ -210,7 +212,7 @@ class AnatomicalEntity(models.Model):
         ordering = ["name"]
         verbose_name_plural = "Anatomical Entities"
         constraints = [
-            models.UniqueConstraint(Upper('name'), name="ae_unique_upper_name")
+            models.UniqueConstraint(Upper("name"), name="ae_unique_upper_name")
         ]
 
 
@@ -282,7 +284,9 @@ class Sentence(models.Model):
     @transition(
         field=state,
         source=[SentenceState.TO_BE_REVIEWED, SentenceState.OPEN],
-        permission=lambda instance, user: SentenceService.has_permission_to_transition_to_compose_now(instance, user),
+        permission=lambda instance, user: SentenceService.has_permission_to_transition_to_compose_now(
+            instance, user
+        ),
         target=SentenceState.COMPOSE_NOW,
         conditions=[SentenceService.can_be_composed],
     )
@@ -301,7 +305,7 @@ class Sentence(models.Model):
         if SentenceService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
-            
+
     @property
     def pmid_uri(self) -> str:
         return pmid_uri(self.pmid)
@@ -366,7 +370,7 @@ class Via(models.Model):
 
     def __str__(self):
         return f"{self.connectivity_statement} - {self.anatomical_entity}"
-    
+
     def save(self, *args, **kwargs):
         if self.display_order is None:
             self.display_order = self.connectivity_statement.path.all().count()
@@ -426,7 +430,7 @@ class ConnectivityStatement(models.Model):
     circuit_type = models.CharField(
         max_length=20, default=CircuitType.UNKNOWN, choices=CircuitType.choices
     )
-    #TODO for next releases we could have only 1 field for phenotype + an intermediate table with the phenotype's categories such as circuit_type, laterality, projection, functional_circuit_role, projection_phenotype among others
+    # TODO for next releases we could have only 1 field for phenotype + an intermediate table with the phenotype's categories such as circuit_type, laterality, projection, functional_circuit_role, projection_phenotype among others
     phenotype = models.ForeignKey(
         Phenotype,
         verbose_name="Phenotype",
@@ -436,14 +440,27 @@ class ConnectivityStatement(models.Model):
     )
     species = models.ManyToManyField(Specie, verbose_name="Species", blank=True)
     tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
-    sex = models.ForeignKey(
-        Sex, on_delete=models.DO_NOTHING, null=True, blank=True
+    sex = models.ForeignKey(Sex, on_delete=models.DO_NOTHING, null=True, blank=True)
+    forward_connection = models.ManyToManyField(
+        "self",
+        blank=True,
+        symmetrical=False,
     )
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
     additional_information = models.TextField(null=True, blank=True)
     reference_uri = models.URLField(null=True, blank=True)
-    functional_circuit_role = models.ForeignKey(FunctionalCircuitRole, on_delete=models.DO_NOTHING, null=True, blank=True,)
-    projection_phenotype = models.ForeignKey(ProjectionPhenotype, on_delete=models.DO_NOTHING, null=True,blank=True,)
+    functional_circuit_role = models.ForeignKey(
+        FunctionalCircuitRole,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+    )
+    projection_phenotype = models.ForeignKey(
+        ProjectionPhenotype,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+    )
     created_date = models.DateTimeField(auto_now_add=True, db_index=True)
     modified_date = models.DateTimeField(auto_now=True, db_index=True)
 
@@ -501,7 +518,8 @@ class ConnectivityStatement(models.Model):
     def rejected(self, *args, **kwargs):
         ...
 
-    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.NPO_APPROVED)
+    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.NPO_APPROVED,
+                conditions=[ConnectivityStatementService.is_valid])
     def npo_approved(self, *args, **kwargs):
         ...
 
@@ -512,10 +530,11 @@ class ConnectivityStatement(models.Model):
             instance, user
         ),
         target=CSState.EXPORTED,
+        conditions=[ConnectivityStatementService.is_valid]
     )
     def exported(self, *args, **kwargs):
         ...
-    
+
     @property
     def export_id(self):
         return f"CPR:{self.id:06d}"
@@ -534,11 +553,11 @@ class ConnectivityStatement(models.Model):
 
     def get_laterality_description(self):
         laterality_map = {
-            Laterality.RIGHT.value: 'on the right side of the body',
-            Laterality.LEFT.value: 'on the left side of the body',
-            Laterality.UNKNOWN.value: 'at an unknown location'
+            Laterality.RIGHT.value: "on the right side of the body",
+            Laterality.LEFT.value: "on the left side of the body",
+            Laterality.UNKNOWN.value: "at an unknown location",
         }
-        return laterality_map.get(self.laterality, 'at an unknown location')
+        return laterality_map.get(self.laterality, "at an unknown location")
 
     def assign_owner(self, request):
         if ConnectivityStatementService(self).should_set_owner(request):
@@ -617,7 +636,7 @@ class Note(models.Model):
     type = models.CharField(
         max_length=20, default=NoteType.PLAIN, choices=NoteType.choices
     )
-    
+
     objects = NoteManager()
     all_objects = models.Manager()
 
@@ -651,9 +670,16 @@ class ExportBatch(models.Model):
 
     user = models.ForeignKey(User, verbose_name="User", on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
-    sentences_created = models.IntegerField(default=0, help_text="Number of sentences created since the previous export")
-    connectivity_statements_created = models.IntegerField(default=0, help_text="Number of connectivity statements created since the previous export")
-    connectivity_statements = models.ManyToManyField(ConnectivityStatement, help_text="Connectivity statements in this export batch")
+    sentences_created = models.IntegerField(
+        default=0, help_text="Number of sentences created since the previous export"
+    )
+    connectivity_statements_created = models.IntegerField(
+        default=0,
+        help_text="Number of connectivity statements created since the previous export",
+    )
+    connectivity_statements = models.ManyToManyField(
+        ConnectivityStatement, help_text="Connectivity statements in this export batch"
+    )
 
     @property
     def get_count_sentences_created_since_this_export(self):
@@ -664,16 +690,18 @@ class ExportBatch(models.Model):
     @property
     def get_count_connectivity_statements_created_since_this_export(self):
         return ConnectivityStatement.objects.filter(
-            created_date__gt=self.created_at,
-            state=CSState.NPO_APPROVED
+            created_date__gt=self.created_at, state=CSState.NPO_APPROVED
         ).count()
 
     @property
     def get_count_connectivity_statements_modified_since_this_export(self):
-        return ConnectivityStatement.objects.filter(
-            modified_date__gt=self.created_at,
-            state=CSState.NPO_APPROVED
-        ).exclude(state=CSState.EXPORTED).count() # exclude statements that are in EXPORTED state
+        return (
+            ConnectivityStatement.objects.filter(
+                modified_date__gt=self.created_at, state=CSState.NPO_APPROVED
+            )
+            .exclude(state=CSState.EXPORTED)
+            .count()
+        )  # exclude statements that are in EXPORTED state
 
     @property
     def get_count_connectivity_statements_in_this_export(self):
@@ -689,10 +717,13 @@ class ExportMetrics(models.Model):
 
     export_batch = models.ForeignKey(ExportBatch, on_delete=models.CASCADE)
     entity = models.CharField(
-        max_length=max((len(state[1]) for state in MetricEntity.choices)), choices=MetricEntity.choices
+        max_length=max((len(state[1]) for state in MetricEntity.choices)),
+        choices=MetricEntity.choices,
     )
     state = models.CharField(
-        max_length=max((len(state[1]) for state in CSState.choices + SentenceState.choices))
+        max_length=max(
+            (len(state[1]) for state in CSState.choices + SentenceState.choices)
+        )
     )
     count = models.IntegerField()
 
@@ -700,5 +731,8 @@ class ExportMetrics(models.Model):
         verbose_name_plural = "Export Metrics"
         ordering = ["id"]
         constraints = [
-            models.UniqueConstraint(fields=["export_batch", "entity", "state"], name="unique_state_per_export_batch"),
+            models.UniqueConstraint(
+                fields=["export_batch", "entity", "state"],
+                name="unique_state_per_export_batch",
+            ),
         ]

@@ -57,9 +57,9 @@ def filter_by_ontology_uri(qs, field, anatomical_entity):
 
 
 class ConnectivityStatementFilter(django_filters.FilterSet):
-    sentence_id = django_filters.ModelChoiceFilter(
-        field_name="sentence_id", queryset=Sentence.objects.all()
-    )
+    sentence_id = django_filters.NumberFilter(field_name="sentence__id")
+    exclude_sentence_id = django_filters.NumberFilter(field_name="sentence__id", exclude=True)
+
     knowledge_statement = django_filters.CharFilter(
         field_name="knowledge_statement", lookup_expr="icontains"
     )

@@ -7,6 +7,7 @@ import { useSectionStyle, useGreyBgContainer } from "../../styles/styles";
 import { useTheme } from "@mui/system";
 import PathsBuilder from "./PathsBuilder";
 import StatementPreviewForm from "../Forms/StatementPreviewForm";
+import StatementForm from "../Forms/StatementForm";
 
 const ProofingTab = (props: any) => {
   const { statement, refreshStatement, setStatement } = props;
@@ -56,6 +57,24 @@ const ProofingTab = (props: any) => {
         <PathsBuilder
           {...props}
         />
+      </Grid>
+      <Grid item xs={12}>
+        <Paper sx={sectionStyle}>
+          <Stack spacing={2}>
+            <Typography variant="h5">Forward connections</Typography>
+            <Box>
+              <StatementForm
+                statement={statement}
+                format="small"
+                setter={refreshStatement}
+                extraData={{ sentence_id: statement.sentence.id }}
+                uiFields={["forward_connection"]}
+                className='ks'
+                enableAutoSave={true}
+              />
+            </Box>
+          </Stack>
+        </Paper>
       </Grid>
       <Grid item xs={12}>
         <Paper sx={sectionStyle}>

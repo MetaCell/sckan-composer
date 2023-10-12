@@ -11,7 +11,8 @@ from django.db.models import Count, QuerySet
 from django.utils import timezone
 
 from composer.enums import CSState
-from composer.enums import NoteType, ExportRelationships, CircuitType, Laterality, MetricEntity, DestinationType, ViaType, SentenceState, \
+from composer.enums import NoteType, ExportRelationships, CircuitType, Laterality, MetricEntity, DestinationType, \
+    ViaType, SentenceState, \
     Projection
 from composer.exceptions import UnexportableConnectivityStatement
 from composer.models import (
@@ -307,6 +308,17 @@ def get_functional_circuit_row(cs: ConnectivityStatement):
     )
 
 
+def get_forward_connection_row(forward_conn: ConnectivityStatement):
+    return Row(
+        forward_conn.sentence.pk,
+        forward_conn.pk,
+        ExportRelationships.hasForwardConnection.label,
+        ExportRelationships.hasForwardConnection.value,
+        "",
+        ""
+    )
+
+
 def get_rows(cs: ConnectivityStatement) -> List:
     rows = []
     try:
@@ -355,19 +367,24 @@ def get_rows(cs: ConnectivityStatement) -> List:
         rows.append(get_phenotype_row(cs))
     except Exception:
         raise UnexportableConnectivityStatement("Error getting phenotype row")
-    
+
     if cs.projection_phenotype:
         try:
             rows.append(get_projection_phenotype_row(cs))
         except Exception:
             raise UnexportableConnectivityStatement("Error getting projection phenotype row")
-    
+
     if cs.functional_circuit_role:
         try:
             rows.append(get_functional_circuit_row(cs))
         except Exception:
             raise UnexportableConnectivityStatement("Error getting functinal circuit role row")
 
+    for forward_conn in cs.forward_connection.all():
+        try:
+            rows.append(get_forward_connection_row(forward_conn))
+        except Exception:
+            raise UnexportableConnectivityStatement("Error getting forward connection row")
 
     return rows
 
@@ -492,11 +509,10 @@ def dump_export_batch(export_batch, folder_path: typing.Optional[str] = None) ->
 def export_connectivity_statements(
         qs: QuerySet, user: User, folder_path: typing.Optional[str]
 ) -> typing.Tuple[str, ExportBatch]:
-    
     with transaction.atomic():
         # make sure create_export_batch and do_transition_to_exported are in one database transaction
         export_batch = create_export_batch(qs, user)
         do_transition_to_exported(export_batch, user)
-  
+
     export_file = dump_export_batch(export_batch, folder_path)
     return export_file, export_batch

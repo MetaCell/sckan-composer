@@ -74,6 +74,10 @@ paths:
         schema:
           type: integer
       - in: query
+        name: exclude_sentence_id
+        schema:
+          type: integer
+      - in: query
         name: knowledge_statement
         schema:
           type: string
@@ -1670,6 +1674,10 @@ components:
           allOf:
           - $ref: '#/components/schemas/Sex'
           readOnly: true
+        forward_connection:
+          type: array
+          items:
+            type: integer
         apinatomy_model:
           type: string
           nullable: true
@@ -1687,9 +1695,13 @@ components:
         statement_preview:
           type: string
           readOnly: true
+        errors:
+          type: string
+          readOnly: true
       required:
       - available_transitions
       - destination
+      - errors
       - has_notes
       - id
       - journey
@@ -2038,6 +2050,10 @@ components:
           allOf:
           - $ref: '#/components/schemas/Sex'
           readOnly: true
+        forward_connection:
+          type: array
+          items:
+            type: integer
         apinatomy_model:
           type: string
           nullable: true
@@ -2053,6 +2069,9 @@ components:
           type: boolean
           readOnly: true
         statement_preview:
+          type: string
+          readOnly: true
+        errors:
           type: string
           readOnly: true
     PatchedNote:

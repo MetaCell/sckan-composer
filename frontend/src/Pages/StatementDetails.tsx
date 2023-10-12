@@ -130,7 +130,7 @@ const StatementDetails = () => {
             :
             <GroupedButtons
             disabled
-            selectedOption='Missing data'
+            selectedOption='No options available'
           />
           }
           </Grid>

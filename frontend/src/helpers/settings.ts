@@ -2,7 +2,7 @@
 import { StatementStateToColor, SentenceStateToColor } from "./helpers";
 
 export const duplicatesRowsPerPage = 10;
-export const duplicatesSelectRowsPerPage = 100;
+export const autocompleteRows = 100;
 
 export const statementStateToColor: StatementStateToColor = {
     compose_now: "error", //red
