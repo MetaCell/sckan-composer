@@ -10,6 +10,7 @@ import AnatomicalEntitiesField from "../AnatomicalEntitiesField";
 import { sexes } from "../../services/SexService";
 import { phenotypes } from "../../services/PhenotypeService";
 import { CustomAutocompleteForwardConnection } from "../Widgets/CustomAutocompleteForwardConnection";
+import { CustomAnatomicalField } from "../Widgets/CustomAnatomicalField";
 
 const StatementForm = (props: any) => {
   const { uiFields, statement, setter, format } = props;
@@ -95,13 +96,30 @@ const StatementForm = (props: any) => {
     },
   };
 
+  // copiedUISchema.origin_id = {
+  //   "ui:widget": AnatomicalEntitiesField,
+  //   "ui:options": {
+  //     label: format === "noLabel" ? false : "Origin",
+  //     errors: [],
+  //   },
+  //   default: statement.origin,
+  // };
+
   copiedUISchema.origin_id = {
-    "ui:widget": AnatomicalEntitiesField,
+    "ui:widget": CustomAnatomicalField,
     "ui:options": {
       label: format === "noLabel" ? false : "Origin",
-      errors: [],
+      placeholder: "Look for Origins",
+      options: [],
+      data: [],
+      statement: statement,
+      service: statementService,
+      setter: setter,
+      errors: statement?.errors?.includes("Invalid origin")
+        ? statement.errors
+        : "",
     },
-    default: statement.origin,
+    value: statement?.forward_connection ?? "",
   };
 
   copiedUISchema.destination_type = {
