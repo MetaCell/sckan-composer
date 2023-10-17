@@ -24,14 +24,12 @@ const PathsBuilder = (props: any) => {
           <Typography variant="subtitle1" color={vars.captionColor} sx={{mb:1, pl:1}}>Origin</Typography>
           <Table>
             <TableBody>
-              <TableRow  startIcon={<OutlinedFlagTwoToneIcon/>}>
+              <TableRow startIcon={<OutlinedFlagTwoToneIcon/>} action={false}>
                 <Grid
                   container
                   columnSpacing={2}
+                  alignItems='center'
                   sx={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    alignItems: "center",
                     "& .MuiGrid-container": { mt: "0 !important" },
                     "& .MuiGrid-item": { pt: 0, mb: "0 !important" },
                   }}
@@ -39,7 +37,7 @@ const PathsBuilder = (props: any) => {
                   <Grid item>
                     <Typography>Origin</Typography>
                   </Grid>
-                  <Grid item>
+                  <Grid item flex={1}>
                     <StatementForm
                       {...props}
                       statement={statement}
