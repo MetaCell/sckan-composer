@@ -27,14 +27,6 @@ import { composerApi as api } from "../../services/apis";
 import { SEARCH_DEBOUNCE } from "../../settings";
 const { titleFontColor } = vars;
 
-type Option = ConnectivityStatement & {
-  relation: Group;
-};
-
-enum Group {
-  SameSentence = "Origin",
-  Other = "Other",
-}
 
 enum Origins {
   SameSentence = "Origins",
@@ -51,18 +43,13 @@ export const CustomAnatomicalField = ({
   options: { removeChip, label, statement, service, setter, errors, searchPlaceholder, noResultReason, disabledReason },
 }: any) => {
   const [isInputFocused, setInputFocus] = useState(false);
-  const [sameSentenceList, setSameSentenceLists] = useState<Option[]>([]);
 
   const [hoveredOption, setHoveredOption] = useState<OriginOption | null>(null);
 
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>(
+  const [selectedOptions, setSelectedOptions] = useState<OriginOption[]>(
     [statement.origin] || [],
   );
   const [searchValue, setSearchValue] = useState("");
-
-  const options: Option[] = [
-    ...(sameSentenceList as Option[]),
-  ];
 
   const formIsDisabled = !statement.destination;
 
@@ -133,7 +120,7 @@ export const CustomAnatomicalField = ({
     }
   };
 
-  const [optionsNew, setOptionsNew] = useState<readonly any[]>([]);
+  const [optionsNew, setOptionsNew] = useState<any[]>([]);
 
   const fetchEntities = React.useMemo(
     () =>
@@ -195,19 +182,13 @@ export const CustomAnatomicalField = ({
         options={optionsNew}
         filterOptions={(options) => options}
         onChange={(e, value) => onChange(e, value)}
-        groupBy={(option: Option) => Origins.SameSentence}
+        groupBy={(option) => Origins.SameSentence}
         value={selectedOptions}
-        // getOptionLabel={(option: string | Option) => {
-        //   return typeof option === "string"
-        //     ? option
-        //     : (option as Option).knowledge_statement || "";
-        // }}
         getOptionLabel={(option: any) =>
           typeof option === "string" ? option : option.name
         }
-        // isOptionEqualToValue={(option, value) => option.id === value.id}
         isOptionEqualToValue={(option: any, value: any) =>
-          option.name === value.name
+          option.id === value.id
         }
         renderTags={(value, getTagProps) =>
           value.map((option, index) => (
@@ -400,7 +381,7 @@ export const CustomAnatomicalField = ({
                         }
                       }}
                     >
-                      {selectedOptions.length === options.length ? (
+                      {selectedOptions.length === optionsNew.length ? (
                         <Button
                           startIcon={<PlaylistRemoveOutlinedIcon />}
                           variant="text"
@@ -417,7 +398,7 @@ export const CustomAnatomicalField = ({
                           variant="text"
                           onClick={(e) => {
                             e.preventDefault();
-                            setSelectedOptions(options);
+                            setSelectedOptions(optionsNew);
                           }}
                         >
                           Select all
