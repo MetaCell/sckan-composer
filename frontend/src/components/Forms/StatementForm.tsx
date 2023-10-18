@@ -110,16 +110,19 @@ const StatementForm = (props: any) => {
     "ui:options": {
       label: format === "noLabel" ? false : "Origin",
       placeholder: "Look for Origins",
+      searchPlaceholder: "Search for Origins",
+      noResultReason: "We couldn’t find any record with these origin in the database.",
+      disabledReason: "Add Destination entity to get access to the forward connection form",
       options: [],
       data: [],
       statement: statement,
       service: statementService,
-      setter: setter,
+      // setter: setter,
       errors: statement?.errors?.includes("Invalid origin")
         ? statement.errors
         : "",
     },
-    value: statement?.forward_connection ?? "",
+    value: statement?.origin ?? "",
   };
 
   copiedUISchema.destination_type = {

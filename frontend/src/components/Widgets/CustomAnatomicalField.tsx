@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { TextField } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
-import { Autocomplete, Box, InputAdornment, styled } from "@mui/material";
+import { Autocomplete, Box, InputAdornment, styled, debounce } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import { vars } from "../../theme/variables";
 import Typography from "@mui/material/Typography";
@@ -23,7 +23,8 @@ import theme from "../../theme/Theme";
 import { autocompleteRows } from "../../helpers/settings";
 import SearchIcon from '@mui/icons-material/Search';
 import { CheckedItemIcon, UncheckedItemIcon } from "../icons";
-
+import { composerApi as api } from "../../services/apis";
+import { SEARCH_DEBOUNCE } from "../../settings";
 const { titleFontColor } = vars;
 
 type Option = ConnectivityStatement & {
@@ -31,64 +32,47 @@ type Option = ConnectivityStatement & {
 };
 
 enum Group {
-  SameSentence = "Derived from the same statement",
+  SameSentence = "Origin",
   Other = "Other",
 }
 
+enum Origins {
+  SameSentence = "Origins",
+}
+
+type OriginOption = {
+  id: string;
+  name: string;
+  ontology_uri: string;
+};
+
 export const CustomAnatomicalField = ({
   placeholder,
-  options: { removeChip, label, statement, service, setter, errors },
+  options: { removeChip, label, statement, service, setter, errors, searchPlaceholder, noResultReason, disabledReason },
 }: any) => {
   const [isInputFocused, setInputFocus] = useState(false);
   const [sameSentenceList, setSameSentenceLists] = useState<Option[]>([]);
-  const [differentSentenceList, setDifferentSentenceLists] = useState<Option[]>(
-    [],
-  );
-  const [hoveredOption, setHoveredOption] = useState<Option | undefined>(
-    undefined,
-  );
+
+  const [hoveredOption, setHoveredOption] = useState<OriginOption | null>(null);
+
   const [selectedOptions, setSelectedOptions] = useState<Option[]>(
-    statement.forward_connection || [],
+    [statement.origin] || [],
   );
   const [searchValue, setSearchValue] = useState("");
 
   const options: Option[] = [
     ...(sameSentenceList as Option[]),
-    ...(differentSentenceList as Option[]),
   ];
 
   const formIsDisabled = !statement.destination;
 
-  const queryOptions = {
-    knowledgeStatement: undefined,
-    limit: autocompleteRows,
-    notes: undefined,
-    index: 0,
-    ordering: undefined,
-    stateFilter: undefined,
-    tagFilter: undefined,
-  };
   const onChange = (e: any, value: any) => {
     setSelectedOptions(value);
-    const formData = {
-      ...statement,
-      forward_connection: value,
-    };
-    service
-      .save(formData)
-      .then((newData: any) => {
-        setter && setter(newData);
-      })
-      .catch((error: any) => {
-        // todo: handle errors here
-        console.log("Something went wrong");
-      });
   };
 
-  const handleSelectAll = (group: Group) => {
-    if (group === Group.Other) {
-      const newSelectedOptions = [...selectedOptions];
-      differentSentenceList.forEach((item) => {
+  const handleSelectAll = (group: string) => {
+    const newSelectedOptions = [...selectedOptions];
+      optionsNew.forEach((item) => {
         if (
           !newSelectedOptions.some(
             (selectedItem) => selectedItem.id === item.id,
@@ -98,79 +82,18 @@ export const CustomAnatomicalField = ({
         }
       });
       setSelectedOptions(newSelectedOptions);
-    }
-    if (group === Group.SameSentence) {
-      const newSelectedOptions = [...selectedOptions];
-      sameSentenceList.forEach((item) => {
-        if (
-          !newSelectedOptions.some(
-            (selectedItem) => selectedItem.id === item.id,
-          )
-        ) {
-          newSelectedOptions.push(item);
-        }
-      });
-      setSelectedOptions(newSelectedOptions);
-    }
   };
 
-  const handleDeselectAll = (group: Group) => {
-    if (group === Group.Other) {
-      const newSelectedOptions = selectedOptions.filter(
-        (item) =>
-          !differentSentenceList.some(
-            (selectedItem) => selectedItem.id === item.id,
-          ),
-      );
-      setSelectedOptions(newSelectedOptions);
-    }
-    if (group === Group.SameSentence) {
-      const newSelectedOptions = selectedOptions.filter(
-        (item) =>
-          !sameSentenceList.some((selectedItem) => selectedItem.id === item.id),
-      );
-      setSelectedOptions(newSelectedOptions);
-    }
+  const handleDeselectAll = (group: string) => {
+    const newSelectedOptions = selectedOptions.filter(
+      (item) =>
+        !optionsNew.some((selectedItem) => selectedItem.id === item.id),
+    );
+    setSelectedOptions(newSelectedOptions);
   };
 
   const getGroupButton = (group: string) => {
-    if (group === Group.SameSentence) {
-      const allObjectsExist = sameSentenceList.every((obj1) =>
-        selectedOptions.some(
-          (obj2) => JSON.stringify(obj1) === JSON.stringify(obj2),
-        ),
-      );
-
-      return allObjectsExist ? (
-        <Button
-          variant="text"
-          sx={{
-            color: "#184EA2",
-            fontSize: "0.75rem",
-            fontWeight: 600,
-            lineHeight: "1.125rem",
-          }}
-          onClick={() => handleDeselectAll(group)}
-        >
-          Deselect All
-        </Button>
-      ) : (
-        <Button
-          variant="text"
-          sx={{
-            color: "#184EA2",
-            fontSize: "0.75rem",
-            fontWeight: 600,
-            lineHeight: "1.125rem",
-          }}
-          onClick={() => handleSelectAll(group)}
-        >
-          Select All
-        </Button>
-      );
-    }
-    if (group === Group.Other) {
-      const allObjectsExist = differentSentenceList.every((obj1) =>
+    const allObjectsExist = optionsNew.every((obj1) =>
         selectedOptions.some(
           (obj2) => JSON.stringify(obj1) === JSON.stringify(obj2),
         ),
@@ -184,7 +107,7 @@ export const CustomAnatomicalField = ({
             fontWeight: 600,
             lineHeight: "1.125rem",
           }}
-          onClick={() => handleDeselectAll(group)}
+          onClick={() => handleDeselectAll(Origins.SameSentence)}
         >
           Deselect All
         </Button>
@@ -197,12 +120,11 @@ export const CustomAnatomicalField = ({
             fontWeight: 600,
             lineHeight: "1.125rem",
           }}
-          onClick={() => handleSelectAll(group)}
+          onClick={() => handleSelectAll(Origins.SameSentence)}
         >
           Select All
         </Button>
       );
-    }
   };
 
   const handleInputChange = (value: string) => {
@@ -211,47 +133,28 @@ export const CustomAnatomicalField = ({
     }
   };
 
+  const [optionsNew, setOptionsNew] = useState<readonly any[]>([]);
+
+  const fetchEntities = React.useMemo(
+    () =>
+      debounce(() => {
+        api.composerAnatomicalEntityList(autocompleteRows, searchValue, 0).then((res: { data: any }) => {
+          const { data } = res;
+          const { results } = data;
+          let entities = results;
+          if (!entities) {
+            entities = [];
+          }
+          setOptionsNew(entities);
+        });
+      }, SEARCH_DEBOUNCE),
+    [searchValue],
+  );
+
   useEffect(() => {
-    if (!formIsDisabled) {
-      connectivityStatementService
-        .getList({
-          ...queryOptions,
-          excludeSentenceId: undefined,
-          sentenceId: statement.sentence_id,
-          origin: statement.destination.id,
-          knowledgeStatement: searchValue,
-        })
-        .then((res) => {
-          if (res.results) {
-            const results = res.results.map((item) => ({
-              ...item,
-              relation: Group.SameSentence,
-            })) as Option[];
-            setSameSentenceLists(results);
-          }
-        });
-      connectivityStatementService
-        .getList({
-          ...queryOptions,
-          excludeSentenceId: statement.sentence_id,
-          sentenceId: undefined,
-          origin: statement.destination.id,
-          knowledgeStatement: searchValue,
-        })
-        .then((res) => {
-          if (res.results) {
-            const results = res.results.map((item) => ({
-              ...item,
-              relation: Group.Other,
-            })) as Option[];
-            setDifferentSentenceLists(results);
-          }
-        });
-    }
-    return () => {
-      setHoveredOption(undefined);
-    }
-  }, [statement.destination, statement.sentence_id, searchValue]);
+    searchValue !== undefined && fetchEntities();
+  }, [searchValue, fetchEntities]);
+
 
   return formIsDisabled ? (
     <Box
@@ -261,7 +164,7 @@ export const CustomAnatomicalField = ({
       justifyContent="center"
     >
       <Typography>
-        Add Destination entity to get access to the forward connection form
+        {disabledReason}
       </Typography>
     </Box>
   ) : (
@@ -289,24 +192,30 @@ export const CustomAnatomicalField = ({
         disableCloseOnSelect
         multiple
         disableClearable
-        options={options}
+        options={optionsNew}
         filterOptions={(options) => options}
         onChange={(e, value) => onChange(e, value)}
-        groupBy={(option: Option) => option.relation}
+        groupBy={(option: Option) => Origins.SameSentence}
         value={selectedOptions}
-        getOptionLabel={(option: string | Option) => {
-          return typeof option === "string"
-            ? option
-            : (option as Option).knowledge_statement || "";
-        }}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-        renderTags={(value: Option[], getTagProps) =>
+        // getOptionLabel={(option: string | Option) => {
+        //   return typeof option === "string"
+        //     ? option
+        //     : (option as Option).knowledge_statement || "";
+        // }}
+        getOptionLabel={(option: any) =>
+          typeof option === "string" ? option : option.name
+        }
+        // isOptionEqualToValue={(option, value) => option.id === value.id}
+        isOptionEqualToValue={(option: any, value: any) =>
+          option.name === value.name
+        }
+        renderTags={(value, getTagProps) =>
           value.map((option, index) => (
             <Chip
               {...getTagProps({ index })}
               deleteIcon={<ClearOutlinedIcon />}
               variant="outlined"
-              label={(option?.knowledge_statement !== undefined && option?.knowledge_statement?.length > 15) ? option.knowledge_statement.slice(0, 15) + "..." : option.knowledge_statement}
+              label={(option?.name !== undefined && option?.name?.length > 15) ? option.name.slice(0, 15) + "..." : option.name}
               key={option.id}
               sx={{
                 borderRadius: "0.375rem",
@@ -359,9 +268,9 @@ export const CustomAnatomicalField = ({
               onMouseEnter={() => setHoveredOption(option)}
               sx={{ width: 1, height: 1, padding: "0.625rem" }}
             >
-              {option.knowledge_statement}
+              {option?.name}
             </Typography>
-            <Typography variant="body2">{option.destination_type}</Typography>
+            <Typography variant="body2">{option?.id}</Typography>
           </li>
         )}
         PaperComponent={(props) => (
@@ -371,10 +280,10 @@ export const CustomAnatomicalField = ({
             sx={{
               display: "flex",
               height: "19.5rem",
-              minWidth: options.length > 0 ? '55.5rem' : '100%'
+              minWidth: optionsNew.length > 0 ? '55.5rem' : '100%'
             }}
           >
-            {options.length > 0 ? (
+            {optionsNew.length > 0 ? (
               <>
                 <Box
                   display="flex"
@@ -398,7 +307,7 @@ export const CustomAnatomicalField = ({
                         display: 'none'
                       }
                     }}
-                    placeholder="Search for Origins"
+                    placeholder={searchPlaceholder}
                     InputProps={{
                       startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: '1rem', color: '#667085' }} /></InputAdornment>
                     }}
@@ -518,7 +427,7 @@ export const CustomAnatomicalField = ({
                   </Box>
                 </Box>
                 <Box overflow='auto' sx={{ background: '#FCFCFD' }} flex={1}>
-                  {hoveredOption?.statement_preview ? (
+                  {hoveredOption ? (
                     <Box
                       width={1}
                       p={3}
@@ -558,17 +467,17 @@ export const CustomAnatomicalField = ({
                           <Typography variant="body1">
                             Preferred ID
                           </Typography>
-                          <Typography variant="body2">{hoveredOption.id}</Typography>
+                          <Typography variant="body2">{hoveredOption?.id}</Typography>
                         </Stack>
                         <Stack spacing={1} mt={3}>
                           <Typography variant="body1">
                             Description
                           </Typography>
                           <Typography variant="body2">
-                            {hoveredOption.statement_preview}
+                            {hoveredOption?.name}
                           </Typography>
                         </Stack>
-                        <Stack spacing={1} mt={3}>
+                        {/* <Stack spacing={1} mt={3}>
                           <Typography variant="body1">
                             Synonym
                           </Typography>
@@ -583,10 +492,10 @@ export const CustomAnatomicalField = ({
                           <Typography variant="body2">
                             {hoveredOption.relation}
                           </Typography>
-                        </Stack>
+                        </Stack> */}
                       </Stack>
                       <Box sx={{mt: '1.5rem', pt: '1.5rem', borderTop: '0.0625rem solid #F2F4F7'}}>
-                        <Chip variant="outlined" label={hoveredOption?.apinatomy_model} />
+                        <Chip variant="outlined" label={hoveredOption?.ontology_uri} />
                       </Box>
                     </Box>
                   ) : (
@@ -631,7 +540,7 @@ export const CustomAnatomicalField = ({
                 </Typography>
 
                 <Typography variant="body1" marginBottom={2}>
-                  We couldn’t find any record with these origin in the database.
+                  { noResultReason }
                 </Typography>
                 <Button variant="outlined">Clear search</Button>
               </Box>
