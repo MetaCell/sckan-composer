@@ -82,7 +82,7 @@ export const CustomAnatomicalField = ({
 
   const handleSelectAll = (group: string) => {
     const newSelectedOptions = [...selectedOptions];
-      optionsNew.forEach((item) => {
+      optionsNew.filter((option: Option) => option.relation === group).forEach((item) => {
         if (
           !newSelectedOptions.some(
             (selectedItem) => selectedItem.id === item.id,
@@ -97,13 +97,13 @@ export const CustomAnatomicalField = ({
   const handleDeselectAll = (group: string) => {
     const newSelectedOptions = selectedOptions.filter(
       (item) =>
-        !optionsNew.some((selectedItem) => selectedItem.id === item.id),
+        !optionsNew.filter((option: Option) => option.relation === group).some((selectedItem) => selectedItem.id === item.id),
     );
     setSelectedOptions(newSelectedOptions);
   };
 
   const getGroupButton = (group: string) => {
-    const allObjectsExist = optionsNew.every((obj1) =>
+    const allObjectsExist = optionsNew.filter((option: Option) => option.relation === group).every((obj1) =>
         selectedOptions.some(
           (obj2) => JSON.stringify(obj1) === JSON.stringify(obj2),
         ),
