@@ -96,14 +96,250 @@ const StatementForm = (props: any) => {
     },
   };
 
-  // copiedUISchema.origin_id = {
-  //   "ui:widget": AnatomicalEntitiesField,
-  //   "ui:options": {
-  //     label: format === "noLabel" ? false : "Origin",
-  //     errors: [],
-  //   },
-  //   default: statement.origin,
-  // };
+  const mockEntities = [
+        {
+          "id": "5304",
+          "relation": 'Origins',
+          "('Aortic arch', 'arch of aorta')": [
+            {
+              "title": "Name",
+              "value": "('Aortic arch', 'arch of aorta')"
+            },
+            {
+              "title": "Ontology URI",
+              "value": "http://purl.obolibrary.org/obo/UBERON_0001508"
+            }
+          ]
+        },
+        {
+          "id": "32845",
+          "relation": 'Origins',
+          "(embryonic) hindbrain flexure": [
+            {
+              "title": "Name",
+              "value": "(embryonic) hindbrain flexure"
+            },
+            {
+              "title": "Ontology URI",
+              "value": "http://purl.obolibrary.org/obo/UBERON_0005820"
+            }
+          ]
+        },
+        {
+          "id": "47428",
+          "relation": 'Origins',
+          "(mid-third) lateral capsular ligament": [
+            {
+              "title": "Name",
+              "value": "(mid-third) lateral capsular ligament"
+            },
+            {
+              "title": "Ontology URI",
+              "value": "http://purl.obolibrary.org/obo/UBERON_0014899"
+            }
+          ]
+        },
+        {
+          "id": "12822",
+          "relation": 'Origins',
+          "(pre-)piriform cortex": [
+            {
+              "title": "Name",
+              "value": "(pre-)piriform cortex"
+            },
+            {
+              "title": "Ontology URI",
+              "value": "http://purl.obolibrary.org/obo/UBERON_0002590"
+            }
+          ]
+        },
+        {
+          "id": "1798",
+          "relation": 'Origins',
+          "02 optic nerve": [
+            {
+              "title": "Name",
+              "value": "02 optic nerve"
+            },
+            {
+              "title": "Ontology URI",
+              "value": "http://purl.obolibrary.org/obo/UBERON_0000941"
+            }
+          ]
+        },
+        {
+          "id": "53259",
+          "relation": 'Origins',
+          "10 R+L thoracic": [
+            {
+              "title": "Name",
+              "value": "10 R+L thoracic"
+            },
+            {
+              "title": "Ontology URI",
+              "value": "http://purl.obolibrary.org/obo/UBERON_0039167"
+            }
+          ]
+        },
+        {
+          "id": "6604",
+          "relation": 'Origins',
+          "10n": [
+            {
+              "title": "Name",
+              "value": "10n"
+            },
+            {
+              "title": "Ontology URI",
+              "value": "http://purl.obolibrary.org/obo/UBERON_0001759"
+            }
+          ]
+        },
+        {
+          "id": "52948",
+          "relation": 'Origins',
+          "11 R+L thoracic": [
+            {
+              "title": "Name",
+              "value": "11 R+L thoracic"
+            },
+            {
+              "title": "Ontology URI",
+              "value": "http://purl.obolibrary.org/obo/UBERON_0038635"
+            }
+          ]
+        },
+        {
+          "id": "52950",
+          "relation": 'Origins',
+          "11 thoracic lymph node": [
+            {
+              "title": "Name",
+              "value": "11 thoracic lymph node"
+            },
+            {
+              "title": "Ontology URI",
+              "value": "http://purl.obolibrary.org/obo/UBERON_0038635"
+            }
+          ]
+        },
+        {
+          "id": "52956",
+          "relation": 'Origins',
+          "12R+L thoracic lymph node": [
+            {
+              "title": "Name",
+              "value": "12R+L thoracic lymph node"
+            },
+            {
+              "title": "Ontology URI",
+              "value": "http://purl.obolibrary.org/obo/UBERON_0038638"
+            }
+          ]
+        },
+        {
+          "id": "6050",
+          "relation": 'Origins',
+          "12n": [
+            {
+              "title": "Name",
+              "value": "12n"
+            },
+            {
+              "title": "Ontology URI",
+              "value": "http://purl.obolibrary.org/obo/UBERON_0001650"
+            }
+          ]
+        }
+    ];
+
+  const mockConnections = [
+        {
+          "id": "5304",
+          'relation': 'Derived from Same Sentence',
+          "chorda tympani to lingual to geniculate ganglion to nts S2-S4 via pelvic splanchnic nerves via pelvic ganglion to uterovaginal ganglion": [
+            {
+              "title": "Knowledge Statement ID",
+              "value": "73"
+            },
+            {
+              "title": "Title",
+              "value": "chorda tympani to lingual to geniculate ganglion to nts S2-S4 via pelvic splanchnic nerves via pelvic ganglion to uterovaginal ganglion"
+            },
+            {
+              "title": "Statement",
+              "value": "In a parasympathetic post-ganglionic phenotype connection goes from S2 spinal cord segment to accessory pelvic ganglion via 2nd toe intermediate phalanx, via pelvic ganglion and via ventral root of the first sacral spinal cord segment. This ANAXONIC projects UNKNOWN from the S2 spinal cord segment and is found at an unknown location.chorda tympani to lingual to geniculate ganglion to nts S2-S4 via pelvic splanchnic nerves via pelvic ganglion to uterovaginal ganglion"
+            }
+          ]
+        },
+        {
+          "id": "32845",
+          'relation': 'Others',
+          "neuron type sstom 10": [
+            {
+              "title": "Knowledge Statement ID",
+              "value": "71"
+            },
+            {
+              "title": "Title",
+              "value": "neuron type sstom 10"
+            },
+            {
+              "title": "Statement",
+              "value": "In a connection goes from to . This UNKNOWN projects UNKNOWN from the and is found at an unknown location."
+            }
+          ]
+        },
+        {
+          "id": "47428",
+          "relation": 'Others',
+          "(mid-third) lateral capsular ligament": [
+            {
+              "title": "Knowledge Statement ID",
+              "value": "70"
+            },
+            {
+              "title": "Title",
+              "value": "(mid-third) lateral capsular ligament"
+            },
+            {
+              "title": "Statement",
+              "value": "In a connection goes from to . This UNKNOWN projects UNKNOWN from the and is found at an unknown location."
+            }
+          ]
+        },
+        {
+          "id": "12822",
+          "relation": 'Others',
+          "(pre-)piriform cortex": [
+            {
+              "title": "Knowledge Statement ID",
+              "value": "69"
+            },
+            {
+              "title": "Title",
+              "value": "(pre-)piriform cortex"
+            },
+            {
+              "title": "Statement",
+              "value": "In a connection goes from to . This UNKNOWN projects UNKNOWN from the and is found at an unknown location."
+            }
+          ]
+        },
+
+  ];
+
+  const getEntities = (searchValue: string) => mockEntities;
+
+  const getConnections = (searchValue: string) => mockConnections ;
+
+  const updateOriginsInStatment = (options: any, id: string) => {
+    return false;
+  }
+
+  const updateForwardConnectionsInStatment = (options: any, id: string) => {
+    return false;
+  }
 
   copiedUISchema.origin_id = {
     "ui:widget": CustomAnatomicalField,
@@ -113,16 +349,17 @@ const StatementForm = (props: any) => {
       searchPlaceholder: "Search for Origins",
       noResultReason: "We couldn’t find any record with these origin in the database.",
       disabledReason: "Add Destination entity to get access to the forward connection form",
+      onSearch: (searchValue: string) => getEntities(searchValue),
+      onUpdate: (selectedOptions: any) => updateOriginsInStatment(selectedOptions, statement?.id),
       options: [],
       data: [],
       statement: statement,
-      service: statementService,
-      // setter: setter,
       errors: statement?.errors?.includes("Invalid origin")
         ? statement.errors
         : "",
+      value: mockEntities[0] ?? "",
     },
-    value: statement?.origin ?? "",
+
   };
 
   copiedUISchema.destination_type = {
@@ -162,20 +399,23 @@ const StatementForm = (props: any) => {
   };
 
   copiedUISchema.forward_connection = {
-    "ui:widget": CustomAutocompleteForwardConnection,
+    "ui:widget": CustomAnatomicalField,
     "ui:options": {
       label: "",
       placeholder: "Forward connection(s)",
+      searchPlaceholder: "Search for Connections",
+      noResultReason: "We couldn’t find any record with these origin in the database.",
+      disabledReason: "Add Destination entity to get access to the forward connection form",
+      onSearch: (searchValue: string) => getConnections(searchValue),
+      onUpdate: (selectedOptions: any) => updateForwardConnectionsInStatment(selectedOptions, statement?.id),
       options: [],
       data: [],
       statement: statement,
-      service: statementService,
-      setter: setter,
       errors: statement?.errors?.includes("Invalid forward connection")
         ? statement.errors
         : "",
+      value: mockConnections[0] ?? "",
     },
-    value: statement?.forward_connection ?? "",
   };
 
   const widgets = {

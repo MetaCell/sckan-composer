@@ -27,33 +27,56 @@ import { composerApi as api } from "../../services/apis";
 import { SEARCH_DEBOUNCE } from "../../settings";
 const { titleFontColor } = vars;
 
-
-enum Origins {
-  SameSentence = "Origins",
+type BaseOption = {
+  id: string;
+  relation: string;
 }
 
-type OriginOption = {
-  id: string;
-  name: string;
-  ontology_uri: string;
+type OptionDetail = {
+  title: string; // What to display as the title/label for the property.
+  value: string; // The actual value/content for the property.
 };
+
+type DetailedOption = {
+  [name: string]: OptionDetail[];
+}
+
+type Option = BaseOption & DetailedOption;
+// type StyleDetails = {
+
+// };
+//decide later for bottom elements chip/button
 
 export const CustomAnatomicalField = ({
   placeholder,
-  options: { removeChip, label, statement, service, setter, errors, searchPlaceholder, noResultReason, disabledReason },
+  options: { removeChip, label, statement, service, setter, errors, searchPlaceholder, noResultReason, disabledReason, onSearch, value },
 }: any) => {
+  const [optionsNew, setOptionsNew] = useState<Option[]>([]);
+
   const [isInputFocused, setInputFocus] = useState(false);
 
-  const [hoveredOption, setHoveredOption] = useState<OriginOption | null>(null);
+  const [hoveredOption, setHoveredOption] = useState<Option | null>(null);
 
-  const [selectedOptions, setSelectedOptions] = useState<OriginOption[]>(
-    [statement.origin] || [],
+  const [selectedOptions, setSelectedOptions] = useState<any[]>(
+    [value] || []
   );
   const [searchValue, setSearchValue] = useState("");
 
   const formIsDisabled = !statement.destination;
 
+  const getTheName = (option: any) => {
+    for (const key in option) {
+      if (Array.isArray(option[key])) {
+        const nameObject = option[key].find((item: any) => item.title === "Name" || item.title === "Title");
+        if (nameObject) {
+          return  nameObject.value;
+        }
+      }
+    }
+  }
+
   const onChange = (e: any, value: any) => {
+    // setOptionsGroup(Object.keys(optionsNew))
     setSelectedOptions(value);
   };
 
@@ -94,7 +117,7 @@ export const CustomAnatomicalField = ({
             fontWeight: 600,
             lineHeight: "1.125rem",
           }}
-          onClick={() => handleDeselectAll(Origins.SameSentence)}
+          onClick={() => handleDeselectAll(group)}
         >
           Deselect All
         </Button>
@@ -107,7 +130,7 @@ export const CustomAnatomicalField = ({
             fontWeight: 600,
             lineHeight: "1.125rem",
           }}
-          onClick={() => handleSelectAll(Origins.SameSentence)}
+          onClick={() => handleSelectAll(group)}
         >
           Select All
         </Button>
@@ -117,30 +140,14 @@ export const CustomAnatomicalField = ({
   const handleInputChange = (value: string) => {
     if (value !== "" && value !== undefined) {
       setSearchValue(value);
+      setOptionsNew(onSearch(value))
     }
   };
 
-  const [optionsNew, setOptionsNew] = useState<any[]>([]);
-
-  const fetchEntities = React.useMemo(
-    () =>
-      debounce(() => {
-        api.composerAnatomicalEntityList(autocompleteRows, searchValue, 0).then((res: { data: any }) => {
-          const { data } = res;
-          const { results } = data;
-          let entities = results;
-          if (!entities) {
-            entities = [];
-          }
-          setOptionsNew(entities);
-        });
-      }, SEARCH_DEBOUNCE),
-    [searchValue],
-  );
-
   useEffect(() => {
-    searchValue !== undefined && fetchEntities();
-  }, [searchValue, fetchEntities]);
+    searchValue !== undefined &&
+    setOptionsNew(onSearch(searchValue));
+  }, [searchValue, onSearch, optionsNew]);
 
 
   return formIsDisabled ? (
@@ -182,21 +189,20 @@ export const CustomAnatomicalField = ({
         options={optionsNew}
         filterOptions={(options) => options}
         onChange={(e, value) => onChange(e, value)}
-        groupBy={(option) => Origins.SameSentence}
+        groupBy={(option) => option.relation}
         value={selectedOptions}
-        getOptionLabel={(option: any) =>
-          typeof option === "string" ? option : option.name
-        }
+        getOptionLabel={(option: any) => getTheName(option) }
         isOptionEqualToValue={(option: any, value: any) =>
           option.id === value.id
         }
         renderTags={(value, getTagProps) =>
-          value.map((option, index) => (
-            <Chip
+          value.map((option, index) => {
+            const name = getTheName(option)
+            return (<Chip
               {...getTagProps({ index })}
               deleteIcon={<ClearOutlinedIcon />}
               variant="outlined"
-              label={(option?.name !== undefined && option?.name?.length > 15) ? option.name.slice(0, 15) + "..." : option.name}
+              label={(name !== undefined && name?.length > 15) ? name.slice(0, 15) + "..." : name}
               key={option.id}
               sx={{
                 borderRadius: "0.375rem",
@@ -210,7 +216,8 @@ export const CustomAnatomicalField = ({
                 },
               }}
             />
-          ))
+            )
+          })
         }
         renderGroup={(params) => (
           <li key={params.key}>
@@ -249,7 +256,7 @@ export const CustomAnatomicalField = ({
               onMouseEnter={() => setHoveredOption(option)}
               sx={{ width: 1, height: 1, padding: "0.625rem" }}
             >
-              {option?.name}
+              {getTheName(option)}
             </Typography>
             <Typography variant="body2">{option?.id}</Typography>
           </li>
@@ -444,39 +451,15 @@ export const CustomAnatomicalField = ({
                       }}
                     >
                       <Stack spacing={2}>
-                        <Stack spacing={1}>
+                        {hoveredOption[getTheName(hoveredOption)].map((detail, i) => <Stack spacing={1} sx={{ mt: i !== 0 ? 3 : 0 }}>
                           <Typography variant="body1">
-                            Preferred ID
+                            {detail?.title}
                           </Typography>
-                          <Typography variant="body2">{hoveredOption?.id}</Typography>
-                        </Stack>
-                        <Stack spacing={1} mt={3}>
-                          <Typography variant="body1">
-                            Description
-                          </Typography>
-                          <Typography variant="body2">
-                            {hoveredOption?.name}
-                          </Typography>
-                        </Stack>
-                        {/* <Stack spacing={1} mt={3}>
-                          <Typography variant="body1">
-                            Synonym
-                          </Typography>
-                          <Typography variant="body2">
-                            {hoveredOption.destination_type}
-                          </Typography>
-                        </Stack>
-                        <Stack spacing={1} mt={3}>
-                          <Typography variant="body1">
-                            Relationship
-                          </Typography>
-                          <Typography variant="body2">
-                            {hoveredOption.relation}
-                          </Typography>
-                        </Stack> */}
+                          <Typography variant="body2">{detail?.value}</Typography>
+                        </Stack>)}
                       </Stack>
                       <Box sx={{mt: '1.5rem', pt: '1.5rem', borderTop: '0.0625rem solid #F2F4F7'}}>
-                        <Chip variant="outlined" label={hoveredOption?.ontology_uri} />
+                        <Chip variant="outlined" label={"https://google.com"} />
                       </Box>
                     </Box>
                   ) : (
