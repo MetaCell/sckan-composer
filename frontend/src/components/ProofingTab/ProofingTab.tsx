@@ -62,24 +62,7 @@ const ProofingTab = (props: any) => {
       <Grid item xs={12}>
         <PathsBuilder {...props} refs={refs} />
       </Grid>
-      <Grid item xs={12}>
-        <Paper sx={sectionStyle}>
-          <Stack spacing={2}>
-            <Typography variant="h5">Forward connections</Typography>
-            <Box>
-              <StatementForm
-                statement={statement}
-                format="small"
-                setter={refreshStatement}
-                extraData={{ sentence_id: statement.sentence.id }}
-                uiFields={["forward_connection"]}
-                className="ks"
-                enableAutoSave={true}
-              />
-            </Box>
-          </Stack>
-        </Paper>
-      </Grid>
+
       <Grid item xs={12}>
         <Box ref={refs[6]}>
           <Paper sx={sectionStyle}>

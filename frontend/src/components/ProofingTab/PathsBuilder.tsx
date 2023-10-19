@@ -91,8 +91,8 @@ const PathsBuilder = (props: any) => {
             submitOnChangeFields={["path"]}
           />
         </Box>
-        <Box ref={refs[5]} height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
-        <Box sx={subSectionStyle}>
+        <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
+        <Box sx={subSectionStyle} ref={refs[5]}>
           <Typography
             variant="subtitle1"
             color={vars.captionColor}
@@ -117,6 +117,25 @@ const PathsBuilder = (props: any) => {
               </TableRow>
             </TableBody>
           </Table>
+        </Box>
+        <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
+        <Box sx={subSectionStyle}>
+          <Typography
+            variant="subtitle1"
+            color={vars.captionColor}
+            sx={{ mb: 1, pl: 1 }}
+          >
+            Forward connections
+          </Typography>
+          <StatementForm
+            statement={statement}
+            format="small"
+            setter={refreshStatement}
+            extraData={{ sentence_id: statement.sentence.id }}
+            uiFields={["forward_connection"]}
+            className="ks"
+            enableAutoSave={true}
+          />
         </Box>
       </Stack>
     </Paper>
