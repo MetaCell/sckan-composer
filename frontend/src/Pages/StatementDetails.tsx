@@ -51,8 +51,6 @@ const StatementDetails = () => {
 
   const scrollToElement = (index: number) => {
     const element = refs[index].current;
-    console.log(index);
-
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
