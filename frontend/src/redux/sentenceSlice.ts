@@ -6,10 +6,11 @@ export interface QueryParams {
   limit: number,
   notes: boolean | undefined,
   index: number | undefined,
-  ordering: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'> | undefined,
+  ordering: Array<'-last_edited' | '-id' | 'last_edited' | 'id'> | undefined,
   stateFilter: StateFilter | undefined,
   tagFilter: number[] | undefined,
   title: string | undefined
+  exclude: string[] | undefined
 }
 
 export interface SentenceState {
@@ -24,7 +25,8 @@ export const initialState: SentenceState = {
     ordering: undefined,
     stateFilter: undefined,
     tagFilter: undefined,
-    title: undefined
+    title: undefined,
+    exclude: undefined
   }
 }
 

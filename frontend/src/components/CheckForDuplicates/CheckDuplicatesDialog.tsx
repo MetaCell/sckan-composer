@@ -14,7 +14,7 @@ import {GridRowsProp} from "@mui/x-data-grid";
 import {useState} from "react";
 import {Fab} from "@mui/material";
 import {AnatomicalEntity, PaginatedConnectivityStatementList} from "../../apiclient/backend";
-import {duplicatesRowsPerPage, duplicatesSelectRowsPerPage} from "../../helpers/settings";
+import {duplicatesRowsPerPage, autocompleteRows} from "../../helpers/settings";
 import ResultsGrid from "./ResultsGrid";
 import NoResults from "./NoResults";
 import NoSearch from "./NoSearch";
@@ -23,7 +23,7 @@ import AutoComplete from "../AutoComplete";
 
 
 type criteria =
-    | ("pmid" | "-pmid")[]
+    | ("id" | "-id")[]
     | undefined;
 
 export default function CheckDuplicates() {
@@ -38,15 +38,16 @@ export default function CheckDuplicates() {
         ordering?: criteria,
         index?: number,
     ) => {
-        if (origin && destination) {
+        if (origin || destination) {
             api.composerConnectivityStatementList(
-                destination.id,
+                destination ? destination.id : undefined,
+                undefined,
                 undefined,
                 duplicatesRowsPerPage,
                 undefined,
                 index,
                 ordering || sorting,
-                origin.id,
+                origin ? origin.id : undefined,
             )
                 .then((res: { data: React.SetStateAction<PaginatedConnectivityStatementList | undefined>; }) => {
                     setStatementsList(res.data);
@@ -71,10 +72,10 @@ export default function CheckDuplicates() {
         } else {
             const {field, sort} = model[0];
             const sortingCriteria = `${field} ${sort}`;
-            if (sortingCriteria === "pmid asc") {
-                ordering = ["pmid"];
-            } else if (sortingCriteria === "pmid desc") {
-                ordering = ["-pmid"];
+            if (sortingCriteria === "id asc") {
+                ordering = ["id"];
+            } else if (sortingCriteria === "id desc") {
+                ordering = ["-id"];
             }
         }
         fetchDuplicates(ordering);
@@ -103,7 +104,6 @@ export default function CheckDuplicates() {
             const {id, sentence, knowledge_statement, state} = statement;
             return {
                 id,
-                pmid: sentence.pmid,
                 knowledge_statement,
                 state,
             };
@@ -120,7 +120,7 @@ export default function CheckDuplicates() {
             }) :
         NoSearch()
 
-    const autoCompleteFetch = (inputValue: string) => api.composerAnatomicalEntityList(duplicatesSelectRowsPerPage, inputValue, 0)
+    const autoCompleteFetch = (inputValue: string) => api.composerAnatomicalEntityList(autocompleteRows, inputValue, 0)
     const autoCompleteNoOptionsText = "No entities found"
 
     return (
@@ -152,25 +152,25 @@ export default function CheckDuplicates() {
                         </Typography>
                     </Box>
                     <IconButton sx={{ml: 'auto'}} onClick={() => handleClose()}>
-                        <CloseIcon />
+                        <CloseIcon/>
                     </IconButton>
                 </DialogTitle>
 
                 <DialogContent sx={{backgroundColor: "#F9FAFB", display: "flex", flexDirection: "column"}}>
-                    <Stack direction='row' 
-                        spacing={1}
-                        sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        p: 2,
-                        marginTop: "1em",
-                        marginBottom: "1em",
-                        borderRadius: "1em",
-                        backgroundColor: "white",
-                        boxShadow: "0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)",
-                        border: "1px solid #EAECF0"
-                    }}>
+                    <Stack direction='row'
+                           spacing={1}
+                           sx={{
+                               display: "flex",
+                               justifyContent: "space-between",
+                               alignItems: "center",
+                               p: 2,
+                               marginTop: "1em",
+                               marginBottom: "1em",
+                               borderRadius: "1em",
+                               backgroundColor: "white",
+                               boxShadow: "0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)",
+                               border: "1px solid #EAECF0"
+                           }}>
                         <AutoComplete placeholder="Select origin"
                                       setValue={(value: AnatomicalEntity) => setOrigin(value)}
                                       value={origin}

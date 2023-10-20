@@ -13,13 +13,15 @@
  */
 
 
-import { Configuration } from './configuration';
-import globalAxios, { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { Configuration } from './configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
  * Anatomical Entity
@@ -222,6 +224,12 @@ export interface ConnectivityStatement {
     'sex': Sex;
     /**
      * 
+     * @type {Array<number>}
+     * @memberof ConnectivityStatement
+     */
+    'forward_connection'?: Array<number>;
+    /**
+     * 
      * @type {string}
      * @memberof ConnectivityStatement
      */
@@ -244,7 +252,21 @@ export interface ConnectivityStatement {
      * @memberof ConnectivityStatement
      */
     'has_notes': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatement
+     */
+    'statement_preview': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatement
+     */
+    'errors': string;
 }
+
+
 /**
  * 
  * @export
@@ -820,6 +842,12 @@ export interface PatchedConnectivityStatement {
     'sex'?: Sex;
     /**
      * 
+     * @type {Array<number>}
+     * @memberof PatchedConnectivityStatement
+     */
+    'forward_connection'?: Array<number>;
+    /**
+     * 
      * @type {string}
      * @memberof PatchedConnectivityStatement
      */
@@ -842,7 +870,21 @@ export interface PatchedConnectivityStatement {
      * @memberof PatchedConnectivityStatement
      */
     'has_notes'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'statement_preview'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'errors'?: string;
 }
+
+
 /**
  * Note
  * @export
@@ -1044,6 +1086,8 @@ export interface PatchedVia {
      */
     'anatomical_entity'?: AnatomicalEntity;
 }
+
+
 /**
  * Phenotype
  * @export
@@ -1383,6 +1427,8 @@ export interface SentenceConnectivityStatement {
      */
     'owner': User;
 }
+
+
 /**
  * Sex
  * @export
@@ -1547,6 +1593,8 @@ export interface Via {
     'anatomical_entity': AnatomicalEntity;
 }
 
+
+
 /**
  * ComposerApi - axios parameter creator
  * @export
@@ -1578,10 +1626,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -1632,10 +1680,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1678,10 +1726,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1724,10 +1772,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1770,10 +1818,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1812,10 +1860,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1853,10 +1901,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1902,10 +1950,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1948,10 +1996,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -1994,10 +2042,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2036,10 +2084,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2085,10 +2133,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2107,19 +2155,20 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * ConnectivityStatement
          * @param {number} [destination] 
+         * @param {number} [excludeSentenceId] 
          * @param {string} [knowledgeStatement] 
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
-         * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
+         * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
          * @param {number} [origin] 
          * @param {number} [sentenceId] 
-         * @param {Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
+         * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList: async (destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementList: async (destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origin?: number, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/connectivity-statement/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2136,13 +2185,17 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
 
+            // authentication cookieAuth required
+
             if (destination !== undefined) {
                 localVarQueryParameter['destination'] = destination;
+            }
+
+            if (excludeSentenceId !== undefined) {
+                localVarQueryParameter['exclude_sentence_id'] = excludeSentenceId;
             }
 
             if (knowledgeStatement !== undefined) {
@@ -2219,10 +2272,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2264,10 +2317,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2309,10 +2362,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2350,10 +2403,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2391,10 +2444,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2436,10 +2489,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2454,14 +2507,14 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * Note
-         * @param {number} [connectivityStatementId] 
+         * @param {number | null} [connectivityStatementId] 
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
-         * @param {number} [sentenceId] 
+         * @param {number | null} [sentenceId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteList: async (connectivityStatementId?: number, limit?: number, offset?: number, sentenceId?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerNoteList: async (connectivityStatementId?: number | null, limit?: number, offset?: number, sentenceId?: number | null, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/note/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2478,10 +2531,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (connectivityStatementId !== undefined) {
                 localVarQueryParameter['connectivity_statement_id'] = connectivityStatementId;
@@ -2537,10 +2590,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2582,10 +2635,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2622,10 +2675,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -2672,10 +2725,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2717,10 +2770,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2760,10 +2813,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -2810,10 +2863,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2848,10 +2901,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2894,10 +2947,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2935,10 +2988,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -2984,10 +3037,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3033,10 +3086,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3054,17 +3107,18 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * Sentence
+         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
-         * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
-         * @param {Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>} [state] 
+         * @param {Array<ComposerSentenceListOrderingEnum>} [ordering] Ordering
+         * @param {Array<ComposerSentenceListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {string} [title] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceList: async (limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceList: async (exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/sentence/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3081,10 +3135,14 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (exclude) {
+                localVarQueryParameter['exclude'] = exclude.join(COLLECTION_FORMATS.csv);
+            }
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -3152,10 +3210,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3197,10 +3255,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3242,10 +3300,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3285,10 +3343,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -3335,10 +3393,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3376,10 +3434,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -3430,10 +3488,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3470,10 +3528,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -3520,10 +3578,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3561,10 +3619,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3606,10 +3664,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3647,10 +3705,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
             if (connectivityStatementId !== undefined) {
                 localVarQueryParameter['connectivity_statement_id'] = connectivityStatementId;
@@ -3702,10 +3760,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3747,10 +3805,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3792,10 +3850,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -3954,20 +4012,21 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         /**
          * ConnectivityStatement
          * @param {number} [destination] 
+         * @param {number} [excludeSentenceId] 
          * @param {string} [knowledgeStatement] 
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
-         * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
+         * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
          * @param {number} [origin] 
          * @param {number} [sentenceId] 
-         * @param {Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
+         * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destination, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options);
+        async composerConnectivityStatementList(destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origin?: number, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destination, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4033,14 +4092,14 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * Note
-         * @param {number} [connectivityStatementId] 
+         * @param {number | null} [connectivityStatementId] 
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
-         * @param {number} [sentenceId] 
+         * @param {number | null} [sentenceId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerNoteList(connectivityStatementId?: number, limit?: number, offset?: number, sentenceId?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedNoteList>> {
+        async composerNoteList(connectivityStatementId?: number | null, limit?: number, offset?: number, sentenceId?: number | null, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedNoteList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerNoteList(connectivityStatementId, limit, offset, sentenceId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -4173,18 +4232,19 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * Sentence
+         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
-         * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
-         * @param {Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>} [state] 
+         * @param {Array<ComposerSentenceListOrderingEnum>} [ordering] Ordering
+         * @param {Array<ComposerSentenceListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {string} [title] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceList(limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceList(limit, notes, offset, ordering, state, tags, title, options);
+        async composerSentenceList(exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceList(exclude, limit, notes, offset, ordering, state, tags, title, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4478,20 +4538,21 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         /**
          * ConnectivityStatement
          * @param {number} [destination] 
+         * @param {number} [excludeSentenceId] 
          * @param {string} [knowledgeStatement] 
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
-         * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
+         * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
          * @param {number} [origin] 
          * @param {number} [sentenceId] 
-         * @param {Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
+         * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementList> {
-            return localVarFp.composerConnectivityStatementList(destination, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options).then((request) => request(axios, basePath));
+        composerConnectivityStatementList(destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origin?: number, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementList> {
+            return localVarFp.composerConnectivityStatementList(destination, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -4550,14 +4611,14 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * Note
-         * @param {number} [connectivityStatementId] 
+         * @param {number | null} [connectivityStatementId] 
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
-         * @param {number} [sentenceId] 
+         * @param {number | null} [sentenceId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteList(connectivityStatementId?: number, limit?: number, offset?: number, sentenceId?: number, options?: any): AxiosPromise<PaginatedNoteList> {
+        composerNoteList(connectivityStatementId?: number | null, limit?: number, offset?: number, sentenceId?: number | null, options?: any): AxiosPromise<PaginatedNoteList> {
             return localVarFp.composerNoteList(connectivityStatementId, limit, offset, sentenceId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -4677,18 +4738,19 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * Sentence
+         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
-         * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
-         * @param {Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>} [state] 
+         * @param {Array<ComposerSentenceListOrderingEnum>} [ordering] Ordering
+         * @param {Array<ComposerSentenceListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {string} [title] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceList(limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: any): AxiosPromise<PaginatedSentenceList> {
-            return localVarFp.composerSentenceList(limit, notes, offset, ordering, state, tags, title, options).then((request) => request(axios, basePath));
+        composerSentenceList(exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: any): AxiosPromise<PaginatedSentenceList> {
+            return localVarFp.composerSentenceList(exclude, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(axios, basePath));
         },
         /**
          * Sentence
@@ -4990,21 +5052,22 @@ export class ComposerApi extends BaseAPI {
     /**
      * ConnectivityStatement
      * @param {number} [destination] 
+     * @param {number} [excludeSentenceId] 
      * @param {string} [knowledgeStatement] 
      * @param {number} [limit] Number of results to return per page.
      * @param {boolean} [notes] Checks if entity has notes
      * @param {number} [offset] The initial index from which to return the results.
-     * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
+     * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
      * @param {number} [origin] 
      * @param {number} [sentenceId] 
-     * @param {Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>} [state] 
+     * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
      * @param {Array<number>} [tags] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementList(destination?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, origin?: number, sentenceId?: number, state?: Array<'compose_now' | 'connection_missing' | 'curated' | 'draft' | 'excluded' | 'exported' | 'npo_approved' | 'rejected' | 'to_be_reviewed'>, tags?: Array<number>, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementList(destination, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
+    public composerConnectivityStatementList(destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origin?: number, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementList(destination, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -5076,15 +5139,15 @@ export class ComposerApi extends BaseAPI {
 
     /**
      * Note
-     * @param {number} [connectivityStatementId] 
+     * @param {number | null} [connectivityStatementId] 
      * @param {number} [limit] Number of results to return per page.
      * @param {number} [offset] The initial index from which to return the results.
-     * @param {number} [sentenceId] 
+     * @param {number | null} [sentenceId] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerNoteList(connectivityStatementId?: number, limit?: number, offset?: number, sentenceId?: number, options?: AxiosRequestConfig) {
+    public composerNoteList(connectivityStatementId?: number | null, limit?: number, offset?: number, sentenceId?: number | null, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerNoteList(connectivityStatementId, limit, offset, sentenceId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -5229,19 +5292,20 @@ export class ComposerApi extends BaseAPI {
 
     /**
      * Sentence
+     * @param {Array<string>} [exclude] Multiple values may be separated by commas.
      * @param {number} [limit] Number of results to return per page.
      * @param {boolean} [notes] Checks if entity has notes
      * @param {number} [offset] The initial index from which to return the results.
-     * @param {Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>} [ordering] Ordering
-     * @param {Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>} [state] 
+     * @param {Array<ComposerSentenceListOrderingEnum>} [ordering] Ordering
+     * @param {Array<ComposerSentenceListStateEnum>} [state] 
      * @param {Array<number>} [tags] 
      * @param {string} [title] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceList(limit?: number, notes?: boolean, offset?: number, ordering?: Array<'-last_edited' | '-pmid' | 'last_edited' | 'pmid'>, state?: Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>, tags?: Array<number>, title?: string, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerSentenceList(limit, notes, offset, ordering, state, tags, title, options).then((request) => request(this.axios, this.basePath));
+    public composerSentenceList(exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSentenceList(exclude, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -5420,6 +5484,54 @@ export class ComposerApi extends BaseAPI {
     }
 }
 
+/**
+ * @export
+ */
+export const ComposerConnectivityStatementListOrderingEnum = {
+    '-id': '-id',
+    '-last_edited': '-last_edited',
+    'id': 'id',
+    'last_edited': 'last_edited'
+} as const;
+export type ComposerConnectivityStatementListOrderingEnum = typeof ComposerConnectivityStatementListOrderingEnum[keyof typeof ComposerConnectivityStatementListOrderingEnum];
+/**
+ * @export
+ */
+export const ComposerConnectivityStatementListStateEnum = {
+    ComposeNow: 'compose_now',
+    ConnectionMissing: 'connection_missing',
+    Curated: 'curated',
+    Draft: 'draft',
+    Excluded: 'excluded',
+    Exported: 'exported',
+    NpoApproved: 'npo_approved',
+    Rejected: 'rejected',
+    ToBeReviewed: 'to_be_reviewed'
+} as const;
+export type ComposerConnectivityStatementListStateEnum = typeof ComposerConnectivityStatementListStateEnum[keyof typeof ComposerConnectivityStatementListStateEnum];
+/**
+ * @export
+ */
+export const ComposerSentenceListOrderingEnum = {
+    '-id': '-id',
+    '-last_edited': '-last_edited',
+    'id': 'id',
+    'last_edited': 'last_edited'
+} as const;
+export type ComposerSentenceListOrderingEnum = typeof ComposerSentenceListOrderingEnum[keyof typeof ComposerSentenceListOrderingEnum];
+/**
+ * @export
+ */
+export const ComposerSentenceListStateEnum = {
+    ComposeLater: 'compose_later',
+    ComposeNow: 'compose_now',
+    Duplicate: 'duplicate',
+    Excluded: 'excluded',
+    Open: 'open',
+    ToBeReviewed: 'to_be_reviewed'
+} as const;
+export type ComposerSentenceListStateEnum = typeof ComposerSentenceListStateEnum[keyof typeof ComposerSentenceListStateEnum];
+
 
 /**
  * MetacellAuthApi - axios parameter creator
@@ -5449,10 +5561,10 @@ export const MetacellAuthApiAxiosParamCreator = function (configuration?: Config
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -5487,10 +5599,10 @@ export const MetacellAuthApiAxiosParamCreator = function (configuration?: Config
             // http basic authentication required
             setBasicAuthToObject(localVarRequestOptions, configuration)
 
-            // authentication cookieAuth required
-
             // authentication tokenAuth required
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
 
 
     
@@ -5587,5 +5699,6 @@ export class MetacellAuthApi extends BaseAPI {
         return MetacellAuthApiFp(this.configuration).metacellAuthLogoutRetrieve(options).then((request) => request(this.axios, this.basePath));
     }
 }
+
 
 

@@ -182,7 +182,6 @@ const theme = createTheme({
       .MuiFormLabel-root{
         margin-bottom: 16px;
       }`,
-      
     },
     MuiButton: {
       styleOverrides: {
@@ -206,9 +205,14 @@ const theme = createTheme({
             borderColor: buttonOutlinedBorderColor,
           },
         },
-        textInfo:{
-          color:'#475467'
-        }
+        textInfo: {
+          color: "#475467",
+        },
+
+        outlined: {
+          color: buttonOutlinedColor,
+          borderColor: buttonOutlinedBorderColor,
+        },
       },
     },
     MuiButtonGroup: {

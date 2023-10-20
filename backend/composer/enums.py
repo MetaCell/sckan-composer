@@ -85,8 +85,13 @@ class ExportRelationships(models.TextChoices):
     hasAxonSensorySubcellularElementIn = "hasAxonSensorySubcellularElementIn", "Afferent terminal",
     hasAxonLocatedIn = "hasAxonLocatedIn", "Axon"
     hasDendriteLocatedIn = "hasDendriteLocatedIn", "Dendrite"
+    hasForwardConnection = "hasForwardConnectionPhenotype", "Forward Connection"
 
 
 class MetricEntity(models.TextChoices):
     SENTENCE = "sentence"
     CONNECTIVITY_STATEMENT = "connectivity statement"
+
+
+class ConnectivityErrors(Enum):
+    INVALID_FORWARD_CONNECTION = "Invalid forward connection"

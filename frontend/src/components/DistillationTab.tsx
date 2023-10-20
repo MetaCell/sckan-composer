@@ -10,6 +10,7 @@ import { useSectionStyle, useGreyBgContainer} from "../styles/styles";
 import { useTheme } from "@mui/system";
 import StatementDetailsAccordion from "./TriageStatementSection/StatementDetailsAccordion";
 import ProvenancesForm from "./Forms/ProvenanceForm";
+import StatementPreviewForm from "./Forms/StatementPreviewForm";
 
 const DistillationTab = ({ statement, setStatement, refreshStatement, disabled } : any) => {
   const theme = useTheme()
@@ -23,6 +24,16 @@ const DistillationTab = ({ statement, setStatement, refreshStatement, disabled }
           <Typography variant="h5" mb={3}>
           Knowledge Statement
           </Typography>
+          <Box sx={{
+              paddingLeft: "8px",
+              "& .MuiGrid-container": {mt: "0 !important"},
+              "& .MuiGrid-item": { pt: 0}}
+          }>
+              <Typography variant="h6" mb={0}>
+                  Statement Preview
+              </Typography>
+              <StatementPreviewForm statement={statement} />
+          </Box>
           <Box
            sx={greyBgContainer}
            >

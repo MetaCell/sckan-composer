@@ -11,7 +11,7 @@ import { ConnectivityStatement, Sentence, Tag } from "../apiclient/backend";
 import {
   renderDate,
   renderNote,
-  renderPMID,
+  renderID,
   renderSentenceState,
   renderStatementState,
   renderTag,
@@ -31,6 +31,7 @@ import {
 } from "../redux/statementSlice";
 import { useAppDispatch } from "../redux/hooks";
 import { useNavigate } from "react-router";
+import Stack from "@mui/material/Stack";
 
 interface DataGridProps {
   entityType: "sentence" | "statement";
@@ -41,7 +42,7 @@ interface DataGridProps {
 }
 
 type criteria =
-  | ("pmid" | "-pmid" | "last_edited" | "-last_edited")[]
+  | ("id" | "-id" | "last_edited" | "-last_edited")[]
   | undefined;
 
 const EntityDataGrid = (props: DataGridProps) => {
@@ -64,12 +65,12 @@ const EntityDataGrid = (props: DataGridProps) => {
       notes: has_notes,
     };
     if (entityType === "sentence") {
-      const { pmid, text } = item;
-      return { ...commonRowProps, pmid, text };
+      const { id, text } = item;
+      return { ...commonRowProps, id, text };
     }
     if (entityType === "statement") {
-      const { sentence, knowledge_statement } = item;
-      return { ...commonRowProps, pmid: sentence.pmid, knowledge_statement };
+      const {  id, knowledge_statement } = item;
+      return { ...commonRowProps, id: id, knowledge_statement };
     }
     return {};
   };
@@ -78,7 +79,7 @@ const EntityDataGrid = (props: DataGridProps) => {
     entityList?.map((item) => generateRowProps(item)) || [];
 
   const columns: GridColDef[] = [
-    { field: "pmid", headerName: "PMID", renderCell: renderPMID },
+    { field: "id", headerName: "ID", renderCell: renderID },
     {
       field: entityType === "sentence" ? "text" : "knowledge_statement",
       headerName:
@@ -145,10 +146,10 @@ const EntityDataGrid = (props: DataGridProps) => {
     } else {
       const { field, sort } = model[0];
       const sortingCriteria = `${field} ${sort}`;
-      if (sortingCriteria === "pmid asc") {
-        ordering = ["pmid"];
-      } else if (sortingCriteria === "pmid desc") {
-        ordering = ["-pmid"];
+      if (sortingCriteria === "id asc") {
+        ordering = ["id"];
+      } else if (sortingCriteria === "id desc") {
+        ordering = ["-id"];
       } else if (sortingCriteria === "last_edited asc") {
         ordering = ["last_edited"];
       } else if (sortingCriteria === "last_edited desc") {
@@ -189,6 +190,11 @@ const EntityDataGrid = (props: DataGridProps) => {
         }
         components={{
           Pagination: CustomPagination,
+          NoRowsOverlay: () => (
+              <Stack height="100%" alignItems="center" justifyContent="center">
+                {`No ${entityType}s to display, clear your filter or modify your search criteria`}
+              </Stack>
+          )
         }}
       />
     </Box>

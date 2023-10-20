@@ -8,7 +8,7 @@ import Tag from "../Widgets/Tag"
 import {SentenceStateChip, StatementStateChip} from "../Widgets/StateChip"
 import { Tooltip } from "@mui/material"
 
-export const renderPMID = (params: GridRenderCellParams) => (
+export const renderID = (params: GridRenderCellParams) => (
   <Typography variant="subtitle1" color={vars.darkTextColor}>
     {params.value}
   </Typography>

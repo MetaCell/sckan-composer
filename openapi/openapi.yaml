@@ -74,6 +74,10 @@ paths:
         schema:
           type: integer
       - in: query
+        name: exclude_sentence_id
+        schema:
+          type: integer
+      - in: query
         name: knowledge_statement
         schema:
           type: string
@@ -101,10 +105,10 @@ paths:
           items:
             type: string
             enum:
+            - -id
             - -last_edited
-            - -pmid
+            - id
             - last_edited
-            - pmid
         description: Ordering
         explode: false
         style: form
@@ -869,6 +873,15 @@ paths:
       operationId: composer_sentence_list
       description: Sentence
       parameters:
+      - in: query
+        name: exclude
+        schema:
+          type: array
+          items:
+            type: string
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
       - name: limit
         required: false
         in: query
@@ -893,10 +906,10 @@ paths:
           items:
             type: string
             enum:
+            - -id
             - -last_edited
-            - -pmid
+            - id
             - last_edited
-            - pmid
         description: Ordering
         explode: false
         style: form
@@ -1661,6 +1674,10 @@ components:
           allOf:
           - $ref: '#/components/schemas/Sex'
           readOnly: true
+        forward_connection:
+          type: array
+          items:
+            type: integer
         apinatomy_model:
           type: string
           nullable: true
@@ -1675,9 +1692,16 @@ components:
         has_notes:
           type: boolean
           readOnly: true
+        statement_preview:
+          type: string
+          readOnly: true
+        errors:
+          type: string
+          readOnly: true
       required:
       - available_transitions
       - destination
+      - errors
       - has_notes
       - id
       - journey
@@ -1689,6 +1713,7 @@ components:
       - sentence_id
       - sex
       - state
+      - statement_preview
       - tags
     ConnectivityStatementAvailableTransitionsEnum:
       enum:
@@ -2025,6 +2050,10 @@ components:
           allOf:
           - $ref: '#/components/schemas/Sex'
           readOnly: true
+        forward_connection:
+          type: array
+          items:
+            type: integer
         apinatomy_model:
           type: string
           nullable: true
@@ -2038,6 +2067,12 @@ components:
           readOnly: true
         has_notes:
           type: boolean
+          readOnly: true
+        statement_preview:
+          type: string
+          readOnly: true
+        errors:
+          type: string
           readOnly: true
     PatchedNote:
       type: object

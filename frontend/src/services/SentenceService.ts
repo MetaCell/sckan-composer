@@ -16,7 +16,7 @@ class SentenceService extends AbstractService {
   async getObject(id: string): Promise<Sentence> {
     return composerApi.composerSentenceRetrieve(Number(id)).then((response: any) => response.data)
   }
-  async doTransition(sentence: Sentence, transition: string) {
+  async doTransition(sentence: Sentence, transition: string): Promise<Sentence> {
     return composerApi.composerSentenceDoTransitionCreate(sentence.id, transition, sentence).then((response: any) => response.data)
   }
   async addTag(id: number, tagId: number): Promise<Sentence> {
@@ -26,8 +26,8 @@ class SentenceService extends AbstractService {
     return composerApi.composerSentenceDelTagCreate(id, tagId).then((response: any) => response.data)
   }
   async getList(queryOptions: QueryParams): Promise<PaginatedSentenceList> {
-    const { limit, ordering, index, title, stateFilter, tagFilter } = queryOptions
-    return composerApi.composerSentenceList(limit, undefined, index, ordering, stateFilter, tagFilter, title).then((res: any) => res.data)
+    const { exclude, limit, ordering, index, title, stateFilter, tagFilter } = queryOptions
+    return composerApi.composerSentenceList(exclude, limit, undefined, index, ordering, stateFilter, tagFilter, title).then((res: any) => res.data)
   }
 }
 

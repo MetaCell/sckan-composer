@@ -16,13 +16,16 @@ import Stack from "@mui/material/Stack";
 import GroupedButtons from "../components/Widgets/CustomGroupedButtons";
 import SentenceForm from "../components/Forms/SentenceForm";
 import Divider from "@mui/material/Divider";
-import { styled } from "@mui/material";
+import {Backdrop, CircularProgress, styled} from "@mui/material";
 import { vars } from "../theme/variables";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import NoteDetails from "../components/Widgets/NotesFomList";
 import TriageStatementSection from "../components/TriageStatementSection/TriageStatementSection";
 import { useSectionStyle } from "../styles/styles";
 import { useTheme } from "@mui/system";
+import {useAppSelector} from "../redux/hooks";
+import {useNavigate} from "react-router";
+import {QueryParams} from "../redux/sentenceSlice";
 
 const { bodyBgColor, darkBlue } = vars;
 
@@ -37,10 +40,17 @@ const StyledAddStatementBtn = styled(Button)(({ theme }) => ({
   },
 }));
 
+const shouldResearchWithoutFilters = (res: any, queryOptions: QueryParams) => {
+  return !(res && res.results && res.results.length) && wasSearchFiltered(queryOptions)
+}
+const wasSearchFiltered = (queryOptions: QueryParams) => {
+  return queryOptions.title || queryOptions.tagFilter || queryOptions.notes
+};
+
 const SentencesDetails = () => {
   const { sentenceId } = useParams();
   const [sentence, setSentence] = useState({} as Sentence);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [connectivityStatements, setConnectivityStatements] =
     useState<SentenceConnectivityStatement[]>();
 
@@ -48,17 +58,55 @@ const SentencesDetails = () => {
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [refetch, setRefetch] = useState(false);
 
+
   const theme = useTheme()
   const sectionStyle = useSectionStyle(theme)
 
+  const queryOptions = useAppSelector((state) => state.sentence.queryOptions);
+  const navigate = useNavigate();
+
   const handleClick = () => {
+    const fetchNextSentence = async (sentence: Sentence) => {
+      try {
+        const nextSentenceOptions = {
+          ...queryOptions,
+          stateFilter: ['open'] as ("open" | "to_be_reviewed" | "compose_later" | "compose_now" | "excluded" | "duplicate")[],
+          exclude: [`${sentence.id}`],
+          limit: 1,
+          index: 0,
+        };
+
+        let res = await sentenceService.getList(nextSentenceOptions);
+        if (shouldResearchWithoutFilters(res, queryOptions)) {
+          res = await sentenceService.getList({
+            notes: undefined,
+            tagFilter: undefined,
+            title: undefined,
+            ordering: queryOptions.ordering,
+            stateFilter: ['open'] as ("open" | "to_be_reviewed" | "compose_later" | "compose_now" | "excluded" | "duplicate")[],
+            exclude: [`${sentence.id}`],
+            limit: 1,
+            index: 0,
+          });
+        }
+
+        if (res && res.results && res.results.length) {
+          const nextSentenceId = res.results[0].id;
+          navigate(`/sentence/${nextSentenceId}`);
+        } else {
+          navigate('/');
+        }
+
+      } catch (error) {
+        console.error("Error fetching the next sentence:", error);
+        setIsLoading(false)
+      }
+    };
+
+    setIsLoading(true);
     const transition = sentence?.available_transitions[selectedIndex];
-    sentenceService
-      .doTransition(sentence, transition)
-      .then((sentence: Sentence) => {
-        setSentence(sentence);
-        setSelectedIndex(0);
-      });
+    sentenceService.doTransition(sentence, transition).then((sentence: Sentence) => fetchNextSentence(sentence))
+
   };
 
   const onAddNewStatement = () => {
@@ -116,13 +164,17 @@ const SentencesDetails = () => {
         })
         .finally(() => {
           setRefetch(false);
-          setLoading(false);
+          setIsLoading(false);
         });
     }
   }, [sentenceId, refetch]);
-
-  if (loading) {
-    return <div>Loading...</div>;
+  
+  if (isLoading) {
+    return (
+        <Backdrop open={isLoading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+    )
   }
 
   const disabled = sentence.owner?.id !== userProfile.getUser().id;

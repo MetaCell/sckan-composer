@@ -1,3 +1,4 @@
+from typing import List
 from django.db.models import Q
 import django_filters
 
@@ -17,12 +18,17 @@ def field_has_content(queryset, name, value):
     lookup = "__".join([name, "isnull"])
     return queryset.filter(**{lookup: not value})
 
+
 def filter_by_title_or_text(queryset, name, value):
     return queryset.filter(Q(title__icontains=value) | Q(text__icontains=value))
 
 
+def exclude_ids(queryset, name, value: List[int]):
+    return queryset.exclude(id__in=value)
+
+
 class SentenceFilter(django_filters.FilterSet):
-    title = django_filters.CharFilter( method=filter_by_title_or_text)
+    title = django_filters.CharFilter(method=filter_by_title_or_text)
 
     state = django_filters.MultipleChoiceFilter(
         field_name="state", choices=SentenceState.choices
@@ -35,10 +41,11 @@ class SentenceFilter(django_filters.FilterSet):
     )
     ordering = django_filters.OrderingFilter(
         fields=(
-            ("pmid", "pmid"),
+            ("id", "id"),
             ("modified_date", "last_edited"),
         ),
     )
+    exclude = django_filters.BaseInFilter(method=exclude_ids)
 
     class Meta:
         model = Sentence
@@ -50,9 +57,9 @@ def filter_by_ontology_uri(qs, field, anatomical_entity):
 
 
 class ConnectivityStatementFilter(django_filters.FilterSet):
-    sentence_id = django_filters.ModelChoiceFilter(
-        field_name="sentence_id", queryset=Sentence.objects.all()
-    )
+    sentence_id = django_filters.NumberFilter(field_name="sentence__id")
+    exclude_sentence_id = django_filters.NumberFilter(field_name="sentence__id", exclude=True)
+
     knowledge_statement = django_filters.CharFilter(
         field_name="knowledge_statement", lookup_expr="icontains"
     )
@@ -77,7 +84,7 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
     )
     ordering = django_filters.OrderingFilter(
         fields=(
-            ("sentence__pmid", "pmid"),
+            ("id", "id"),
             ("modified_date", "last_edited"),
         ),
     )
@@ -88,11 +95,26 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
 
 
 class AnatomicalEntityFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(field_name="name", lookup_expr="icontains")
+    name = django_filters.CharFilter(method="filter_name")
 
     class Meta:
         model = AnatomicalEntity
         fields = []
+
+    @staticmethod
+    def filter_name(queryset, name, value):
+        words = value.split()
+
+        if not words:
+            return queryset
+
+        queries = [Q(name__icontains=word) for word in words]
+
+        query = queries.pop()
+        for item in queries:
+            query &= item
+
+        return queryset.filter(query)
 
 
 class SpecieFilter(django_filters.FilterSet):
