@@ -520,7 +520,7 @@ export const CustomAutocompleteForwardConnection = ({
                 </Typography>
 
                 <Typography variant="body1" marginBottom={2}>
-                  We couldn’t find any record with these origin in the database.
+			We couldn't find any records with this origin in the database.                  
                 </Typography>
                 <Button variant="outlined">Clear search</Button>
               </Box>

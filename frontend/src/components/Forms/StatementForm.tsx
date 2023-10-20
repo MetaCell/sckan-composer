@@ -45,7 +45,7 @@ const StatementForm = (props: any) => {
   copiedUISchema.apinatomy_model = {
     "ui:widget": "CustomTextField",
     "ui:options": {
-      label: "Apinatomy Model Name",
+      label: "ApiNATOMY Model Name",
       placeholder: "Enter Apinatomay Model Name",
     },
     value: statement?.apinatomy_model ?? "",
