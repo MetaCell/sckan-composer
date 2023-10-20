@@ -27,21 +27,18 @@ import { composerApi as api } from "../../services/apis";
 import { SEARCH_DEBOUNCE } from "../../settings";
 const { titleFontColor } = vars;
 
-type BaseOption = {
-  id: string;
-  relation: string;
-}
-
 type OptionDetail = {
   title: string; // What to display as the title/label for the property.
   value: string; // The actual value/content for the property.
 };
 
-type DetailedOption = {
-  [name: string]: OptionDetail[];
-}
 
-type Option = BaseOption & DetailedOption;
+type Option = {
+  id: string;
+  label: string;
+  group: string;
+  content: OptionDetail[];
+}
 // type StyleDetails = {
 
 // };
@@ -51,7 +48,7 @@ export const CustomAnatomicalField = ({
   placeholder,
   options: { removeChip, label, statement, service, setter, errors, searchPlaceholder, noResultReason, disabledReason, onSearch, value },
 }: any) => {
-  const [optionsNew, setOptionsNew] = useState<Option[]>([]);
+  const [autocompleteOptions, setAutocompleteOptions] = useState<Option[]>([]);
 
   const [isInputFocused, setInputFocus] = useState(false);
 
@@ -64,25 +61,13 @@ export const CustomAnatomicalField = ({
 
   const formIsDisabled = !statement.destination;
 
-  const getTheName = (option: any) => {
-    for (const key in option) {
-      if (Array.isArray(option[key])) {
-        const nameObject = option[key].find((item: any) => item.title === "Name" || item.title === "Title");
-        if (nameObject) {
-          return  nameObject.value;
-        }
-      }
-    }
-  }
-
   const onChange = (e: any, value: any) => {
-    // setOptionsGroup(Object.keys(optionsNew))
     setSelectedOptions(value);
   };
 
   const handleSelectAll = (group: string) => {
     const newSelectedOptions = [...selectedOptions];
-      optionsNew.filter((option: Option) => option.relation === group).forEach((item) => {
+      autocompleteOptions.filter((option: Option) => option.group === group).forEach((item) => {
         if (
           !newSelectedOptions.some(
             (selectedItem) => selectedItem.id === item.id,
@@ -97,13 +82,13 @@ export const CustomAnatomicalField = ({
   const handleDeselectAll = (group: string) => {
     const newSelectedOptions = selectedOptions.filter(
       (item) =>
-        !optionsNew.filter((option: Option) => option.relation === group).some((selectedItem) => selectedItem.id === item.id),
+        !autocompleteOptions.filter((option: Option) => option.group === group).some((selectedItem) => selectedItem.id === item.id),
     );
     setSelectedOptions(newSelectedOptions);
   };
 
   const getGroupButton = (group: string) => {
-    const allObjectsExist = optionsNew.filter((option: Option) => option.relation === group).every((obj1) =>
+    const allObjectsExist = autocompleteOptions.filter((option: Option) => option.group === group).every((obj1) =>
         selectedOptions.some(
           (obj2) => JSON.stringify(obj1) === JSON.stringify(obj2),
         ),
@@ -140,14 +125,20 @@ export const CustomAnatomicalField = ({
   const handleInputChange = (value: string) => {
     if (value !== "" && value !== undefined) {
       setSearchValue(value);
-      setOptionsNew(onSearch(value))
+      setAutocompleteOptions(onSearch(value))
     }
   };
 
   useEffect(() => {
     searchValue !== undefined &&
-    setOptionsNew(onSearch(searchValue));
-  }, [searchValue, onSearch, optionsNew]);
+    setAutocompleteOptions(onSearch(searchValue));
+  }, [searchValue, onSearch, autocompleteOptions]);
+
+  const filterOptions = (options: Option[], { inputValue }: any) => {
+    return options.filter((option: Option) =>
+      option.label.toLowerCase().includes(inputValue.toLowerCase())
+    );
+  };
 
 
   return formIsDisabled ? (
@@ -186,18 +177,18 @@ export const CustomAnatomicalField = ({
         disableCloseOnSelect
         multiple
         disableClearable
-        options={optionsNew}
-        filterOptions={(options) => options}
+        options={autocompleteOptions}
+        filterOptions={filterOptions}
         onChange={(e, value) => onChange(e, value)}
-        groupBy={(option) => option.relation}
+        groupBy={(option) => option.group}
         value={selectedOptions}
-        getOptionLabel={(option: any) => getTheName(option) }
+        getOptionLabel={(option: any) => option?.label }
         isOptionEqualToValue={(option: any, value: any) =>
           option.id === value.id
         }
         renderTags={(value, getTagProps) =>
           value.map((option, index) => {
-            const name = getTheName(option)
+            const name = option?.label
             return (<Chip
               {...getTagProps({ index })}
               deleteIcon={<ClearOutlinedIcon />}
@@ -256,7 +247,7 @@ export const CustomAnatomicalField = ({
               onMouseEnter={() => setHoveredOption(option)}
               sx={{ width: 1, height: 1, padding: "0.625rem" }}
             >
-              {getTheName(option)}
+              {option?.label}
             </Typography>
             <Typography variant="body2">{option?.id}</Typography>
           </li>
@@ -268,10 +259,10 @@ export const CustomAnatomicalField = ({
             sx={{
               display: "flex",
               height: "19.5rem",
-              minWidth: optionsNew.length > 0 ? '55.5rem' : '100%'
+              minWidth: autocompleteOptions.length > 0 ? '55.5rem' : '100%'
             }}
           >
-            {optionsNew.length > 0 ? (
+            {autocompleteOptions.length > 0 ? (
               <>
                 <Box
                   display="flex"
@@ -388,7 +379,7 @@ export const CustomAnatomicalField = ({
                         }
                       }}
                     >
-                      {selectedOptions.length === optionsNew.length ? (
+                      {selectedOptions.length === autocompleteOptions.length ? (
                         <Button
                           startIcon={<PlaylistRemoveOutlinedIcon />}
                           variant="text"
@@ -405,7 +396,7 @@ export const CustomAnatomicalField = ({
                           variant="text"
                           onClick={(e) => {
                             e.preventDefault();
-                            setSelectedOptions(optionsNew);
+                            setSelectedOptions(autocompleteOptions);
                           }}
                         >
                           Select all
@@ -419,6 +410,8 @@ export const CustomAnatomicalField = ({
                     <Box
                       width={1}
                       p={3}
+                      display='flex'
+                      flexDirection='column'
                       minHeight={1}
                       sx={{
                         '& .MuiTypography-body1': {
@@ -444,14 +437,27 @@ export const CustomAnatomicalField = ({
                           borderRadius: '0.375rem',
                           borderColor: '#D0D5DD',
                           padding: '0.125rem 0',
+                          '&.MuiChip-filledSuccess': {
+                            background: '#ECFDF3',
+                            borderRadius: '1rem',
+                            color: '#027A48'
+                          },
+                          '&.MuiChip-filledError': {
+                            background: '#FEF3F2',
+                            borderRadius: '1rem',
+                            color: '#B42318',
+                          },
                           '& .MuiChip-label': {
                             p: '0 0.5625rem',
                           }
                         }
                       }}
                     >
-                      <Stack spacing={2}>
-                        {hoveredOption[getTheName(hoveredOption)].map((detail, i) => <Stack spacing={1} sx={{ mt: i !== 0 ? 3 : 0 }}>
+                      <Box sx={{mb: '1.5rem', pb: '1.5rem', borderBottom: '0.0625rem solid #F2F4F7'}}>
+                        <Chip variant="outlined" label={"https://google.com"} />
+                      </Box>
+                      <Stack spacing={2} flexGrow={1}>
+                        {hoveredOption?.content?.map((detail, i) => <Stack spacing={1} sx={{ mt: i !== 0 ? 3 : 0 }}>
                           <Typography variant="body1">
                             {detail?.title}
                           </Typography>
@@ -459,6 +465,8 @@ export const CustomAnatomicalField = ({
                         </Stack>)}
                       </Stack>
                       <Box sx={{mt: '1.5rem', pt: '1.5rem', borderTop: '0.0625rem solid #F2F4F7'}}>
+                        {/* <Chip variant="filled" color="error" label={"https://google.com"} /> */}
+                        <Chip variant="filled" color="success" label={"https://google.com"} />
                         <Chip variant="outlined" label={"https://google.com"} />
                       </Box>
                     </Box>

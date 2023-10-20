@@ -99,8 +99,9 @@ const StatementForm = (props: any) => {
   const mockEntities = [
         {
           "id": "5304",
-          "relation": 'Origins',
-          "('Aortic arch', 'arch of aorta')": [
+          "group": 'Origins',
+          "label": "('Aortic arch', 'arch of aorta')",
+          "content": [
             {
               "title": "Name",
               "value": "('Aortic arch', 'arch of aorta')"
@@ -113,8 +114,9 @@ const StatementForm = (props: any) => {
         },
         {
           "id": "32845",
-          "relation": 'Origins',
-          "(embryonic) hindbrain flexure": [
+          "group": 'Origins',
+          "label": "(embryonic) hindbrain flexure",
+          "content": [
             {
               "title": "Name",
               "value": "(embryonic) hindbrain flexure"
@@ -127,8 +129,9 @@ const StatementForm = (props: any) => {
         },
         {
           "id": "47428",
-          "relation": 'Origins',
-          "(mid-third) lateral capsular ligament": [
+          "group": 'Origins',
+          "label": "(mid-third) lateral capsular ligament",
+          "content": [
             {
               "title": "Name",
               "value": "(mid-third) lateral capsular ligament"
@@ -141,8 +144,9 @@ const StatementForm = (props: any) => {
         },
         {
           "id": "12822",
-          "relation": 'Origins',
-          "(pre-)piriform cortex": [
+          "group": 'Origins',
+          "label": "(pre-)piriform cortex",
+          "content": [
             {
               "title": "Name",
               "value": "(pre-)piriform cortex"
@@ -155,8 +159,9 @@ const StatementForm = (props: any) => {
         },
         {
           "id": "1798",
-          "relation": 'Origins',
-          "02 optic nerve": [
+          "group": 'Origins',
+          "label": "02 optic nerve",
+          "content": [
             {
               "title": "Name",
               "value": "02 optic nerve"
@@ -169,8 +174,9 @@ const StatementForm = (props: any) => {
         },
         {
           "id": "53259",
-          "relation": 'Origins',
-          "10 R+L thoracic": [
+          "group": 'Origins',
+          "label": "10 R+L thoracic",
+          "content": [
             {
               "title": "Name",
               "value": "10 R+L thoracic"
@@ -183,8 +189,9 @@ const StatementForm = (props: any) => {
         },
         {
           "id": "6604",
-          "relation": 'Origins',
-          "10n": [
+          "group": 'Origins',
+          "label": "10n",
+          "content": [
             {
               "title": "Name",
               "value": "10n"
@@ -197,8 +204,9 @@ const StatementForm = (props: any) => {
         },
         {
           "id": "52948",
-          "relation": 'Origins',
-          "11 R+L thoracic": [
+          "group": 'Origins',
+          "label":"11 R+L thoracic",
+          "content": [
             {
               "title": "Name",
               "value": "11 R+L thoracic"
@@ -211,8 +219,9 @@ const StatementForm = (props: any) => {
         },
         {
           "id": "52950",
-          "relation": 'Origins',
-          "11 thoracic lymph node": [
+          "group": 'Origins',
+          "label": "11 thoracic lymph node",
+          "content": [
             {
               "title": "Name",
               "value": "11 thoracic lymph node"
@@ -225,8 +234,9 @@ const StatementForm = (props: any) => {
         },
         {
           "id": "52956",
-          "relation": 'Origins',
-          "12R+L thoracic lymph node": [
+          "group": 'Origins',
+          "label": "12R+L thoracic lymph node",
+          "content": [
             {
               "title": "Name",
               "value": "12R+L thoracic lymph node"
@@ -239,8 +249,9 @@ const StatementForm = (props: any) => {
         },
         {
           "id": "6050",
-          "relation": 'Origins',
-          "12n": [
+          "group": 'Origins',
+          "label": "12n",
+          "content": [
             {
               "title": "Name",
               "value": "12n"
@@ -256,8 +267,9 @@ const StatementForm = (props: any) => {
   const mockConnections = [
         {
           "id": "5304",
-          'relation': 'Derived from Same Sentence',
-          "chorda tympani to lingual to geniculate ganglion to nts S2-S4 via pelvic splanchnic nerves via pelvic ganglion to uterovaginal ganglion": [
+          'group': 'Derived from Same Sentence',
+          "label": "chorda tympani to lingual to geniculate ganglion to nts S2-S4 via pelvic splanchnic nerves via pelvic ganglion to uterovaginal ganglion",
+          "content": [
             {
               "title": "Knowledge Statement ID",
               "value": "73"
@@ -274,8 +286,9 @@ const StatementForm = (props: any) => {
         },
         {
           "id": "32845",
-          'relation': 'Others',
-          "neuron type sstom 10": [
+          'group': 'Others',
+          "label": "neuron type sstom 10",
+          "content": [
             {
               "title": "Knowledge Statement ID",
               "value": "71"
@@ -292,8 +305,9 @@ const StatementForm = (props: any) => {
         },
         {
           "id": "47428",
-          "relation": 'Others',
-          "(mid-third) lateral capsular ligament": [
+          "group": 'Others',
+          "label": "(mid-third) lateral capsular ligament",
+          "content": [
             {
               "title": "Knowledge Statement ID",
               "value": "70"
@@ -310,8 +324,9 @@ const StatementForm = (props: any) => {
         },
         {
           "id": "12822",
-          "relation": 'Others',
-          "(pre-)piriform cortex": [
+          "group": 'Others',
+          "label": "(pre-)piriform cortex",
+          "content": [
             {
               "title": "Knowledge Statement ID",
               "value": "69"
