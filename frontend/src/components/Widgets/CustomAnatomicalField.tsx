@@ -1,30 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { TextField } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
-import { Autocomplete, Box, InputAdornment, styled, debounce } from "@mui/material";
+import { Autocomplete, Box, InputAdornment } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import { vars } from "../../theme/variables";
 import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
-import connectivityStatementService from "../../services/StatementService";
 import Checkbox from "@mui/material/Checkbox";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
-import Stack from "@mui/material/Stack";
 import ListSubheader from "@mui/material/ListSubheader";
 import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
 import PlaylistRemoveOutlinedIcon from "@mui/icons-material/PlaylistRemoveOutlined";
 import PlaylistAddCheckOutlinedIcon from "@mui/icons-material/PlaylistAddCheckOutlined";
-import { ConnectivityStatement } from "../../apiclient/backend";
 import Chip from "@mui/material/Chip";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import theme from "../../theme/Theme";
-import { autocompleteRows } from "../../helpers/settings";
 import SearchIcon from '@mui/icons-material/Search';
 import { CheckedItemIcon, UncheckedItemIcon } from "../icons";
-import { composerApi as api } from "../../services/apis";
-import { SEARCH_DEBOUNCE } from "../../settings";
 import HoveredOptionContent from "./HoveredOptionContent";
 const { titleFontColor } = vars;
 
@@ -40,10 +31,6 @@ type Option = {
   group: string;
   content: OptionDetail[];
 }
-// type StyleDetails = {
-
-// };
-//decide later for bottom elements chip/button
 
 export const CustomAnatomicalField = ({
   placeholder,

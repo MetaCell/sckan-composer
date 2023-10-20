@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack, Typography, Box, Chip } from '@mui/material';
+import { Stack, Typography, Box } from '@mui/material';
 
 const DefaultBody = ({ entity }: any) => (
 <Stack spacing={2} flexGrow={1}>
@@ -18,7 +18,6 @@ const HoveredOptionContent = ({
   BodyComponent,
   FooterComponent
 }: any) => {
-  console.log(BodyComponent)
   return (
     <Box
       width={1}
