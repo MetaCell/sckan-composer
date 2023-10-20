@@ -25,6 +25,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { CheckedItemIcon, UncheckedItemIcon } from "../icons";
 import { composerApi as api } from "../../services/apis";
 import { SEARCH_DEBOUNCE } from "../../settings";
+import HoveredOptionContent from "./HoveredOptionContent";
 const { titleFontColor } = vars;
 
 type OptionDetail = {
@@ -46,7 +47,7 @@ type Option = {
 
 export const CustomAnatomicalField = ({
   placeholder,
-  options: { removeChip, label, statement, service, setter, errors, searchPlaceholder, noResultReason, disabledReason, onSearch, value },
+  options: { removeChip, label, statement, service, setter, errors, searchPlaceholder, noResultReason, disabledReason, onSearch, value, CustomHeader = null, CustomBody = null, CustomFooter = null },
 }: any) => {
   const [autocompleteOptions, setAutocompleteOptions] = useState<Option[]>([]);
 
@@ -139,7 +140,6 @@ export const CustomAnatomicalField = ({
       option.label.toLowerCase().includes(inputValue.toLowerCase())
     );
   };
-
 
   return formIsDisabled ? (
     <Box
@@ -407,69 +407,12 @@ export const CustomAnatomicalField = ({
                 </Box>
                 <Box overflow='auto' sx={{ background: '#FCFCFD' }} flex={1}>
                   {hoveredOption ? (
-                    <Box
-                      width={1}
-                      p={3}
-                      display='flex'
-                      flexDirection='column'
-                      minHeight={1}
-                      sx={{
-                        '& .MuiTypography-body1': {
-                          color: "#A9ACB2",
-                          fontSize: "0.75rem",
-                          fontWeight: 500,
-                          lineHeight: "1.125rem",
-                        },
-
-                        '& .MuiTypography-body2': {
-                          color: "#373A3E",
-                          fontSize: "0.875rem",
-                          fontWeight: 400,
-                          lineHeight: "1.25rem",
-                          marginTop: '0.25rem',
-                        },
-
-                        '& .MuiChip-root': {
-                          color: "#344054",
-                          fontSize: "0.875rem",
-                          fontWeight: 500,
-                          lineHeight: "1.25rem",
-                          borderRadius: '0.375rem',
-                          borderColor: '#D0D5DD',
-                          padding: '0.125rem 0',
-                          '&.MuiChip-filledSuccess': {
-                            background: '#ECFDF3',
-                            borderRadius: '1rem',
-                            color: '#027A48'
-                          },
-                          '&.MuiChip-filledError': {
-                            background: '#FEF3F2',
-                            borderRadius: '1rem',
-                            color: '#B42318',
-                          },
-                          '& .MuiChip-label': {
-                            p: '0 0.5625rem',
-                          }
-                        }
-                      }}
-                    >
-                      <Box sx={{mb: '1.5rem', pb: '1.5rem', borderBottom: '0.0625rem solid #F2F4F7'}}>
-                        <Chip variant="outlined" label={"https://google.com"} />
-                      </Box>
-                      <Stack spacing={2} flexGrow={1}>
-                        {hoveredOption?.content?.map((detail, i) => <Stack spacing={1} sx={{ mt: i !== 0 ? 3 : 0 }}>
-                          <Typography variant="body1">
-                            {detail?.title}
-                          </Typography>
-                          <Typography variant="body2">{detail?.value}</Typography>
-                        </Stack>)}
-                      </Stack>
-                      <Box sx={{mt: '1.5rem', pt: '1.5rem', borderTop: '0.0625rem solid #F2F4F7'}}>
-                        {/* <Chip variant="filled" color="error" label={"https://google.com"} /> */}
-                        <Chip variant="filled" color="success" label={"https://google.com"} />
-                        <Chip variant="outlined" label={"https://google.com"} />
-                      </Box>
-                    </Box>
+                    <HoveredOptionContent
+                      entity={hoveredOption}
+                      HeaderComponent={CustomHeader ?? CustomHeader}
+                      BodyComponent={CustomBody ?? CustomBody}
+                      FooterComponent={CustomFooter ?? CustomFooter}
+                    />
                   ) : (
                     <Box
                       width={1}
