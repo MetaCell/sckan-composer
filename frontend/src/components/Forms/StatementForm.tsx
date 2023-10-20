@@ -11,7 +11,7 @@ import { sexes } from "../../services/SexService";
 import { phenotypes } from "../../services/PhenotypeService";
 import { CustomAutocompleteForwardConnection } from "../Widgets/CustomAutocompleteForwardConnection";
 import { CustomAnatomicalField } from "../Widgets/CustomAnatomicalField";
-
+import { Box, Chip } from '@mui/material';
 const StatementForm = (props: any) => {
   const { uiFields, statement, setter, format } = props;
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
@@ -373,6 +373,14 @@ const StatementForm = (props: any) => {
         ? statement.errors
         : "",
       value: mockEntities[0] ?? "",
+      CustomHeader : ({entity}: any) => <Box sx={{mb: '1.5rem', pb: '1.5rem', borderBottom: '0.0625rem solid #F2F4F7'}}>
+        <Chip variant="outlined" label={"https://google.com"} />
+      </Box>,
+      CustomFooter : ({entity}: any) => <Box sx={{mt: '1.5rem', pt: '1.5rem', borderTop: '0.0625rem solid #F2F4F7'}}>
+        {/* <Chip variant="filled" color="error" label={"https://google.com"} /> */}
+        <Chip variant="filled" color="success" label={"https://google.com"} />
+        <Chip variant="outlined" label={"https://google.com"} />
+      </Box>,
     },
 
   };
@@ -430,6 +438,17 @@ const StatementForm = (props: any) => {
         ? statement.errors
         : "",
       value: mockConnections[0] ?? "",
+      CustomHeader: ({ entity }: any) => (
+        <Box sx={{ mb: '1.5rem', pb: '1.5rem', borderBottom: '0.0625rem solid #F2F4F7' }}>
+          <Chip variant="outlined" label={"https://google.com"} />
+        </Box>
+      ),
+      CustomFooter: ({ entity }: any) => (
+        <Box sx={{ mt: '1.5rem', pt: '1.5rem', borderTop: '0.0625rem solid #F2F4F7' }}>
+          <Chip variant="filled" color="success" label={"https://google.com"} />
+          <Chip variant="outlined" label={"https://google.com"} />
+        </Box>
+      ),
     },
   };
 
