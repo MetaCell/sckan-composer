@@ -12,6 +12,7 @@ import { phenotypes } from "../../services/PhenotypeService";
 import { CustomAutocompleteForwardConnection } from "../Widgets/CustomAutocompleteForwardConnection";
 import { CustomAnatomicalField } from "../Widgets/CustomAnatomicalField";
 import { Box, Chip } from '@mui/material';
+import AutocompleteTextField from "../Widgets/AutocompleteTextField";
 const StatementForm = (props: any) => {
   const { uiFields, statement, setter, format } = props;
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
@@ -357,7 +358,7 @@ const StatementForm = (props: any) => {
   }
 
   copiedUISchema.origin_id = {
-    "ui:widget": CustomAnatomicalField,
+    "ui:widget": AutocompleteTextField,
     "ui:options": {
       label: format === "noLabel" ? false : "Origin",
       placeholder: "Look for Origins",
