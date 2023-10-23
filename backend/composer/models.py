@@ -88,12 +88,11 @@ class ConnectivityStatementManager(models.Manager):
             .get_queryset()
             .select_related(
                 "owner",
-                "origin",
                 "destination",
                 "phenotype",
                 "sentence",
             )
-            .prefetch_related("notes", "tags", "species")
+            .prefetch_related("notes", "tags", "species", "origins")
         )
 
     def excluding_draft(self):
@@ -398,14 +397,8 @@ class ConnectivityStatement(models.Model):
     )
     knowledge_statement = models.TextField(db_index=True, blank=True)
     state = FSMField(default=CSState.DRAFT, protected=True)
-    origin = models.ForeignKey(
-        AnatomicalEntity,
-        verbose_name="Origin",
-        on_delete=models.DO_NOTHING,
-        related_name="origin",
-        null=True,
-        blank=True,
-    )
+    origins = models.ManyToManyField(AnatomicalEntity, related_name='origins_relations')
+
     destination = models.ForeignKey(
         AnatomicalEntity,
         verbose_name="Destination",

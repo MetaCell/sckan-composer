@@ -108,13 +108,12 @@ class ConnectivityStatementAdmin(
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
     readonly_fields = ("state",)
-    autocomplete_fields = ("sentence", "origin", "destination")
+    autocomplete_fields = ("sentence", "origins", "destination")
     list_display = (
         "sentence",
         "pmid",
         "pmcid",
         "short_ks",
-        "origin",
         "destination",
         "tag_list",
         "state",
@@ -124,14 +123,14 @@ class ConnectivityStatementAdmin(
     )
     list_display_links = ("sentence", "pmid", "pmcid", "short_ks", "state")
     list_filter = ("state", "owner", "tags__tag")
-    list_select_related = ("sentence", "origin", "destination")
+    list_select_related = ("sentence", "origins", "destination")
     search_fields = (
         "sentence__title",
         "sentence__text",
         "sentence__pmid",
         "sentence__pmcid",
         "knowledge_statement",
-        "origin__name",
+        "origins__name",
         "destination__name",
     )
 

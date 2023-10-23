@@ -7,23 +7,19 @@ from composer.services.state_services import ConnectivityStatementService
 @pytest.mark.django_db
 def test_forward_connection_service():
     sentence = Sentence.objects.create()
+
+    # Create origin and destination entities
     origin_entity = AnatomicalEntity.objects.create(name="OriginEntity")
     destination_entity = AnatomicalEntity.objects.create(name="DestinationEntity")
-    wrong_destination_entity = AnatomicalEntity.objects.create(
-        name="WrongDestinationEntity"
-    )
+    wrong_destination_entity = AnatomicalEntity.objects.create(name="WrongDestinationEntity")
 
-    statement = ConnectivityStatement.objects.create(
-        sentence=sentence,
-        origin=origin_entity,
-        destination=destination_entity,
-    )
+    # Create a statement and associate the origin and destination entities
+    statement = ConnectivityStatement.objects.create(sentence=sentence, destination=destination_entity)
+    statement.origins.add(origin_entity)
 
-    statement_forward = ConnectivityStatement.objects.create(
-        sentence=sentence,
-        origin=origin_entity,
-        destination=wrong_destination_entity,
-    )
+    # Create a forward statement
+    statement_forward = ConnectivityStatement.objects.create(sentence=sentence, destination=wrong_destination_entity)
+    statement_forward.origins.add(origin_entity)
 
     # Add statement_forward as forward connection to statement
     statement.forward_connection.add(statement_forward)

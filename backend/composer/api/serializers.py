@@ -308,7 +308,6 @@ class ConnectivityStatementSerializer(
     sentence_id = serializers.IntegerField()
     knowledge_statement = serializers.CharField(allow_blank=True, required=False)
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
-    origin_id = serializers.IntegerField(required=False, allow_null=True)
     destination_id = serializers.IntegerField(required=False, allow_null=True)
     phenotype_id = serializers.IntegerField(required=False, allow_null=True)
     sex_id = serializers.IntegerField(required=False, allow_null=True)
@@ -319,7 +318,7 @@ class ConnectivityStatementSerializer(
     )
     path = ViaSerializer(source="via_set", many=True, read_only=False, required=False)
     owner = UserSerializer(required=False, read_only=True)
-    origin = AnatomicalEntitySerializer(required=False, read_only=True)
+    origins = AnatomicalEntitySerializer(many=True, required=False, read_only=True)
     destination = AnatomicalEntitySerializer(required=False, read_only=True)
     phenotype = PhenotypeSerializer(required=False, read_only=True)
     sex = SexSerializer(required=False, read_only=True)
@@ -352,7 +351,9 @@ class ConnectivityStatementSerializer(
             species = ""
 
         phenotype = instance.phenotype.name if instance.phenotype else ""
-        origin = instance.origin.name if instance.origin else ""
+        origin_names = [origin.name for origin in instance.origins.all()]
+        origins = ', '.join(origin_names) if origin_names else ""
+
         destination = instance.destination.name if instance.destination else ""
 
         via_values = [f"via {via.name}" for via in instance.path.all()]
@@ -376,8 +377,9 @@ class ConnectivityStatementSerializer(
         apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
 
         # Creating the statement
-        statement = f"In {sex} {species}, a {phenotype} connection goes from {origin} to {destination}{via_string}. "
-        statement += f"This {circuit_type} projects {projection} from the {origin} and is found {laterality_description}. "
+        # TODO: Update for the new graph format
+        statement = f"In {sex} {species}, a {phenotype} connection goes from {origins} to {destination}{via_string}. "
+        statement += f"This {circuit_type} projects {projection} from the {origins} and is found {laterality_description}. "
 
         if forward_connection:
             statement += f"This neuron population connects to {forward_connection}. "
@@ -418,8 +420,7 @@ class ConnectivityStatementSerializer(
             "owner_id",
             "state",
             "available_transitions",
-            "origin_id",
-            "origin",
+            "origins",
             "destination_id",
             "destination",
             "phenotype_id",

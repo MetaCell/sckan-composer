@@ -107,10 +107,20 @@ class SentenceService(StateServiceMixin):
 class ConnectivityStatementService(StateServiceMixin):
     @staticmethod
     def compile_journey(connectivity_statement):
-        origin = connectivity_statement.origin
+        # TODO: Update for the new graph format
+
+        # Get all the origin names
+        origin_names = [str(origin) for origin in connectivity_statement.origins.all()]
+
+        # Combine them into a comma-separated string
+        origins_combined = ", ".join(origin_names[:-1]) + (" and " + origin_names[-1] if len(origin_names) > 1 else "")
+
         destination = connectivity_statement.destination
-        journey = f"{origin} to {destination} via "
-        journey += " via ".join(str(path) for path in connectivity_statement.path.order_by('via'))
+        paths = " via ".join(str(path) for path in connectivity_statement.path.order_by('via'))
+
+        # Construct the final journey string
+        journey = f"{origins_combined} to {destination} via {paths}"
+
         return journey
 
     @staticmethod
@@ -118,7 +128,7 @@ class ConnectivityStatementService(StateServiceMixin):
         # return True if the state,emt can go to state to_be_reviewed it should have at least one provenance,
         # origin, destination, phenotype, sex, path and species
         return (
-            connectivity_statement.origin is not None
+            connectivity_statement.origins is not None
             and connectivity_statement.destination is not None
             and connectivity_statement.phenotype is not None
             and connectivity_statement.sex is not None
@@ -157,7 +167,8 @@ class ConnectivityStatementService(StateServiceMixin):
 
     @staticmethod
     def is_forward_connection_valid(connectivity_statement):
+        # TODO: Update for the new graph format
         for forward_connection in connectivity_statement.forward_connection.all():
-            if forward_connection.origin != connectivity_statement.destination:
-                return False
-        return True
+            if connectivity_statement.destination in forward_connection.origins.all():
+                return True
+        return False

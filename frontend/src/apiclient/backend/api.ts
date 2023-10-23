@@ -134,16 +134,16 @@ export interface ConnectivityStatement {
     'available_transitions': Array<ConnectivityStatementAvailableTransitionsEnum>;
     /**
      * 
-     * @type {number}
+     * @type {Array<number>}
      * @memberof ConnectivityStatement
      */
-    'origin_id'?: number | null;
+    'origins_ids'?: Array<number> | null;
     /**
      * 
-     * @type {AnatomicalEntity}
+     * @type {Array<AnatomicalEntity>}
      * @memberof ConnectivityStatement
      */
-    'origin': AnatomicalEntity;
+    'origins': Array<AnatomicalEntity>;
     /**
      * 
      * @type {number}
@@ -260,10 +260,10 @@ export interface ConnectivityStatement {
     'statement_preview': string;
     /**
      * 
-     * @type {string}
+     * @type {Array<any>}
      * @memberof ConnectivityStatement
      */
-    'errors': string;
+    'errors': Array<any>;
 }
 
 
@@ -752,16 +752,16 @@ export interface PatchedConnectivityStatement {
     'available_transitions'?: Array<ConnectivityStatementAvailableTransitionsEnum>;
     /**
      * 
-     * @type {number}
+     * @type {Array<number>}
      * @memberof PatchedConnectivityStatement
      */
-    'origin_id'?: number | null;
+    'origins_ids'?: Array<number> | null;
     /**
      * 
-     * @type {AnatomicalEntity}
+     * @type {Array<AnatomicalEntity>}
      * @memberof PatchedConnectivityStatement
      */
-    'origin'?: AnatomicalEntity;
+    'origins'?: Array<AnatomicalEntity>;
     /**
      * 
      * @type {number}
@@ -878,10 +878,10 @@ export interface PatchedConnectivityStatement {
     'statement_preview'?: string;
     /**
      * 
-     * @type {string}
+     * @type {Array<any>}
      * @memberof PatchedConnectivityStatement
      */
-    'errors'?: string;
+    'errors'?: Array<any>;
 }
 
 
@@ -2161,14 +2161,14 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
          * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
-         * @param {number} [origin] 
+         * @param {Array<number>} [origins] 
          * @param {number} [sentenceId] 
          * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList: async (destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origin?: number, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementList: async (destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/connectivity-statement/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2218,8 +2218,8 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
                 localVarQueryParameter['ordering'] = ordering.join(COLLECTION_FORMATS.csv);
             }
 
-            if (origin !== undefined) {
-                localVarQueryParameter['origin'] = origin;
+            if (origins) {
+                localVarQueryParameter['origins'] = origins;
             }
 
             if (sentenceId !== undefined) {
@@ -4018,15 +4018,15 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
          * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
-         * @param {number} [origin] 
+         * @param {Array<number>} [origins] 
          * @param {number} [sentenceId] 
          * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementList(destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origin?: number, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destination, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options);
+        async composerConnectivityStatementList(destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destination, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4544,15 +4544,15 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
          * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
-         * @param {number} [origin] 
+         * @param {Array<number>} [origins] 
          * @param {number} [sentenceId] 
          * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList(destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origin?: number, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementList> {
-            return localVarFp.composerConnectivityStatementList(destination, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options).then((request) => request(axios, basePath));
+        composerConnectivityStatementList(destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementList> {
+            return localVarFp.composerConnectivityStatementList(destination, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -5058,7 +5058,7 @@ export class ComposerApi extends BaseAPI {
      * @param {boolean} [notes] Checks if entity has notes
      * @param {number} [offset] The initial index from which to return the results.
      * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
-     * @param {number} [origin] 
+     * @param {Array<number>} [origins] 
      * @param {number} [sentenceId] 
      * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
      * @param {Array<number>} [tags] 
@@ -5066,8 +5066,8 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementList(destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origin?: number, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementList(destination, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origin, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
+    public composerConnectivityStatementList(destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementList(destination, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -5488,10 +5488,10 @@ export class ComposerApi extends BaseAPI {
  * @export
  */
 export const ComposerConnectivityStatementListOrderingEnum = {
-    '-id': '-id',
-    '-last_edited': '-last_edited',
-    'id': 'id',
-    'last_edited': 'last_edited'
+    Id: '-id',
+    LastEdited: '-last_edited',
+    Id2: 'id',
+    LastEdited2: 'last_edited'
 } as const;
 export type ComposerConnectivityStatementListOrderingEnum = typeof ComposerConnectivityStatementListOrderingEnum[keyof typeof ComposerConnectivityStatementListOrderingEnum];
 /**
@@ -5513,10 +5513,10 @@ export type ComposerConnectivityStatementListStateEnum = typeof ComposerConnecti
  * @export
  */
 export const ComposerSentenceListOrderingEnum = {
-    '-id': '-id',
-    '-last_edited': '-last_edited',
-    'id': 'id',
-    'last_edited': 'last_edited'
+    Id: '-id',
+    LastEdited: '-last_edited',
+    Id2: 'id',
+    LastEdited2: 'last_edited'
 } as const;
 export type ComposerSentenceListOrderingEnum = typeof ComposerSentenceListOrderingEnum[keyof typeof ComposerSentenceListOrderingEnum];
 /**

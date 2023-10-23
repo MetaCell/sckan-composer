@@ -56,6 +56,17 @@ def filter_by_ontology_uri(qs, field, anatomical_entity):
     return qs.filter(Q(**{f"{field}__ontology_uri": anatomical_entity.ontology_uri}))
 
 
+def filter_by_ontology_uri_many(qs, field, anatomical_entities):
+    # If the anatomical_entities queryset is empty, return the original queryset
+    if not anatomical_entities.exists():
+        return qs
+
+    ontology_uris = [entity.ontology_uri for entity in anatomical_entities]
+
+    # Filter the main queryset based on those ontology_uris
+    return qs.filter(Q(**{f"{field}__ontology_uri__in": ontology_uris}))
+
+
 class ConnectivityStatementFilter(django_filters.FilterSet):
     sentence_id = django_filters.NumberFilter(field_name="sentence__id")
     exclude_sentence_id = django_filters.NumberFilter(field_name="sentence__id", exclude=True)
@@ -69,10 +80,10 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
     tags = django_filters.ModelMultipleChoiceFilter(
         field_name="tags", queryset=Tag.objects.all()
     )
-    origin = django_filters.ModelChoiceFilter(
-        field_name="origin",
+    origins = django_filters.ModelMultipleChoiceFilter(
+        field_name="origins",
         queryset=AnatomicalEntity.objects.all(),
-        method=filter_by_ontology_uri,
+        method=filter_by_ontology_uri_many,
     )
     destination = django_filters.ModelChoiceFilter(
         field_name="destination",

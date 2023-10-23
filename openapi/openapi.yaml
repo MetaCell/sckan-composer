@@ -113,9 +113,13 @@ paths:
         explode: false
         style: form
       - in: query
-        name: origin
+        name: origins
         schema:
-          type: integer
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
       - in: query
         name: sentence_id
         schema:
@@ -1627,12 +1631,15 @@ components:
           items:
             $ref: '#/components/schemas/ConnectivityStatementAvailableTransitionsEnum'
           readOnly: true
-        origin_id:
-          type: integer
+        origins_ids:
+          type: array
+          items:
+            type: integer
           nullable: true
-        origin:
-          allOf:
-          - $ref: '#/components/schemas/AnatomicalEntity'
+        origins:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnatomicalEntity'
           readOnly: true
         destination_id:
           type: integer
@@ -1696,7 +1703,8 @@ components:
           type: string
           readOnly: true
         errors:
-          type: string
+          type: array
+          items: {}
           readOnly: true
       required:
       - available_transitions
@@ -1706,7 +1714,7 @@ components:
       - id
       - journey
       - modified_date
-      - origin
+      - origins
       - owner
       - phenotype
       - sentence
@@ -2003,12 +2011,15 @@ components:
           items:
             $ref: '#/components/schemas/ConnectivityStatementAvailableTransitionsEnum'
           readOnly: true
-        origin_id:
-          type: integer
+        origins_ids:
+          type: array
+          items:
+            type: integer
           nullable: true
-        origin:
-          allOf:
-          - $ref: '#/components/schemas/AnatomicalEntity'
+        origins:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnatomicalEntity'
           readOnly: true
         destination_id:
           type: integer
@@ -2072,7 +2083,8 @@ components:
           type: string
           readOnly: true
         errors:
-          type: string
+          type: array
+          items: {}
           readOnly: true
     PatchedNote:
       type: object

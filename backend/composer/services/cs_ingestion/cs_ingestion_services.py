@@ -229,13 +229,15 @@ def ingest_statements():
         connectivity_statement, created = ConnectivityStatement.objects.get_or_create(
             reference_uri__exact=reference_uri,
             defaults={
-            "sentence": sentence, "knowledge_statement": knowledge_statement,"reference_uri": reference_uri, "origin": origin, "destination": destination, "destination_type": destination_type, "circuit_type": circuit_type, "sex": sex, "functional_circuit_role": functional_circuit_role, "phenotype": phenotype, "projection_phenotype": projection_phenotype
+            "sentence": sentence, "knowledge_statement": knowledge_statement,"reference_uri": reference_uri, "destination": destination, "destination_type": destination_type, "circuit_type": circuit_type, "sex": sex, "functional_circuit_role": functional_circuit_role, "phenotype": phenotype, "projection_phenotype": projection_phenotype
             }
         )
         # add the many to many fields: path, species, provenances, notes
         if created:
             species = Specie.objects.filter(ontology_uri__in=statement[SPECIES])
             connectivity_statement.species.add(*species)
+            connectivity_statement.origins.add(origin)
+
             #TODO add display_order criteria on neurondm update
             vias = (Via(connectivity_statement = connectivity_statement, anatomical_entity=AnatomicalEntity.objects.filter(ontology_uri=via[ENTITY_URI])[0], type=via[TYPE]) for via in statement[VIAS])
             Via.objects.bulk_create(vias)

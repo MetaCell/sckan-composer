@@ -198,7 +198,7 @@ class CSCloningMixin(viewsets.GenericViewSet):
     def clone_statement(self, request, pk=None, statement_id=None):
         instance = self.get_object()
         instance.pk = None
-        instance.origin = None
+        instance.origins = None
         instance.destination = None
         instance.destination_type = 'UNKNOWN'
         instance.save()

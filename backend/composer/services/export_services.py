@@ -22,7 +22,7 @@ from composer.models import (
     ExportMetrics,
     Sentence,
     Specie,
-    Via,
+    Via, AnatomicalEntity,
 )
 from composer.services.filesystem_service import create_dir_if_not_exists
 from composer.services.state_services import ConnectivityStatementService
@@ -183,14 +183,10 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
     return attributes_map
 
 
-def get_origin_row(cs: ConnectivityStatement):
-    review_notes = "\n".join(
-        [note.note for note in cs.notes.filter(type=NoteType.PLAIN)]
-    )
-    curation_notes = "\n".join([note.note for note in cs.sentence.notes.all()])
+def get_origin_row(origin: AnatomicalEntity, review_notes: str, curation_notes: str):
     return Row(
-        cs.origin.name,
-        cs.origin.ontology_uri,
+        origin.name,
+        origin.ontology_uri,
         ExportRelationships.hasSomaLocatedIn.label,
         ExportRelationships.hasSomaLocatedIn.value,
         curation_notes,
@@ -322,7 +318,13 @@ def get_forward_connection_row(forward_conn: ConnectivityStatement):
 def get_rows(cs: ConnectivityStatement) -> List:
     rows = []
     try:
-        rows.append(get_origin_row(cs))
+        review_notes = "\n".join(
+            [note.note for note in cs.notes.filter(type=NoteType.PLAIN)]
+        )
+        curation_notes = "\n".join([note.note for note in cs.sentence.notes.all()])
+        for origin in cs.origins.all():
+            rows.append(get_origin_row(origin, review_notes, curation_notes))
+
     except Exception:
         raise UnexportableConnectivityStatement("Error getting origin row")
 
