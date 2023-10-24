@@ -145,7 +145,7 @@ export default function CheckDuplicates() {
                 <DialogTitle sx={{display: 'flex', alignItems: 'center', borderBottom: "1px solid #EAECF0"}}>
                     <Box>
                         <Typography variant="h5">
-                            Check fo duplicates
+                            Check for duplicates
                         </Typography>
                         <Typography>
                             Use smart search tool to find eventual duplicates of a record.
