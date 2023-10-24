@@ -199,8 +199,6 @@ class CSCloningMixin(viewsets.GenericViewSet):
         instance = self.get_object()
         instance.pk = None
         instance.origins = None
-        instance.destination = None
-        instance.destination_type = 'UNKNOWN'
         instance.save()
         instance.species.add(*self.get_object().species.all())
         provenances = (Provenance(connectivity_statement = instance, uri=provenance.uri) for provenance in self.get_object().provenance_set.all())

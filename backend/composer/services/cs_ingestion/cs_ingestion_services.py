@@ -1,19 +1,17 @@
-
-from composer.models import AnatomicalEntity, Sentence, ConnectivityStatement, Sex, FunctionalCircuitRole, ProjectionPhenotype, Phenotype, Specie, Provenance, Via, Note, User
+from composer.models import AnatomicalEntity, Sentence, ConnectivityStatement, Sex, FunctionalCircuitRole, \
+    ProjectionPhenotype, Phenotype, Specie, Provenance, Via, Note, User, Destination
 import logging
 from datetime import datetime
 from .neurondm_script import main as get_statements_from_neurondm
 from ...enums import (
     CircuitType,
-    NoteType, 
+    NoteType,
     DestinationType,
     SentenceState,
     CSState
 )
 
 from ..state_services import SentenceService, ConnectivityStatementService
-
-
 
 ID = "id"
 ORIGIN = "origin"
@@ -30,21 +28,23 @@ PHENOTYPE = 'phenotype'
 OTHER_PHENOTYPE = 'other_phenotype'
 SPECIES = 'species'
 PROVENANCE = 'provenance'
-NOTE_ALERT = 'note_alert' 
+NOTE_ALERT = 'note_alert'
 CIRCUIT_TYPE_MAPPING = {
-        "http://uri.interlex.org/tgbugs/uris/readable/IntrinsicPhenotype": CircuitType.INTRINSIC,
-        "http://uri.interlex.org/tgbugs/uris/readable/ProjectionPhenotype": CircuitType.PROJECTION,
-        "http://uri.interlex.org/tgbugs/uris/readable/MotorPhenotype": CircuitType.MOTOR,
-        "http://uri.interlex.org/tgbugs/uris/readable/SensoryPhenotype": CircuitType.SENSORY,
-        "": CircuitType.UNKNOWN
-    }
+    "http://uri.interlex.org/tgbugs/uris/readable/IntrinsicPhenotype": CircuitType.INTRINSIC,
+    "http://uri.interlex.org/tgbugs/uris/readable/ProjectionPhenotype": CircuitType.PROJECTION,
+    "http://uri.interlex.org/tgbugs/uris/readable/MotorPhenotype": CircuitType.MOTOR,
+    "http://uri.interlex.org/tgbugs/uris/readable/SensoryPhenotype": CircuitType.SENSORY,
+    "": CircuitType.UNKNOWN
+}
 
 NOW = datetime.now().strftime("%Y%m%d%H%M%S")
+
 
 def not_found_entity(entity):
     if len(AnatomicalEntity.objects.filter(ontology_uri=entity)) == 0:
         return True
     return False
+
 
 def has_invalid_entities(statement):
     invalid_entities = [
@@ -57,27 +57,21 @@ def has_invalid_entities(statement):
         for entity in statement[VIAS]:
             if not_found_entity(entity[ENTITY_URI]):
                 invalid_entities.append({"entity": entity[ENTITY_URI], "prop": VIAS})
-    
+
     if len(invalid_entities) > 0:
-        logging.warning(f'Skip statement {statement[LABEL]} due to the following entities not found in composer db: {invalid_entities}')
+        logging.warning(
+            f'Skip statement {statement[LABEL]} due to the following entities not found in composer db: {invalid_entities}')
         return True
     return False
 
-
-def has_multiple_destination(statement):
-    if len(statement[DESTINATION]) > 1:
-        logging.warning(f'Skip statement {statement[LABEL]} due to multiple destinations')
-        return True
-    else:
-        return False
-    
 def has_invalid_sex(statement):
     if has_prop(statement[SEX]) and len(Sex.objects.filter(ontology_uri=statement[SEX][0])) == 0:
         logging.warning(f'Skip statement {statement[LABEL]} due to sex {statement[SEX][0]} not found in composer db')
         return True
     else:
         return False
-    
+
+
 def has_invalid_species(statement):
     if has_prop(statement[SPECIES]):
         for s in statement[SPECIES]:
@@ -86,9 +80,10 @@ def has_invalid_species(statement):
                 return False
             except:
                 logging.warning(f'Skip statement {statement[LABEL]} due to specie {s} not found in composer db')
-                return True 
+                return True
     return False
-    
+
+
 def get_valid_phenotypes(statement):
     valid_phenotypes = []
     if has_prop(statement[PHENOTYPE]):
@@ -105,14 +100,14 @@ def pick_first_phenotype(phenotypes_list, statement):
     if len(phenotypes_list) == 0:
         return None
     elif len(phenotypes_list) > 1:
-        logging.warning(f'Multiple phenotypes found, ignore the following {phenotypes_list[1:]} at statement {statement[LABEL]}')
+        logging.warning(
+            f'Multiple phenotypes found, ignore the following {phenotypes_list[1:]} at statement {statement[LABEL]}')
     return phenotypes_list[0]
+
 
 def validate_statements(statement_list):
     valid_statements = []
     for statement in statement_list:
-        if has_multiple_destination(statement):
-            continue
         if has_invalid_entities(statement):
             continue
         if has_invalid_sex(statement):
@@ -129,13 +124,13 @@ def create_artifact_sentence(statement):
     text = f'{statement[LABEL]} created from neurondm on {NOW}'
     has_sentence_reference = len(statement[SENTENCE_NUMBER]) > 0
     sentence, created = Sentence.objects.get_or_create(
-            doi__iexact=statement[ID],
-            defaults={"title": text[0:185], "text": text,
-            "doi": statement[ID],
-            "external_ref": statement[SENTENCE_NUMBER][0] if has_sentence_reference else None,
-            "batch_name": f"neurondm-{NOW}" if has_sentence_reference else None
-            },
-        )
+        doi__iexact=statement[ID],
+        defaults={"title": text[0:185], "text": text,
+                  "doi": statement[ID],
+                  "external_ref": statement[SENTENCE_NUMBER][0] if has_sentence_reference else None,
+                  "batch_name": f"neurondm-{NOW}" if has_sentence_reference else None
+                  },
+    )
     if created:
         logging.info(f"Sentence for neuron {statement[LABEL]} created.")
         sentence.save()
@@ -145,6 +140,7 @@ def create_artifact_sentence(statement):
 def has_prop(prop):
     return True if len(prop) > 0 else False
 
+
 def get_value_or_none(model, prop):
     if has_prop(prop):
         if model == AnatomicalEntity:
@@ -152,15 +148,15 @@ def get_value_or_none(model, prop):
         else:
             return model.objects.get(ontology_uri=prop[0])
     else:
-        return None 
+        return None
 
 
 def do_transition_to_compose_now(sentence: Sentence, user: User):
     available_transitions = [
         available_state.target
-            for available_state in sentence.get_available_user_state_transitions(
-                user
-            )
+        for available_state in sentence.get_available_user_state_transitions(
+            user
+        )
     ]
     if SentenceState.COMPOSE_NOW in available_transitions:
         # we need to update the state to compose_now when the system user has the permission to do so
@@ -176,6 +172,7 @@ def do_transition_to_exported(statement: ConnectivityStatement, user: User):
         CSState.EXPORTED, user
     )
     cs.save()
+
 
 def do_state_transitions(sentence: Sentence):
     system_user = User.objects.get(username="system")
@@ -201,7 +198,7 @@ def ingest_statements():
     # skip statements with sex not found in db
     # skip statements with species not found in db
     valid_statements = validate_statements(statements_list)
-        
+
     # create an artifact sentence to relate to the statements
     for statement in valid_statements:
         sentence = create_artifact_sentence(statement)
@@ -209,13 +206,11 @@ def ingest_statements():
         reference_uri = statement[ID]
         knowledge_statement = statement[LABEL]
         origin = get_value_or_none(AnatomicalEntity, statement[ORIGIN])
-        destination = AnatomicalEntity.objects.filter(ontology_uri=statement[DESTINATION][0][ENTITY_URI])[0] if has_prop(statement[DESTINATION]) else None
-        destination_type = statement[DESTINATION][0][TYPE] if has_prop(statement[DESTINATION]) else DestinationType.UNKNOWN
         circuit_type_uri = statement[CIRCUIT_TYPE][0] if has_prop(statement[CIRCUIT_TYPE]) else ""
         circuit_type = CIRCUIT_TYPE_MAPPING[circuit_type_uri]
-        sex =  get_value_or_none(Sex, statement[SEX])
+        sex = get_value_or_none(Sex, statement[SEX])
         functional_circuit_role = get_value_or_none(FunctionalCircuitRole, statement[FUNCTIONAL_CIRCUIT_ROLE])
-        #some values from neurondm's phenotype field are not mapped in composer db. Add only the first one founded in composer db, if any
+        # some values from neurondm's phenotype field are not mapped in composer db. Add only the first one founded in composer db, if any
         phenotypes_list = get_valid_phenotypes(statement)
         phenotype = pick_first_phenotype(phenotypes_list, statement)
         # other phenotypes includes 3 predicates, we will only store hasProjectionPhenotype which belongs to the last element of the other_phenotypes list from neurondm
@@ -225,11 +220,13 @@ def ingest_statements():
             projection_phenotype = None
 
         # create the statement
-      
+
         connectivity_statement, created = ConnectivityStatement.objects.get_or_create(
             reference_uri__exact=reference_uri,
             defaults={
-            "sentence": sentence, "knowledge_statement": knowledge_statement,"reference_uri": reference_uri, "destination": destination, "destination_type": destination_type, "circuit_type": circuit_type, "sex": sex, "functional_circuit_role": functional_circuit_role, "phenotype": phenotype, "projection_phenotype": projection_phenotype
+                "sentence": sentence, "knowledge_statement": knowledge_statement, "reference_uri": reference_uri,
+                "circuit_type": circuit_type, "sex": sex, "functional_circuit_role": functional_circuit_role,
+                "phenotype": phenotype, "projection_phenotype": projection_phenotype
             }
         )
         # add the many to many fields: path, species, provenances, notes
@@ -237,16 +234,36 @@ def ingest_statements():
             species = Specie.objects.filter(ontology_uri__in=statement[SPECIES])
             connectivity_statement.species.add(*species)
             connectivity_statement.origins.add(origin)
+            if has_prop(statement[DESTINATION]):
+                for dest in statement[DESTINATION]:
+                    destination_entity = AnatomicalEntity.objects.filter(ontology_uri=dest[ENTITY_URI]).first()
+                    destination_type = dest.get(TYPE, DestinationType.UNKNOWN)
 
-            #TODO add display_order criteria on neurondm update
-            vias = (Via(connectivity_statement = connectivity_statement, anatomical_entity=AnatomicalEntity.objects.filter(ontology_uri=via[ENTITY_URI])[0], type=via[TYPE]) for via in statement[VIAS])
+                    if destination_entity:
+                        destination_instance, _ = Destination.objects.get_or_create(
+                            connectivity_statement=connectivity_statement,
+                            defaults={
+                                "type": destination_type
+                            }
+                        )
+                        destination_instance.anatomical_entities.add(destination_entity)
+
+
+            # TODO add display_order criteria on neurondm update
+            vias = (Via(connectivity_statement=connectivity_statement,
+                        anatomical_entity=AnatomicalEntity.objects.filter(ontology_uri=via[ENTITY_URI])[0],
+                        type=via[TYPE]) for via in statement[VIAS])
             Via.objects.bulk_create(vias)
-            provenances_list = statement[PROVENANCE][0].split(", ") if has_prop(statement[PROVENANCE]) else [statement[ID]]
-            provenances = (Provenance(connectivity_statement = connectivity_statement, uri=provenance) for provenance in provenances_list)
+            provenances_list = statement[PROVENANCE][0].split(", ") if has_prop(statement[PROVENANCE]) else [
+                statement[ID]]
+            provenances = (Provenance(connectivity_statement=connectivity_statement, uri=provenance) for provenance in
+                           provenances_list)
             Provenance.objects.bulk_create(provenances)
             # only 5 statements have a note_alert but they were all filtered out since at least one of their anatomical entities was not found in composer db
-            if has_prop(statement[NOTE_ALERT]):   
-                Note.objects.create(connectivity_statement = connectivity_statement, user=User.objects.get(username="system"), type=NoteType.ALERT, note=statement[NOTE_ALERT][0])
+            if has_prop(statement[NOTE_ALERT]):
+                Note.objects.create(connectivity_statement=connectivity_statement,
+                                    user=User.objects.get(username="system"), type=NoteType.ALERT,
+                                    note=statement[NOTE_ALERT][0])
             connectivity_statement.save()
 
             # transitions sentence from  open --> compose_now, and statement from draft --> compose_now --> exported 

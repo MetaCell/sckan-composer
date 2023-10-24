@@ -85,10 +85,10 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
         queryset=AnatomicalEntity.objects.all(),
         method=filter_by_ontology_uri_many,
     )
-    destination = django_filters.ModelChoiceFilter(
-        field_name="destination",
+    destinations = django_filters.ModelMultipleChoiceFilter(
+        field_name="destinations__anatomical_entities",
         queryset=AnatomicalEntity.objects.all(),
-        method=filter_by_ontology_uri,
+        method=filter_by_ontology_uri_many,
     )
     notes = django_filters.BooleanFilter(
         field_name="notes", label="Checks if entity has notes", method=field_has_content

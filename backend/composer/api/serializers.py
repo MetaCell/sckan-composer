@@ -19,7 +19,7 @@ from ..models import (
     Sentence,
     Specie,
     Tag,
-    Via,
+    Via, Destination,
 )
 from ..services.errors_service import get_connectivity_errors
 
@@ -297,6 +297,14 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
         )
 
 
+class DestinationSerializer(serializers.ModelSerializer):
+    anatomical_entities = AnatomicalEntitySerializer(many=True)
+
+    class Meta:
+        model = Destination
+        fields = ('id', 'type', 'anatomical_entities')
+
+
 class ConnectivityStatementSerializer(
     FixManyToManyMixin, FixedWritableNestedModelSerializer
 ):
@@ -308,7 +316,6 @@ class ConnectivityStatementSerializer(
     sentence_id = serializers.IntegerField()
     knowledge_statement = serializers.CharField(allow_blank=True, required=False)
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
-    destination_id = serializers.IntegerField(required=False, allow_null=True)
     phenotype_id = serializers.IntegerField(required=False, allow_null=True)
     sex_id = serializers.IntegerField(required=False, allow_null=True)
     tags = TagSerializer(many=True, read_only=True, required=False)
@@ -319,7 +326,7 @@ class ConnectivityStatementSerializer(
     path = ViaSerializer(source="via_set", many=True, read_only=False, required=False)
     owner = UserSerializer(required=False, read_only=True)
     origins = AnatomicalEntitySerializer(many=True, required=False, read_only=True)
-    destination = AnatomicalEntitySerializer(required=False, read_only=True)
+    destinations = DestinationSerializer(many=True, required=False, read_only=True)
     phenotype = PhenotypeSerializer(required=False, read_only=True)
     sex = SexSerializer(required=False, read_only=True)
     sentence = SentenceSerializer(required=False, read_only=True)
@@ -341,6 +348,7 @@ class ConnectivityStatementSerializer(
         return instance.has_notes
 
     def get_statement_preview(self, instance) -> str:
+        # TODO: Update for the new graph format
         sex = instance.sex.name if instance.sex else ""
         species_list = [specie.name for specie in instance.species.all()]
         if len(species_list) > 1:
@@ -354,7 +362,15 @@ class ConnectivityStatementSerializer(
         origin_names = [origin.name for origin in instance.origins.all()]
         origins = ', '.join(origin_names) if origin_names else ""
 
-        destination = instance.destination.name if instance.destination else ""
+        # Extracting all destinations for the instance
+        destinations = instance.destinations.all()
+        destination_strings = []
+        for dest in destinations:
+            dest_names = [str(entity.name) for entity in dest.anatomical_entities.all()]
+            dest_combined = ", ".join(dest_names[:-1]) + (" and " + dest_names[-1] if len(dest_names) > 1 else "")
+            destination_strings.append(dest_combined)
+        all_destinations_combined = ", ".join(destination_strings[:-1]) + (
+            " and " + destination_strings[-1] if len(destination_strings) > 1 else "")
 
         via_values = [f"via {via.name}" for via in instance.path.all()]
         if len(via_values) > 1:
@@ -377,8 +393,7 @@ class ConnectivityStatementSerializer(
         apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
 
         # Creating the statement
-        # TODO: Update for the new graph format
-        statement = f"In {sex} {species}, a {phenotype} connection goes from {origins} to {destination}{via_string}. "
+        statement = f"In {sex} {species}, a {phenotype} connection goes from {origins} to {all_destinations_combined}{via_string}. "
         statement += f"This {circuit_type} projects {projection} from the {origins} and is found {laterality_description}. "
 
         if forward_connection:
@@ -421,11 +436,9 @@ class ConnectivityStatementSerializer(
             "state",
             "available_transitions",
             "origins",
-            "destination_id",
-            "destination",
+            "destinations",
             "phenotype_id",
             "phenotype",
-            "destination_type",
             "path",
             "journey",
             "laterality",

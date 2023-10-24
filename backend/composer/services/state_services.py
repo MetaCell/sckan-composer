@@ -1,7 +1,7 @@
 from django.db import transaction
-
-from composer.enums import CSState
+from django.apps import apps
 from django.db.models import Q, Count
+from composer.enums import CSState
 from ..enums import SentenceState
 
 
@@ -79,9 +79,9 @@ class SentenceService(StateServiceMixin):
         # return True if the sentence can go to state to_be_reviewed
         # it should have at least one provenance (pmid, pmcid, doi) and at least one connectivity statement
         return (
-            sentence.pmid is not None
-            or sentence.pmcid is not None
-            or sentence.doi is not None
+                sentence.pmid is not None
+                or sentence.pmcid is not None
+                or sentence.doi is not None
         ) and (sentence.connectivitystatement_set.count() > 0)
 
     @staticmethod
@@ -113,13 +113,24 @@ class ConnectivityStatementService(StateServiceMixin):
         origin_names = [str(origin) for origin in connectivity_statement.origins.all()]
 
         # Combine them into a comma-separated string
-        origins_combined = ", ".join(origin_names[:-1]) + (" and " + origin_names[-1] if len(origin_names) > 1 else "")
+        all_origins_combined = ", ".join(origin_names[:-1]) + (
+            " and " + origin_names[-1] if len(origin_names) > 1 else "")
 
-        destination = connectivity_statement.destination
+        # Get all destinations for the connectivity_statement
+        destinations = connectivity_statement.destinations.all()
+        destination_strings = []
+        for dest in destinations:
+            dest_names = [str(entity) for entity in dest.anatomical_entities.all()]
+            dest_combined = ", ".join(dest_names[:-1]) + (" and " + dest_names[-1] if len(dest_names) > 1 else "")
+            destination_strings.append(dest_combined)
+
+        all_destinations_combined = ", ".join(destination_strings[:-1]) + (
+            " and " + destination_strings[-1] if len(destination_strings) > 1 else "")
+
         paths = " via ".join(str(path) for path in connectivity_statement.path.order_by('via'))
 
         # Construct the final journey string
-        journey = f"{origins_combined} to {destination} via {paths}"
+        journey = f"{all_origins_combined} to {all_destinations_combined} via {paths}"
 
         return journey
 
@@ -128,13 +139,13 @@ class ConnectivityStatementService(StateServiceMixin):
         # return True if the state,emt can go to state to_be_reviewed it should have at least one provenance,
         # origin, destination, phenotype, sex, path and species
         return (
-            connectivity_statement.origins is not None
-            and connectivity_statement.destination is not None
-            and connectivity_statement.phenotype is not None
-            and connectivity_statement.sex is not None
-            and connectivity_statement.path.count() > 0
-            and connectivity_statement.species.count() > 0
-            and connectivity_statement.provenance_set.count() > 0
+                connectivity_statement.origins.exists()
+                and connectivity_statement.destinations.exists()
+                and connectivity_statement.phenotype is not None
+                and connectivity_statement.sex is not None
+                and connectivity_statement.path.count() > 0
+                and connectivity_statement.species.count() > 0
+                and connectivity_statement.provenance_set.count() > 0
         )
 
     @staticmethod
@@ -167,8 +178,14 @@ class ConnectivityStatementService(StateServiceMixin):
 
     @staticmethod
     def is_forward_connection_valid(connectivity_statement):
-        # TODO: Update for the new graph format
+        AnatomicalEntity = apps.get_model('composer', 'AnatomicalEntity')
+
+        # Get all anatomical_entities associated with the destinations of the connectivity statement
+        destination_anatomical_entities = AnatomicalEntity.objects.filter(
+            connection_layers__in=connectivity_statement.destinations.all())
+
         for forward_connection in connectivity_statement.forward_connection.all():
-            if connectivity_statement.destination in forward_connection.origins.all():
+            # Check if any anatomical_entity associated with the destination is in the origins of the forward_connection
+            if any(entity in forward_connection.origins.all() for entity in destination_anatomical_entities):
                 return True
         return False

@@ -22,7 +22,7 @@ from composer.models import (
     ExportMetrics,
     Sentence,
     Specie,
-    Via, AnatomicalEntity,
+    Via, AnatomicalEntity, Destination,
 )
 from composer.services.filesystem_service import create_dir_if_not_exists
 from composer.services.state_services import ConnectivityStatementService
@@ -194,12 +194,12 @@ def get_origin_row(origin: AnatomicalEntity, review_notes: str, curation_notes: 
     )
 
 
-def get_destination_row(cs: ConnectivityStatement):
+def get_destination_row(destination_instance: Destination):
     return Row(
-        cs.destination.name,
-        cs.destination.ontology_uri,
-        cs.get_destination_type_display(),
-        TEMP_DESTINATION_PREDICATE_MAP.get(cs.destination_type),
+        destination_instance.anatomical_entity.name,
+        destination_instance.anatomical_entity.ontology_uri,
+        destination_instance.get_type_display(),
+        TEMP_DESTINATION_PREDICATE_MAP.get(destination_instance.type),
         "",
         "",
     )
@@ -328,10 +328,11 @@ def get_rows(cs: ConnectivityStatement) -> List:
     except Exception:
         raise UnexportableConnectivityStatement("Error getting origin row")
 
-    try:
-        rows.append(get_destination_row(cs))
-    except Exception:
-        raise UnexportableConnectivityStatement("Error getting destination row")
+    for destination_instance in cs.destinations.all():
+        try:
+            rows.append(get_destination_row(destination_instance))
+        except Exception:
+            raise UnexportableConnectivityStatement("Error getting destination row")
 
     for via in cs.via_set.all().order_by("display_order"):
         try:

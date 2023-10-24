@@ -19,8 +19,9 @@ from composer.models import (
     Tag,
     Via,
     FunctionalCircuitRole,
-    ProjectionPhenotype
+    ProjectionPhenotype, Destination
 )
+
 
 # Define Inlines
 
@@ -101,6 +102,12 @@ class AnatomicalEntityAdmin(admin.ModelAdmin):
     search_fields = ("name",)  # or ("^name",) for search to start with
 
 
+class DestinationInline(admin.TabularInline):
+    model = Destination
+    extra = 1
+    autocomplete_fields = ['anatomical_entities']
+
+
 class ConnectivityStatementAdmin(
     SortableAdminBase, FSMTransitionMixin, admin.ModelAdmin
 ):
@@ -108,13 +115,12 @@ class ConnectivityStatementAdmin(
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
     readonly_fields = ("state",)
-    autocomplete_fields = ("sentence", "origins", "destination")
+    autocomplete_fields = ("sentence", "origins")
     list_display = (
         "sentence",
         "pmid",
         "pmcid",
         "short_ks",
-        "destination",
         "tag_list",
         "state",
         "has_notes",
@@ -123,7 +129,7 @@ class ConnectivityStatementAdmin(
     )
     list_display_links = ("sentence", "pmid", "pmcid", "short_ks", "state")
     list_filter = ("state", "owner", "tags__tag")
-    list_select_related = ("sentence", "origins", "destination")
+    list_select_related = ("sentence", "origins", "destinations")
     search_fields = (
         "sentence__title",
         "sentence__text",
@@ -131,12 +137,12 @@ class ConnectivityStatementAdmin(
         "sentence__pmcid",
         "knowledge_statement",
         "origins__name",
-        "destination__name",
+        "destinations__anatomical_entities__name",
     )
 
     fieldsets = ()
 
-    inlines = (ProvenanceInline, PathInline, NoteConnectivityStatementInline)
+    inlines = (ProvenanceInline, PathInline, NoteConnectivityStatementInline, DestinationInline)
 
     @admin.display(description="Knowledge Statement")
     def short_ks(self, obj):
@@ -149,26 +155,29 @@ class ConnectivityStatementAdmin(
     @admin.display(description="PMCID")
     def pmcid(self, obj):
         return obj.sentence.pmcid
-    
+
     @admin.display(description="REFERENCE")
     def reference(self, obj):
         return str(obj)
 
-    
+
 class ExportBatchAdmin(admin.ModelAdmin):
     list_display = ("user", "created_at", "count_connectivity_statements",)
     list_display_links = ("user", "created_at", "count_connectivity_statements",)
     list_filter = ("user",)
     date_hierarchy = "created_at"
     exclude = ("connectivity_statements",)
-    readonly_fields = ("user", "created_at", "count_connectivity_statements", "sentences_created", "connectivity_statements_created",)
+    readonly_fields = (
+        "user", "created_at", "count_connectivity_statements", "sentences_created", "connectivity_statements_created",)
     list_per_page = 10
     change_form_template = "admin/export_metrics_change_form.html"
-    
+
     def has_delete_permission(self, request, obj=None):
         return False
+
     def has_change_permission(self, request, obj=None):
         return False
+
     def has_add_permission(self, request):
         return False
 
@@ -178,7 +187,8 @@ class ExportBatchAdmin(admin.ModelAdmin):
 
     def get_form(self, request, obj=None, change=False, **kwargs):
         # add help text to the count_connectivity_statements computed field
-        help_texts = {'count_connectivity_statements': 'Number of connectivity statements exported in this export batch'}
+        help_texts = {
+            'count_connectivity_statements': 'Number of connectivity statements exported in this export batch'}
         kwargs.update({'help_texts': help_texts})
         return super().get_form(request, obj=obj, change=change, **kwargs)
 
@@ -203,7 +213,10 @@ admin.site.register(ProjectionPhenotype)
 
 #
 from .views import index
+
+
 def login(request, extra_context=None):
     return index(request)
+
 
 admin.site.login = login

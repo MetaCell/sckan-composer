@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
-from django.db.models.expressions import RawSQL, F
+from django.db.models.expressions import RawSQL, F, Exists, OuterRef
 from django.db.models.functions import Upper
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
@@ -88,11 +88,10 @@ class ConnectivityStatementManager(models.Manager):
             .get_queryset()
             .select_related(
                 "owner",
-                "destination",
                 "phenotype",
                 "sentence",
             )
-            .prefetch_related("notes", "tags", "species", "origins")
+            .prefetch_related("notes", "tags", "species", "origins", "destinations")
         )
 
     def excluding_draft(self):
@@ -335,19 +334,19 @@ class Sentence(models.Model):
             ),
             models.CheckConstraint(
                 check=~Q(state=SentenceState.COMPOSE_NOW)
-                | (
-                    Q(state=SentenceState.COMPOSE_NOW)
-                    & (
-                        Q(pmid__isnull=False)
-                        | Q(pmcid__isnull=False)
-                        | Q(doi__isnull=False)
-                    )
-                ),
+                      | (
+                              Q(state=SentenceState.COMPOSE_NOW)
+                              & (
+                                      Q(pmid__isnull=False)
+                                      | Q(pmcid__isnull=False)
+                                      | Q(doi__isnull=False)
+                              )
+                      ),
                 name="sentence_pmid_pmcd_valid",
             ),
             models.CheckConstraint(
                 check=(Q(external_ref__isnull=True) & Q(batch_name__isnull=True))
-                | Q(external_ref__isnull=False) & Q(batch_name__isnull=False),
+                      | Q(external_ref__isnull=False) & Q(batch_name__isnull=False),
                 name="sentence_externalref_and_batch_valid",
             ),
         ]
@@ -398,18 +397,6 @@ class ConnectivityStatement(models.Model):
     knowledge_statement = models.TextField(db_index=True, blank=True)
     state = FSMField(default=CSState.DRAFT, protected=True)
     origins = models.ManyToManyField(AnatomicalEntity, related_name='origins_relations')
-
-    destination = models.ForeignKey(
-        AnatomicalEntity,
-        verbose_name="Destination",
-        on_delete=models.DO_NOTHING,
-        related_name="destination",
-        null=True,
-        blank=True,
-    )
-    destination_type = models.CharField(
-        max_length=10, default=DestinationType.UNKNOWN, choices=DestinationType.choices
-    )
     owner = models.ForeignKey(
         User, verbose_name="Curator", on_delete=models.SET_NULL, null=True, blank=True
     )
@@ -578,13 +565,40 @@ class ConnectivityStatement(models.Model):
                 check=Q(circuit_type__in=[c[0] for c in CircuitType.choices]),
                 name="circuit_type_valid",
             ),
-            models.CheckConstraint(
-                check=Q(destination_type__in=[dt[0] for dt in DestinationType.choices]),
-                name="destination_type_valid",
-            ),
+
             models.CheckConstraint(
                 check=Q(projection__in=[p[0] for p in Projection.choices]),
                 name="projection_valid",
+            ),
+        ]
+
+
+class AbstractConnectionLayer(models.Model):
+    connectivity_statement = models.ForeignKey(ConnectivityStatement, on_delete=models.CASCADE)
+    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True, related_name='connection_layers')
+    from_entities = models.ManyToManyField(AnatomicalEntity, blank=True)
+
+    class Meta:
+        abstract = True
+
+
+class Destination(AbstractConnectionLayer):
+    connectivity_statement = models.ForeignKey(
+        ConnectivityStatement,
+        on_delete=models.CASCADE,
+        related_name="destinations"  # Overridden related_name
+    )
+    type = models.CharField(
+        max_length=12,
+        choices=DestinationType.choices,
+        default=DestinationType.UNKNOWN
+    )
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=Q(type__in=[dt[0] for dt in DestinationType.choices]),
+                name="destination_type_valid",
             ),
         ]
 
@@ -645,7 +659,7 @@ class Note(models.Model):
                     sentence__isnull=False,
                     connectivity_statement__isnull=True,
                 )
-                | models.Q(
+                      | models.Q(
                     sentence__isnull=True,
                     connectivity_statement__isnull=False,
                 ),
