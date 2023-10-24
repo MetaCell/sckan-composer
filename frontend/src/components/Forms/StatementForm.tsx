@@ -12,7 +12,7 @@ import { phenotypes } from "../../services/PhenotypeService";
 import { CustomAutocompleteForwardConnection } from "../Widgets/CustomAutocompleteForwardConnection";
 import { CustomAnatomicalField } from "../Widgets/CustomAnatomicalField";
 import { Box, Chip } from '@mui/material';
-import AutocompleteTextField from "../Widgets/AutocompleteTextField";
+import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
 const StatementForm = (props: any) => {
   const { uiFields, statement, setter, format } = props;
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
@@ -358,9 +358,10 @@ const StatementForm = (props: any) => {
   }
 
   copiedUISchema.origin_id = {
-    "ui:widget": AutocompleteTextField,
+    "ui:widget": CustomEntitiesDropdown,
     "ui:options": {
-      label: format === "noLabel" ? false : "Origin",
+      entity: 'Origin',
+      header:{ label: 'Origins', values: ['Major pelvic ganglion', 'Prevertebral sympathetic ganglion in abdominal aortic plexus', 'Accessory pelvic ganglion']},
       placeholder: "Look for Origins",
       searchPlaceholder: "Search for Origins",
       noResultReason: "We couldn’t find any record with these origin in the database.",
@@ -423,11 +424,12 @@ const StatementForm = (props: any) => {
   };
 
   copiedUISchema.forward_connection = {
-    "ui:widget": CustomAnatomicalField,
+    "ui:widget": CustomEntitiesDropdown,
     "ui:options": {
+      entity: 'Connections',
       label: "",
       placeholder: "Forward connection(s)",
-      searchPlaceholder: "Search for Connections",
+      searchPlaceholder: "Search for Knowledge Statements",
       noResultReason: "We couldn’t find any record with these origin in the database.",
       disabledReason: "Add Destination entity to get access to the forward connection form",
       onSearch: (searchValue: string) => getConnections(searchValue),
