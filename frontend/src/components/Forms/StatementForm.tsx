@@ -378,7 +378,7 @@ const StatementForm = (props: any) => {
       CustomHeader : ({entity}: any) => <Box sx={{mb: '1.5rem', pb: '1.5rem', borderBottom: '0.0625rem solid #F2F4F7'}}>
         <Chip variant="outlined" label={"https://google.com"} />
       </Box>,
-      CustomFooter : ({entity}: any) => <Box sx={{mt: '1.5rem', pt: '1.5rem', borderTop: '0.0625rem solid #F2F4F7'}}>
+      CustomFooter : ({entity}: any) => <Box sx={{mt: '1.5rem', display: 'flex', gap: 1, flexWrap: 'wrap', pt: '1.5rem', borderTop: '0.0625rem solid #F2F4F7'}}>
         {/* <Chip variant="filled" color="error" label={"https://google.com"} /> */}
         <Chip variant="filled" color="success" label={"https://google.com"} />
         <Chip variant="outlined" label={"https://google.com"} />

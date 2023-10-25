@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 // import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
-import { InputAdornment, List, ListItem, ListItemButton, ListItemText, styled } from "@mui/material";
+import { Badge, InputAdornment, List, ListItem, ListItemButton, ListItemText, Tooltip, styled } from "@mui/material";
 // import Typography from "@mui/material/Typography";
 import { vars } from "../../theme/variables";
 import { CustomAnatomicalField } from "./CustomAnatomicalField";
@@ -46,7 +46,7 @@ const styles = {
     background: '#FFF',
     display: 'flex',
     alignItems: 'center',
-    padding: '0 0.75rem',
+    padding: '0.5rem 0.75rem',
     boxShadow: '0 0.0625rem 0.125rem 0 rgba(16, 24, 40, 0.05)',
     ...transition,
     '&:after': {
@@ -83,6 +83,7 @@ const styles = {
     background: '#FFF',
     color: '#344054',
     fontSize: '0.875rem',
+    maxWidth: '8rem',
     fontWeight: 500,
 
 
@@ -94,21 +95,7 @@ const styles = {
       margin: 0,
       color: '#98A2B3',
       fontSize: '0.75rem',
-      zIndex: '9999'
-    }
-  },
-
-
-  popover: {
-    '& .MuiPopover-paper': {
-      height: "19.5rem",
-      display: 'flex',
-      width: '55.5rem',
-      borderRadius: '0.5rem',
-      border: '0.0625rem solid #ECEDEE',
-      background: '#FFF',
-      boxShadow: '0 0.5rem 0.5rem -0.25rem rgba(7, 8, 8, 0.03), 0 1.25rem 1.5rem -0.25rem rgba(7, 8, 8, 0.08)',
-      mt: '0.25rem'
+      zIndex: 10000
     }
   },
 
@@ -130,6 +117,24 @@ const styles = {
   list: {
     width: '50%',
     flexShrink: 0,
+    display: 'flex',
+    flexDirection: 'column'
+  },
+
+  badge: {
+    display: 'block',
+    '& .MuiBadge-badge': {
+      position: 'absolute',
+      width: '1.375rem',
+      height: '1.375rem',
+      color: '#184EA2',
+      background: '#C6D9F6',
+      textAlign: 'center',
+      fontSize: '0.75rem',
+      borderRadius: '3.125rem',
+      fontWeight: 500,
+      lineHeight: '150%'
+    }
   },
 
   details: {
@@ -249,7 +254,7 @@ export default function CustomEntitiesDropdown({
 
   const handleOptionSelection = (option: Option) => {
     const isOptionAlreadySelected = selectedOptions.some((selected) => selected.id === option.id);
-  
+
     if (isOptionAlreadySelected) {
       const updatedSelectedOptions = selectedOptions.filter((selected) => selected.id !== option.id);
       setSelectedOptions(updatedSelectedOptions);
@@ -275,11 +280,11 @@ export default function CustomEntitiesDropdown({
   };
   // show the disable message only in case of forward connections
   const formIsDisabled = !statement.destination && entity === 'Connections';
-  
-  return  formIsDisabled ? (
+
+  return formIsDisabled ? (
     <Box
       sx={{ background: theme.palette.grey[100], borderRadius: 1 }}
-      p={3}
+      p={2}
       display="flex"
       justifyContent="center"
     >
@@ -289,43 +294,63 @@ export default function CustomEntitiesDropdown({
     </Box>
   ) : (
     <>
-      <Box
-        aria-describedby={id}
-        sx={
-          open ?
-            { ...styles.root, ...styles.rootOpen } : selectedOptions.length === 0 ? styles.root : { ...styles.root, ...styles.rootHover }}
-        onClick={handleClick}
-      >
-        {selectedOptions.length === 0 ? (
-          <Typography sx={styles.placeholder}>{placeholder}</Typography>
-        ) : (
-          <Box gap={1} display='flex' flexWrap='wrap'>
-            {selectedOptions?.map((item: any) => (
-              <Chip
-                key={item?.id}
-                sx={styles.chip}
-                variant='outlined'
-                deleteIcon={<ClearOutlinedIcon />}
-                onDelete={(e) => {
-                  e.stopPropagation();
-                  handleChipRemove(item);
-                }}
-                label={item?.label?.length > 15 ?  item?.label.slice(0, 15) + "..." : item?.label}
-              />
-            ))}
-          </Box>
-        )}
+      <Badge sx={styles.badge} badgeContent={selectedOptions?.length}>
+        <Box
+          aria-describedby={id}
+          sx={
+            open ?
+              { ...styles.root, ...styles.rootOpen } : selectedOptions.length === 0 ? styles.root : { ...styles.root, ...styles.rootHover }}
+          onClick={handleClick}
+        >
+          {selectedOptions.length === 0 ? (
+            <Typography sx={styles.placeholder}>{placeholder}</Typography>
+          ) : (
+            <Box gap={1} display='flex' flexWrap='wrap'>
+              {selectedOptions?.map((item: any) => (
+                <Tooltip title={item?.label} placement='top' arrow>
+                  <Chip
+                    key={item?.id}
+                    sx={styles.chip}
+                    variant='outlined'
+                    deleteIcon={<ClearOutlinedIcon />}
+                    onDelete={(e) => {
+                      e.stopPropagation();
+                      handleChipRemove(item);
+                    }}
+                    // label={item?.label?.length > 15 ? item?.label.slice(0, 15) + "..." : item?.label}
+                    label={item?.label}
+                  />
+                </Tooltip>
+              ))}
+            </Box>
+          )}
 
-        {open ? <ArrowDropUpIcon sx={styles.toggleIcon} /> : <ArrowDropDownIcon sx={styles.toggleIcon} />}
+          {open ? <ArrowDropUpIcon sx={styles.toggleIcon} /> : <ArrowDropDownIcon sx={styles.toggleIcon} />}
 
-      </Box>
+        </Box>
+      </Badge>
+
 
       <Popover
         id={id}
         open={open}
         anchorEl={anchorEl}
         onClose={handleClose}
-        sx={styles.popover}
+        sx={{
+          '& .MuiPopover-paper': {
+            height: "28.125rem",
+            borderRadius: '0.5rem',
+            border: '0.0625rem solid #ECEDEE',
+            background: '#FFF',
+            boxShadow: '0 0.5rem 0.5rem -0.25rem rgba(7, 8, 8, 0.03), 0 1.25rem 1.5rem -0.25rem rgba(7, 8, 8, 0.08)',
+            mt: '0.25rem',
+            width: autocompleteOptions.length > 0 ? '55.5rem' : '27.75rem',
+            display: 'flex',
+            flexDirection: 'column',
+            zIndex: 110000
+
+          },
+        }}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'left',
@@ -335,256 +360,266 @@ export default function CustomEntitiesDropdown({
           horizontal: 'left',
         }}
       >
-        <Box sx={styles.list}>
-          { header?.values?.length > 0 && (
-            <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              sx={{
-                borderTop: '0.0625rem solid #ECEDEE',
-                height: '2.75rem',
-              }}
-            >
-              <Typography variant="body2" marginBottom={2}>
-                { header?.label }
-              </Typography>
-              {header?.values?.map((item: any) => (
+
+        {header?.values?.length > 0 && (
+          <Box
+            display="flex"
+            alignItems="center"
+            flexWrap='wrap'
+            gap={1}
+            sx={{
+              borderBottom: '0.0625rem solid #ECEDEE',
+              height: autocompleteOptions.length > 0 ? '2.75rem' : 'auto',
+              padding: autocompleteOptions.length > 0 ? '0 0.875rem' : '0.875rem'
+            }}
+          >
+            <Typography variant="body2">
+              {header?.label}
+            </Typography>
+            {header?.values?.map((item: any) => (
+              <Tooltip title={item} placement='top' arrow>
                 <Chip
                   key={item?.id}
                   sx={styles.chip}
                   variant='outlined'
                   label={item}
                 />
-              ))}
-            )
-            </Box>
-          )}
+              </Tooltip>
+            ))}
+          </Box>
+        )}
+        <Box display='flex' flex={1} height={autocompleteOptions.length > 0 ? 'calc(100% - 2.75rem)' : 'auto'}>
+          <Box sx={{
+            ...styles.list,
+            width: autocompleteOptions.length > 0 ? '50%' : '100%'
+          }}>
             <Box sx={{
-            borderBottom: '0.0625rem solid #ECEDEE',
-            height: '3.125rem',
-            padding: '0 0.875rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            flexWrap: 'wrap',
-            overflowY: 'auto',
-
-            '& .MuiOutlinedInput-input': {
-              padding: 0,
-              fontSize: '0.75rem',
-              color: '#676C74',
-              fontWeight: '400',
+              borderBottom: '0.0625rem solid #ECEDEE',
               height: '3.125rem',
+              padding: '0 0.875rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              flexWrap: 'wrap',
 
-              '&::placeholder': {
+              '& .MuiOutlinedInput-input': {
+                padding: 0,
                 fontSize: '0.75rem',
                 color: '#676C74',
                 fontWeight: '400',
+                height: '3.125rem',
+
+                '&::placeholder': {
+                  fontSize: '0.75rem',
+                  color: '#676C74',
+                  fontWeight: '400',
+                }
+              },
+
+              '& .MuiOutlinedInput-notchedOutline': {
+                display: 'none'
+              },
+
+              '& .MuiOutlinedInput-root': {
+                border: 'none',
+                boxShadow: 'none',
+                padding: '0'
               }
-            },
-
-            '& .MuiOutlinedInput-notchedOutline': {
-              display: 'none'
-            },
-
-            '& .MuiOutlinedInput-root': {
-              border: 'none',
-              boxShadow: 'none',
-              padding: '0'
-            }
-          }}>
-            <TextField
-              fullWidth={selectedOptions.length === 0}
-              type="text"
-              value={inputValue}
-              onChange={handleInputChange}
-              placeholder={searchPlaceholder}
-              InputProps={{
-                startAdornment: <InputAdornment position='start'><SearchIcon sx={{fontSize: '1rem', color: '#667085'}} /></InputAdornment>
-              }}
-            />
+            }}>
+              <TextField
+                fullWidth={selectedOptions.length === 0}
+                type="text"
+                value={inputValue}
+                onChange={handleInputChange}
+                placeholder={searchPlaceholder}
+                InputProps={{
+                  startAdornment: <InputAdornment position='start'><SearchIcon sx={{ fontSize: '1rem', color: '#667085' }} /></InputAdornment>
+                }}
+              />
             </Box>
             {autocompleteOptions.length > 0 ? (
               <>
-              <Box overflow='auto' height='calc(100% - (2.75rem + 3.125rem))'>
-                {Object.keys(groupedOptions).map((group) => (
-                  <Box sx={{
-                    padding: '0 0.375rem',
-                    '& .MuiListSubheader-root': {
-                      padding: '0 0 0 0.625rem',
-                      height: '1.875rem',
-                      margin: '0.375rem 0 0.125rem',
+                <Box overflow='auto' height='calc(100% - (2.75rem + 3.125rem))'>
+                  {Object.keys(groupedOptions).map((group) => (
+                    <Box sx={{
+                      padding: '0 0.375rem',
+                      '& .MuiListSubheader-root': {
+                        padding: '0 0 0 0.625rem',
+                        height: '1.875rem',
+                        margin: '0.375rem 0 0.125rem',
 
-                      '& .MuiTypography-root': {
+                        '& .MuiTypography-root': {
+                          fontSize: '0.75rem',
+                          lineHeight: '1.125rem',
+                          fontWeight: 600,
+                          color: '#344054'
+                        },
+                      },
+                      '& .MuiCheckbox-root': {
+                        padding: 0
+                      },
+                      '& .MuiButton-root': {
+                        padding: 0,
+                        height: '1.625rem',
+                        width: '5.0625rem',
                         fontSize: '0.75rem',
                         lineHeight: '1.125rem',
                         fontWeight: 600,
-                        color: '#344054'
+                        color: '#184EA2'
                       },
-                    },
-                    '& .MuiCheckbox-root': {
-                      padding: 0
-                    },
-                    '& .MuiButton-root': {
-                      padding: 0,
-                      height: '1.625rem',
-                      width: '5.0625rem',
-                      fontSize: '0.75rem',
-                      lineHeight: '1.125rem',
-                      fontWeight: 600,
-                      color: '#184EA2'
-                    },
 
-                    '& ul': {
-                      margin: 0,
-                      listStyle: 'none',
-                      padding: '0',
+                      '& ul': {
+                        margin: 0,
+                        listStyle: 'none',
+                        padding: '0',
 
-                      '& li': {
-                        padding: '0.6875rem 0.625rem',
-                        display: 'flex',
-                        gap: '0.5rem',
-                        cursor: 'pointer',
+                        '& li': {
+                          padding: '0.6875rem 0.625rem',
+                          display: 'flex',
+                          gap: '0.5rem',
+                          cursor: 'pointer',
 
-                        '&:hover': {
-                          borderRadius: '0.375rem',
-                          background: '#F2F4F7'
-                        },
+                          '&:hover': {
+                            borderRadius: '0.375rem',
+                            background: '#F2F4F7'
+                          },
 
-                        '&.selected': {
-                          borderRadius: '0.375rem',
-                          background: '#F2F4F7'
-                        },
+                          '&.selected': {
+                            borderRadius: '0.375rem',
+                            background: '#F2F4F7'
+                          },
 
-                        '& .MuiTypography-body1': {
-                          color: '#344054',
-                          fontSize: '0.875rem',
-                          fontWeight: 500,
-                          lineHeight: '142.857%',
-                          padding: 0
-                        },
+                          '& .MuiTypography-body1': {
+                            color: '#344054',
+                            fontSize: '0.875rem',
+                            fontWeight: 500,
+                            lineHeight: '142.857%',
+                            padding: 0
+                          },
 
-                        '& .MuiTypography-body2': {
-                          color: '#667085',
-                          fontSize: '0.75rem',
-                          fontWeight: 400,
-                          lineHeight: '150%',
-                          padding: 0,
-                          whiteSpace: 'nowrap'
+                          '& .MuiTypography-body2': {
+                            color: '#667085',
+                            fontSize: '0.75rem',
+                            fontWeight: 400,
+                            lineHeight: '150%',
+                            padding: 0,
+                            whiteSpace: 'nowrap'
+                          }
                         }
                       }
-                    }
-                  }} key={group}>
-                    <ListSubheader
-                      component="div"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Typography
-                        sx={{
-                          color: "#344054",
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          lineHeight: "1.125rem",
+                    }} key={group}>
+                      <ListSubheader
+                        component="div"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
                         }}
                       >
-                        {group}
-                      </Typography>
-                      {getGroupButton(group)}
-                    </ListSubheader>
-                    <ul>
-                      {groupedOptions[group]
-                        .filter((suggestion: any) =>
-                          suggestion.label.toLowerCase().includes(inputValue.toLowerCase())
-                        )
-                        .map((suggestion: any) => (
-                          <li
-                            key={suggestion.id}
-                            onMouseEnter={() => setHoveredOption(suggestion)}
-                            onClick={() => handleOptionSelection(suggestion)}
-                            className={isOptionSelected(suggestion) ? 'selected' : ''}
-                          >
-                            <Checkbox
-                              disableRipple
-                              icon={<UncheckedItemIcon fontSize="small" />}
-                              checkedIcon={<CheckedItemIcon fontSize="small" />}
-                              checked={isOptionSelected(suggestion)}
-                            />
-                            <Typography
-                              sx={{ width: 1, height: 1, padding: "0.625rem" }}
+                        <Typography
+                          sx={{
+                            color: "#344054",
+                            fontSize: "0.75rem",
+                            fontWeight: 600,
+                            lineHeight: "1.125rem",
+                          }}
+                        >
+                          {group}
+                        </Typography>
+                        {getGroupButton(group)}
+                      </ListSubheader>
+                      <ul>
+                        {groupedOptions[group]
+                          .filter((suggestion: any) =>
+                            suggestion.label.toLowerCase().includes(inputValue.toLowerCase())
+                          )
+                          .map((suggestion: any) => (
+                            <li
+                              key={suggestion.id}
+                              onMouseEnter={() => setHoveredOption(suggestion)}
+                              onClick={() => handleOptionSelection(suggestion)}
+                              className={isOptionSelected(suggestion) ? 'selected' : ''}
                             >
-                              {suggestion?.label}
-                            </Typography>
-                            <Typography whiteSpace='nowrap' variant="body2">{suggestion?.id}</Typography>
-                          </li>
-                        ))}
-                    </ul>
-                  </Box>
-                ))}
-              </Box>
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                sx={{
-                  borderTop: '0.0625rem solid #ECEDEE',
-                  height: '2.75rem',
+                              <Checkbox
+                                disableRipple
+                                icon={<UncheckedItemIcon fontSize="small" />}
+                                checkedIcon={<CheckedItemIcon fontSize="small" />}
+                                checked={isOptionSelected(suggestion)}
+                              />
+                              <Typography
+                                sx={{ width: 1, height: 1, padding: "0.625rem" }}
+                              >
+                                {suggestion?.label}
+                              </Typography>
+                              <Typography whiteSpace='nowrap' variant="body2">{suggestion?.id}</Typography>
+                            </li>
+                          ))}
+                      </ul>
+                    </Box>
+                  ))}
+                </Box>
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  sx={{
+                    borderTop: '0.0625rem solid #ECEDEE',
+                    height: '2.75rem',
 
-                  '& .MuiButton-root': {
-                    color: "#676C74",
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                    height: '100%',
-                    lineHeight: "1.25rem",
-                    zIndex: 200000,
-                    width: '100%',
-                    borderRadius: 0,
-                    p: 0,
-                    '&:hover': {
-                      background: '#F2F4F7'
+                    '& .MuiButton-root': {
+                      color: "#676C74",
+                      fontSize: "0.875rem",
+                      fontWeight: 600,
+                      height: '100%',
+                      lineHeight: "1.25rem",
+                      zIndex: 200000,
+                      width: '100%',
+                      borderRadius: 0,
+                      p: 0,
+                      '&:hover': {
+                        background: '#F2F4F7'
+                      }
                     }
-                  }
-                }}
-              >
-                {selectedOptions.length === autocompleteOptions.length ? (
-                  <Button
-                    disableRipple
-                    startIcon={<PlaylistRemoveOutlinedIcon />}
-                    variant="text"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setSelectedOptions([]);
-                    }}
-                  >
-                    Deselect all
-                  </Button>
-                ) : (
-                  <Button
-                    disableRipple
-                    startIcon={<PlaylistAddCheckOutlinedIcon />}
-                    variant="text"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setSelectedOptions(autocompleteOptions);
-                    }}
-                  >
-                    Select all
-                  </Button>
-                )}
-              </Box>
+                  }}
+                >
+                  {selectedOptions.length === autocompleteOptions.length ? (
+                    <Button
+                      disableRipple
+                      startIcon={<PlaylistRemoveOutlinedIcon />}
+                      variant="text"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectedOptions([]);
+                      }}
+                    >
+                      Deselect all
+                    </Button>
+                  ) : (
+                    <Button
+                      disableRipple
+                      startIcon={<PlaylistAddCheckOutlinedIcon />}
+                      variant="text"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectedOptions(autocompleteOptions);
+                      }}
+                    >
+                      Select all
+                    </Button>
+                  )}
+                </Box>
               </>
             ) : (
               <Box
                 width={1}
+                px={2}
+                textAlign='center'
                 sx={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexDirection: "column",
+                  flex: 1
                 }}
               >
                 <Typography
@@ -597,27 +632,30 @@ export default function CustomEntitiesDropdown({
                 </Typography>
 
                 <Typography variant="body1" marginBottom={2}>
-                  { noResultReason }
+                  {noResultReason}
                 </Typography>
                 <Button variant="outlined">Clear search</Button>
               </Box>
             )}
-        </Box>
-        <Box sx={styles.details}>
-          { autocompleteOptions.length > 0 && (hoveredOption ? (
-            <HoveredOptionContent
-              entity={hoveredOption}
-              HeaderComponent={CustomHeader ?? CustomHeader}
-              BodyComponent={CustomBody ?? CustomBody}
-              FooterComponent={CustomFooter ?? CustomFooter}
-            />
-          ) : (
-            <Box height={1} display='flex' alignItems='center' justifyContent='center'>
-              <Typography variant='body2'>
-                Hover over each nerve to its details
-              </Typography>
+          </Box>
+          {autocompleteOptions.length > 0 && (
+            <Box sx={styles.details}>
+              {autocompleteOptions.length > 0 && (hoveredOption ? (
+                <HoveredOptionContent
+                  entity={hoveredOption}
+                  HeaderComponent={CustomHeader ?? CustomHeader}
+                  BodyComponent={CustomBody ?? CustomBody}
+                  FooterComponent={CustomFooter ?? CustomFooter}
+                />
+              ) : (
+                <Box height={1} display='flex' alignItems='center' justifyContent='center'>
+                  <Typography variant='body2'>
+                    Hover over each nerve to its details
+                  </Typography>
+                </Box>
+              ))}
             </Box>
-          ))}
+          )}
 
         </Box>
       </Popover>
