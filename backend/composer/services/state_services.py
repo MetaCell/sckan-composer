@@ -143,7 +143,6 @@ class ConnectivityStatementService(StateServiceMixin):
                 and connectivity_statement.destinations.exists()
                 and connectivity_statement.phenotype is not None
                 and connectivity_statement.sex is not None
-                and connectivity_statement.path.count() > 0
                 and connectivity_statement.species.count() > 0
                 and connectivity_statement.provenance_set.count() > 0
         )
@@ -182,7 +181,7 @@ class ConnectivityStatementService(StateServiceMixin):
 
         # Get all anatomical_entities associated with the destinations of the connectivity statement
         destination_anatomical_entities = AnatomicalEntity.objects.filter(
-            connection_layers__in=connectivity_statement.destinations.all())
+            destination_connection_layers__in=connectivity_statement.destinations.all())
 
         for forward_connection in connectivity_statement.forward_connection.all():
             # Check if any anatomical_entity associated with the destination is in the origins of the forward_connection

@@ -249,11 +249,19 @@ def ingest_statements():
                         destination_instance.anatomical_entities.add(destination_entity)
 
 
-            # TODO add display_order criteria on neurondm update
-            vias = (Via(connectivity_statement=connectivity_statement,
-                        anatomical_entity=AnatomicalEntity.objects.filter(ontology_uri=via[ENTITY_URI])[0],
-                        type=via[TYPE]) for via in statement[VIAS])
-            Via.objects.bulk_create(vias)
+            # TODO add display_order criteria on neurondm update @antonella
+            vias_data = [
+                Via(connectivity_statement=connectivity_statement, type=via[TYPE])
+                for via in statement[VIAS]
+            ]
+            created_vias = Via.objects.bulk_create(vias_data)
+
+            for via_instance, via_data in zip(created_vias, statement[VIAS]):
+                anatomical_entities = AnatomicalEntity.objects.filter(
+                    ontology_uri__in=via_data[ENTITY_URI]
+                )
+                via_instance.anatomical_entities.set(anatomical_entities)
+
             provenances_list = statement[PROVENANCE][0].split(", ") if has_prop(statement[PROVENANCE]) else [
                 statement[ID]]
             provenances = (Provenance(connectivity_statement=connectivity_statement, uri=provenance) for provenance in

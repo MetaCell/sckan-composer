@@ -33,13 +33,6 @@ class ProfileInline(admin.StackedInline):
     verbose_name_plural = "profile"
 
 
-class PathInline(SortableStackedInline):
-    model = Via
-    extra = 0
-    autocomplete_fields = ("anatomical_entity",)
-    default_order_field = "display_order"
-
-
 class ProvenanceInline(admin.StackedInline):
     model = Provenance
     extra = 1
@@ -102,10 +95,17 @@ class AnatomicalEntityAdmin(admin.ModelAdmin):
     search_fields = ("name",)  # or ("^name",) for search to start with
 
 
+class PathInline(SortableStackedInline):
+    model = Via
+    extra = 0
+    raw_id_fields = ("anatomical_entities", "from_entities")
+    default_order_field = "order"
+
+
 class DestinationInline(admin.TabularInline):
     model = Destination
-    extra = 1
-    autocomplete_fields = ['anatomical_entities']
+    extra = 0
+    raw_id_fields = ("anatomical_entities", "from_entities")
 
 
 class ConnectivityStatementAdmin(
@@ -142,7 +142,7 @@ class ConnectivityStatementAdmin(
 
     fieldsets = ()
 
-    inlines = (ProvenanceInline, PathInline, NoteConnectivityStatementInline, DestinationInline)
+    inlines = (ProvenanceInline, NoteConnectivityStatementInline, PathInline, DestinationInline)
 
     @admin.display(description="Knowledge Statement")
     def short_ks(self, obj):

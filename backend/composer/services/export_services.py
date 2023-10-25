@@ -195,9 +195,13 @@ def get_origin_row(origin: AnatomicalEntity, review_notes: str, curation_notes: 
 
 
 def get_destination_row(destination_instance: Destination):
+    # Joining all anatomical entity names together
+    names = ', '.join([ae.name for ae in destination_instance.anatomical_entities.all()])
+    ontology_uris = ', '.join([ae.ontology_uri for ae in destination_instance.anatomical_entities.all()])
+
     return Row(
-        destination_instance.anatomical_entity.name,
-        destination_instance.anatomical_entity.ontology_uri,
+        names,
+        ontology_uris,
         destination_instance.get_type_display(),
         TEMP_DESTINATION_PREDICATE_MAP.get(destination_instance.type),
         "",
@@ -206,9 +210,13 @@ def get_destination_row(destination_instance: Destination):
 
 
 def get_via_row(via: Via):
+    # Joining all anatomical entity names together
+    names = ', '.join([ae.name for ae in via.anatomical_entities.all()])
+    ontology_uris = ', '.join([ae.ontology_uri for ae in via.anatomical_entities.all()])
+
     return Row(
-        via.anatomical_entity.name,
-        via.anatomical_entity.ontology_uri,
+        names,
+        ontology_uris,
         via.get_type_display(),
         TEMP_VIA_PREDICATE_MAP.get(via.type),
         "",
@@ -334,7 +342,7 @@ def get_rows(cs: ConnectivityStatement) -> List:
         except Exception:
             raise UnexportableConnectivityStatement("Error getting destination row")
 
-    for via in cs.via_set.all().order_by("display_order"):
+    for via in cs.via_set.all().order_by("order"):
         try:
             rows.append(get_via_row(via))
         except Exception:

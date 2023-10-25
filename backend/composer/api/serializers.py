@@ -157,18 +157,20 @@ class SexSerializer(serializers.ModelSerializer):
 class ViaSerializer(serializers.ModelSerializer):
     """Via"""
 
-    anatomical_entity_id = serializers.IntegerField(required=True)
-    anatomical_entity = AnatomicalEntitySerializer(required=False, read_only=True)
+    anatomical_entities_details = AnatomicalEntitySerializer(
+        source='anatomical_entities',
+        many=True,
+        read_only=True
+    )
 
     class Meta:
         model = Via
         fields = (
             "id",
-            "display_order",
+            "order",
             "connectivity_statement_id",
             "type",
-            "anatomical_entity_id",
-            "anatomical_entity",
+            "anatomical_entities_details",
         )
 
 
@@ -323,7 +325,7 @@ class ConnectivityStatementSerializer(
     provenances = ProvenanceSerializer(
         source="provenance_set", many=True, read_only=False, required=False
     )
-    path = ViaSerializer(source="via_set", many=True, read_only=False, required=False)
+    vias = ViaSerializer(source="via_set", many=True, read_only=False, required=False)
     owner = UserSerializer(required=False, read_only=True)
     origins = AnatomicalEntitySerializer(many=True, required=False, read_only=True)
     destinations = DestinationSerializer(many=True, required=False, read_only=True)
@@ -348,37 +350,32 @@ class ConnectivityStatementSerializer(
         return instance.has_notes
 
     def get_statement_preview(self, instance) -> str:
-        # TODO: Update for the new graph format
+        # TODO: Update statement preview?
         sex = instance.sex.name if instance.sex else ""
         species_list = [specie.name for specie in instance.species.all()]
-        if len(species_list) > 1:
-            species = f"{', '.join(species_list[:-1])} and {species_list[-1]}"
-        elif species_list:
-            species = species_list[0]
-        else:
-            species = ""
+        species = ', '.join(species_list[:-1]) + f" and {species_list[-1]}" if species_list else ""
 
         phenotype = instance.phenotype.name if instance.phenotype else ""
         origin_names = [origin.name for origin in instance.origins.all()]
         origins = ', '.join(origin_names) if origin_names else ""
 
-        # Extracting all destinations for the instance
         destinations = instance.destinations.all()
-        destination_strings = []
-        for dest in destinations:
-            dest_names = [str(entity.name) for entity in dest.anatomical_entities.all()]
-            dest_combined = ", ".join(dest_names[:-1]) + (" and " + dest_names[-1] if len(dest_names) > 1 else "")
-            destination_strings.append(dest_combined)
-        all_destinations_combined = ", ".join(destination_strings[:-1]) + (
-            " and " + destination_strings[-1] if len(destination_strings) > 1 else "")
+        destination_strings = [
+            ', '.join([entity.name for entity in dest.anatomical_entities.all()])
+            for dest in destinations
+        ]
+        all_destinations_combined = ', '.join(destination_strings[:-1]) + (
+            f" and {destination_strings[-1]}" if destination_strings else ""
+        )
 
-        via_values = [f"via {via.name}" for via in instance.path.all()]
-        if len(via_values) > 1:
-            via_string = f" {', '.join(via_values[:-1])} and {via_values[-1]}"
-        elif via_values:
-            via_string = f" {via_values[0]}"
-        else:
-            via_string = ""
+        vias = instance.via_set.all()
+        via_strings = [
+            ', '.join([entity.name for entity in via.anatomical_entities.all()])
+            for via in vias
+        ]
+        via_combined = ', '.join(via_strings[:-1]) + (
+            f" and {via_strings[-1]}" if via_strings else ""
+        )
 
         circuit_type = instance.circuit_type if instance.circuit_type else ""
         projection = instance.projection if instance.projection else ""
@@ -393,7 +390,10 @@ class ConnectivityStatementSerializer(
         apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
 
         # Creating the statement
-        statement = f"In {sex} {species}, a {phenotype} connection goes from {origins} to {all_destinations_combined}{via_string}. "
+        statement = f"In {sex} {species}, a {phenotype} connection goes from {origins}"
+        if via_combined:
+            statement += f" via {via_combined}"
+        statement += f" to {all_destinations_combined}. "
         statement += f"This {circuit_type} projects {projection} from the {origins} and is found {laterality_description}. "
 
         if forward_connection:
@@ -403,6 +403,7 @@ class ConnectivityStatementSerializer(
             statement += f"It is described in {apinatomy} model."
 
         return statement.strip()
+
 
     def get_errors(self, instance) -> List:
         return get_connectivity_errors(instance)
@@ -436,10 +437,10 @@ class ConnectivityStatementSerializer(
             "state",
             "available_transitions",
             "origins",
+            "vias",
             "destinations",
             "phenotype_id",
             "phenotype",
-            "path",
             "journey",
             "laterality",
             "projection",

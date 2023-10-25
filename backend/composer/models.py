@@ -352,39 +352,6 @@ class Sentence(models.Model):
         ]
 
 
-class Via(models.Model):
-    """Via"""
-
-    connectivity_statement = models.ForeignKey(
-        "ConnectivityStatement",
-        on_delete=models.CASCADE,
-    )
-    anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.DO_NOTHING)
-    display_order = models.PositiveIntegerField(
-        blank=True,
-        null=True,
-    )
-    type = models.CharField(max_length=8, default=ViaType.AXON, choices=ViaType.choices)
-
-    def __str__(self):
-        return f"{self.connectivity_statement} - {self.anatomical_entity}"
-
-    def save(self, *args, **kwargs):
-        if self.display_order is None:
-            self.display_order = self.connectivity_statement.path.all().count()
-        super().save(*args, **kwargs)
-
-    class Meta:
-        ordering = ["display_order"]
-        verbose_name_plural = "Via"
-        constraints = [
-            models.CheckConstraint(
-                check=Q(type__in=[vt[0] for vt in ViaType.choices]),
-                name="via_type_valid",
-            ),
-        ]
-
-
 class ConnectivityStatement(models.Model):
     """Connectivity Statement"""
 
@@ -400,7 +367,6 @@ class ConnectivityStatement(models.Model):
     owner = models.ForeignKey(
         User, verbose_name="Curator", on_delete=models.SET_NULL, null=True, blank=True
     )
-    path = models.ManyToManyField(AnatomicalEntity, through=Via, blank=True)
     laterality = models.CharField(
         max_length=20, default=Laterality.UNKNOWN, choices=Laterality.choices
     )
@@ -575,7 +541,7 @@ class ConnectivityStatement(models.Model):
 
 class AbstractConnectionLayer(models.Model):
     connectivity_statement = models.ForeignKey(ConnectivityStatement, on_delete=models.CASCADE)
-    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True, related_name='connection_layers')
+    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True)
     from_entities = models.ManyToManyField(AnatomicalEntity, blank=True)
 
     class Meta:
@@ -588,6 +554,9 @@ class Destination(AbstractConnectionLayer):
         on_delete=models.CASCADE,
         related_name="destinations"  # Overridden related_name
     )
+
+    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True, related_name='destination_connection_layers')
+
     type = models.CharField(
         max_length=12,
         choices=DestinationType.choices,
@@ -601,6 +570,40 @@ class Destination(AbstractConnectionLayer):
                 name="destination_type_valid",
             ),
         ]
+
+
+class Via(AbstractConnectionLayer):
+    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True, related_name='via_connection_layers')
+
+    type = models.CharField(
+        max_length=10,
+        choices=ViaType.choices,
+        default=ViaType.AXON
+    )
+    order = models.PositiveIntegerField()
+
+    def save(self, *args, **kwargs):
+        # Check if the object already exists in the database
+        if not self.pk:
+            self.order = Via.objects.filter(connectivity_statement=self.connectivity_statement).count()
+        else:
+            # Fetch the existing object from the database
+            old_via = Via.objects.get(pk=self.pk)
+            # If the 'order' field has changed, clear the 'from_entities'
+            if old_via.order != self.order:
+                self.from_entities.all().clear()
+        super(Via, self).save(*args, **kwargs)
+
+    class Meta:
+        ordering = ["order"]
+        verbose_name_plural = "Via"
+        constraints = [
+            models.CheckConstraint(
+                check=Q(type__in=[vt[0] for vt in ViaType.choices]),
+                name="via_type_valid",
+            ),
+        ]
+        unique_together = [('connectivity_statement', 'order')]
 
 
 class Provenance(models.Model):
