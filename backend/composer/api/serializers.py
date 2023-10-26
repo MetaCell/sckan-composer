@@ -401,7 +401,7 @@ class ConnectivityStatementSerializer(
             representation["forward_connection"] = ConnectivityStatementSerializer(
                 instance.forward_connection.all(),
                 many=True,
-                context={'depth': depth + 1}
+                context={**self.context, 'depth': depth + 1}
             ).data
         return representation
 

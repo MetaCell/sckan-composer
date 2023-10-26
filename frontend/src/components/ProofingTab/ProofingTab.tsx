@@ -10,10 +10,10 @@ import StatementPreviewForm from "../Forms/StatementPreviewForm";
 import StatementForm from "../Forms/StatementForm";
 
 const ProofingTab = (props: any) => {
-  const { statement, refreshStatement, setStatement } = props;
+  const { statement, refreshStatement, setStatement, refs } = props;
   const theme = useTheme();
   const sectionStyle = useSectionStyle(theme);
-  const greyBgContainer = useGreyBgContainer(theme)
+  const greyBgContainer = useGreyBgContainer(theme);
 
   const hasJourney =
     statement.origin && statement.destination && statement.path.length > 0;
@@ -21,80 +21,69 @@ const ProofingTab = (props: any) => {
   return (
     <Grid container mb={2} spacing={2}>
       <Grid item xs={12}>
-        <Paper sx={sectionStyle}>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            sx={{
-              "& .MuiButtonBase-root": {
-                padding: 0,
-              },
-            }}
-          >
-            <Typography variant="h5" mb={3}>
-              Knowledge Statement
-            </Typography>
-            <CheckDuplicates />
-          </Stack>
-          <Box sx={{
-              paddingLeft: "8px",
-              "& .MuiGrid-container": {mt: "0 !important"},
-              "& .MuiGrid-item": { pt: 0}}
-          }>
+        <Box ref={refs[0]}>
+          <Paper sx={sectionStyle}>
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              sx={{
+                "& .MuiButtonBase-root": {
+                  padding: 0,
+                },
+              }}
+            >
+              <Typography variant="h5" mb={3}>
+                Knowledge Statement
+              </Typography>
+              <CheckDuplicates />
+            </Stack>
+            <Box
+              sx={{
+                paddingLeft: "8px",
+                "& .MuiGrid-container": { mt: "0 !important" },
+                "& .MuiGrid-item": { pt: 0 },
+              }}
+            >
               <Typography variant="h6" mb={0}>
-                  Statement Preview
+                Statement Preview
               </Typography>
               <StatementPreviewForm statement={statement} />
-          </Box>
-          <Box
-            sx={greyBgContainer}
-          >
-            <StatementWithProvenances statement={statement} refreshStatement={refreshStatement} setStatement={setStatement}/>
-          </Box>
-        </Paper>
-      </Grid>
-      <Grid item xs={12}>
-        <PathsBuilder
-          {...props}
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <Paper sx={sectionStyle}>
-          <Stack spacing={2}>
-            <Typography variant="h5">Forward connections</Typography>
-            <Box>
-              <StatementForm
+            </Box>
+            <Box sx={greyBgContainer}>
+              <StatementWithProvenances
                 statement={statement}
-                format="small"
-                setter={refreshStatement}
-                extraData={{ sentence_id: statement.sentence.id }}
-                uiFields={["forward_connection"]}
-                className='ks'
-                enableAutoSave={true}
+                refreshStatement={refreshStatement}
+                setStatement={setStatement}
               />
             </Box>
-          </Stack>
-        </Paper>
+          </Paper>
+        </Box>
       </Grid>
       <Grid item xs={12}>
-        <Paper sx={sectionStyle}>
-          <Stack spacing={2}>
-            <Typography variant="h5">Statement preview</Typography>
-            <StatementChart statement={statement} />
-          </Stack>
+        <PathsBuilder {...props} refs={refs} />
+      </Grid>
 
-          {hasJourney && (
-            <>
-              <Box my={2}>
-                <Divider />
-              </Box>
-              <Stack spacing={2}>
-                <Typography variant="h5">Journey</Typography>
-                <Typography>{statement.journey}</Typography>
-              </Stack>
-            </>
-          )}
-        </Paper>
+      <Grid item xs={12}>
+        <Box ref={refs[6]}>
+          <Paper sx={sectionStyle}>
+            <Stack spacing={2}>
+              <Typography variant="h5">Statement preview</Typography>
+              <StatementChart statement={statement} />
+            </Stack>
+
+            {hasJourney && (
+              <>
+                <Box my={2}>
+                  <Divider />
+                </Box>
+                <Stack spacing={2}>
+                  <Typography variant="h5">Journey</Typography>
+                  <Typography>{statement.journey}</Typography>
+                </Stack>
+              </>
+            )}
+          </Paper>
+        </Box>
       </Grid>
     </Grid>
   );

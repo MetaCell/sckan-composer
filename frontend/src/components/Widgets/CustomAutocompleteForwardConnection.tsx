@@ -274,6 +274,9 @@ export const CustomAutocompleteForwardConnection = ({
       </Typography>
       <Autocomplete
         sx={{
+          background: "#fff",
+          borderRadius: "0.5rem",
+          padding: ".75rem",
           "& .MuiFormControl-root": {
             "& .MuiInputBase-root": {
               borderColor:
@@ -520,7 +523,7 @@ export const CustomAutocompleteForwardConnection = ({
                 </Typography>
 
                 <Typography variant="body1" marginBottom={2}>
-                  We couldn’t find any record with these origin in the database.
+			We couldn't find any records with this origin in the database.                  
                 </Typography>
                 <Button variant="outlined">Clear search</Button>
               </Box>
