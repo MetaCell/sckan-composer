@@ -362,33 +362,17 @@ const StatementForm = (props: any) => {
   copiedUISchema.origin_id = {
     "ui:widget": CustomEntitiesDropdown,
     "ui:options": {
-      header:{ label: 'Origins', values: ['Major pelvic ganglion', 'Prevertebral sympathetic ganglion in abdominal aortic plexus', 'Accessory pelvic ganglion']},
       placeholder: "Look for Origins",
       searchPlaceholder: "Search for Origins",
       noResultReason: "We couldn’t find any record with these origin in the database.",
       disabledReason: "Add Destination entity to get access to the forward connection form",
       onSearch: (searchValue: string) => getEntities(searchValue),
       onUpdate: (selectedOptions: any) => updateOriginsInStatment(selectedOptions, statement?.id),
-      options: [],
-      data: [],
       statement: statement,
       errors: statement?.errors?.includes("Invalid origin")
         ? statement.errors
         : "",
       value: mockEntities[0] ?? "",
-      CustomInputChip : ({entity, sx={}}: any) => <Chip
-        key={entity?.id}
-        variant={'filled'}
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-        deleteIcon={<OpenInNewIcon sx={{fill: '#548CE5'}} />}
-        onDelete={(e) => {
-          e.stopPropagation();
-        }}
-        label={entity?.label}
-        sx={{...sx}}
-      />,
       CustomHeader : ({entity}: any) => <Box sx={{mb: '1.5rem', pb: '1.5rem', borderBottom: '0.0625rem solid #F2F4F7'}}>
         <Chip variant="outlined" label={"https://google.com"} />
       </Box>,
@@ -441,20 +425,33 @@ const StatementForm = (props: any) => {
     "ui:widget": CustomEntitiesDropdown,
     "ui:options": {
       entity: 'Connections',
-      label: "",
       placeholder: "Forward connection(s)",
       searchPlaceholder: "Search for Knowledge Statements",
       noResultReason: "We couldn’t find any record with these origin in the database.",
       disabledReason: "Add Destination entity to get access to the forward connection form",
       onSearch: (searchValue: string) => getConnections(searchValue),
       onUpdate: (selectedOptions: any) => updateForwardConnectionsInStatment(selectedOptions, statement?.id),
-      options: [],
-      data: [],
       statement: statement,
       errors: statement?.errors?.includes("Invalid forward connection")
         ? statement.errors
         : "",
       value: mockConnections[0] ?? "",
+      header:{ label: 'Origins', values: ['Major pelvic ganglion', 'Prevertebral sympathetic ganglion in abdominal aortic plexus', 'Accessory pelvic ganglion']},
+      CustomInputChip : ({entity, sx={}}: any) => (
+        <Chip
+          key={entity?.id}
+          variant={'filled'}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          deleteIcon={<OpenInNewIcon sx={{fill: '#548CE5'}} />}
+          onDelete={(e) => {
+            e.stopPropagation();
+          }}
+          label={entity?.label}
+          sx={{...sx}}
+        />
+      ),
       CustomHeader: ({ entity }: any) => (
         <Box sx={{ mb: '1.5rem', pb: '1.5rem', borderBottom: '0.0625rem solid #F2F4F7' }}>
           <Chip variant="outlined" label={"https://google.com"} />

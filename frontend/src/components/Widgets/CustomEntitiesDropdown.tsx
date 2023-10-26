@@ -415,7 +415,7 @@ export default function CustomEntitiesDropdown({
               }
             }}>
               <TextField
-                fullWidth={selectedOptions.length === 0}
+                fullWidth
                 type="text"
                 value={inputValue}
                 onChange={handleInputChange}
