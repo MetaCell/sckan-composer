@@ -13,6 +13,8 @@ import { CustomAutocompleteForwardConnection } from "../Widgets/CustomAutocomple
 import { CustomAnatomicalField } from "../Widgets/CustomAnatomicalField";
 import { Box, Chip } from '@mui/material';
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+
 const StatementForm = (props: any) => {
   const { uiFields, statement, setter, format } = props;
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
@@ -360,7 +362,6 @@ const StatementForm = (props: any) => {
   copiedUISchema.origin_id = {
     "ui:widget": CustomEntitiesDropdown,
     "ui:options": {
-      entity: 'Origin',
       header:{ label: 'Origins', values: ['Major pelvic ganglion', 'Prevertebral sympathetic ganglion in abdominal aortic plexus', 'Accessory pelvic ganglion']},
       placeholder: "Look for Origins",
       searchPlaceholder: "Search for Origins",
@@ -375,6 +376,19 @@ const StatementForm = (props: any) => {
         ? statement.errors
         : "",
       value: mockEntities[0] ?? "",
+      CustomInputChip : ({entity, sx={}}: any) => <Chip
+        key={entity?.id}
+        variant={'filled'}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        deleteIcon={<OpenInNewIcon sx={{fill: '#548CE5'}} />}
+        onDelete={(e) => {
+          e.stopPropagation();
+        }}
+        label={entity?.label}
+        sx={{...sx}}
+      />,
       CustomHeader : ({entity}: any) => <Box sx={{mb: '1.5rem', pb: '1.5rem', borderBottom: '0.0625rem solid #F2F4F7'}}>
         <Chip variant="outlined" label={"https://google.com"} />
       </Box>,

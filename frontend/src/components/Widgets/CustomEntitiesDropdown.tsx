@@ -10,7 +10,6 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import theme from "../../theme/Theme";
 import PlaylistRemoveOutlinedIcon from "@mui/icons-material/PlaylistRemoveOutlined";
 import PlaylistAddCheckOutlinedIcon from "@mui/icons-material/PlaylistAddCheckOutlined";
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import NoResultField from './NoResultField';
 
 type OptionDetail = {
@@ -166,7 +165,7 @@ const styles = {
 
 export default function CustomEntitiesDropdown({
   placeholder,
-  options: { secondaryChip, entity, statement, errors, searchPlaceholder, noResultReason, disabledReason, onSearch, value, CustomHeader = null, CustomBody = null, CustomFooter = null, header = {} },
+  options: { entity = null, statement, errors, searchPlaceholder, noResultReason, disabledReason, onSearch, value, CustomHeader = null, CustomBody = null, CustomFooter = null, header = {}, CustomInputChip = null },
 }: any) {
   const [searchValue, setSearchValue] = useState("");
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -295,20 +294,22 @@ export default function CustomEntitiesDropdown({
             <Box gap={1} display='flex' flexWrap='wrap'>
               {selectedOptions?.map((item: Option) => (
                 <Tooltip title={item?.label} placement='top' arrow>
-                  <Chip
-                    key={item?.id}
-                    sx={styles.chip}
-                    variant={secondaryChip ? 'filled' : 'outlined'}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                    deleteIcon={secondaryChip ? <OpenInNewIcon sx={{fill: '#548CE5'}} /> : <ClearOutlinedIcon />}
-                    onDelete={(e) => {
-                      e.stopPropagation();
-                      handleChipRemove(item);
-                    }}
-                    label={item?.label}
-                  />
+                  {CustomInputChip ? <CustomInputChip sx={styles.chip} entity={item} /> : (
+                    <Chip
+                      key={item?.id}
+                      sx={styles.chip}
+                      variant={'outlined'}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                      deleteIcon={<ClearOutlinedIcon />}
+                      onDelete={(e) => {
+                        e.stopPropagation();
+                        handleChipRemove(item);
+                      }}
+                      label={item?.label}
+                    />
+                  )}
                 </Tooltip>
               ))}
             </Box>
