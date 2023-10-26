@@ -11,11 +11,31 @@ import theme from "../../theme/Theme";
 import PlaylistRemoveOutlinedIcon from "@mui/icons-material/PlaylistRemoveOutlined";
 import PlaylistAddCheckOutlinedIcon from "@mui/icons-material/PlaylistAddCheckOutlined";
 import NoResultField from './NoResultField';
+import { vars } from '../../theme/variables';
 
 type OptionDetail = {
   title: string; // What to display as the title/label for the property.
   value: string; // The actual value/content for the property.
 };
+
+const {
+  buttonOutlinedBorderColor,
+  darkBlue,
+  whiteColor,
+  dropdownBorderColor,
+  buttonOutlinedColor,
+  lightBlue,
+  inputTextColor,
+  dropdownChipColor,
+  captionColor,
+  bodyBgColor,
+  badgeBg,
+  drodownDetailBg,
+  dropdownHeadingColor,
+  dropdownTextColor,
+  grey400,
+  popperBorderColor
+} = vars;
 
 
 type Option = {
@@ -34,9 +54,9 @@ const styles = {
     gap: '0.5rem',
     minHeight: '2.5rem',
     borderRadius: '0.5rem',
-    border: '0.0625rem solid #D0D5DD',
+    border: `0.0625rem solid ${buttonOutlinedBorderColor}`,
     cursor: 'pointer',
-    background: '#FFF',
+    background: whiteColor,
     display: 'flex',
     alignItems: 'center',
     padding: '0.5rem 0.75rem',
@@ -57,13 +77,13 @@ const styles = {
 
   rootHover: {
     '&:hover': {
-      borderColor: '#8DB2EE',
+      borderColor: dropdownBorderColor,
       boxShadow: '0rem 0rem 0rem 0.25rem #CEDDED, 0rem 0.0625rem 0.125rem 0rem rgba(16, 24, 40, 0.05)'
     }
   },
 
   rootOpen: {
-    borderColor: '#8DB2EE',
+    borderColor: dropdownBorderColor,
     boxShadow: '0rem 0rem 0rem 0.25rem #CEDDED, 0rem 0.0625rem 0.125rem 0rem rgba(16, 24, 40, 0.05)'
   },
 
@@ -78,15 +98,15 @@ const styles = {
 
     '&.MuiChip-filled': {
       borderRadius: '1rem',
-      background: '#E2ECFB',
-      color: '#184EA2',
+      background: lightBlue,
+      color: darkBlue,
       mixBlendMode: 'multiply',
     },
 
     '&.MuiChip-outlined': {
-      color: '#344054',
-      background: '#FFF',
-      border: '0.0625rem solid #D0D5DD',
+      color: buttonOutlinedColor,
+      background: whiteColor,
+      border: `0.0625rem solid ${buttonOutlinedBorderColor}`,
     },
 
 
@@ -96,7 +116,7 @@ const styles = {
 
     '& .MuiChip-deleteIcon': {
       margin: 0,
-      color: '#98A2B3',
+      color: grey400,
       fontSize: '0.75rem',
       // zIndex: 10000
     }
@@ -107,11 +127,11 @@ const styles = {
     position: 'relative',
     zIndex: 9,
     fontSize: '1.25rem',
-    color: '#667085'
+    color: captionColor
   },
 
   placeholder: {
-    color: '#667085',
+    color: captionColor,
     fontSize: '0.875rem',
     fontWeight: 400,
     userSelect: 'none'
@@ -130,8 +150,8 @@ const styles = {
       position: 'absolute',
       width: '1.375rem',
       height: '1.375rem',
-      color: '#184EA2',
-      background: '#C6D9F6',
+      color: darkBlue,
+      background: badgeBg,
       textAlign: 'center',
       fontSize: '0.75rem',
       borderRadius: '3.125rem',
@@ -141,12 +161,12 @@ const styles = {
   },
 
   details: {
-    background: '#FCFCFD',
+    background: drodownDetailBg,
     width: '50%',
     overflow: 'auto',
     flexShrink: 0,
     '& .MuiTypography-body2': {
-      color: '#373A3E',
+      color: dropdownHeadingColor,
       fontSize: '0.875rem',
       fontWeight: 400,
       lineHeight: '142.857%',
@@ -154,7 +174,7 @@ const styles = {
     },
 
     '& .MuiTypography-body1': {
-      color: '#A9ACB2',
+      color: dropdownTextColor,
       fontSize: '0.75rem',
       fontWeight: 500,
       lineHeight: '150%',
@@ -230,7 +250,7 @@ export default function CustomEntitiesDropdown({
       <Button
         variant="text"
         sx={{
-          color: "#184EA2",
+          color: darkBlue,
           fontSize: "0.75rem",
           fontWeight: 600,
           lineHeight: "1.125rem",
@@ -326,8 +346,8 @@ export default function CustomEntitiesDropdown({
         sx={{
             height: "28.125rem",
             borderRadius: '0.5rem',
-            border: '0.0625rem solid #ECEDEE',
-            background: '#FFF',
+            border: `0.0625rem solid ${popperBorderColor}`,
+            background: whiteColor,
             boxShadow: '0 0.5rem 0.5rem -0.25rem rgba(7, 8, 8, 0.03), 0 1.25rem 1.5rem -0.25rem rgba(7, 8, 8, 0.08)',
             m: '0.25rem 0  !important',
             width: autocompleteOptions.length > 0 ? '55.5rem' : '27.75rem',
@@ -343,7 +363,7 @@ export default function CustomEntitiesDropdown({
             flexWrap='wrap'
             gap={1}
             sx={{
-              borderBottom: '0.0625rem solid #ECEDEE',
+              borderBottom: `0.0625rem solid ${popperBorderColor}`,
               height: autocompleteOptions.length > 0 ? '2.75rem' : 'auto',
               padding: autocompleteOptions.length > 0 ? '0 0.875rem' : '0.875rem'
             }}
@@ -363,7 +383,7 @@ export default function CustomEntitiesDropdown({
                   label={
                     <>
                       <Typography
-                        sx={{ verticalAlign: 'text-bottom', display: 'inline-block', mr: '0.25rem', borderRadius: '0.1875rem', background: '#EAECF0', px: '0.25rem', fontSize: '0.75rem', color: '#344054', fontWeight: 600, height: '1.125rem' }}
+                        sx={{ verticalAlign: 'text-bottom', display: 'inline-block', mr: '0.25rem', borderRadius: '0.1875rem', background: dropdownChipColor, px: '0.25rem', fontSize: '0.75rem', color: buttonOutlinedColor, fontWeight: 600, height: '1.125rem' }}
                         component='span'
                       >
                         {index + 1}
@@ -382,7 +402,7 @@ export default function CustomEntitiesDropdown({
             width: autocompleteOptions.length > 0 ? '50%' : '100%'
           }}>
             <Box sx={{
-              borderBottom: '0.0625rem solid #ECEDEE',
+              borderBottom: `0.0625rem solid ${popperBorderColor}`,
               height: '3.125rem',
               padding: '0 0.875rem',
               display: 'flex',
@@ -393,13 +413,13 @@ export default function CustomEntitiesDropdown({
               '& .MuiOutlinedInput-input': {
                 padding: 0,
                 fontSize: '0.75rem',
-                color: '#676C74',
+                color: inputTextColor,
                 fontWeight: '400',
                 height: '3.125rem',
 
                 '&::placeholder': {
                   fontSize: '0.75rem',
-                  color: '#676C74',
+                  color: inputTextColor,
                   fontWeight: '400',
                 }
               },
@@ -421,7 +441,7 @@ export default function CustomEntitiesDropdown({
                 onChange={handleInputChange}
                 placeholder={searchPlaceholder}
                 InputProps={{
-                  startAdornment: <InputAdornment position='start'><SearchIcon sx={{ fontSize: '1rem', color: '#667085' }} /></InputAdornment>
+                  startAdornment: <InputAdornment position='start'><SearchIcon sx={{ fontSize: '1rem', color: captionColor }} /></InputAdornment>
                 }}
               />
             </Box>
@@ -440,7 +460,7 @@ export default function CustomEntitiesDropdown({
                           fontSize: '0.75rem',
                           lineHeight: '1.125rem',
                           fontWeight: 600,
-                          color: '#344054'
+                          color: buttonOutlinedColor
                         },
                       },
                       '& .MuiCheckbox-root': {
@@ -453,7 +473,7 @@ export default function CustomEntitiesDropdown({
                         fontSize: '0.75rem',
                         lineHeight: '1.125rem',
                         fontWeight: 600,
-                        color: '#184EA2'
+                        color: darkBlue
                       },
 
                       '& ul': {
@@ -469,16 +489,16 @@ export default function CustomEntitiesDropdown({
 
                           '&:hover': {
                             borderRadius: '0.375rem',
-                            background: '#F2F4F7'
+                            background: bodyBgColor
                           },
 
                           '&.selected': {
                             borderRadius: '0.375rem',
-                            background: '#F2F4F7'
+                            background: bodyBgColor
                           },
 
                           '& .MuiTypography-body1': {
-                            color: '#344054',
+                            color: buttonOutlinedColor,
                             fontSize: '0.875rem',
                             fontWeight: 500,
                             lineHeight: '142.857%',
@@ -486,7 +506,7 @@ export default function CustomEntitiesDropdown({
                           },
 
                           '& .MuiTypography-body2': {
-                            color: '#667085',
+                            color: captionColor,
                             fontSize: '0.75rem',
                             fontWeight: 400,
                             lineHeight: '150%',
@@ -506,7 +526,7 @@ export default function CustomEntitiesDropdown({
                       >
                         <Typography
                           sx={{
-                            color: "#344054",
+                            color: buttonOutlinedColor,
                             fontSize: "0.75rem",
                             fontWeight: 600,
                             lineHeight: "1.125rem",
@@ -551,11 +571,11 @@ export default function CustomEntitiesDropdown({
                   justifyContent="center"
                   alignItems="center"
                   sx={{
-                    borderTop: '0.0625rem solid #ECEDEE',
+                    borderTop: `0.0625rem solid ${popperBorderColor}`,
                     height: '2.75rem',
 
                     '& .MuiButton-root': {
-                      color: "#676C74",
+                      color: inputTextColor,
                       fontSize: "0.875rem",
                       fontWeight: 600,
                       height: '100%',
@@ -565,7 +585,7 @@ export default function CustomEntitiesDropdown({
                       borderRadius: 0,
                       p: 0,
                       '&:hover': {
-                        background: '#F2F4F7'
+                        background: bodyBgColor
                       }
                     }
                   }}
