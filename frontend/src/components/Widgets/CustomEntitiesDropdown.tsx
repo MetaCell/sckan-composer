@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
-// import TextField from "@mui/material/TextField";
-import FormControl from "@mui/material/FormControl";
-import { Badge, InputAdornment, List, ListItem, ListItemButton, ListItemText, Tooltip, styled } from "@mui/material";
-// import Typography from "@mui/material/Typography";
-import { vars } from "../../theme/variables";
-import { CustomAnatomicalField } from "./CustomAnatomicalField";
-import CloseIcon from "@mui/icons-material/Close";
+import { Badge, InputAdornment, Popper, Tooltip } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
-import { TextField, Autocomplete, Popover, Paper, Box, Typography, Button, Checkbox, ListSubheader, Chip } from '@mui/material';
+import { TextField, Box, Typography, Button, Checkbox, ListSubheader, Chip } from '@mui/material';
 import { CheckedItemIcon, UncheckedItemIcon } from "../icons";
 import HoveredOptionContent from "./HoveredOptionContent";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
@@ -16,8 +10,8 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import theme from "../../theme/Theme";
 import PlaylistRemoveOutlinedIcon from "@mui/icons-material/PlaylistRemoveOutlined";
 import PlaylistAddCheckOutlinedIcon from "@mui/icons-material/PlaylistAddCheckOutlined";
-import zIndex from '@mui/material/styles/zIndex';
-const { titleFontColor } = vars;
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import NoResultField from './NoResultField';
 
 type OptionDetail = {
   title: string; // What to display as the title/label for the property.
@@ -79,12 +73,22 @@ const styles = {
     gap: '0.1875rem',
     height: '1.5rem',
     borderRadius: '0.375rem',
-    border: '0.0625rem solid #D0D5DD',
-    background: '#FFF',
-    color: '#344054',
     fontSize: '0.875rem',
     maxWidth: '8rem',
     fontWeight: 500,
+
+    '&.MuiChip-filled': {
+      borderRadius: '1rem',
+      background: '#E2ECFB',
+      color: '#184EA2',
+      mixBlendMode: 'multiply',
+    },
+
+    '&.MuiChip-outlined': {
+      color: '#344054',
+      background: '#FFF',
+      border: '0.0625rem solid #D0D5DD',
+    },
 
 
     '& .MuiChip-label': {
@@ -95,7 +99,7 @@ const styles = {
       margin: 0,
       color: '#98A2B3',
       fontSize: '0.75rem',
-      zIndex: 10000
+      // zIndex: 10000
     }
   },
 
@@ -162,10 +166,18 @@ const styles = {
 
 export default function CustomEntitiesDropdown({
   placeholder,
-  options: { entity, statement, errors, searchPlaceholder, noResultReason, disabledReason, onSearch, value, CustomHeader = null, CustomBody = null, CustomFooter = null, header = {} },
+  options: { secondaryChip, entity, statement, errors, searchPlaceholder, noResultReason, disabledReason, onSearch, value, CustomHeader = null, CustomBody = null, CustomFooter = null, header = {} },
 }: any) {
   const [searchValue, setSearchValue] = useState("");
-  const [anchorEl, setAnchorEl] = React.useState<any>(null);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popper' : undefined;
+
   const [hoveredOption, setHoveredOption] = useState<Option | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<Option[]>(
     [value] || []
@@ -177,14 +189,6 @@ export default function CustomEntitiesDropdown({
     searchValue !== undefined &&
       setAutocompleteOptions(onSearch(searchValue));
   }, [searchValue, onSearch, autocompleteOptions]);
-
-  const handleClick = (event: any) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   const groupedOptions = autocompleteOptions.reduce((grouped: any, option: Option) => {
     const group = option.group;
@@ -223,7 +227,7 @@ export default function CustomEntitiesDropdown({
         (obj2) => JSON.stringify(obj1) === JSON.stringify(obj2),
       ),
     );
-    return allObjectsExist ? (
+    return (
       <Button
         variant="text"
         sx={{
@@ -232,29 +236,15 @@ export default function CustomEntitiesDropdown({
           fontWeight: 600,
           lineHeight: "1.125rem",
         }}
-        onClick={() => handleDeselectAll(group)}
+        onClick={() => allObjectsExist ? handleDeselectAll(group) : handleSelectAll(group)}
       >
-        Deselect All
+        {allObjectsExist ? `Deselect` : `Select`} All
       </Button>
-    ) : (
-      <Button
-        variant="text"
-        sx={{
-          color: "#184EA2",
-          fontSize: "0.75rem",
-          fontWeight: 600,
-          lineHeight: "1.125rem",
-        }}
-        onClick={() => handleSelectAll(group)}
-      >
-        Select All
-      </Button>
-    );
+    )
   };
 
   const handleOptionSelection = (option: Option) => {
     const isOptionAlreadySelected = selectedOptions.some((selected) => selected.id === option.id);
-
     if (isOptionAlreadySelected) {
       const updatedSelectedOptions = selectedOptions.filter((selected) => selected.id !== option.id);
       setSelectedOptions(updatedSelectedOptions);
@@ -264,16 +254,13 @@ export default function CustomEntitiesDropdown({
   };
 
   const handleChipRemove = (chip: Option) => {
-    const updatedChips = selectedOptions.filter((c: any) => c !== chip);
+    const updatedChips = selectedOptions.filter((c: Option) => c !== chip);
     setSelectedOptions(updatedChips);
   };
 
   const handleInputChange = (event: any) => {
     setInputValue(event.target.value);
   };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
 
   const isOptionSelected = (option: Option) => {
     return selectedOptions.some((selected) => selected.id === option.id);
@@ -306,61 +293,48 @@ export default function CustomEntitiesDropdown({
             <Typography sx={styles.placeholder}>{placeholder}</Typography>
           ) : (
             <Box gap={1} display='flex' flexWrap='wrap'>
-              {selectedOptions?.map((item: any) => (
+              {selectedOptions?.map((item: Option) => (
                 <Tooltip title={item?.label} placement='top' arrow>
                   <Chip
                     key={item?.id}
                     sx={styles.chip}
-                    variant='outlined'
-                    deleteIcon={<ClearOutlinedIcon />}
+                    variant={secondaryChip ? 'filled' : 'outlined'}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    deleteIcon={secondaryChip ? <OpenInNewIcon sx={{fill: '#548CE5'}} /> : <ClearOutlinedIcon />}
                     onDelete={(e) => {
                       e.stopPropagation();
                       handleChipRemove(item);
                     }}
-                    // label={item?.label?.length > 15 ? item?.label.slice(0, 15) + "..." : item?.label}
                     label={item?.label}
                   />
                 </Tooltip>
               ))}
             </Box>
           )}
-
           {open ? <ArrowDropUpIcon sx={styles.toggleIcon} /> : <ArrowDropDownIcon sx={styles.toggleIcon} />}
-
         </Box>
       </Badge>
 
-
-      <Popover
+      <Popper
         id={id}
         open={open}
+        placement='bottom-start'
         anchorEl={anchorEl}
-        onClose={handleClose}
         sx={{
-          '& .MuiPopover-paper': {
             height: "28.125rem",
             borderRadius: '0.5rem',
             border: '0.0625rem solid #ECEDEE',
             background: '#FFF',
             boxShadow: '0 0.5rem 0.5rem -0.25rem rgba(7, 8, 8, 0.03), 0 1.25rem 1.5rem -0.25rem rgba(7, 8, 8, 0.08)',
-            mt: '0.25rem',
+            m: '0.25rem 0  !important',
             width: autocompleteOptions.length > 0 ? '55.5rem' : '27.75rem',
             display: 'flex',
             flexDirection: 'column',
-            zIndex: 110000
-
-          },
-        }}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
+            zIndex: 999
         }}
       >
-
         {header?.values?.length > 0 && (
           <Box
             display="flex"
@@ -376,13 +350,26 @@ export default function CustomEntitiesDropdown({
             <Typography variant="body2">
               {header?.label}
             </Typography>
-            {header?.values?.map((item: any) => (
+            {header?.values?.map((item: any, index: number) => (
               <Tooltip title={item} placement='top' arrow>
                 <Chip
                   key={item?.id}
-                  sx={styles.chip}
+                  sx={{
+                    ...styles.chip,
+                    display: 'flex',
+                  }}
                   variant='outlined'
-                  label={item}
+                  label={
+                    <>
+                      <Typography
+                        sx={{ verticalAlign: 'text-bottom', display: 'inline-block', mr: '0.25rem', borderRadius: '0.1875rem', background: '#EAECF0', px: '0.25rem', fontSize: '0.75rem', color: '#344054', fontWeight: 600, height: '1.125rem' }}
+                        component='span'
+                      >
+                        {index + 1}
+                      </Typography>
+                      {item}
+                    </>
+                  }
                 />
               </Tooltip>
             ))}
@@ -530,28 +517,28 @@ export default function CustomEntitiesDropdown({
                       </ListSubheader>
                       <ul>
                         {groupedOptions[group]
-                          .filter((suggestion: any) =>
-                            suggestion.label.toLowerCase().includes(inputValue.toLowerCase())
+                          .filter((option: Option) =>
+                            option.label.toLowerCase().includes(inputValue.toLowerCase())
                           )
-                          .map((suggestion: any) => (
+                          .map((option: Option) => (
                             <li
-                              key={suggestion.id}
-                              onMouseEnter={() => setHoveredOption(suggestion)}
-                              onClick={() => handleOptionSelection(suggestion)}
-                              className={isOptionSelected(suggestion) ? 'selected' : ''}
+                              key={option.id}
+                              onMouseEnter={() => setHoveredOption(option)}
+                              onClick={() => handleOptionSelection(option)}
+                              className={isOptionSelected(option) ? 'selected' : ''}
                             >
                               <Checkbox
                                 disableRipple
                                 icon={<UncheckedItemIcon fontSize="small" />}
                                 checkedIcon={<CheckedItemIcon fontSize="small" />}
-                                checked={isOptionSelected(suggestion)}
+                                checked={isOptionSelected(option)}
                               />
                               <Typography
                                 sx={{ width: 1, height: 1, padding: "0.625rem" }}
                               >
-                                {suggestion?.label}
+                                {option?.label?.length > 100 ? option?.label.slice(0, 100) + "..." : option?.label}
                               </Typography>
-                              <Typography whiteSpace='nowrap' variant="body2">{suggestion?.id}</Typography>
+                              <Typography whiteSpace='nowrap' variant="body2">{option?.id}</Typography>
                             </li>
                           ))}
                       </ul>
@@ -610,32 +597,7 @@ export default function CustomEntitiesDropdown({
                 </Box>
               </>
             ) : (
-              <Box
-                width={1}
-                px={2}
-                textAlign='center'
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                  flex: 1
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  fontWeight={500}
-                  marginBottom={2}
-                  color={titleFontColor}
-                >
-                  No result found
-                </Typography>
-
-                <Typography variant="body1" marginBottom={2}>
-                  {noResultReason}
-                </Typography>
-                <Button variant="outlined">Clear search</Button>
-              </Box>
+              <NoResultField noResultReason={noResultReason} />
             )}
           </Box>
           {autocompleteOptions.length > 0 && (
@@ -658,7 +620,7 @@ export default function CustomEntitiesDropdown({
           )}
 
         </Box>
-      </Popover>
+      </Popper>
       {errors && (
         <Typography color={theme.palette.error.main} mt={1}>
           {errors}
