@@ -33,7 +33,7 @@ import { QueryParams } from "../redux/sentenceSlice";
 import IconButton from "@mui/material/IconButton";
 import {
   BiotechOutlined,
-  EditNoteOutlined,
+  EditOutlined,
   InputOutlined,
 } from "@mui/icons-material";
 
@@ -265,7 +265,7 @@ const SentencesDetails = () => {
           </IconButton>
           <Divider />
           <IconButton onClick={() => scrollToElement(2)}>
-            <EditNoteOutlined />
+            <EditOutlined />
           </IconButton>
         </Stack>
       </Grid>

@@ -22,5 +22,14 @@ export const vars = {
     darkBlue: "#184EA2",
     lightBlue: "#E2ECFB",
     mediumBlue: "#548CE5",
-    inputPlaceholderColor:'#667085',
+    inputPlaceholderColor: '#667085',
+    whiteColor: '#fff',
+    inputTextColor: '#676C74',
+    dropdownChipColor: '#EAECF0',
+    dropdownBorderColor: '#8DB2EE',
+    popperBorderColor: '#ECEDEE',
+    badgeBg: '#C6D9F6',
+    drodownDetailBg: '#FCFCFD',
+    dropdownHeadingColor: '#373A3E',
+    dropdownTextColor: '#A9ACB2'
 };
