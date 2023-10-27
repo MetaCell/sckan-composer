@@ -157,8 +157,12 @@ class SexSerializer(serializers.ModelSerializer):
 class ViaSerializer(serializers.ModelSerializer):
     """Via"""
 
-    anatomical_entities_details = AnatomicalEntitySerializer(
-        source='anatomical_entities',
+    anatomical_entities = AnatomicalEntitySerializer(
+        many=True,
+        read_only=True
+    )
+
+    from_entities = AnatomicalEntitySerializer(
         many=True,
         read_only=True
     )
@@ -170,7 +174,8 @@ class ViaSerializer(serializers.ModelSerializer):
             "order",
             "connectivity_statement_id",
             "type",
-            "anatomical_entities_details",
+            "anatomical_entities",
+            "from_entities"
         )
 
 
@@ -300,11 +305,14 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
 
 
 class DestinationSerializer(serializers.ModelSerializer):
-    anatomical_entities = AnatomicalEntitySerializer(many=True)
+    """Destination"""
+
+    anatomical_entities = AnatomicalEntitySerializer(many=True, read_only=True)
+    from_entities = AnatomicalEntitySerializer(many=True, read_only=True)
 
     class Meta:
         model = Destination
-        fields = ('id', 'type', 'anatomical_entities')
+        fields = ('id', 'type', 'anatomical_entities', 'from_entities')
 
 
 class ConnectivityStatementSerializer(
@@ -403,7 +411,6 @@ class ConnectivityStatementSerializer(
             statement += f"It is described in {apinatomy} model."
 
         return statement.strip()
-
 
     def get_errors(self, instance) -> List:
         return get_connectivity_errors(instance)
