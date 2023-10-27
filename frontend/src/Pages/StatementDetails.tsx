@@ -22,7 +22,7 @@ import { useSectionStyle } from "../styles/styles";
 import { useTheme } from "@mui/system";
 import IconButton from "@mui/material/IconButton";
 import {
-  EditNoteOutlined,
+  EditOutlined,
   BiotechOutlined,
   BubbleChartOutlined,
   FindInPageOutlined,
@@ -181,7 +181,7 @@ const StatementDetails = () => {
           <Divider />
 
           <IconButton onClick={() => scrollToElement(7)}>
-            <EditNoteOutlined />
+            <EditOutlined />
           </IconButton>
         </Stack>
       </Grid>
