@@ -1,6 +1,5 @@
 import React from "react";
-import { ArrayFieldTemplateProps } from "@rjsf/utils";
-import { Box, Button, Table, TableBody, TableContainer } from "@mui/material";
+import { Box, Button, Table, TableBody } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {
   arrayMove,
@@ -9,8 +8,8 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import {
-  DndContext,
   closestCenter,
+  DndContext,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -18,8 +17,11 @@ import {
 } from "@dnd-kit/core";
 import { SortableItem } from "../ProofingTab/SortableItem";
 
-function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
-  const sortableItems = props.items.map((item) => ({ ...item, id: item.key }));
+function ArrayFieldTemplate(props: any) {
+  const sortableItems = props.items.map((item: any) => ({
+    ...item,
+    id: item.key,
+  }));
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -36,8 +38,8 @@ function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
         (via: any, index: number) =>
           (via.children.props.formData.display_order = index),
       );
-      const result = sortedItems[oldIndex].onReorderClick(oldIndex, newIndex)();
-      return result;
+      // @ts-ignore
+      return sortedItems[oldIndex].onReorderClick(oldIndex, newIndex)();
     }
   }
 
@@ -53,7 +55,7 @@ function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
       >
         <Table sx={{ borderSpacing: "0 8px", borderCollapse: "separate" }}>
           <TableBody>
-            {sortableItems.map((element) => (
+            {sortableItems.map((element: any) => (
               <SortableItem
                 key={element.key}
                 id={element.id}

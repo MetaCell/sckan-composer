@@ -21,7 +21,9 @@ const StatementForm = (props: any) => {
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
+  copiedSchema.properties.destinations.title = "";
   copiedSchema.properties.forward_connection.type = ["string", "null"];
+  copiedUISchema["ui:order"] = ["destination_type", "*"];
   copiedUISchema.circuit_type = {
     "ui:widget": "radio",
     "ui:options": {
@@ -351,6 +353,68 @@ const StatementForm = (props: any) => {
     return false;
   };
 
+  copiedUISchema.origin_id = {
+    "ui:widget": CustomEntitiesDropdown,
+    "ui:options": {
+      placeholder: "Look for Origins",
+      searchPlaceholder: "Search for Origins",
+      noResultReason:
+        "We couldn’t find any record with these origin in the database.",
+      disabledReason:
+        "Add Destination entity to get access to the forward connection form",
+      onSearch: (searchValue: string) => getEntities(searchValue),
+      onUpdate: (selectedOptions: any) =>
+        updateOriginsInStatment(selectedOptions, statement?.id),
+      statement: statement,
+      errors: statement?.errors?.includes("Invalid origin")
+        ? statement.errors
+        : "",
+      value: mockEntities[0] ?? "",
+      CustomFooter: ({ entity }: any) => (
+        <Box
+          sx={{
+            mt: "1.5rem",
+            display: "flex",
+            gap: 1,
+            flexWrap: "wrap",
+            pt: "1.5rem",
+            borderTop: "0.0625rem solid #F2F4F7",
+          }}
+        >
+          {/* <Chip variant="filled" color="error" label={"https://google.com"} /> */}
+          <Chip variant="outlined" label={"https://google.com"} />
+        </Box>
+      ),
+    },
+  };
+
+  copiedUISchema.destinations = {
+    items: {
+      "ui:options": {
+        label: false,
+      },
+      "ui:label": false,
+      type: {
+        "ui:widget": "select",
+        "ui:options": {
+          label: false,
+        },
+      },
+      anatomical_entities: {
+        "ui:widget": "select",
+        "ui:options": {
+          label: false,
+        },
+      },
+      from_entities: {
+        "ui:widget": "select",
+        "ui:options": {
+          label: false,
+        },
+      },
+    },
+  };
+
   copiedUISchema.additional_information = {
     "ui:widget": "CustomTextField",
     "ui:options": {
@@ -437,7 +501,10 @@ const StatementForm = (props: any) => {
     CustomAutocompleteForwardConnection,
   };
 
-  console.log(schema);
+  const templates = {
+    ArrayFieldTemplate,
+  };
+
   return (
     <FormBase
       data={statement}
@@ -448,6 +515,7 @@ const StatementForm = (props: any) => {
       enableAutoSave={false}
       children={true}
       widgets={widgets}
+      templates={templates}
       showErrorList={false}
       submitOnBlurFields={[
         "knowledge_statement",
@@ -460,6 +528,7 @@ const StatementForm = (props: any) => {
         "laterality",
         "circuit_type",
         "projection",
+        "destinations",
         "path_type",
       ]}
       {...props}
