@@ -10,7 +10,10 @@ const StatementChart = (props: { statement: ConnectivityStatement }) => {
   const theme = useTheme();
 
   const displayChart =
-    statement.origin && statement.destination && statement.path && statement.path.length > 0
+    statement.origins &&
+    statement.destination &&
+    statement.path &&
+    statement.path.length > 0;
 
   return (
     <Box

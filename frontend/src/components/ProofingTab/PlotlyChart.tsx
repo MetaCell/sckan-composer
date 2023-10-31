@@ -46,7 +46,7 @@ const styledLabels = (text: string) => {
     font-size: 14px;
     font-family:Inter, sans-serif;
     color: #344054;
-">${word}</span><br>`
+">${word}</span><br>`,
   );
   const formattedText = formattedTextArray.join("").slice(0, -4);
   return formattedText;
@@ -69,7 +69,7 @@ function PlotlyChart(props: { statement: ConnectivityStatement }) {
   const { statement } = props;
   const theme = useTheme();
 
-  const path = statement.path || []
+  const path = statement.path || [];
 
   layout.annotations = generateAnnotations(path);
 
@@ -92,7 +92,7 @@ function PlotlyChart(props: { statement: ConnectivityStatement }) {
       type: "scatter",
       mode: "markers+text",
       text: [
-        styledLabels(statement.origin?.name),
+        statement.origins.map((origin) => styledLabels(origin.name)),
         styledLabels(statement.destination?.name),
       ],
       marker: {

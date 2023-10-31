@@ -24,9 +24,8 @@ function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
-
   function handleDragEnd(event: any) {
     const { active, over } = event;
     if (active.id !== over.id) {
@@ -35,7 +34,7 @@ function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
       const sortedItems = arrayMove(sortableItems, oldIndex, newIndex);
       sortedItems.forEach(
         (via: any, index: number) =>
-          (via.children.props.formData.display_order = index)
+          (via.children.props.formData.display_order = index),
       );
       const result = sortedItems[oldIndex].onReorderClick(oldIndex, newIndex)();
       return result;

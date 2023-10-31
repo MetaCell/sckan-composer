@@ -10,9 +10,9 @@ import AnatomicalEntitiesField from "../AnatomicalEntitiesField";
 import { sexes } from "../../services/SexService";
 import { phenotypes } from "../../services/PhenotypeService";
 import { CustomAutocompleteForwardConnection } from "../Widgets/CustomAutocompleteForwardConnection";
-import { Box, Chip } from '@mui/material';
+import { Box, Chip } from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 const StatementForm = (props: any) => {
   const { uiFields, statement, setter, format } = props;
@@ -21,9 +21,7 @@ const StatementForm = (props: any) => {
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
-  copiedSchema.properties.path.title = "";
   copiedSchema.properties.forward_connection.type = ["string", "null"];
-  copiedUISchema["ui:order"] = ["destination_type", "*"];
   copiedUISchema.circuit_type = {
     "ui:widget": "radio",
     "ui:options": {
@@ -88,321 +86,269 @@ const StatementForm = (props: any) => {
     },
   };
 
-  copiedUISchema.destination_id = {
-    "ui:widget": AnatomicalEntitiesField,
-    "ui:options": {
-      label: format === "noLabel" ? false : "Destination",
-      errors: statement?.errors?.includes("Invalid forward connection")
-        ? statement.errors
-        : "",
-    },
-  };
-
   const mockEntities = [
+    {
+      id: "5304",
+      group: "Origins",
+      label: "('Aortic arch', 'arch of aorta')",
+      content: [
         {
-          "id": "5304",
-          "group": 'Origins',
-          "label": "('Aortic arch', 'arch of aorta')",
-          "content": [
-            {
-              "title": "Name",
-              "value": "('Aortic arch', 'arch of aorta')"
-            },
-            {
-              "title": "Ontology URI",
-              "value": "http://purl.obolibrary.org/obo/UBERON_0001508"
-            }
-          ]
+          title: "Name",
+          value: "('Aortic arch', 'arch of aorta')",
         },
         {
-          "id": "32845",
-          "group": 'Origins',
-          "label": "(embryonic) hindbrain flexure",
-          "content": [
-            {
-              "title": "Name",
-              "value": "(embryonic) hindbrain flexure"
-            },
-            {
-              "title": "Ontology URI",
-              "value": "http://purl.obolibrary.org/obo/UBERON_0005820"
-            }
-          ]
+          title: "Ontology URI",
+          value: "http://purl.obolibrary.org/obo/UBERON_0001508",
+        },
+      ],
+    },
+    {
+      id: "32845",
+      group: "Origins",
+      label: "(embryonic) hindbrain flexure",
+      content: [
+        {
+          title: "Name",
+          value: "(embryonic) hindbrain flexure",
         },
         {
-          "id": "47428",
-          "group": 'Origins',
-          "label": "(mid-third) lateral capsular ligament",
-          "content": [
-            {
-              "title": "Name",
-              "value": "(mid-third) lateral capsular ligament"
-            },
-            {
-              "title": "Ontology URI",
-              "value": "http://purl.obolibrary.org/obo/UBERON_0014899"
-            }
-          ]
+          title: "Ontology URI",
+          value: "http://purl.obolibrary.org/obo/UBERON_0005820",
+        },
+      ],
+    },
+    {
+      id: "47428",
+      group: "Origins",
+      label: "(mid-third) lateral capsular ligament",
+      content: [
+        {
+          title: "Name",
+          value: "(mid-third) lateral capsular ligament",
         },
         {
-          "id": "12822",
-          "group": 'Origins',
-          "label": "(pre-)piriform cortex",
-          "content": [
-            {
-              "title": "Name",
-              "value": "(pre-)piriform cortex"
-            },
-            {
-              "title": "Ontology URI",
-              "value": "http://purl.obolibrary.org/obo/UBERON_0002590"
-            }
-          ]
+          title: "Ontology URI",
+          value: "http://purl.obolibrary.org/obo/UBERON_0014899",
+        },
+      ],
+    },
+    {
+      id: "12822",
+      group: "Origins",
+      label: "(pre-)piriform cortex",
+      content: [
+        {
+          title: "Name",
+          value: "(pre-)piriform cortex",
         },
         {
-          "id": "1798",
-          "group": 'Origins',
-          "label": "02 optic nerve",
-          "content": [
-            {
-              "title": "Name",
-              "value": "02 optic nerve"
-            },
-            {
-              "title": "Ontology URI",
-              "value": "http://purl.obolibrary.org/obo/UBERON_0000941"
-            }
-          ]
+          title: "Ontology URI",
+          value: "http://purl.obolibrary.org/obo/UBERON_0002590",
+        },
+      ],
+    },
+    {
+      id: "1798",
+      group: "Origins",
+      label: "02 optic nerve",
+      content: [
+        {
+          title: "Name",
+          value: "02 optic nerve",
         },
         {
-          "id": "53259",
-          "group": 'Origins',
-          "label": "10 R+L thoracic",
-          "content": [
-            {
-              "title": "Name",
-              "value": "10 R+L thoracic"
-            },
-            {
-              "title": "Ontology URI",
-              "value": "http://purl.obolibrary.org/obo/UBERON_0039167"
-            }
-          ]
+          title: "Ontology URI",
+          value: "http://purl.obolibrary.org/obo/UBERON_0000941",
+        },
+      ],
+    },
+    {
+      id: "53259",
+      group: "Origins",
+      label: "10 R+L thoracic",
+      content: [
+        {
+          title: "Name",
+          value: "10 R+L thoracic",
         },
         {
-          "id": "6604",
-          "group": 'Origins',
-          "label": "10n",
-          "content": [
-            {
-              "title": "Name",
-              "value": "10n"
-            },
-            {
-              "title": "Ontology URI",
-              "value": "http://purl.obolibrary.org/obo/UBERON_0001759"
-            }
-          ]
+          title: "Ontology URI",
+          value: "http://purl.obolibrary.org/obo/UBERON_0039167",
+        },
+      ],
+    },
+    {
+      id: "6604",
+      group: "Origins",
+      label: "10n",
+      content: [
+        {
+          title: "Name",
+          value: "10n",
         },
         {
-          "id": "52948",
-          "group": 'Origins',
-          "label":"11 R+L thoracic",
-          "content": [
-            {
-              "title": "Name",
-              "value": "11 R+L thoracic"
-            },
-            {
-              "title": "Ontology URI",
-              "value": "http://purl.obolibrary.org/obo/UBERON_0038635"
-            }
-          ]
+          title: "Ontology URI",
+          value: "http://purl.obolibrary.org/obo/UBERON_0001759",
+        },
+      ],
+    },
+    {
+      id: "52948",
+      group: "Origins",
+      label: "11 R+L thoracic",
+      content: [
+        {
+          title: "Name",
+          value: "11 R+L thoracic",
         },
         {
-          "id": "52950",
-          "group": 'Origins',
-          "label": "11 thoracic lymph node",
-          "content": [
-            {
-              "title": "Name",
-              "value": "11 thoracic lymph node"
-            },
-            {
-              "title": "Ontology URI",
-              "value": "http://purl.obolibrary.org/obo/UBERON_0038635"
-            }
-          ]
+          title: "Ontology URI",
+          value: "http://purl.obolibrary.org/obo/UBERON_0038635",
+        },
+      ],
+    },
+    {
+      id: "52950",
+      group: "Origins",
+      label: "11 thoracic lymph node",
+      content: [
+        {
+          title: "Name",
+          value: "11 thoracic lymph node",
         },
         {
-          "id": "52956",
-          "group": 'Origins',
-          "label": "12R+L thoracic lymph node",
-          "content": [
-            {
-              "title": "Name",
-              "value": "12R+L thoracic lymph node"
-            },
-            {
-              "title": "Ontology URI",
-              "value": "http://purl.obolibrary.org/obo/UBERON_0038638"
-            }
-          ]
+          title: "Ontology URI",
+          value: "http://purl.obolibrary.org/obo/UBERON_0038635",
+        },
+      ],
+    },
+    {
+      id: "52956",
+      group: "Origins",
+      label: "12R+L thoracic lymph node",
+      content: [
+        {
+          title: "Name",
+          value: "12R+L thoracic lymph node",
         },
         {
-          "id": "6050",
-          "group": 'Origins',
-          "label": "12n",
-          "content": [
-            {
-              "title": "Name",
-              "value": "12n"
-            },
-            {
-              "title": "Ontology URI",
-              "value": "http://purl.obolibrary.org/obo/UBERON_0001650"
-            }
-          ]
-        }
-    ];
+          title: "Ontology URI",
+          value: "http://purl.obolibrary.org/obo/UBERON_0038638",
+        },
+      ],
+    },
+    {
+      id: "6050",
+      group: "Origins",
+      label: "12n",
+      content: [
+        {
+          title: "Name",
+          value: "12n",
+        },
+        {
+          title: "Ontology URI",
+          value: "http://purl.obolibrary.org/obo/UBERON_0001650",
+        },
+      ],
+    },
+  ];
 
   const mockConnections = [
+    {
+      id: "5304",
+      group: "Derived from Same Sentence",
+      label:
+        "chorda tympani to lingual to geniculate ganglion to nts S2-S4 via pelvic splanchnic nerves via pelvic ganglion to uterovaginal ganglion",
+      content: [
         {
-          "id": "5304",
-          'group': 'Derived from Same Sentence',
-          "label": "chorda tympani to lingual to geniculate ganglion to nts S2-S4 via pelvic splanchnic nerves via pelvic ganglion to uterovaginal ganglion",
-          "content": [
-            {
-              "title": "Knowledge Statement ID",
-              "value": "73"
-            },
-            {
-              "title": "Title",
-              "value": "chorda tympani to lingual to geniculate ganglion to nts S2-S4 via pelvic splanchnic nerves via pelvic ganglion to uterovaginal ganglion"
-            },
-            {
-              "title": "Statement",
-              "value": "In a parasympathetic post-ganglionic phenotype connection goes from S2 spinal cord segment to accessory pelvic ganglion via 2nd toe intermediate phalanx, via pelvic ganglion and via ventral root of the first sacral spinal cord segment. This ANAXONIC projects UNKNOWN from the S2 spinal cord segment and is found at an unknown location.chorda tympani to lingual to geniculate ganglion to nts S2-S4 via pelvic splanchnic nerves via pelvic ganglion to uterovaginal ganglion"
-            }
-          ]
+          title: "Knowledge Statement ID",
+          value: "73",
         },
         {
-          "id": "32845",
-          'group': 'Others',
-          "label": "neuron type sstom 10",
-          "content": [
-            {
-              "title": "Knowledge Statement ID",
-              "value": "71"
-            },
-            {
-              "title": "Title",
-              "value": "neuron type sstom 10"
-            },
-            {
-              "title": "Statement",
-              "value": "In a connection goes from to . This UNKNOWN projects UNKNOWN from the and is found at an unknown location."
-            }
-          ]
+          title: "Title",
+          value:
+            "chorda tympani to lingual to geniculate ganglion to nts S2-S4 via pelvic splanchnic nerves via pelvic ganglion to uterovaginal ganglion",
         },
         {
-          "id": "47428",
-          "group": 'Others',
-          "label": "(mid-third) lateral capsular ligament",
-          "content": [
-            {
-              "title": "Knowledge Statement ID",
-              "value": "70"
-            },
-            {
-              "title": "Title",
-              "value": "(mid-third) lateral capsular ligament"
-            },
-            {
-              "title": "Statement",
-              "value": "In a connection goes from to . This UNKNOWN projects UNKNOWN from the and is found at an unknown location."
-            }
-          ]
+          title: "Statement",
+          value:
+            "In a parasympathetic post-ganglionic phenotype connection goes from S2 spinal cord segment to accessory pelvic ganglion via 2nd toe intermediate phalanx, via pelvic ganglion and via ventral root of the first sacral spinal cord segment. This ANAXONIC projects UNKNOWN from the S2 spinal cord segment and is found at an unknown location.chorda tympani to lingual to geniculate ganglion to nts S2-S4 via pelvic splanchnic nerves via pelvic ganglion to uterovaginal ganglion",
+        },
+      ],
+    },
+    {
+      id: "32845",
+      group: "Others",
+      label: "neuron type sstom 10",
+      content: [
+        {
+          title: "Knowledge Statement ID",
+          value: "71",
         },
         {
-          "id": "12822",
-          "group": 'Others',
-          "label": "(pre-)piriform cortex",
-          "content": [
-            {
-              "title": "Knowledge Statement ID",
-              "value": "69"
-            },
-            {
-              "title": "Title",
-              "value": "(pre-)piriform cortex"
-            },
-            {
-              "title": "Statement",
-              "value": "In a connection goes from to . This UNKNOWN projects UNKNOWN from the and is found at an unknown location."
-            }
-          ]
+          title: "Title",
+          value: "neuron type sstom 10",
         },
-
+        {
+          title: "Statement",
+          value:
+            "In a connection goes from to . This UNKNOWN projects UNKNOWN from the and is found at an unknown location.",
+        },
+      ],
+    },
+    {
+      id: "47428",
+      group: "Others",
+      label: "(mid-third) lateral capsular ligament",
+      content: [
+        {
+          title: "Knowledge Statement ID",
+          value: "70",
+        },
+        {
+          title: "Title",
+          value: "(mid-third) lateral capsular ligament",
+        },
+        {
+          title: "Statement",
+          value:
+            "In a connection goes from to . This UNKNOWN projects UNKNOWN from the and is found at an unknown location.",
+        },
+      ],
+    },
+    {
+      id: "12822",
+      group: "Others",
+      label: "(pre-)piriform cortex",
+      content: [
+        {
+          title: "Knowledge Statement ID",
+          value: "69",
+        },
+        {
+          title: "Title",
+          value: "(pre-)piriform cortex",
+        },
+        {
+          title: "Statement",
+          value:
+            "In a connection goes from to . This UNKNOWN projects UNKNOWN from the and is found at an unknown location.",
+        },
+      ],
+    },
   ];
 
   const getEntities = (searchValue: string) => mockEntities;
 
-  const getConnections = (searchValue: string) => mockConnections ;
+  const getConnections = (searchValue: string) => mockConnections;
 
   const updateOriginsInStatment = (options: any, id: string) => {
     return false;
-  }
+  };
 
   const updateForwardConnectionsInStatment = (options: any, id: string) => {
     return false;
-  }
-
-  copiedUISchema.origin_id = {
-    "ui:widget": CustomEntitiesDropdown,
-    "ui:options": {
-      placeholder: "Look for Origins",
-      searchPlaceholder: "Search for Origins",
-      noResultReason: "We couldn’t find any record with these origin in the database.",
-      disabledReason: "Add Destination entity to get access to the forward connection form",
-      onSearch: (searchValue: string) => getEntities(searchValue),
-      onUpdate: (selectedOptions: any) => updateOriginsInStatment(selectedOptions, statement?.id),
-      statement: statement,
-      errors: statement?.errors?.includes("Invalid origin")
-        ? statement.errors
-        : "",
-      value: mockEntities[0] ?? "",
-      CustomFooter : ({entity}: any) => <Box sx={{mt: '1.5rem', display: 'flex', gap: 1, flexWrap: 'wrap', pt: '1.5rem', borderTop: '0.0625rem solid #F2F4F7'}}>
-        {/* <Chip variant="filled" color="error" label={"https://google.com"} /> */}
-        <Chip variant="outlined" label={"https://google.com"} />
-      </Box>,
-    },
-
-  };
-
-  copiedUISchema.destination_type = {
-    "ui:options": {
-      label: false,
-      placeholder: "Select detination type",
-    },
-  };
-
-  copiedUISchema.path.items = {
-    "ui:options": {
-      label: false,
-    },
-    "ui:label": false,
-  };
-
-  copiedUISchema.path.items.anatomical_entity_id = {
-    "ui:widget": AnatomicalEntitiesField,
-    "ui:options": {
-      label: false,
-    },
-  };
-
-  copiedUISchema.path.items.display_order = {
-    "ui:widget": "hidden",
   };
 
   copiedUISchema.additional_information = {
@@ -419,41 +365,63 @@ const StatementForm = (props: any) => {
   copiedUISchema.forward_connection = {
     "ui:widget": CustomEntitiesDropdown,
     "ui:options": {
-      entity: 'Connections',
+      entity: "Connections",
       placeholder: "Forward connection(s)",
       searchPlaceholder: "Search for Knowledge Statements",
-      noResultReason: "We couldn’t find any record with these origin in the database.",
-      disabledReason: "Add Destination entity to get access to the forward connection form",
+      noResultReason:
+        "We couldn’t find any record with these origin in the database.",
+      disabledReason:
+        "Add Destination entity to get access to the forward connection form",
       onSearch: (searchValue: string) => getConnections(searchValue),
-      onUpdate: (selectedOptions: any) => updateForwardConnectionsInStatment(selectedOptions, statement?.id),
+      onUpdate: (selectedOptions: any) =>
+        updateForwardConnectionsInStatment(selectedOptions, statement?.id),
       statement: statement,
       errors: statement?.errors?.includes("Invalid forward connection")
         ? statement.errors
         : "",
       value: mockConnections[0] ?? "",
-      header:{ label: 'Origins', values: ['Major pelvic ganglion', 'Prevertebral sympathetic ganglion in abdominal aortic plexus', 'Accessory pelvic ganglion']},
-      CustomInputChip : ({entity, sx={}}: any) => (
+      header: {
+        label: "Origins",
+        values: [
+          "Major pelvic ganglion",
+          "Prevertebral sympathetic ganglion in abdominal aortic plexus",
+          "Accessory pelvic ganglion",
+        ],
+      },
+      CustomInputChip: ({ entity, sx = {} }: any) => (
         <Chip
           key={entity?.id}
-          variant={'filled'}
+          variant={"filled"}
           onClick={(e) => {
             e.stopPropagation();
           }}
-          deleteIcon={<OpenInNewIcon sx={{fill: '#548CE5'}} />}
+          deleteIcon={<OpenInNewIcon sx={{ fill: "#548CE5" }} />}
           onDelete={(e) => {
             e.stopPropagation();
           }}
           label={entity?.label}
-          sx={{...sx}}
+          sx={{ ...sx }}
         />
       ),
       CustomHeader: ({ entity }: any) => (
-        <Box sx={{ mb: '1.5rem', pb: '1.5rem', borderBottom: '0.0625rem solid #F2F4F7' }}>
+        <Box
+          sx={{
+            mb: "1.5rem",
+            pb: "1.5rem",
+            borderBottom: "0.0625rem solid #F2F4F7",
+          }}
+        >
           <Chip variant="outlined" label={"https://google.com"} />
         </Box>
       ),
       CustomFooter: ({ entity }: any) => (
-        <Box sx={{ mt: '1.5rem', pt: '1.5rem', borderTop: '0.0625rem solid #F2F4F7' }}>
+        <Box
+          sx={{
+            mt: "1.5rem",
+            pt: "1.5rem",
+            borderTop: "0.0625rem solid #F2F4F7",
+          }}
+        >
           <Chip variant="filled" color="success" label={"https://google.com"} />
         </Box>
       ),
@@ -469,10 +437,7 @@ const StatementForm = (props: any) => {
     CustomAutocompleteForwardConnection,
   };
 
-  const templates = {
-    ArrayFieldTemplate,
-  };
-
+  console.log(schema);
   return (
     <FormBase
       data={statement}
@@ -483,7 +448,6 @@ const StatementForm = (props: any) => {
       enableAutoSave={false}
       children={true}
       widgets={widgets}
-      templates={templates}
       showErrorList={false}
       submitOnBlurFields={[
         "knowledge_statement",
@@ -496,7 +460,6 @@ const StatementForm = (props: any) => {
         "laterality",
         "circuit_type",
         "projection",
-        "destination_type",
         "path_type",
       ]}
       {...props}

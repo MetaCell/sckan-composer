@@ -39,11 +39,11 @@ const PathsBuilder = (props: any) => {
           </Typography>
           <Table>
             <TableBody>
-              <TableRow startIcon={<OutlinedFlagTwoToneIcon/>} action={false}>
+              <TableRow startIcon={<OutlinedFlagTwoToneIcon />} action={false}>
                 <Grid
                   container
                   columnSpacing={2}
-                  alignItems='center'
+                  alignItems="center"
                   sx={{
                     "& .MuiGrid-container": { mt: "0 !important" },
                     "& .MuiGrid-item": { pt: 0, mb: "0 !important" },
@@ -59,9 +59,10 @@ const PathsBuilder = (props: any) => {
                       format="noLabel"
                       setter={refreshStatement}
                       extraData={{ sentence_id: statement.sentence.id }}
-                      uiFields={["origin_id"]}
+                      uiFields={["origins"]}
                       enableAutoSave={false}
-                      submitOnChangeFields={["origin_id"]}
+                      submitOnChangeFields={["origins"]}
+                      canAdd={false}
                     />
                   </Grid>
                 </Grid>
@@ -83,10 +84,11 @@ const PathsBuilder = (props: any) => {
             statement={statement}
             setter={refreshStatement}
             extraData={{ sentence_id: statement.sentence.id }}
-            uiFields={["path"]}
-            className="vias"
+            uiFields={["vias"]}
             enableAutoSave={false}
-            submitOnChangeFields={["path"]}
+            submitOnChangeFields={["vias"]}
+            format="noLabel"
+            canAdd={false}
           />
         </Box>
         <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
@@ -107,10 +109,10 @@ const PathsBuilder = (props: any) => {
                   format="noLabel"
                   setter={refreshStatement}
                   extraData={{ sentence_id: statement.sentence.id }}
-                  uiFields={["destination_id", "destination_type"]}
-                  className="inLineForm"
+                  uiFields={["destinations"]}
                   enableAutoSave={false}
-                  submitOnChangeFields={["destination_id", "destination_type"]}
+                  submitOnChangeFields={["destinations"]}
+                  canAdd={false}
                 />
               </TableRow>
             </TableBody>

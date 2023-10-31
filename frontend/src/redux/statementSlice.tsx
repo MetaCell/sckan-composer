@@ -18,14 +18,12 @@ export interface QueryParams {
   limit: number;
   notes: boolean | undefined;
   index: number | undefined;
-  ordering:
-    | Array<"-last_edited" | "-id" | "last_edited" | "id">
-    | undefined;
+  ordering: Array<"-last_edited" | "-id" | "last_edited" | "id"> | undefined;
   stateFilter: StateFilter | undefined;
   tagFilter: number[] | undefined;
   sentenceId: number | undefined;
   excludeSentenceId: number | undefined;
-  origin: number | undefined;
+  origin: number[] | undefined;
 }
 
 export interface StatementState {
@@ -43,7 +41,7 @@ export const initialState: StatementState = {
     knowledgeStatement: undefined,
     sentenceId: undefined,
     excludeSentenceId: undefined,
-    origin: undefined
+    origin: undefined,
   },
 };
 
