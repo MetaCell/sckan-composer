@@ -193,7 +193,6 @@ const styles = {
 };
 
 export default function CustomEntitiesDropdown({
-  placeholder,
   options: {
     entity = null,
     statement,
@@ -208,6 +207,7 @@ export default function CustomEntitiesDropdown({
     CustomFooter = null,
     header = {},
     CustomInputChip = null,
+    placeholder,
   },
 }: any) {
   const [searchValue, setSearchValue] = useState("");
@@ -216,14 +216,13 @@ export default function CustomEntitiesDropdown({
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
-  console.log(statement);
+
   const open = Boolean(anchorEl);
   const id = open ? "simple-popper" : undefined;
 
   const [hoveredOption, setHoveredOption] = useState<Option | null>(null);
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>(
-    [value] || [],
-  );
+  const [selectedOptions, setSelectedOptions] = useState<Option[]>(value || []);
+
   const [autocompleteOptions, setAutocompleteOptions] = useState<Option[]>([]);
   const [inputValue, setInputValue] = useState("");
 
@@ -271,11 +270,12 @@ export default function CustomEntitiesDropdown({
 
   const getGroupButton = (group: string) => {
     const allObjectsExist = autocompleteOptions
-      .filter((option: Option) => option.group === group)
-      .every((obj1) =>
-        selectedOptions.some(
-          (obj2) => JSON.stringify(obj1) === JSON.stringify(obj2),
-        ),
+      ?.filter((option: Option) => option.group === group)
+      .every(
+        (obj1) =>
+          selectedOptions?.some(
+            (obj2) => JSON.stringify(obj1) === JSON.stringify(obj2),
+          ),
       );
     return (
       <Button
@@ -296,7 +296,7 @@ export default function CustomEntitiesDropdown({
   };
 
   const handleOptionSelection = (option: Option) => {
-    const isOptionAlreadySelected = selectedOptions.some(
+    const isOptionAlreadySelected = selectedOptions?.some(
       (selected) => selected.id === option.id,
     );
     if (isOptionAlreadySelected) {
@@ -319,7 +319,7 @@ export default function CustomEntitiesDropdown({
   };
 
   const isOptionSelected = (option: Option) => {
-    return selectedOptions.some((selected) => selected.id === option.id);
+    return selectedOptions?.some((selected) => selected?.id === option?.id);
   };
   // show the disable message only in case of forward connections
   const formIsDisabled = !statement.destinations && entity === "Connections";
@@ -351,28 +351,32 @@ export default function CustomEntitiesDropdown({
             <Typography sx={styles.placeholder}>{placeholder}</Typography>
           ) : (
             <Box gap={1} display="flex" flexWrap="wrap">
-              {selectedOptions?.map((item: Option) => (
-                <Tooltip title={item?.label} placement="top" arrow>
-                  {CustomInputChip ? (
-                    <CustomInputChip sx={styles.chip} entity={item} />
-                  ) : (
-                    <Chip
-                      key={item?.id}
-                      sx={styles.chip}
-                      variant={"outlined"}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
-                      deleteIcon={<ClearOutlinedIcon />}
-                      onDelete={(e) => {
-                        e.stopPropagation();
-                        handleChipRemove(item);
-                      }}
-                      label={item?.label}
-                    />
-                  )}
-                </Tooltip>
-              ))}
+              {selectedOptions?.length
+                ? selectedOptions?.map((item: Option) => {
+                    return (
+                      <Tooltip title={item?.label} placement="top" arrow>
+                        {CustomInputChip ? (
+                          <CustomInputChip sx={styles.chip} entity={item} />
+                        ) : (
+                          <Chip
+                            key={item?.id}
+                            sx={{ ...styles.chip }}
+                            variant={"outlined"}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                            deleteIcon={<ClearOutlinedIcon />}
+                            onDelete={(e) => {
+                              e.stopPropagation();
+                              handleChipRemove(item);
+                            }}
+                            label={item?.label}
+                          />
+                        )}
+                      </Tooltip>
+                    );
+                  })
+                : null}
             </Box>
           )}
           {open ? (

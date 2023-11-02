@@ -31,7 +31,7 @@ const PathsBuilder = (props: any) => {
       <Stack sx={{ px: 1.5, mt: 1.5, width: 1 }}>
         <Box sx={subSectionStyle} ref={refs[5]}>
           <Typography variant="subtitle1" color={vars.captionColor}>
-            Destination
+            Origin
           </Typography>
           <StatementForm
             {...props}
@@ -39,9 +39,9 @@ const PathsBuilder = (props: any) => {
             format="noLabel"
             setter={refreshStatement}
             extraData={{ sentence_id: statement.sentence.id }}
-            uiFields={["destinations"]}
+            uiFields={["origins"]}
             enableAutoSave={false}
-            submitOnChangeFields={["destinations"]}
+            submitOnChangeFields={["origins"]}
           />
         </Box>
         <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
@@ -58,6 +58,22 @@ const PathsBuilder = (props: any) => {
             uiFields={["vias"]}
             enableAutoSave={false}
             submitOnChangeFields={["vias"]}
+          />
+        </Box>
+        <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
+        <Box sx={subSectionStyle} ref={refs[5]}>
+          <Typography variant="subtitle1" color={vars.captionColor}>
+            Destination
+          </Typography>
+          <StatementForm
+            {...props}
+            statement={statement}
+            format="noLabel"
+            setter={refreshStatement}
+            extraData={{ sentence_id: statement.sentence.id }}
+            uiFields={["destinations"]}
+            enableAutoSave={false}
+            submitOnChangeFields={["destinations"]}
           />
         </Box>
         <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />

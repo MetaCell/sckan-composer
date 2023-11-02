@@ -18,8 +18,6 @@ import {
 import { SortableItem } from "../ProofingTab/SortableItem";
 
 function ArrayFieldTemplate(props: any) {
-  console.log(props);
-
   const sortableItems = props.items.map((item: any) => ({
     ...item,
     id: item.key,

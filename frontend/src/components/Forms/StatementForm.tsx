@@ -23,17 +23,8 @@ const StatementForm = (props: any) => {
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
   copiedSchema.properties.destinations.name = "Destination";
-  copiedSchema.properties.destinations.items.properties = {
-    ...schema.properties.destinations.items.properties,
-    anatomical_entities: {
-      type: "string",
-      title: "anatomical_entities",
-    },
-    from_entities: {
-      type: "string",
-      title: "anatomical_entities",
-    },
-  };
+  copiedSchema.properties.vias.name = "Via";
+
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["destination_type", "*"];
   copiedUISchema.circuit_type = {
@@ -365,41 +356,6 @@ const StatementForm = (props: any) => {
     return false;
   };
 
-  copiedUISchema.origin_id = {
-    "ui:widget": CustomEntitiesDropdown,
-    "ui:options": {
-      placeholder: "Look for Origins",
-      searchPlaceholder: "Search for Origins",
-      noResultReason:
-        "We couldn’t find any record with these origin in the database.",
-      disabledReason:
-        "Add Destination entity to get access to the forward connection form",
-      onSearch: (searchValue: string) => getEntities(searchValue),
-      onUpdate: (selectedOptions: any) =>
-        updateOriginsInStatment(selectedOptions, statement?.id),
-      statement: statement,
-      errors: statement?.errors?.includes("Invalid origin")
-        ? statement.errors
-        : "",
-      value: mockEntities[0] ?? "",
-      CustomFooter: ({ entity }: any) => (
-        <Box
-          sx={{
-            mt: "1.5rem",
-            display: "flex",
-            gap: 1,
-            flexWrap: "wrap",
-            pt: "1.5rem",
-            borderTop: "0.0625rem solid #F2F4F7",
-          }}
-        >
-          {/* <Chip variant="filled" color="error" label={"https://google.com"} /> */}
-          <Chip variant="outlined" label={"https://google.com"} />
-        </Box>
-      ),
-    },
-  };
-
   copiedUISchema.destinations = {
     "ui:ArrayFieldTemplate": ArrayFieldTemplate,
     items: {
@@ -407,6 +363,9 @@ const StatementForm = (props: any) => {
         label: false,
       },
       "ui:label": false,
+      order: {
+        "ui:widget": "hidden",
+      },
       type: {
         "ui:widget": "CustomSingleSelect",
         "ui:options": {
@@ -428,7 +387,7 @@ const StatementForm = (props: any) => {
           errors: statement?.errors?.includes("Invalid origin")
             ? statement.errors
             : "",
-          value: mockEntities[0] ?? "",
+          value: statement.destinations.anatomical_entities ?? [],
           CustomFooter: ({ entity }: any) => (
             <Box
               sx={{
@@ -461,7 +420,92 @@ const StatementForm = (props: any) => {
           errors: statement?.errors?.includes("Invalid origin")
             ? statement.errors
             : "",
-          value: mockEntities[0] ?? "",
+          value: statement.destinations.from_entities ?? [],
+          CustomFooter: ({ entity }: any) => (
+            <Box
+              sx={{
+                mt: "1.5rem",
+                display: "flex",
+                gap: 1,
+                flexWrap: "wrap",
+                pt: "1.5rem",
+                borderTop: "0.0625rem solid #F2F4F7",
+              }}
+            >
+              {/* <Chip variant="filled" color="error" label={"https://google.com"} /> */}
+              <Chip variant="outlined" label={"https://google.com"} />
+            </Box>
+          ),
+        },
+      },
+    },
+  };
+
+  copiedUISchema.vias = {
+    "ui:ArrayFieldTemplate": ArrayFieldTemplate,
+    items: {
+      "ui:options": {
+        label: false,
+      },
+      "ui:label": false,
+      order: {
+        "ui:widget": "hidden",
+      },
+      type: {
+        "ui:widget": "CustomSingleSelect",
+        "ui:options": {
+          label: false,
+        },
+      },
+      anatomical_entities: {
+        "ui:widget": CustomEntitiesDropdown,
+        "ui:options": {
+          placeholder: "Look for vias",
+          searchPlaceholder: "Search for vias",
+          noResultReason:
+            "We couldn’t find any record with these via in the database.",
+          disabledReason: "",
+          onSearch: (searchValue: string) => getEntities(searchValue),
+          onUpdate: (selectedOptions: any) =>
+            updateOriginsInStatment(selectedOptions, statement?.id),
+          statement: statement,
+          errors: statement?.errors?.includes("Invalid origin")
+            ? statement.errors
+            : "",
+          value: statement.vias.anatomical_entities ?? [],
+          CustomFooter: ({ entity }: any) => (
+            <Box
+              sx={{
+                mt: "1.5rem",
+                display: "flex",
+                gap: 1,
+                flexWrap: "wrap",
+                pt: "1.5rem",
+                borderTop: "0.0625rem solid #F2F4F7",
+              }}
+            >
+              {/* <Chip variant="filled" color="error" label={"https://google.com"} /> */}
+              <Chip variant="outlined" label={"https://google.com"} />
+            </Box>
+          ),
+        },
+      },
+      from_entities: {
+        "ui:widget": CustomEntitiesDropdown,
+        "ui:options": {
+          placeholder: "Look for vias",
+          searchPlaceholder: "Search for vias",
+          noResultReason:
+            "We couldn’t find any record with these via in the database.",
+          disabledReason: "",
+          onSearch: (searchValue: string) => getEntities(searchValue),
+          onUpdate: (selectedOptions: any) =>
+            updateOriginsInStatment(selectedOptions, statement?.id),
+          statement: statement,
+          errors: statement?.errors?.includes("Invalid origin")
+            ? statement.errors
+            : "",
+          value: statement.vias.from_entities ?? [],
           CustomFooter: ({ entity }: any) => (
             <Box
               sx={{
@@ -510,7 +554,7 @@ const StatementForm = (props: any) => {
       errors: statement?.errors?.includes("Invalid forward connection")
         ? statement.errors
         : "",
-      value: mockConnections[0] ?? "",
+      value: statement.forward_connection ?? [],
       header: {
         label: "Origins",
         values: [
@@ -558,6 +602,26 @@ const StatementForm = (props: any) => {
       ),
     },
   };
+
+  copiedUISchema.origins = {
+    "ui:widget": CustomEntitiesDropdown,
+    "ui:options": {
+      placeholder: "Origin",
+      searchPlaceholder: "Search for Knowledge Origins",
+      noResultReason:
+        "We couldn’t find any record with these origin in the database.",
+      disabledReason:
+        "Add origin entity to get access to the forward connection form",
+      onSearch: (searchValue: string) => getConnections(searchValue),
+      onUpdate: (selectedOptions: any) =>
+        updateForwardConnectionsInStatment(selectedOptions, statement?.id),
+      statement: statement,
+      errors: statement?.errors?.includes("Invalid Origins")
+        ? statement.errors
+        : "",
+      value: statement?.origins ?? [],
+    },
+  };
   const widgets = {
     AnatomicalEntitiesField,
     CustomSingleSelect,
@@ -590,7 +654,8 @@ const StatementForm = (props: any) => {
         "circuit_type",
         "projection",
         "destinations",
-        "path_type",
+        "vias",
+        "origins",
       ]}
       {...props}
     />
