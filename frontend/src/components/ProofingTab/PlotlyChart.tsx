@@ -4,6 +4,8 @@ import { ConnectivityStatement, Via } from "../../apiclient/backend";
 import { useTheme } from "@mui/system";
 import { Box } from "@mui/material";
 
+// TODO: Update component to work with graphs @afonsobspinto
+
 const axis_config = {
   showgrid: false,
   zeroline: false,
@@ -52,57 +54,59 @@ const styledLabels = (text: string) => {
   return formattedText;
 };
 
-const generateAnnotations = (path: (Via | null)[]) =>
-  path.map((via, i) => ({
-    x: i,
-    y: 1,
-    text: via && truncateString(via.anatomical_entity.name, 20),
-    font: { size: 12 },
-    showarrow: false,
-    textangle: -45,
-    yanchor: "bottom",
-    xanchor: "left",
-    xref: "x2",
-  }));
+// const generateAnnotations = (path: (Via | null)[]) =>
+//   path.map((via, i) => ({
+//     x: i,
+//     y: 1,
+//     text: via && truncateString(via.anatomical_entity.name, 20),
+//     font: { size: 12 },
+//     showarrow: false,
+//     textangle: -45,
+//     yanchor: "bottom",
+//     xanchor: "left",
+//     xref: "x2",
+//   }));
 
 function PlotlyChart(props: { statement: ConnectivityStatement }) {
-  const { statement } = props;
-  const theme = useTheme();
+  // const { statement } = props;
+  // const theme = useTheme();
+  //
+  // const path = statement.path || [];
+  //
+  // layout.annotations = generateAnnotations(path);
+  //
+  // const data = [
+  //   {
+  //     name: "Via",
+  //     x: [0, ...path.map((v, i) => i + 1)],
+  //     y: [1, ...path.map(() => 1)],
+  //     type: "scatter",
+  //     mode: "lines+markers",
+  //     text: [...path.map((v) => v.anatomical_entity.name), ""],
+  //     line: { color: "#98A2B3", width: 1 },
+  //     marker: { symbol: "arrow", angleref: "previous", size: 10 },
+  //     xaxis: "x2",
+  //     hovertemplate: "%{text}<extra></extra>",
+  //   },
+  //   {
+  //     x: [0, statement.path?.length],
+  //     y: [1, 1],
+  //     type: "scatter",
+  //     mode: "markers+text",
+  //     text: [
+  //       statement.origins.map((origin) => styledLabels(origin.name)),
+  //       styledLabels(statement.destination?.name),
+  //     ],
+  //     marker: {
+  //       color: theme.palette.common.white,
+  //       size: 100,
+  //       line: { color: "#D0D5DD", width: 1 },
+  //     },
+  //     hoverinfo: "skip",
+  //   },
+  // ];
 
-  const path = statement.path || [];
-
-  layout.annotations = generateAnnotations(path);
-
-  const data = [
-    {
-      name: "Via",
-      x: [0, ...path.map((v, i) => i + 1)],
-      y: [1, ...path.map(() => 1)],
-      type: "scatter",
-      mode: "lines+markers",
-      text: [...path.map((v) => v.anatomical_entity.name), ""],
-      line: { color: "#98A2B3", width: 1 },
-      marker: { symbol: "arrow", angleref: "previous", size: 10 },
-      xaxis: "x2",
-      hovertemplate: "%{text}<extra></extra>",
-    },
-    {
-      x: [0, statement.path?.length],
-      y: [1, 1],
-      type: "scatter",
-      mode: "markers+text",
-      text: [
-        statement.origins.map((origin) => styledLabels(origin.name)),
-        styledLabels(statement.destination?.name),
-      ],
-      marker: {
-        color: theme.palette.common.white,
-        size: 100,
-        line: { color: "#D0D5DD", width: 1 },
-      },
-      hoverinfo: "skip",
-    },
-  ];
+  const data: any[] = []
   return (
     <Box width="100%" display="flex" justifyContent="center">
       <Plot

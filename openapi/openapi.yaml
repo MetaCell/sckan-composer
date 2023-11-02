@@ -70,9 +70,13 @@ paths:
       description: ConnectivityStatement
       parameters:
       - in: query
-        name: destination
+        name: destinations
         schema:
-          type: integer
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
       - in: query
         name: exclude_sentence_id
         schema:
@@ -233,13 +237,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ConnectivityStatement'
+              $ref: '#/components/schemas/ConnectivityStatementUpdate'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/ConnectivityStatement'
+              $ref: '#/components/schemas/ConnectivityStatementUpdate'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/ConnectivityStatement'
+              $ref: '#/components/schemas/ConnectivityStatementUpdate'
         required: true
       security:
       - tokenAuth: []
@@ -268,13 +272,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedConnectivityStatement'
+              $ref: '#/components/schemas/PatchedConnectivityStatementUpdate'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedConnectivityStatement'
+              $ref: '#/components/schemas/PatchedConnectivityStatementUpdate'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedConnectivityStatement'
+              $ref: '#/components/schemas/PatchedConnectivityStatementUpdate'
       security:
       - tokenAuth: []
       - basicAuth: []
@@ -1582,6 +1586,18 @@ components:
       - id
       - name
       - ontology_uri
+    AvailableTransitionsC67Enum:
+      enum:
+      - draft
+      - compose_now
+      - curated
+      - excluded
+      - rejected
+      - to_be_reviewed
+      - connection_missing
+      - npo_approved
+      - exported
+      type: string
     CircuitTypeEnum:
       enum:
       - SENSORY
@@ -1629,25 +1645,20 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/ConnectivityStatementAvailableTransitionsEnum'
+            $ref: '#/components/schemas/AvailableTransitionsC67Enum'
           readOnly: true
-        origins_ids:
-          type: array
-          items:
-            type: integer
-          nullable: true
         origins:
           type: array
           items:
             $ref: '#/components/schemas/AnatomicalEntity'
-          readOnly: true
-        destination_id:
-          type: integer
-          nullable: true
-        destination:
-          allOf:
-          - $ref: '#/components/schemas/AnatomicalEntity'
-          readOnly: true
+        vias:
+          type: array
+          items:
+            $ref: '#/components/schemas/Via'
+        destinations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Destination'
         phenotype_id:
           type: integer
           nullable: true
@@ -1655,12 +1666,6 @@ components:
           allOf:
           - $ref: '#/components/schemas/Phenotype'
           readOnly: true
-        destination_type:
-          $ref: '#/components/schemas/DestinationTypeEnum'
-        path:
-          type: array
-          items:
-            $ref: '#/components/schemas/Via'
         journey:
           type: string
           readOnly: true
@@ -1708,7 +1713,125 @@ components:
           readOnly: true
       required:
       - available_transitions
-      - destination
+      - errors
+      - has_notes
+      - id
+      - journey
+      - modified_date
+      - owner
+      - phenotype
+      - sentence
+      - sentence_id
+      - sex
+      - state
+      - statement_preview
+      - tags
+    ConnectivityStatementUpdate:
+      type: object
+      description: Connectivity Statement
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          nullable: true
+        sentence_id:
+          type: integer
+        sentence:
+          allOf:
+          - $ref: '#/components/schemas/Sentence'
+          readOnly: true
+        knowledge_statement:
+          type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+          readOnly: true
+        provenances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Provenance'
+        owner:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        owner_id:
+          type: integer
+          nullable: true
+        state:
+          type: string
+          maxLength: 50
+        available_transitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AvailableTransitionsC67Enum'
+          readOnly: true
+        origins:
+          type: array
+          items:
+            type: integer
+        vias:
+          type: array
+          items:
+            $ref: '#/components/schemas/Via'
+        destinations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Destination'
+        phenotype_id:
+          type: integer
+          nullable: true
+        phenotype:
+          allOf:
+          - $ref: '#/components/schemas/Phenotype'
+          readOnly: true
+        journey:
+          type: string
+          readOnly: true
+        laterality:
+          $ref: '#/components/schemas/LateralityEnum'
+        projection:
+          $ref: '#/components/schemas/ProjectionEnum'
+        circuit_type:
+          $ref: '#/components/schemas/CircuitTypeEnum'
+        species:
+          type: array
+          items:
+            $ref: '#/components/schemas/Specie'
+        sex_id:
+          type: integer
+          nullable: true
+        sex:
+          allOf:
+          - $ref: '#/components/schemas/Sex'
+          readOnly: true
+        forward_connection:
+          type: array
+          items:
+            type: integer
+        apinatomy_model:
+          type: string
+          nullable: true
+          maxLength: 200
+        additional_information:
+          type: string
+          nullable: true
+        modified_date:
+          type: string
+          format: date-time
+          readOnly: true
+        has_notes:
+          type: boolean
+          readOnly: true
+        statement_preview:
+          type: string
+          readOnly: true
+        errors:
+          type: array
+          items: {}
+          readOnly: true
+      required:
+      - available_transitions
       - errors
       - has_notes
       - id
@@ -1720,21 +1843,29 @@ components:
       - sentence
       - sentence_id
       - sex
-      - state
       - statement_preview
       - tags
-    ConnectivityStatementAvailableTransitionsEnum:
-      enum:
-      - draft
-      - compose_now
-      - curated
-      - excluded
-      - rejected
-      - to_be_reviewed
-      - connection_missing
-      - npo_approved
-      - exported
-      type: string
+    Destination:
+      type: object
+      description: Destination
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/DestinationTypeEnum'
+        anatomical_entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnatomicalEntity'
+        from_entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnatomicalEntity'
+      required:
+      - anatomical_entities
+      - from_entities
+      - id
     DestinationTypeEnum:
       enum:
       - AXON-T
@@ -1971,7 +2102,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Via'
-    PatchedConnectivityStatement:
+    PatchedConnectivityStatementUpdate:
       type: object
       description: Connectivity Statement
       properties:
@@ -2005,29 +2136,24 @@ components:
           nullable: true
         state:
           type: string
-          readOnly: true
+          maxLength: 50
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/ConnectivityStatementAvailableTransitionsEnum'
+            $ref: '#/components/schemas/AvailableTransitionsC67Enum'
           readOnly: true
-        origins_ids:
-          type: array
-          items:
-            type: integer
-          nullable: true
         origins:
           type: array
           items:
-            $ref: '#/components/schemas/AnatomicalEntity'
-          readOnly: true
-        destination_id:
-          type: integer
-          nullable: true
-        destination:
-          allOf:
-          - $ref: '#/components/schemas/AnatomicalEntity'
-          readOnly: true
+            type: integer
+        vias:
+          type: array
+          items:
+            $ref: '#/components/schemas/Via'
+        destinations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Destination'
         phenotype_id:
           type: integer
           nullable: true
@@ -2035,12 +2161,6 @@ components:
           allOf:
           - $ref: '#/components/schemas/Phenotype'
           readOnly: true
-        destination_type:
-          $ref: '#/components/schemas/DestinationTypeEnum'
-        path:
-          type: array
-          items:
-            $ref: '#/components/schemas/Via'
         journey:
           type: string
           readOnly: true
@@ -2181,20 +2301,21 @@ components:
         id:
           type: integer
           readOnly: true
-        display_order:
+        order:
           type: integer
-          nullable: true
         connectivity_statement_id:
           type: integer
           readOnly: true
         type:
-          $ref: '#/components/schemas/TypeEnum'
-        anatomical_entity_id:
-          type: integer
-        anatomical_entity:
-          allOf:
-          - $ref: '#/components/schemas/AnatomicalEntity'
-          readOnly: true
+          $ref: '#/components/schemas/ViaTypeEnum'
+        anatomical_entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnatomicalEntity'
+        from_entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnatomicalEntity'
     Phenotype:
       type: object
       description: Phenotype
@@ -2466,11 +2587,6 @@ components:
       required:
       - id
       - tag
-    TypeEnum:
-      enum:
-      - AXON
-      - DENDRITE
-      type: string
     User:
       type: object
       description: User
@@ -2505,25 +2621,32 @@ components:
         id:
           type: integer
           readOnly: true
-        display_order:
+        order:
           type: integer
-          nullable: true
         connectivity_statement_id:
           type: integer
           readOnly: true
         type:
-          $ref: '#/components/schemas/TypeEnum'
-        anatomical_entity_id:
-          type: integer
-        anatomical_entity:
-          allOf:
-          - $ref: '#/components/schemas/AnatomicalEntity'
-          readOnly: true
+          $ref: '#/components/schemas/ViaTypeEnum'
+        anatomical_entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnatomicalEntity'
+        from_entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnatomicalEntity'
       required:
-      - anatomical_entity
-      - anatomical_entity_id
+      - anatomical_entities
       - connectivity_statement_id
+      - from_entities
       - id
+      - order
+    ViaTypeEnum:
+      enum:
+      - AXON
+      - DENDRITE
+      type: string
   securitySchemes:
     basicAuth:
       type: http

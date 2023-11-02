@@ -14,7 +14,7 @@ import { Box, Chip, MenuItem, Select } from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
-import {getOrigins} from "../../services/CustomDropdownService";
+import {getOrigins, updateOrigins} from "../../services/CustomDropdownService";
 import {mapAnatomicalEntitiesToOptions} from "../../helpers/dropdownMappers";
 const StatementForm = (props: any) => {
   const { uiFields, statement, setter, format } = props;
@@ -350,13 +350,6 @@ const StatementForm = (props: any) => {
 
   const getConnections = async (searchValue: string) => mockConnections;
 
-  const updateOriginsInStatment = (options: any, id: string) => {
-    return false;
-  };
-
-  const updateForwardConnectionsInStatment = (options: any, id: string) => {
-    return false;
-  };
 
   copiedUISchema.destinations = {
     "ui:ArrayFieldTemplate": ArrayFieldTemplate,
@@ -383,8 +376,7 @@ const StatementForm = (props: any) => {
             "We couldn’t find any record with these destination in the database.",
           disabledReason: "",
           onSearch: async (searchValue: string) => getEntities(searchValue),
-          onUpdate: (selectedOptions: any) =>
-            updateOriginsInStatment(selectedOptions, statement?.id),
+          onUpdate: async (selectedOptions: any) => {},
           statement: statement,
           errors: statement?.errors?.includes("Invalid origin")
             ? statement.errors
@@ -416,8 +408,7 @@ const StatementForm = (props: any) => {
             "We couldn’t find any record with these destination in the database.",
           disabledReason: "",
           onSearch: async (searchValue: string) => getEntities(searchValue),
-          onUpdate: (selectedOptions: any) =>
-            updateOriginsInStatment(selectedOptions, statement?.id),
+          onUpdate: async (selectedOptions: any) => {},
           statement: statement,
           errors: statement?.errors?.includes("Invalid origin")
             ? statement.errors
@@ -468,8 +459,7 @@ const StatementForm = (props: any) => {
             "We couldn’t find any record with these via in the database.",
           disabledReason: "",
           onSearch: async (searchValue: string) => getEntities(searchValue),
-          onUpdate: (selectedOptions: any) =>
-            updateOriginsInStatment(selectedOptions, statement?.id),
+          onUpdate: async (selectedOptions: any) => updateOrigins(selectedOptions, statement?.id),
           statement: statement,
           errors: statement?.errors?.includes("Invalid origin")
             ? statement.errors
@@ -501,8 +491,7 @@ const StatementForm = (props: any) => {
             "We couldn’t find any record with these via in the database.",
           disabledReason: "",
           onSearch: async (searchValue: string) => getEntities(searchValue),
-          onUpdate: (selectedOptions: any) =>
-            updateOriginsInStatment(selectedOptions, statement?.id),
+          onUpdate: async (selectedOptions: any) => {},
           statement: statement,
           errors: statement?.errors?.includes("Invalid origin")
             ? statement.errors
@@ -550,8 +539,7 @@ const StatementForm = (props: any) => {
       disabledReason:
         "Add Destination entity to get access to the forward connection form",
       onSearch: async (searchValue: string) => getConnections(searchValue),
-      onUpdate: (selectedOptions: any) =>
-        updateForwardConnectionsInStatment(selectedOptions, statement?.id),
+      onUpdate: async (selectedOptions: any) => {},
       statement: statement,
       errors: statement?.errors?.includes("Invalid forward connection")
         ? statement.errors
@@ -609,14 +597,11 @@ const StatementForm = (props: any) => {
     "ui:widget": CustomEntitiesDropdown,
     "ui:options": {
       placeholder: "Origin",
-      searchPlaceholder: "Search for Knowledge Origins",
-      noResultReason:
-        "We couldn’t find any record with these origin in the database.",
-      disabledReason:
-        "Add origin entity to get access to the forward connection form",
-      onSearch: (searchValue: string) => getOrigins(searchValue),
-      onUpdate: (selectedOptions: any) =>
-        updateForwardConnectionsInStatment(selectedOptions, statement?.id),
+      searchPlaceholder: "Search for Origins",
+      noResultReason: "No results found",
+      disabledReason: "",
+      onSearch: async (searchValue: string) => getOrigins(searchValue),
+      onUpdate: async (selectedOptions: any) => updateOrigins(selectedOptions, statement.id),
       statement: statement,
       errors: "",
       value: mapAnatomicalEntitiesToOptions(statement?.origins, 'Origins')

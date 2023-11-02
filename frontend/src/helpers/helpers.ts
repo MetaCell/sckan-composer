@@ -1,5 +1,5 @@
 import { SentenceAvailableTransitionsEnum as sentenceStates } from "../apiclient/backend/api";
-import { ConnectivityStatementAvailableTransitionsEnum as statementStates } from "../apiclient/backend/api";
+import { ComposerConnectivityStatementListStateEnum as statementStates } from "../apiclient/backend/api";
 
 export const hiddenWidget = (fields: string[]) => {
   let hiddenSchema = {}

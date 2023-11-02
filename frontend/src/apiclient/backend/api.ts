@@ -54,6 +54,27 @@ export interface AnatomicalEntity {
  * @enum {string}
  */
 
+export const AvailableTransitionsC67Enum = {
+    Draft: 'draft',
+    ComposeNow: 'compose_now',
+    Curated: 'curated',
+    Excluded: 'excluded',
+    Rejected: 'rejected',
+    ToBeReviewed: 'to_be_reviewed',
+    ConnectionMissing: 'connection_missing',
+    NpoApproved: 'npo_approved',
+    Exported: 'exported'
+} as const;
+
+export type AvailableTransitionsC67Enum = typeof AvailableTransitionsC67Enum[keyof typeof AvailableTransitionsC67Enum];
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
 export const CircuitTypeEnum = {
     Sensory: 'SENSORY',
     Motor: 'MOTOR',
@@ -128,34 +149,28 @@ export interface ConnectivityStatement {
     'state': string;
     /**
      * 
-     * @type {Array<ConnectivityStatementAvailableTransitionsEnum>}
+     * @type {Array<AvailableTransitionsC67Enum>}
      * @memberof ConnectivityStatement
      */
-    'available_transitions': Array<ConnectivityStatementAvailableTransitionsEnum>;
-    /**
-     * 
-     * @type {Array<number>}
-     * @memberof ConnectivityStatement
-     */
-    'origins_ids'?: Array<number> | null;
+    'available_transitions': Array<AvailableTransitionsC67Enum>;
     /**
      * 
      * @type {Array<AnatomicalEntity>}
      * @memberof ConnectivityStatement
      */
-    'origins': Array<AnatomicalEntity>;
+    'origins'?: Array<AnatomicalEntity>;
     /**
      * 
-     * @type {number}
+     * @type {Array<Via>}
      * @memberof ConnectivityStatement
      */
-    'destination_id'?: number | null;
+    'vias'?: Array<Via>;
     /**
      * 
-     * @type {AnatomicalEntity}
+     * @type {Array<Destination>}
      * @memberof ConnectivityStatement
      */
-    'destination': AnatomicalEntity;
+    'destinations'?: Array<Destination>;
     /**
      * 
      * @type {number}
@@ -168,18 +183,6 @@ export interface ConnectivityStatement {
      * @memberof ConnectivityStatement
      */
     'phenotype': Phenotype;
-    /**
-     * 
-     * @type {DestinationTypeEnum}
-     * @memberof ConnectivityStatement
-     */
-    'destination_type'?: DestinationTypeEnum;
-    /**
-     * 
-     * @type {Array<Via>}
-     * @memberof ConnectivityStatement
-     */
-    'path'?: Array<Via>;
     /**
      * 
      * @type {string}
@@ -268,24 +271,219 @@ export interface ConnectivityStatement {
 
 
 /**
- * 
+ * Connectivity Statement
  * @export
- * @enum {string}
+ * @interface ConnectivityStatementUpdate
  */
+export interface ConnectivityStatementUpdate {
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'id': number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'sentence_id': number;
+    /**
+     * 
+     * @type {Sentence}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'sentence': Sentence;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'knowledge_statement'?: string;
+    /**
+     * 
+     * @type {Array<Tag>}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'tags': Array<Tag>;
+    /**
+     * 
+     * @type {Array<Provenance>}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'provenances'?: Array<Provenance>;
+    /**
+     * 
+     * @type {User}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'owner': User;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'owner_id'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'state'?: string;
+    /**
+     * 
+     * @type {Array<AvailableTransitionsC67Enum>}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'available_transitions': Array<AvailableTransitionsC67Enum>;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'origins': Array<number>;
+    /**
+     * 
+     * @type {Array<Via>}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'vias'?: Array<Via>;
+    /**
+     * 
+     * @type {Array<Destination>}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'destinations'?: Array<Destination>;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'phenotype_id'?: number | null;
+    /**
+     * 
+     * @type {Phenotype}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'phenotype': Phenotype;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'journey': string;
+    /**
+     * 
+     * @type {LateralityEnum}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'laterality'?: LateralityEnum;
+    /**
+     * 
+     * @type {ProjectionEnum}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'projection'?: ProjectionEnum;
+    /**
+     * 
+     * @type {CircuitTypeEnum}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'circuit_type'?: CircuitTypeEnum;
+    /**
+     * 
+     * @type {Array<Specie>}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'species'?: Array<Specie>;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'sex_id'?: number | null;
+    /**
+     * 
+     * @type {Sex}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'sex': Sex;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'forward_connection'?: Array<number>;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'apinatomy_model'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'additional_information'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'modified_date': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'has_notes': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'statement_preview': string;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'errors': Array<any>;
+}
 
-export const ConnectivityStatementAvailableTransitionsEnum = {
-    Draft: 'draft',
-    ComposeNow: 'compose_now',
-    Curated: 'curated',
-    Excluded: 'excluded',
-    Rejected: 'rejected',
-    ToBeReviewed: 'to_be_reviewed',
-    ConnectionMissing: 'connection_missing',
-    NpoApproved: 'npo_approved',
-    Exported: 'exported'
-} as const;
 
-export type ConnectivityStatementAvailableTransitionsEnum = typeof ConnectivityStatementAvailableTransitionsEnum[keyof typeof ConnectivityStatementAvailableTransitionsEnum];
+/**
+ * Destination
+ * @export
+ * @interface Destination
+ */
+export interface Destination {
+    /**
+     * 
+     * @type {number}
+     * @memberof Destination
+     */
+    'id': number;
+    /**
+     * 
+     * @type {DestinationTypeEnum}
+     * @memberof Destination
+     */
+    'type'?: DestinationTypeEnum;
+    /**
+     * 
+     * @type {Array<AnatomicalEntity>}
+     * @memberof Destination
+     */
+    'anatomical_entities': Array<AnatomicalEntity>;
+    /**
+     * 
+     * @type {Array<AnatomicalEntity>}
+     * @memberof Destination
+     */
+    'from_entities': Array<AnatomicalEntity>;
+}
 
 
 /**
@@ -687,199 +885,181 @@ export interface PaginatedViaList {
 /**
  * Connectivity Statement
  * @export
- * @interface PatchedConnectivityStatement
+ * @interface PatchedConnectivityStatementUpdate
  */
-export interface PatchedConnectivityStatement {
+export interface PatchedConnectivityStatementUpdate {
     /**
      * 
      * @type {number}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'id'?: number | null;
     /**
      * 
      * @type {number}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'sentence_id'?: number;
     /**
      * 
      * @type {Sentence}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'sentence'?: Sentence;
     /**
      * 
      * @type {string}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'knowledge_statement'?: string;
     /**
      * 
      * @type {Array<Tag>}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'tags'?: Array<Tag>;
     /**
      * 
      * @type {Array<Provenance>}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'provenances'?: Array<Provenance>;
     /**
      * 
      * @type {User}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'owner'?: User;
     /**
      * 
      * @type {number}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'owner_id'?: number | null;
     /**
      * 
      * @type {string}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'state'?: string;
     /**
      * 
-     * @type {Array<ConnectivityStatementAvailableTransitionsEnum>}
-     * @memberof PatchedConnectivityStatement
+     * @type {Array<AvailableTransitionsC67Enum>}
+     * @memberof PatchedConnectivityStatementUpdate
      */
-    'available_transitions'?: Array<ConnectivityStatementAvailableTransitionsEnum>;
+    'available_transitions'?: Array<AvailableTransitionsC67Enum>;
     /**
      * 
      * @type {Array<number>}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
-    'origins_ids'?: Array<number> | null;
+    'origins'?: Array<number>;
     /**
      * 
-     * @type {Array<AnatomicalEntity>}
-     * @memberof PatchedConnectivityStatement
+     * @type {Array<Via>}
+     * @memberof PatchedConnectivityStatementUpdate
      */
-    'origins'?: Array<AnatomicalEntity>;
+    'vias'?: Array<Via>;
     /**
      * 
-     * @type {number}
-     * @memberof PatchedConnectivityStatement
+     * @type {Array<Destination>}
+     * @memberof PatchedConnectivityStatementUpdate
      */
-    'destination_id'?: number | null;
-    /**
-     * 
-     * @type {AnatomicalEntity}
-     * @memberof PatchedConnectivityStatement
-     */
-    'destination'?: AnatomicalEntity;
+    'destinations'?: Array<Destination>;
     /**
      * 
      * @type {number}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'phenotype_id'?: number | null;
     /**
      * 
      * @type {Phenotype}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'phenotype'?: Phenotype;
     /**
      * 
-     * @type {DestinationTypeEnum}
-     * @memberof PatchedConnectivityStatement
-     */
-    'destination_type'?: DestinationTypeEnum;
-    /**
-     * 
-     * @type {Array<Via>}
-     * @memberof PatchedConnectivityStatement
-     */
-    'path'?: Array<Via>;
-    /**
-     * 
      * @type {string}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'journey'?: string;
     /**
      * 
      * @type {LateralityEnum}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'laterality'?: LateralityEnum;
     /**
      * 
      * @type {ProjectionEnum}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'projection'?: ProjectionEnum;
     /**
      * 
      * @type {CircuitTypeEnum}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'circuit_type'?: CircuitTypeEnum;
     /**
      * 
      * @type {Array<Specie>}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'species'?: Array<Specie>;
     /**
      * 
      * @type {number}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'sex_id'?: number | null;
     /**
      * 
      * @type {Sex}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'sex'?: Sex;
     /**
      * 
      * @type {Array<number>}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'forward_connection'?: Array<number>;
     /**
      * 
      * @type {string}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'apinatomy_model'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'additional_information'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'modified_date'?: string;
     /**
      * 
      * @type {boolean}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'has_notes'?: boolean;
     /**
      * 
      * @type {string}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'statement_preview'?: string;
     /**
      * 
      * @type {Array<any>}
-     * @memberof PatchedConnectivityStatement
+     * @memberof PatchedConnectivityStatementUpdate
      */
     'errors'?: Array<any>;
 }
@@ -1060,7 +1240,7 @@ export interface PatchedVia {
      * @type {number}
      * @memberof PatchedVia
      */
-    'display_order'?: number | null;
+    'order'?: number;
     /**
      * 
      * @type {number}
@@ -1069,22 +1249,22 @@ export interface PatchedVia {
     'connectivity_statement_id'?: number;
     /**
      * 
-     * @type {TypeEnum}
+     * @type {ViaTypeEnum}
      * @memberof PatchedVia
      */
-    'type'?: TypeEnum;
+    'type'?: ViaTypeEnum;
     /**
      * 
-     * @type {number}
+     * @type {Array<AnatomicalEntity>}
      * @memberof PatchedVia
      */
-    'anatomical_entity_id'?: number;
+    'anatomical_entities'?: Array<AnatomicalEntity>;
     /**
      * 
-     * @type {AnatomicalEntity}
+     * @type {Array<AnatomicalEntity>}
      * @memberof PatchedVia
      */
-    'anatomical_entity'?: AnatomicalEntity;
+    'from_entities'?: Array<AnatomicalEntity>;
 }
 
 
@@ -1499,20 +1679,6 @@ export interface Tag {
     'tag': string;
 }
 /**
- * 
- * @export
- * @enum {string}
- */
-
-export const TypeEnum = {
-    Axon: 'AXON',
-    Dendrite: 'DENDRITE'
-} as const;
-
-export type TypeEnum = typeof TypeEnum[keyof typeof TypeEnum];
-
-
-/**
  * User
  * @export
  * @interface User
@@ -1566,7 +1732,7 @@ export interface Via {
      * @type {number}
      * @memberof Via
      */
-    'display_order'?: number | null;
+    'order': number;
     /**
      * 
      * @type {number}
@@ -1575,23 +1741,37 @@ export interface Via {
     'connectivity_statement_id': number;
     /**
      * 
-     * @type {TypeEnum}
+     * @type {ViaTypeEnum}
      * @memberof Via
      */
-    'type'?: TypeEnum;
+    'type'?: ViaTypeEnum;
     /**
      * 
-     * @type {number}
+     * @type {Array<AnatomicalEntity>}
      * @memberof Via
      */
-    'anatomical_entity_id': number;
+    'anatomical_entities': Array<AnatomicalEntity>;
     /**
      * 
-     * @type {AnatomicalEntity}
+     * @type {Array<AnatomicalEntity>}
      * @memberof Via
      */
-    'anatomical_entity': AnatomicalEntity;
+    'from_entities': Array<AnatomicalEntity>;
 }
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const ViaTypeEnum = {
+    Axon: 'AXON',
+    Dendrite: 'DENDRITE'
+} as const;
+
+export type ViaTypeEnum = typeof ViaTypeEnum[keyof typeof ViaTypeEnum];
 
 
 
@@ -2154,7 +2334,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * ConnectivityStatement
-         * @param {number} [destination] 
+         * @param {Array<number>} [destinations] 
          * @param {number} [excludeSentenceId] 
          * @param {string} [knowledgeStatement] 
          * @param {number} [limit] Number of results to return per page.
@@ -2168,7 +2348,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList: async (destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementList: async (destinations?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/connectivity-statement/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2190,8 +2370,8 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
 
             // authentication cookieAuth required
 
-            if (destination !== undefined) {
-                localVarQueryParameter['destination'] = destination;
+            if (destinations) {
+                localVarQueryParameter['destinations'] = destinations;
             }
 
             if (excludeSentenceId !== undefined) {
@@ -2248,11 +2428,11 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {PatchedConnectivityStatement} [patchedConnectivityStatement] 
+         * @param {PatchedConnectivityStatementUpdate} [patchedConnectivityStatementUpdate] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementPartialUpdate: async (id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementPartialUpdate: async (id: number, patchedConnectivityStatementUpdate?: PatchedConnectivityStatementUpdate, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementPartialUpdate', 'id', id)
             const localVarPath = `/api/composer/connectivity-statement/{id}/`
@@ -2284,7 +2464,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(patchedConnectivityStatement, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(patchedConnectivityStatementUpdate, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2336,15 +2516,15 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {ConnectivityStatement} connectivityStatement 
+         * @param {ConnectivityStatementUpdate} connectivityStatementUpdate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementUpdate: async (id: number, connectivityStatement: ConnectivityStatement, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementUpdate: async (id: number, connectivityStatementUpdate: ConnectivityStatementUpdate, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementUpdate', 'id', id)
-            // verify required parameter 'connectivityStatement' is not null or undefined
-            assertParamExists('composerConnectivityStatementUpdate', 'connectivityStatement', connectivityStatement)
+            // verify required parameter 'connectivityStatementUpdate' is not null or undefined
+            assertParamExists('composerConnectivityStatementUpdate', 'connectivityStatementUpdate', connectivityStatementUpdate)
             const localVarPath = `/api/composer/connectivity-statement/{id}/`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -2374,7 +2554,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(connectivityStatement, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(connectivityStatementUpdate, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -4011,7 +4191,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * ConnectivityStatement
-         * @param {number} [destination] 
+         * @param {Array<number>} [destinations] 
          * @param {number} [excludeSentenceId] 
          * @param {string} [knowledgeStatement] 
          * @param {number} [limit] Number of results to return per page.
@@ -4025,19 +4205,19 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementList(destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destination, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options);
+        async composerConnectivityStatementList(destinations?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destinations, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {PatchedConnectivityStatement} [patchedConnectivityStatement] 
+         * @param {PatchedConnectivityStatementUpdate} [patchedConnectivityStatementUpdate] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementPartialUpdate(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementPartialUpdate(id, patchedConnectivityStatement, options);
+        async composerConnectivityStatementPartialUpdate(id: number, patchedConnectivityStatementUpdate?: PatchedConnectivityStatementUpdate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementPartialUpdate(id, patchedConnectivityStatementUpdate, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4053,12 +4233,12 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {ConnectivityStatement} connectivityStatement 
+         * @param {ConnectivityStatementUpdate} connectivityStatementUpdate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementUpdate(id: number, connectivityStatement: ConnectivityStatement, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementUpdate(id, connectivityStatement, options);
+        async composerConnectivityStatementUpdate(id: number, connectivityStatementUpdate: ConnectivityStatementUpdate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementUpdate(id, connectivityStatementUpdate, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4537,7 +4717,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * ConnectivityStatement
-         * @param {number} [destination] 
+         * @param {Array<number>} [destinations] 
          * @param {number} [excludeSentenceId] 
          * @param {string} [knowledgeStatement] 
          * @param {number} [limit] Number of results to return per page.
@@ -4551,18 +4731,18 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList(destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementList> {
-            return localVarFp.composerConnectivityStatementList(destination, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options).then((request) => request(axios, basePath));
+        composerConnectivityStatementList(destinations?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementList> {
+            return localVarFp.composerConnectivityStatementList(destinations, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {PatchedConnectivityStatement} [patchedConnectivityStatement] 
+         * @param {PatchedConnectivityStatementUpdate} [patchedConnectivityStatementUpdate] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementPartialUpdate(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options?: any): AxiosPromise<ConnectivityStatement> {
-            return localVarFp.composerConnectivityStatementPartialUpdate(id, patchedConnectivityStatement, options).then((request) => request(axios, basePath));
+        composerConnectivityStatementPartialUpdate(id: number, patchedConnectivityStatementUpdate?: PatchedConnectivityStatementUpdate, options?: any): AxiosPromise<ConnectivityStatement> {
+            return localVarFp.composerConnectivityStatementPartialUpdate(id, patchedConnectivityStatementUpdate, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -4576,12 +4756,12 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {ConnectivityStatement} connectivityStatement 
+         * @param {ConnectivityStatementUpdate} connectivityStatementUpdate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementUpdate(id: number, connectivityStatement: ConnectivityStatement, options?: any): AxiosPromise<ConnectivityStatement> {
-            return localVarFp.composerConnectivityStatementUpdate(id, connectivityStatement, options).then((request) => request(axios, basePath));
+        composerConnectivityStatementUpdate(id: number, connectivityStatementUpdate: ConnectivityStatementUpdate, options?: any): AxiosPromise<ConnectivityStatement> {
+            return localVarFp.composerConnectivityStatementUpdate(id, connectivityStatementUpdate, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -5051,7 +5231,7 @@ export class ComposerApi extends BaseAPI {
 
     /**
      * ConnectivityStatement
-     * @param {number} [destination] 
+     * @param {Array<number>} [destinations] 
      * @param {number} [excludeSentenceId] 
      * @param {string} [knowledgeStatement] 
      * @param {number} [limit] Number of results to return per page.
@@ -5066,20 +5246,20 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementList(destination?: number, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementList(destination, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
+    public composerConnectivityStatementList(destinations?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementList(destinations, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * ConnectivityStatement
      * @param {number} id A unique integer value identifying this connectivity statement.
-     * @param {PatchedConnectivityStatement} [patchedConnectivityStatement] 
+     * @param {PatchedConnectivityStatementUpdate} [patchedConnectivityStatementUpdate] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementPartialUpdate(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementPartialUpdate(id, patchedConnectivityStatement, options).then((request) => request(this.axios, this.basePath));
+    public composerConnectivityStatementPartialUpdate(id: number, patchedConnectivityStatementUpdate?: PatchedConnectivityStatementUpdate, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementPartialUpdate(id, patchedConnectivityStatementUpdate, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -5096,13 +5276,13 @@ export class ComposerApi extends BaseAPI {
     /**
      * ConnectivityStatement
      * @param {number} id A unique integer value identifying this connectivity statement.
-     * @param {ConnectivityStatement} connectivityStatement 
+     * @param {ConnectivityStatementUpdate} connectivityStatementUpdate 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementUpdate(id: number, connectivityStatement: ConnectivityStatement, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementUpdate(id, connectivityStatement, options).then((request) => request(this.axios, this.basePath));
+    public composerConnectivityStatementUpdate(id: number, connectivityStatementUpdate: ConnectivityStatementUpdate, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementUpdate(id, connectivityStatementUpdate, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

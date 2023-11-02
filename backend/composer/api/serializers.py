@@ -321,7 +321,7 @@ class ConnectivityStatementSerializer(
     id = serializers.IntegerField(
         required=False, default=None, allow_null=True, read_only=True
     )
-    sentence_id = serializers.IntegerField()
+    sentence_id = serializers.IntegerField(required=False)
     knowledge_statement = serializers.CharField(allow_blank=True, required=False)
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
     phenotype_id = serializers.IntegerField(required=False, allow_null=True)
@@ -462,3 +462,43 @@ class ConnectivityStatementSerializer(
             "errors"
         )
         read_only_fields = ("state",)
+
+
+class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
+    origins = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=AnatomicalEntity.objects.all()
+    )
+
+    class Meta:
+        model = ConnectivityStatement
+        fields = (
+            "id",
+            "sentence_id",
+            "sentence",
+            "knowledge_statement",
+            "tags",
+            "provenances",
+            "owner",
+            "owner_id",
+            "state",
+            "available_transitions",
+            "origins",
+            "vias",
+            "destinations",
+            "phenotype_id",
+            "phenotype",
+            "journey",
+            "laterality",
+            "projection",
+            "circuit_type",
+            "species",
+            "sex_id",
+            "sex",
+            "forward_connection",
+            "apinatomy_model",
+            "additional_information",
+            "modified_date",
+            "has_notes",
+            "statement_preview",
+            "errors"
+        )

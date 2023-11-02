@@ -9,12 +9,14 @@ const StatementChart = (props: { statement: ConnectivityStatement }) => {
   const { statement } = props;
   const theme = useTheme();
 
-  const displayChart =
-    statement.origins &&
-    statement.destination &&
-    statement.path &&
-    statement.path.length > 0;
+  // const displayChart =
+  //   statement.origins &&
+  //   statement.destination &&
+  //   statement.path &&
+  //   statement.path.length > 0;
 
+   // TODO: Update to work with multiple paths @ afonsobspinto
+  const displayChart = false
   return (
     <Box
       display="flex"

@@ -4,12 +4,16 @@ from django.http import HttpResponse, Http404
 from drf_react_template.schema_form_encoder import SchemaProcessor, UiSchemaProcessor
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
-from rest_framework import mixins, permissions, viewsets
+from rest_framework import mixins, permissions, viewsets, status
 from rest_framework.decorators import action, api_view
 from rest_framework.renderers import INDENT_SEPARATORS
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
+from composer.services.state_services import (
+    ConnectivityStatementService,
+    SentenceService,
+)
 from .filtersets import (
     SentenceFilter,
     ConnectivityStatementFilter,
@@ -29,7 +33,7 @@ from .serializers import (
     TagSerializer,
     ViaSerializer,
     ProvenanceSerializer,
-    SexSerializer,
+    SexSerializer, ConnectivityStatementUpdateSerializer,
 )
 from ..models import (
     AnatomicalEntity,
@@ -43,10 +47,6 @@ from ..models import (
     Via,
     Provenance,
     Sex,
-)
-from composer.services.state_services import (
-    ConnectivityStatementService,
-    SentenceService,
 )
 
 
@@ -201,7 +201,8 @@ class CSCloningMixin(viewsets.GenericViewSet):
         instance.origins = None
         instance.save()
         instance.species.add(*self.get_object().species.all())
-        provenances = (Provenance(connectivity_statement = instance, uri=provenance.uri) for provenance in self.get_object().provenance_set.all())
+        provenances = (Provenance(connectivity_statement=instance, uri=provenance.uri) for provenance in
+                       self.get_object().provenance_set.all())
         Provenance.objects.bulk_create(provenances)
         return Response(self.get_serializer(instance).data)
 
@@ -311,18 +312,38 @@ class ConnectivityStatementViewSet(
             return ConnectivityStatement.objects.excluding_draft()
         return super().get_queryset()
 
+    @extend_schema(
+        methods=['PUT'],
+        request=ConnectivityStatementUpdateSerializer,
+        responses={200: ConnectivityStatementSerializer}
+    )
     def update(self, request, *args, **kwargs):
         # Remove 'state' from the request data
         request.data.pop('state', None)
-        return super().update(request, *args, **kwargs)
 
-        # partial = kwargs.pop('partial', False)
-        # instance = self.get_object()
-        # serializer = self.get_serializer(instance, data=data, partial=partial)
-        # serializer.is_valid(raise_exception=True)
-        # self.perform_update(serializer)
+        # Extract origins IDs from the request
+        origin_ids = request.data.pop('origins', [])
 
-        # return Response(serializer.data)
+        # Continue with the standard update process
+        response = super().update(request, *args, **kwargs)
+
+        # If update is successful, update origins using the provided IDs
+        if response.status_code == status.HTTP_200_OK:
+            instance = self.get_object()
+            instance.origins.clear()
+            instance.origins.add(*origin_ids)
+            instance.save()
+
+        return response
+
+    @extend_schema(
+        methods=['PATCH'],
+        request=ConnectivityStatementUpdateSerializer,
+        responses={200: ConnectivityStatementSerializer}
+    )
+    def partial_update(self, request, *args, **kwargs):
+        # Make sure this method either has its own logic or calls self.update
+        return self.update(request, *args, **kwargs)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
