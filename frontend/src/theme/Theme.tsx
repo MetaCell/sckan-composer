@@ -181,12 +181,7 @@ const theme = createTheme({
       }
       .MuiFormLabel-root{
         margin-bottom: 16px;
-      }
-  
-      * {
-        scroll-margin-top: 3rem;
-      }
-      `,
+      }`,
     },
     MuiButton: {
       styleOverrides: {

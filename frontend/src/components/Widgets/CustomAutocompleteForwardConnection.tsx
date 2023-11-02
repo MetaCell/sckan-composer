@@ -272,9 +272,6 @@ export const CustomAutocompleteForwardConnection = ({
       </Typography>
       <Autocomplete
         sx={{
-          background: "#fff",
-          borderRadius: "0.5rem",
-          padding: ".75rem",
           "& .MuiFormControl-root": {
             "& .MuiInputBase-root": {
               borderColor:

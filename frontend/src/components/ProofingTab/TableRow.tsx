@@ -4,14 +4,13 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 
 
 const TableRow = (props: any) => {
-  const { action = true } = props;
   //const theme = useTheme();
   const rowStyles = {
     m: "0 !important",
     backgroundColor:'common.white',
     border: '1px solid #EAECF0',
   }
-
+  
 
   return (
     <MuiTableRow sx={rowStyles}>
@@ -19,10 +18,8 @@ const TableRow = (props: any) => {
        {props.startIcon}
       </TableCell>
       <TableCell width="100%" sx={{
-        borderBottom: 0
-      }}>{props.children}</TableCell>
-      {action && (
-        <TableCell sx={{ borderBottom:0, borderTopRightRadius:'8px', borderBottomRightRadius:'8px'  }}>
+    borderBottom:0 }}>{props.children}</TableCell>
+      <TableCell sx={{ borderBottom:0, borderTopRightRadius:'8px', borderBottomRightRadius:'8px'  }}>
         <IconButton
           size="small"
           sx={{ visibility: "hidden" }}
@@ -30,8 +27,6 @@ const TableRow = (props: any) => {
           <DeleteOutlineOutlinedIcon fontSize="small" />
         </IconButton>
       </TableCell>
-      )}
-
     </MuiTableRow>
   );
 };
