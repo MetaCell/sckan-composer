@@ -18,6 +18,8 @@ import {
 import { SortableItem } from "../ProofingTab/SortableItem";
 
 function ArrayFieldTemplate(props: any) {
+  console.log(props);
+
   const sortableItems = props.items.map((item: any) => ({
     ...item,
     id: item.key,
@@ -53,19 +55,15 @@ function ArrayFieldTemplate(props: any) {
         items={sortableItems}
         strategy={verticalListSortingStrategy}
       >
-        <Table sx={{ borderSpacing: "0 8px", borderCollapse: "separate" }}>
-          <TableBody>
-            {sortableItems.map((element: any) => (
-              <SortableItem
-                key={element.key}
-                id={element.id}
-                children={element.children}
-                onDropIndexClick={element.onDropIndexClick(element.index)}
-                disabled={props.disabled}
-              />
-            ))}
-          </TableBody>
-        </Table>
+        {sortableItems.map((element: any) => (
+          <SortableItem
+            key={element.key}
+            id={element.id}
+            children={element.children}
+            onDropIndexClick={element.onDropIndexClick(element.index)}
+            disabled={props.disabled}
+          />
+        ))}
       </SortableContext>
       {props.canAdd && (
         <Box mt={1} ml={0.75}>
@@ -76,7 +74,7 @@ function ArrayFieldTemplate(props: any) {
             startIcon={<AddCircleIcon />}
             disabled={props.disabled}
           >
-            Add a via
+            Add a {props.schema.name}
           </Button>
         </Box>
       )}

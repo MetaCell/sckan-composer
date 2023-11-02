@@ -10,10 +10,10 @@ import AnatomicalEntitiesField from "../AnatomicalEntitiesField";
 import { sexes } from "../../services/SexService";
 import { phenotypes } from "../../services/PhenotypeService";
 import { CustomAutocompleteForwardConnection } from "../Widgets/CustomAutocompleteForwardConnection";
-import { Box, Chip } from "@mui/material";
+import { Box, Chip, MenuItem, Select } from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-
+import AcUnitIcon from "@mui/icons-material/AcUnit";
 const StatementForm = (props: any) => {
   const { uiFields, statement, setter, format } = props;
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
@@ -22,6 +22,18 @@ const StatementForm = (props: any) => {
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
+  copiedSchema.properties.destinations.name = "Destination";
+  copiedSchema.properties.destinations.items.properties = {
+    ...schema.properties.destinations.items.properties,
+    anatomical_entities: {
+      type: "string",
+      title: "anatomical_entities",
+    },
+    from_entities: {
+      type: "string",
+      title: "anatomical_entities",
+    },
+  };
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["destination_type", "*"];
   copiedUISchema.circuit_type = {
@@ -389,27 +401,82 @@ const StatementForm = (props: any) => {
   };
 
   copiedUISchema.destinations = {
+    "ui:ArrayFieldTemplate": ArrayFieldTemplate,
     items: {
       "ui:options": {
         label: false,
       },
       "ui:label": false,
       type: {
-        "ui:widget": "select",
+        "ui:widget": "CustomSingleSelect",
         "ui:options": {
           label: false,
         },
       },
       anatomical_entities: {
-        "ui:widget": "select",
+        "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
-          label: false,
+          placeholder: "Look for Destinations",
+          searchPlaceholder: "Search for Destinations",
+          noResultReason:
+            "We couldn’t find any record with these destination in the database.",
+          disabledReason: "",
+          onSearch: (searchValue: string) => getEntities(searchValue),
+          onUpdate: (selectedOptions: any) =>
+            updateOriginsInStatment(selectedOptions, statement?.id),
+          statement: statement,
+          errors: statement?.errors?.includes("Invalid origin")
+            ? statement.errors
+            : "",
+          value: mockEntities[0] ?? "",
+          CustomFooter: ({ entity }: any) => (
+            <Box
+              sx={{
+                mt: "1.5rem",
+                display: "flex",
+                gap: 1,
+                flexWrap: "wrap",
+                pt: "1.5rem",
+                borderTop: "0.0625rem solid #F2F4F7",
+              }}
+            >
+              {/* <Chip variant="filled" color="error" label={"https://google.com"} /> */}
+              <Chip variant="outlined" label={"https://google.com"} />
+            </Box>
+          ),
         },
       },
       from_entities: {
-        "ui:widget": "select",
+        "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
-          label: false,
+          placeholder: "Look for Destinations",
+          searchPlaceholder: "Search for Destinations",
+          noResultReason:
+            "We couldn’t find any record with these destination in the database.",
+          disabledReason: "",
+          onSearch: (searchValue: string) => getEntities(searchValue),
+          onUpdate: (selectedOptions: any) =>
+            updateOriginsInStatment(selectedOptions, statement?.id),
+          statement: statement,
+          errors: statement?.errors?.includes("Invalid origin")
+            ? statement.errors
+            : "",
+          value: mockEntities[0] ?? "",
+          CustomFooter: ({ entity }: any) => (
+            <Box
+              sx={{
+                mt: "1.5rem",
+                display: "flex",
+                gap: 1,
+                flexWrap: "wrap",
+                pt: "1.5rem",
+                borderTop: "0.0625rem solid #F2F4F7",
+              }}
+            >
+              {/* <Chip variant="filled" color="error" label={"https://google.com"} /> */}
+              <Chip variant="outlined" label={"https://google.com"} />
+            </Box>
+          ),
         },
       },
     },
@@ -491,7 +558,6 @@ const StatementForm = (props: any) => {
       ),
     },
   };
-
   const widgets = {
     AnatomicalEntitiesField,
     CustomSingleSelect,
@@ -499,10 +565,6 @@ const StatementForm = (props: any) => {
     CustomTextArea,
     SelectWidget: CustomSingleSelect,
     CustomAutocompleteForwardConnection,
-  };
-
-  const templates = {
-    ArrayFieldTemplate,
   };
 
   return (
@@ -515,7 +577,6 @@ const StatementForm = (props: any) => {
       enableAutoSave={false}
       children={true}
       widgets={widgets}
-      templates={templates}
       showErrorList={false}
       submitOnBlurFields={[
         "knowledge_statement",

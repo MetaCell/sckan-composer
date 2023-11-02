@@ -7,18 +7,8 @@ import Select from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material";
 import { vars } from "../../theme/variables";
-
-const StyledSelect = styled(Select)(({ theme }) => ({
-  "&:hover": {
-    border: "1px solid #EAECF0",
-    boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
-  },
-
-  "& .MuiOutlinedInput-notchedOutline": {
-    border: 0,
-    boxShadow: "none",
-  },
-}));
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { DestinationIcon } from "../icons";
 
 const CustomSingleSelect = ({
   onChange,
@@ -43,6 +33,7 @@ const CustomSingleSelect = ({
       <FormControl
         variant="standard"
         sx={{
+          width: "auto",
           "& .MuiInputLabel-root": {
             color: "#667085",
             fontWeight: "400",
@@ -54,7 +45,25 @@ const CustomSingleSelect = ({
         <InputLabel shrink={false} htmlFor="custom-select">
           {!value && placeholder}
         </InputLabel>
-        <StyledSelect
+        <Select
+          startAdornment={<DestinationIcon />}
+          sx={{
+            "&:hover": {
+              border: 0,
+              boxShadow: "none",
+            },
+
+            "& .MuiOutlinedInput-notchedOutline": {
+              border: 0,
+              boxShadow: "none",
+            },
+
+            "&.MuiInputBase-root": {
+              border: 0,
+              boxShadow: "none",
+              width: "auto",
+            },
+          }}
           value={value ? value : ""}
           onChange={(event) => onChange(event.target.value)}
           disabled={disabled}
@@ -66,7 +75,7 @@ const CustomSingleSelect = ({
               {optionLabel}
             </MenuItem>
           ))}
-        </StyledSelect>
+        </Select>
       </FormControl>
     </>
   );

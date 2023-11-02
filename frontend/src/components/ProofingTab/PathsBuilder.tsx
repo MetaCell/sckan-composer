@@ -28,101 +28,41 @@ const PathsBuilder = (props: any) => {
         Path Builder
       </Typography>
       <Divider />
-      <Stack sx={{ px: 1.5, mt: 1.5 }}>
-        <Box ref={refs[3]} sx={subSectionStyle}>
-          <Typography
-            variant="subtitle1"
-            color={vars.captionColor}
-            sx={{ mb: 1, pl: 1 }}
-          >
-            Origin
+      <Stack sx={{ px: 1.5, mt: 1.5, width: 1 }}>
+        <Box sx={subSectionStyle} ref={refs[5]}>
+          <Typography variant="subtitle1" color={vars.captionColor}>
+            Destination
           </Typography>
-          <Table>
-            <TableBody>
-              <TableRow startIcon={<OutlinedFlagTwoToneIcon />} action={false}>
-                <Grid
-                  container
-                  columnSpacing={2}
-                  alignItems="center"
-                  sx={{
-                    "& .MuiGrid-container": { mt: "0 !important" },
-                    "& .MuiGrid-item": { pt: 0, mb: "0 !important" },
-                  }}
-                >
-                  <Grid item>
-                    <Typography>Origin</Typography>
-                  </Grid>
-                  <Grid item flex={1}>
-                    <StatementForm
-                      {...props}
-                      statement={statement}
-                      format="noLabel"
-                      setter={refreshStatement}
-                      extraData={{ sentence_id: statement.sentence.id }}
-                      uiFields={["origin_id"]}
-                      enableAutoSave={false}
-                      submitOnChangeFields={["origin_id"]}
-                    />
-                  </Grid>
-                </Grid>
-              </TableRow>
-            </TableBody>
-          </Table>
+          <StatementForm
+            {...props}
+            statement={statement}
+            format="noLabel"
+            setter={refreshStatement}
+            extraData={{ sentence_id: statement.sentence.id }}
+            uiFields={["destinations"]}
+            enableAutoSave={false}
+            submitOnChangeFields={["destinations"]}
+          />
         </Box>
         <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
-        <Box ref={refs[4]} sx={subSectionStyle}>
-          <Typography
-            variant="subtitle1"
-            color={vars.captionColor}
-            sx={{ pl: 1 }}
-          >
+        <Box sx={subSectionStyle} ref={refs[5]}>
+          <Typography variant="subtitle1" color={vars.captionColor}>
             Vias
           </Typography>
           <StatementForm
             {...props}
             statement={statement}
+            format="noLabel"
             setter={refreshStatement}
             extraData={{ sentence_id: statement.sentence.id }}
-            uiFields={["path"]}
-            className="vias"
+            uiFields={["vias"]}
             enableAutoSave={false}
-            submitOnChangeFields={["path"]}
+            submitOnChangeFields={["vias"]}
           />
         </Box>
         <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
-        <Box sx={subSectionStyle} ref={refs[5]}>
-          <Typography
-            variant="subtitle1"
-            color={vars.captionColor}
-            sx={{ mb: 1, pl: 1 }}
-          >
-            Destination
-          </Typography>
-          <Table>
-            <TableBody>
-              <TableRow startIcon={<FmdGoodOutlinedIcon />}>
-                <StatementForm
-                  {...props}
-                  statement={statement}
-                  format="noLabel"
-                  setter={refreshStatement}
-                  extraData={{ sentence_id: statement.sentence.id }}
-                  uiFields={["destinations"]}
-                  className="inLineForm"
-                  enableAutoSave={false}
-                  submitOnChangeFields={["destinations"]}
-                />
-              </TableRow>
-            </TableBody>
-          </Table>
-        </Box>
-        <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
         <Box sx={subSectionStyle}>
-          <Typography
-            variant="subtitle1"
-            color={vars.captionColor}
-            sx={{ mb: 1, pl: 1 }}
-          >
+          <Typography variant="subtitle1" color={vars.captionColor}>
             Forward connections
           </Typography>
           <StatementForm
@@ -131,7 +71,6 @@ const PathsBuilder = (props: any) => {
             setter={refreshStatement}
             extraData={{ sentence_id: statement.sentence.id }}
             uiFields={["forward_connection"]}
-            className="ks"
             enableAutoSave={true}
           />
         </Box>
