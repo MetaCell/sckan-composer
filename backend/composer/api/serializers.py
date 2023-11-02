@@ -159,12 +159,10 @@ class ViaSerializer(serializers.ModelSerializer):
 
     anatomical_entities = AnatomicalEntitySerializer(
         many=True,
-        read_only=True
     )
 
     from_entities = AnatomicalEntitySerializer(
         many=True,
-        read_only=True
     )
 
     class Meta:
@@ -307,8 +305,8 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
 class DestinationSerializer(serializers.ModelSerializer):
     """Destination"""
 
-    anatomical_entities = AnatomicalEntitySerializer(many=True, read_only=True)
-    from_entities = AnatomicalEntitySerializer(many=True, read_only=True)
+    anatomical_entities = AnatomicalEntitySerializer(many=True)
+    from_entities = AnatomicalEntitySerializer(many=True)
 
     class Meta:
         model = Destination
