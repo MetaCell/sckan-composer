@@ -67,7 +67,7 @@ the "ingest_nlp_sentence" management command
 
 ```bash
 cd backend
-python3 manage.py ingest_nlp_sentence ./composer/resources/nlp_connectivity_20221025.csv
+python3 manage.py ingest_nlp_sentence ./composer/resources/pmc_oai_202209.csv
 ```
 
 ### Ingest sample Anatomical Entities data
