@@ -1,37 +1,50 @@
 import React from "react";
-import { Paper, Stack, Typography, Divider, Grid, Box, Table, TableBody } from "@mui/material";
+import {
+  Paper,
+  Stack,
+  Typography,
+  Divider,
+  Grid,
+  Box,
+  Table,
+  TableBody,
+} from "@mui/material";
 import { useTheme } from "@emotion/react";
 import { useSectionStyle, useGreyBgContainer } from "../../styles/styles";
 import StatementForm from "../Forms/StatementForm";
 import TableRow from "./TableRow";
 import { vars } from "../../theme/variables";
-import OutlinedFlagTwoToneIcon from '@mui/icons-material/OutlinedFlagTwoTone';
-import FmdGoodOutlinedIcon from '@mui/icons-material/FmdGoodOutlined';
+import OutlinedFlagTwoToneIcon from "@mui/icons-material/OutlinedFlagTwoTone";
+import FmdGoodOutlinedIcon from "@mui/icons-material/FmdGoodOutlined";
 
 const PathsBuilder = (props: any) => {
-  const { statement,  refreshStatement } = props;
+  const { statement, refreshStatement, refs } = props;
   const theme = useTheme();
   const sectionStyle = useSectionStyle(theme);
-  const subSectionStyle = useGreyBgContainer(theme)
+  const subSectionStyle = useGreyBgContainer(theme);
   return (
     <Paper sx={{ ...sectionStyle, px: 0 }}>
-        <Typography variant="h5" sx={{ px: 3, pb: 2 }}>
-          Path Builder
-        </Typography>
-        <Divider/>
-      <Stack sx={{ px: 1.5, mt:1.5}}>
-        <Box sx={subSectionStyle}>
-          <Typography variant="subtitle1" color={vars.captionColor} sx={{mb:1, pl:1}}>Origin</Typography>
+      <Typography variant="h5" sx={{ px: 3, pb: 2 }}>
+        Path Builder
+      </Typography>
+      <Divider />
+      <Stack sx={{ px: 1.5, mt: 1.5 }}>
+        <Box ref={refs[3]} sx={subSectionStyle}>
+          <Typography
+            variant="subtitle1"
+            color={vars.captionColor}
+            sx={{ mb: 1, pl: 1 }}
+          >
+            Origin
+          </Typography>
           <Table>
             <TableBody>
-              <TableRow  startIcon={<OutlinedFlagTwoToneIcon/>}>
+              <TableRow startIcon={<OutlinedFlagTwoToneIcon/>} action={false}>
                 <Grid
                   container
                   columnSpacing={2}
+                  alignItems='center'
                   sx={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    alignItems: "center",
                     "& .MuiGrid-container": { mt: "0 !important" },
                     "& .MuiGrid-item": { pt: 0, mb: "0 !important" },
                   }}
@@ -39,7 +52,7 @@ const PathsBuilder = (props: any) => {
                   <Grid item>
                     <Typography>Origin</Typography>
                   </Grid>
-                  <Grid item>
+                  <Grid item flex={1}>
                     <StatementForm
                       {...props}
                       statement={statement}
@@ -48,7 +61,7 @@ const PathsBuilder = (props: any) => {
                       extraData={{ sentence_id: statement.sentence.id }}
                       uiFields={["origin_id"]}
                       enableAutoSave={false}
-                      submitOnChangeFields={['origin_id']}
+                      submitOnChangeFields={["origin_id"]}
                     />
                   </Grid>
                 </Grid>
@@ -56,26 +69,38 @@ const PathsBuilder = (props: any) => {
             </TableBody>
           </Table>
         </Box>
-        <Box height={24} width={2} bgcolor='#D0D5DD' ml='34px'/>
-        <Box sx={subSectionStyle}>
-        <Typography variant="subtitle1" color={vars.captionColor} sx={{ pl:1}} >Vias</Typography>
-        <StatementForm
-          {...props}
-          statement={statement}
-          setter={refreshStatement}
-          extraData={{ sentence_id: statement.sentence.id }}
-          uiFields={["path"]}
-          className="vias"
-          enableAutoSave={false}
-          submitOnChangeFields={['path']}
-        />
+        <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
+        <Box ref={refs[4]} sx={subSectionStyle}>
+          <Typography
+            variant="subtitle1"
+            color={vars.captionColor}
+            sx={{ pl: 1 }}
+          >
+            Vias
+          </Typography>
+          <StatementForm
+            {...props}
+            statement={statement}
+            setter={refreshStatement}
+            extraData={{ sentence_id: statement.sentence.id }}
+            uiFields={["path"]}
+            className="vias"
+            enableAutoSave={false}
+            submitOnChangeFields={["path"]}
+          />
         </Box>
-        <Box height={24} width={2} bgcolor='#D0D5DD' ml='34px'/>
-        <Box sx={subSectionStyle}>
-          <Typography variant="subtitle1" color={vars.captionColor} sx={{mb:1, pl:1}}>Destination</Typography>
+        <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
+        <Box sx={subSectionStyle} ref={refs[5]}>
+          <Typography
+            variant="subtitle1"
+            color={vars.captionColor}
+            sx={{ mb: 1, pl: 1 }}
+          >
+            Destination
+          </Typography>
           <Table>
             <TableBody>
-              <TableRow  startIcon={<FmdGoodOutlinedIcon/>}>
+              <TableRow startIcon={<FmdGoodOutlinedIcon />}>
                 <StatementForm
                   {...props}
                   statement={statement}
@@ -90,6 +115,25 @@ const PathsBuilder = (props: any) => {
               </TableRow>
             </TableBody>
           </Table>
+        </Box>
+        <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
+        <Box sx={subSectionStyle}>
+          <Typography
+            variant="subtitle1"
+            color={vars.captionColor}
+            sx={{ mb: 1, pl: 1 }}
+          >
+            Forward connections
+          </Typography>
+          <StatementForm
+            statement={statement}
+            format="small"
+            setter={refreshStatement}
+            extraData={{ sentence_id: statement.sentence.id }}
+            uiFields={["forward_connection"]}
+            className="ks"
+            enableAutoSave={true}
+          />
         </Box>
       </Stack>
     </Paper>
