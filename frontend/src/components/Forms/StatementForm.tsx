@@ -14,6 +14,8 @@ import { Box, Chip, MenuItem, Select } from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
+import {getOrigins} from "../../services/CustomDropdownService";
+import {mapAnatomicalEntitiesToOptions} from "../../helpers/dropdownMappers";
 const StatementForm = (props: any) => {
   const { uiFields, statement, setter, format } = props;
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
@@ -344,9 +346,9 @@ const StatementForm = (props: any) => {
     },
   ];
 
-  const getEntities = (searchValue: string) => mockEntities;
+  const getEntities = async (searchValue: string) => mockEntities;
 
-  const getConnections = (searchValue: string) => mockConnections;
+  const getConnections = async (searchValue: string) => mockConnections;
 
   const updateOriginsInStatment = (options: any, id: string) => {
     return false;
@@ -380,7 +382,7 @@ const StatementForm = (props: any) => {
           noResultReason:
             "We couldn’t find any record with these destination in the database.",
           disabledReason: "",
-          onSearch: (searchValue: string) => getEntities(searchValue),
+          onSearch: async (searchValue: string) => getEntities(searchValue),
           onUpdate: (selectedOptions: any) =>
             updateOriginsInStatment(selectedOptions, statement?.id),
           statement: statement,
@@ -413,7 +415,7 @@ const StatementForm = (props: any) => {
           noResultReason:
             "We couldn’t find any record with these destination in the database.",
           disabledReason: "",
-          onSearch: (searchValue: string) => getEntities(searchValue),
+          onSearch: async (searchValue: string) => getEntities(searchValue),
           onUpdate: (selectedOptions: any) =>
             updateOriginsInStatment(selectedOptions, statement?.id),
           statement: statement,
@@ -465,7 +467,7 @@ const StatementForm = (props: any) => {
           noResultReason:
             "We couldn’t find any record with these via in the database.",
           disabledReason: "",
-          onSearch: (searchValue: string) => getEntities(searchValue),
+          onSearch: async (searchValue: string) => getEntities(searchValue),
           onUpdate: (selectedOptions: any) =>
             updateOriginsInStatment(selectedOptions, statement?.id),
           statement: statement,
@@ -498,7 +500,7 @@ const StatementForm = (props: any) => {
           noResultReason:
             "We couldn’t find any record with these via in the database.",
           disabledReason: "",
-          onSearch: (searchValue: string) => getEntities(searchValue),
+          onSearch: async (searchValue: string) => getEntities(searchValue),
           onUpdate: (selectedOptions: any) =>
             updateOriginsInStatment(selectedOptions, statement?.id),
           statement: statement,
@@ -547,7 +549,7 @@ const StatementForm = (props: any) => {
         "We couldn’t find any record with these origin in the database.",
       disabledReason:
         "Add Destination entity to get access to the forward connection form",
-      onSearch: (searchValue: string) => getConnections(searchValue),
+      onSearch: async (searchValue: string) => getConnections(searchValue),
       onUpdate: (selectedOptions: any) =>
         updateForwardConnectionsInStatment(selectedOptions, statement?.id),
       statement: statement,
@@ -612,14 +614,12 @@ const StatementForm = (props: any) => {
         "We couldn’t find any record with these origin in the database.",
       disabledReason:
         "Add origin entity to get access to the forward connection form",
-      onSearch: (searchValue: string) => getConnections(searchValue),
+      onSearch: (searchValue: string) => getOrigins(searchValue),
       onUpdate: (selectedOptions: any) =>
         updateForwardConnectionsInStatment(selectedOptions, statement?.id),
       statement: statement,
-      errors: statement?.errors?.includes("Invalid Origins")
-        ? statement.errors
-        : "",
-      value: statement?.origins ?? [],
+      errors: "",
+      value: mapAnatomicalEntitiesToOptions(statement?.origins, 'Origins')
     },
   };
   const widgets = {

@@ -20,11 +20,8 @@ import PlaylistRemoveOutlinedIcon from "@mui/icons-material/PlaylistRemoveOutlin
 import PlaylistAddCheckOutlinedIcon from "@mui/icons-material/PlaylistAddCheckOutlined";
 import NoResultField from "./NoResultField";
 import { vars } from "../../theme/variables";
+import {Option} from "../../types";
 
-type OptionDetail = {
-  title: string; // What to display as the title/label for the property.
-  value: string; // The actual value/content for the property.
-};
 
 const {
   buttonOutlinedBorderColor,
@@ -45,12 +42,7 @@ const {
   popperBorderColor,
 } = vars;
 
-type Option = {
-  id: string;
-  label: string;
-  group: string;
-  content: OptionDetail[];
-};
+
 
 const transition = {
   transition: "all ease-in-out .3s",
@@ -227,7 +219,9 @@ export default function CustomEntitiesDropdown({
   const [inputValue, setInputValue] = useState("");
 
   React.useEffect(() => {
-    searchValue !== undefined && setAutocompleteOptions(onSearch(searchValue));
+    if (searchValue !== undefined) {
+      onSearch(searchValue).then(setAutocompleteOptions);
+    }
   }, [searchValue, onSearch, autocompleteOptions]);
 
   const groupedOptions = autocompleteOptions.reduce(
