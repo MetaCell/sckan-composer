@@ -5,7 +5,6 @@ import { Autocomplete, Box, styled } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import { vars } from "../../theme/variables";
 import Typography from "@mui/material/Typography";
-import CloseIcon from "@mui/icons-material/Close";
 import connectivityStatementService from "../../services/StatementService";
 import Checkbox from "@mui/material/Checkbox";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
@@ -37,7 +36,6 @@ export const CustomAutocompleteForwardConnection = ({
   placeholder,
   options: { removeChip, label, statement, service, setter, errors },
 }: any) => {
-  const [isInputFocused, setInputFocus] = useState(false);
   const [sameSentenceList, setSameSentenceLists] = useState<Option[]>([]);
   const [differentSentenceList, setDifferentSentenceLists] = useState<Option[]>(
     [],
@@ -283,7 +281,6 @@ export const CustomAutocompleteForwardConnection = ({
         }}
         disableCloseOnSelect
         multiple
-        disableClearable
         options={options}
         filterOptions={(options) => options}
         onChange={(e, value) => onChange(e, value)}
@@ -540,25 +537,8 @@ export const CustomAutocompleteForwardConnection = ({
             {...params}
             id="custom-input"
             placeholder={placeholder}
-            onFocus={() => setInputFocus(true)}
-            onBlur={() => setInputFocus(false)}
             InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {isInputFocused ? (
-                    <CloseIcon
-                      color="action"
-                      fontSize="small"
-                      sx={{ cursor: "pointer", mr: 0.6 }}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                      }}
-                    />
-                  ) : null}
-                  {params.InputProps.endAdornment}
-                </>
-              ),
+              ...params.InputProps
             }}
           />
         )}
