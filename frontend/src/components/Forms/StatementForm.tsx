@@ -604,7 +604,7 @@ const StatementForm = (props: any) => {
       onUpdate: async (selectedOptions: any) => updateOrigins(selectedOptions, statement.id),
       statement: statement,
       errors: "",
-      value: mapAnatomicalEntitiesToOptions(statement?.origins, 'Origins')
+      value: mapAnatomicalEntitiesToOptions(statement?.origins, "Origins"),
     },
   };
   const widgets = {
