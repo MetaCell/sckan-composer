@@ -14,8 +14,12 @@ import { Box, Chip, MenuItem, Select } from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
-import {getOrigins, updateOrigins} from "../../services/CustomDropdownService";
-import {mapAnatomicalEntitiesToOptions} from "../../helpers/dropdownMappers";
+import {
+  getOrigins,
+  updateOrigins,
+} from "../../services/CustomDropdownService";
+import { mapAnatomicalEntitiesToOptions } from "../../helpers/dropdownMappers";
+import { DestinationIcon, ViaIcon } from "../icons";
 const StatementForm = (props: any) => {
   const { uiFields, statement, setter, format } = props;
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
@@ -350,7 +354,6 @@ const StatementForm = (props: any) => {
 
   const getConnections = async (searchValue: string) => mockConnections;
 
-
   copiedUISchema.destinations = {
     "ui:ArrayFieldTemplate": ArrayFieldTemplate,
     items: {
@@ -365,6 +368,8 @@ const StatementForm = (props: any) => {
         "ui:widget": "CustomSingleSelect",
         "ui:options": {
           label: false,
+          isPathBuilderComponent: true,
+          InputIcon: DestinationIcon,
         },
       },
       anatomical_entities: {
@@ -402,6 +407,7 @@ const StatementForm = (props: any) => {
       from_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          label: "From",
           placeholder: "Look for Destinations",
           searchPlaceholder: "Search for Destinations",
           noResultReason:
@@ -448,18 +454,22 @@ const StatementForm = (props: any) => {
         "ui:widget": "CustomSingleSelect",
         "ui:options": {
           label: false,
+          isPathBuilderComponent: true,
+          InputIcon: ViaIcon,
         },
       },
       anatomical_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          label: "Via",
           placeholder: "Look for vias",
           searchPlaceholder: "Search for vias",
           noResultReason:
             "We couldn’t find any record with these via in the database.",
           disabledReason: "",
           onSearch: async (searchValue: string) => getEntities(searchValue),
-          onUpdate: async (selectedOptions: any) => updateOrigins(selectedOptions, statement?.id),
+          onUpdate: async (selectedOptions: any) =>
+            updateOrigins(selectedOptions, statement?.id),
           statement: statement,
           errors: statement?.errors?.includes("Invalid origin")
             ? statement.errors
@@ -485,6 +495,7 @@ const StatementForm = (props: any) => {
       from_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          label: "From",
           placeholder: "Look for vias",
           searchPlaceholder: "Search for vias",
           noResultReason:
@@ -601,7 +612,8 @@ const StatementForm = (props: any) => {
       noResultReason: "No results found",
       disabledReason: "",
       onSearch: async (searchValue: string) => getOrigins(searchValue),
-      onUpdate: async (selectedOptions: any) => updateOrigins(selectedOptions, statement.id),
+      onUpdate: async (selectedOptions: any) =>
+        updateOrigins(selectedOptions, statement.id),
       statement: statement,
       errors: "",
       value: mapAnatomicalEntitiesToOptions(statement?.origins, "Origins"),

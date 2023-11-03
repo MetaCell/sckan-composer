@@ -5,6 +5,7 @@ import { Box } from "@mui/material";
 import { IconButton, TableRow as MuiTableRow, TableCell } from "@mui/material";
 import DragHandleIcon from "@mui/icons-material/DragHandle";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import Typography from "@mui/material/Typography";
 
 export function SortableItem(props: any) {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -19,8 +20,9 @@ export function SortableItem(props: any) {
   };
 
   const rowStyles = (theme: any) => ({
-    m: "0 !important",
     backgroundColor: "common.white",
+    border: "1px solid #EAECF0",
+    borderRadius: "12px",
   });
 
   return (

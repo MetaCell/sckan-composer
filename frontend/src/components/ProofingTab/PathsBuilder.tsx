@@ -33,22 +33,26 @@ const PathsBuilder = (props: any) => {
           <Typography variant="subtitle1" color={vars.captionColor}>
             Origin
           </Typography>
-          <StatementForm
-            {...props}
-            statement={statement}
-            format="noLabel"
-            setter={refreshStatement}
-            extraData={{ sentence_id: statement.sentence.id }}
-            uiFields={["origins"]}
-            enableAutoSave={false}
-            submitOnChangeFields={["origins"]}
-          />
+          <Box sx={{ ...sectionStyle, padding: ".75rem .88rem .75rem .50rem" }}>
+            <StatementForm
+              {...props}
+              statement={statement}
+              format="noLabel"
+              setter={refreshStatement}
+              extraData={{ sentence_id: statement.sentence.id }}
+              uiFields={["origins"]}
+              enableAutoSave={false}
+              submitOnChangeFields={["origins"]}
+              className="ks"
+            />
+          </Box>
         </Box>
         <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
         <Box sx={subSectionStyle} ref={refs[5]}>
           <Typography variant="subtitle1" color={vars.captionColor}>
             Vias
           </Typography>
+
           <StatementForm
             {...props}
             statement={statement}
@@ -58,6 +62,7 @@ const PathsBuilder = (props: any) => {
             uiFields={["vias"]}
             enableAutoSave={false}
             submitOnChangeFields={["vias"]}
+            className="vias"
           />
         </Box>
         <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
@@ -74,21 +79,25 @@ const PathsBuilder = (props: any) => {
             uiFields={["destinations"]}
             enableAutoSave={false}
             submitOnChangeFields={["destinations"]}
+            className="vias"
           />
         </Box>
         <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
         <Box sx={subSectionStyle}>
           <Typography variant="subtitle1" color={vars.captionColor}>
-            Forward connections
+            Forward connections(s)
           </Typography>
-          <StatementForm
-            statement={statement}
-            format="small"
-            setter={refreshStatement}
-            extraData={{ sentence_id: statement.sentence.id }}
-            uiFields={["forward_connection"]}
-            enableAutoSave={true}
-          />
+          <Box sx={{ ...sectionStyle, padding: ".75rem .88rem .75rem .50rem" }}>
+            <StatementForm
+              statement={statement}
+              format="small"
+              setter={refreshStatement}
+              extraData={{ sentence_id: statement.sentence.id }}
+              uiFields={["forward_connection"]}
+              enableAutoSave={true}
+              className="ks"
+            />
+          </Box>
         </Box>
       </Stack>
     </Paper>

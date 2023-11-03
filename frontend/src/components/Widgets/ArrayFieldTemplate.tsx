@@ -1,5 +1,15 @@
-import React from "react";
-import { Box, Button, Table, TableBody } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Table,
+  TableBody,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {
   arrayMove,
@@ -18,6 +28,11 @@ import {
 import { SortableItem } from "../ProofingTab/SortableItem";
 
 function ArrayFieldTemplate(props: any) {
+  const [isDragging, setIsDragging] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [sourceIndex, setSourceIndex] = useState(-1);
+  const [destinationIndex, setDestinationIndex] = useState(-1);
+
   const sortableItems = props.items.map((item: any) => ({
     ...item,
     id: item.key,
@@ -28,18 +43,43 @@ function ArrayFieldTemplate(props: any) {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
-  function handleDragEnd(event: any) {
-    const { active, over } = event;
-    if (active.id !== over.id) {
-      const oldIndex = sortableItems.map((e: any) => e.id).indexOf(active.id);
-      const newIndex = sortableItems.map((e: any) => e.id).indexOf(over.id);
-      const sortedItems = arrayMove(sortableItems, oldIndex, newIndex);
+
+  function handleDragStart(event: any) {
+    const { active } = event;
+    setSourceIndex(sortableItems.map((e: any) => e.id).indexOf(active.id));
+    setIsDragging(true);
+  }
+
+  function openConfirmationDialog(destination: any) {
+    setDestinationIndex(destination);
+    setShowConfirmation(true);
+  }
+
+  function handleConfirmation(confirm: boolean) {
+    if (confirm) {
+      // Proceed with the reorder
+      const sortedItems = arrayMove(
+        sortableItems,
+        sourceIndex,
+        destinationIndex,
+      );
       sortedItems.forEach(
         (via: any, index: number) =>
           (via.children.props.formData.display_order = index),
       );
       // @ts-ignore
-      return sortedItems[oldIndex].onReorderClick(oldIndex, newIndex)();
+      sortedItems[sourceIndex].onReorderClick(sourceIndex, destinationIndex)();
+    }
+    setIsDragging(false);
+    setShowConfirmation(false);
+  }
+
+  function handleDragEnd(event: any) {
+    const { active, over } = event;
+    if (active.id !== over.id && isDragging) {
+      openConfirmationDialog(
+        sortableItems.map((e: any) => e.id).indexOf(over.id),
+      );
     }
   }
 
@@ -47,6 +87,7 @@ function ArrayFieldTemplate(props: any) {
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
       <SortableContext
@@ -76,6 +117,17 @@ function ArrayFieldTemplate(props: any) {
           </Button>
         </Box>
       )}
+
+      <Dialog open={showConfirmation} onClose={() => handleConfirmation(false)}>
+        <DialogTitle>Confirm Reorder</DialogTitle>
+        <DialogContent>
+          Are you sure you want to reorder this item?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleConfirmation(true)}>Yes</Button>
+          <Button onClick={() => handleConfirmation(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
     </DndContext>
   );
 }

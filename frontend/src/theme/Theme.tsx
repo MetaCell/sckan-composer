@@ -151,11 +151,11 @@ const theme = createTheme({
       .inLineForm > div > div > .MuiGrid-container{
         display: grid;
         grid-template-columns: .5fr 1fr 1fr;
-        align-items: start;
+        align-items: center;
         margin-top: 0 !important;
       }
       .inLineForm > div > div > .MuiGrid-container > .MuiGrid-item{
-        padding-top: 0;
+        padding-top: 0 !important;
         margin: 0 !important;
       }
       .vias > div > div > .MuiGrid-container{

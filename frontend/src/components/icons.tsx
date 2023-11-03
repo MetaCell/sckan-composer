@@ -84,11 +84,11 @@ export const DestinationIcon = (props: SvgIconProps) => (
   <SvgIcon {...props} viewBox="0 0 24 24" sx={{ width: 24, height: 24 }}>
     <path
       d="M2 10.6374C2.56711 10.6374 4.35539 10.6374 4.35539 10.6374C4.71223 7.09492 6.77671 3.90601 9.92162 2.14095C10.452 1.84351 11.1222 2.03227 11.4196 2.56181C11.717 3.09157 11.5283 3.76213 10.9987 4.05957C8.22365 5.61673 6.49995 8.55858 6.49995 11.7374C6.49995 14.9159 8.22365 17.8578 10.9983 19.4149C11.5281 19.7126 11.7166 20.3827 11.4189 20.9129C11.2174 21.2724 10.8439 21.4748 10.4589 21.4748C10.2767 21.4748 10.0919 21.4295 9.92162 21.3338C6.77671 19.5689 4.71223 16.3798 4.35539 12.8374C4.35539 12.8374 2.56711 12.8374 2 12.8374C1.43289 12.8374 1 12.4747 1 11.7374C1 11 1.43289 10.6374 2 10.6374Z"
-      fill="#0C2751"
+      fill={props.fill ? props.fill : "#0C2751"}
     />
     <path
       d="M22.5605 12H19.0605"
-      stroke="#0C2751"
+      stroke={props.fill ? props.fill : "#0C2751"}
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"
@@ -100,7 +100,7 @@ export const DestinationIcon = (props: SvgIconProps) => (
       height="8"
       rx="4"
       transform="matrix(-1 0 0 1 17.5605 7)"
-      stroke="#0C2751"
+      stroke={props.fill ? props.fill : "#0C2751"}
       stroke-width="2"
       fill="#fff"
     />

@@ -15,9 +15,45 @@ const CustomSingleSelect = ({
   placeholder,
   disabled,
   value,
-  options: { label, data, enumOptions },
+  options: {
+    label,
+    data,
+    enumOptions,
+    isPathBuilderComponent = false,
+    InputIcon,
+  },
 }: any) => {
   const selectOptions = enumOptions ? enumOptions : data;
+
+  const pathBuilderComponentStyle = isPathBuilderComponent
+    ? {
+        "& .MuiInputBase-root": {
+          border: 0,
+          boxShadow: "none",
+
+          "&:hover": {
+            border: 0,
+            boxShadow: "none",
+          },
+        },
+        "&:focus-within": {
+          "& .MuiOutlinedInput-notchedOutline": {
+            border: "none !important",
+            boxShadow: "none !important",
+          },
+        },
+
+        "& .MuiOutlinedInput-notchedOutline": {
+          border: "none !important",
+          boxShadow: "none !important",
+        },
+
+        "& .MuiSelect-select": {
+          background: "transparent !important",
+        },
+      }
+    : null;
+  console.log(selectOptions);
   return (
     <>
       {label && (
@@ -40,31 +76,33 @@ const CustomSingleSelect = ({
             fontSize: "14px",
             marginLeft: "14px",
           },
+          ...pathBuilderComponentStyle,
         }}
       >
         <InputLabel shrink={false} htmlFor="custom-select">
           {!value && placeholder}
         </InputLabel>
         <Select
-          startAdornment={<DestinationIcon />}
+          startAdornment={
+            isPathBuilderComponent ? (
+              <InputIcon
+                fill="#475467"
+                style={{ marginRight: ".5rem", width: "1rem" }}
+              />
+            ) : null
+          }
           sx={{
             "&:hover": {
-              border: 0,
-              boxShadow: "none",
+              border: "1px solid #EAECF0",
+              boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
             },
 
             "& .MuiOutlinedInput-notchedOutline": {
-              border: 0,
+              border: "none",
               boxShadow: "none",
-            },
-
-            "&.MuiInputBase-root": {
-              border: 0,
-              boxShadow: "none",
-              width: "auto",
             },
           }}
-          value={value ? value : ""}
+          value={value ? value : selectOptions[0]?.value}
           onChange={(event) => onChange(event.target.value)}
           disabled={disabled}
           id="custom-select"
