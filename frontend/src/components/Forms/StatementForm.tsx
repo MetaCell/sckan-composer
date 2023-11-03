@@ -383,7 +383,7 @@ const StatementForm = (props: any) => {
           onSearch: async (searchValue: string) => getEntities(searchValue),
           onUpdate: async (selectedOptions: any) => {},
           statement: statement,
-          errors: statement?.errors?.includes("Invalid origin")
+          errors: statement?.errors?.includes("Invalid destination")
             ? statement.errors
             : "",
           value: statement.destinations.anatomical_entities ?? [],
@@ -611,6 +611,7 @@ const StatementForm = (props: any) => {
       searchPlaceholder: "Search for Origins",
       noResultReason: "No results found",
       disabledReason: "",
+      chipsNumber: 5,
       onSearch: async (searchValue: string) => getOrigins(searchValue),
       onUpdate: async (selectedOptions: any) =>
         updateOrigins(selectedOptions, statement.id),

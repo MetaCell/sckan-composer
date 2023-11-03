@@ -57,7 +57,6 @@ function ArrayFieldTemplate(props: any) {
 
   function handleConfirmation(confirm: boolean) {
     if (confirm) {
-      // Proceed with the reorder
       const sortedItems = arrayMove(
         sortableItems,
         sourceIndex,

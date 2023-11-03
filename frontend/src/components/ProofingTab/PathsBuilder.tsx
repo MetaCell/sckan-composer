@@ -16,6 +16,7 @@ import TableRow from "./TableRow";
 import { vars } from "../../theme/variables";
 import OutlinedFlagTwoToneIcon from "@mui/icons-material/OutlinedFlagTwoTone";
 import FmdGoodOutlinedIcon from "@mui/icons-material/FmdGoodOutlined";
+import { OriginIcon } from "../icons";
 
 const PathsBuilder = (props: any) => {
   const { statement, refreshStatement, refs } = props;
@@ -30,10 +31,32 @@ const PathsBuilder = (props: any) => {
       <Divider />
       <Stack sx={{ px: 1.5, mt: 1.5, width: 1 }}>
         <Box sx={subSectionStyle} ref={refs[5]}>
-          <Typography variant="subtitle1" color={vars.captionColor}>
+          <Typography
+            variant="subtitle1"
+            color={vars.captionColor}
+            ml={1}
+            mb={1}
+          >
             Origin
           </Typography>
-          <Box sx={{ ...sectionStyle, padding: ".75rem .88rem .75rem .50rem" }}>
+          <Box
+            sx={{
+              ...sectionStyle,
+              padding: ".75rem .88rem .75rem .50rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Stack direction="row" alignItems="center" flex={1}>
+              <OriginIcon
+                fill="#475467"
+                style={{ marginRight: ".5rem", width: "2rem" }}
+              />
+              <Typography color="#667085" fontWeight={500}>
+                Soma
+              </Typography>
+            </Stack>
             <StatementForm
               {...props}
               statement={statement}
@@ -43,16 +66,15 @@ const PathsBuilder = (props: any) => {
               uiFields={["origins"]}
               enableAutoSave={false}
               submitOnChangeFields={["origins"]}
-              className="ks"
+              className="origins"
             />
           </Box>
         </Box>
         <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
         <Box sx={subSectionStyle} ref={refs[5]}>
-          <Typography variant="subtitle1" color={vars.captionColor}>
-            Vias
+          <Typography variant="subtitle1" color={vars.captionColor} ml={1}>
+            Via
           </Typography>
-
           <StatementForm
             {...props}
             statement={statement}
@@ -67,7 +89,7 @@ const PathsBuilder = (props: any) => {
         </Box>
         <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
         <Box sx={subSectionStyle} ref={refs[5]}>
-          <Typography variant="subtitle1" color={vars.captionColor}>
+          <Typography variant="subtitle1" color={vars.captionColor} ml={1}>
             Destination
           </Typography>
           <StatementForm
@@ -84,7 +106,12 @@ const PathsBuilder = (props: any) => {
         </Box>
         <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
         <Box sx={subSectionStyle}>
-          <Typography variant="subtitle1" color={vars.captionColor}>
+          <Typography
+            variant="subtitle1"
+            color={vars.captionColor}
+            ml={1}
+            mb={1}
+          >
             Forward connections(s)
           </Typography>
           <Box sx={{ ...sectionStyle, padding: ".75rem .88rem .75rem .50rem" }}>

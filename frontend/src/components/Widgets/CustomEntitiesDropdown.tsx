@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Badge, InputAdornment, Popper, Tooltip } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import {
@@ -183,6 +183,7 @@ const styles = {
 };
 
 export default function CustomEntitiesDropdown({
+  placeholder: plHolder,
   options: {
     entity = null,
     statement,
@@ -200,13 +201,10 @@ export default function CustomEntitiesDropdown({
     CustomInputChip = null,
     placeholder,
     label,
+    chipsNumber = 2,
   },
 }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(anchorEl ? null : event.currentTarget);
-  };
 
   const open = Boolean(anchorEl);
   const id = open ? "simple-popper" : undefined;
@@ -216,6 +214,11 @@ export default function CustomEntitiesDropdown({
 
   const [autocompleteOptions, setAutocompleteOptions] = useState<Option[]>([]);
   const [inputValue, setInputValue] = useState("");
+  const popperRef = useRef<HTMLDivElement | null>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
 
   const handleSelectedOptionsChange = async (newSelectedOptions: Option[]) => {
     onUpdate(newSelectedOptions).then(() =>
@@ -325,6 +328,22 @@ export default function CustomEntitiesDropdown({
   // show the disable message only in case of forward connections
   const formIsDisabled = !statement.destinations && entity === "Connections";
 
+  useEffect(() => {
+    const closePopperOnClickOutside = (event: MouseEvent) => {
+      if (
+        popperRef.current &&
+        !popperRef.current.contains(event.target as Node)
+      ) {
+        setAnchorEl(null);
+      }
+    };
+
+    document.addEventListener("mousedown", closePopperOnClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", closePopperOnClickOutside);
+    };
+  }, []);
+
   return formIsDisabled ? (
     <Box
       sx={{ background: theme.palette.grey[100], borderRadius: 1 }}
@@ -355,35 +374,45 @@ export default function CustomEntitiesDropdown({
             onClick={handleClick}
           >
             {selectedOptions.length === 0 ? (
-              <Typography sx={styles.placeholder}>{placeholder}</Typography>
+              <Typography sx={styles.placeholder}>
+                {placeholder || plHolder}
+              </Typography>
             ) : (
-              <Box gap={1} display="flex" flexWrap="wrap">
+              <Box gap={1} display="flex" flexWrap="wrap" alignItems="center">
                 {selectedOptions?.length
-                  ? selectedOptions?.map((item: Option) => {
-                      return (
-                        <Tooltip title={item?.label} placement="top" arrow>
-                          {CustomInputChip ? (
-                            <CustomInputChip sx={styles.chip} entity={item} />
-                          ) : (
-                            <Chip
-                              key={item?.id}
-                              sx={{ ...styles.chip }}
-                              variant={"outlined"}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                              }}
-                              deleteIcon={<ClearOutlinedIcon />}
-                              onDelete={(e) => {
-                                e.stopPropagation();
-                                handleChipRemove(item);
-                              }}
-                              label={item?.label}
-                            />
-                          )}
-                        </Tooltip>
-                      );
-                    })
+                  ? selectedOptions
+                      ?.slice(0, chipsNumber)
+                      .map((item: Option, index) => {
+                        return (
+                          <Tooltip
+                            title={item?.label}
+                            placement="top"
+                            arrow
+                            key={item.id}
+                          >
+                            {CustomInputChip ? (
+                              <CustomInputChip sx={styles.chip} entity={item} />
+                            ) : (
+                              <Chip
+                                sx={{ ...styles.chip }}
+                                variant={"outlined"}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                }}
+                                deleteIcon={<ClearOutlinedIcon />}
+                                onDelete={(e) => {
+                                  e.stopPropagation();
+                                  handleChipRemove(item);
+                                }}
+                                label={item?.label}
+                              />
+                            )}
+                          </Tooltip>
+                        );
+                      })
                   : null}
+                {selectedOptions.length > chipsNumber &&
+                  `+${selectedOptions.length - chipsNumber}`}
               </Box>
             )}
             {open ? (
@@ -395,6 +424,7 @@ export default function CustomEntitiesDropdown({
         </Badge>
 
         <Popper
+          ref={popperRef}
           id={id}
           open={open}
           placement="bottom-start"
@@ -752,7 +782,7 @@ export default function CustomEntitiesDropdown({
         </Popper>
       </Stack>
       {errors && (
-        <Typography color={theme.palette.error.main} mt={1}>
+        <Typography color={theme.palette.error.main} mt={1} ml={2}>
           {errors}
         </Typography>
       )}

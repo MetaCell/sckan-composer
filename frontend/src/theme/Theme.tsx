@@ -186,6 +186,11 @@ const theme = createTheme({
       * {
         scroll-margin-top: 3rem;
       }
+      
+      .MuiBox-root:has(.origins) {
+        flex: 2
+      }
+      
       `,
     },
     MuiButton: {

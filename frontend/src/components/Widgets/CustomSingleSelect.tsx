@@ -5,10 +5,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
-import { styled } from "@mui/material";
 import { vars } from "../../theme/variables";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import { DestinationIcon } from "../icons";
 
 const CustomSingleSelect = ({
   onChange,
@@ -53,7 +50,7 @@ const CustomSingleSelect = ({
         },
       }
     : null;
-  console.log(selectOptions);
+
   return (
     <>
       {label && (
@@ -87,7 +84,7 @@ const CustomSingleSelect = ({
             isPathBuilderComponent ? (
               <InputIcon
                 fill="#475467"
-                style={{ marginRight: ".5rem", width: "1rem" }}
+                style={{ marginRight: ".5rem", width: "2rem" }}
               />
             ) : null
           }
