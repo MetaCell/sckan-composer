@@ -204,7 +204,7 @@ export const CustomAutocompleteForwardConnection = ({
   };
 
   const handleInputChange = (value: string) => {
-    if (value !== "" && value !== undefined) {
+    if (value !== undefined) {
       setSearchValue(value);
     }
   };
@@ -289,6 +289,7 @@ export const CustomAutocompleteForwardConnection = ({
         onChange={(e, value) => onChange(e, value)}
         groupBy={(option: Option) => option.relation}
         value={selectedOptions}
+        inputValue={searchValue}
         getOptionLabel={(option: string | Option) => {
           return typeof option === "string"
             ? option
@@ -522,7 +523,7 @@ export const CustomAutocompleteForwardConnection = ({
                 <Typography variant="body1" marginBottom={2}>
 			We couldn't find any records with this origin in the database.                  
                 </Typography>
-                <Button variant="outlined">Clear search</Button>
+                <Button variant="outlined" onClick={() => setSearchValue("")}>Clear search</Button>
               </Box>
             )}
           </Paper>
