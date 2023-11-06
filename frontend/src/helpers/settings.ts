@@ -24,3 +24,7 @@ export const sentenceStateToColor: SentenceStateToColor = {
     excluded: "info", //grey
     duplicate: "info", //grey
 }
+
+export const OriginsGroupLabel = 'Origins'
+export const ViasGroupLabel = 'Vias'
+export const DestinationsGroupLabel = 'Destinations'

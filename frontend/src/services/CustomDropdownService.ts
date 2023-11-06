@@ -5,11 +5,11 @@ import {mapAnatomicalEntitiesToOptions} from "../helpers/dropdownMappers";
 import {PatchedConnectivityStatementUpdate} from "../apiclient/backend";
 
 
-export async function getOrigins(searchValue: string): Promise<Option[]> {
+export async function getAnatomicalEntities(searchValue: string, groupLabel: string): Promise<Option[]> {
     try {
         const response = await api.composerAnatomicalEntityList(autocompleteRows, searchValue, 0);
         const anatomicalEntities = response.data.results || [];
-        return mapAnatomicalEntitiesToOptions(anatomicalEntities, 'Origins');
+        return mapAnatomicalEntitiesToOptions(anatomicalEntities, groupLabel);
     } catch (error) {
         console.error('Error fetching anatomical entities:', error);
         return [];

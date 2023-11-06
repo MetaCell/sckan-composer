@@ -183,9 +183,9 @@ const styles = {
 };
 
 export default function CustomEntitiesDropdown({
-  placeholder: plHolder,
+  value: context,
   options: {
-    entity = null,
+    isFormDisabled = () => false,
     statement,
     errors,
     searchPlaceholder,
@@ -193,7 +193,7 @@ export default function CustomEntitiesDropdown({
     disabledReason,
     onSearch,
     onUpdate,
-    value,
+    getValue,
     CustomHeader = null,
     CustomBody = null,
     CustomFooter = null,
@@ -210,7 +210,7 @@ export default function CustomEntitiesDropdown({
   const id = open ? "simple-popper" : undefined;
 
   const [hoveredOption, setHoveredOption] = useState<Option | null>(null);
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>(value || []);
+  const [selectedOptions, setSelectedOptions] = useState<Option[]>(getValue(context) || []);
 
   const [autocompleteOptions, setAutocompleteOptions] = useState<Option[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -325,9 +325,6 @@ export default function CustomEntitiesDropdown({
     onSearch("").then(setAutocompleteOptions);
   }, []);
 
-  // show the disable message only in case of forward connections
-  const formIsDisabled = !statement.destinations && entity === "Connections";
-
   useEffect(() => {
     const closePopperOnClickOutside = (event: MouseEvent) => {
       if (
@@ -344,7 +341,7 @@ export default function CustomEntitiesDropdown({
     };
   }, []);
 
-  return formIsDisabled ? (
+  return isFormDisabled() ? (
     <Box
       sx={{ background: theme.palette.grey[100], borderRadius: 1 }}
       p={2}
@@ -375,7 +372,7 @@ export default function CustomEntitiesDropdown({
           >
             {selectedOptions.length === 0 ? (
               <Typography sx={styles.placeholder}>
-                {placeholder || plHolder}
+                {placeholder}
               </Typography>
             ) : (
               <Box gap={1} display="flex" flexWrap="wrap" alignItems="center">
