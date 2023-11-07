@@ -104,7 +104,7 @@ export interface ConnectivityStatement {
      * @type {number}
      * @memberof ConnectivityStatement
      */
-    'sentence_id': number;
+    'sentence_id'?: number;
     /**
      * 
      * @type {Sentence}
@@ -287,7 +287,7 @@ export interface ConnectivityStatementUpdate {
      * @type {number}
      * @memberof ConnectivityStatementUpdate
      */
-    'sentence_id': number;
+    'sentence_id'?: number;
     /**
      * 
      * @type {Sentence}
@@ -2058,13 +2058,11 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * ConnectivityStatement
-         * @param {ConnectivityStatement} connectivityStatement 
+         * @param {ConnectivityStatement} [connectivityStatement] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementCreate: async (connectivityStatement: ConnectivityStatement, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'connectivityStatement' is not null or undefined
-            assertParamExists('composerConnectivityStatementCreate', 'connectivityStatement', connectivityStatement)
+        composerConnectivityStatementCreate: async (connectivityStatement?: ConnectivityStatement, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/connectivity-statement/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2284,17 +2282,15 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {string} transition 
-         * @param {ConnectivityStatement} connectivityStatement 
+         * @param {ConnectivityStatement} [connectivityStatement] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDoTransitionCreate: async (id: number, transition: string, connectivityStatement: ConnectivityStatement, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementDoTransitionCreate: async (id: number, transition: string, connectivityStatement?: ConnectivityStatement, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementDoTransitionCreate', 'id', id)
             // verify required parameter 'transition' is not null or undefined
             assertParamExists('composerConnectivityStatementDoTransitionCreate', 'transition', transition)
-            // verify required parameter 'connectivityStatement' is not null or undefined
-            assertParamExists('composerConnectivityStatementDoTransitionCreate', 'connectivityStatement', connectivityStatement)
             const localVarPath = `/api/composer/connectivity-statement/{id}/do_transition/{transition}/`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)))
                 .replace(`{${"transition"}}`, encodeURIComponent(String(transition)));
@@ -4126,11 +4122,11 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * ConnectivityStatement
-         * @param {ConnectivityStatement} connectivityStatement 
+         * @param {ConnectivityStatement} [connectivityStatement] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementCreate(connectivityStatement: ConnectivityStatement, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementCreate(connectivityStatement?: ConnectivityStatement, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementCreate(connectivityStatement, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -4181,11 +4177,11 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {string} transition 
-         * @param {ConnectivityStatement} connectivityStatement 
+         * @param {ConnectivityStatement} [connectivityStatement] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementDoTransitionCreate(id: number, transition: string, connectivityStatement: ConnectivityStatement, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementDoTransitionCreate(id: number, transition: string, connectivityStatement?: ConnectivityStatement, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementDoTransitionCreate(id, transition, connectivityStatement, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -4658,11 +4654,11 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * ConnectivityStatement
-         * @param {ConnectivityStatement} connectivityStatement 
+         * @param {ConnectivityStatement} [connectivityStatement] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementCreate(connectivityStatement: ConnectivityStatement, options?: any): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementCreate(connectivityStatement?: ConnectivityStatement, options?: any): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementCreate(connectivityStatement, options).then((request) => request(axios, basePath));
         },
         /**
@@ -4708,11 +4704,11 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {string} transition 
-         * @param {ConnectivityStatement} connectivityStatement 
+         * @param {ConnectivityStatement} [connectivityStatement] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDoTransitionCreate(id: number, transition: string, connectivityStatement: ConnectivityStatement, options?: any): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementDoTransitionCreate(id: number, transition: string, connectivityStatement?: ConnectivityStatement, options?: any): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementDoTransitionCreate(id, transition, connectivityStatement, options).then((request) => request(axios, basePath));
         },
         /**
@@ -5160,12 +5156,12 @@ export class ComposerApi extends BaseAPI {
 
     /**
      * ConnectivityStatement
-     * @param {ConnectivityStatement} connectivityStatement 
+     * @param {ConnectivityStatement} [connectivityStatement] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementCreate(connectivityStatement: ConnectivityStatement, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementCreate(connectivityStatement?: ConnectivityStatement, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementCreate(connectivityStatement, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -5220,12 +5216,12 @@ export class ComposerApi extends BaseAPI {
      * ConnectivityStatement
      * @param {number} id A unique integer value identifying this connectivity statement.
      * @param {string} transition 
-     * @param {ConnectivityStatement} connectivityStatement 
+     * @param {ConnectivityStatement} [connectivityStatement] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementDoTransitionCreate(id: number, transition: string, connectivityStatement: ConnectivityStatement, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementDoTransitionCreate(id: number, transition: string, connectivityStatement?: ConnectivityStatement, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementDoTransitionCreate(id, transition, connectivityStatement, options).then((request) => request(this.axios, this.basePath));
     }
 

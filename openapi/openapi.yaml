@@ -184,7 +184,6 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/ConnectivityStatement'
-        required: true
       security:
       - tokenAuth: []
       - basicAuth: []
@@ -534,7 +533,6 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/ConnectivityStatement'
-        required: true
       security:
       - tokenAuth: []
       - basicAuth: []
@@ -1721,7 +1719,6 @@ components:
       - owner
       - phenotype
       - sentence
-      - sentence_id
       - sex
       - state
       - statement_preview
@@ -1841,7 +1838,6 @@ components:
       - owner
       - phenotype
       - sentence
-      - sentence_id
       - sex
       - statement_preview
       - tags

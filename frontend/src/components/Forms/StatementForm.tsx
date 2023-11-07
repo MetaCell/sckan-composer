@@ -365,8 +365,7 @@ const StatementForm = (props: any) => {
             disabledReason: "",
             chipsNumber: 5,
             onSearch: async (searchValue: string) => getAnatomicalEntities(searchValue, OriginsGroupLabel),
-            onUpdate: async (selectedOptions: any) =>
-                updateOrigins(selectedOptions, statement.id),
+            onUpdate: async (selectedOptions: any) => updateOrigins(selectedOptions, statement.id),
             statement: statement,
             errors: "",
             getValue: () => mapAnatomicalEntitiesToOptions(statement?.origins, OriginsGroupLabel),

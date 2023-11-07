@@ -10,7 +10,7 @@ from composer.models import (
     Note,
     Tag,
     Via,
-    Specie,
+    Specie, Destination,
 )
 
 
@@ -158,4 +158,15 @@ class ViaFilter(django_filters.FilterSet):
 
     class Meta:
         model = Via
+        fields = []
+
+
+class DestinationFilter(django_filters.FilterSet):
+    connectivity_statement_id = django_filters.ModelChoiceFilter(
+        field_name="connectivity_statement_id",
+        queryset=ConnectivityStatement.objects.all(),
+    )
+
+    class Meta:
+        model = Destination
         fields = []

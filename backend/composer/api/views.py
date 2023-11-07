@@ -20,7 +20,7 @@ from .filtersets import (
     AnatomicalEntityFilter,
     NoteFilter,
     ViaFilter,
-    SpecieFilter,
+    SpecieFilter, DestinationFilter,
 )
 from .serializers import (
     AnatomicalEntitySerializer,
@@ -33,7 +33,7 @@ from .serializers import (
     TagSerializer,
     ViaSerializer,
     ProvenanceSerializer,
-    SexSerializer, ConnectivityStatementUpdateSerializer,
+    SexSerializer, ConnectivityStatementUpdateSerializer, DestinationSerializer,
 )
 from ..models import (
     AnatomicalEntity,
@@ -46,7 +46,7 @@ from ..models import (
     Tag,
     Via,
     Provenance,
-    Sex,
+    Sex, Destination,
 )
 
 
@@ -318,21 +318,13 @@ class ConnectivityStatementViewSet(
         responses={200: ConnectivityStatementSerializer}
     )
     def update(self, request, *args, **kwargs):
-        # Remove 'state' from the request data
-        request.data.pop('state', None)
+        origin_ids = request.data.pop('origins', None)
 
-        # Extract origins IDs from the request
-        origin_ids = request.data.pop('origins', [])
-
-        # Continue with the standard update process
         response = super().update(request, *args, **kwargs)
 
-        # If update is successful, update origins using the provided IDs
-        if response.status_code == status.HTTP_200_OK:
+        if origin_ids and response.status_code == status.HTTP_200_OK:
             instance = self.get_object()
-            instance.origins.clear()
-            instance.origins.add(*origin_ids)
-            instance.save()
+            instance.update_origins(origin_ids)
 
         return response
 
@@ -342,8 +334,7 @@ class ConnectivityStatementViewSet(
         responses={200: ConnectivityStatementSerializer}
     )
     def partial_update(self, request, *args, **kwargs):
-        # Make sure this method either has its own logic or calls self.update
-        return self.update(request, *args, **kwargs)
+        return super().partial_update(request, *args, **kwargs)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -425,6 +416,18 @@ class ViaViewSet(viewsets.ModelViewSet):
     filterset_class = ViaFilter
 
 
+class DestinationViewSet(viewsets.ModelViewSet):
+    """
+    Destination
+    """
+
+    queryset = Destination.objects.all()
+    serializer_class = DestinationSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+    ]
+    filterset_class = DestinationFilter
+
 @extend_schema(
     responses=OpenApiTypes.OBJECT,
 )
@@ -434,6 +437,7 @@ def jsonschemas(request):
         ConnectivityStatementSerializer,
         SentenceSerializer,
         ViaSerializer,
+        DestinationSerializer,
         TagSerializer,
         ProvenanceSerializer,
         SpecieSerializer,

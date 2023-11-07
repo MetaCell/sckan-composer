@@ -516,6 +516,11 @@ class ConnectivityStatement(models.Model):
             self.reference_uri = create_reference_uri(self.pk)
             self.save(update_fields=["reference_uri"])
 
+    def update_origins(self, origin_ids):
+        self.origins.clear()
+        self.origins.add(*origin_ids)
+        self.save()
+
     class Meta:
         ordering = ["-modified_date"]
         verbose_name_plural = "Connectivity Statements"
