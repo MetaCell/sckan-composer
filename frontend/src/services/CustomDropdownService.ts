@@ -3,12 +3,16 @@ import {composerApi as api} from "./apis";
 import {autocompleteRows} from "../helpers/settings";
 import {mapAnatomicalEntitiesToOptions} from "../helpers/dropdownMappers";
 import {
+    AnatomicalEntity,
+    ConnectivityStatement,
     DestinationSerializerDetails,
     PatchedConnectivityStatementUpdate,
     PatchedDestination,
     PatchedVia,
     ViaSerializerDetails
 } from "../apiclient/backend";
+import {searchAnatomicalEntities} from "../helpers/helpers";
+import AnatomicalEntitiesField from "../components/AnatomicalEntitiesField";
 
 
 export async function getAnatomicalEntities(searchValue: string, groupLabel: string): Promise<Option[]> {
@@ -23,7 +27,7 @@ export async function getAnatomicalEntities(searchValue: string, groupLabel: str
 }
 
 
-export async function updateOrigins(selected: Option[], statementId: number){
+export async function updateOrigins(selected: Option[], statementId: number) {
     const originIds = selected.map(option => parseInt(option.id));
     const patchedStatement: PatchedConnectivityStatementUpdate = {
         origins: originIds,
@@ -36,8 +40,8 @@ export async function updateOrigins(selected: Option[], statementId: number){
 
 }
 
-export async function updateViaAnatomicalEntities(selected: Option[], viaId: number | null){
-    if(viaId == null){
+export async function updateViaAnatomicalEntities(selected: Option[], viaId: number | null) {
+    if (viaId == null) {
         console.error("Error updating via")
         return
     }
@@ -52,8 +56,8 @@ export async function updateViaAnatomicalEntities(selected: Option[], viaId: num
     }
 }
 
-export async function updateDestinationAnatomicalEntities(selected: Option[], destinationId: number | null){
-    if(destinationId == null){
+export async function updateDestinationAnatomicalEntities(selected: Option[], destinationId: number | null) {
+    if (destinationId == null) {
         console.error("Error updating destination")
         return
     }
@@ -68,9 +72,9 @@ export async function updateDestinationAnatomicalEntities(selected: Option[], de
     }
 }
 
-export function getConnectionId(formId: string, connections: ViaSerializerDetails[] | DestinationSerializerDetails[]): number | null  {
+export function getConnectionId(formId: string, connections: ViaSerializerDetails[] | DestinationSerializerDetails[]): number | null {
     const index = getFirstNumberFromString(formId)
-    if(index != null){
+    if (index != null) {
         return connections[index].id
     }
     return null
@@ -80,4 +84,29 @@ export function getConnectionId(formId: string, connections: ViaSerializerDetail
 function getFirstNumberFromString(inputString: string) {
     const match = inputString.match(/\d+/);
     return match ? parseInt(match[0], 10) : null;
+}
+
+export function searchFromEntitiesVia(searchValue: string, statement: ConnectivityStatement, formId: string): Option[] {
+    const viaIndex = getFirstNumberFromString(formId)
+    if(viaIndex == null || statement.vias == null || statement.vias[viaIndex] == null){
+        console.error('Error searching from entities');
+        return []
+    }
+    const viaOrder = statement.vias[viaIndex].order
+    const anatomicalEntities = getEntitiesBeforeOrder(statement, viaOrder)
+
+    return mapAnatomicalEntitiesToOptions(searchAnatomicalEntities(anatomicalEntities, searchValue), 'From Entities')
+}
+
+function getEntitiesBeforeOrder(statement: ConnectivityStatement, order: number) {
+    const entities = statement.origins != null ? [...statement.origins] : []
+    const vias = statement.vias || []
+    return vias.reduce((acc, via) => {
+        if (via.order < order) {
+            via.anatomical_entities.forEach(entity => {
+                acc.push(entity);
+            });
+        }
+        return acc;
+    }, entities as AnatomicalEntity[]);
 }

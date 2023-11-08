@@ -1,4 +1,4 @@
-import { SentenceAvailableTransitionsEnum as sentenceStates } from "../apiclient/backend/api";
+import {AnatomicalEntity, SentenceAvailableTransitionsEnum as sentenceStates} from "../apiclient/backend/api";
 import { ComposerConnectivityStatementListStateEnum as statementStates } from "../apiclient/backend/api";
 
 export const hiddenWidget = (fields: string[]) => {
@@ -182,3 +182,12 @@ export const isEqual = function (obj1: any, obj2: any) {
 
   return true;
 };
+
+
+export function searchAnatomicalEntities(entities: AnatomicalEntity[], searchValue:string) {
+  const normalizedSearchValue = searchValue.toLowerCase();
+
+  return entities.filter(entity =>
+      entity.name.toLowerCase().includes(normalizedSearchValue)
+  );
+}

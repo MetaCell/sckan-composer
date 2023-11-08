@@ -14,7 +14,7 @@ import {Box, Chip, MenuItem, Select} from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
-    getAnatomicalEntities, getConnectionId, updateDestinationAnatomicalEntities,
+    getAnatomicalEntities, getConnectionId, searchFromEntitiesVia, updateDestinationAnatomicalEntities,
     updateOrigins, updateViaAnatomicalEntities,
 } from "../../services/CustomDropdownService";
 import {mapAnatomicalEntitiesToOptions} from "../../helpers/dropdownMappers";
@@ -99,263 +99,6 @@ const StatementForm = (props: any) => {
         },
     };
 
-    const mockEntities = [
-        {
-            id: "5304",
-            group: "Origins",
-            label: "('Aortic arch', 'arch of aorta')",
-            content: [
-                {
-                    title: "Name",
-                    value: "('Aortic arch', 'arch of aorta')",
-                },
-                {
-                    title: "Ontology URI",
-                    value: "http://purl.obolibrary.org/obo/UBERON_0001508",
-                },
-            ],
-        },
-        {
-            id: "32845",
-            group: "Origins",
-            label: "(embryonic) hindbrain flexure",
-            content: [
-                {
-                    title: "Name",
-                    value: "(embryonic) hindbrain flexure",
-                },
-                {
-                    title: "Ontology URI",
-                    value: "http://purl.obolibrary.org/obo/UBERON_0005820",
-                },
-            ],
-        },
-        {
-            id: "47428",
-            group: "Origins",
-            label: "(mid-third) lateral capsular ligament",
-            content: [
-                {
-                    title: "Name",
-                    value: "(mid-third) lateral capsular ligament",
-                },
-                {
-                    title: "Ontology URI",
-                    value: "http://purl.obolibrary.org/obo/UBERON_0014899",
-                },
-            ],
-        },
-        {
-            id: "12822",
-            group: "Origins",
-            label: "(pre-)piriform cortex",
-            content: [
-                {
-                    title: "Name",
-                    value: "(pre-)piriform cortex",
-                },
-                {
-                    title: "Ontology URI",
-                    value: "http://purl.obolibrary.org/obo/UBERON_0002590",
-                },
-            ],
-        },
-        {
-            id: "1798",
-            group: "Origins",
-            label: "02 optic nerve",
-            content: [
-                {
-                    title: "Name",
-                    value: "02 optic nerve",
-                },
-                {
-                    title: "Ontology URI",
-                    value: "http://purl.obolibrary.org/obo/UBERON_0000941",
-                },
-            ],
-        },
-        {
-            id: "53259",
-            group: "Origins",
-            label: "10 R+L thoracic",
-            content: [
-                {
-                    title: "Name",
-                    value: "10 R+L thoracic",
-                },
-                {
-                    title: "Ontology URI",
-                    value: "http://purl.obolibrary.org/obo/UBERON_0039167",
-                },
-            ],
-        },
-        {
-            id: "6604",
-            group: "Origins",
-            label: "10n",
-            content: [
-                {
-                    title: "Name",
-                    value: "10n",
-                },
-                {
-                    title: "Ontology URI",
-                    value: "http://purl.obolibrary.org/obo/UBERON_0001759",
-                },
-            ],
-        },
-        {
-            id: "52948",
-            group: "Origins",
-            label: "11 R+L thoracic",
-            content: [
-                {
-                    title: "Name",
-                    value: "11 R+L thoracic",
-                },
-                {
-                    title: "Ontology URI",
-                    value: "http://purl.obolibrary.org/obo/UBERON_0038635",
-                },
-            ],
-        },
-        {
-            id: "52950",
-            group: "Origins",
-            label: "11 thoracic lymph node",
-            content: [
-                {
-                    title: "Name",
-                    value: "11 thoracic lymph node",
-                },
-                {
-                    title: "Ontology URI",
-                    value: "http://purl.obolibrary.org/obo/UBERON_0038635",
-                },
-            ],
-        },
-        {
-            id: "52956",
-            group: "Origins",
-            label: "12R+L thoracic lymph node",
-            content: [
-                {
-                    title: "Name",
-                    value: "12R+L thoracic lymph node",
-                },
-                {
-                    title: "Ontology URI",
-                    value: "http://purl.obolibrary.org/obo/UBERON_0038638",
-                },
-            ],
-        },
-        {
-            id: "6050",
-            group: "Origins",
-            label: "12n",
-            content: [
-                {
-                    title: "Name",
-                    value: "12n",
-                },
-                {
-                    title: "Ontology URI",
-                    value: "http://purl.obolibrary.org/obo/UBERON_0001650",
-                },
-            ],
-        },
-    ];
-
-    const mockConnections = [
-        {
-            id: "5304",
-            group: "Derived from Same Sentence",
-            label:
-                "chorda tympani to lingual to geniculate ganglion to nts S2-S4 via pelvic splanchnic nerves via pelvic ganglion to uterovaginal ganglion",
-            content: [
-                {
-                    title: "Knowledge Statement ID",
-                    value: "73",
-                },
-                {
-                    title: "Title",
-                    value:
-                        "chorda tympani to lingual to geniculate ganglion to nts S2-S4 via pelvic splanchnic nerves via pelvic ganglion to uterovaginal ganglion",
-                },
-                {
-                    title: "Statement",
-                    value:
-                        "In a parasympathetic post-ganglionic phenotype connection goes from S2 spinal cord segment to accessory pelvic ganglion via 2nd toe intermediate phalanx, via pelvic ganglion and via ventral root of the first sacral spinal cord segment. This ANAXONIC projects UNKNOWN from the S2 spinal cord segment and is found at an unknown location.chorda tympani to lingual to geniculate ganglion to nts S2-S4 via pelvic splanchnic nerves via pelvic ganglion to uterovaginal ganglion",
-                },
-            ],
-        },
-        {
-            id: "32845",
-            group: "Others",
-            label: "neuron type sstom 10",
-            content: [
-                {
-                    title: "Knowledge Statement ID",
-                    value: "71",
-                },
-                {
-                    title: "Title",
-                    value: "neuron type sstom 10",
-                },
-                {
-                    title: "Statement",
-                    value:
-                        "In a connection goes from to . This UNKNOWN projects UNKNOWN from the and is found at an unknown location.",
-                },
-            ],
-        },
-        {
-            id: "47428",
-            group: "Others",
-            label: "(mid-third) lateral capsular ligament",
-            content: [
-                {
-                    title: "Knowledge Statement ID",
-                    value: "70",
-                },
-                {
-                    title: "Title",
-                    value: "(mid-third) lateral capsular ligament",
-                },
-                {
-                    title: "Statement",
-                    value:
-                        "In a connection goes from to . This UNKNOWN projects UNKNOWN from the and is found at an unknown location.",
-                },
-            ],
-        },
-        {
-            id: "12822",
-            group: "Others",
-            label: "(pre-)piriform cortex",
-            content: [
-                {
-                    title: "Knowledge Statement ID",
-                    value: "69",
-                },
-                {
-                    title: "Title",
-                    value: "(pre-)piriform cortex",
-                },
-                {
-                    title: "Statement",
-                    value:
-                        "In a connection goes from to . This UNKNOWN projects UNKNOWN from the and is found at an unknown location.",
-                },
-            ],
-        },
-    ];
-
-    const getEntities = async (searchValue: string) => mockEntities;
-
-    const getConnections = async (searchValue: string) => mockConnections;
-
     copiedUISchema.origins = {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
@@ -364,11 +107,10 @@ const StatementForm = (props: any) => {
             noResultReason: "No results found",
             disabledReason: "",
             chipsNumber: 5,
-            onSearch: async (searchValue: string) => getAnatomicalEntities(searchValue, OriginsGroupLabel),
+            onSearch: async (searchValue: string, formId: string) => getAnatomicalEntities(searchValue, OriginsGroupLabel),
             onUpdate: async (selectedOptions: any) => updateOrigins(selectedOptions, statement.id),
-            statement: statement,
             errors: "",
-            getOption: () => mapAnatomicalEntitiesToOptions(statement?.origins, OriginsGroupLabel),
+            mapValueToOption: () => mapAnatomicalEntitiesToOptions(statement?.origins, OriginsGroupLabel),
         },
     };
 
@@ -399,12 +141,11 @@ const StatementForm = (props: any) => {
                     searchPlaceholder: "Search for vias",
                     noResultReason: "No anatomical entities found",
                     disabledReason: "",
-                    onSearch: async (searchValue: string) => getAnatomicalEntities(searchValue, ViasGroupLabel),
+                    onSearch: async (searchValue: string, formId: string) => getAnatomicalEntities(searchValue, ViasGroupLabel),
                     onUpdate: async (selectedOptions: Option[], formId: any) =>
                         updateViaAnatomicalEntities(selectedOptions, getConnectionId(formId, statement.vias)),
-                    statement: statement,
                     errors: "",
-                    getOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
+                    mapValueToOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
                     CustomFooter: ({entity}: any) => (
                         <Box
                             sx={{
@@ -430,12 +171,10 @@ const StatementForm = (props: any) => {
                     searchPlaceholder: "Search for connections",
                     noResultReason: "No prior connections found",
                     disabledReason: "",
-                    onSearch: async (searchValue: string) => getEntities(searchValue),
-                    onUpdate: async (selectedOptions: any) => {
-                    },
-                    statement: statement,
+                    onSearch: async (searchValue: string, formId:string) => searchFromEntitiesVia(searchValue, statement, formId),
+                    onUpdate: async (selectedOptions: any) => {},
                     errors: "",
-                    getOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
+                    mapValueToOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
                     CustomFooter: ({entity}: any) => (
                         <Box
                             sx={{
@@ -482,12 +221,11 @@ const StatementForm = (props: any) => {
                     searchPlaceholder: "Search for Destinations",
                     noResultReason: "No anatomical entities found",
                     disabledReason: "",
-                    onSearch: async (searchValue: string) => getEntities(searchValue),
+                    onSearch: async (searchValue: string) => getAnatomicalEntities(searchValue, DestinationsGroupLabel),
                     onUpdate: async (selectedOptions: any, formId: string) =>
                         updateDestinationAnatomicalEntities(selectedOptions, getConnectionId(formId, statement.destinations)),
-                    statement: statement,
                     errors: "",
-                    getOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, DestinationsGroupLabel),
+                    mapValueToOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, DestinationsGroupLabel),
                     CustomFooter: ({entity}: any) => (
                         <Box
                             sx={{
@@ -513,12 +251,10 @@ const StatementForm = (props: any) => {
                     searchPlaceholder: "Search for Destinations",
                     noResultReason: "",
                     disabledReason: "",
-                    onSearch: async (searchValue: string) => getEntities(searchValue),
-                    onUpdate: async (selectedOptions: any) => {
-                    },
-                    statement: statement,
+                    onSearch: async (searchValue: string) => [],
+                    onUpdate: async (selectedOptions: any) => {},
                     errors: "",
-                    getOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, DestinationsGroupLabel),
+                    mapValueToOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, DestinationsGroupLabel),
                     CustomFooter: ({entity}: any) => (
                         <Box
                             sx={{
@@ -560,14 +296,14 @@ const StatementForm = (props: any) => {
                 "We couldn’t find any record with these origin in the database.",
             disabledReason:
                 "Add Destination entity to get access to the forward connection form",
-            onSearch: async (searchValue: string) => getConnections(searchValue),
+            onSearch: async (searchValue: string) => [],
             onUpdate: async (selectedOptions: Option[]) => {
             },
             statement: statement,
             errors: statement?.errors?.includes("Invalid forward connection")
                 ? statement.errors
                 : "",
-            getOption: () => statement.forward_connection,
+            mapValueToOption: () => statement.forward_connection,
             header: {
                 label: "Origins",
                 values: [

@@ -187,14 +187,13 @@ export default function CustomEntitiesDropdown({
   id,
   options: {
     isFormDisabled = () => false,
-    statement,
     errors,
     searchPlaceholder,
     noResultReason,
     disabledReason,
     onSearch,
     onUpdate,
-    getOption,
+    mapValueToOption,
     CustomHeader = null,
     CustomBody = null,
     CustomFooter = null,
@@ -211,7 +210,7 @@ export default function CustomEntitiesDropdown({
   const aria = open ? "simple-popper" : undefined;
 
   const [hoveredOption, setHoveredOption] = useState<Option | null>(null);
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>(getOption(value) || []);
+  const [selectedOptions, setSelectedOptions] = useState<Option[]>(mapValueToOption(value) || []);
 
   const [autocompleteOptions, setAutocompleteOptions] = useState<Option[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -313,7 +312,7 @@ export default function CustomEntitiesDropdown({
 
   const handleInputChange = (event: any) => {
     if (event.target.value !== undefined) {
-      onSearch(event.target.value).then(setAutocompleteOptions);
+      onSearch(event.target.value, id).then(setAutocompleteOptions);
     }
     setInputValue(event.target.value);
   };
@@ -323,7 +322,7 @@ export default function CustomEntitiesDropdown({
   };
 
   useEffect(() => {
-    onSearch("").then(setAutocompleteOptions);
+    onSearch("", id).then(setAutocompleteOptions);
   }, []);
 
   useEffect(() => {
