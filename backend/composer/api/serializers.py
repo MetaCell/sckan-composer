@@ -154,7 +154,7 @@ class SexSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "ontology_uri")
 
 
-class ViaSerializer(serializers.ModelSerializer):
+class ViaSerializerDetails(serializers.ModelSerializer):
     """Via"""
 
     anatomical_entities = AnatomicalEntitySerializer(
@@ -170,6 +170,71 @@ class ViaSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "order",
+            "connectivity_statement_id",
+            "type",
+            "anatomical_entities",
+            "from_entities"
+        )
+
+
+class ViaSerializer(serializers.ModelSerializer):
+    """Via"""
+    anatomical_entities = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=AnatomicalEntity.objects.all(),
+        required=False
+    )
+    from_entities = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=AnatomicalEntity.objects.all(),
+        required=False
+    )
+
+    class Meta:
+        model = Via
+        fields = (
+            "id",
+            "order",
+            "connectivity_statement_id",
+            "type",
+            "anatomical_entities",
+            "from_entities"
+        )
+
+
+class DestinationSerializer(serializers.ModelSerializer):
+    """Destination"""
+    anatomical_entities = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=AnatomicalEntity.objects.all(),
+        required=False
+    )
+    from_entities = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=AnatomicalEntity.objects.all(),
+        required=False
+    )
+
+    class Meta:
+        model = Destination
+        fields = ('id', "connectivity_statement_id", 'type', 'anatomical_entities', 'from_entities')
+
+
+class DestinationSerializerDetails(serializers.ModelSerializer):
+    """Destination"""
+
+    anatomical_entities = AnatomicalEntitySerializer(
+        many=True,
+    )
+
+    from_entities = AnatomicalEntitySerializer(
+        many=True,
+    )
+
+    class Meta:
+        model = Destination
+        fields = (
+            "id",
             "connectivity_statement_id",
             "type",
             "anatomical_entities",
@@ -302,17 +367,6 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
         )
 
 
-class DestinationSerializer(serializers.ModelSerializer):
-    """Destination"""
-
-    anatomical_entities = AnatomicalEntitySerializer(many=True)
-    from_entities = AnatomicalEntitySerializer(many=True)
-
-    class Meta:
-        model = Destination
-        fields = ('id', 'type', 'anatomical_entities', 'from_entities')
-
-
 class ConnectivityStatementSerializer(
     FixManyToManyMixin, FixedWritableNestedModelSerializer
 ):
@@ -328,13 +382,11 @@ class ConnectivityStatementSerializer(
     sex_id = serializers.IntegerField(required=False, allow_null=True)
     tags = TagSerializer(many=True, read_only=True, required=False)
     species = SpecieSerializer(many=True, read_only=False, required=False)
-    provenances = ProvenanceSerializer(
-        source="provenance_set", many=True, read_only=False, required=False
-    )
-    vias = ViaSerializer(source="via_set", many=True, read_only=False, required=False)
-    owner = UserSerializer(required=False, read_only=True)
+    provenances = ProvenanceSerializer(source="provenance_set", many=True, read_only=False, required=False)
     origins = AnatomicalEntitySerializer(many=True, required=False)
-    destinations = DestinationSerializer(many=True, required=False)
+    vias = ViaSerializerDetails(source="via_set", many=True, read_only=False, required=False)
+    destinations = DestinationSerializerDetails(many=True, required=False)
+    owner = UserSerializer(required=False, read_only=True)
     phenotype = PhenotypeSerializer(required=False, read_only=True)
     sex = SexSerializer(required=False, read_only=True)
     sentence = SentenceSerializer(required=False, read_only=True)

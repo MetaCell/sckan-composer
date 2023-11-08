@@ -14,8 +14,8 @@ import {Box, Chip, MenuItem, Select} from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
-    getAnatomicalEntities,
-    updateOrigins,
+    getAnatomicalEntities, getViaId,
+    updateOrigins, updateViaAnatomicalEntities,
 } from "../../services/CustomDropdownService";
 import {mapAnatomicalEntitiesToOptions} from "../../helpers/dropdownMappers";
 import {DestinationIcon, ViaIcon} from "../icons";
@@ -368,7 +368,7 @@ const StatementForm = (props: any) => {
             onUpdate: async (selectedOptions: any) => updateOrigins(selectedOptions, statement.id),
             statement: statement,
             errors: "",
-            getValue: () => mapAnatomicalEntitiesToOptions(statement?.origins, OriginsGroupLabel),
+            getOption: () => mapAnatomicalEntitiesToOptions(statement?.origins, OriginsGroupLabel),
         },
     };
 
@@ -400,11 +400,11 @@ const StatementForm = (props: any) => {
                     noResultReason: "No anatomical entities found",
                     disabledReason: "",
                     onSearch: async (searchValue: string) => getAnatomicalEntities(searchValue, ViasGroupLabel),
-                    onUpdate: async (selectedOptions: any) => {
-                    },
+                    onUpdate: async (selectedOptions: Option[], formId: any) =>
+                        updateViaAnatomicalEntities(selectedOptions, getViaId(formId, statement.vias)),
                     statement: statement,
                     errors: "",
-                    getValue: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
+                    getOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
                     CustomFooter: ({entity}: any) => (
                         <Box
                             sx={{
@@ -435,7 +435,7 @@ const StatementForm = (props: any) => {
                     },
                     statement: statement,
                     errors: "",
-                    getValue: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
+                    getOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
                     CustomFooter: ({entity}: any) => (
                         <Box
                             sx={{
@@ -487,7 +487,7 @@ const StatementForm = (props: any) => {
                     },
                     statement: statement,
                     errors: "",
-                    getValue: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, DestinationsGroupLabel),
+                    getOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, DestinationsGroupLabel),
                     CustomFooter: ({entity}: any) => (
                         <Box
                             sx={{
@@ -518,7 +518,7 @@ const StatementForm = (props: any) => {
                     },
                     statement: statement,
                     errors: "",
-                    getValue: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, DestinationsGroupLabel),
+                    getOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, DestinationsGroupLabel),
                     CustomFooter: ({entity}: any) => (
                         <Box
                             sx={{
@@ -561,12 +561,13 @@ const StatementForm = (props: any) => {
             disabledReason:
                 "Add Destination entity to get access to the forward connection form",
             onSearch: async (searchValue: string) => getConnections(searchValue),
-            onUpdate: async (selectedOptions: Option[]) => {},
+            onUpdate: async (selectedOptions: Option[]) => {
+            },
             statement: statement,
             errors: statement?.errors?.includes("Invalid forward connection")
                 ? statement.errors
                 : "",
-            getValue: () => statement.forward_connection,
+            getOption: () => statement.forward_connection,
             header: {
                 label: "Origins",
                 values: [
@@ -633,7 +634,6 @@ const StatementForm = (props: any) => {
             uiSchema={copiedUISchema}
             uiFields={uiFields}
             enableAutoSave={false}
-            children={true}
             widgets={widgets}
             showErrorList={false}
             submitOnBlurFields={[

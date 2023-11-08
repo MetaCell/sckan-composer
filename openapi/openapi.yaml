@@ -544,6 +544,180 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConnectivityStatement'
           description: ''
+  /api/composer/destination/:
+    get:
+      operationId: composer_destination_list
+      description: Destination
+      parameters:
+      - in: query
+        name: connectivity_statement_id
+        schema:
+          type: integer
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDestinationList'
+          description: ''
+    post:
+      operationId: composer_destination_create
+      description: Destination
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Destination'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Destination'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Destination'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Destination'
+          description: ''
+  /api/composer/destination/{id}/:
+    get:
+      operationId: composer_destination_retrieve
+      description: Destination
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this destination.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Destination'
+          description: ''
+    put:
+      operationId: composer_destination_update
+      description: Destination
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this destination.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Destination'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Destination'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Destination'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Destination'
+          description: ''
+    patch:
+      operationId: composer_destination_partial_update
+      description: Destination
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this destination.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDestination'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDestination'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDestination'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Destination'
+          description: ''
+    delete:
+      operationId: composer_destination_destroy
+      description: Destination
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this destination.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/composer/jsonschemas/:
     get:
       operationId: composer_jsonschemas_retrieve
@@ -1652,11 +1826,11 @@ components:
         vias:
           type: array
           items:
-            $ref: '#/components/schemas/Via'
+            $ref: '#/components/schemas/ViaSerializerDetails'
         destinations:
           type: array
           items:
-            $ref: '#/components/schemas/Destination'
+            $ref: '#/components/schemas/DestinationSerializerDetails'
         phenotype_id:
           type: integer
           nullable: true
@@ -1770,11 +1944,11 @@ components:
         vias:
           type: array
           items:
-            $ref: '#/components/schemas/Via'
+            $ref: '#/components/schemas/ViaSerializerDetails'
         destinations:
           type: array
           items:
-            $ref: '#/components/schemas/Destination'
+            $ref: '#/components/schemas/DestinationSerializerDetails'
         phenotype_id:
           type: integer
           nullable: true
@@ -1848,8 +2022,34 @@ components:
         id:
           type: integer
           readOnly: true
+        connectivity_statement_id:
+          type: integer
+          readOnly: true
         type:
-          $ref: '#/components/schemas/DestinationTypeEnum'
+          $ref: '#/components/schemas/TypeC11Enum'
+        anatomical_entities:
+          type: array
+          items:
+            type: integer
+        from_entities:
+          type: array
+          items:
+            type: integer
+      required:
+      - connectivity_statement_id
+      - id
+    DestinationSerializerDetails:
+      type: object
+      description: Destination
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        connectivity_statement_id:
+          type: integer
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/TypeC11Enum'
         anatomical_entities:
           type: array
           items:
@@ -1860,14 +2060,9 @@ components:
             $ref: '#/components/schemas/AnatomicalEntity'
       required:
       - anatomical_entities
+      - connectivity_statement_id
       - from_entities
       - id
-    DestinationTypeEnum:
-      enum:
-      - AXON-T
-      - AFFERENT-T
-      - UNKNOWN
-      type: string
     LateralityEnum:
       enum:
       - RIGHT
@@ -1958,6 +2153,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ConnectivityStatement'
+    PaginatedDestinationList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Destination'
     PaginatedNoteList:
       type: object
       properties:
@@ -2145,11 +2360,11 @@ components:
         vias:
           type: array
           items:
-            $ref: '#/components/schemas/Via'
+            $ref: '#/components/schemas/ViaSerializerDetails'
         destinations:
           type: array
           items:
-            $ref: '#/components/schemas/Destination'
+            $ref: '#/components/schemas/DestinationSerializerDetails'
         phenotype_id:
           type: integer
           nullable: true
@@ -2202,6 +2417,26 @@ components:
           type: array
           items: {}
           readOnly: true
+    PatchedDestination:
+      type: object
+      description: Destination
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        connectivity_statement_id:
+          type: integer
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/TypeC11Enum'
+        anatomical_entities:
+          type: array
+          items:
+            type: integer
+        from_entities:
+          type: array
+          items:
+            type: integer
     PatchedNote:
       type: object
       description: Note
@@ -2303,15 +2538,15 @@ components:
           type: integer
           readOnly: true
         type:
-          $ref: '#/components/schemas/ViaTypeEnum'
+          $ref: '#/components/schemas/TypeB60Enum'
         anatomical_entities:
           type: array
           items:
-            $ref: '#/components/schemas/AnatomicalEntity'
+            type: integer
         from_entities:
           type: array
           items:
-            $ref: '#/components/schemas/AnatomicalEntity'
+            type: integer
     Phenotype:
       type: object
       description: Phenotype
@@ -2583,6 +2818,17 @@ components:
       required:
       - id
       - tag
+    TypeB60Enum:
+      enum:
+      - AXON
+      - DENDRITE
+      type: string
+    TypeC11Enum:
+      enum:
+      - AXON-T
+      - AFFERENT-T
+      - UNKNOWN
+      type: string
     User:
       type: object
       description: User
@@ -2623,7 +2869,33 @@ components:
           type: integer
           readOnly: true
         type:
-          $ref: '#/components/schemas/ViaTypeEnum'
+          $ref: '#/components/schemas/TypeB60Enum'
+        anatomical_entities:
+          type: array
+          items:
+            type: integer
+        from_entities:
+          type: array
+          items:
+            type: integer
+      required:
+      - connectivity_statement_id
+      - id
+      - order
+    ViaSerializerDetails:
+      type: object
+      description: Via
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        order:
+          type: integer
+        connectivity_statement_id:
+          type: integer
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/TypeB60Enum'
         anatomical_entities:
           type: array
           items:
@@ -2638,11 +2910,6 @@ components:
       - from_entities
       - id
       - order
-    ViaTypeEnum:
-      enum:
-      - AXON
-      - DENDRITE
-      type: string
   securitySchemes:
     basicAuth:
       type: http

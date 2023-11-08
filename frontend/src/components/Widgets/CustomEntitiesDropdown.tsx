@@ -183,7 +183,8 @@ const styles = {
 };
 
 export default function CustomEntitiesDropdown({
-  value: context,
+  value,
+  id,
   options: {
     isFormDisabled = () => false,
     statement,
@@ -193,7 +194,7 @@ export default function CustomEntitiesDropdown({
     disabledReason,
     onSearch,
     onUpdate,
-    getValue,
+    getOption,
     CustomHeader = null,
     CustomBody = null,
     CustomFooter = null,
@@ -207,10 +208,10 @@ export default function CustomEntitiesDropdown({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const open = Boolean(anchorEl);
-  const id = open ? "simple-popper" : undefined;
+  const aria = open ? "simple-popper" : undefined;
 
   const [hoveredOption, setHoveredOption] = useState<Option | null>(null);
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>(getValue(context) || []);
+  const [selectedOptions, setSelectedOptions] = useState<Option[]>(getOption(value) || []);
 
   const [autocompleteOptions, setAutocompleteOptions] = useState<Option[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -221,7 +222,7 @@ export default function CustomEntitiesDropdown({
   };
 
   const handleSelectedOptionsChange = async (newSelectedOptions: Option[]) => {
-    onUpdate(newSelectedOptions).then(() =>
+    onUpdate(newSelectedOptions, id).then(() =>
       setSelectedOptions(newSelectedOptions),
     );
   };
@@ -360,7 +361,7 @@ export default function CustomEntitiesDropdown({
           badgeContent={selectedOptions?.length}
         >
           <Box
-            aria-describedby={id}
+            aria-describedby={aria}
             sx={
               open
                 ? { ...styles.root, ...styles.rootOpen }
@@ -422,7 +423,7 @@ export default function CustomEntitiesDropdown({
 
         <Popper
           ref={popperRef}
-          id={id}
+          id={aria}
           open={open}
           placement="bottom-start"
           anchorEl={anchorEl}

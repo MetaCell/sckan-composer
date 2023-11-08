@@ -596,7 +596,7 @@ class Via(AbstractConnectionLayer):
             old_via = Via.objects.get(pk=self.pk)
             # If the 'order' field has changed, clear the 'from_entities'
             if old_via.order != self.order:
-                self.from_entities.all().clear()
+                self.from_entities.clear()
         super(Via, self).save(*args, **kwargs)
 
     class Meta:
