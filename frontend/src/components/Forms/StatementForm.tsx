@@ -14,7 +14,7 @@ import {Box, Chip, MenuItem, Select} from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
-    getAnatomicalEntities, getViaId,
+    getAnatomicalEntities, getConnectionId, updateDestinationAnatomicalEntities,
     updateOrigins, updateViaAnatomicalEntities,
 } from "../../services/CustomDropdownService";
 import {mapAnatomicalEntitiesToOptions} from "../../helpers/dropdownMappers";
@@ -401,7 +401,7 @@ const StatementForm = (props: any) => {
                     disabledReason: "",
                     onSearch: async (searchValue: string) => getAnatomicalEntities(searchValue, ViasGroupLabel),
                     onUpdate: async (selectedOptions: Option[], formId: any) =>
-                        updateViaAnatomicalEntities(selectedOptions, getViaId(formId, statement.vias)),
+                        updateViaAnatomicalEntities(selectedOptions, getConnectionId(formId, statement.vias)),
                     statement: statement,
                     errors: "",
                     getOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
@@ -483,8 +483,8 @@ const StatementForm = (props: any) => {
                     noResultReason: "No anatomical entities found",
                     disabledReason: "",
                     onSearch: async (searchValue: string) => getEntities(searchValue),
-                    onUpdate: async (selectedOptions: any) => {
-                    },
+                    onUpdate: async (selectedOptions: any, formId: string) =>
+                        updateDestinationAnatomicalEntities(selectedOptions, getConnectionId(formId, statement.destinations)),
                     statement: statement,
                     errors: "",
                     getOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, DestinationsGroupLabel),

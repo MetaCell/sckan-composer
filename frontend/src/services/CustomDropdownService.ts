@@ -2,7 +2,13 @@ import {Option} from "../types";
 import {composerApi as api} from "./apis";
 import {autocompleteRows} from "../helpers/settings";
 import {mapAnatomicalEntitiesToOptions} from "../helpers/dropdownMappers";
-import {PatchedConnectivityStatementUpdate, PatchedVia, ViaSerializerDetails} from "../apiclient/backend";
+import {
+    DestinationSerializerDetails,
+    PatchedConnectivityStatementUpdate,
+    PatchedDestination,
+    PatchedVia,
+    ViaSerializerDetails
+} from "../apiclient/backend";
 
 
 export async function getAnatomicalEntities(searchValue: string, groupLabel: string): Promise<Option[]> {
@@ -46,10 +52,26 @@ export async function updateViaAnatomicalEntities(selected: Option[], viaId: num
     }
 }
 
-export function getViaId(formId: string, vias: ViaSerializerDetails[]): number | null  {
+export async function updateDestinationAnatomicalEntities(selected: Option[], destinationId: number | null){
+    if(destinationId == null){
+        console.error("Error updating destination")
+        return
+    }
+    const anatomicalEntitiesIds = selected.map(option => parseInt(option.id));
+    const patchedDestination: PatchedDestination = {
+        anatomical_entities: anatomicalEntitiesIds,
+    };
+    try {
+        await api.composerDestinationPartialUpdate(destinationId, patchedDestination);
+    } catch (error) {
+        console.error('Error updating destination', error);
+    }
+}
+
+export function getConnectionId(formId: string, connections: ViaSerializerDetails[] | DestinationSerializerDetails[]): number | null  {
     const index = getFirstNumberFromString(formId)
     if(index != null){
-        return vias[index].id
+        return connections[index].id
     }
     return null
 
