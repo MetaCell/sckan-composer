@@ -202,6 +202,7 @@ export default function CustomEntitiesDropdown({
     placeholder,
     label,
     chipsNumber = 2,
+    statement,
   },
 }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -323,7 +324,7 @@ export default function CustomEntitiesDropdown({
 
   useEffect(() => {
     onSearch("", id).then(setAutocompleteOptions);
-  }, []);
+  }, [statement]);
 
   useEffect(() => {
     const closePopperOnClickOutside = (event: MouseEvent) => {

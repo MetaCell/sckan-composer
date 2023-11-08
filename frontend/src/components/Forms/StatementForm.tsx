@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {FormBase} from "./FormBase";
 import {jsonSchemas} from "../../services/JsonSchema";
 import statementService from "../../services/StatementService";
@@ -10,12 +10,17 @@ import AnatomicalEntitiesField from "../AnatomicalEntitiesField";
 import {sexes} from "../../services/SexService";
 import {phenotypes} from "../../services/PhenotypeService";
 import {CustomAutocompleteForwardConnection} from "../Widgets/CustomAutocompleteForwardConnection";
-import {Box, Chip, MenuItem, Select} from "@mui/material";
+import {Box, Chip} from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
-    getAnatomicalEntities, getConnectionId, searchFromEntitiesVia, updateDestinationAnatomicalEntities,
-    updateOrigins, updateViaAnatomicalEntities,
+    getAnatomicalEntities,
+    getConnectionId,
+    searchFromEntitiesDestination,
+    searchFromEntitiesVia,
+    updateDestinationAnatomicalEntities,
+    updateOrigins,
+    updateViaAnatomicalEntities,
 } from "../../services/CustomDropdownService";
 import {mapAnatomicalEntitiesToOptions} from "../../helpers/dropdownMappers";
 import {DestinationIcon, ViaIcon} from "../icons";
@@ -23,7 +28,7 @@ import {DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel} from "../../h
 import {Option} from "../../types";
 
 const StatementForm = (props: any) => {
-    const {uiFields, statement, setter, format} = props;
+    const {uiFields, statement, refreshStatement} = props;
     const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
     const copiedSchema = JSON.parse(JSON.stringify(schema));
     const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
@@ -102,13 +107,17 @@ const StatementForm = (props: any) => {
     copiedUISchema.origins = {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+            statement: statement,
             placeholder: "Origin",
             searchPlaceholder: "Search for Origins",
             noResultReason: "No results found",
             disabledReason: "",
             chipsNumber: 5,
             onSearch: async (searchValue: string, formId: string) => getAnatomicalEntities(searchValue, OriginsGroupLabel),
-            onUpdate: async (selectedOptions: any) => updateOrigins(selectedOptions, statement.id),
+            onUpdate: async (selectedOptions: any) => {
+                await updateOrigins(selectedOptions, statement.id)
+                refreshStatement()
+            },
             errors: "",
             mapValueToOption: () => mapAnatomicalEntitiesToOptions(statement?.origins, OriginsGroupLabel),
         },
@@ -136,14 +145,17 @@ const StatementForm = (props: any) => {
             anatomical_entities: {
                 "ui:widget": CustomEntitiesDropdown,
                 "ui:options": {
+                    statement: statement,
                     label: "Via",
                     placeholder: "Look for vias",
                     searchPlaceholder: "Search for vias",
                     noResultReason: "No anatomical entities found",
                     disabledReason: "",
                     onSearch: async (searchValue: string, formId: string) => getAnatomicalEntities(searchValue, ViasGroupLabel),
-                    onUpdate: async (selectedOptions: Option[], formId: any) =>
-                        updateViaAnatomicalEntities(selectedOptions, getConnectionId(formId, statement.vias)),
+                    onUpdate: async (selectedOptions: Option[], formId: any) => {
+                        await updateViaAnatomicalEntities(selectedOptions, getConnectionId(formId, statement.vias))
+                        refreshStatement()
+                    },
                     errors: "",
                     mapValueToOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
                     CustomFooter: ({entity}: any) => (
@@ -222,8 +234,10 @@ const StatementForm = (props: any) => {
                     noResultReason: "No anatomical entities found",
                     disabledReason: "",
                     onSearch: async (searchValue: string) => getAnatomicalEntities(searchValue, DestinationsGroupLabel),
-                    onUpdate: async (selectedOptions: any, formId: string) =>
-                        updateDestinationAnatomicalEntities(selectedOptions, getConnectionId(formId, statement.destinations)),
+                    onUpdate: async (selectedOptions: any, formId: string) =>{
+                        await updateDestinationAnatomicalEntities(selectedOptions, getConnectionId(formId, statement.destinations))
+                        refreshStatement()
+                    },
                     errors: "",
                     mapValueToOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, DestinationsGroupLabel),
                     CustomFooter: ({entity}: any) => (
@@ -246,12 +260,13 @@ const StatementForm = (props: any) => {
             from_entities: {
                 "ui:widget": CustomEntitiesDropdown,
                 "ui:options": {
+                    statement: statement,
                     label: "From",
                     placeholder: "Look for Destinations",
                     searchPlaceholder: "Search for Destinations",
                     noResultReason: "",
                     disabledReason: "",
-                    onSearch: async (searchValue: string) => [],
+                    onSearch: async (searchValue: string, formId: string) => searchFromEntitiesDestination(searchValue, statement),
                     onUpdate: async (selectedOptions: any) => {},
                     errors: "",
                     mapValueToOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, DestinationsGroupLabel),

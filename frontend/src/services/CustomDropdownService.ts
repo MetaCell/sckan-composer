@@ -98,6 +98,16 @@ export function searchFromEntitiesVia(searchValue: string, statement: Connectivi
     return mapAnatomicalEntitiesToOptions(searchAnatomicalEntities(anatomicalEntities, searchValue), 'From Entities')
 }
 
+export function searchFromEntitiesDestination(searchValue: string, statement: ConnectivityStatement): Option[] {
+    const vias = statement.vias || []
+    const maxOrder = vias.reduce((maxOrder, via) => {
+        return via.order > maxOrder ? via.order : maxOrder;
+    }, 0) + 1
+    const anatomicalEntities = getEntitiesBeforeOrder(statement, maxOrder)
+
+    return mapAnatomicalEntitiesToOptions(searchAnatomicalEntities(anatomicalEntities, searchValue), 'From Entities')
+}
+
 function getEntitiesBeforeOrder(statement: ConnectivityStatement, order: number) {
     const entities = statement.origins != null ? [...statement.origins] : []
     const vias = statement.vias || []
