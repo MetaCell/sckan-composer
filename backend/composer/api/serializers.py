@@ -157,9 +157,24 @@ class SexSerializer(serializers.ModelSerializer):
 class ViaSerializerDetails(serializers.ModelSerializer):
     """Via Serializer with Custom Logic for from_entities"""
 
+    anatomical_entities = AnatomicalEntitySerializer(
+        many=True,
+    )
+
+    from_entities = AnatomicalEntitySerializer(
+        many=True,
+    )
+
     class Meta:
         model = Via
-        fields = "__all__"
+        fields = (
+            "id",
+            "order",
+            "connectivity_statement_id",
+            "type",
+            "anatomical_entities",
+            "from_entities"
+        )
 
     def to_representation(self, instance):
         """
@@ -192,6 +207,7 @@ class ViaSerializerDetails(serializers.ModelSerializer):
                     representation['from_entities'] = previous_entities
 
         return representation
+
 
 class ViaSerializer(serializers.ModelSerializer):
     """Via"""
@@ -238,6 +254,14 @@ class DestinationSerializer(serializers.ModelSerializer):
 
 class DestinationSerializerDetails(serializers.ModelSerializer):
     """Destination with Custom Logic for from_entities"""
+
+    anatomical_entities = AnatomicalEntitySerializer(
+        many=True,
+    )
+
+    from_entities = AnatomicalEntitySerializer(
+        many=True,
+    )
 
     class Meta:
         model = Destination
