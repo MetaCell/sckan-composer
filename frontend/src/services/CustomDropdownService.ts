@@ -56,6 +56,22 @@ export async function updateViaAnatomicalEntities(selected: Option[], viaId: num
     }
 }
 
+export async function updateViaFromEntities(selected: Option[], viaId: number | null) {
+    if (viaId == null) {
+        console.error("Error updating via")
+        return
+    }
+    const anatomicalEntitiesIds = selected.map(option => parseInt(option.id));
+    const patchedVia: PatchedVia = {
+        from_entities: anatomicalEntitiesIds,
+    };
+    try {
+        await api.composerViaPartialUpdate(viaId, patchedVia);
+    } catch (error) {
+        console.error('Error updating via', error);
+    }
+}
+
 export async function updateDestinationAnatomicalEntities(selected: Option[], destinationId: number | null) {
     if (destinationId == null) {
         console.error("Error updating destination")

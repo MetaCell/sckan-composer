@@ -20,7 +20,7 @@ import {
     searchFromEntitiesVia,
     updateDestinationAnatomicalEntities,
     updateOrigins,
-    updateViaAnatomicalEntities,
+    updateViaAnatomicalEntities, updateViaFromEntities,
 } from "../../services/CustomDropdownService";
 import {mapAnatomicalEntitiesToOptions} from "../../helpers/dropdownMappers";
 import {DestinationIcon, ViaIcon} from "../icons";
@@ -169,7 +169,6 @@ const StatementForm = (props: any) => {
                                 borderTop: "0.0625rem solid #F2F4F7",
                             }}
                         >
-                            {/* <Chip variant="filled" color="error" label={"https://google.com"} /> */}
                             <Chip variant="outlined" label={"https://google.com"}/>
                         </Box>
                     ),
@@ -184,7 +183,10 @@ const StatementForm = (props: any) => {
                     noResultReason: "No prior connections found",
                     disabledReason: "",
                     onSearch: async (searchValue: string, formId:string) => searchFromEntitiesVia(searchValue, statement, formId),
-                    onUpdate: async (selectedOptions: any) => {},
+                    onUpdate: async (selectedOptions: Option[], formId: any) => {
+                        await updateViaFromEntities(selectedOptions, getConnectionId(formId, statement.vias))
+                        refreshStatement()
+                    },
                     errors: "",
                     mapValueToOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
                     CustomFooter: ({entity}: any) => (

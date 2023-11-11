@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.expressions import RawSQL, F, Exists, OuterRef
 from django.db.models.functions import Upper
@@ -560,7 +560,8 @@ class Destination(AbstractConnectionLayer):
         related_name="destinations"  # Overridden related_name
     )
 
-    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True, related_name='destination_connection_layers')
+    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True,
+                                                 related_name='destination_connection_layers')
 
     type = models.CharField(
         max_length=12,
@@ -585,19 +586,64 @@ class Via(AbstractConnectionLayer):
         choices=ViaType.choices,
         default=ViaType.AXON
     )
-    order = models.PositiveIntegerField()
+    order = models.IntegerField()
 
     def save(self, *args, **kwargs):
-        # Check if the object already exists in the database
-        if not self.pk:
-            self.order = Via.objects.filter(connectivity_statement=self.connectivity_statement).count()
-        else:
-            # Fetch the existing object from the database
-            old_via = Via.objects.get(pk=self.pk)
-            # If the 'order' field has changed, clear the 'from_entities'
-            if old_via.order != self.order:
-                self.from_entities.clear()
-        super(Via, self).save(*args, **kwargs)
+        with transaction.atomic():
+            # Check if the object already exists in the database
+            if not self.pk:
+                self.order = Via.objects.filter(connectivity_statement=self.connectivity_statement).count()
+            else:
+                # Fetch the existing object from the database
+                old_via = Via.objects.get(pk=self.pk)
+                # If the 'order' field has changed, clear the 'from_entities'
+                if old_via.order != self.order:
+                    self._update_order_for_other_vias(old_via.order)
+                    self.from_entities.clear()
+            super(Via, self).save(*args, **kwargs)
+
+    def _update_order_for_other_vias(self, old_order):
+        temp_order = -1  # A temporary order value outside the normal range
+        with transaction.atomic():
+            # Temporarily set the order of the current object to a unique value
+            Via.objects.filter(pk=self.pk).update(order=temp_order)
+
+            # Fetch the affected Vias before updating
+            if old_order < self.order:
+                affected_vias = list(Via.objects.filter(
+                    connectivity_statement=self.connectivity_statement,
+                    order__gt=old_order, order__lte=self.order
+                ))
+                Via.objects.filter(
+                    connectivity_statement=self.connectivity_statement,
+                    order__gt=old_order, order__lte=self.order
+                ).update(order=F('order') - 1)
+            elif old_order > self.order:
+                affected_vias = list(Via.objects.filter(
+                    connectivity_statement=self.connectivity_statement,
+                    order__lt=old_order, order__gte=self.order
+                ))
+                Via.objects.filter(
+                    connectivity_statement=self.connectivity_statement,
+                    order__lt=old_order, order__gte=self.order
+                ).update(order=F('order') + 1)
+
+            # Clear 'from_entities' for the fetched affected Vias
+            for via in affected_vias:
+                via.from_entities.clear()
+
+            # Finally, set the correct order for the current object
+            Via.objects.filter(pk=self.pk).update(order=self.order)
+
+
+    def delete(self, *args, **kwargs):
+        with transaction.atomic():
+            super().delete(*args, **kwargs)
+            vias_to_update = Via.objects.filter(
+                connectivity_statement=self.connectivity_statement,
+                order__gt=self.order
+            )
+            vias_to_update.update(order=F('order') - 1)
 
     class Meta:
         ordering = ["order"]
