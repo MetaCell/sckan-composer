@@ -6,13 +6,10 @@ import {
     AnatomicalEntity,
     ConnectivityStatement,
     DestinationSerializerDetails,
-    PatchedConnectivityStatementUpdate,
-    PatchedDestination,
-    PatchedVia,
+    PatchedConnectivityStatementUpdate, PatchedDestination, PatchedVia,
     ViaSerializerDetails
 } from "../apiclient/backend";
 import {searchAnatomicalEntities} from "../helpers/helpers";
-import AnatomicalEntitiesField from "../components/AnatomicalEntitiesField";
 
 
 export async function getAnatomicalEntities(searchValue: string, groupLabel: string): Promise<Option[]> {
@@ -40,51 +37,36 @@ export async function updateOrigins(selected: Option[], statementId: number) {
 
 }
 
-export async function updateViaAnatomicalEntities(selected: Option[], viaId: number | null) {
-    if (viaId == null) {
-        console.error("Error updating via")
-        return
-    }
-    const anatomicalEntitiesIds = selected.map(option => parseInt(option.id));
-    const patchedVia: PatchedVia = {
-        anatomical_entities: anatomicalEntitiesIds,
-    };
-    try {
-        await api.composerViaPartialUpdate(viaId, patchedVia);
-    } catch (error) {
-        console.error('Error updating via', error);
-    }
-}
+export type UpdateEntityParams = {
+    selected: Option[];
+    entityId: number | null;
+    entityType: 'via' | 'destination';
+    propertyToUpdate: 'anatomical_entities' | 'from_entities';
+};
 
-export async function updateViaFromEntities(selected: Option[], viaId: number | null) {
-    if (viaId == null) {
-        console.error("Error updating via")
-        return
-    }
-    const anatomicalEntitiesIds = selected.map(option => parseInt(option.id));
-    const patchedVia: PatchedVia = {
-        from_entities: anatomicalEntitiesIds,
-    };
-    try {
-        await api.composerViaPartialUpdate(viaId, patchedVia);
-    } catch (error) {
-        console.error('Error updating via', error);
-    }
-}
+const apiFunctionMap = {
+    'via': (id: number, patchedVia: PatchedVia) => api.composerViaPartialUpdate(id, patchedVia),
+    'destination': (id: number, patchedDestination: PatchedDestination) => api.composerDestinationPartialUpdate(id, patchedDestination),
+};
 
-export async function updateDestinationAnatomicalEntities(selected: Option[], destinationId: number | null) {
-    if (destinationId == null) {
-        console.error("Error updating destination")
-        return
+export async function updateEntity({ selected, entityId, entityType, propertyToUpdate }: UpdateEntityParams) {
+    if (entityId == null) {
+        console.error(`Error updating ${entityType}`);
+        return;
     }
-    const anatomicalEntitiesIds = selected.map(option => parseInt(option.id));
-    const patchedDestination: PatchedDestination = {
-        anatomical_entities: anatomicalEntitiesIds,
-    };
+
+    const entityIds = selected.map(option => parseInt(option.id));
+    const patchObject = { [propertyToUpdate]: entityIds };
+
     try {
-        await api.composerDestinationPartialUpdate(destinationId, patchedDestination);
+        const updateFunction = apiFunctionMap[entityType];
+        if (updateFunction) {
+            await updateFunction(entityId, patchObject);
+        } else {
+            console.error(`No update function found for entity type: ${entityType}`);
+        }
     } catch (error) {
-        console.error('Error updating destination', error);
+        console.error(`Error updating ${entityType}`, error);
     }
 }
 

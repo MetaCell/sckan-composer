@@ -589,6 +589,7 @@ class Via(AbstractConnectionLayer):
     order = models.IntegerField()
 
     def save(self, *args, **kwargs):
+        # TODO: Check if we need to clear the from entities when it maches with all entities from the prior entity. @afonsobspinto
         with transaction.atomic():
             # Check if the object already exists in the database
             if not self.pk:
@@ -634,7 +635,6 @@ class Via(AbstractConnectionLayer):
 
             # Finally, set the correct order for the current object
             Via.objects.filter(pk=self.pk).update(order=self.order)
-
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():

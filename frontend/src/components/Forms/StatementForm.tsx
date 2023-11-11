@@ -18,9 +18,8 @@ import {
     getConnectionId,
     searchFromEntitiesDestination,
     searchFromEntitiesVia,
-    updateDestinationAnatomicalEntities,
+    updateEntity,
     updateOrigins,
-    updateViaAnatomicalEntities, updateViaFromEntities,
 } from "../../services/CustomDropdownService";
 import {mapAnatomicalEntitiesToOptions} from "../../helpers/dropdownMappers";
 import {DestinationIcon, ViaIcon} from "../icons";
@@ -123,6 +122,8 @@ const StatementForm = (props: any) => {
         },
     };
 
+    // TODO: check how to treat from entities with the same id from different layers @ afonsobspinto
+    // TODO: Fix custom header @ afonsobspinto
 
     copiedUISchema.vias = {
         "ui:ArrayFieldTemplate": ArrayFieldTemplate,
@@ -153,7 +154,12 @@ const StatementForm = (props: any) => {
                     disabledReason: "",
                     onSearch: async (searchValue: string, formId: string) => getAnatomicalEntities(searchValue, ViasGroupLabel),
                     onUpdate: async (selectedOptions: Option[], formId: any) => {
-                        await updateViaAnatomicalEntities(selectedOptions, getConnectionId(formId, statement.vias))
+                        await updateEntity({
+                            selected: selectedOptions,
+                            entityId: getConnectionId(formId, statement.vias),
+                            entityType: 'via',
+                            propertyToUpdate: 'anatomical_entities'
+                        });
                         refreshStatement()
                     },
                     errors: "",
@@ -184,7 +190,12 @@ const StatementForm = (props: any) => {
                     disabledReason: "",
                     onSearch: async (searchValue: string, formId:string) => searchFromEntitiesVia(searchValue, statement, formId),
                     onUpdate: async (selectedOptions: Option[], formId: any) => {
-                        await updateViaFromEntities(selectedOptions, getConnectionId(formId, statement.vias))
+                        await updateEntity({
+                            selected: selectedOptions,
+                            entityId: getConnectionId(formId, statement.vias),
+                            entityType: 'via',
+                            propertyToUpdate: 'from_entities'
+                        });
                         refreshStatement()
                     },
                     errors: "",
@@ -236,8 +247,13 @@ const StatementForm = (props: any) => {
                     noResultReason: "No anatomical entities found",
                     disabledReason: "",
                     onSearch: async (searchValue: string) => getAnatomicalEntities(searchValue, DestinationsGroupLabel),
-                    onUpdate: async (selectedOptions: any, formId: string) =>{
-                        await updateDestinationAnatomicalEntities(selectedOptions, getConnectionId(formId, statement.destinations))
+                    onUpdate: async (selectedOptions: Option[], formId: string) =>{
+                        await updateEntity({
+                            selected: selectedOptions,
+                            entityId: getConnectionId(formId, statement.vias),
+                            entityType: 'destination',
+                            propertyToUpdate: 'anatomical_entities'
+                        });
                         refreshStatement()
                     },
                     errors: "",
@@ -269,7 +285,15 @@ const StatementForm = (props: any) => {
                     noResultReason: "",
                     disabledReason: "",
                     onSearch: async (searchValue: string, formId: string) => searchFromEntitiesDestination(searchValue, statement),
-                    onUpdate: async (selectedOptions: any) => {},
+                    onUpdate: async (selectedOptions: Option[], formId: string) => {
+                        await updateEntity({
+                            selected: selectedOptions,
+                            entityId: getConnectionId(formId, statement.destinations),
+                            entityType: 'destination',
+                            propertyToUpdate: 'from_entities'
+                        });
+                        refreshStatement()
+                    },
                     errors: "",
                     mapValueToOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, DestinationsGroupLabel),
                     CustomFooter: ({entity}: any) => (

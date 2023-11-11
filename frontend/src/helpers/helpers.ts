@@ -189,5 +189,5 @@ export function searchAnatomicalEntities(entities: AnatomicalEntity[], searchVal
 
   return entities.filter(entity =>
       entity.name.toLowerCase().includes(normalizedSearchValue)
-  );
+  ).sort((a, b) => a.name.localeCompare(b.name));
 }
