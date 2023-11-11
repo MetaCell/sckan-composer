@@ -25,6 +25,7 @@ import {mapAnatomicalEntitiesToOptions} from "../../helpers/dropdownMappers";
 import {DestinationIcon, ViaIcon} from "../icons";
 import {DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel} from "../../helpers/settings";
 import {Option} from "../../types";
+import {composerApi as api} from "../../services/apis";
 
 const StatementForm = (props: any) => {
     const {uiFields, statement, refreshStatement} = props;
@@ -126,7 +127,11 @@ const StatementForm = (props: any) => {
     // TODO: Fix custom header @ afonsobspinto
 
     copiedUISchema.vias = {
-        "ui:ArrayFieldTemplate": ArrayFieldTemplate,
+        "ui:ArrayFieldTemplate":
+            (props: any) =>
+                <ArrayFieldTemplate {...props}
+                                    onElementDelete={async (element: any) => await
+                                        api.composerViaDestroy(element.children.props.formData.id)}/>,
         items: {
             "ui:options": {
                 label: false,
@@ -188,7 +193,7 @@ const StatementForm = (props: any) => {
                     searchPlaceholder: "Search for connections",
                     noResultReason: "No prior connections found",
                     disabledReason: "",
-                    onSearch: async (searchValue: string, formId:string) => searchFromEntitiesVia(searchValue, statement, formId),
+                    onSearch: async (searchValue: string, formId: string) => searchFromEntitiesVia(searchValue, statement, formId),
                     onUpdate: async (selectedOptions: Option[], formId: any) => {
                         await updateEntity({
                             selected: selectedOptions,
@@ -222,7 +227,10 @@ const StatementForm = (props: any) => {
 
 
     copiedUISchema.destinations = {
-        "ui:ArrayFieldTemplate": ArrayFieldTemplate,
+        "ui:ArrayFieldTemplate": (props: any) =>
+            <ArrayFieldTemplate {...props}
+                                onElementDelete={async (element: any) => await
+                                    api.composerDestinationDestroy(element.children.props.formData.id)}/>,
         items: {
             "ui:options": {
                 label: false,
@@ -247,7 +255,7 @@ const StatementForm = (props: any) => {
                     noResultReason: "No anatomical entities found",
                     disabledReason: "",
                     onSearch: async (searchValue: string) => getAnatomicalEntities(searchValue, DestinationsGroupLabel),
-                    onUpdate: async (selectedOptions: Option[], formId: string) =>{
+                    onUpdate: async (selectedOptions: Option[], formId: string) => {
                         await updateEntity({
                             selected: selectedOptions,
                             entityId: getConnectionId(formId, statement.vias),

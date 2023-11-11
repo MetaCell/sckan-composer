@@ -79,6 +79,16 @@ function ArrayFieldTemplate(props: any) {
     }
   }
 
+  function handleDelete(element: any) {
+    // Call the original onDropIndexClick function
+    element.onDropIndexClick(element.index)();
+
+    // Additionally call onElementDelete if it's provided
+    if (props.onElementDelete) {
+      props.onElementDelete(element);
+    }
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -95,7 +105,7 @@ function ArrayFieldTemplate(props: any) {
             key={element.key}
             id={element.id}
             children={element.children}
-            onDropIndexClick={element.onDropIndexClick(element.index)}
+            onDropIndexClick={() => handleDelete(element)}
             disabled={props.disabled}
           />
         ))}
