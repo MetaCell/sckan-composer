@@ -654,7 +654,6 @@ class Via(AbstractConnectionLayer):
                 name="via_type_valid",
             ),
         ]
-        unique_together = [('connectivity_statement', 'order')]
 
 
 class Provenance(models.Model):

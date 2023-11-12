@@ -146,6 +146,13 @@ const StatementForm = (props: any) => {
                                         })
                                         refreshStatement()
                                     }}
+                                    onElementReorder={async (sourceIndex: number, destinationIndex: number) => {
+                                        // Custom logic for reordering
+                                        await api.composerViaPartialUpdate(statement.vias[sourceIndex].id, {
+                                            order: destinationIndex
+                                        })
+                                        refreshStatement()
+                                    }}
                 />,
         items: {
             "ui:options": {

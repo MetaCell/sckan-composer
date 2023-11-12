@@ -65,6 +65,10 @@ function ArrayFieldTemplate(props: any) {
       );
       // @ts-ignore
       sortedItems[sourceIndex].onReorderClick(sourceIndex, destinationIndex)();
+
+      if (props.onElementReorder) {
+        props.onElementReorder(sourceIndex, destinationIndex);
+      }
     }
     setIsDragging(false);
     setShowConfirmation(false);

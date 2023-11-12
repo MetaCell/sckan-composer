@@ -222,6 +222,7 @@ class ViaSerializer(serializers.ModelSerializer):
         required=False
     )
     connectivity_statement = serializers.PrimaryKeyRelatedField(
+        required=False,
         queryset=ConnectivityStatement.objects.all()
     )
 
