@@ -26,6 +26,7 @@ import {DestinationIcon, ViaIcon} from "../icons";
 import {DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel} from "../../helpers/settings";
 import {Option} from "../../types";
 import {composerApi as api} from "../../services/apis";
+import {TypeC11Enum} from "../../apiclient/backend";
 
 const StatementForm = (props: any) => {
     const {uiFields, statement, refreshStatement} = props;
@@ -130,8 +131,21 @@ const StatementForm = (props: any) => {
         "ui:ArrayFieldTemplate":
             (props: any) =>
                 <ArrayFieldTemplate {...props}
-                                    onElementDelete={async (element: any) => await
-                                        api.composerViaDestroy(element.children.props.formData.id)}/>,
+                                    onElementDelete={async (element: any) => {
+                                        await api.composerViaDestroy(element.children.props.formData.id)
+                                        refreshStatement()
+                                    }}
+                                    onElementAdd={async (element: any) => {
+                                        await api.composerViaCreate({
+                                            id: -1,
+                                            order: statement.vias.length,
+                                            connectivity_statement: statement.id,
+                                            anatomical_entities: [],
+                                            from_entities: []
+                                        })
+                                        refreshStatement()
+                                    }}
+                />,
         items: {
             "ui:options": {
                 label: false,
@@ -229,8 +243,21 @@ const StatementForm = (props: any) => {
     copiedUISchema.destinations = {
         "ui:ArrayFieldTemplate": (props: any) =>
             <ArrayFieldTemplate {...props}
-                                onElementDelete={async (element: any) => await
-                                    api.composerDestinationDestroy(element.children.props.formData.id)}/>,
+                                onElementDelete={async (element: any) => {
+                                    await api.composerDestinationDestroy(element.children.props.formData.id)
+                                    refreshStatement()
+                                }}
+                                onElementAdd={async (element: any) => {
+                                    await api.composerDestinationCreate({
+                                            id: -1,
+                                            connectivity_statement: statement.id,
+                                            type: TypeC11Enum.AxonT,
+                                            anatomical_entities: [],
+                                            from_entities: []
+                                        })
+                                    refreshStatement()
+                                }}
+            />,
         items: {
             "ui:options": {
                 label: false,

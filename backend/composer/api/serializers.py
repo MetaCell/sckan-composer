@@ -221,13 +221,16 @@ class ViaSerializer(serializers.ModelSerializer):
         queryset=AnatomicalEntity.objects.all(),
         required=False
     )
+    connectivity_statement = serializers.PrimaryKeyRelatedField(
+        queryset=ConnectivityStatement.objects.all()
+    )
 
     class Meta:
         model = Via
         fields = (
             "id",
             "order",
-            "connectivity_statement_id",
+            "connectivity_statement",
             "type",
             "anatomical_entities",
             "from_entities"
@@ -246,10 +249,13 @@ class DestinationSerializer(serializers.ModelSerializer):
         queryset=AnatomicalEntity.objects.all(),
         required=False
     )
+    connectivity_statement = serializers.PrimaryKeyRelatedField(
+        queryset=ConnectivityStatement.objects.all()
+    )
 
     class Meta:
         model = Destination
-        fields = ('id', "connectivity_statement_id", 'type', 'anatomical_entities', 'from_entities')
+        fields = ('id', "connectivity_statement", 'type', 'anatomical_entities', 'from_entities')
 
 
 class DestinationSerializerDetails(serializers.ModelSerializer):

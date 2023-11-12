@@ -595,6 +595,7 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/Destination'
+        required: true
       security:
       - tokenAuth: []
       - basicAuth: []
@@ -654,6 +655,7 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/Destination'
+        required: true
       security:
       - tokenAuth: []
       - basicAuth: []
@@ -2022,9 +2024,8 @@ components:
         id:
           type: integer
           readOnly: true
-        connectivity_statement_id:
+        connectivity_statement:
           type: integer
-          readOnly: true
         type:
           $ref: '#/components/schemas/TypeC11Enum'
         anatomical_entities:
@@ -2036,11 +2037,11 @@ components:
           items:
             type: integer
       required:
-      - connectivity_statement_id
+      - connectivity_statement
       - id
     DestinationSerializerDetails:
       type: object
-      description: Destination
+      description: Destination with Custom Logic for from_entities
       properties:
         id:
           type: integer
@@ -2424,9 +2425,8 @@ components:
         id:
           type: integer
           readOnly: true
-        connectivity_statement_id:
+        connectivity_statement:
           type: integer
-          readOnly: true
         type:
           $ref: '#/components/schemas/TypeC11Enum'
         anatomical_entities:
@@ -2534,9 +2534,8 @@ components:
           readOnly: true
         order:
           type: integer
-        connectivity_statement_id:
+        connectivity_statement:
           type: integer
-          readOnly: true
         type:
           $ref: '#/components/schemas/TypeB60Enum'
         anatomical_entities:
@@ -2865,9 +2864,8 @@ components:
           readOnly: true
         order:
           type: integer
-        connectivity_statement_id:
+        connectivity_statement:
           type: integer
-          readOnly: true
         type:
           $ref: '#/components/schemas/TypeB60Enum'
         anatomical_entities:
@@ -2879,12 +2877,12 @@ components:
           items:
             type: integer
       required:
-      - connectivity_statement_id
+      - connectivity_statement
       - id
       - order
     ViaSerializerDetails:
       type: object
-      description: Via
+      description: Via Serializer with Custom Logic for from_entities
       properties:
         id:
           type: integer

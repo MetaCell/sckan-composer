@@ -470,7 +470,7 @@ export interface Destination {
      * @type {number}
      * @memberof Destination
      */
-    'connectivity_statement_id': number;
+    'connectivity_statement': number;
     /**
      * 
      * @type {TypeC11Enum}
@@ -493,7 +493,7 @@ export interface Destination {
 
 
 /**
- * Destination
+ * Destination with Custom Logic for from_entities
  * @export
  * @interface DestinationSerializerDetails
  */
@@ -1143,7 +1143,7 @@ export interface PatchedDestination {
      * @type {number}
      * @memberof PatchedDestination
      */
-    'connectivity_statement_id'?: number;
+    'connectivity_statement'?: number;
     /**
      * 
      * @type {TypeC11Enum}
@@ -1346,7 +1346,7 @@ export interface PatchedVia {
      * @type {number}
      * @memberof PatchedVia
      */
-    'connectivity_statement_id'?: number;
+    'connectivity_statement'?: number;
     /**
      * 
      * @type {TypeB60Enum}
@@ -1867,7 +1867,7 @@ export interface Via {
      * @type {number}
      * @memberof Via
      */
-    'connectivity_statement_id': number;
+    'connectivity_statement': number;
     /**
      * 
      * @type {TypeB60Enum}
@@ -1890,7 +1890,7 @@ export interface Via {
 
 
 /**
- * Via
+ * Via Serializer with Custom Logic for from_entities
  * @export
  * @interface ViaSerializerDetails
  */
@@ -2719,11 +2719,13 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * Destination
-         * @param {Destination} [destination] 
+         * @param {Destination} destination 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationCreate: async (destination?: Destination, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerDestinationCreate: async (destination: Destination, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'destination' is not null or undefined
+            assertParamExists('composerDestinationCreate', 'destination', destination)
             const localVarPath = `/api/composer/destination/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2945,13 +2947,15 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * Destination
          * @param {number} id A unique integer value identifying this destination.
-         * @param {Destination} [destination] 
+         * @param {Destination} destination 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationUpdate: async (id: number, destination?: Destination, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerDestinationUpdate: async (id: number, destination: Destination, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerDestinationUpdate', 'id', id)
+            // verify required parameter 'destination' is not null or undefined
+            assertParamExists('composerDestinationUpdate', 'destination', destination)
             const localVarPath = `/api/composer/destination/{id}/`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -4670,11 +4674,11 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * Destination
-         * @param {Destination} [destination] 
+         * @param {Destination} destination 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerDestinationCreate(destination?: Destination, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Destination>> {
+        async composerDestinationCreate(destination: Destination, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Destination>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerDestinationCreate(destination, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -4724,11 +4728,11 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         /**
          * Destination
          * @param {number} id A unique integer value identifying this destination.
-         * @param {Destination} [destination] 
+         * @param {Destination} destination 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerDestinationUpdate(id: number, destination?: Destination, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Destination>> {
+        async composerDestinationUpdate(id: number, destination: Destination, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Destination>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerDestinationUpdate(id, destination, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -5256,11 +5260,11 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * Destination
-         * @param {Destination} [destination] 
+         * @param {Destination} destination 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationCreate(destination?: Destination, options?: any): AxiosPromise<Destination> {
+        composerDestinationCreate(destination: Destination, options?: any): AxiosPromise<Destination> {
             return localVarFp.composerDestinationCreate(destination, options).then((request) => request(axios, basePath));
         },
         /**
@@ -5305,11 +5309,11 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         /**
          * Destination
          * @param {number} id A unique integer value identifying this destination.
-         * @param {Destination} [destination] 
+         * @param {Destination} destination 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationUpdate(id: number, destination?: Destination, options?: any): AxiosPromise<Destination> {
+        composerDestinationUpdate(id: number, destination: Destination, options?: any): AxiosPromise<Destination> {
             return localVarFp.composerDestinationUpdate(id, destination, options).then((request) => request(axios, basePath));
         },
         /**
@@ -5836,12 +5840,12 @@ export class ComposerApi extends BaseAPI {
 
     /**
      * Destination
-     * @param {Destination} [destination] 
+     * @param {Destination} destination 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerDestinationCreate(destination?: Destination, options?: AxiosRequestConfig) {
+    public composerDestinationCreate(destination: Destination, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerDestinationCreate(destination, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -5895,12 +5899,12 @@ export class ComposerApi extends BaseAPI {
     /**
      * Destination
      * @param {number} id A unique integer value identifying this destination.
-     * @param {Destination} [destination] 
+     * @param {Destination} destination 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerDestinationUpdate(id: number, destination?: Destination, options?: AxiosRequestConfig) {
+    public composerDestinationUpdate(id: number, destination: Destination, options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerDestinationUpdate(id, destination, options).then((request) => request(this.axios, this.basePath));
     }
 

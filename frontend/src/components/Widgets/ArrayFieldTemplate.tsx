@@ -89,6 +89,16 @@ function ArrayFieldTemplate(props: any) {
     }
   }
 
+  function handleAdd(event: any) {
+    // Call the default onAddClick function
+    props.onAddClick(event);
+
+    // Additionally call onElementAdd if it's provided
+    if (props.onElementAdd) {
+      props.onElementAdd();
+    }
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -115,7 +125,7 @@ function ArrayFieldTemplate(props: any) {
           <Button
             variant="text"
             color="info"
-            onClick={props.onAddClick}
+            onClick={handleAdd}
             startIcon={<AddCircleIcon />}
             disabled={props.disabled}
           >
