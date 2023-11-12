@@ -545,6 +545,15 @@ class ConnectivityStatementSerializer(
             ).data
         return representation
 
+    def update(self, instance, validated_data):
+        # Remove 'vias' and 'destinations' from validated_data if they exist
+        validated_data.pop('via_set', None)
+        validated_data.pop('destinations', None)
+
+        # Call the super class's update method with the modified validated_data
+        return super(ConnectivityStatementSerializer, self).update(instance, validated_data)
+
+
     class Meta:
         model = ConnectivityStatement
         fields = (

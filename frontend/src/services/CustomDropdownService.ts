@@ -87,7 +87,6 @@ function getFirstNumberFromString(inputString: string) {
 export function searchFromEntitiesVia(searchValue: string, statement: ConnectivityStatement, formId: string): Option[] {
     const viaIndex = getFirstNumberFromString(formId)
     if(viaIndex == null || statement.vias == null || statement.vias[viaIndex] == null){
-        console.error('Error searching from entities');
         return []
     }
     const viaOrder = statement.vias[viaIndex].order
