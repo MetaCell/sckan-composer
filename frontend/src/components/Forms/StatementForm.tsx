@@ -125,7 +125,9 @@ const StatementForm = (props: any) => {
     };
 
     // TODO: check how to treat from entities with the same id from different layers @ afonsobspinto
+    // TODO: check why there's no loading when adding a new via @ afonsobspinto
     // TODO: Fix custom header @ afonsobspinto
+    // Todo: Fix put occurring after via/destination delete @ afonsobspinto
 
     copiedUISchema.vias = {
         "ui:ArrayFieldTemplate":
@@ -285,7 +287,7 @@ const StatementForm = (props: any) => {
                     onUpdate: async (selectedOptions: Option[], formId: string) => {
                         await updateEntity({
                             selected: selectedOptions,
-                            entityId: getConnectionId(formId, statement.vias),
+                            entityId: getConnectionId(formId, statement.destinations),
                             entityType: 'destination',
                             propertyToUpdate: 'anatomical_entities'
                         });
@@ -459,9 +461,6 @@ const StatementForm = (props: any) => {
                 "laterality",
                 "circuit_type",
                 "projection",
-                "destinations",
-                "vias",
-                "origins",
             ]}
             {...props}
         />
