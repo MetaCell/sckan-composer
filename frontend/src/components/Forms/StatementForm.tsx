@@ -9,13 +9,12 @@ import ArrayFieldTemplate from "../Widgets/ArrayFieldTemplate";
 import AnatomicalEntitiesField from "../AnatomicalEntitiesField";
 import {sexes} from "../../services/SexService";
 import {phenotypes} from "../../services/PhenotypeService";
-import {CustomAutocompleteForwardConnection} from "../Widgets/CustomAutocompleteForwardConnection";
 import {Box, Chip} from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
     getAnatomicalEntities,
-    getConnectionId,
+    getConnectionId, searchForwardConnection,
     searchFromEntitiesDestination,
     searchFromEntitiesVia,
     updateEntity,
@@ -375,14 +374,11 @@ const StatementForm = (props: any) => {
         "ui:options": {
             isFormDisabled: () => statement.destinations.length === 0,
             placeholder: "Forward connection(s)",
-            searchPlaceholder: "Search for Knowledge Statements",
-            noResultReason:
-                "We couldn’t find any record with these origin in the database.",
-            disabledReason:
-                "Add Destination entity to get access to the forward connection form",
-            onSearch: async (searchValue: string) => [],
-            onUpdate: async (selectedOptions: Option[]) => {
-            },
+            searchPlaceholder: "Search for Connectivity Statements",
+            noResultReason: "We couldn’t find any record with these origin in the database.",
+            disabledReason: "Add Destination entity to get access to the forward connection form",
+            onSearch: async (searchValue: string) => searchForwardConnection(searchValue, statement),
+            onUpdate: async (selectedOptions: Option[]) => {},
             statement: statement,
             errors: statement?.errors?.includes("Invalid forward connection")
                 ? statement.errors
@@ -443,7 +439,6 @@ const StatementForm = (props: any) => {
         CustomTextField,
         CustomTextArea,
         SelectWidget: CustomSingleSelect,
-        CustomAutocompleteForwardConnection,
     };
 
     return (

@@ -1,5 +1,5 @@
-import {AnatomicalEntity} from "../apiclient/backend";
-import {Option} from "../types";
+import {AnatomicalEntity, ConnectivityStatement} from "../apiclient/backend";
+import {Option, OptionDetail} from "../types";
 
 export function mapAnatomicalEntitiesToOptions(entities: AnatomicalEntity[], groupLabel: string): Option[] {
     if(!entities){
@@ -20,4 +20,29 @@ export function mapAnatomicalEntitiesToOptions(entities: AnatomicalEntity[], gro
             },
         ],
     }));
+}
+
+export function mapConnectivityStatementsToOptions(statements: ConnectivityStatement[], group: string): Option[] {
+    return statements.reduce((options: Option[], statement) => {
+        if (statement.id === null) {
+            console.warn('Skipped statement with null ID', statement);
+            return options;
+        }
+
+        const optionDetails: OptionDetail[] = [
+            { title: "Knowledge Statement ID", value: statement.id.toString() || "N/A" },
+            { title: "Title", value: statement.knowledge_statement || "N/A" },
+            { title: "Statement", value: statement.statement_preview || "N/A" },
+        ];
+
+        const option: Option = {
+            id: statement.id.toString(),
+            label: statement.knowledge_statement || "No Knowledge Statement",
+            group: group,
+            content: optionDetails,
+        };
+
+        options.push(option);
+        return options;
+    }, []);
 }

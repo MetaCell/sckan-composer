@@ -1,7 +1,7 @@
 import {Option} from "../types";
 import {composerApi as api} from "./apis";
 import {autocompleteRows} from "../helpers/settings";
-import {mapAnatomicalEntitiesToOptions} from "../helpers/dropdownMappers";
+import {mapAnatomicalEntitiesToOptions, mapConnectivityStatementsToOptions} from "../helpers/dropdownMappers";
 import {
     AnatomicalEntity,
     ConnectivityStatement,
@@ -10,6 +10,7 @@ import {
     ViaSerializerDetails
 } from "../apiclient/backend";
 import {searchAnatomicalEntities} from "../helpers/helpers";
+import connectivityStatementService from "./StatementService";
 
 
 export async function getAnatomicalEntities(searchValue: string, groupLabel: string): Promise<Option[]> {
@@ -117,3 +118,48 @@ function getEntitiesBeforeOrder(statement: ConnectivityStatement, order: number)
         return acc;
     }, entities as AnatomicalEntity[]);
 }
+
+const queryOptions = {
+    knowledgeStatement: undefined,
+    limit: autocompleteRows,
+    notes: undefined,
+    index: 0,
+    ordering: undefined,
+    stateFilter: undefined,
+    tagFilter: undefined,
+};
+export async function searchForwardConnection(searchValue: string, statement: ConnectivityStatement): Promise<Option[]> {
+    try {
+        const sameSentencePromise = connectivityStatementService.getList({
+            ...queryOptions,
+            excludeSentenceId: undefined,
+            sentenceId: statement.sentence_id,
+            origins: statement.destinations?.map(destination => destination.id) ?? [],
+            knowledgeStatement: searchValue,
+        });
+
+        const differentSentencePromise = connectivityStatementService.getList({
+            ...queryOptions,
+            excludeSentenceId: statement.sentence_id,
+            sentenceId: undefined,
+            origins: statement.destinations?.map(destination => destination.id) ?? [],
+            knowledgeStatement: searchValue,
+        });
+
+        const [sameRes, diffRes] = await Promise.all([sameSentencePromise, differentSentencePromise]);
+
+        const sameSentenceOptions = sameRes.results
+            ? mapConnectivityStatementsToOptions(sameRes.results, 'Derived from the same statement')
+            : [];
+
+        const differentSentenceOptions = diffRes.results
+            ? mapConnectivityStatementsToOptions(diffRes.results, 'Other')
+            : [];
+
+        return [...sameSentenceOptions, ...differentSentenceOptions];
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        throw error;
+    }
+}
+

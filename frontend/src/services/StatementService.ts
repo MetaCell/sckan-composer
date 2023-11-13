@@ -53,8 +53,8 @@ class ConnectivityStatementService extends AbstractService {
     return composerApi.composerConnectivityStatementDelSpecieCreate(id, specieId).then((response: any) => response.data)
   }
   async getList(queryOptions: QueryParams): Promise<PaginatedConnectivityStatementList> {
-    const { origin, limit, ordering, index, knowledgeStatement, stateFilter, tagFilter, sentenceId, excludeSentenceId } = queryOptions
-    return composerApi.composerConnectivityStatementList(undefined, excludeSentenceId, knowledgeStatement, limit, undefined, index, ordering, origin, sentenceId, stateFilter, tagFilter).then((res: any) => res.data)
+    const { origins, limit, ordering, index, knowledgeStatement, stateFilter, tagFilter, sentenceId, excludeSentenceId } = queryOptions
+    return composerApi.composerConnectivityStatementList(undefined, excludeSentenceId, knowledgeStatement, limit, undefined, index, ordering, origins, sentenceId, stateFilter, tagFilter).then((res: any) => res.data)
   }
   async getPhenotypeList() {
     return composerApi.composerPhenotypeList(undefined).then((res: any) => res.data)
