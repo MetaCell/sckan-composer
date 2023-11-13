@@ -52,21 +52,6 @@ class SentenceFilter(django_filters.FilterSet):
         fields = []
 
 
-def filter_by_ontology_uri(qs, field, anatomical_entity):
-    return qs.filter(Q(**{f"{field}__ontology_uri": anatomical_entity.ontology_uri}))
-
-
-def filter_by_ontology_uri_many(qs, field, anatomical_entities):
-    # If the anatomical_entities queryset is empty, return the original queryset
-    if not anatomical_entities.exists():
-        return qs
-
-    ontology_uris = [entity.ontology_uri for entity in anatomical_entities]
-
-    # Filter the main queryset based on those ontology_uris
-    return qs.filter(Q(**{f"{field}__ontology_uri__in": ontology_uris}))
-
-
 class ConnectivityStatementFilter(django_filters.FilterSet):
     sentence_id = django_filters.NumberFilter(field_name="sentence__id")
     exclude_sentence_id = django_filters.NumberFilter(field_name="sentence__id", exclude=True)
@@ -83,12 +68,12 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
     origins = django_filters.ModelMultipleChoiceFilter(
         field_name="origins",
         queryset=AnatomicalEntity.objects.all(),
-        method=filter_by_ontology_uri_many,
+        conjoined=False
     )
     destinations = django_filters.ModelMultipleChoiceFilter(
-        field_name="destinations__anatomical_entities",
-        queryset=AnatomicalEntity.objects.all(),
-        method=filter_by_ontology_uri_many,
+        field_name="destinations",
+        queryset=Destination.objects.all(),
+        conjoined=False
     )
     notes = django_filters.BooleanFilter(
         field_name="notes", label="Checks if entity has notes", method=field_has_content

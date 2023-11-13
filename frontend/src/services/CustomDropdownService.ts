@@ -134,7 +134,9 @@ export async function searchForwardConnection(searchValue: string, statement: Co
             ...queryOptions,
             excludeSentenceId: undefined,
             sentenceId: statement.sentence_id,
-            origins: statement.destinations?.map(destination => destination.id) ?? [],
+            origins: statement.destinations?.flatMap(destination =>
+                destination.anatomical_entities?.map(entity => entity.id) ?? []
+            ) ?? [],
             knowledgeStatement: searchValue,
         });
 
@@ -142,7 +144,9 @@ export async function searchForwardConnection(searchValue: string, statement: Co
             ...queryOptions,
             excludeSentenceId: statement.sentence_id,
             sentenceId: undefined,
-            origins: statement.destinations?.map(destination => destination.id) ?? [],
+            origins: statement.destinations?.flatMap(destination =>
+                destination.anatomical_entities?.map(entity => entity.id) ?? []
+            ) ?? [],
             knowledgeStatement: searchValue,
         });
 
