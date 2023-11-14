@@ -1,16 +1,21 @@
 import {Option} from "../types";
 import {composerApi as api} from "./apis";
 import {autocompleteRows} from "../helpers/settings";
-import {mapAnatomicalEntitiesToOptions, mapConnectivityStatementsToOptions} from "../helpers/dropdownMappers";
+import {
+    convertToConnectivityStatementUpdate,
+    mapAnatomicalEntitiesToOptions,
+    mapConnectivityStatementsToOptions
+} from "../helpers/dropdownMappers";
 import {
     AnatomicalEntity,
-    ConnectivityStatement,
+    ConnectivityStatement, ConnectivityStatementUpdate,
     DestinationSerializerDetails,
     PatchedConnectivityStatementUpdate, PatchedDestination, PatchedVia,
     ViaSerializerDetails
 } from "../apiclient/backend";
 import {searchAnatomicalEntities} from "../helpers/helpers";
 import connectivityStatementService from "./StatementService";
+import statementService from "./StatementService";
 
 
 export async function getAnatomicalEntities(searchValue: string, groupLabel: string): Promise<Option[]> {
@@ -128,6 +133,12 @@ const queryOptions = {
     stateFilter: undefined,
     tagFilter: undefined,
 };
+
+export const forwardConnectionGroups = {
+    sameSentence: 'Derived from the same statement',
+    otherSentence: 'Other'
+}
+
 export async function searchForwardConnection(searchValue: string, statement: ConnectivityStatement): Promise<Option[]> {
     try {
         const sameSentencePromise = connectivityStatementService.getList({
@@ -153,11 +164,14 @@ export async function searchForwardConnection(searchValue: string, statement: Co
         const [sameRes, diffRes] = await Promise.all([sameSentencePromise, differentSentencePromise]);
 
         const sameSentenceOptions = sameRes.results
-            ? mapConnectivityStatementsToOptions(sameRes.results, 'Derived from the same statement')
+            ? mapConnectivityStatementsToOptions(
+                sameRes.results.filter(res => res.id !== statement.id),
+                forwardConnectionGroups.sameSentence
+            )
             : [];
 
         const differentSentenceOptions = diffRes.results
-            ? mapConnectivityStatementsToOptions(diffRes.results, 'Other')
+            ? mapConnectivityStatementsToOptions(diffRes.results, forwardConnectionGroups.otherSentence)
             : [];
 
         return [...sameSentenceOptions, ...differentSentenceOptions];
@@ -167,3 +181,37 @@ export async function searchForwardConnection(searchValue: string, statement: Co
     }
 }
 
+
+export async function updateForwardConnections(selectedOptions: Option[], currentStatement: ConnectivityStatement) {
+    const forwardConnectionIds = selectedOptions.map(option => parseInt(option.id));
+
+    const updateData: ConnectivityStatementUpdate = {
+        ...convertToConnectivityStatementUpdate(currentStatement),
+        forward_connection: forwardConnectionIds
+    };
+
+    // Call the update method of statementService
+    try {
+        await statementService.update(updateData);
+    } catch (error) {
+        console.error("Error updating statement:", error);
+        throw error;
+    }
+}
+
+
+export function createOptionsFromStatements(
+    statements: ConnectivityStatement[],
+    currentSentenceId: number
+): Option[] {
+    // Separate the statements into two groups
+    const sameSentenceStatements = statements.filter(statement => statement.sentence_id === currentSentenceId);
+    const differentSentenceStatements = statements.filter(statement => statement.sentence_id !== currentSentenceId);
+
+    // Create options for each group
+    const sameSentenceOptions = mapConnectivityStatementsToOptions(sameSentenceStatements, 'forwardConnectionGroups.sameSentence');
+    const differentSentenceOptions = mapConnectivityStatementsToOptions(differentSentenceStatements, 'forwardConnectionGroups.otherSentence');
+
+    // Combine and return all options
+    return [...sameSentenceOptions, ...differentSentenceOptions];
+}

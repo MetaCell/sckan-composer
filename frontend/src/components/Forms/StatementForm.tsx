@@ -13,19 +13,20 @@ import {Box, Chip} from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
+    createOptionsFromStatements,
     getAnatomicalEntities,
     getConnectionId, searchForwardConnection,
     searchFromEntitiesDestination,
     searchFromEntitiesVia,
-    updateEntity,
+    updateEntity, updateForwardConnections,
     updateOrigins,
 } from "../../services/CustomDropdownService";
-import {mapAnatomicalEntitiesToOptions} from "../../helpers/dropdownMappers";
+import {mapAnatomicalEntitiesToOptions, mapConnectivityStatementsToOptions} from "../../helpers/dropdownMappers";
 import {DestinationIcon, ViaIcon} from "../icons";
 import {DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel} from "../../helpers/settings";
 import {Option} from "../../types";
 import {composerApi as api} from "../../services/apis";
-import {TypeC11Enum} from "../../apiclient/backend";
+import {ConnectivityStatement, TypeC11Enum} from "../../apiclient/backend";
 
 const StatementForm = (props: any) => {
     const {uiFields, statement, refreshStatement} = props;
@@ -378,12 +379,15 @@ const StatementForm = (props: any) => {
             noResultReason: "We couldn’t find any record with these origin in the database.",
             disabledReason: "Add Destination entity to get access to the forward connection form",
             onSearch: async (searchValue: string) => searchForwardConnection(searchValue, statement),
-            onUpdate: async (selectedOptions: Option[]) => {},
+            onUpdate: async (selectedOptions: Option[]) => {
+                await updateForwardConnections(selectedOptions, statement)
+                refreshStatement()
+            },
             statement: statement,
             errors: statement?.errors?.includes("Invalid forward connection")
                 ? statement.errors
                 : "",
-            mapValueToOption: () => statement.forward_connection,
+            mapValueToOption: (connectivityStatements: ConnectivityStatement[]) => createOptionsFromStatements(connectivityStatements, statement.sentence_id),
             header: {
                 label: "Origins",
                 values: [

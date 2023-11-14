@@ -1,4 +1,4 @@
-import {AnatomicalEntity, ConnectivityStatement} from "../apiclient/backend";
+import {AnatomicalEntity, ConnectivityStatement, ConnectivityStatementUpdate} from "../apiclient/backend";
 import {Option, OptionDetail} from "../types";
 
 export function mapAnatomicalEntitiesToOptions(entities: AnatomicalEntity[], groupLabel: string): Option[] {
@@ -45,4 +45,12 @@ export function mapConnectivityStatementsToOptions(statements: ConnectivityState
         options.push(option);
         return options;
     }, []);
+}
+
+
+export function convertToConnectivityStatementUpdate(statement: ConnectivityStatement): ConnectivityStatementUpdate {
+    return {
+        ...statement,
+        origins: statement.origins?.map(entity => entity.id) || []
+    };
 }
