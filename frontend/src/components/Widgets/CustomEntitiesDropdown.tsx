@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Badge, InputAdornment, Popper, Tooltip } from "@mui/material";
+import {Badge, CircularProgress, InputAdornment, Popper, Tooltip} from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   TextField,
@@ -217,9 +217,15 @@ export default function CustomEntitiesDropdown({
   const [inputValue, setInputValue] = useState("");
   const popperRef = useRef<HTMLDivElement | null>(null);
 
+  const [isDropdownOpened, setIsDropdownOpened] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setIsDropdownOpened(true);
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
+
 
   const handleSelectedOptionsChange = async (newSelectedOptions: Option[]) => {
     onUpdate(newSelectedOptions, id).then(() =>
@@ -322,9 +328,31 @@ export default function CustomEntitiesDropdown({
     return selectedOptions?.some((selected) => selected?.id === option?.id);
   };
 
+
   useEffect(() => {
-    onSearch("", id).then(setAutocompleteOptions);
-  }, [statement]);
+    const fetchData = async () => {
+      if (!isDropdownOpened) return;
+
+      setIsLoading(true);
+      try {
+        const options = await onSearch('', id);
+        setAutocompleteOptions(options);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [isDropdownOpened, id, onSearch]);
+
+
+  useEffect(() => {
+    if (inputValue !== '') {
+      onSearch(inputValue, id).then(setAutocompleteOptions);
+    }
+  }, [inputValue, id]);
 
   useEffect(() => {
     const closePopperOnClickOutside = (event: MouseEvent) => {
@@ -491,7 +519,18 @@ export default function CustomEntitiesDropdown({
               ))}
             </Box>
           )}
-          <Box
+
+          {isLoading ? (
+                  <Box
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                      sx={{ height: "100%" }}
+                  >
+                    <CircularProgress />
+                  </Box>
+              ) :
+              (<Box
             display="flex"
             flex={1}
             height={
@@ -776,7 +815,7 @@ export default function CustomEntitiesDropdown({
                   ))}
               </Box>
             )}
-          </Box>
+          </Box>)}
         </Popper>
       </Stack>
       {errors && (
