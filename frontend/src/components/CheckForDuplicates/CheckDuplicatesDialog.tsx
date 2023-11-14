@@ -129,7 +129,7 @@ export default function CheckDuplicates() {
     : NoSearch();
 
   const autoCompleteFetch = (inputValue: string) =>
-    api.composerAnatomicalEntityList(autocompleteRows, inputValue, 0);
+    api.composerAnatomicalEntityList([], autocompleteRows, inputValue, 0);
   const autoCompleteNoOptionsText = "No entities found";
 
   return (

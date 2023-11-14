@@ -20,7 +20,7 @@ import statementService from "./StatementService";
 
 export async function getAnatomicalEntities(searchValue: string, groupLabel: string): Promise<Option[]> {
     try {
-        const response = await api.composerAnatomicalEntityList(autocompleteRows, searchValue, 0);
+        const response = await api.composerAnatomicalEntityList([], autocompleteRows, searchValue, 0);
         const anatomicalEntities = response.data.results || [];
         return mapAnatomicalEntitiesToOptions(anatomicalEntities, groupLabel);
     } catch (error) {
