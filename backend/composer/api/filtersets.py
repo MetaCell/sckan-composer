@@ -1,6 +1,7 @@
 from typing import List
 from django.db.models import Q
 import django_filters
+from django_filters import BaseInFilter, NumberFilter
 
 from composer.enums import SentenceState, CSState
 from composer.models import (
@@ -90,8 +91,13 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
         fields = []
 
 
+class NumberInFilter(BaseInFilter, NumberFilter):
+    pass
+
+
 class AnatomicalEntityFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(method="filter_name")
+    exclude_ids = NumberInFilter(field_name='id', exclude=True)
 
     class Meta:
         model = AnatomicalEntity

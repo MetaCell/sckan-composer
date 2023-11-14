@@ -9,6 +9,15 @@ paths:
       operationId: composer_anatomical_entity_list
       description: AnatomicalEntity
       parameters:
+      - in: query
+        name: exclude_ids
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
       - name: limit
         required: false
         in: query
@@ -2877,7 +2886,6 @@ components:
           items:
             type: integer
       required:
-      - connectivity_statement
       - id
       - order
     ViaSerializerDetails:

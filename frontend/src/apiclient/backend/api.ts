@@ -1867,7 +1867,7 @@ export interface Via {
      * @type {number}
      * @memberof Via
      */
-    'connectivity_statement': number;
+    'connectivity_statement'?: number;
     /**
      * 
      * @type {TypeB60Enum}
@@ -1943,13 +1943,14 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
     return {
         /**
          * AnatomicalEntity
+         * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
          * @param {string} [name] 
          * @param {number} [offset] The initial index from which to return the results.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerAnatomicalEntityList: async (limit?: number, name?: string, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerAnatomicalEntityList: async (excludeIds?: Array<number>, limit?: number, name?: string, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/anatomical-entity/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1970,6 +1971,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
 
             // authentication cookieAuth required
+
+            if (excludeIds) {
+                localVarQueryParameter['exclude_ids'] = excludeIds.join(COLLECTION_FORMATS.csv);
+            }
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -4492,14 +4497,15 @@ export const ComposerApiFp = function(configuration?: Configuration) {
     return {
         /**
          * AnatomicalEntity
+         * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
          * @param {string} [name] 
          * @param {number} [offset] The initial index from which to return the results.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerAnatomicalEntityList(limit?: number, name?: string, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedAnatomicalEntityList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerAnatomicalEntityList(limit, name, offset, options);
+        async composerAnatomicalEntityList(excludeIds?: Array<number>, limit?: number, name?: string, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedAnatomicalEntityList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerAnatomicalEntityList(excludeIds, limit, name, offset, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -5094,14 +5100,15 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
     return {
         /**
          * AnatomicalEntity
+         * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
          * @param {string} [name] 
          * @param {number} [offset] The initial index from which to return the results.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerAnatomicalEntityList(limit?: number, name?: string, offset?: number, options?: any): AxiosPromise<PaginatedAnatomicalEntityList> {
-            return localVarFp.composerAnatomicalEntityList(limit, name, offset, options).then((request) => request(axios, basePath));
+        composerAnatomicalEntityList(excludeIds?: Array<number>, limit?: number, name?: string, offset?: number, options?: any): AxiosPromise<PaginatedAnatomicalEntityList> {
+            return localVarFp.composerAnatomicalEntityList(excludeIds, limit, name, offset, options).then((request) => request(axios, basePath));
         },
         /**
          * AnatomicalEntity
@@ -5642,6 +5649,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
 export class ComposerApi extends BaseAPI {
     /**
      * AnatomicalEntity
+     * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
      * @param {number} [limit] Number of results to return per page.
      * @param {string} [name] 
      * @param {number} [offset] The initial index from which to return the results.
@@ -5649,8 +5657,8 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerAnatomicalEntityList(limit?: number, name?: string, offset?: number, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerAnatomicalEntityList(limit, name, offset, options).then((request) => request(this.axios, this.basePath));
+    public composerAnatomicalEntityList(excludeIds?: Array<number>, limit?: number, name?: string, offset?: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerAnatomicalEntityList(excludeIds, limit, name, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
