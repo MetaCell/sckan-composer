@@ -1,6 +1,9 @@
 import {AnatomicalEntity, ConnectivityStatement, ConnectivityStatementUpdate} from "../apiclient/backend";
 import {Option, OptionDetail} from "../types";
 
+export const DROPDOWN_MAPPER_ONTOLOGY_URL = "Ontology URI"
+export const DROPDOWN_MAPPER_STATE = "state"
+
 export function mapAnatomicalEntitiesToOptions(entities: AnatomicalEntity[], groupLabel: string): Option[] {
     if(!entities){
         return []
@@ -15,7 +18,7 @@ export function mapAnatomicalEntitiesToOptions(entities: AnatomicalEntity[], gro
                 value: entity.name,
             },
             {
-                title: "Ontology URI",
+                title: DROPDOWN_MAPPER_ONTOLOGY_URL,
                 value: entity.ontology_uri,
             },
         ],
@@ -33,6 +36,7 @@ export function mapConnectivityStatementsToOptions(statements: ConnectivityState
             { title: "Knowledge Statement ID", value: statement.id.toString() || "N/A" },
             { title: "Title", value: statement.knowledge_statement || "N/A" },
             { title: "Statement", value: statement.statement_preview || "N/A" },
+            { title: DROPDOWN_MAPPER_STATE, value: statement.state || "N/A" },
         ];
 
         const option: Option = {

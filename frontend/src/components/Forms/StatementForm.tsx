@@ -21,12 +21,17 @@ import {
     updateEntity, updateForwardConnections,
     updateOrigins,
 } from "../../services/CustomDropdownService";
-import {mapAnatomicalEntitiesToOptions, mapConnectivityStatementsToOptions} from "../../helpers/dropdownMappers";
+import {
+    mapAnatomicalEntitiesToOptions,
+    mapConnectivityStatementsToOptions,
+    DROPDOWN_MAPPER_ONTOLOGY_URL, DROPDOWN_MAPPER_STATE
+} from "../../helpers/dropdownMappers";
 import {DestinationIcon, ViaIcon} from "../icons";
 import {DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel} from "../../helpers/settings";
-import {Option} from "../../types";
+import {Option, OptionDetail} from "../../types";
 import {composerApi as api} from "../../services/apis";
 import {ConnectivityStatement, TypeC11Enum} from "../../apiclient/backend";
+import {CustomFooter} from "../Widgets/HoveredOptionContent";
 
 const StatementForm = (props: any) => {
     const {uiFields, statement, refreshStatement} = props;
@@ -124,9 +129,6 @@ const StatementForm = (props: any) => {
         },
     };
 
-    // TODO: check how to treat from entities with the same id from different layers @ afonsobspinto
-    // TODO: check why there's no loading when adding a new via @ afonsobspinto
-    // TODO: Fix custom header @ afonsobspinto
 
     copiedUISchema.vias = {
         "ui:ArrayFieldTemplate":
@@ -147,7 +149,6 @@ const StatementForm = (props: any) => {
                                         refreshStatement()
                                     }}
                                     onElementReorder={async (sourceIndex: number, destinationIndex: number) => {
-                                        // Custom logic for reordering
                                         await api.composerViaPartialUpdate(statement.vias[sourceIndex].id, {
                                             order: destinationIndex
                                         })
@@ -191,20 +192,8 @@ const StatementForm = (props: any) => {
                     },
                     errors: "",
                     mapValueToOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
-                    CustomFooter: ({entity}: any) => (
-                        <Box
-                            sx={{
-                                mt: "1.5rem",
-                                display: "flex",
-                                gap: 1,
-                                flexWrap: "wrap",
-                                pt: "1.5rem",
-                                borderTop: "0.0625rem solid #F2F4F7",
-                            }}
-                        >
-                            <Chip variant="outlined" label={"https://google.com"}/>
-                        </Box>
-                    ),
+                    CustomFooter: CustomFooter,
+
                 },
             },
             from_entities: {
@@ -227,21 +216,7 @@ const StatementForm = (props: any) => {
                     },
                     errors: "",
                     mapValueToOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
-                    CustomFooter: ({entity}: any) => (
-                        <Box
-                            sx={{
-                                mt: "1.5rem",
-                                display: "flex",
-                                gap: 1,
-                                flexWrap: "wrap",
-                                pt: "1.5rem",
-                                borderTop: "0.0625rem solid #F2F4F7",
-                            }}
-                        >
-                            {/* <Chip variant="filled" color="error" label={"https://google.com"} /> */}
-                            <Chip variant="outlined" label={"https://google.com"}/>
-                        </Box>
-                    ),
+                    CustomFooter: CustomFooter,
                 },
             },
         },
@@ -301,21 +276,7 @@ const StatementForm = (props: any) => {
                     },
                     errors: "",
                     mapValueToOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, DestinationsGroupLabel),
-                    CustomFooter: ({entity}: any) => (
-                        <Box
-                            sx={{
-                                mt: "1.5rem",
-                                display: "flex",
-                                gap: 1,
-                                flexWrap: "wrap",
-                                pt: "1.5rem",
-                                borderTop: "0.0625rem solid #F2F4F7",
-                            }}
-                        >
-                            {/* <Chip variant="filled" color="error" label={"https://google.com"} /> */}
-                            <Chip variant="outlined" label={"https://google.com"}/>
-                        </Box>
-                    ),
+                    CustomFooter: CustomFooter,
                 },
             },
             from_entities: {
@@ -339,21 +300,7 @@ const StatementForm = (props: any) => {
                     },
                     errors: "",
                     mapValueToOption: (anatomicalEntities: any[]) => mapAnatomicalEntitiesToOptions(anatomicalEntities, DestinationsGroupLabel),
-                    CustomFooter: ({entity}: any) => (
-                        <Box
-                            sx={{
-                                mt: "1.5rem",
-                                display: "flex",
-                                gap: 1,
-                                flexWrap: "wrap",
-                                pt: "1.5rem",
-                                borderTop: "0.0625rem solid #F2F4F7",
-                            }}
-                        >
-                            {/* <Chip variant="filled" color="error" label={"https://google.com"} /> */}
-                            <Chip variant="outlined" label={"https://google.com"}/>
-                        </Box>
-                    ),
+                    CustomFooter: CustomFooter,
                 },
             }
         },
@@ -411,28 +358,25 @@ const StatementForm = (props: any) => {
                     sx={{...sx}}
                 />
             ),
-            CustomHeader: ({entity}: any) => (
-                <Box
-                    sx={{
-                        mb: "1.5rem",
-                        pb: "1.5rem",
-                        borderBottom: "0.0625rem solid #F2F4F7",
-                    }}
-                >
-                    <Chip variant="outlined" label={"https://google.com"}/>
-                </Box>
-            ),
-            CustomFooter: ({entity}: any) => (
-                <Box
-                    sx={{
-                        mt: "1.5rem",
-                        pt: "1.5rem",
-                        borderTop: "0.0625rem solid #F2F4F7",
-                    }}
-                >
-                    <Chip variant="filled" color="success" label={"https://google.com"}/>
-                </Box>
-            ),
+            CustomHeader: ({entity}: any) => {
+                const stateDetail = entity.content.find((detail: OptionDetail) => detail.title === DROPDOWN_MAPPER_STATE);
+                const stateValue = stateDetail ? stateDetail.value : 'State not available';
+
+                return (
+                    <Box
+                        sx={{
+                            mt: "1.5rem",
+                            display: "flex",
+                            gap: 1,
+                            flexWrap: "wrap",
+                            pt: "1.5rem",
+                            borderTop: "0.0625rem solid #F2F4F7",
+                        }}
+                    >
+                        <Chip variant="outlined" label={stateValue}/>
+                    </Box>
+                );
+            },
         },
     };
 
