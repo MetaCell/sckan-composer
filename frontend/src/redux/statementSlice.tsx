@@ -23,6 +23,7 @@ export interface QueryParams {
   tagFilter: number[] | undefined;
   sentenceId: number | undefined;
   excludeSentenceId: number | undefined;
+  excludeIds: number[] | undefined;
   origins: number[] | undefined;
 }
 
@@ -41,6 +42,7 @@ export const initialState: StatementState = {
     knowledgeStatement: undefined,
     sentenceId: undefined,
     excludeSentenceId: undefined,
+    excludeIds: undefined,
     origins: undefined,
   },
 };

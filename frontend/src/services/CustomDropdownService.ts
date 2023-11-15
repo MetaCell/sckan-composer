@@ -188,6 +188,7 @@ export async function searchForwardConnection(
   try {
     const sameSentencePromise = connectivityStatementService.getList({
       ...queryOptions,
+      excludeIds: [],
       excludeSentenceId: undefined,
       sentenceId: statement.sentence_id,
       origins:
@@ -200,6 +201,7 @@ export async function searchForwardConnection(
 
     const differentSentencePromise = connectivityStatementService.getList({
       ...queryOptions,
+      excludeIds: [],
       excludeSentenceId: statement.sentence_id,
       sentenceId: undefined,
       origins:

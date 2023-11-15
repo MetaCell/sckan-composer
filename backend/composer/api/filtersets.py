@@ -27,6 +27,8 @@ def filter_by_title_or_text(queryset, name, value):
 def exclude_ids(queryset, name, value: List[int]):
     return queryset.exclude(id__in=value)
 
+class NumberInFilter(BaseInFilter, NumberFilter):
+    pass
 
 class SentenceFilter(django_filters.FilterSet):
     title = django_filters.CharFilter(method=filter_by_title_or_text)
@@ -54,6 +56,8 @@ class SentenceFilter(django_filters.FilterSet):
 
 
 class ConnectivityStatementFilter(django_filters.FilterSet):
+    exclude_ids = NumberInFilter(field_name='id', exclude=True)
+
     sentence_id = django_filters.NumberFilter(field_name="sentence__id")
     exclude_sentence_id = django_filters.NumberFilter(field_name="sentence__id", exclude=True)
 
@@ -89,10 +93,6 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
     class Meta:
         model = ConnectivityStatement
         fields = []
-
-
-class NumberInFilter(BaseInFilter, NumberFilter):
-    pass
 
 
 class AnatomicalEntityFilter(django_filters.FilterSet):
