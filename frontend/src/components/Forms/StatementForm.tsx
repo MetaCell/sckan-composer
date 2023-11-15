@@ -132,8 +132,14 @@ const StatementForm = (props: any) => {
       noResultReason: "No results found",
       disabledReason: "",
       chipsNumber: 5,
-      onSearch: async (searchValue: string, formId: string) =>
-        getAnatomicalEntities(searchValue, OriginsGroupLabel, selectedOrigins),
+      onSearch: async (searchValue: string, formId: string) => {
+        const excludedIds = searchValue ? [] : selectedOrigins;
+        return getAnatomicalEntities(
+          searchValue,
+          OriginsGroupLabel,
+          excludedIds,
+        );
+      },
       onUpdate: async (selectedOptions: any) => {
         await updateOrigins(selectedOptions, statement.id);
         refreshStatement();
@@ -152,18 +158,18 @@ const StatementForm = (props: any) => {
     type: string,
     property: "from_entities" | "anatomical_entities",
   ) => {
-    let excludeIds: number[] = [];
+    let selectedIds: number[] = [];
     const currentIndex = getIndexFromKey(formId);
 
     if (currentIndex !== null && currentIndex !== undefined) {
       const currentElement = statement[type][currentIndex];
 
       if (currentElement) {
-        excludeIds =
+        selectedIds =
           currentElement[property]?.map((entity: Option) => entity.id) || [];
       }
     }
-
+    const excludeIds = searchValue ? [] : selectedIds;
     return getAnatomicalEntities(searchValue, groupLabel, excludeIds);
   };
 
@@ -419,8 +425,10 @@ const StatementForm = (props: any) => {
         "We couldn’t find any record with these origin in the database.",
       disabledReason:
         "Add Destination entity to get access to the forward connection form",
-      onSearch: async (searchValue: string) =>
-        searchForwardConnection(searchValue, statement),
+      onSearch: async (searchValue: string) => {
+        const excludedIds = searchValue ? [] : selectedForwardConnection;
+        return searchForwardConnection(searchValue, statement, excludedIds);
+      },
       onUpdate: async (selectedOptions: Option[]) => {
         await updateForwardConnections(selectedOptions, statement);
         refreshStatement();

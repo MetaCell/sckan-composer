@@ -184,11 +184,12 @@ export const forwardConnectionGroups = {
 export async function searchForwardConnection(
   searchValue: string,
   statement: ConnectivityStatement,
+  excludeIds?: number[],
 ): Promise<Option[]> {
   try {
     const sameSentencePromise = connectivityStatementService.getList({
       ...queryOptions,
-      excludeIds: [],
+      excludeIds,
       excludeSentenceId: undefined,
       sentenceId: statement.sentence_id,
       origins:
@@ -201,7 +202,7 @@ export async function searchForwardConnection(
 
     const differentSentencePromise = connectivityStatementService.getList({
       ...queryOptions,
-      excludeIds: [],
+      excludeIds,
       excludeSentenceId: statement.sentence_id,
       sentenceId: undefined,
       origins:
