@@ -11,7 +11,7 @@ export function SortableItem(props: any) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: props.id });
 
-  const { id, children, onDropIndexClick, disabled } = props;
+  const { id, children, onDropIndexClick, disabled, hideDeleteBtn } = props;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -53,17 +53,23 @@ export function SortableItem(props: any) {
       >
         {children}
       </TableCell>
-      <TableCell
-        sx={{
-          borderBottom: 0,
-          borderTopRightRadius: "8px",
-          borderBottomRightRadius: "8px",
-        }}
-      >
-        <IconButton size="small" onClick={onDropIndexClick} disabled={disabled}>
-          <DeleteOutlineOutlinedIcon fontSize="small" />
-        </IconButton>
-      </TableCell>
+      {!hideDeleteBtn && (
+        <TableCell
+          sx={{
+            borderBottom: 0,
+            borderTopRightRadius: "8px",
+            borderBottomRightRadius: "8px",
+          }}
+        >
+          <IconButton
+            size="small"
+            onClick={onDropIndexClick}
+            disabled={disabled}
+          >
+            <DeleteOutlineOutlinedIcon fontSize="small" />
+          </IconButton>
+        </TableCell>
+      )}
     </MuiTableRow>
   );
 }
