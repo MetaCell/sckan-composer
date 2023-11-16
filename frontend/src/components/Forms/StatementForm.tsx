@@ -173,9 +173,9 @@ const StatementForm = (props: any) => {
     const excludeIds = searchValue ? [] : selectedIds;
 
     if (property === "from_entities" && type === "destinations") {
-      return searchFromEntitiesDestination(searchValue, statement);
+      return searchFromEntitiesDestination(searchValue, statement, excludeIds);
     } else if (property === "from_entities" && type === "vias") {
-      return searchFromEntitiesVia(searchValue, statement, formId);
+      return searchFromEntitiesVia(searchValue, statement, formId, excludeIds);
     } else {
       return getAnatomicalEntities(searchValue, groupLabel, excludeIds);
     }

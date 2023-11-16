@@ -5,6 +5,7 @@ import {
   convertToConnectivityStatementUpdate,
   mapAnatomicalEntitiesToOptions,
   mapConnectivityStatementsToOptions,
+  removeEntitiesById,
 } from "../helpers/dropdownMappers";
 import {
   AnatomicalEntity,
@@ -115,6 +116,7 @@ export function searchFromEntitiesVia(
   searchValue: string,
   statement: ConnectivityStatement,
   formId: string,
+  excludeIds: number[],
 ): Option[] {
   const viaIndex = getFirstNumberFromString(formId);
   if (
@@ -127,15 +129,19 @@ export function searchFromEntitiesVia(
   const viaOrder = statement.vias[viaIndex].order;
   const anatomicalEntities = getEntitiesBeforeOrder(statement, viaOrder);
 
-  return mapAnatomicalEntitiesToOptions(
-    searchAnatomicalEntities(anatomicalEntities, searchValue),
-    "From Entities",
+  return removeEntitiesById(
+    mapAnatomicalEntitiesToOptions(
+      searchAnatomicalEntities(anatomicalEntities, searchValue),
+      "From Entities",
+    ),
+    excludeIds,
   );
 }
 
 export function searchFromEntitiesDestination(
   searchValue: string,
   statement: ConnectivityStatement,
+  excludeIds: number[],
 ): Option[] {
   const vias = statement.vias || [];
   const maxOrder =
@@ -144,9 +150,12 @@ export function searchFromEntitiesDestination(
     }, 0) + 1;
   const anatomicalEntities = getEntitiesBeforeOrder(statement, maxOrder);
 
-  return mapAnatomicalEntitiesToOptions(
-    searchAnatomicalEntities(anatomicalEntities, searchValue),
-    "From Entities",
+  return removeEntitiesById(
+    mapAnatomicalEntitiesToOptions(
+      searchAnatomicalEntities(anatomicalEntities, searchValue),
+      "From Entities",
+    ),
+    excludeIds,
   );
 }
 

@@ -342,19 +342,7 @@ export default function CustomEntitiesDropdown({
       try {
         const options = await onSearch("", id);
         const allOptions = [...selectedOptions, ...options];
-        const allOptionsWithoutSelectedOptions = allOptions.reduce(
-          (accumulator, item) => {
-            const existingItem = accumulator.find(
-              (accItem: Option) => accItem.id === item.id,
-            );
-            if (!existingItem) {
-              accumulator.push(item);
-            }
-            return accumulator;
-          },
-          [],
-        );
-        setAutocompleteOptions(allOptionsWithoutSelectedOptions);
+        setAutocompleteOptions(allOptions);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
