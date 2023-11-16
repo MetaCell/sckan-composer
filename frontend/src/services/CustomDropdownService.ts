@@ -5,7 +5,7 @@ import {
   convertToConnectivityStatementUpdate,
   mapAnatomicalEntitiesToOptions,
   mapConnectivityStatementsToOptions,
-  removeEntitiesById,
+  removeEntitiesById, sortFromViasEntities,
 } from "../helpers/dropdownMappers";
 import {
   AnatomicalEntity,
@@ -128,16 +128,15 @@ export function searchFromEntitiesVia(
   }
   const viaOrder = statement.vias[viaIndex].order;
   const anatomicalEntities = getEntitiesBeforeOrder(statement, viaOrder);
-
-  return removeEntitiesById(
-    mapAnatomicalEntitiesToOptions(
-      searchAnatomicalEntities(anatomicalEntities, searchValue),
-      "From Entities",
-    ),
-    excludeIds,
+  
+  const entities = mapAnatomicalEntitiesToOptions(
+    searchAnatomicalEntities(anatomicalEntities, searchValue),
+    "Vias",
+    true
   );
+  
+  return removeEntitiesById(sortFromViasEntities(entities), excludeIds);
 }
-
 export function searchFromEntitiesDestination(
   searchValue: string,
   statement: ConnectivityStatement,
@@ -165,10 +164,10 @@ function getEntitiesBeforeOrder(
 ) {
   const entities = statement.origins != null ? [...statement.origins] : [];
   const vias = statement.vias || [];
-  return vias.reduce((acc, via) => {
+  return vias.reduce((acc: any, via) => {
     if (via.order < order) {
       via.anatomical_entities.forEach((entity) => {
-        acc.push(entity);
+        acc.push({...entity, order: via.order});
       });
     }
     return acc;

@@ -11,25 +11,33 @@ export const DROPDOWN_MAPPER_STATE = "state";
 export function mapAnatomicalEntitiesToOptions(
   entities: AnatomicalEntity[],
   groupLabel: string,
+  isFromViasEntity: boolean = false,
 ): Option[] {
   if (!entities) {
     return [];
   }
-  return entities.map((entity) => ({
-    id: entity.id.toString(),
-    label: entity.name,
-    group: groupLabel,
-    content: [
-      {
-        title: "Name",
-        value: entity.name,
-      },
-      {
-        title: DROPDOWN_MAPPER_ONTOLOGY_URL,
-        value: entity.ontology_uri,
-      },
-    ],
-  }));
+  return entities.map((entity: any) => ({
+      id: entity.id.toString(),
+      label: entity.name,
+      group: groupLabel !== 'Vias'
+        ? groupLabel
+        : isFromViasEntity
+          ? entity.order !== undefined
+            ? `${groupLabel}-${entity.order}`
+            : 'Origins'
+          : groupLabel,
+      content: [
+        {
+          title: "Name",
+          value: entity.name,
+        },
+        {
+          title: DROPDOWN_MAPPER_ONTOLOGY_URL,
+          value: entity.ontology_uri,
+        },
+      ],
+    })
+  );
 }
 
 export function mapConnectivityStatementsToOptions(
@@ -75,4 +83,22 @@ export function convertToConnectivityStatementUpdate(
 
 export function removeEntitiesById(entities: Option[], excludeIds: number[]) {
   return entities.filter((entity) => !excludeIds.includes(Number(entity.id)));
+}
+
+export function sortFromViasEntities(entities: Option[]){
+  return entities.sort((a, b) => {
+    const groupA = a.group.toLowerCase();
+    const groupB = b.group.toLowerCase();
+    
+    if (groupA.startsWith('vias-') && groupB.startsWith('vias-')) {
+      const viaOrderA = parseInt(groupA.slice(5), 10);
+      const viaOrderB = parseInt(groupB.slice(5), 10);
+      
+      // Sort in descending order of viaOrder
+      return viaOrderB - viaOrderA;
+    }
+    
+    // Origins comes last
+    return groupA === 'origins' ? 1 : -1;
+  });
 }

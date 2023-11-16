@@ -25,8 +25,6 @@ import {
 } from "../../services/CustomDropdownService";
 import {
   mapAnatomicalEntitiesToOptions,
-  mapConnectivityStatementsToOptions,
-  DROPDOWN_MAPPER_ONTOLOGY_URL,
   DROPDOWN_MAPPER_STATE,
 } from "../../helpers/dropdownMappers";
 import { DestinationIcon, ViaIcon } from "../icons";
@@ -289,8 +287,11 @@ const StatementForm = (props: any) => {
             refreshStatement();
           },
           errors: "",
-          mapValueToOption: (anatomicalEntities: any[]) =>
-            mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
+          mapValueToOption: (anatomicalEntities: any[], formId: any) => {
+            const currentIndex = getIndexFromKey(formId);
+            const label = currentIndex ? `${ViasGroupLabel}-${currentIndex - 1}` : ViasGroupLabel
+           return  mapAnatomicalEntitiesToOptions(anatomicalEntities, label, true)
+          },
           CustomFooter: CustomFooter,
         },
       },

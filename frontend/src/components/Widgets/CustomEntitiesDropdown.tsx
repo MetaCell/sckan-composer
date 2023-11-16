@@ -218,7 +218,7 @@ export default function CustomEntitiesDropdown({
 
   const [hoveredOption, setHoveredOption] = useState<Option | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<Option[]>(
-    mapValueToOption(value) || [],
+    mapValueToOption(value, id) || [],
   );
 
   const [autocompleteOptions, setAutocompleteOptions] = useState<Option[]>([]);
