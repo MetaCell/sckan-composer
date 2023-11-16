@@ -155,7 +155,7 @@ const StatementForm = (props: any) => {
     formId: string,
     statement: any,
     groupLabel: string,
-    type: string,
+    type: "vias" | "destinations",
     property: "from_entities" | "anatomical_entities",
   ) => {
     let selectedIds: number[] = [];
@@ -169,8 +169,16 @@ const StatementForm = (props: any) => {
           currentElement[property]?.map((entity: Option) => entity.id) || [];
       }
     }
+
     const excludeIds = searchValue ? [] : selectedIds;
-    return getAnatomicalEntities(searchValue, groupLabel, excludeIds);
+
+    if (property === "from_entities" && type === "destinations") {
+      return searchFromEntitiesDestination(searchValue, statement);
+    } else if (property === "from_entities" && type === "vias") {
+      return searchFromEntitiesVia(searchValue, statement, formId);
+    } else {
+      return getAnatomicalEntities(searchValue, groupLabel, excludeIds);
+    }
   };
 
   copiedUISchema.vias = {
