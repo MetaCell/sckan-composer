@@ -39,6 +39,7 @@ import { Option, OptionDetail } from "../../types";
 import { composerApi as api } from "../../services/apis";
 import { ConnectivityStatement, TypeC11Enum } from "../../apiclient/backend";
 import { CustomFooter } from "../Widgets/HoveredOptionContent";
+import {StatementStateChip} from "../Widgets/StateChip";
 
 const StatementForm = (props: any) => {
   const { uiFields, statement, refreshStatement } = props;
@@ -481,23 +482,22 @@ const StatementForm = (props: any) => {
           ? stateDetail.value
           : "State not available";
 
-        return (
-          <Box
-            sx={{
-              mt: "1.5rem",
-              display: "flex",
-              gap: 1,
-              flexWrap: "wrap",
-              pt: "1.5rem",
-              borderTop: "0.0625rem solid #F2F4F7",
-            }}
-          >
-            <Chip variant="outlined" label={stateValue} />
-          </Box>
-        );
-      },
-    },
-  };
+                return (
+                  <Box
+                    sx={{
+                      mt: "1.5rem",
+                      display: "flex",
+                      gap: 1,
+                      flexWrap: "wrap",
+                      pb: "1.5rem",
+                    }}
+                  >
+                    <StatementStateChip value={stateValue} />
+                  </Box>
+                );
+            },
+        },
+    };
 
   const widgets = {
     AnatomicalEntitiesField,
