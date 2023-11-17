@@ -27,23 +27,26 @@ export function SortableItem(props: any) {
 
   return (
     <MuiTableRow sx={rowStyles} ref={setNodeRef} style={style}>
-      <TableCell
-        sx={{
-          borderBottom: 0,
-          borderTopLeftRadius: "8px",
-          borderBottomLeftRadius: "8px",
-        }}
-      >
-        <IconButton
-          size="small"
-          disabled={disabled}
-          {...attributes}
-          {...listeners}
-          sx={{ p: 0 }}
+      {props.showReOrderingIcon && (
+        <TableCell
+          sx={{
+            borderBottom: 0,
+            borderTopLeftRadius: "8px",
+            borderBottomLeftRadius: "8px",
+          }}
         >
-          <DragHandleIcon fontSize="small" />
-        </IconButton>
-      </TableCell>
+          <IconButton
+            size="small"
+            disabled={disabled}
+            {...attributes}
+            {...listeners}
+            sx={{ p: 0 }}
+          >
+            <DragHandleIcon fontSize="small" />
+          </IconButton>
+        </TableCell>
+      )}
+
       <TableCell
         className="inLineForm"
         width="100%"
