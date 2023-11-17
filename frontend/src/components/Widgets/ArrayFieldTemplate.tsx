@@ -29,7 +29,6 @@ function ArrayFieldTemplate(props: any) {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [sourceIndex, setSourceIndex] = useState(-1);
   const [destinationIndex, setDestinationIndex] = useState(-1);
-
   const sortableItems = props.items.map((item: any) => ({
     ...item,
     id: item.key,
@@ -114,13 +113,15 @@ function ArrayFieldTemplate(props: any) {
         items={sortableItems}
         strategy={verticalListSortingStrategy}
       >
-        {sortableItems.map((element: any) => (
+        {sortableItems.map((element: any, i: number) => (
           <SortableItem
             key={element.key}
             id={element.id}
             children={element.children}
             onDropIndexClick={() => handleDelete(element)}
             disabled={props.disabled}
+            showReOrderingIcon={props.showReOrderingIcon}
+            hideDeleteBtn={props.hideDeleteBtn}
           />
         ))}
       </SortableContext>
@@ -133,7 +134,7 @@ function ArrayFieldTemplate(props: any) {
             startIcon={<AddCircleIcon />}
             disabled={props.disabled}
           >
-            Add a {props.schema.name}
+            Add a {props.addButtonPlaceholder}
           </Button>
         </Box>
       )}

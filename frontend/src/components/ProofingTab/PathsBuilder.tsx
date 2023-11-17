@@ -83,7 +83,6 @@ const PathsBuilder = (props: any) => {
             extraData={{ sentence_id: statement.sentence.id }}
             uiFields={["vias"]}
             enableAutoSave={false}
-            submitOnChangeFields={["vias"]}
             className="vias"
           />
         </Box>
@@ -100,7 +99,6 @@ const PathsBuilder = (props: any) => {
             extraData={{ sentence_id: statement.sentence.id }}
             uiFields={["destinations"]}
             enableAutoSave={false}
-            submitOnChangeFields={["destinations"]}
             className="vias"
           />
         </Box>
