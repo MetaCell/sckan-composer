@@ -100,14 +100,14 @@ export function sortFromViasEntities(entities: Option[]){
 export function getViasGroupLabel(currentIndex: number | null) {
   return currentIndex ? `${ViasGroupLabel}-${currentIndex}` : OriginsGroupLabel
 }
-export function findMatchingEntities(statement: ConnectivityStatement, searchArray: Option[]) {
+export function findMatchingEntities(statement: ConnectivityStatement, entities: Option[]) {
   const matchingOrigins: AnatomicalEntity[] = (statement.origins || []).filter((origin: AnatomicalEntity) =>
-    searchArray.some((searchItem: Option) => Number(origin.id) === Number(searchItem.id))
+    entities.some((searchItem: Option) => Number(origin.id) === Number(searchItem.id))
   );
   
   const matchingFromEntities: AnatomicalEntity & { order?: number }[] = (statement.vias || []).reduce((result: any, via: any) => {
     const matchingFromEntitiesInVia: { id: number, name: string, ontology_uri: string, order?: number }[] = via.from_entities
-      .filter((fromEntity: Option) => searchArray.some((searchItem: Option) => fromEntity.id === searchItem.id))
+      .filter((fromEntity: Option) => entities.some((searchItem: Option) => fromEntity.id === searchItem.id))
       .map((fromEntity: Option) => ({ ...fromEntity, order: via.order }));
     
     if (matchingFromEntitiesInVia.length > 0) {
