@@ -4,6 +4,7 @@ import {
   ConnectivityStatementUpdate,
 } from "../apiclient/backend";
 import { Option, OptionDetail } from "../types";
+import {OriginsGroupLabel, ViasGroupLabel} from "./settings";
 
 export const DROPDOWN_MAPPER_ONTOLOGY_URL = "Ontology URI";
 export const DROPDOWN_MAPPER_STATE = "state";
@@ -94,4 +95,8 @@ export function sortFromViasEntities(entities: Option[]){
     // Origins comes last
     return groupA === 'origins' ? 1 : -1;
   });
+}
+
+export function getViasGroupLabel(currentIndex: number | null) {
+  return currentIndex ? `${ViasGroupLabel}-${currentIndex}` : OriginsGroupLabel
 }

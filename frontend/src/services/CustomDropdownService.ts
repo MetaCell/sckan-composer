@@ -2,7 +2,7 @@ import { Option } from "../types";
 import { composerApi as api } from "./apis";
 import {autocompleteRows, OriginsGroupLabel, ViasGroupLabel} from "../helpers/settings";
 import {
-  convertToConnectivityStatementUpdate,
+  convertToConnectivityStatementUpdate, getViasGroupLabel,
   mapAnatomicalEntitiesToOptions,
   mapConnectivityStatementsToOptions,
   removeEntitiesById, sortFromViasEntities,
@@ -293,8 +293,4 @@ export function createOptionsFromStatements(
 
   // Combine and return all options
   return [...sameSentenceOptions, ...differentSentenceOptions];
-}
-
-export function getViasGroupLabel(currentIndex: number | null) {
-  return currentIndex ? `${ViasGroupLabel}-${currentIndex}` : OriginsGroupLabel
 }

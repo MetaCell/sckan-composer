@@ -15,7 +15,7 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
   createOptionsFromStatements,
   getAnatomicalEntities,
-  getConnectionId, getFirstNumberFromString, getViasGroupLabel,
+  getConnectionId, getFirstNumberFromString,
   searchForwardConnection,
   searchFromEntitiesDestination,
   searchFromEntitiesVia,
@@ -25,7 +25,7 @@ import {
 } from "../../services/CustomDropdownService";
 import {
   mapAnatomicalEntitiesToOptions,
-  DROPDOWN_MAPPER_STATE,
+  DROPDOWN_MAPPER_STATE, getViasGroupLabel,
 } from "../../helpers/dropdownMappers";
 import { DestinationIcon, ViaIcon } from "../icons";
 import {
