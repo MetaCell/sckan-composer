@@ -1,6 +1,6 @@
 import { Option } from "../types";
 import { composerApi as api } from "./apis";
-import {autocompleteRows, OriginsGroupLabel, ViasGroupLabel} from "../helpers/settings";
+import {autocompleteRows} from "../helpers/settings";
 import {
   convertToConnectivityStatementUpdate, getViasGroupLabel,
   mapAnatomicalEntitiesToOptions,
@@ -147,15 +147,15 @@ export function searchFromEntitiesDestination(
     vias.reduce((maxOrder, via) => {
       return via.order > maxOrder ? via.order : maxOrder;
     }, 0) + 1;
+  
   const anatomicalEntities = getEntitiesBeforeOrder(statement, maxOrder);
-
-  return removeEntitiesById(
-    mapAnatomicalEntitiesToOptions(
-      searchAnatomicalEntities(anatomicalEntities, searchValue),
-      "From Entities",
-    ),
-    excludeIds,
-  );
+  
+  const entities: Option[] = [];
+  searchAnatomicalEntities(anatomicalEntities, searchValue).forEach((row: any) => {
+    entities.push(mapAnatomicalEntitiesToOptions([row], getViasGroupLabel(row.order + 1))[0]);
+  });
+  
+  return removeEntitiesById(sortFromViasEntities(entities), excludeIds);
 }
 
 function getEntitiesBeforeOrder(

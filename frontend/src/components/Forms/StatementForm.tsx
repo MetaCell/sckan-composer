@@ -25,7 +25,7 @@ import {
 } from "../../services/CustomDropdownService";
 import {
   mapAnatomicalEntitiesToOptions,
-  DROPDOWN_MAPPER_STATE, getViasGroupLabel,
+  DROPDOWN_MAPPER_STATE, getViasGroupLabel, findMatchingEntities, sortFromViasEntities,
 } from "../../helpers/dropdownMappers";
 import { DestinationIcon, ViaIcon } from "../icons";
 import {
@@ -38,6 +38,7 @@ import { composerApi as api } from "../../services/apis";
 import { ConnectivityStatement, TypeC11Enum } from "../../apiclient/backend";
 import { CustomFooter } from "../Widgets/HoveredOptionContent";
 import {StatementStateChip} from "../Widgets/StateChip";
+import {searchAnatomicalEntities} from "../../helpers/helpers";
 
 const StatementForm = (props: any) => {
   const { uiFields, statement, refreshStatement } = props;
@@ -285,9 +286,12 @@ const StatementForm = (props: any) => {
           },
           errors: "",
           mapValueToOption: (anatomicalEntities: any[], formId: any) => {
-            const currentIndex = getFirstNumberFromString(formId);
-            const label = getViasGroupLabel(currentIndex?? - 1)
-           return  mapAnatomicalEntitiesToOptions(anatomicalEntities, label)
+            const entities: Option[] = [];
+            const selected = findMatchingEntities(statement, anatomicalEntities)
+            selected.forEach((row: any) => {
+              entities.push(mapAnatomicalEntitiesToOptions([row], getViasGroupLabel(row.order))[0]);
+            })
+            return sortFromViasEntities(entities)
           },
           CustomFooter: CustomFooter,
         },
@@ -348,7 +352,7 @@ const StatementForm = (props: any) => {
               searchValue,
               formId,
               statement,
-              ViasGroupLabel,
+              DestinationsGroupLabel,
               "destinations",
               "anatomical_entities",
             );
@@ -400,11 +404,14 @@ const StatementForm = (props: any) => {
             refreshStatement();
           },
           errors: "",
-          mapValueToOption: (anatomicalEntities: any[]) =>
-            mapAnatomicalEntitiesToOptions(
-              anatomicalEntities,
-              DestinationsGroupLabel,
-            ),
+          mapValueToOption: (anatomicalEntities: any[], formId: any) => {
+            const entities: Option[] = [];
+            const selected = findMatchingEntities(statement, anatomicalEntities)
+            selected.forEach((row: any) => {
+              entities.push(mapAnatomicalEntitiesToOptions([row], getViasGroupLabel(row.order + 1))[0]);
+            })
+            return  sortFromViasEntities(entities)
+          },
           CustomFooter: CustomFooter,
         },
       },
