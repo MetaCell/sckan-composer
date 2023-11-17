@@ -87,6 +87,15 @@ paths:
         explode: true
         style: form
       - in: query
+        name: exclude_ids
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
         name: exclude_sentence_id
         schema:
           type: integer
