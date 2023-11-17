@@ -25,8 +25,6 @@ import {
 } from "../../services/CustomDropdownService";
 import {
   mapAnatomicalEntitiesToOptions,
-  mapConnectivityStatementsToOptions,
-  DROPDOWN_MAPPER_ONTOLOGY_URL,
   DROPDOWN_MAPPER_STATE,
 } from "../../helpers/dropdownMappers";
 import { DestinationIcon, ViaIcon } from "../icons";
@@ -49,8 +47,6 @@ const StatementForm = (props: any) => {
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
-  copiedSchema.properties.destinations.name = "Destination";
-  copiedSchema.properties.vias.name = "Via";
 
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["destination_type", "*"];
@@ -210,6 +206,8 @@ const StatementForm = (props: any) => {
           refreshStatement();
         }}
         hideDeleteBtn={statement.vias.length <= 1}
+        showReOrderingIcon={true}
+        addButtonPlaceholder={"Via"}
       />
     ),
     items: {
@@ -319,6 +317,8 @@ const StatementForm = (props: any) => {
           refreshStatement();
         }}
         hideDeleteBtn={statement.destinations.length <= 1}
+        showReOrderingIcon={false}
+        addButtonPlaceholder={"Destination"}
       />
     ),
     items: {
