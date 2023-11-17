@@ -25,8 +25,6 @@ import {
 } from "../../services/CustomDropdownService";
 import {
   mapAnatomicalEntitiesToOptions,
-  mapConnectivityStatementsToOptions,
-  DROPDOWN_MAPPER_ONTOLOGY_URL,
   DROPDOWN_MAPPER_STATE,
 } from "../../helpers/dropdownMappers";
 import { DestinationIcon, ViaIcon } from "../icons";
@@ -116,6 +114,12 @@ const StatementForm = (props: any) => {
     },
   };
 
+  const selectedOrigins = statement.origins.map((origin: Option) => origin.id);
+  const getIndexFromKey = (str: string) => {
+    const match = str.match(/\d+/);
+    return match ? parseInt(match[0]) : null;
+  };
+
   copiedUISchema.origins = {
     "ui:widget": CustomEntitiesDropdown,
     "ui:options": {
@@ -125,8 +129,14 @@ const StatementForm = (props: any) => {
       noResultReason: "No results found",
       disabledReason: "",
       chipsNumber: 5,
-      onSearch: async (searchValue: string, formId: string) =>
-        getAnatomicalEntities(searchValue, OriginsGroupLabel),
+      onSearch: async (searchValue: string, formId: string) => {
+        const excludedIds = searchValue ? [] : selectedOrigins;
+        return getAnatomicalEntities(
+          searchValue,
+          OriginsGroupLabel,
+          excludedIds,
+        );
+      },
       onUpdate: async (selectedOptions: any) => {
         await updateOrigins(selectedOptions, statement.id);
         refreshStatement();
@@ -135,6 +145,37 @@ const StatementForm = (props: any) => {
       mapValueToOption: () =>
         mapAnatomicalEntitiesToOptions(statement?.origins, OriginsGroupLabel),
     },
+  };
+
+  const getAnatomicalEntitiesForForm = async (
+    searchValue: string,
+    formId: string,
+    statement: any,
+    groupLabel: string,
+    type: "vias" | "destinations",
+    property: "from_entities" | "anatomical_entities",
+  ) => {
+    let selectedIds: number[] = [];
+    const currentIndex = getIndexFromKey(formId);
+
+    if (currentIndex !== null && currentIndex !== undefined) {
+      const currentElement = statement[type][currentIndex];
+
+      if (currentElement) {
+        selectedIds =
+          currentElement[property]?.map((entity: Option) => entity.id) || [];
+      }
+    }
+
+    const excludeIds = searchValue ? [] : selectedIds;
+
+    if (property === "from_entities" && type === "destinations") {
+      return searchFromEntitiesDestination(searchValue, statement, excludeIds);
+    } else if (property === "from_entities" && type === "vias") {
+      return searchFromEntitiesVia(searchValue, statement, formId, excludeIds);
+    } else {
+      return getAnatomicalEntities(searchValue, groupLabel, excludeIds);
+    }
   };
 
   copiedUISchema.vias = {
@@ -164,6 +205,7 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
+        hideDeleteBtn={statement.vias.length <= 1}
         showReOrderingIcon={true}
         addButtonPlaceholder={"Via"}
       />
@@ -193,8 +235,16 @@ const StatementForm = (props: any) => {
           searchPlaceholder: "Search for vias",
           noResultReason: "No anatomical entities found",
           disabledReason: "",
-          onSearch: async (searchValue: string, formId: string) =>
-            getAnatomicalEntities(searchValue, ViasGroupLabel),
+          onSearch: async (searchValue: string, formId: string) => {
+            return getAnatomicalEntitiesForForm(
+              searchValue,
+              formId,
+              statement,
+              ViasGroupLabel,
+              "vias",
+              "anatomical_entities",
+            );
+          },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
             await updateEntity({
               selected: selectedOptions,
@@ -218,8 +268,16 @@ const StatementForm = (props: any) => {
           searchPlaceholder: "Search for connections",
           noResultReason: "No prior connections found",
           disabledReason: "",
-          onSearch: async (searchValue: string, formId: string) =>
-            searchFromEntitiesVia(searchValue, statement, formId),
+          onSearch: async (searchValue: string, formId: string) => {
+            return getAnatomicalEntitiesForForm(
+              searchValue,
+              formId,
+              statement,
+              ViasGroupLabel,
+              "vias",
+              "from_entities",
+            );
+          },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
             await updateEntity({
               selected: selectedOptions,
@@ -258,6 +316,7 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
+        hideDeleteBtn={statement.destinations.length <= 1}
         showReOrderingIcon={false}
         addButtonPlaceholder={"Destination"}
       />
@@ -285,8 +344,16 @@ const StatementForm = (props: any) => {
           searchPlaceholder: "Search for Destinations",
           noResultReason: "No anatomical entities found",
           disabledReason: "",
-          onSearch: async (searchValue: string) =>
-            getAnatomicalEntities(searchValue, DestinationsGroupLabel),
+          onSearch: async (searchValue: string, formId: string) => {
+            return getAnatomicalEntitiesForForm(
+              searchValue,
+              formId,
+              statement,
+              ViasGroupLabel,
+              "destinations",
+              "anatomical_entities",
+            );
+          },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
             await updateEntity({
               selected: selectedOptions,
@@ -314,8 +381,16 @@ const StatementForm = (props: any) => {
           searchPlaceholder: "Search for Destinations",
           noResultReason: "",
           disabledReason: "",
-          onSearch: async (searchValue: string, formId: string) =>
-            searchFromEntitiesDestination(searchValue, statement),
+          onSearch: async (searchValue: string, formId: string) => {
+            return getAnatomicalEntitiesForForm(
+              searchValue,
+              formId,
+              statement,
+              ViasGroupLabel,
+              "destinations",
+              "from_entities",
+            );
+          },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
             await updateEntity({
               selected: selectedOptions,
@@ -347,6 +422,9 @@ const StatementForm = (props: any) => {
     },
     value: statement?.additional_information ?? "",
   };
+  const selectedForwardConnection = statement.forward_connection.map(
+    (origin: Option) => origin.id,
+  );
 
   copiedUISchema.forward_connection = {
     "ui:widget": CustomEntitiesDropdown,
@@ -358,8 +436,10 @@ const StatementForm = (props: any) => {
         "We couldn’t find any record with these origin in the database.",
       disabledReason:
         "Add Destination entity to get access to the forward connection form",
-      onSearch: async (searchValue: string) =>
-        searchForwardConnection(searchValue, statement),
+      onSearch: async (searchValue: string) => {
+        const excludedIds = searchValue ? [] : selectedForwardConnection;
+        return searchForwardConnection(searchValue, statement, excludedIds);
+      },
       onUpdate: async (selectedOptions: Option[]) => {
         await updateForwardConnections(selectedOptions, statement);
         refreshStatement();
