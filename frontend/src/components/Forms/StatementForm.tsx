@@ -209,6 +209,7 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
+        hideDeleteBtn={statement.vias.length <= 1}
       />
     ),
     items: {
@@ -317,6 +318,7 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
+        hideDeleteBtn={statement.destinations.length <= 1}
       />
     ),
     items: {
