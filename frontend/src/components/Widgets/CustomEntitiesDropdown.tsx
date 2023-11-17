@@ -28,6 +28,7 @@ import NoResultField from "./NoResultField";
 import { vars } from "../../theme/variables";
 import { Option } from "../../types";
 import Stack from "@mui/material/Stack";
+import {sortFromViasEntities} from "../../helpers/dropdownMappers";
 
 const {
   buttonOutlinedBorderColor,
@@ -342,7 +343,8 @@ export default function CustomEntitiesDropdown({
       try {
         const options = await onSearch("", id);
         const allOptions = [...selectedOptions, ...options];
-        setAutocompleteOptions(allOptions);
+        const sortedOptions = sortFromViasEntities(allOptions)
+        setAutocompleteOptions(sortedOptions);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {

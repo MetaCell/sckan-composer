@@ -134,7 +134,7 @@ export function searchFromEntitiesVia(
     entities.push(mapAnatomicalEntitiesToOptions([row], getViasGroupLabel(row.order + 1))[0]);
   });
   
-  return removeEntitiesById(sortFromViasEntities(entities), excludeIds);
+  return removeEntitiesById(entities, excludeIds);
 }
 
 export function searchFromEntitiesDestination(
@@ -155,7 +155,7 @@ export function searchFromEntitiesDestination(
     entities.push(mapAnatomicalEntitiesToOptions([row], getViasGroupLabel(row.order + 1))[0]);
   });
   
-  return removeEntitiesById(sortFromViasEntities(entities), excludeIds);
+  return removeEntitiesById(entities, excludeIds);
 }
 
 function getEntitiesBeforeOrder(

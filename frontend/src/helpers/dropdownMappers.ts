@@ -79,7 +79,16 @@ export function removeEntitiesById(entities: Option[], excludeIds: number[]) {
   return entities.filter((entity) => !excludeIds.includes(Number(entity.id)));
 }
 
-export function sortFromViasEntities(entities: Option[]){
+export function sortFromViasEntities(entities: Option[]): Option[] {
+  // Check if there is only one group
+  const uniqueGroups = Array.from(new Set(entities.map(entity => entity.group.toLowerCase())));
+  
+  if (uniqueGroups.length === 1) {
+    // If there is only one group, return the original list without sorting
+    return entities;
+  }
+  
+  // Apply sorting logic for multiple groups
   return entities.sort((a, b) => {
     const groupA = a.group.toLowerCase();
     const groupB = b.group.toLowerCase();
@@ -97,6 +106,7 @@ export function sortFromViasEntities(entities: Option[]){
   });
 }
 
+
 export function getViasGroupLabel(currentIndex: number | null) {
   return currentIndex ? `${ViasGroupLabel}-${currentIndex}` : OriginsGroupLabel
 }
@@ -105,17 +115,17 @@ export function findMatchingEntities(statement: ConnectivityStatement, entities:
     entities.some((searchItem: Option) => Number(origin.id) === Number(searchItem.id))
   );
   
-  const matchingFromEntities: AnatomicalEntity & { order?: number }[] = (statement.vias || []).reduce((result: any, via: any) => {
-    const matchingFromEntitiesInVia: { id: number, name: string, ontology_uri: string, order?: number }[] = via.from_entities
+  const matchingVias: AnatomicalEntity & { order?: number }[] = (statement.vias || []).reduce((result: any, via: any) => {
+    const matchingAnatomicalEntitiesInVia: AnatomicalEntity & { order?: number }[] = via.anatomical_entities
       .filter((fromEntity: Option) => entities.some((searchItem: Option) => fromEntity.id === searchItem.id))
       .map((fromEntity: Option) => ({ ...fromEntity, order: via.order }));
     
-    if (matchingFromEntitiesInVia.length > 0) {
-      result.push(...matchingFromEntitiesInVia);
+    if (matchingAnatomicalEntitiesInVia.length > 0) {
+      result.push(...matchingAnatomicalEntitiesInVia);
     }
     
     return result;
   }, []);
   
-  return [...matchingOrigins, ...matchingFromEntities];
+  return [...matchingOrigins, ...matchingVias];
 }

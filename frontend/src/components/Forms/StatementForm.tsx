@@ -289,9 +289,9 @@ const StatementForm = (props: any) => {
             const entities: Option[] = [];
             const selected = findMatchingEntities(statement, anatomicalEntities)
             selected.forEach((row: any) => {
-              entities.push(mapAnatomicalEntitiesToOptions([row], getViasGroupLabel(row.order))[0]);
+              entities.push(mapAnatomicalEntitiesToOptions([row], getViasGroupLabel(row.order + 1))[0]);
             })
-            return sortFromViasEntities(entities)
+            return entities
           },
           CustomFooter: CustomFooter,
         },
@@ -410,7 +410,7 @@ const StatementForm = (props: any) => {
             selected.forEach((row: any) => {
               entities.push(mapAnatomicalEntitiesToOptions([row], getViasGroupLabel(row.order + 1))[0]);
             })
-            return  sortFromViasEntities(entities)
+            return  entities
           },
           CustomFooter: CustomFooter,
         },
