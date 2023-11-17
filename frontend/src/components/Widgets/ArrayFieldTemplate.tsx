@@ -114,13 +114,14 @@ function ArrayFieldTemplate(props: any) {
         items={sortableItems}
         strategy={verticalListSortingStrategy}
       >
-        {sortableItems.map((element: any) => (
+        {sortableItems.map((element: any, i: number) => (
           <SortableItem
             key={element.key}
             id={element.id}
             children={element.children}
             onDropIndexClick={() => handleDelete(element)}
             disabled={props.disabled}
+            hideDeleteBtn={props.hideDeleteBtn}
           />
         ))}
       </SortableContext>
