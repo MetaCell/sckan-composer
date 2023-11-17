@@ -15,7 +15,7 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
   createOptionsFromStatements,
   getAnatomicalEntities,
-  getConnectionId,
+  getConnectionId, getFirstNumberFromString, getViasGroupLabel,
   searchForwardConnection,
   searchFromEntitiesDestination,
   searchFromEntitiesVia,
@@ -117,10 +117,6 @@ const StatementForm = (props: any) => {
   };
 
   const selectedOrigins = statement.origins.map((origin: Option) => origin.id);
-  const getIndexFromKey = (str: string) => {
-    const match = str.match(/\d+/);
-    return match ? parseInt(match[0]) : null;
-  };
 
   copiedUISchema.origins = {
     "ui:widget": CustomEntitiesDropdown,
@@ -158,7 +154,7 @@ const StatementForm = (props: any) => {
     property: "from_entities" | "anatomical_entities",
   ) => {
     let selectedIds: number[] = [];
-    const currentIndex = getIndexFromKey(formId);
+    const currentIndex = getFirstNumberFromString(formId);
 
     if (currentIndex !== null && currentIndex !== undefined) {
       const currentElement = statement[type][currentIndex];
@@ -288,9 +284,9 @@ const StatementForm = (props: any) => {
           },
           errors: "",
           mapValueToOption: (anatomicalEntities: any[], formId: any) => {
-            const currentIndex = getIndexFromKey(formId);
-            const label = currentIndex ? `${ViasGroupLabel}-${currentIndex - 1}` : ViasGroupLabel
-           return  mapAnatomicalEntitiesToOptions(anatomicalEntities, label, true)
+            const currentIndex = getFirstNumberFromString(formId);
+            const label = getViasGroupLabel(currentIndex?? - 1)
+           return  mapAnatomicalEntitiesToOptions(anatomicalEntities, label)
           },
           CustomFooter: CustomFooter,
         },

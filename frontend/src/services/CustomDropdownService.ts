@@ -1,6 +1,6 @@
 import { Option } from "../types";
 import { composerApi as api } from "./apis";
-import { autocompleteRows } from "../helpers/settings";
+import {autocompleteRows, OriginsGroupLabel, ViasGroupLabel} from "../helpers/settings";
 import {
   convertToConnectivityStatementUpdate,
   mapAnatomicalEntitiesToOptions,
@@ -107,7 +107,7 @@ export function getConnectionId(
   return null;
 }
 
-function getFirstNumberFromString(inputString: string) {
+export function getFirstNumberFromString(inputString: string) {
   const match = inputString.match(/\d+/);
   return match ? parseInt(match[0], 10) : null;
 }
@@ -129,14 +129,14 @@ export function searchFromEntitiesVia(
   const viaOrder = statement.vias[viaIndex].order;
   const anatomicalEntities = getEntitiesBeforeOrder(statement, viaOrder);
   
-  const entities = mapAnatomicalEntitiesToOptions(
-    searchAnatomicalEntities(anatomicalEntities, searchValue),
-    "Vias",
-    true
-  );
+  const entities: Option[] = [];
+  searchAnatomicalEntities(anatomicalEntities, searchValue).forEach((row: any) => {
+    entities.push(mapAnatomicalEntitiesToOptions([row], getViasGroupLabel(row.order + 1))[0]);
+  });
   
   return removeEntitiesById(sortFromViasEntities(entities), excludeIds);
 }
+
 export function searchFromEntitiesDestination(
   searchValue: string,
   statement: ConnectivityStatement,
@@ -293,4 +293,8 @@ export function createOptionsFromStatements(
 
   // Combine and return all options
   return [...sameSentenceOptions, ...differentSentenceOptions];
+}
+
+export function getViasGroupLabel(currentIndex: number | null) {
+  return currentIndex ? `${ViasGroupLabel}-${currentIndex}` : OriginsGroupLabel
 }

@@ -11,7 +11,6 @@ export const DROPDOWN_MAPPER_STATE = "state";
 export function mapAnatomicalEntitiesToOptions(
   entities: AnatomicalEntity[],
   groupLabel: string,
-  isFromViasEntity: boolean = false,
 ): Option[] {
   if (!entities) {
     return [];
@@ -19,13 +18,7 @@ export function mapAnatomicalEntitiesToOptions(
   return entities.map((entity: any) => ({
       id: entity.id.toString(),
       label: entity.name,
-      group: groupLabel !== 'Vias'
-        ? groupLabel
-        : isFromViasEntity
-          ? entity.order !== undefined
-            ? `${groupLabel}-${entity.order}`
-            : 'Origins'
-          : groupLabel,
+      group: groupLabel,
       content: [
         {
           title: "Name",
