@@ -64,6 +64,15 @@ def has_invalid_entities(statement):
         return True
     return False
 
+
+def has_multiple_destination(statement):
+    if len(statement[DESTINATION]) > 1:
+        logging.warning(f'Skip statement {statement[LABEL]} due to multiple destinations')
+        return True
+    else:
+        return False
+
+
 def has_invalid_sex(statement):
     if has_prop(statement[SEX]) and len(Sex.objects.filter(ontology_uri=statement[SEX][0])) == 0:
         logging.warning(f'Skip statement {statement[LABEL]} due to sex {statement[SEX][0]} not found in composer db')
@@ -108,6 +117,8 @@ def pick_first_phenotype(phenotypes_list, statement):
 def validate_statements(statement_list):
     valid_statements = []
     for statement in statement_list:
+        if has_multiple_destination(statement):
+            continue
         if has_invalid_entities(statement):
             continue
         if has_invalid_sex(statement):
@@ -206,6 +217,10 @@ def ingest_statements():
         reference_uri = statement[ID]
         knowledge_statement = statement[LABEL]
         origin = get_value_or_none(AnatomicalEntity, statement[ORIGIN])
+        destination = AnatomicalEntity.objects.filter(ontology_uri=statement[DESTINATION][0][ENTITY_URI])[
+            0] if has_prop(statement[DESTINATION]) else None
+        destination_type = statement[DESTINATION][0][TYPE] if has_prop(
+            statement[DESTINATION]) else DestinationType.UNKNOWN
         circuit_type_uri = statement[CIRCUIT_TYPE][0] if has_prop(statement[CIRCUIT_TYPE]) else ""
         circuit_type = CIRCUIT_TYPE_MAPPING[circuit_type_uri]
         sex = get_value_or_none(Sex, statement[SEX])
@@ -232,28 +247,27 @@ def ingest_statements():
         # add the many to many fields: path, species, provenances, notes
         if created:
             species = Specie.objects.filter(ontology_uri__in=statement[SPECIES])
-            connectivity_statement.species.add(*species)
             connectivity_statement.origins.add(origin)
-            if has_prop(statement[DESTINATION]):
-                for dest in statement[DESTINATION]:
-                    destination_entity = AnatomicalEntity.objects.filter(ontology_uri=dest[ENTITY_URI]).first()
-                    destination_type = dest.get(TYPE, DestinationType.UNKNOWN)
+            connectivity_statement.species.add(*species)
 
-                    if destination_entity:
-                        destination_instance, _ = Destination.objects.get_or_create(
-                            connectivity_statement=connectivity_statement,
-                            defaults={
-                                "type": destination_type
-                            }
-                        )
-                        destination_instance.anatomical_entities.add(destination_entity)
+            for dest in statement[DESTINATION]:
+                destination_entity = AnatomicalEntity.objects.filter(ontology_uri=dest[ENTITY_URI]).first()
+                destination_type = dest.get(TYPE, DestinationType.UNKNOWN)
 
+                if destination_entity:
+                    destination_instance, _ = Destination.objects.get_or_create(
+                        connectivity_statement=connectivity_statement,
+                        defaults={
+                            "type": destination_type
+                        }
+                    )
+                    destination_instance.anatomical_entities.add(destination_entity)
 
-            # TODO add display_order criteria on neurondm update @antonella
             vias_data = [
-                Via(connectivity_statement=connectivity_statement, type=via[TYPE])
-                for via in statement[VIAS]
+                Via(connectivity_statement=connectivity_statement, type=via[TYPE], order=index)
+                for index, via in enumerate(statement[VIAS])
             ]
+
             created_vias = Via.objects.bulk_create(vias_data)
 
             for via_instance, via_data in zip(created_vias, statement[VIAS]):
