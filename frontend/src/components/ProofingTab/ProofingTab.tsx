@@ -15,8 +15,7 @@ const ProofingTab = (props: any) => {
   const sectionStyle = useSectionStyle(theme);
   const greyBgContainer = useGreyBgContainer(theme);
 
-  const hasJourney =
-    statement.origin && statement.destination && statement.path.length > 0;
+  const hasJourney = statement.journey != null;
 
   return (
     <Grid container mb={2} spacing={2}>

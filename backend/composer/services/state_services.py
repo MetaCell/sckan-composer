@@ -3,6 +3,7 @@ from django.apps import apps
 from django.db.models import Q, Count
 from composer.enums import CSState
 from ..enums import SentenceState
+from ..utils import join_entities
 
 
 class BaseServiceMixin:
@@ -107,30 +108,31 @@ class SentenceService(StateServiceMixin):
 class ConnectivityStatementService(StateServiceMixin):
     @staticmethod
     def compile_journey(connectivity_statement):
-        # TODO: Update for the new graph format
+        if (not connectivity_statement.origins.exists() or
+                not any(dest.anatomical_entities.exists() for dest in connectivity_statement.destinations.all())):
+            return None
 
-        # Get all the origin names
-        origin_names = [str(origin) for origin in connectivity_statement.origins.all()]
+        # Get all the origin names and join them
+        origin_names = join_entities(connectivity_statement.origins.all())
 
-        # Combine them into a comma-separated string
-        all_origins_combined = ", ".join(origin_names[:-1]) + (
-            " and " + origin_names[-1] if len(origin_names) > 1 else "")
+        # Construct the journey string for Vias
+        via_strings = [join_entities(via.anatomical_entities.all()) for via in connectivity_statement.via_set.order_by('order')]
 
-        # Get all destinations for the connectivity_statement
-        destinations = connectivity_statement.destinations.all()
-        destination_strings = []
-        for dest in destinations:
-            dest_names = [str(entity) for entity in dest.anatomical_entities.all()]
-            dest_combined = ", ".join(dest_names[:-1]) + (" and " + dest_names[-1] if len(dest_names) > 1 else "")
-            destination_strings.append(dest_combined)
+        # Get all destination names and join them
+        destination_entities = set()
+        for dest in connectivity_statement.destinations.all():
+            destination_entities.update(dest.anatomical_entities.all())
+        destination_names = join_entities(destination_entities)
 
-        all_destinations_combined = ", ".join(destination_strings[:-1]) + (
-            " and " + destination_strings[-1] if len(destination_strings) > 1 else "")
+        # Combine all parts of the journey
+        journey = f"{origin_names} To {destination_names}"
 
-        paths = " via ".join(str(path) for path in connectivity_statement.path.order_by('via'))
+        if via_strings:
+            journey += " Via " + " Via ".join(via for via in via_strings if via)
 
-        # Construct the final journey string
-        journey = f"{all_origins_combined} to {all_destinations_combined} via {paths}"
+        # Add handling of skipped layers
+        if connectivity_statement.has_shortcuts:
+            journey += ". Note: The connection skips one or more Via layers."
 
         return journey
 
