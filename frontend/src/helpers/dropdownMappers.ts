@@ -1,13 +1,11 @@
-import {
-  AnatomicalEntity,
-  ConnectivityStatement,
-  ConnectivityStatementUpdate,
-} from "../apiclient/backend";
-import { Option, OptionDetail } from "../types";
+import {AnatomicalEntity, ConnectivityStatement, ConnectivityStatementUpdate,} from "../apiclient/backend";
+import {Option, OptionDetail} from "../types";
 import {OriginsGroupLabel, ViasGroupLabel} from "./settings";
 
 export const DROPDOWN_MAPPER_ONTOLOGY_URL = "Ontology URI";
 export const DROPDOWN_MAPPER_STATE = "state";
+
+type tempOption = { sort: number } & Option
 
 export function mapAnatomicalEntitiesToOptions(
   entities: AnatomicalEntity[],
@@ -79,33 +77,38 @@ export function removeEntitiesById(entities: Option[], excludeIds: number[]) {
   return entities.filter((entity) => !excludeIds.includes(Number(entity.id)));
 }
 
-export function sortFromViasEntities(entities: Option[]): Option[] {
-  // Check if there is only one group
-  const uniqueGroups = Array.from(new Set(entities.map(entity => entity.group.toLowerCase())));
-  
-  if (uniqueGroups.length === 1) {
-    // If there is only one group, return the original list without sorting
-    return entities;
-  }
-  
-  // Apply sorting logic for multiple groups
-  return entities.sort((a, b) => {
-    const groupA = a.group.toLowerCase();
-    const groupB = b.group.toLowerCase();
-    
-    if (groupA.startsWith('vias-') && groupB.startsWith('vias-')) {
-      const viaOrderA = parseInt(groupA.slice(5), 10);
-      const viaOrderB = parseInt(groupB.slice(5), 10);
-      
-      // Sort in descending order of viaOrder
-      return viaOrderB - viaOrderA;
+export const processFromEntitiesData = (allOptions: tempOption[]) => {
+  const getSortValueForItem = (item: tempOption) => {
+    if (item.group === 'Origins') {
+      return 0;
     }
     
-    // Origins comes last
-    return groupA === 'origins' ? 1 : -1;
-  });
-}
-
+    if (item.group.startsWith('Vias-')) {
+      return parseInt(item.group.split('-')[1]);
+    }
+    
+    return -1;
+  };
+  
+  const dataMap: Record<string, tempOption[]> = allOptions.reduce((dataMap, item: tempOption) => {
+    if (!dataMap[item.id]) {
+      dataMap[item.id] = []; // we keep it sorted
+    }
+    
+    // set sort value for each item
+    item.sort = getSortValueForItem(item);
+    
+    dataMap[item.id].push(item);
+    
+    // Sort the array based on the "sort" key
+    dataMap[item.id].sort((a: tempOption, b: tempOption) => a.sort - b.sort);
+    
+    return dataMap;
+  }, {} as Record<string, tempOption[]>);
+  
+  const newData: tempOption[] = Object.keys(dataMap).map((key) => dataMap[key][0]);
+  return newData.sort((a: tempOption, b: tempOption) => b.sort - a.sort);
+};
 
 export function getViasGroupLabel(currentIndex: number | null) {
   return currentIndex ? `${ViasGroupLabel}-${currentIndex}` : OriginsGroupLabel

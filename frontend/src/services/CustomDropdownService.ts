@@ -5,7 +5,7 @@ import {
   convertToConnectivityStatementUpdate, getViasGroupLabel,
   mapAnatomicalEntitiesToOptions,
   mapConnectivityStatementsToOptions,
-  removeEntitiesById, sortFromViasEntities,
+  removeEntitiesById,
 } from "../helpers/dropdownMappers";
 import {
   AnatomicalEntity,

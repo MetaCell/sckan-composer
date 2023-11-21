@@ -28,7 +28,7 @@ import NoResultField from "./NoResultField";
 import { vars } from "../../theme/variables";
 import { Option } from "../../types";
 import Stack from "@mui/material/Stack";
-import {sortFromViasEntities} from "../../helpers/dropdownMappers";
+import {processFromEntitiesData} from "../../helpers/dropdownMappers";
 
 const {
   buttonOutlinedBorderColor,
@@ -209,14 +209,13 @@ export default function CustomEntitiesDropdown({
     placeholder,
     label,
     chipsNumber = 2,
-    statement,
+    selectType = null,
   },
 }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
   const open = Boolean(anchorEl);
   const aria = open ? "simple-popper" : undefined;
-
+  console.log(selectType);
   const [hoveredOption, setHoveredOption] = useState<Option | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<Option[]>(
     mapValueToOption(value, id) || [],
@@ -334,6 +333,8 @@ export default function CustomEntitiesDropdown({
   const isOptionSelected = (option: Option) => {
     return selectedOptions?.some((selected) => selected?.id === option?.id);
   };
+  
+  type tempOption = {sort: number} & Option
 
   useEffect(() => {
     const fetchData = async () => {
@@ -343,8 +344,8 @@ export default function CustomEntitiesDropdown({
       try {
         const options = await onSearch("", id);
         const allOptions = [...selectedOptions, ...options];
-        const sortedOptions = sortFromViasEntities(allOptions)
-        setAutocompleteOptions(sortedOptions);
+       
+        setAutocompleteOptions(selectType && selectType === 'from_entities' ? processFromEntitiesData(allOptions) : allOptions);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {

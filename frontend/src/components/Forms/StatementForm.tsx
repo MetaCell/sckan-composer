@@ -25,7 +25,7 @@ import {
 } from "../../services/CustomDropdownService";
 import {
   mapAnatomicalEntitiesToOptions,
-  DROPDOWN_MAPPER_STATE, getViasGroupLabel, findMatchingEntities, sortFromViasEntities,
+  DROPDOWN_MAPPER_STATE, getViasGroupLabel, findMatchingEntities,
 } from "../../helpers/dropdownMappers";
 import { DestinationIcon, ViaIcon } from "../icons";
 import {
@@ -261,6 +261,7 @@ const StatementForm = (props: any) => {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
           label: "From",
+          selectType: "from_entities",
           placeholder: "Look for connections",
           searchPlaceholder: "Search for connections",
           noResultReason: "No prior connections found",
@@ -380,6 +381,7 @@ const StatementForm = (props: any) => {
         "ui:options": {
           statement: statement,
           label: "From",
+          selectType: "from_entities",
           placeholder: "Look for Destinations",
           searchPlaceholder: "Search for Destinations",
           noResultReason: "",
