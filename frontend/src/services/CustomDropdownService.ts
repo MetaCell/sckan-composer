@@ -1,8 +1,8 @@
 import { Option } from "../types";
 import { composerApi as api } from "./apis";
-import { autocompleteRows } from "../helpers/settings";
+import {autocompleteRows} from "../helpers/settings";
 import {
-  convertToConnectivityStatementUpdate,
+  convertToConnectivityStatementUpdate, getViasGroupLabel,
   mapAnatomicalEntitiesToOptions,
   mapConnectivityStatementsToOptions,
   removeEntitiesById,
@@ -107,7 +107,7 @@ export function getConnectionId(
   return null;
 }
 
-function getFirstNumberFromString(inputString: string) {
+export function getFirstNumberFromString(inputString: string) {
   const match = inputString.match(/\d+/);
   return match ? parseInt(match[0], 10) : null;
 }
@@ -128,14 +128,13 @@ export function searchFromEntitiesVia(
   }
   const viaOrder = statement.vias[viaIndex].order;
   const anatomicalEntities = getEntitiesBeforeOrder(statement, viaOrder);
-
-  return removeEntitiesById(
-    mapAnatomicalEntitiesToOptions(
-      searchAnatomicalEntities(anatomicalEntities, searchValue),
-      "From Entities",
-    ),
-    excludeIds,
-  );
+  
+  const entities: Option[] = [];
+  searchAnatomicalEntities(anatomicalEntities, searchValue).forEach((row: any) => {
+    entities.push(mapAnatomicalEntitiesToOptions([row], getViasGroupLabel(row.order + 1))[0]);
+  });
+  
+  return removeEntitiesById(entities, excludeIds);
 }
 
 export function searchFromEntitiesDestination(
@@ -148,15 +147,15 @@ export function searchFromEntitiesDestination(
     vias.reduce((maxOrder, via) => {
       return via.order > maxOrder ? via.order : maxOrder;
     }, 0) + 1;
+  
   const anatomicalEntities = getEntitiesBeforeOrder(statement, maxOrder);
-
-  return removeEntitiesById(
-    mapAnatomicalEntitiesToOptions(
-      searchAnatomicalEntities(anatomicalEntities, searchValue),
-      "From Entities",
-    ),
-    excludeIds,
-  );
+  
+  const entities: Option[] = [];
+  searchAnatomicalEntities(anatomicalEntities, searchValue).forEach((row: any) => {
+    entities.push(mapAnatomicalEntitiesToOptions([row], getViasGroupLabel(row.order + 1))[0]);
+  });
+  
+  return removeEntitiesById(entities, excludeIds);
 }
 
 function getEntitiesBeforeOrder(
@@ -165,10 +164,10 @@ function getEntitiesBeforeOrder(
 ) {
   const entities = statement.origins != null ? [...statement.origins] : [];
   const vias = statement.vias || [];
-  return vias.reduce((acc, via) => {
+  return vias.reduce((acc: any, via) => {
     if (via.order < order) {
       via.anatomical_entities.forEach((entity) => {
-        acc.push(entity);
+        acc.push({...entity, order: via.order});
       });
     }
     return acc;
