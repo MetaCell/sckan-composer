@@ -132,7 +132,7 @@ class ConnectivityStatementService(StateServiceMixin):
 
         # Add handling of skipped layers
         if connectivity_statement.has_shortcuts:
-            journey += ". Note: The connection skips one or more Via layers."
+            journey += ". The connection skips one or more Via layers."
 
         return journey
 

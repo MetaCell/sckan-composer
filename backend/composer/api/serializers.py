@@ -22,6 +22,7 @@ from ..models import (
     Via, Destination,
 )
 from ..services.errors_service import get_connectivity_errors
+from ..utils import join_entities
 
 
 # MixIns
@@ -474,57 +475,41 @@ class ConnectivityStatementSerializer(
         return instance.has_notes
 
     def get_statement_preview(self, instance) -> str:
-        # TODO: Update statement preview?
-        sex = instance.sex.name if instance.sex else ""
+        sex = instance.sex.name if instance.sex else "{sex}"
         species_list = [specie.name for specie in instance.species.all()]
-        species = ', '.join(species_list[:-1]) + f" and {species_list[-1]}" if species_list else ""
+        species = join_entities(species_list)
+        if not species:
+            species = "{species}"
 
-        phenotype = instance.phenotype.name if instance.phenotype else ""
+        phenotype = instance.phenotype.name if instance.phenotype else "{phenotype}"
         origin_names = [origin.name for origin in instance.origins.all()]
-        origins = ', '.join(origin_names) if origin_names else ""
+        origins = join_entities(origin_names)
+        if not origins:
+            origins = "{species}"
 
-        destinations = instance.destinations.all()
-        destination_strings = [
-            ', '.join([entity.name for entity in dest.anatomical_entities.all()])
-            for dest in destinations
-        ]
-        all_destinations_combined = ', '.join(destination_strings[:-1]) + (
-            f" and {destination_strings[-1]}" if destination_strings else ""
-        )
-
-        vias = instance.via_set.all()
-        via_strings = [
-            ', '.join([entity.name for entity in via.anatomical_entities.all()])
-            for via in vias
-        ]
-        via_combined = ', '.join(via_strings[:-1]) + (
-            f" and {via_strings[-1]}" if via_strings else ""
-        )
-
-        circuit_type = instance.circuit_type if instance.circuit_type else ""
-        projection = instance.projection if instance.projection else ""
+        circuit_type = instance.circuit_type if instance.circuit_type else "{circuit_type}"
+        projection = instance.projection if instance.projection else "{projection}"
 
         laterality_description = instance.get_laterality_description()
+        if not laterality_description:
+            laterality_description = "{laterality_description}"
 
         forward_connection = (
-            instance.forward_connection
-            if hasattr(instance, "forward_connection") and instance.forward_connection
-            else ""
+            join_entities(instance.forward_connection.all().values_list('id', flat=True))
+            if instance.forward_connection
+            else "{forward_connection}"
         )
-        apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
+        apinatomy = instance.apinatomy_model if instance.apinatomy_model else "{apinatomy}"
 
         # Creating the statement
-        statement = f"In {sex} {species}, a {phenotype} connection goes from {origins}"
-        if via_combined:
-            statement += f" via {via_combined}"
-        statement += f" to {all_destinations_combined}. "
-        statement += f"This {circuit_type} projects {projection} from the {origins} and is found {laterality_description}. "
+        statement = f"In a {sex} {species}, a {phenotype} connection goes from {instance.journey}"
+        statement += f" This {circuit_type} projects {projection} from the {origins} and is found {laterality_description}."
 
         if forward_connection:
-            statement += f"This neuron population connects to {forward_connection}. "
+            statement += f" This neuron population connects to connectivity statements with id {forward_connection}."
 
         if apinatomy:
-            statement += f"It is described in {apinatomy} model."
+            statement += f" It is described in {apinatomy} model."
 
         return statement.strip()
 
@@ -553,7 +538,6 @@ class ConnectivityStatementSerializer(
 
         # Call the super class's update method with the modified validated_data
         return super(ConnectivityStatementSerializer, self).update(instance, validated_data)
-
 
     class Meta:
         model = ConnectivityStatement
