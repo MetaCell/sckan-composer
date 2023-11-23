@@ -2,6 +2,7 @@ from django.db import transaction
 from django.apps import apps
 from django.db.models import Q, Count
 from composer.enums import CSState
+from .graph_service import generate_paths, consolidate_paths
 from ..enums import SentenceState
 from ..utils import join_entities
 
@@ -108,33 +109,39 @@ class SentenceService(StateServiceMixin):
 class ConnectivityStatementService(StateServiceMixin):
     @staticmethod
     def compile_journey(connectivity_statement):
-        if (not connectivity_statement.origins.exists() or
-                not any(dest.anatomical_entities.exists() for dest in connectivity_statement.destinations.all())):
-            return None
+        """
+       Generates a string of descriptions of journey paths for a given connectivity statement.
 
-        # Get all the origin names and join them
-        origin_names = join_entities(connectivity_statement.origins.all())
+       Args:
+           connectivity_statement: The connectivity statement containing origins, vias, and destinations.
 
-        # Construct the journey string for Vias
-        via_strings = [join_entities(via.anatomical_entities.all()) for via in connectivity_statement.via_set.order_by('order')]
+       Returns:
+           A string with each journey path description on a new line.
+       """
+        # Extract origins, vias, and destinations from the connectivity statement
+        origins = list(connectivity_statement.origins.all())
+        vias = list(connectivity_statement.via_set.all())
+        destinations = list(connectivity_statement.destinations.all())
 
-        # Get all destination names and join them
-        destination_entities = set()
-        for dest in connectivity_statement.destinations.all():
-            destination_entities.update(dest.anatomical_entities.all())
-        destination_names = join_entities(destination_entities)
+        # Generate all paths and then consolidate them
+        all_paths = generate_paths(origins, vias, destinations)
+        journey_paths = consolidate_paths(all_paths)
 
-        # Combine all parts of the journey
-        journey = f"{origin_names} To {destination_names}"
+        # Create sentences for each journey path
+        journey_descriptions = []
+        for path in journey_paths:
+            origin_names = path[0][0]
+            destination_names = path[-1][0]
+            via_names = ' via '.join([node for node, layer in path if 0 < layer < len(vias) + 1])
 
-        if via_strings:
-            journey += " Via " + " Via ".join(via for via in via_strings if via)
+            if via_names:
+                sentence = f"'{origin_names}' to '{destination_names}' via {via_names}"
+            else:
+                sentence = f"'{origin_names}' to '{destination_names}'"
 
-        # Add handling of skipped layers
-        if connectivity_statement.has_shortcuts:
-            journey += ". The connection skips one or more Via layers."
+            journey_descriptions.append(sentence)
 
-        return journey
+        return '. '.join(journey_descriptions)
 
     @staticmethod
     def can_be_reviewed(connectivity_statement):

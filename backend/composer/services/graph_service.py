@@ -7,7 +7,7 @@ def generate_paths(origins, vias, destinations):
     for origin in origins:
         for destination in destinations:
             # Check if there's a direct connection between the origin and the destination
-            if origin in destination.from_entities.all() or not destination.from_entities.exists():
+            if origin in destination.from_entities.all() or (not destination.from_entities.exists() and len(vias) == 0):
                 for dest_entity in destination.anatomical_entities.all():
                     # Add path with origin and destination at their respective layers
                     paths.append([(origin.name, 0), (dest_entity.name, number_of_layers - 1)])
