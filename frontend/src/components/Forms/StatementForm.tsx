@@ -37,7 +37,11 @@ import {
 } from "../../helpers/settings";
 import { Option, OptionDetail } from "../../types";
 import { composerApi as api } from "../../services/apis";
-import { ConnectivityStatement, TypeC11Enum } from "../../apiclient/backend";
+import {
+  ConnectivityStatement,
+  TypeB60Enum,
+  TypeC11Enum,
+} from "../../apiclient/backend";
 import { CustomFooter } from "../Widgets/HoveredOptionContent";
 import { StatementStateChip } from "../Widgets/StateChip";
 
@@ -217,13 +221,12 @@ const StatementForm = (props: any) => {
           isPathBuilderComponent: true,
           InputIcon: ViaIcon,
           onUpdate: async (selectedOption: string, formId: string) => {
-            if (formId) {
-              api.composerViaPartialUpdate(
-                getConnectionId(formId, statement.Via),
-                {
-                  type: selectedOption,
-                },
-              );
+            const viaIndex = getConnectionId(formId, statement.vias);
+            const typeOption = selectedOption as TypeB60Enum;
+            if (viaIndex) {
+              api.composerViaPartialUpdate(viaIndex, {
+                type: typeOption,
+              });
             }
           },
         },
@@ -363,6 +366,15 @@ const StatementForm = (props: any) => {
           label: false,
           isPathBuilderComponent: true,
           InputIcon: DestinationIcon,
+          onUpdate: async (selectedOption: string, formId: string) => {
+            const viaIndex = getConnectionId(formId, statement.vias);
+            const typeOption = selectedOption as TypeC11Enum;
+            if (viaIndex) {
+              api.composerDestinationPartialUpdate(viaIndex, {
+                type: typeOption,
+              });
+            }
+          },
         },
       },
       anatomical_entities: {
