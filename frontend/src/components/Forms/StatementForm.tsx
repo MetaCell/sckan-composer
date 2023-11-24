@@ -16,7 +16,6 @@ import {
   createOptionsFromStatements,
   getAnatomicalEntities,
   getConnectionId,
-  getFirstNumberFromString,
   searchForwardConnection,
   searchFromEntitiesDestination,
   searchFromEntitiesVia,
@@ -212,11 +211,21 @@ const StatementForm = (props: any) => {
         "ui:widget": "hidden",
       },
       type: {
-        "ui:widget": CustomSingleSelect,
+        "ui:CustomSingleSelect": () => <CustomSingleSelect />,
         "ui:options": {
           label: false,
           isPathBuilderComponent: true,
           InputIcon: ViaIcon,
+          onUpdate: async (selectedOption: string, formId: string) => {
+            if (formId) {
+              api.composerViaPartialUpdate(
+                getConnectionId(formId, statement.Via),
+                {
+                  type: selectedOption,
+                },
+              );
+            }
+          },
         },
       },
       anatomical_entities: {
