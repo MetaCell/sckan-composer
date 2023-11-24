@@ -64,9 +64,10 @@ class Row:
             identifier: str,
             relationship: str,
             predicate: str,
-            curation_notes: str,
-            review_notes: str,
+            curation_notes: str = "",
+            review_notes: str = "",
             layer: str = "",
+            connected_from: str = ""
     ):
         self.structure = structure
         self.identifier = identifier
@@ -75,6 +76,7 @@ class Row:
         self.curation_notes = curation_notes
         self.review_notes = review_notes
         self.layer = layer
+        self.connected_from = connected_from
 
 
 def get_sentence_number(cs: ConnectivityStatement, row: Row):
@@ -107,6 +109,10 @@ def get_relationship(cs: ConnectivityStatement, row: Row):
 
 def get_layer(cs: ConnectivityStatement, row: Row):
     return row.layer
+
+
+def get_connected_from(cs: ConnectivityStatement, row: Row):
+    return row.connected_from
 
 
 def get_predicate(cs: ConnectivityStatement, row: Row):
@@ -172,6 +178,7 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
         "Identifier": get_identifier,
         "Relationship": get_relationship,
         "Axonal course poset": get_layer,
+        "Connected From": get_connected_from,
         "Predicate": get_predicate,
         "Observed in species": get_observed_in_species,
         "Different from existing": get_different_from_existing,
@@ -191,7 +198,6 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
 
 
 def get_origin_row(origin: AnatomicalEntity, review_notes: str, curation_notes: str):
-    # Directly create a Row for each origin
     return Row(
         origin.name,
         origin.ontology_uri,
@@ -204,7 +210,7 @@ def get_origin_row(origin: AnatomicalEntity, review_notes: str, curation_notes: 
 
 
 def get_destination_row(destination_instance: Destination, total_vias: int):
-    # For each anatomical entity in destination_instance, create a new row with layer as total_vias + 2
+    connected_from = ', '.join([fe.name for fe in destination_instance.from_entities.all()])
     layer_value = str(total_vias + 2)
     return [
         Row(
@@ -214,15 +220,17 @@ def get_destination_row(destination_instance: Destination, total_vias: int):
             TEMP_DESTINATION_PREDICATE_MAP.get(destination_instance.type),
             "",
             "",
-            layer=layer_value
+            layer=layer_value,
+            connected_from=connected_from
         )
         for ae in destination_instance.anatomical_entities.all()
     ]
 
 
 def get_via_row(via: Via):
-    # For each anatomical entity in via, create a new row with layer as via.order + 2
+    connected_from = ', '.join([fe.name for fe in via.from_entities.all()])
     layer_value = str(via.order + 2)
+
     return [
         Row(
             ae.name,
@@ -231,7 +239,8 @@ def get_via_row(via: Via):
             TEMP_VIA_PREDICATE_MAP.get(via.type),
             "",
             "",
-            layer=layer_value
+            layer=layer_value,
+            connected_from=connected_from
         )
         for ae in via.anatomical_entities.all()
     ]
