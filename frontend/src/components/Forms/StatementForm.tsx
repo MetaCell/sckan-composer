@@ -215,7 +215,7 @@ const StatementForm = (props: any) => {
         "ui:widget": "hidden",
       },
       type: {
-        "ui:CustomSingleSelect": () => <CustomSingleSelect />,
+        "ui:CustomSingleSelect": "CustomSingleSelect",
         "ui:options": {
           label: false,
           isPathBuilderComponent: true,
@@ -367,7 +367,7 @@ const StatementForm = (props: any) => {
           isPathBuilderComponent: true,
           InputIcon: DestinationIcon,
           onUpdate: async (selectedOption: string, formId: string) => {
-            const viaIndex = getConnectionId(formId, statement.vias);
+            const viaIndex = getConnectionId(formId, statement.destinations);
             const typeOption = selectedOption as TypeC11Enum;
             if (viaIndex) {
               api.composerDestinationPartialUpdate(viaIndex, {

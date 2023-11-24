@@ -104,7 +104,7 @@ const CustomSingleSelect = ({
           value={value ? value : selectOptions[0]?.value}
           onChange={(event) => {
             onChange(event.target.value);
-            onUpdate(event.target.value, id);
+            onUpdate && onUpdate(event.target.value, id);
           }}
           disabled={disabled}
           id="custom-select"
