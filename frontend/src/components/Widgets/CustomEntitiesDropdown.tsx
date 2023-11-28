@@ -209,7 +209,7 @@ export default function CustomEntitiesDropdown({
     placeholder,
     label,
     chipsNumber = 2,
-    selectType = null,
+    postProcessOptions = false,
     refreshStatement,
   },
 }: any) {
@@ -329,16 +329,15 @@ export default function CustomEntitiesDropdown({
     try {
       const options = await onSearch(inputValue, id, selectedOptions);
       const allOptions = [...selectedOptions, ...options];
-      const sortedOptions =
-        selectType && selectType === "from_entities"
-          ? processFromEntitiesData(allOptions)
-          : allOptions;
+      const sortedOptions = postProcessOptions
+        ? processFromEntitiesData(allOptions)
+        : allOptions;
       setAllOptions(sortedOptions);
       setAutocompleteOptions(sortedOptions);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [inputValue, id, onSearch, selectType]);
+  }, [inputValue, id, onSearch, postProcessOptions]);
 
   useEffect(() => {
     if (!isDropdownOpened) return;

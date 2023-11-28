@@ -276,7 +276,7 @@ const StatementForm = (props: any) => {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
           label: "From",
-          selectType: "from_entities",
+          postProcessOptions: true,
           placeholder: "Look for connections",
           searchPlaceholder: "Search for connections",
           noResultReason: "No prior connections found",
@@ -426,7 +426,7 @@ const StatementForm = (props: any) => {
         "ui:options": {
           statement: statement,
           label: "From",
-          selectType: "from_entities",
+          postProcessOptions: true,
           placeholder: "Look for Destinations",
           searchPlaceholder: "Search for Destinations",
           noResultReason: "",
