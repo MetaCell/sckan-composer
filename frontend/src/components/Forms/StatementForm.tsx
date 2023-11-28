@@ -224,9 +224,11 @@ const StatementForm = (props: any) => {
             const viaIndex = getConnectionId(formId, statement.vias);
             const typeOption = selectedOption as TypeB60Enum;
             if (viaIndex) {
-              api.composerViaPartialUpdate(viaIndex, {
-                type: typeOption,
-              });
+              api
+                .composerViaPartialUpdate(viaIndex, {
+                  type: typeOption,
+                })
+                .then(() => refreshStatement());
             }
           },
         },
@@ -370,9 +372,11 @@ const StatementForm = (props: any) => {
             const viaIndex = getConnectionId(formId, statement.destinations);
             const typeOption = selectedOption as TypeC11Enum;
             if (viaIndex) {
-              api.composerDestinationPartialUpdate(viaIndex, {
-                type: typeOption,
-              });
+              api
+                .composerDestinationPartialUpdate(viaIndex, {
+                  type: typeOption,
+                })
+                .then(() => refreshStatement());
             }
           },
         },
