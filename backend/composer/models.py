@@ -325,7 +325,7 @@ class Sentence(models.Model):
         return self.notes.exclude(type=NoteType.TRANSITION).exists()
 
     class Meta:
-        ordering = ["title"]
+        ordering = ["text"]
         verbose_name_plural = "Sentences"
         constraints = [
             models.CheckConstraint(
