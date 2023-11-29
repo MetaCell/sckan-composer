@@ -2496,6 +2496,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * ConnectivityStatement
          * @param {Array<number>} [destinations] 
+         * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
          * @param {number} [excludeSentenceId] 
          * @param {string} [knowledgeStatement] 
          * @param {number} [limit] Number of results to return per page.
@@ -2509,7 +2510,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList: async (destinations?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementList: async (destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/connectivity-statement/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2533,6 +2534,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
 
             if (destinations) {
                 localVarQueryParameter['destinations'] = destinations;
+            }
+
+            if (excludeIds) {
+                localVarQueryParameter['exclude_ids'] = excludeIds.join(COLLECTION_FORMATS.csv);
             }
 
             if (excludeSentenceId !== undefined) {
@@ -4629,6 +4634,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         /**
          * ConnectivityStatement
          * @param {Array<number>} [destinations] 
+         * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
          * @param {number} [excludeSentenceId] 
          * @param {string} [knowledgeStatement] 
          * @param {number} [limit] Number of results to return per page.
@@ -4642,8 +4648,8 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementList(destinations?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destinations, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options);
+        async composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -5220,6 +5226,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         /**
          * ConnectivityStatement
          * @param {Array<number>} [destinations] 
+         * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
          * @param {number} [excludeSentenceId] 
          * @param {string} [knowledgeStatement] 
          * @param {number} [limit] Number of results to return per page.
@@ -5233,8 +5240,8 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList(destinations?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementList> {
-            return localVarFp.composerConnectivityStatementList(destinations, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options).then((request) => request(axios, basePath));
+        composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementList> {
+            return localVarFp.composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -5793,6 +5800,7 @@ export class ComposerApi extends BaseAPI {
     /**
      * ConnectivityStatement
      * @param {Array<number>} [destinations] 
+     * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
      * @param {number} [excludeSentenceId] 
      * @param {string} [knowledgeStatement] 
      * @param {number} [limit] Number of results to return per page.
@@ -5807,8 +5815,8 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementList(destinations?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementList(destinations, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
+    public composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

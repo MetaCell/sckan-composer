@@ -11,7 +11,7 @@ export function SortableItem(props: any) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: props.id });
 
-  const { id, children, onDropIndexClick, disabled } = props;
+  const { id, children, onDropIndexClick, disabled, hideDeleteBtn } = props;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -27,23 +27,26 @@ export function SortableItem(props: any) {
 
   return (
     <MuiTableRow sx={rowStyles} ref={setNodeRef} style={style}>
-      <TableCell
-        sx={{
-          borderBottom: 0,
-          borderTopLeftRadius: "8px",
-          borderBottomLeftRadius: "8px",
-        }}
-      >
-        <IconButton
-          size="small"
-          disabled={disabled}
-          {...attributes}
-          {...listeners}
-          sx={{ p: 0 }}
+      {props.showReOrderingIcon && (
+        <TableCell
+          sx={{
+            borderBottom: 0,
+            borderTopLeftRadius: "8px",
+            borderBottomLeftRadius: "8px",
+          }}
         >
-          <DragHandleIcon fontSize="small" />
-        </IconButton>
-      </TableCell>
+          <IconButton
+            size="small"
+            disabled={disabled}
+            {...attributes}
+            {...listeners}
+            sx={{ p: 0 }}
+          >
+            <DragHandleIcon fontSize="small" />
+          </IconButton>
+        </TableCell>
+      )}
+
       <TableCell
         className="inLineForm"
         width="100%"
@@ -53,17 +56,23 @@ export function SortableItem(props: any) {
       >
         {children}
       </TableCell>
-      <TableCell
-        sx={{
-          borderBottom: 0,
-          borderTopRightRadius: "8px",
-          borderBottomRightRadius: "8px",
-        }}
-      >
-        <IconButton size="small" onClick={onDropIndexClick} disabled={disabled}>
-          <DeleteOutlineOutlinedIcon fontSize="small" />
-        </IconButton>
-      </TableCell>
+      {!hideDeleteBtn && (
+        <TableCell
+          sx={{
+            borderBottom: 0,
+            borderTopRightRadius: "8px",
+            borderBottomRightRadius: "8px",
+          }}
+        >
+          <IconButton
+            size="small"
+            onClick={onDropIndexClick}
+            disabled={disabled}
+          >
+            <DeleteOutlineOutlinedIcon fontSize="small" />
+          </IconButton>
+        </TableCell>
+      )}
     </MuiTableRow>
   );
 }
