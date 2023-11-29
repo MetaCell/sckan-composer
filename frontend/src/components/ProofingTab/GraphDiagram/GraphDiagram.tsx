@@ -55,16 +55,17 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
         destinations: DestinationSerializerDetails[] | undefined,
     ): { nodes: MetaNode[], links: MetaLink[] } => {
         const nodes: MetaNode[] = [];
-        let xOrigin = 0, xVia = 0
         const yIncrement = 100; // Vertical spacing
         const xIncrement = 100; // Horizontal spacing
+        let xOrigin = 0
 
         origins?.forEach(origin => {
+            console.log(NodeTypes.Origin, origin.name, xOrigin, 0)
             const originNode = new MetaNode(
-                origin.id.toString(),
+                NodeTypes.Origin + origin.id.toString(),
                 origin.name,
                 NodeTypes.Origin,
-                new Point(xOrigin, yIncrement),
+                new Point(xOrigin, 0),
                 '',
                 undefined,
                 [new MetaPort('out', 'out', PortTypes.OUTPUT_PORT, new Point(0, 0), new Map())],
@@ -75,12 +76,46 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
             xOrigin += xIncrement;
         });
 
-        const yDestination = yIncrement * (vias?.length || 1) + yIncrement
+
+        vias?.forEach((via, layerIndex) => {
+            let xVia = 0
+            let yVia = (layerIndex + 1) * yIncrement; // Calculate y-coordinate based on layer
+            via.anatomical_entities.forEach(entity => {
+                console.log(NodeTypes.Via, entity.name, xVia, yVia)
+                const viaNode = new MetaNode(
+                    NodeTypes.Via + layerIndex + entity.id.toString(),
+                    entity.name,
+                    NodeTypes.Via,
+                    new Point(xVia, yVia),
+                    '',
+                    undefined,
+                    [new MetaPort('out', 'out', PortTypes.OUTPUT_PORT, new Point(0, 0), new Map()),
+                        new MetaPort('in', 'in', PortTypes.INPUT_PORT, new Point(0, 0), new Map())],
+                    undefined,
+                    new Map(),
+                );
+                nodes.push(viaNode);
+                xVia += xIncrement
+            });
+            yVia += yIncrement;
+        });
+
+
+        const yDestination = yIncrement * ((vias?.length || 1) + 1)
         let xDestination = 0
+        let allDestinationEntities: { entity: AnatomicalEntity; index: number; }[] = [];
+
         // Process Destinations
-        destinations?.flatMap(d => d.anatomical_entities).forEach(entity => {
+        destinations?.forEach((d, index) => {
+            d.anatomical_entities.forEach(entity => {
+                allDestinationEntities.push({ entity, index });
+            });
+        });
+
+        allDestinationEntities.forEach(({entity, index}) => {
+            console.log(NodeTypes.Destination, entity.name, xDestination, yDestination)
             const destinationNode = new MetaNode(
-                entity.id.toString(),
+                NodeTypes.Destination + index +  entity.id.toString(),
                 entity.name,
                 NodeTypes.Destination,
                 new Point(xDestination, yDestination),
