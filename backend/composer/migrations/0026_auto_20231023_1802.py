@@ -12,7 +12,8 @@ def migrate_to_destination(apps, schema_editor):
             connectivity_statement=statement,
             type=statement.destination_type
         )
-        destination.anatomical_entities.add(statement.destination)
+        if statement.destination:
+            destination.anatomical_entities.add(statement.destination)
         destination.from_entities.set(statement.origins.all())
 
 
