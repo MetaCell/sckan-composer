@@ -42,6 +42,7 @@ export default function CheckDuplicates() {
       api
         .composerConnectivityStatementList(
           destination ? destination.id : undefined,
+          [],
           undefined,
           undefined,
           duplicatesRowsPerPage,

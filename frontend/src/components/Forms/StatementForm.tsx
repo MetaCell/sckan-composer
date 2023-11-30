@@ -26,6 +26,8 @@ import {
 import {
   mapAnatomicalEntitiesToOptions,
   DROPDOWN_MAPPER_STATE,
+  getViasGroupLabel,
+  findMatchingEntities,
 } from "../../helpers/dropdownMappers";
 import { DestinationIcon, ViaIcon } from "../icons";
 import {
@@ -35,8 +37,13 @@ import {
 } from "../../helpers/settings";
 import { Option, OptionDetail } from "../../types";
 import { composerApi as api } from "../../services/apis";
-import { ConnectivityStatement, TypeC11Enum } from "../../apiclient/backend";
+import {
+  ConnectivityStatement,
+  TypeB60Enum,
+  TypeC11Enum,
+} from "../../apiclient/backend";
 import { CustomFooter } from "../Widgets/HoveredOptionContent";
+import { StatementStateChip } from "../Widgets/StateChip";
 
 const StatementForm = (props: any) => {
   const { uiFields, statement, refreshStatement } = props;
@@ -46,8 +53,6 @@ const StatementForm = (props: any) => {
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
-  copiedSchema.properties.destinations.name = "Destination";
-  copiedSchema.properties.vias.name = "Via";
 
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["destination_type", "*"];
@@ -76,7 +81,7 @@ const StatementForm = (props: any) => {
     "ui:widget": "CustomTextField",
     "ui:options": {
       label: "ApiNATOMY Model Name",
-      placeholder: "Enter ApiNATOMY Model Name",
+      placeholder: "Enter Apinatomay Model Name",
     },
     value: statement?.apinatomy_model ?? "",
   };
@@ -124,16 +129,49 @@ const StatementForm = (props: any) => {
       noResultReason: "No results found",
       disabledReason: "",
       chipsNumber: 5,
-      onSearch: async (searchValue: string, formId: string) =>
-        getAnatomicalEntities(searchValue, OriginsGroupLabel),
+      onSearch: async (
+        searchValue: string,
+        formId: string,
+        selectedOptions: Option[],
+      ) => {
+        const excludedIds = selectedOptions.map((origin: Option) =>
+          Number(origin.id),
+        );
+        return getAnatomicalEntities(
+          searchValue,
+          OriginsGroupLabel,
+          excludedIds,
+        );
+      },
       onUpdate: async (selectedOptions: any) => {
         await updateOrigins(selectedOptions, statement.id);
-        refreshStatement();
       },
+      refreshStatement: () => refreshStatement(),
       errors: "",
       mapValueToOption: () =>
         mapAnatomicalEntitiesToOptions(statement?.origins, OriginsGroupLabel),
     },
+  };
+
+  const getAnatomicalEntitiesForForm = async (
+    searchValue: string,
+    formId: string,
+    statement: any,
+    groupLabel: string,
+    type: "vias" | "destinations",
+    property: "from_entities" | "anatomical_entities",
+    selectedOptions: Option[],
+  ) => {
+    const selectedIds = selectedOptions.map((entity: Option) =>
+      Number(entity.id),
+    );
+    if (property === "from_entities" && type === "destinations") {
+      return searchFromEntitiesDestination(searchValue, statement, selectedIds);
+    } else if (property === "from_entities" && type === "vias") {
+      return searchFromEntitiesVia(searchValue, statement, formId, selectedIds);
+    } else {
+      return getAnatomicalEntities(searchValue, groupLabel, selectedIds);
+    }
   };
 
   copiedUISchema.vias = {
@@ -163,6 +201,9 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
+        hideDeleteBtn={statement.vias.length <= 1}
+        showReOrderingIcon={true}
+        addButtonPlaceholder={"Via"}
       />
     ),
     items: {
@@ -174,11 +215,22 @@ const StatementForm = (props: any) => {
         "ui:widget": "hidden",
       },
       type: {
-        "ui:widget": "CustomSingleSelect",
+        "ui:CustomSingleSelect": "CustomSingleSelect",
         "ui:options": {
           label: false,
           isPathBuilderComponent: true,
           InputIcon: ViaIcon,
+          onUpdate: async (selectedOption: string, formId: string) => {
+            const viaIndex = getConnectionId(formId, statement.vias);
+            const typeOption = selectedOption as TypeB60Enum;
+            if (viaIndex) {
+              api
+                .composerViaPartialUpdate(viaIndex, {
+                  type: typeOption,
+                })
+                .then(() => refreshStatement());
+            }
+          },
         },
       },
       anatomical_entities: {
@@ -190,8 +242,21 @@ const StatementForm = (props: any) => {
           searchPlaceholder: "Search for vias",
           noResultReason: "No anatomical entities found",
           disabledReason: "",
-          onSearch: async (searchValue: string, formId: string) =>
-            getAnatomicalEntities(searchValue, ViasGroupLabel),
+          onSearch: async (
+            searchValue: string,
+            formId: string,
+            selectedOptions: Option[],
+          ) => {
+            return getAnatomicalEntitiesForForm(
+              searchValue,
+              formId,
+              statement,
+              ViasGroupLabel,
+              "vias",
+              "anatomical_entities",
+              selectedOptions,
+            );
+          },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
             await updateEntity({
               selected: selectedOptions,
@@ -199,8 +264,8 @@ const StatementForm = (props: any) => {
               entityType: "via",
               propertyToUpdate: "anatomical_entities",
             });
-            refreshStatement();
           },
+          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) =>
             mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
@@ -211,12 +276,27 @@ const StatementForm = (props: any) => {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
           label: "From",
+          postProcessOptions: true,
           placeholder: "Look for connections",
           searchPlaceholder: "Search for connections",
           noResultReason: "No prior connections found",
           disabledReason: "",
-          onSearch: async (searchValue: string, formId: string) =>
-            searchFromEntitiesVia(searchValue, statement, formId),
+
+          onSearch: async (
+            searchValue: string,
+            formId: string,
+            selectedOptions: Option[],
+          ) => {
+            return getAnatomicalEntitiesForForm(
+              searchValue,
+              formId,
+              statement,
+              ViasGroupLabel,
+              "vias",
+              "from_entities",
+              selectedOptions,
+            );
+          },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
             await updateEntity({
               selected: selectedOptions,
@@ -224,11 +304,25 @@ const StatementForm = (props: any) => {
               entityType: "via",
               propertyToUpdate: "from_entities",
             });
-            refreshStatement();
           },
+          refreshStatement: () => refreshStatement(),
           errors: "",
-          mapValueToOption: (anatomicalEntities: any[]) =>
-            mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
+          mapValueToOption: (anatomicalEntities: any[], formId: any) => {
+            const entities: Option[] = [];
+            const selected = findMatchingEntities(
+              statement,
+              anatomicalEntities,
+            );
+            selected.forEach((row: any) => {
+              entities.push(
+                mapAnatomicalEntitiesToOptions(
+                  [row],
+                  getViasGroupLabel(row.order + 1),
+                )[0],
+              );
+            });
+            return entities;
+          },
           CustomFooter: CustomFooter,
         },
       },
@@ -255,6 +349,9 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
+        hideDeleteBtn={statement.destinations.length <= 1}
+        showReOrderingIcon={false}
+        addButtonPlaceholder={"Destination"}
       />
     ),
     items: {
@@ -271,6 +368,17 @@ const StatementForm = (props: any) => {
           label: false,
           isPathBuilderComponent: true,
           InputIcon: DestinationIcon,
+          onUpdate: async (selectedOption: string, formId: string) => {
+            const viaIndex = getConnectionId(formId, statement.destinations);
+            const typeOption = selectedOption as TypeC11Enum;
+            if (viaIndex) {
+              api
+                .composerDestinationPartialUpdate(viaIndex, {
+                  type: typeOption,
+                })
+                .then(() => refreshStatement());
+            }
+          },
         },
       },
       anatomical_entities: {
@@ -280,8 +388,21 @@ const StatementForm = (props: any) => {
           searchPlaceholder: "Search for Destinations",
           noResultReason: "No anatomical entities found",
           disabledReason: "",
-          onSearch: async (searchValue: string) =>
-            getAnatomicalEntities(searchValue, DestinationsGroupLabel),
+          onSearch: async (
+            searchValue: string,
+            formId: string,
+            selectedOptions: Option[],
+          ) => {
+            return getAnatomicalEntitiesForForm(
+              searchValue,
+              formId,
+              statement,
+              DestinationsGroupLabel,
+              "destinations",
+              "anatomical_entities",
+              selectedOptions,
+            );
+          },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
             await updateEntity({
               selected: selectedOptions,
@@ -289,8 +410,8 @@ const StatementForm = (props: any) => {
               entityType: "destination",
               propertyToUpdate: "anatomical_entities",
             });
-            refreshStatement();
           },
+          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) =>
             mapAnatomicalEntitiesToOptions(
@@ -305,12 +426,26 @@ const StatementForm = (props: any) => {
         "ui:options": {
           statement: statement,
           label: "From",
+          postProcessOptions: true,
           placeholder: "Look for Destinations",
           searchPlaceholder: "Search for Destinations",
           noResultReason: "",
           disabledReason: "",
-          onSearch: async (searchValue: string, formId: string) =>
-            searchFromEntitiesDestination(searchValue, statement),
+          onSearch: async (
+            searchValue: string,
+            formId: string,
+            selectedOptions: Option[],
+          ) => {
+            return getAnatomicalEntitiesForForm(
+              searchValue,
+              formId,
+              statement,
+              ViasGroupLabel,
+              "destinations",
+              "from_entities",
+              selectedOptions,
+            );
+          },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
             await updateEntity({
               selected: selectedOptions,
@@ -318,14 +453,25 @@ const StatementForm = (props: any) => {
               entityType: "destination",
               propertyToUpdate: "from_entities",
             });
-            refreshStatement();
           },
+          refreshStatement: () => refreshStatement(),
           errors: "",
-          mapValueToOption: (anatomicalEntities: any[]) =>
-            mapAnatomicalEntitiesToOptions(
+          mapValueToOption: (anatomicalEntities: any[], formId: any) => {
+            const entities: Option[] = [];
+            const selected = findMatchingEntities(
+              statement,
               anatomicalEntities,
-              DestinationsGroupLabel,
-            ),
+            );
+            selected.forEach((row: any) => {
+              entities.push(
+                mapAnatomicalEntitiesToOptions(
+                  [row],
+                  getViasGroupLabel(row.order + 1),
+                )[0],
+              );
+            });
+            return entities;
+          },
           CustomFooter: CustomFooter,
         },
       },
@@ -342,6 +488,9 @@ const StatementForm = (props: any) => {
     },
     value: statement?.additional_information ?? "",
   };
+  const selectedForwardConnection = statement.forward_connection.map(
+    (origin: Option) => origin.id,
+  );
 
   copiedUISchema.forward_connection = {
     "ui:widget": CustomEntitiesDropdown,
@@ -353,8 +502,10 @@ const StatementForm = (props: any) => {
         "We couldn’t find any record with these origin in the database.",
       disabledReason:
         "Add Destination entity to get access to the forward connection form",
-      onSearch: async (searchValue: string) =>
-        searchForwardConnection(searchValue, statement),
+      onSearch: async (searchValue: string) => {
+        const excludedIds = searchValue ? [] : selectedForwardConnection;
+        return searchForwardConnection(searchValue, statement, excludedIds);
+      },
       onUpdate: async (selectedOptions: Option[]) => {
         await updateForwardConnections(selectedOptions, statement);
         refreshStatement();
@@ -406,11 +557,10 @@ const StatementForm = (props: any) => {
               display: "flex",
               gap: 1,
               flexWrap: "wrap",
-              pt: "1.5rem",
-              borderTop: "0.0625rem solid #F2F4F7",
+              pb: "1.5rem",
             }}
           >
-            <Chip variant="outlined" label={stateValue} />
+            <StatementStateChip value={stateValue} />
           </Box>
         );
       },

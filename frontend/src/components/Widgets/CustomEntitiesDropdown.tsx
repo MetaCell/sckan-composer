@@ -1,5 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
-import {Badge, CircularProgress, InputAdornment, Popper, Tooltip} from "@mui/material";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Badge,
+  CircularProgress,
+  InputAdornment,
+  Popper,
+  Tooltip,
+} from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   TextField,
@@ -22,6 +28,7 @@ import NoResultField from "./NoResultField";
 import { vars } from "../../theme/variables";
 import { Option } from "../../types";
 import Stack from "@mui/material/Stack";
+import { processFromEntitiesData } from "../../helpers/dropdownMappers";
 
 const {
   buttonOutlinedBorderColor,
@@ -202,35 +209,35 @@ export default function CustomEntitiesDropdown({
     placeholder,
     label,
     chipsNumber = 2,
-    statement,
+    postProcessOptions = false,
+    refreshStatement,
   },
 }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
   const open = Boolean(anchorEl);
   const aria = open ? "simple-popper" : undefined;
 
   const [hoveredOption, setHoveredOption] = useState<Option | null>(null);
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>(mapValueToOption(value) || []);
+  const [selectedOptions, setSelectedOptions] = useState<Option[]>(
+    mapValueToOption(value, id) || [],
+  );
 
   const [autocompleteOptions, setAutocompleteOptions] = useState<Option[]>([]);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState<string | undefined>(undefined);
   const popperRef = useRef<HTMLDivElement | null>(null);
 
   const [isDropdownOpened, setIsDropdownOpened] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [allOptions, setAllOptions] = useState<Option[]>([]);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setIsDropdownOpened(true);
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
 
-
   const handleSelectedOptionsChange = async (newSelectedOptions: Option[]) => {
-    onUpdate(newSelectedOptions, id).then(() =>
-      setSelectedOptions(newSelectedOptions),
-    );
+    setSelectedOptions(newSelectedOptions);
+    onUpdate(newSelectedOptions, id);
   };
 
   const groupedOptions = autocompleteOptions.reduce(
@@ -272,14 +279,7 @@ export default function CustomEntitiesDropdown({
   };
 
   const getGroupButton = (group: string) => {
-    const allObjectsExist = autocompleteOptions
-      ?.filter((option: Option) => option.group === group)
-      .every(
-        (obj1) =>
-          selectedOptions?.some(
-            (obj2) => JSON.stringify(obj1) === JSON.stringify(obj2),
-          ),
-      );
+    const allObjectsExist = selectedOptions.length === allOptions.length;
     return (
       <Button
         variant="text"
@@ -318,9 +318,6 @@ export default function CustomEntitiesDropdown({
   };
 
   const handleInputChange = (event: any) => {
-    if (event.target.value !== undefined) {
-      onSearch(event.target.value, id).then(setAutocompleteOptions);
-    }
     setInputValue(event.target.value);
   };
 
@@ -328,29 +325,30 @@ export default function CustomEntitiesDropdown({
     return selectedOptions?.some((selected) => selected?.id === option?.id);
   };
 
+  const fetchData = useCallback(async () => {
+    try {
+      const options = await onSearch(inputValue, id, selectedOptions);
+      const allOptions = [...selectedOptions, ...options];
+      const sortedOptions = postProcessOptions
+        ? processFromEntitiesData(allOptions)
+        : allOptions;
+      setAllOptions(sortedOptions);
+      setAutocompleteOptions(sortedOptions);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, [inputValue, id, onSearch, postProcessOptions]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!isDropdownOpened) return;
-
-      setIsLoading(true);
-      try {
-        const options = await onSearch('', id);
-        setAutocompleteOptions(options);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
+    if (!isDropdownOpened) return;
+    setIsLoading(true);
+    fetchData().then(() => setIsLoading(false));
   }, [isDropdownOpened, id, onSearch]);
 
-
   useEffect(() => {
-    if (inputValue !== '') {
-      onSearch(inputValue, id).then(setAutocompleteOptions);
+    if (inputValue !== undefined) {
+      setIsLoading(true);
+      fetchData().then(() => setIsLoading(false));
     }
   }, [inputValue, id]);
 
@@ -361,6 +359,9 @@ export default function CustomEntitiesDropdown({
         !popperRef.current.contains(event.target as Node)
       ) {
         setAnchorEl(null);
+        setInputValue("");
+        refreshStatement();
+        setAllOptions([]);
       }
     };
 
@@ -400,9 +401,7 @@ export default function CustomEntitiesDropdown({
             onClick={handleClick}
           >
             {selectedOptions.length === 0 ? (
-              <Typography sx={styles.placeholder}>
-                {placeholder}
-              </Typography>
+              <Typography sx={styles.placeholder}>{placeholder}</Typography>
             ) : (
               <Box gap={1} display="flex" flexWrap="wrap" alignItems="center">
                 {selectedOptions?.length
@@ -519,18 +518,7 @@ export default function CustomEntitiesDropdown({
               ))}
             </Box>
           )}
-
-          {isLoading ? (
-                  <Box
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
-                      sx={{ height: "100%" }}
-                  >
-                    <CircularProgress />
-                  </Box>
-              ) :
-              (<Box
+          <Box
             display="flex"
             flex={1}
             height={
@@ -595,7 +583,16 @@ export default function CustomEntitiesDropdown({
                   }}
                 />
               </Box>
-              {autocompleteOptions.length > 0 ? (
+              {isLoading ? (
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  sx={{ height: "100%" }}
+                >
+                  <CircularProgress />
+                </Box>
+              ) : autocompleteOptions.length > 0 ? (
                 <>
                   <Box
                     overflow="auto"
@@ -697,7 +694,11 @@ export default function CustomEntitiesDropdown({
                             .filter((option: Option) =>
                               option.label
                                 .toLowerCase()
-                                .includes(inputValue.toLowerCase()),
+                                .includes(
+                                  inputValue !== undefined
+                                    ? inputValue.toLowerCase()
+                                    : "",
+                                ),
                             )
                             .map((option: Option) => (
                               <li
@@ -760,7 +761,7 @@ export default function CustomEntitiesDropdown({
                       },
                     }}
                   >
-                    {selectedOptions.length === autocompleteOptions.length ? (
+                    {allOptions.length === selectedOptions.length ? (
                       <Button
                         disableRipple
                         startIcon={<PlaylistRemoveOutlinedIcon />}
@@ -815,7 +816,7 @@ export default function CustomEntitiesDropdown({
                   ))}
               </Box>
             )}
-          </Box>)}
+          </Box>
         </Popper>
       </Stack>
       {errors && (
