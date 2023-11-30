@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models, transaction
-from django.db.models import Q
-from django.db.models.expressions import RawSQL, F, Exists, OuterRef
+from django.db.models import Q, Max
+from django.db.models.expressions import F
 from django.db.models.functions import Upper
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
@@ -325,7 +325,7 @@ class Sentence(models.Model):
         return self.notes.exclude(type=NoteType.TRANSITION).exists()
 
     class Meta:
-        ordering = ["title"]
+        ordering = ["text"]
         verbose_name_plural = "Sentences"
         constraints = [
             models.CheckConstraint(
@@ -486,16 +486,44 @@ class ConnectivityStatement(models.Model):
         return f"CPR:{self.id:06d}"
 
     @property
-    def journey(self):
-        return ConnectivityStatementService.compile_journey(self)
-
-    @property
     def has_notes(self):
         return self.notes.exclude(type=NoteType.TRANSITION).exists()
 
     @property
     def tag_list(self):
         return ", ".join(self.tags.all().values_list("tag", flat=True))
+
+    @property
+    def has_shortcuts(self):
+        # Check Destinations
+        if self.destinations.exists():
+            highest_via_order = self.via_set.aggregate(Max('order')).get('order__max')
+            highest_via_order = -1 if highest_via_order is None else highest_via_order
+            previous_layer_entities = self.get_previous_layer_entities(highest_via_order + 1)
+
+            for dest in self.destinations.all():
+                if not set(dest.from_entities.all()).issubset(previous_layer_entities):
+                    return True
+
+        # Check Vias in descending order
+        for via_order in range(highest_via_order, -1, -1):
+            via = self.via_set.get(order=via_order)
+            previous_layer_entities = self.get_previous_layer_entities(via_order)
+
+            if not set(via.from_entities.all()).issubset(previous_layer_entities):
+                return True
+
+        return False
+
+    def get_previous_layer_entities(self, via_order):
+        if via_order == 0:
+            return set(self.origins.all())
+        else:
+            return set(self.via_set.get(order=via_order - 1).anatomical_entities.all())
+
+    @property
+    def journey(self):
+        return ConnectivityStatementService.compile_journey(self)
 
     def get_laterality_description(self):
         laterality_map = {
@@ -589,7 +617,6 @@ class Via(AbstractConnectionLayer):
     order = models.IntegerField()
 
     def save(self, *args, **kwargs):
-        # TODO: Check if we need to clear the from entities when it maches with all entities from the prior entity. @afonsobspinto
         with transaction.atomic():
             # Check if the object already exists in the database
             if not self.pk:

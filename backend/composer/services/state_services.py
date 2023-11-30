@@ -2,7 +2,9 @@ from django.db import transaction
 from django.apps import apps
 from django.db.models import Q, Count
 from composer.enums import CSState
+from .graph_service import generate_paths, consolidate_paths
 from ..enums import SentenceState
+from ..utils import join_entities
 
 
 class BaseServiceMixin:
@@ -107,32 +109,39 @@ class SentenceService(StateServiceMixin):
 class ConnectivityStatementService(StateServiceMixin):
     @staticmethod
     def compile_journey(connectivity_statement):
-        # TODO: Update for the new graph format
+        """
+       Generates a string of descriptions of journey paths for a given connectivity statement.
 
-        # Get all the origin names
-        origin_names = [str(origin) for origin in connectivity_statement.origins.all()]
+       Args:
+           connectivity_statement: The connectivity statement containing origins, vias, and destinations.
 
-        # Combine them into a comma-separated string
-        all_origins_combined = ", ".join(origin_names[:-1]) + (
-            " and " + origin_names[-1] if len(origin_names) > 1 else "")
+       Returns:
+           A string with each journey path description on a new line.
+       """
+        # Extract origins, vias, and destinations from the connectivity statement
+        origins = list(connectivity_statement.origins.all())
+        vias = list(connectivity_statement.via_set.all())
+        destinations = list(connectivity_statement.destinations.all())
 
-        # Get all destinations for the connectivity_statement
-        destinations = connectivity_statement.destinations.all()
-        destination_strings = []
-        for dest in destinations:
-            dest_names = [str(entity) for entity in dest.anatomical_entities.all()]
-            dest_combined = ", ".join(dest_names[:-1]) + (" and " + dest_names[-1] if len(dest_names) > 1 else "")
-            destination_strings.append(dest_combined)
+        # Generate all paths and then consolidate them
+        all_paths = generate_paths(origins, vias, destinations)
+        journey_paths = consolidate_paths(all_paths)
 
-        all_destinations_combined = ", ".join(destination_strings[:-1]) + (
-            " and " + destination_strings[-1] if len(destination_strings) > 1 else "")
+        # Create sentences for each journey path
+        journey_descriptions = []
+        for path in journey_paths:
+            origin_names = path[0][0]
+            destination_names = path[-1][0]
+            via_names = ' via '.join([node for node, layer in path if 0 < layer < len(vias) + 1])
 
-        paths = " via ".join(str(path) for path in connectivity_statement.path.order_by('via'))
+            if via_names:
+                sentence = f"'{origin_names}' to '{destination_names}' via {via_names}"
+            else:
+                sentence = f"'{origin_names}' to '{destination_names}'"
 
-        # Construct the final journey string
-        journey = f"{all_origins_combined} to {all_destinations_combined} via {paths}"
+            journey_descriptions.append(sentence)
 
-        return journey
+        return '. '.join(journey_descriptions)
 
     @staticmethod
     def can_be_reviewed(connectivity_statement):

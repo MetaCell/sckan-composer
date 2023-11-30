@@ -28,7 +28,6 @@ import { composerApi as api } from "../../services/apis";
 import AutoComplete from "../AutoComplete";
 
 type criteria = ("id" | "-id")[] | undefined;
-
 export default function CheckDuplicates() {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [origin, setOrigin] = React.useState<number[] | undefined | []>([]);
