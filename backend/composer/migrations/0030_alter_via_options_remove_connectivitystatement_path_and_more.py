@@ -64,10 +64,6 @@ class Migration(migrations.Migration):
                 max_length=10,
             ),
         ),
-        migrations.AlterUniqueTogether(
-            name="via",
-            unique_together={("connectivity_statement", "order")},
-        ),
         migrations.RemoveField(
             model_name="via",
             name="anatomical_entity",
