@@ -12,12 +12,14 @@ const CustomSingleSelect = ({
   placeholder,
   disabled,
   value,
+  id,
   options: {
     label,
     data,
     enumOptions,
     isPathBuilderComponent = false,
     InputIcon,
+    onUpdate,
   },
 }: any) => {
   const selectOptions = enumOptions ? enumOptions : data;
@@ -100,7 +102,10 @@ const CustomSingleSelect = ({
             },
           }}
           value={value ? value : selectOptions[0]?.value}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(event) => {
+            onChange(event.target.value);
+            onUpdate && onUpdate(event.target.value, id);
+          }}
           disabled={disabled}
           id="custom-select"
           input={<OutlinedInput id="custom-select-input" />}
