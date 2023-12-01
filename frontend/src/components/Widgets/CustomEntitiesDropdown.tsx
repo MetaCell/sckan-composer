@@ -215,7 +215,6 @@ export default function CustomEntitiesDropdown({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const aria = open ? "simple-popper" : undefined;
-  console.log(selectType);
   const [hoveredOption, setHoveredOption] = useState<Option | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<Option[]>(
     mapValueToOption(value, id) || [],

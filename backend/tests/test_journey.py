@@ -376,3 +376,58 @@ class JourneyTestCase(TestCase):
         journey_paths.sort()
         expected_journey.sort()
         self.assertTrue(journey_paths == expected_journey)
+
+    def test_journey_cycles(self):
+        #####################################################################
+
+        # Oa -> Oa -> Da
+        # Ob -> Da
+
+        sentence = Sentence.objects.create()
+        cs = ConnectivityStatement.objects.create(sentence=sentence)
+
+        # Create Anatomical Entities
+        origin1 = AnatomicalEntity.objects.create(name='Oa')
+        origin2 = AnatomicalEntity.objects.create(name='Ob')
+        destination1 = AnatomicalEntity.objects.create(name='Da')
+
+        # Add origins
+        cs.origins.add(origin1, origin2)
+
+        # Create Via
+        via = Via.objects.create(connectivity_statement=cs, order=0)
+        via.anatomical_entities.add(origin1)
+        via.from_entities.add(origin1)
+
+        # Create Destination
+        destination = Destination.objects.create(connectivity_statement=cs)
+        destination.anatomical_entities.add(destination1)
+        destination.from_entities.add(origin1, origin2)
+
+        ######################################################################
+
+        origins = list(cs.origins.all())
+        vias = list(Via.objects.filter(connectivity_statement=cs))
+        destinations = list(Destination.objects.filter(connectivity_statement=cs))
+
+        expected_paths = [
+            [('Oa', 0), ('Da', 2)],
+            [('Oa', 0), ('Oa', 1), ('Da', 2)],
+            [('Ob', 0), ('Da', 2)]
+        ]
+
+        all_paths = generate_paths(origins, vias, destinations)
+
+        all_paths.sort()
+        expected_paths.sort()
+        self.assertTrue(all_paths == expected_paths)
+
+        expected_journey = [
+            [('Oa', 0), ('Oa', 1), ('Da', 2)],
+            [('Oa, Ob', 0), ('Da', 2)]
+        ]
+
+        journey_paths = consolidate_paths(all_paths)
+        expected_journey.sort()
+        journey_paths.sort()
+        self.assertTrue(journey_paths == expected_journey)
