@@ -66,7 +66,7 @@ const ProofingTab = (props: any) => {
         <Box ref={refs[6]}>
           <Paper sx={sectionStyle}>
             <Stack spacing={2}>
-              <Typography variant="h5">Statement Display</Typography>
+              <Typography variant="h5">Population Diagram</Typography>
               <StatementChart statement={statement} />
             </Stack>
 
