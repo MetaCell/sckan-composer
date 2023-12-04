@@ -101,7 +101,7 @@ const CustomSingleSelect = ({
               boxShadow: "none",
             },
           }}
-          value={value ? value : selectOptions[0]?.value}
+          value={value !== null ? value : ""}
           onChange={(event) => {
             onChange(event.target.value);
             onUpdate && onUpdate(event.target.value, id);

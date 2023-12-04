@@ -360,7 +360,7 @@ export default function CustomEntitiesDropdown({
       ) {
         setAnchorEl(null);
         setInputValue("");
-        refreshStatement();
+        refreshStatement && refreshStatement();
         setAllOptions([]);
       }
     };
