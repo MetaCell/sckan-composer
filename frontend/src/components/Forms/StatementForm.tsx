@@ -465,7 +465,6 @@ const StatementForm = (props: any) => {
               statement,
               anatomicalEntities,
             );
-            console.log(selected);
             selected.forEach((row: any) => {
               entities.push(
                 mapAnatomicalEntitiesToOptions(
@@ -526,9 +525,15 @@ const StatementForm = (props: any) => {
         ),
       header: {
         label: "Origins",
-        values: statement?.destinations.flatMap((item: any) =>
-          item.anatomical_entities.map((entity: any) => entity.name),
-        ),
+        values:
+          statement?.destinations &&
+          Array.from(
+            new Set(
+              statement?.destinations.flatMap((item: any) =>
+                item.anatomical_entities.map((entity: any) => entity.name),
+              ),
+            ),
+          ),
       },
       CustomInputChip: ({ entity, sx = {} }: any) => (
         <Chip
