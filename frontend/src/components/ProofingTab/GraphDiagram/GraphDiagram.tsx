@@ -20,7 +20,7 @@ import {sidebarNodes} from "./Sidebar";
 
 const styles = () => ({
     canvasBG: {
-        background: `grey`,
+        background: `silver`,
     },
 
     container: {

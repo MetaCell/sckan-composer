@@ -3,7 +3,7 @@
 import FitScreenIcon from '@mui/icons-material/FitScreen';
 
 export const sidebarNodes = [
-
+    // TODO: See how to manage the selected state @afonsobspinto
     {
         id: 'autoscale',
         type: 'autoscale',
