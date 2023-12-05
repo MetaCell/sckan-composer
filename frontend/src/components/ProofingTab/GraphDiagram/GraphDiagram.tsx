@@ -8,13 +8,13 @@ import MetaDiagram, {
     ComponentsMap,
     MetaNode,
     MetaLink,
-    MetaPort, PortTypes, MetaNodeModel, MetaLinkModel,
+    MetaNodeModel, MetaLinkModel, MetaPortModel,
 } from '@metacell/meta-diagram';
-import {OriginNode} from "./Widgets/OriginNode";
-import {ViaNode} from "./Widgets/ViaNode";
-import {DestinationNode} from "./Widgets/DestinationNode";
-import {DefaultLinkWidget, DefaultPortModel, DefaultNodeModel, DefaultLinkModel} from '@projectstorm/react-diagrams';
+import {OriginNodeWidget} from "./Widgets/OriginNodeWidget";
+import {ViaNodeWidget} from "./Widgets/ViaNodeWidget";
+import {DestinationNodeWidget} from "./Widgets/DestinationNodeWidget";
 import {Point} from "@projectstorm/geometry";
+import CustomLinkWidget from "./Widgets/CustomLinkWidget";
 
 
 export enum NodeTypes {
@@ -38,7 +38,7 @@ function getId(layerId: string, entity: AnatomicalEntity) {
     return layerId + entity.id.toString();
 }
 
-function findNodeForEntity(entity: AnatomicalEntity, nodeMap: Map<string, DefaultNodeModel>, maxLayerIndex: number) {
+function findNodeForEntity(entity: AnatomicalEntity, nodeMap: Map<string, MetaNodeModel>, maxLayerIndex: number) {
     for (let layerIndex = 0; layerIndex <= maxLayerIndex; layerIndex++) {
         let layerId = layerIndex === 0 ? NodeTypes.Origin : NodeTypes.Via + layerIndex
         let id = getId(layerId, entity);
@@ -49,11 +49,24 @@ function findNodeForEntity(entity: AnatomicalEntity, nodeMap: Map<string, Defaul
     return null;
 }
 
-const createLink = (sourceNode: DefaultNodeModel, targetNode: DefaultNodeModel, sourcePortName: string, targetPortName: string) => {
+const createLink = (sourceNode: MetaNodeModel, targetNode: MetaNodeModel, sourcePortName: string, targetPortName: string) => {
     const sourcePort = sourceNode.getPort(sourcePortName);
     const targetPort = targetNode.getPort(targetPortName);
     if (sourcePort && targetPort) {
-        const link = new DefaultLinkModel();
+        const sourceNodeId = sourceNode.getId().join()
+        const targetNodeId = targetNode.getId().join()
+        const metaLink = new MetaLink(
+            'link-' + sourceNodeId + '-' + targetNodeId,
+            'Link between ' +sourceNodeId + ' and ' + targetNodeId,
+            LinkTypes.Default,
+            sourceNodeId,
+            sourcePortName,
+            targetNodeId,
+            targetPortName,
+            '',
+            new Map()
+        );
+        const link = metaLink.toModel()
         link.setSourcePort(sourcePort);
         link.setTargetPort(targetPort);
         return link;
@@ -68,11 +81,11 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
         origins: AnatomicalEntity[] | undefined,
         vias: ViaSerializerDetails[] | undefined,
         destinations: DestinationSerializerDetails[] | undefined,
-    ): { nodes: DefaultNodeModel[], links: DefaultLinkModel[] } => {
-        const nodes: DefaultNodeModel[] = [];
-        const links: DefaultLinkModel[] = [];
+    ): { nodes: MetaNodeModel[], links: MetaLinkModel[] } => {
+        const nodes: MetaNodeModel[] = [];
+        const links: MetaLinkModel[] = [];
 
-        const nodeMap = new Map<string, DefaultNodeModel>();
+        const nodeMap = new Map<string, MetaNodeModel>();
 
         const yIncrement = 100; // Vertical spacing
         const xIncrement = 100; // Horizontal spacing
@@ -80,12 +93,10 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
 
         origins?.forEach(origin => {
             const id = getId(NodeTypes.Origin, origin)
-            const originNode = new DefaultNodeModel({
-                name: id,
-                color: 'red' // Set color or other properties as needed
-            });
-            originNode.setPosition(xOrigin, 0);
-            originNode.addPort(new DefaultPortModel(false, 'out', 'Out'));
+            const originMetaNode = new MetaNode(id, origin.name, NodeTypes.Origin,
+                new Point(xOrigin, 0), '', undefined, [], [], new Map());
+            const originNode = originMetaNode.toModel();
+            originNode.addPort(new MetaPortModel(false, 'out', 'Out'));
             nodes.push(originNode);
             nodeMap.set(id, originNode);
             xOrigin += xIncrement;
@@ -98,14 +109,11 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
             let yVia = layerIndex * yIncrement;
             via.anatomical_entities.forEach(entity => {
                 const id = getId(NodeTypes.Via + layerIndex, entity)
-
-                const viaNode = new DefaultNodeModel({
-                    name: id,
-                    color: 'yellow'
-                });
-                viaNode.setPosition(xVia, yVia);
-                viaNode.addPort(new DefaultPortModel(false, 'out', 'Out'));
-                viaNode.addPort(new DefaultPortModel(true, 'in', 'In'));
+                const viaMetaNode = new MetaNode(id, entity.name, NodeTypes.Via,
+                    new Point(xVia, yVia), '', undefined, [], [], new Map());
+                const viaNode = viaMetaNode.toModel()
+                viaNode.addPort(new MetaPortModel(false, 'out', 'Out'));
+                viaNode.addPort(new MetaPortModel(true, 'in', 'In'));
                 nodes.push(viaNode);
                 nodeMap.set(id, viaNode);
                 xVia += xIncrement
@@ -131,12 +139,10 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
         // Process Destinations
         destinations?.forEach(destination => {
             destination.anatomical_entities.forEach(entity => {
-                const destinationNode = new DefaultNodeModel({
-                    name: getId(NodeTypes.Destination, entity),
-                    color: 'green'
-                });
-                destinationNode.setPosition(xDestination, yDestination);
-                destinationNode.addPort(new DefaultPortModel(true, 'in', 'In'));
+                const destinationMetaNode = new MetaNode(getId(NodeTypes.Destination, entity), entity.name, NodeTypes.Destination,
+                    new Point(xDestination, yDestination), '', undefined, [], [], new Map());
+                const destinationNode = destinationMetaNode.toModel()
+                destinationNode.addPort(new MetaPortModel(true, 'in', 'In'));
                 nodes.push(destinationNode);
                 xDestination += xIncrement;
                 xDestination += xIncrement;
@@ -159,13 +165,13 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
     const {nodes, links} = processData(origins, vias, destinations);
 
     const nodeComponentsMap = new Map<string, React.ComponentType<any>>([
-        [NodeTypes.Origin, OriginNode],
-        [NodeTypes.Via, ViaNode],
-        [NodeTypes.Destination, DestinationNode],
+        [NodeTypes.Origin, OriginNodeWidget],
+        [NodeTypes.Via, ViaNodeWidget],
+        [NodeTypes.Destination, DestinationNodeWidget],
     ]);
 
     const linkComponentsMap = new Map<string, React.ComponentType<any>>([
-        [LinkTypes.Default, DefaultLinkWidget],
+        [LinkTypes.Default, CustomLinkWidget],
     ]);
     const componentsMap = new ComponentsMap(nodeComponentsMap, linkComponentsMap);
 

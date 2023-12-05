@@ -1,30 +1,28 @@
 import React from "react";
 import {PortWidget} from '@metacell/meta-diagram';
+import {Typography} from "@mui/material";
 
-interface ViaNodeProps {
+interface OriginNodeProps {
     model: any;
     engine: any;
 }
 
-export const ViaNode: React.FC<ViaNodeProps> = ({ model, engine }) => {
+export const OriginNodeWidget: React.FC<OriginNodeProps> = ({model, engine}) => {
     return (
         <div style={{
-            width: '60px',
-            height: '60px',
-            backgroundColor: 'green',
-            borderRadius: '10px',
+            width: '50px',
+            height: '50px',
+            backgroundColor: 'blue',
+            borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: 'white',
             position: 'relative'
         }}>
-            Via
-            <PortWidget engine={engine} port={model.getPort('in')}>
-                <div className="circle-port" />
-            </PortWidget>
+            <Typography>{model.getOptions().name}</Typography>
             <PortWidget engine={engine} port={model.getPort('out')}>
-                <div className="circle-port" />
+                <div className="circle-port"/>
             </PortWidget>
         </div>
     );
