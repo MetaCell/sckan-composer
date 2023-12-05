@@ -16,11 +16,23 @@ import {DestinationNodeWidget} from "./Widgets/DestinationNodeWidget";
 import {Point} from "@projectstorm/geometry";
 import CustomLinkWidget from "./Widgets/CustomLinkWidget";
 import {withStyles} from "@mui/styles";
+import {sidebarNodes} from "./Sidebar";
 
 const styles = () => ({
     canvasBG: {
         background: `grey`,
     },
+
+    container: {
+        height: '100%',
+        width: '100%',
+    },
+
+    sidebar: {
+        '& .sidebar': {
+            position: 'relative',
+        },
+    }
 });
 
 export enum NodeTypes {
@@ -60,8 +72,8 @@ const createLink = (sourceNode: MetaNodeModel, targetNode: MetaNodeModel, source
     const sourcePort = sourceNode.getPort(sourcePortName);
     const targetPort = targetNode.getPort(targetPortName);
     if (sourcePort && targetPort) {
-        const sourceNodeId = sourceNode.getId().join()
-        const targetNodeId = targetNode.getId().join()
+        const sourceNodeId = sourceNode.getOptions().id || ''
+        const targetNodeId = targetNode.getOptions().id || ''
         const metaLink = new MetaLink(
             'link-' + sourceNodeId + '-' + targetNodeId,
             'Link between ' + sourceNodeId + ' and ' + targetNodeId,
@@ -190,10 +202,12 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations,
             metaNodes={nodes as unknown as MetaNodeModel[]}
             metaLinks={links as unknown as MetaLinkModel[]}
             componentsMap={componentsMap}
+            sidebarNodes={sidebarNodes}
             metaTheme={{
                 customThemeVariables: {},
                 canvasClassName: classes.canvasBG,
             }}
+            wrapperClassName={classes.container + " " + classes.sidebar}
             globalProps={{
                 disableZoom: false,
                 disableMoveCanvas: false,
