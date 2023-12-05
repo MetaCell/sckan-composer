@@ -15,7 +15,13 @@ import {ViaNodeWidget} from "./Widgets/ViaNodeWidget";
 import {DestinationNodeWidget} from "./Widgets/DestinationNodeWidget";
 import {Point} from "@projectstorm/geometry";
 import CustomLinkWidget from "./Widgets/CustomLinkWidget";
+import {withStyles} from "@mui/styles";
 
+const styles = () => ({
+    canvasBG: {
+        background: `grey`,
+    },
+});
 
 export enum NodeTypes {
     Origin = 'Origin',
@@ -31,6 +37,7 @@ interface GraphDiagramProps {
     origins: AnatomicalEntity[] | undefined;
     vias: ViaSerializerDetails[] | undefined;
     destinations: DestinationSerializerDetails[] | undefined;
+    classes: any
 }
 
 
@@ -57,7 +64,7 @@ const createLink = (sourceNode: MetaNodeModel, targetNode: MetaNodeModel, source
         const targetNodeId = targetNode.getId().join()
         const metaLink = new MetaLink(
             'link-' + sourceNodeId + '-' + targetNodeId,
-            'Link between ' +sourceNodeId + ' and ' + targetNodeId,
+            'Link between ' + sourceNodeId + ' and ' + targetNodeId,
             LinkTypes.Default,
             sourceNodeId,
             sourcePortName,
@@ -74,7 +81,7 @@ const createLink = (sourceNode: MetaNodeModel, targetNode: MetaNodeModel, source
     return null;
 };
 
-const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}) => {
+const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations, classes}) => {
     const diagramRef = useRef<any>(null);
 
     const processData = (
@@ -119,10 +126,10 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
                 xVia += xIncrement
 
                 via.from_entities.forEach(fromEntity => {
-                    const sourceNode = findNodeForEntity(fromEntity, nodeMap,layerIndex - 1);
+                    const sourceNode = findNodeForEntity(fromEntity, nodeMap, layerIndex - 1);
                     if (sourceNode) {
-                        const link = createLink(sourceNode, viaNode, 'out',  'in');
-                        if(link){
+                        const link = createLink(sourceNode, viaNode, 'out', 'in');
+                        if (link) {
                             links.push(link);
                         }
                     }
@@ -150,7 +157,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
                     const sourceNode = findNodeForEntity(fromEntity, nodeMap, vias?.length || 0);
                     if (sourceNode) {
                         const link = createLink(sourceNode, destinationNode, 'out', 'in');
-                        if(link){
+                        if (link) {
                             links.push(link);
                         }
                     }
@@ -178,12 +185,14 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
     return (
         <MetaDiagram
             ref={diagramRef}
+            metaCallback={() => {
+            }}
             metaNodes={nodes as unknown as MetaNodeModel[]}
             metaLinks={links as unknown as MetaLinkModel[]}
             componentsMap={componentsMap}
             metaTheme={{
                 customThemeVariables: {},
-                canvasClassName: '',
+                canvasClassName: classes.canvasBG,
             }}
             globalProps={{
                 disableZoom: false,
@@ -195,4 +204,5 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
     );
 }
 
-export default GraphDiagram;
+export default withStyles(styles)(GraphDiagram);
+
