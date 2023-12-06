@@ -57,22 +57,25 @@ const StatementForm = (props: any) => {
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["destination_type", "*"];
   copiedUISchema.circuit_type = {
-    "ui:widget": "radio",
+    "ui:widget": "CustomSingleSelect",
     "ui:options": {
+      label: "Circuit Type",
       classNames: "col-xs-12 col-md-6",
     },
   };
 
   copiedUISchema.laterality = {
-    "ui:widget": "radio",
+    "ui:widget": "CustomSingleSelect",
     "ui:options": {
+      label: "Laterality",
       classNames: "col-xs-12 col-md-6",
     },
   };
 
   copiedUISchema.projection = {
-    "ui:widget": "radio",
+    "ui:widget": "CustomSingleSelect",
     "ui:options": {
+      label: "Projection",
       classNames: "col-xs-12 col-md-6",
     },
   };
@@ -185,7 +188,7 @@ const StatementForm = (props: any) => {
         onElementAdd={async (element: any) => {
           await api.composerViaCreate({
             id: -1,
-            order: statement.vias.length,
+            order: statement?.vias?.length,
             connectivity_statement: statement.id,
             anatomical_entities: [],
             from_entities: [],
@@ -201,7 +204,7 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
-        hideDeleteBtn={statement.vias.length <= 1}
+        hideDeleteBtn={statement?.vias?.length <= 1}
         showReOrderingIcon={true}
         addButtonPlaceholder={"Via"}
       />
@@ -349,7 +352,7 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
-        hideDeleteBtn={statement.destinations.length <= 1}
+        hideDeleteBtn={statement?.destinations?.length <= 1}
         showReOrderingIcon={false}
         addButtonPlaceholder={"Destination"}
       />
@@ -369,7 +372,7 @@ const StatementForm = (props: any) => {
           isPathBuilderComponent: true,
           InputIcon: DestinationIcon,
           onUpdate: async (selectedOption: string, formId: string) => {
-            const viaIndex = getConnectionId(formId, statement.destinations);
+            const viaIndex = getConnectionId(formId, statement?.destinations);
             const typeOption = selectedOption as TypeC11Enum;
             if (viaIndex) {
               api
@@ -406,7 +409,7 @@ const StatementForm = (props: any) => {
           onUpdate: async (selectedOptions: Option[], formId: string) => {
             await updateEntity({
               selected: selectedOptions,
-              entityId: getConnectionId(formId, statement.destinations),
+              entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
               propertyToUpdate: "anatomical_entities",
             });
@@ -449,7 +452,7 @@ const StatementForm = (props: any) => {
           onUpdate: async (selectedOptions: Option[], formId: string) => {
             await updateEntity({
               selected: selectedOptions,
-              entityId: getConnectionId(formId, statement.destinations),
+              entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
               propertyToUpdate: "from_entities",
             });
@@ -488,14 +491,11 @@ const StatementForm = (props: any) => {
     },
     value: statement?.additional_information ?? "",
   };
-  const selectedForwardConnection = statement.forward_connection.map(
-    (origin: Option) => origin.id,
-  );
 
   copiedUISchema.forward_connection = {
     "ui:widget": CustomEntitiesDropdown,
     "ui:options": {
-      isFormDisabled: () => statement.destinations.length === 0,
+      isFormDisabled: () => statement?.destinations?.length === 0,
       placeholder: "Forward connection(s)",
       searchPlaceholder: "Search for Connectivity Statements",
       noResultReason:
@@ -503,6 +503,10 @@ const StatementForm = (props: any) => {
       disabledReason:
         "Add Destination entity to get access to the forward connection form",
       onSearch: async (searchValue: string) => {
+        const selectedForwardConnection = statement?.forward_connection?.map(
+          (origin: Option) => origin.id,
+        );
+
         const excludedIds = searchValue ? [] : selectedForwardConnection;
         return searchForwardConnection(searchValue, statement, excludedIds);
       },
@@ -521,11 +525,15 @@ const StatementForm = (props: any) => {
         ),
       header: {
         label: "Origins",
-        values: [
-          "Major pelvic ganglion",
-          "Prevertebral sympathetic ganglion in abdominal aortic plexus",
-          "Accessory pelvic ganglion",
-        ],
+        values:
+          statement?.destinations &&
+          Array.from(
+            new Set(
+              statement?.destinations.flatMap((item: any) =>
+                item.anatomical_entities.map((entity: any) => entity.name),
+              ),
+            ),
+          ),
       },
       CustomInputChip: ({ entity, sx = {} }: any) => (
         <Chip
