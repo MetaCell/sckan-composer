@@ -27,12 +27,6 @@ const styles = () => ({
         height: '100%',
         width: '100%',
     },
-
-    sidebar: {
-        '& .sidebar': {
-            position: 'relative',
-        },
-    }
 });
 
 export enum NodeTypes {
@@ -106,14 +100,15 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations,
 
         const nodeMap = new Map<string, MetaNodeModel>();
 
+        const yStart = 100
         const yIncrement = 100; // Vertical spacing
         const xIncrement = 100; // Horizontal spacing
-        let xOrigin = 0
+        let xOrigin = 600
 
         origins?.forEach(origin => {
             const id = getId(NodeTypes.Origin, origin)
             const originMetaNode = new MetaNode(id, origin.name, NodeTypes.Origin,
-                new Point(xOrigin, 0), '', undefined, [], [], new Map());
+                new Point(xOrigin, yStart), '', undefined, [], [], new Map());
             const originNode = originMetaNode.toModel();
             originNode.addPort(new MetaPortModel(false, 'out', 'Out'));
             nodes.push(originNode);
@@ -124,8 +119,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations,
 
         vias?.forEach((via) => {
             const layerIndex = via.order + 1
-            let xVia = 0
-            let yVia = layerIndex * yIncrement;
+            let xVia = 600
+            let yVia = layerIndex * yIncrement + yStart;
             via.anatomical_entities.forEach(entity => {
                 const id = getId(NodeTypes.Via + layerIndex, entity)
                 const viaMetaNode = new MetaNode(id, entity.name, NodeTypes.Via,
@@ -151,8 +146,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations,
         });
 
 
-        const yDestination = yIncrement * ((vias?.length || 1) + 1)
-        let xDestination = 0
+        const yDestination = yIncrement * ((vias?.length || 1) + 1) + yStart
+        let xDestination = 600
 
 
         // Process Destinations
@@ -202,12 +197,11 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations,
             metaNodes={nodes as unknown as MetaNodeModel[]}
             metaLinks={links as unknown as MetaLinkModel[]}
             componentsMap={componentsMap}
-            sidebarNodes={sidebarNodes}
             metaTheme={{
                 customThemeVariables: {},
                 canvasClassName: classes.canvasBG,
             }}
-            wrapperClassName={classes.container + " " + classes.sidebar}
+            wrapperClassName={classes.container}
             globalProps={{
                 disableZoom: false,
                 disableMoveCanvas: false,
