@@ -465,7 +465,7 @@ export default function CustomEntitiesDropdown({
             width: autocompleteOptions.length > 0 ? "55.5rem" : "27.75rem",
             display: "flex",
             flexDirection: "column",
-            zIndex: 999,
+            zIndex: 9999,
           }}
         >
           {header?.values?.length > 0 && (
