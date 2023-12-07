@@ -314,7 +314,7 @@ export default function CustomEntitiesDropdown({
 
   const handleChipRemove = (chip: Option) => {
     const updatedChips = selectedOptions.filter((c: Option) => c !== chip);
-    handleSelectedOptionsChange(updatedChips);
+    handleSelectedOptionsChange(updatedChips).then(() => refreshStatement());
   };
 
   const handleInputChange = (event: any) => {
