@@ -110,6 +110,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations,
             const originMetaNode = new MetaNode(id, origin.name, NodeTypes.Origin,
                 new Point(xOrigin, yStart), '', undefined, [], [], new Map());
             const originNode = originMetaNode.toModel();
+            // @ts-ignore
             originNode.addPort(new MetaPortModel(false, 'out', 'Out'));
             nodes.push(originNode);
             nodeMap.set(id, originNode);
@@ -126,7 +127,9 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations,
                 const viaMetaNode = new MetaNode(id, entity.name, NodeTypes.Via,
                     new Point(xVia, yVia), '', undefined, [], [], new Map());
                 const viaNode = viaMetaNode.toModel()
+                // @ts-ignore
                 viaNode.addPort(new MetaPortModel(false, 'out', 'Out'));
+                // @ts-ignore
                 viaNode.addPort(new MetaPortModel(true, 'in', 'In'));
                 nodes.push(viaNode);
                 nodeMap.set(id, viaNode);
@@ -156,6 +159,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations,
                 const destinationMetaNode = new MetaNode(getId(NodeTypes.Destination, entity), entity.name, NodeTypes.Destination,
                     new Point(xDestination, yDestination), '', undefined, [], [], new Map());
                 const destinationNode = destinationMetaNode.toModel()
+                // @ts-ignore
                 destinationNode.addPort(new MetaPortModel(true, 'in', 'In'));
                 nodes.push(destinationNode);
                 xDestination += xIncrement;
