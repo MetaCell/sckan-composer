@@ -7,7 +7,6 @@ import { useSectionStyle, useGreyBgContainer } from "../../styles/styles";
 import { useTheme } from "@mui/system";
 import PathsBuilder from "./PathsBuilder";
 import StatementPreviewForm from "../Forms/StatementPreviewForm";
-import StatementForm from "../Forms/StatementForm";
 
 const ProofingTab = (props: any) => {
   const { statement, refreshStatement, setStatement, refs } = props;
@@ -69,7 +68,6 @@ const ProofingTab = (props: any) => {
               <Typography variant="h5">Population Diagram</Typography>
               <StatementChart statement={statement} />
             </Stack>
-
             {hasJourney && (
               <>
                 <Box my={2}>
