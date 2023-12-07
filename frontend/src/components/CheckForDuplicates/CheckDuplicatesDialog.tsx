@@ -159,7 +159,7 @@ export default function CheckDuplicates() {
           }}
         >
           <Box>
-            <Typography variant="h5">Check fo duplicates</Typography>
+            <Typography variant="h5">Check for duplicates</Typography>
             <Typography>
               Use smart search tool to find eventual duplicates of a record.
             </Typography>

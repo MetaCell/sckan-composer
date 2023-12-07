@@ -84,7 +84,7 @@ const StatementForm = (props: any) => {
     "ui:widget": "CustomTextField",
     "ui:options": {
       label: "ApiNATOMY Model Name",
-      placeholder: "Enter Apinatomay Model Name",
+      placeholder: "Enter ApiNATOMY Model Name",
     },
     value: statement?.apinatomy_model ?? "",
   };
