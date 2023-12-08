@@ -15,20 +15,21 @@ import {ViaNodeWidget} from "./Widgets/ViaNodeWidget";
 import {DestinationNodeWidget} from "./Widgets/DestinationNodeWidget";
 import {Point} from "@projectstorm/geometry";
 import CustomLinkWidget from "./Widgets/CustomLinkWidget";
-import {withStyles} from "@mui/styles";
-import {sidebarNodes} from "./Sidebar";
+import InfoMenu from "./InfoMenu";
+import NavigationMenu from "./NavigationMenu";
+import {makeStyles} from "@mui/styles";
+import {Theme} from "@mui/material/styles";
 
-const styles = () => ({
+const useStyles = makeStyles((theme: Theme) => ({
     canvasBG: {
-        background: `silver`,
+        background: 'silver',
     },
-
     container: {
         height: '100%',
         width: '100%',
     },
-});
 
+}));
 export enum NodeTypes {
     Origin = 'Origin',
     Via = 'Via',
@@ -43,7 +44,6 @@ interface GraphDiagramProps {
     origins: AnatomicalEntity[] | undefined;
     vias: ViaSerializerDetails[] | undefined;
     destinations: DestinationSerializerDetails[] | undefined;
-    classes: any
 }
 
 
@@ -87,8 +87,9 @@ const createLink = (sourceNode: MetaNodeModel, targetNode: MetaNodeModel, source
     return null;
 };
 
-const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations, classes}) => {
+const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}) => {
     const diagramRef = useRef<any>(null);
+    const classes = useStyles();
 
     const processData = (
         origins: AnatomicalEntity[] | undefined,
@@ -194,27 +195,32 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations,
     const componentsMap = new ComponentsMap(nodeComponentsMap, linkComponentsMap);
 
     return (
-        <MetaDiagram
-            ref={diagramRef}
-            metaCallback={() => {
-            }}
-            metaNodes={nodes as unknown as MetaNodeModel[]}
-            metaLinks={links as unknown as MetaLinkModel[]}
-            componentsMap={componentsMap}
-            metaTheme={{
-                customThemeVariables: {},
-                canvasClassName: classes.canvasBG,
-            }}
-            wrapperClassName={classes.container}
-            globalProps={{
-                disableZoom: false,
-                disableMoveCanvas: false,
-                disableMoveNodes: true,
-                disableDeleteDefaultKey: true,
-            }}
-        />
+        <div className={classes.container}>
+            <NavigationMenu/>
+            <InfoMenu />
+            <MetaDiagram
+                ref={diagramRef}
+                metaCallback={() => {
+                }}
+                metaNodes={nodes as unknown as MetaNodeModel[]}
+                metaLinks={links as unknown as MetaLinkModel[]}
+                componentsMap={componentsMap}
+                metaTheme={{
+                    customThemeVariables: {},
+                    canvasClassName: classes.canvasBG,
+                }}
+                wrapperClassName={classes.container}
+                globalProps={{
+                    disableZoom: false,
+                    disableMoveCanvas: false,
+                    disableMoveNodes: true,
+                    disableDeleteDefaultKey: true,
+                }}
+            />
+        </div>
+
     );
 }
 
-export default withStyles(styles)(GraphDiagram);
+export default GraphDiagram;
 
