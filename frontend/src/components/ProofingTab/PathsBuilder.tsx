@@ -30,7 +30,7 @@ const PathsBuilder = (props: any) => {
       </Typography>
       <Divider />
       <Stack sx={{ px: 1.5, mt: 1.5, width: 1 }}>
-        <Box sx={subSectionStyle} ref={refs[5]}>
+        <Box sx={subSectionStyle} ref={refs[3]}>
           <Typography
             variant="subtitle1"
             color={vars.captionColor}
@@ -71,7 +71,7 @@ const PathsBuilder = (props: any) => {
           </Box>
         </Box>
         <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
-        <Box sx={subSectionStyle} ref={refs[5]}>
+        <Box sx={subSectionStyle} ref={refs[4]}>
           <Typography variant="subtitle1" color={vars.captionColor} ml={1}>
             Via
           </Typography>
@@ -86,8 +86,8 @@ const PathsBuilder = (props: any) => {
             className="vias"
           />
         </Box>
-        <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
-        <Box sx={subSectionStyle} ref={refs[5]}>
+        <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" ref={refs[5]} />
+        <Box sx={subSectionStyle}>
           <Typography variant="subtitle1" color={vars.captionColor} ml={1}>
             Destination
           </Typography>
