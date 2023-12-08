@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
     AnatomicalEntity,
     DestinationSerializerDetails,
@@ -163,6 +163,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
     const classes = useStyles();
     const [engine] = useState(() => createEngine());
     const [modelUpdated, setModelUpdated] = useState(false)
+    const containerRef = useRef<HTMLDivElement>(null);
 
     // This effect runs once to set up the engine
     useEffect(() => {
@@ -172,22 +173,41 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
 
     // This effect runs whenever origins, vias, or destinations change
     useEffect(() => {
-        const { nodes, links } = processData(origins, vias, destinations);
+        const {nodes, links} = processData(origins, vias, destinations);
 
         const model = new DiagramModel();
         model.addAll(...nodes, ...links);
 
         engine.setModel(model);
+        engine.getModel().setLocked(true)
         setModelUpdated(true)
     }, [origins, vias, destinations, engine]);
 
+    // This effect prevents the default scroll and touchmove behavior
+    useEffect(() => {
+        if (modelUpdated && containerRef.current) {
+            const disableScroll = (event: any) => {
+                event.stopPropagation();
+            };
+
+            containerRef.current.addEventListener('wheel', disableScroll, {passive: false});
+            containerRef.current.addEventListener('touchmove', disableScroll, {passive: false});
+
+            return () => {
+                containerRef.current?.removeEventListener('wheel', disableScroll);
+                containerRef.current?.removeEventListener('touchmove', disableScroll);
+            };
+        }
+    }, [modelUpdated]);
 
     return (
-        modelUpdated ? <div className={classes.container}>
-            <NavigationMenu engine={engine}/>
-            <InfoMenu engine={engine}/>
-            <CanvasWidget className={classes.container} engine={engine}/>
-        </div> : null
+        modelUpdated ? (
+                <div ref={containerRef} className={classes.container}>
+                    <NavigationMenu engine={engine}/>
+                    <InfoMenu engine={engine}/>
+                    <CanvasWidget className={classes.container} engine={engine}/>
+                </div>)
+            : null
     );
 }
 
