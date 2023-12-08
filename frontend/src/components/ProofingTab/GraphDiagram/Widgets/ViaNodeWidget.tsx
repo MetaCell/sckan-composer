@@ -50,7 +50,7 @@ export const ViaNodeWidget: React.FC<ViaNodeProps> = ({ model, engine }) => {
           lineHeight: "1.25rem",
         }}
       >
-        {model.getOptions().name}
+        {model.name}
       </Typography>
       <PortWidget engine={engine} port={model.getPort("in")}>
         <div className="circle-port" />

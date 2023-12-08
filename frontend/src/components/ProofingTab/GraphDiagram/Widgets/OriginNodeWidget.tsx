@@ -51,7 +51,7 @@ export const OriginNodeWidget: React.FC<OriginNodeProps> = ({
           lineHeight: "1.25rem",
         }}
       >
-        {model.getOptions().name}
+        {model.name}
       </Typography>
       <PortWidget engine={engine} port={model.getPort("out")}>
         <div className="circle-port" />
