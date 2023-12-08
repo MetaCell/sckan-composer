@@ -143,3 +143,256 @@ export const OriginIcon = (props: SvgIconProps) => (
     />
   </SvgIcon>
 );
+
+export const OriginInfoIcon = (props: SvgIconProps) => (
+  <SvgIcon
+    {...props}
+    viewBox="0 0 36 26"
+    sx={{
+      width: props.width ? props.width : 36,
+      height: props.height ? props.height : 36,
+    }}
+  >
+    <g filter="url(#filter0_di_3328_77745)">
+      <rect x="6" y="2" width="24" height="24" rx="12" fill="#ECFDF3" />
+      <rect
+        x="7"
+        y="3"
+        width="22"
+        height="22"
+        rx="11"
+        stroke="#039855"
+        stroke-width="2"
+      />
+    </g>
+    <defs>
+      <filter
+        id="filter0_di_3328_77745"
+        x="0"
+        y="0"
+        width="36"
+        height="36"
+        filterUnits="userSpaceOnUse"
+        color-interpolation-filters="sRGB"
+      >
+        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+        <feColorMatrix
+          in="SourceAlpha"
+          type="matrix"
+          values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+          result="hardAlpha"
+        />
+        <feMorphology
+          radius="4"
+          operator="erode"
+          in="SourceAlpha"
+          result="effect1_dropShadow_3328_77745"
+        />
+        <feOffset dy="4" />
+        <feGaussianBlur stdDeviation="5" />
+        <feComposite in2="hardAlpha" operator="out" />
+        <feColorMatrix
+          type="matrix"
+          values="0 0 0 0 0.0121568 0 0 0 0 0.595686 0 0 0 0 0.333098 0 0 0 0.2 0"
+        />
+        <feBlend
+          mode="normal"
+          in2="BackgroundImageFix"
+          result="effect1_dropShadow_3328_77745"
+        />
+        <feBlend
+          mode="normal"
+          in="SourceGraphic"
+          in2="effect1_dropShadow_3328_77745"
+          result="shape"
+        />
+        <feColorMatrix
+          in="SourceAlpha"
+          type="matrix"
+          values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+          result="hardAlpha"
+        />
+        <feOffset />
+        <feGaussianBlur stdDeviation="13" />
+        <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
+        <feColorMatrix
+          type="matrix"
+          values="0 0 0 0 0.65098 0 0 0 0 0.956863 0 0 0 0 0.772549 0 0 0 1 0"
+        />
+        <feBlend
+          mode="normal"
+          in2="shape"
+          result="effect2_innerShadow_3328_77745"
+        />
+      </filter>
+    </defs>
+  </SvgIcon>
+);
+export const ViaInfoIcon = (props: SvgIconProps) => (
+  <SvgIcon
+    {...props}
+    viewBox="0 0 36 26"
+    sx={{
+      width: props.width ? props.width : 36,
+      height: props.height ? props.height : 36,
+    }}
+  >
+    <g filter="url(#filter0_di_3328_77749)">
+      <rect x="6" y="2" width="24" height="24" rx="8" fill="#F0FDF9" />
+      <rect
+        x="7"
+        y="3"
+        width="22"
+        height="22"
+        rx="7"
+        stroke="#0E9384"
+        stroke-width="2"
+      />
+    </g>
+    <defs>
+      <filter
+        id="filter0_di_3328_77749"
+        x="0"
+        y="0"
+        width="36"
+        height="36"
+        filterUnits="userSpaceOnUse"
+        color-interpolation-filters="sRGB"
+      >
+        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+        <feColorMatrix
+          in="SourceAlpha"
+          type="matrix"
+          values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+          result="hardAlpha"
+        />
+        <feMorphology
+          radius="4"
+          operator="erode"
+          in="SourceAlpha"
+          result="effect1_dropShadow_3328_77749"
+        />
+        <feOffset dy="4" />
+        <feGaussianBlur stdDeviation="5" />
+        <feComposite in2="hardAlpha" operator="out" />
+        <feColorMatrix
+          type="matrix"
+          values="0 0 0 0 0.054902 0 0 0 0 0.576471 0 0 0 0 0.517647 0 0 0 0.2 0"
+        />
+        <feBlend
+          mode="normal"
+          in2="BackgroundImageFix"
+          result="effect1_dropShadow_3328_77749"
+        />
+        <feBlend
+          mode="normal"
+          in="SourceGraphic"
+          in2="effect1_dropShadow_3328_77749"
+          result="shape"
+        />
+        <feColorMatrix
+          in="SourceAlpha"
+          type="matrix"
+          values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+          result="hardAlpha"
+        />
+        <feOffset />
+        <feGaussianBlur stdDeviation="13" />
+        <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
+        <feColorMatrix
+          type="matrix"
+          values="0 0 0 0 0.6 0 0 0 0 0.964706 0 0 0 0 0.878431 0 0 0 1 0"
+        />
+        <feBlend
+          mode="normal"
+          in2="shape"
+          result="effect2_innerShadow_3328_77749"
+        />
+      </filter>
+    </defs>
+  </SvgIcon>
+);
+export const DestinationInfoIcon = (props: SvgIconProps) => (
+  <SvgIcon
+    {...props}
+    viewBox="0 0 36 26"
+    sx={{
+      width: props.width ? props.width : 36,
+      height: props.height ? props.height : 36,
+    }}
+  >
+    <g filter="url(#filter0_di_3328_77753)">
+      <rect x="6" y="2" width="24" height="24" rx="4" fill="#ECFDFF" />
+      <rect
+        x="7"
+        y="3"
+        width="22"
+        height="22"
+        rx="3"
+        stroke="#088AB2"
+        stroke-width="2"
+      />
+    </g>
+    <defs>
+      <filter
+        id="filter0_di_3328_77753"
+        x="0"
+        y="0"
+        width="36"
+        height="36"
+        filterUnits="userSpaceOnUse"
+        color-interpolation-filters="sRGB"
+      >
+        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+        <feColorMatrix
+          in="SourceAlpha"
+          type="matrix"
+          values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+          result="hardAlpha"
+        />
+        <feMorphology
+          radius="4"
+          operator="erode"
+          in="SourceAlpha"
+          result="effect1_dropShadow_3328_77753"
+        />
+        <feOffset dy="4" />
+        <feGaussianBlur stdDeviation="5" />
+        <feComposite in2="hardAlpha" operator="out" />
+        <feColorMatrix
+          type="matrix"
+          values="0 0 0 0 0.0313726 0 0 0 0 0.541176 0 0 0 0 0.698039 0 0 0 0.2 0"
+        />
+        <feBlend
+          mode="normal"
+          in2="BackgroundImageFix"
+          result="effect1_dropShadow_3328_77753"
+        />
+        <feBlend
+          mode="normal"
+          in="SourceGraphic"
+          in2="effect1_dropShadow_3328_77753"
+          result="shape"
+        />
+        <feColorMatrix
+          in="SourceAlpha"
+          type="matrix"
+          values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+          result="hardAlpha"
+        />
+        <feOffset />
+        <feGaussianBlur stdDeviation="13" />
+        <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
+        <feColorMatrix
+          type="matrix"
+          values="0 0 0 0 0.647059 0 0 0 0 0.941176 0 0 0 0 0.988235 0 0 0 1 0"
+        />
+        <feBlend
+          mode="normal"
+          in2="shape"
+          result="effect2_innerShadow_3328_77753"
+        />
+      </filter>
+    </defs>
+  </SvgIcon>
+);
