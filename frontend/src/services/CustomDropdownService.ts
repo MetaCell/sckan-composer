@@ -1,8 +1,9 @@
 import { Option } from "../types";
 import { composerApi as api } from "./apis";
-import {autocompleteRows} from "../helpers/settings";
+import { autocompleteRows } from "../helpers/settings";
 import {
-  convertToConnectivityStatementUpdate, getViasGroupLabel,
+  convertToConnectivityStatementUpdate,
+  getViasGroupLabel,
   mapAnatomicalEntitiesToOptions,
   mapConnectivityStatementsToOptions,
   removeEntitiesById,
@@ -128,12 +129,19 @@ export function searchFromEntitiesVia(
   }
   const viaOrder = statement.vias[viaIndex].order;
   const anatomicalEntities = getEntitiesBeforeOrder(statement, viaOrder);
-  
+
   const entities: Option[] = [];
-  searchAnatomicalEntities(anatomicalEntities, searchValue).forEach((row: any) => {
-    entities.push(mapAnatomicalEntitiesToOptions([row], getViasGroupLabel(row.order + 1))[0]);
-  });
-  
+  searchAnatomicalEntities(anatomicalEntities, searchValue).forEach(
+    (row: any) => {
+      entities.push(
+        mapAnatomicalEntitiesToOptions(
+          [row],
+          getViasGroupLabel(row.order + 1),
+        )[0],
+      );
+    },
+  );
+
   return removeEntitiesById(entities, excludeIds);
 }
 
@@ -147,14 +155,21 @@ export function searchFromEntitiesDestination(
     vias.reduce((maxOrder, via) => {
       return via.order > maxOrder ? via.order : maxOrder;
     }, 0) + 1;
-  
+
   const anatomicalEntities = getEntitiesBeforeOrder(statement, maxOrder);
-  
+
   const entities: Option[] = [];
-  searchAnatomicalEntities(anatomicalEntities, searchValue).forEach((row: any) => {
-    entities.push(mapAnatomicalEntitiesToOptions([row], getViasGroupLabel(row.order + 1))[0]);
-  });
-  
+  searchAnatomicalEntities(anatomicalEntities, searchValue).forEach(
+    (row: any) => {
+      entities.push(
+        mapAnatomicalEntitiesToOptions(
+          [row],
+          getViasGroupLabel(row.order + 1),
+        )[0],
+      );
+    },
+  );
+
   return removeEntitiesById(entities, excludeIds);
 }
 
@@ -167,7 +182,7 @@ function getEntitiesBeforeOrder(
   return vias.reduce((acc: any, via) => {
     if (via.order < order) {
       via.anatomical_entities.forEach((entity) => {
-        acc.push({...entity, order: via.order});
+        acc.push({ ...entity, order: via.order });
       });
     }
     return acc;
@@ -274,10 +289,10 @@ export function createOptionsFromStatements(
   currentSentenceId: number,
 ): Option[] {
   // Separate the statements into two groups
-  const sameSentenceStatements = statements.filter(
+  const sameSentenceStatements = statements?.filter(
     (statement) => statement.sentence_id === currentSentenceId,
   );
-  const differentSentenceStatements = statements.filter(
+  const differentSentenceStatements = statements?.filter(
     (statement) => statement.sentence_id !== currentSentenceId,
   );
 
@@ -290,7 +305,7 @@ export function createOptionsFromStatements(
     differentSentenceStatements,
     "forwardConnectionGroups.otherSentence",
   );
-
-  // Combine and return all options
-  return [...sameSentenceOptions, ...differentSentenceOptions];
+  return sameSentenceOptions && differentSentenceOptions
+    ? [...sameSentenceOptions, ...differentSentenceOptions]
+    : [];
 }

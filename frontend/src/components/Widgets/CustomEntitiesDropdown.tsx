@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Badge,
   CircularProgress,
@@ -28,7 +28,7 @@ import NoResultField from "./NoResultField";
 import { vars } from "../../theme/variables";
 import { Option } from "../../types";
 import Stack from "@mui/material/Stack";
-import {processFromEntitiesData} from "../../helpers/dropdownMappers";
+import { processFromEntitiesData } from "../../helpers/dropdownMappers";
 
 const {
   buttonOutlinedBorderColor,
@@ -209,23 +209,26 @@ export default function CustomEntitiesDropdown({
     placeholder,
     label,
     chipsNumber = 2,
-    selectType = null,
+    postProcessOptions = false,
+    refreshStatement,
   },
 }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const aria = open ? "simple-popper" : undefined;
+
   const [hoveredOption, setHoveredOption] = useState<Option | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<Option[]>(
     mapValueToOption(value, id) || [],
   );
 
   const [autocompleteOptions, setAutocompleteOptions] = useState<Option[]>([]);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState<string | undefined>(undefined);
   const popperRef = useRef<HTMLDivElement | null>(null);
 
   const [isDropdownOpened, setIsDropdownOpened] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [allOptions, setAllOptions] = useState<Option[]>([]);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setIsDropdownOpened(true);
@@ -233,9 +236,8 @@ export default function CustomEntitiesDropdown({
   };
 
   const handleSelectedOptionsChange = async (newSelectedOptions: Option[]) => {
-    onUpdate(newSelectedOptions, id).then(() =>
-      setSelectedOptions(newSelectedOptions),
-    );
+    setSelectedOptions(newSelectedOptions);
+    onUpdate(newSelectedOptions, id);
   };
 
   const groupedOptions = autocompleteOptions.reduce(
@@ -277,14 +279,7 @@ export default function CustomEntitiesDropdown({
   };
 
   const getGroupButton = (group: string) => {
-    const allObjectsExist = autocompleteOptions
-      ?.filter((option: Option) => option.group === group)
-      .every(
-        (obj1) =>
-          selectedOptions?.some(
-            (obj2) => JSON.stringify(obj1) === JSON.stringify(obj2),
-          ),
-      );
+    const allObjectsExist = selectedOptions.length === allOptions.length;
     return (
       <Button
         variant="text"
@@ -319,45 +314,41 @@ export default function CustomEntitiesDropdown({
 
   const handleChipRemove = (chip: Option) => {
     const updatedChips = selectedOptions.filter((c: Option) => c !== chip);
-    handleSelectedOptionsChange(updatedChips);
+    handleSelectedOptionsChange(updatedChips).then(() => refreshStatement());
   };
 
   const handleInputChange = (event: any) => {
-    if (event.target.value !== undefined) {
-      onSearch(event.target.value, id).then(setAutocompleteOptions);
-    }
     setInputValue(event.target.value);
   };
 
   const isOptionSelected = (option: Option) => {
     return selectedOptions?.some((selected) => selected?.id === option?.id);
   };
-  
-  type tempOption = {sort: number} & Option
+
+  const fetchData = useCallback(async () => {
+    try {
+      const options = await onSearch(inputValue, id, selectedOptions);
+      const allOptions = [...selectedOptions, ...options];
+      const sortedOptions = postProcessOptions
+        ? processFromEntitiesData(allOptions)
+        : allOptions;
+      setAllOptions(sortedOptions);
+      setAutocompleteOptions(sortedOptions);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, [inputValue, id, onSearch, postProcessOptions]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!isDropdownOpened) return;
-
-      setIsLoading(true);
-      try {
-        const options = await onSearch("", id);
-        const allOptions = [...selectedOptions, ...options];
-       
-        setAutocompleteOptions(selectType && selectType === 'from_entities' ? processFromEntitiesData(allOptions) : allOptions);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
+    if (!isDropdownOpened) return;
+    setIsLoading(true);
+    fetchData().then(() => setIsLoading(false));
   }, [isDropdownOpened, id, onSearch]);
 
   useEffect(() => {
-    if (inputValue !== "") {
-      onSearch(inputValue, id).then(setAutocompleteOptions);
+    if (inputValue !== undefined) {
+      setIsLoading(true);
+      fetchData().then(() => setIsLoading(false));
     }
   }, [inputValue, id]);
 
@@ -368,6 +359,9 @@ export default function CustomEntitiesDropdown({
         !popperRef.current.contains(event.target as Node)
       ) {
         setAnchorEl(null);
+        setInputValue("");
+        refreshStatement && refreshStatement();
+        setAllOptions([]);
       }
     };
 
@@ -471,7 +465,7 @@ export default function CustomEntitiesDropdown({
             width: autocompleteOptions.length > 0 ? "55.5rem" : "27.75rem",
             display: "flex",
             flexDirection: "column",
-            zIndex: 999,
+            zIndex: 9999,
           }}
         >
           {header?.values?.length > 0 && (
@@ -524,309 +518,305 @@ export default function CustomEntitiesDropdown({
               ))}
             </Box>
           )}
-
-          {isLoading ? (
+          <Box
+            display="flex"
+            flex={1}
+            height={
+              autocompleteOptions.length > 0 ? "calc(100% - 2.75rem)" : "auto"
+            }
+          >
             <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              sx={{ height: "100%" }}
-            >
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Box
-              display="flex"
-              flex={1}
-              height={
-                autocompleteOptions.length > 0 ? "calc(100% - 2.75rem)" : "auto"
-              }
+              sx={{
+                ...styles.list,
+                width: autocompleteOptions.length > 0 ? "50%" : "100%",
+              }}
             >
               <Box
                 sx={{
-                  ...styles.list,
-                  width: autocompleteOptions.length > 0 ? "50%" : "100%",
-                }}
-              >
-                <Box
-                  sx={{
-                    borderBottom: `0.0625rem solid ${popperBorderColor}`,
-                    height: "3.125rem",
-                    padding: "0 0.875rem",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    flexWrap: "wrap",
+                  borderBottom: `0.0625rem solid ${popperBorderColor}`,
+                  height: "3.125rem",
+                  padding: "0 0.875rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  flexWrap: "wrap",
 
-                    "& .MuiOutlinedInput-input": {
-                      padding: 0,
+                  "& .MuiOutlinedInput-input": {
+                    padding: 0,
+                    fontSize: "0.75rem",
+                    color: inputTextColor,
+                    fontWeight: "400",
+                    height: "3.125rem",
+
+                    "&::placeholder": {
                       fontSize: "0.75rem",
                       color: inputTextColor,
                       fontWeight: "400",
-                      height: "3.125rem",
-
-                      "&::placeholder": {
-                        fontSize: "0.75rem",
-                        color: inputTextColor,
-                        fontWeight: "400",
-                      },
                     },
+                  },
 
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      display: "none",
-                    },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    display: "none",
+                  },
 
-                    "& .MuiOutlinedInput-root": {
-                      border: "none",
-                      boxShadow: "none",
-                      padding: "0",
-                    },
+                  "& .MuiOutlinedInput-root": {
+                    border: "none",
+                    boxShadow: "none",
+                    padding: "0",
+                  },
+                }}
+              >
+                <TextField
+                  fullWidth
+                  type="text"
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  placeholder={searchPlaceholder}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon
+                          sx={{ fontSize: "1rem", color: captionColor }}
+                        />
+                      </InputAdornment>
+                    ),
                   }}
+                />
+              </Box>
+              {isLoading ? (
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  sx={{ height: "100%" }}
                 >
-                  <TextField
-                    fullWidth
-                    type="text"
-                    value={inputValue}
-                    onChange={handleInputChange}
-                    placeholder={searchPlaceholder}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon
-                            sx={{ fontSize: "1rem", color: captionColor }}
-                          />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
+                  <CircularProgress />
                 </Box>
-                {autocompleteOptions.length > 0 ? (
-                  <>
-                    <Box
-                      overflow="auto"
-                      height="calc(100% - (2.75rem + 3.125rem))"
-                    >
-                      {Object.keys(groupedOptions).map((group) => (
-                        <Box
-                          sx={{
-                            padding: "0 0.375rem",
-                            "& .MuiListSubheader-root": {
-                              padding: "0 0 0 0.625rem",
-                              height: "1.875rem",
-                              margin: "0.375rem 0 0.125rem",
+              ) : autocompleteOptions.length > 0 ? (
+                <>
+                  <Box
+                    overflow="auto"
+                    height="calc(100% - (2.75rem + 3.125rem))"
+                  >
+                    {Object.keys(groupedOptions).map((group) => (
+                      <Box
+                        sx={{
+                          padding: "0 0.375rem",
+                          "& .MuiListSubheader-root": {
+                            padding: "0 0 0 0.625rem",
+                            height: "1.875rem",
+                            margin: "0.375rem 0 0.125rem",
 
-                              "& .MuiTypography-root": {
-                                fontSize: "0.75rem",
-                                lineHeight: "1.125rem",
-                                fontWeight: 600,
-                                color: buttonOutlinedColor,
-                              },
-                            },
-                            "& .MuiCheckbox-root": {
-                              padding: 0,
-                            },
-                            "& .MuiButton-root": {
-                              padding: 0,
-                              height: "1.625rem",
-                              width: "5.0625rem",
+                            "& .MuiTypography-root": {
                               fontSize: "0.75rem",
                               lineHeight: "1.125rem",
                               fontWeight: 600,
-                              color: darkBlue,
+                              color: buttonOutlinedColor,
                             },
+                          },
+                          "& .MuiCheckbox-root": {
+                            padding: 0,
+                          },
+                          "& .MuiButton-root": {
+                            padding: 0,
+                            height: "1.625rem",
+                            width: "5.0625rem",
+                            fontSize: "0.75rem",
+                            lineHeight: "1.125rem",
+                            fontWeight: 600,
+                            color: darkBlue,
+                          },
 
-                            "& ul": {
-                              margin: 0,
-                              listStyle: "none",
-                              padding: "0",
+                          "& ul": {
+                            margin: 0,
+                            listStyle: "none",
+                            padding: "0",
 
-                              "& li": {
-                                padding: "0.6875rem 0.625rem",
-                                display: "flex",
-                                gap: "0.5rem",
-                                cursor: "pointer",
+                            "& li": {
+                              padding: "0.6875rem 0.625rem",
+                              display: "flex",
+                              gap: "0.5rem",
+                              cursor: "pointer",
 
-                                "&:hover": {
-                                  borderRadius: "0.375rem",
-                                  background: bodyBgColor,
-                                },
+                              "&:hover": {
+                                borderRadius: "0.375rem",
+                                background: bodyBgColor,
+                              },
 
-                                "&.selected": {
-                                  borderRadius: "0.375rem",
-                                  background: bodyBgColor,
-                                },
+                              "&.selected": {
+                                borderRadius: "0.375rem",
+                                background: bodyBgColor,
+                              },
 
-                                "& .MuiTypography-body1": {
-                                  color: buttonOutlinedColor,
-                                  fontSize: "0.875rem",
-                                  fontWeight: 500,
-                                  lineHeight: "142.857%",
-                                  padding: 0,
-                                },
+                              "& .MuiTypography-body1": {
+                                color: buttonOutlinedColor,
+                                fontSize: "0.875rem",
+                                fontWeight: 500,
+                                lineHeight: "142.857%",
+                                padding: 0,
+                              },
 
-                                "& .MuiTypography-body2": {
-                                  color: captionColor,
-                                  fontSize: "0.75rem",
-                                  fontWeight: 400,
-                                  lineHeight: "150%",
-                                  padding: 0,
-                                  whiteSpace: "nowrap",
-                                },
+                              "& .MuiTypography-body2": {
+                                color: captionColor,
+                                fontSize: "0.75rem",
+                                fontWeight: 400,
+                                lineHeight: "150%",
+                                padding: 0,
+                                whiteSpace: "nowrap",
                               },
                             },
+                          },
+                        }}
+                        key={group}
+                      >
+                        <ListSubheader
+                          component="div"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
                           }}
-                          key={group}
                         >
-                          <ListSubheader
-                            component="div"
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
+                          <Typography
+                            sx={{
+                              color: buttonOutlinedColor,
+                              fontSize: "0.75rem",
+                              fontWeight: 600,
+                              lineHeight: "1.125rem",
                             }}
                           >
-                            <Typography
-                              sx={{
-                                color: buttonOutlinedColor,
-                                fontSize: "0.75rem",
-                                fontWeight: 600,
-                                lineHeight: "1.125rem",
-                              }}
-                            >
-                              {group}
-                            </Typography>
-                            {getGroupButton(group)}
-                          </ListSubheader>
-                          <ul>
-                            {groupedOptions[group]
-                              .filter((option: Option) =>
-                                option.label
-                                  .toLowerCase()
-                                  .includes(inputValue.toLowerCase()),
-                              )
-                              .map((option: Option) => (
-                                <li
-                                  key={option.id}
-                                  onMouseEnter={() => setHoveredOption(option)}
-                                  onClick={() => handleOptionSelection(option)}
-                                  className={
-                                    isOptionSelected(option) ? "selected" : ""
+                            {group}
+                          </Typography>
+                          {getGroupButton(group)}
+                        </ListSubheader>
+                        <ul>
+                          {groupedOptions[group]
+                            .filter((option: Option) =>
+                              option.label
+                                .toLowerCase()
+                                .includes(
+                                  inputValue !== undefined
+                                    ? inputValue.toLowerCase()
+                                    : "",
+                                ),
+                            )
+                            .map((option: Option) => (
+                              <li
+                                key={option.id}
+                                onMouseEnter={() => setHoveredOption(option)}
+                                onClick={() => handleOptionSelection(option)}
+                                className={
+                                  isOptionSelected(option) ? "selected" : ""
+                                }
+                              >
+                                <Checkbox
+                                  disableRipple
+                                  icon={<UncheckedItemIcon fontSize="small" />}
+                                  checkedIcon={
+                                    <CheckedItemIcon fontSize="small" />
                                   }
+                                  checked={isOptionSelected(option)}
+                                />
+                                <Typography
+                                  sx={{
+                                    width: 1,
+                                    height: 1,
+                                    padding: "0.625rem",
+                                  }}
                                 >
-                                  <Checkbox
-                                    disableRipple
-                                    icon={
-                                      <UncheckedItemIcon fontSize="small" />
-                                    }
-                                    checkedIcon={
-                                      <CheckedItemIcon fontSize="small" />
-                                    }
-                                    checked={isOptionSelected(option)}
-                                  />
-                                  <Typography
-                                    sx={{
-                                      width: 1,
-                                      height: 1,
-                                      padding: "0.625rem",
-                                    }}
-                                  >
-                                    {option?.label?.length > 100
-                                      ? option?.label.slice(0, 100) + "..."
-                                      : option?.label}
-                                  </Typography>
-                                  <Typography
-                                    whiteSpace="nowrap"
-                                    variant="body2"
-                                  >
-                                    {option?.id}
-                                  </Typography>
-                                </li>
-                              ))}
-                          </ul>
-                        </Box>
-                      ))}
-                    </Box>
-                    <Box
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
-                      sx={{
-                        borderTop: `0.0625rem solid ${popperBorderColor}`,
-                        height: "2.75rem",
-
-                        "& .MuiButton-root": {
-                          color: inputTextColor,
-                          fontSize: "0.875rem",
-                          fontWeight: 600,
-                          height: "100%",
-                          lineHeight: "1.25rem",
-                          zIndex: 200000,
-                          width: "100%",
-                          borderRadius: 0,
-                          p: 0,
-                          "&:hover": {
-                            background: bodyBgColor,
-                          },
-                        },
-                      }}
-                    >
-                      {selectedOptions.length === autocompleteOptions.length ? (
-                        <Button
-                          disableRipple
-                          startIcon={<PlaylistRemoveOutlinedIcon />}
-                          variant="text"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleSelectedOptionsChange([]);
-                          }}
-                        >
-                          Deselect all
-                        </Button>
-                      ) : (
-                        <Button
-                          disableRipple
-                          startIcon={<PlaylistAddCheckOutlinedIcon />}
-                          variant="text"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleSelectedOptionsChange(autocompleteOptions);
-                          }}
-                        >
-                          Select all
-                        </Button>
-                      )}
-                    </Box>
-                  </>
-                ) : (
-                  <NoResultField noResultReason={noResultReason} />
-                )}
-              </Box>
-              {autocompleteOptions.length > 0 && (
-                <Box sx={styles.details}>
-                  {autocompleteOptions.length > 0 &&
-                    (hoveredOption ? (
-                      <HoveredOptionContent
-                        entity={hoveredOption}
-                        HeaderComponent={CustomHeader ?? CustomHeader}
-                        BodyComponent={CustomBody ?? CustomBody}
-                        FooterComponent={CustomFooter ?? CustomFooter}
-                      />
-                    ) : (
-                      <Box
-                        height={1}
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                      >
-                        <Typography variant="body2">
-                          Hover over each nerve to its details
-                        </Typography>
+                                  {option?.label?.length > 100
+                                    ? option?.label.slice(0, 100) + "..."
+                                    : option?.label}
+                                </Typography>
+                                <Typography whiteSpace="nowrap" variant="body2">
+                                  {option?.id}
+                                </Typography>
+                              </li>
+                            ))}
+                        </ul>
                       </Box>
                     ))}
-                </Box>
+                  </Box>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    sx={{
+                      borderTop: `0.0625rem solid ${popperBorderColor}`,
+                      height: "2.75rem",
+
+                      "& .MuiButton-root": {
+                        color: inputTextColor,
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                        height: "100%",
+                        lineHeight: "1.25rem",
+                        zIndex: 200000,
+                        width: "100%",
+                        borderRadius: 0,
+                        p: 0,
+                        "&:hover": {
+                          background: bodyBgColor,
+                        },
+                      },
+                    }}
+                  >
+                    {allOptions.length === selectedOptions.length ? (
+                      <Button
+                        disableRipple
+                        startIcon={<PlaylistRemoveOutlinedIcon />}
+                        variant="text"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleSelectedOptionsChange([]);
+                        }}
+                      >
+                        Deselect all
+                      </Button>
+                    ) : (
+                      <Button
+                        disableRipple
+                        startIcon={<PlaylistAddCheckOutlinedIcon />}
+                        variant="text"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleSelectedOptionsChange(autocompleteOptions);
+                        }}
+                      >
+                        Select all
+                      </Button>
+                    )}
+                  </Box>
+                </>
+              ) : (
+                <NoResultField noResultReason={noResultReason} />
               )}
             </Box>
-          )}
+            {autocompleteOptions.length > 0 && (
+              <Box sx={styles.details}>
+                {autocompleteOptions.length > 0 &&
+                  (hoveredOption ? (
+                    <HoveredOptionContent
+                      entity={hoveredOption}
+                      HeaderComponent={CustomHeader ?? CustomHeader}
+                      BodyComponent={CustomBody ?? CustomBody}
+                      FooterComponent={CustomFooter ?? CustomFooter}
+                    />
+                  ) : (
+                    <Box
+                      height={1}
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <Typography variant="body2">
+                        Hover over each nerve to its details
+                      </Typography>
+                    </Box>
+                  ))}
+              </Box>
+            )}
+          </Box>
         </Popper>
       </Stack>
       {errors && (
