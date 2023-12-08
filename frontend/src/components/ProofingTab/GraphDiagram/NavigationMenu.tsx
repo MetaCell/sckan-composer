@@ -5,8 +5,26 @@ import ZoomInOutlinedIcon from "@mui/icons-material/ZoomInOutlined";
 import ZoomOutOutlinedIcon from "@mui/icons-material/ZoomOutOutlined";
 import IconButton from "@mui/material/IconButton";
 
+const ZOOM_CHANGE = 25
+
 const NavigationMenu = (props: any) => {
-    return (
+    const {engine} = props
+
+    const zoomOut = () => {
+        let zoomLevel = engine.model.getZoomLevel();
+        engine.model.setZoomLevel(zoomLevel - ZOOM_CHANGE);
+        console.log("New Zoom Level (Out):", engine.model.getZoomLevel());
+        engine.repaintCanvas();
+    };
+
+    const zoomIn = () => {
+        let zoomLevel = engine.model.getZoomLevel();
+        engine.model.setZoomLevel(zoomLevel + ZOOM_CHANGE);
+        console.log("New Zoom Level (In):", engine.model.getZoomLevel());
+        engine.repaintCanvas();
+
+    };
+    return engine ? (
         <Stack
             direction="row"
             spacing="1rem"
@@ -40,18 +58,18 @@ const NavigationMenu = (props: any) => {
                 },
             }}
         >
-            <IconButton>
+            <IconButton onClick={() => engine.zoomToFit()}>
                 <FitScreenOutlinedIcon/>
             </IconButton>
             <Divider/>
-            <IconButton>
+            <IconButton onClick={() => zoomIn()}>
                 <ZoomInOutlinedIcon/>
             </IconButton>
             <IconButton>
-                <ZoomOutOutlinedIcon/>
+                <ZoomOutOutlinedIcon onClick={() => zoomOut()}/>
             </IconButton>
         </Stack>
-    );
+    ) : null;
 };
 
 export default NavigationMenu;

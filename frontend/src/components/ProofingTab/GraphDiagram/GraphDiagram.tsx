@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import React, {useRef, useState} from "react";
 import {
     AnatomicalEntity,
     DestinationSerializerDetails,
@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     container: {
         height: '100%',
         width: '100%',
+        position: 'relative',
     },
 
 }));
@@ -88,8 +89,9 @@ const createLink = (sourceNode: MetaNodeModel, targetNode: MetaNodeModel, source
 };
 
 const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}) => {
-    const diagramRef = useRef<any>(null);
     const classes = useStyles();
+    const engineRef = useRef<any>(null);
+    const [hasMounted, setHasMounted] = useState(false)
 
     const processData = (
         origins: AnatomicalEntity[] | undefined,
@@ -102,9 +104,9 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
         const nodeMap = new Map<string, MetaNodeModel>();
 
         const yStart = 100
-        const yIncrement = 100; // Vertical spacing
-        const xIncrement = 100; // Horizontal spacing
-        let xOrigin = 600
+        const yIncrement = 200; // Vertical spacing
+        const xIncrement = 200; // Horizontal spacing
+        let xOrigin = 100
 
         origins?.forEach(origin => {
             const id = getId(NodeTypes.Origin, origin)
@@ -121,7 +123,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
 
         vias?.forEach((via) => {
             const layerIndex = via.order + 1
-            let xVia = 600
+            let xVia = 100
             let yVia = layerIndex * yIncrement + yStart;
             via.anatomical_entities.forEach(entity => {
                 const id = getId(NodeTypes.Via + layerIndex, entity)
@@ -151,7 +153,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
 
 
         const yDestination = yIncrement * ((vias?.length || 1) + 1) + yStart
-        let xDestination = 600
+        let xDestination = 100
 
 
         // Process Destinations
@@ -194,14 +196,31 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
     ]);
     const componentsMap = new ComponentsMap(nodeComponentsMap, linkComponentsMap);
 
+    const onMount = (engine: any) => {
+        engineRef.current = engine
+        // @ts-ignore
+        window.engine = engine
+        // const state = engineRef.current?.getStateMachine().currentState
+        // if(state.createLink){
+        //     state.createLink.config.allowCreate = false;
+        // }
+        // state.unsetCreateLinkState()
+        // state.setDragState();
+        // if(state.dragCanvas){
+        //     state.dragCanvas.config.allowDrag = true;
+        // }
+        setHasMounted(true)
+    }
+
+    console.log(engineRef.current?.getStateMachine().stateStack)
+
+
     return (
         <div className={classes.container}>
-            <NavigationMenu/>
-            <InfoMenu />
+            <NavigationMenu engine={engineRef.current}/>
+            <InfoMenu engine={engineRef.current}/>
             <MetaDiagram
-                ref={diagramRef}
-                metaCallback={() => {
-                }}
+                metaCallback={() => {}}
                 metaNodes={nodes as unknown as MetaNodeModel[]}
                 metaLinks={links as unknown as MetaLinkModel[]}
                 componentsMap={componentsMap}
@@ -210,12 +229,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
                     canvasClassName: classes.canvasBG,
                 }}
                 wrapperClassName={classes.container}
-                globalProps={{
-                    disableZoom: false,
-                    disableMoveCanvas: false,
-                    disableMoveNodes: true,
-                    disableDeleteDefaultKey: true,
-                }}
+                globalProps={{}}
+                onMount={onMount}
             />
         </div>
 

@@ -7,7 +7,8 @@ import {
 } from "../../icons";
 
 const InfoMenu = (props: any) => {
-    return (
+    const {engine} = props
+    return engine ? (
         <Stack
             direction="row"
             spacing="1rem"
@@ -76,7 +77,7 @@ const InfoMenu = (props: any) => {
                 </Typography>
             </Stack>
         </Stack>
-    );
+    ) : null;
 };
 
 export default InfoMenu;
