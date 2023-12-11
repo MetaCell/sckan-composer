@@ -211,6 +211,8 @@ export default function CustomEntitiesDropdown({
     chipsNumber = 2,
     postProcessOptions = false,
     refreshStatement,
+    statement,
+    fieldName = "",
   },
 }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -230,6 +232,8 @@ export default function CustomEntitiesDropdown({
   const [isLoading, setIsLoading] = useState(false);
   const [allOptions, setAllOptions] = useState<Option[]>([]);
 
+  const [hasValueChanged, setHasValueChanged] = useState(false);
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setIsDropdownOpened(true);
     setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -237,9 +241,9 @@ export default function CustomEntitiesDropdown({
 
   const handleSelectedOptionsChange = async (newSelectedOptions: Option[]) => {
     setSelectedOptions(newSelectedOptions);
+    setHasValueChanged(true);
     onUpdate(newSelectedOptions, id);
   };
-
   const groupedOptions = autocompleteOptions.reduce(
     (grouped: any, option: Option) => {
       const group = option.group;
@@ -360,8 +364,11 @@ export default function CustomEntitiesDropdown({
       ) {
         setAnchorEl(null);
         setInputValue("");
-        refreshStatement && refreshStatement();
         setAllOptions([]);
+        if (refreshStatement && hasValueChanged) {
+          refreshStatement();
+          setHasValueChanged(false);
+        }
       }
     };
 
@@ -369,7 +376,7 @@ export default function CustomEntitiesDropdown({
     return () => {
       document.removeEventListener("mousedown", closePopperOnClickOutside);
     };
-  }, []);
+  }, [hasValueChanged]);
 
   return isFormDisabled() ? (
     <Box

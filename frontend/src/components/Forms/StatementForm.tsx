@@ -131,6 +131,7 @@ const StatementForm = (props: any) => {
       searchPlaceholder: "Search for Origins",
       noResultReason: "No results found",
       disabledReason: "",
+      fieldName: "origins",
       chipsNumber: 5,
       onSearch: async (
         searchValue: string,
@@ -241,6 +242,7 @@ const StatementForm = (props: any) => {
         "ui:options": {
           statement: statement,
           label: "Via",
+          fieldName: "vias.anatomical_entities",
           placeholder: "Look for vias",
           searchPlaceholder: "Search for vias",
           noResultReason: "No anatomical entities found",
@@ -278,7 +280,9 @@ const StatementForm = (props: any) => {
       from_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          statement: statement,
           label: "From",
+          fieldName: "vias.from_entities",
           postProcessOptions: true,
           placeholder: "Look for connections",
           searchPlaceholder: "Search for connections",
@@ -386,10 +390,12 @@ const StatementForm = (props: any) => {
       anatomical_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          statement: statement,
           placeholder: "Look for Destinations",
           searchPlaceholder: "Search for Destinations",
           noResultReason: "No anatomical entities found",
           disabledReason: "",
+          fieldName: "destinations.anatomical_entities",
           onSearch: async (
             searchValue: string,
             formId: string,
@@ -428,6 +434,7 @@ const StatementForm = (props: any) => {
         "ui:options": {
           statement: statement,
           label: "From",
+          fieldName: "destinations.from_entities",
           postProcessOptions: true,
           placeholder: "Look for Destinations",
           searchPlaceholder: "Search for Destinations",
@@ -501,6 +508,8 @@ const StatementForm = (props: any) => {
         "We couldn’t find any record with these origin in the database.",
       disabledReason:
         "Add Destination entity to get access to the forward connection form",
+      fieldName: "forward_connection",
+
       onSearch: async (searchValue: string) => {
         const selectedForwardConnection = statement?.forward_connection?.map(
           (origin: Option) => origin.id,
