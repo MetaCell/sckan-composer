@@ -1,3 +1,6 @@
+JOURNEY_DELIMITER = '\\'
+
+
 def generate_paths(origins, vias, destinations):
     paths = []
     # Calculate the total number of layers, including origins and destinations
@@ -79,10 +82,11 @@ def consolidate_paths(paths):
                     merges_made = True
 
             consolidated.append(merged_path)
+            used_indices.add(i)
 
-        paths = [p for i, p in enumerate(consolidated) if i not in used_indices]
+        paths = consolidated + [paths[i] for i in range(len(paths)) if i not in used_indices]
 
-    return paths
+    return [[(node.replace(JOURNEY_DELIMITER, ', '), layer) for node, layer in path] for path in paths]
 
 
 def can_merge(path1, path2):
@@ -93,8 +97,8 @@ def can_merge(path1, path2):
     differences = 0
     for (p1, layer1), (p2, layer2) in zip(path1, path2):
         # Split nodes into individual entities
-        p1_entities = set(p1.split(", "))
-        p2_entities = set(p2.split(", "))
+        p1_entities = set(p1.split(JOURNEY_DELIMITER))
+        p2_entities = set(p2.split(JOURNEY_DELIMITER))
 
         # Only consider merging if the layers are the same
         if layer1 == layer2:
@@ -110,7 +114,7 @@ def can_merge(path1, path2):
                 return False
 
     # Only allow merging if there is exactly one difference and it occurs in the same layer
-    return differences == 1
+    return differences <= 1
 
 
 def merge_paths(path1, path2):
@@ -119,6 +123,6 @@ def merge_paths(path1, path2):
         if p1 == p2 and layer1 == layer2:
             merged_path.append((p1, layer1))
         else:
-            merged_nodes = set(p1.split(", ") + p2.split(", "))
-            merged_path.append((", ".join(sorted(merged_nodes)), layer1))
+            merged_nodes = set(p1.split(JOURNEY_DELIMITER) + p2.split(JOURNEY_DELIMITER))
+            merged_path.append((JOURNEY_DELIMITER.join(sorted(merged_nodes)), layer1))
     return merged_path
