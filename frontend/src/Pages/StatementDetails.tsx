@@ -30,6 +30,7 @@ import {
 } from "@mui/icons-material";
 import Stack from "@mui/material/Stack";
 import { ViaIcon, DestinationIcon, OriginIcon } from "../components/icons";
+import { CircularProgress } from "@mui/material";
 const StatementDetails = () => {
   const { statementId } = useParams();
   const [statement, setStatement] = useState({} as ConnectivityStatement);
@@ -79,6 +80,7 @@ const StatementDetails = () => {
 
   const refreshStatement = () => {
     setRefetch(true);
+    setLoading(true);
   };
 
   useEffect(() => {
@@ -111,199 +113,221 @@ const StatementDetails = () => {
     }
   }, [statementId, refetch]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   //TODO add logic for disabled
   // something like this statement.owner?.id !== userProfile.getUser().id;
   const disabled = false;
-
   return (
     <Grid p={6} container>
-      <Grid item xs={1}>
-        <Stack
-          spacing="1rem"
-          sx={{
-            borderRadius: "1.75rem",
-            border: "1px solid #F2F4F7",
-            background: "#FFF",
-            boxShadow:
-              "0px 4px 6px -2px rgba(16, 24, 40, 0.03), 0px 12px 16px -4px rgba(16, 24, 40, 0.08)",
-            width: "fit-content",
-            padding: "1.25rem .75rem",
-            position: "sticky",
-            top: 200,
-            alignSelf: "flex-start",
-            marginRight: "1rem",
-
-            "& .MuiSvgIcon-root": {
-              color: "#344054",
-            },
-
-            "& .MuiDivider-root": {
-              borderColor: "#F2F4F7",
-            },
+      {loading && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "#f2f4f74f",
+            zIndex: 3,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <IconButton onClick={() => scrollToElement(0)}>
-            <BiotechOutlined />
-          </IconButton>
-          <Divider />
-          {activeTab === 0 && (
-            <>
-              <IconButton onClick={() => scrollToElement(2)}>
-                <FindInPageOutlined />
-              </IconButton>
-              <IconButton onClick={() => scrollToElement(1)}>
-                <InputOutlined />
-              </IconButton>
-            </>
-          )}
-          {activeTab === 1 && (
-            <>
-              <IconButton onClick={() => scrollToElement(3)}>
-                <OriginIcon />
-              </IconButton>
-              <IconButton onClick={() => scrollToElement(4)}>
-                <ViaIcon />
-              </IconButton>
-              <IconButton onClick={() => scrollToElement(5)}>
-                <DestinationIcon />
+          <CircularProgress />
+        </div>
+      )}
+      {statement.knowledge_statement && (
+        <>
+          <Grid item xs={1}>
+            <Stack
+              spacing="1rem"
+              sx={{
+                borderRadius: "1.75rem",
+                border: "1px solid #F2F4F7",
+                background: "#FFF",
+                boxShadow:
+                  "0px 4px 6px -2px rgba(16, 24, 40, 0.03), 0px 12px 16px -4px rgba(16, 24, 40, 0.08)",
+                width: "fit-content",
+                padding: "1.25rem .75rem",
+                position: "sticky",
+                top: 200,
+                alignSelf: "flex-start",
+                marginRight: "1rem",
+
+                "& .MuiSvgIcon-root": {
+                  color: "#344054",
+                },
+
+                "& .MuiDivider-root": {
+                  borderColor: "#F2F4F7",
+                },
+              }}
+            >
+              <IconButton onClick={() => scrollToElement(0)}>
+                <BiotechOutlined />
               </IconButton>
               <Divider />
+              {activeTab === 0 && (
+                <>
+                  <IconButton onClick={() => scrollToElement(2)}>
+                    <FindInPageOutlined />
+                  </IconButton>
+                  <IconButton onClick={() => scrollToElement(1)}>
+                    <InputOutlined />
+                  </IconButton>
+                </>
+              )}
+              {activeTab === 1 && (
+                <>
+                  <IconButton onClick={() => scrollToElement(3)}>
+                    <OriginIcon />
+                  </IconButton>
+                  <IconButton onClick={() => scrollToElement(4)}>
+                    <ViaIcon />
+                  </IconButton>
+                  <IconButton onClick={() => scrollToElement(5)}>
+                    <DestinationIcon />
+                  </IconButton>
+                  <Divider />
 
-              <IconButton onClick={() => scrollToElement(6)}>
-                <BubbleChartOutlined />
+                  <IconButton onClick={() => scrollToElement(6)}>
+                    <BubbleChartOutlined />
+                  </IconButton>
+                </>
+              )}
+              <Divider />
+
+              <IconButton onClick={() => scrollToElement(7)}>
+                <EditOutlined />
               </IconButton>
-            </>
-          )}
-          <Divider />
-
-          <IconButton onClick={() => scrollToElement(7)}>
-            <EditOutlined />
-          </IconButton>
-        </Stack>
-      </Grid>
-      <Grid item xs={11}>
-        <Grid container>
-          <Grid item xs={12} mb={4}>
+            </Stack>
+          </Grid>
+          <Grid item xs={11}>
             <Grid container>
-              <Grid item xs={12} md={6}>
-                <Box>
-                  <Typography variant="h3" mb={1}>
-                    Statement Details #{statementId}{" "}
-                    <span>
-                      <SentenceStateChip
-                        key={statement?.state}
-                        value={statement?.state}
+              <Grid item xs={12} mb={4}>
+                <Grid container>
+                  <Grid item xs={12} md={6}>
+                    <Box>
+                      <Typography variant="h3" mb={1}>
+                        Statement Details #{statementId}{" "}
+                        <span>
+                          <SentenceStateChip
+                            key={statement?.state}
+                            value={statement?.state}
+                          />
+                        </span>
+                      </Typography>
+                      <span>
+                        Last Edited on {formatDate(statement?.modified_date)},{" "}
+                        {formatTime(statement?.modified_date)}
+                      </span>
+                    </Box>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    md={6}
+                    display="flex"
+                    justifyContent="flex-end"
+                  >
+                    {statement.available_transitions &&
+                    statement.available_transitions.length > 0 ? (
+                      <GroupedButtons
+                        handleClick={doTransition}
+                        selectedOption={
+                          StatementsLabels[
+                            statement?.available_transitions[selectedIndex]
+                          ]
+                        }
+                        options={statement?.available_transitions}
+                        selectedIndex={selectedIndex}
+                        handleMenuItemClick={handleMenuItemClick}
+                        hasFormat={true}
+                        format={StatementsLabels}
                       />
-                    </span>
-                  </Typography>
-                  <span>
-                    Last Edited on {formatDate(statement?.modified_date)},{" "}
-                    {formatTime(statement?.modified_date)}
-                  </span>
+                    ) : (
+                      <GroupedButtons
+                        disabled
+                        selectedOption="No options available"
+                      />
+                    )}
+                  </Grid>
+                </Grid>
+              </Grid>
+
+              <Grid item xl={12} mb={4}>
+                <Box>
+                  <Tabs
+                    value={activeTab}
+                    variant="standard"
+                    onChange={(e, i: number) => setActiveTab(i)}
+                    sx={{
+                      borderBottom: "1px solid #EAECF0",
+                    }}
+                  >
+                    <Tab label="Distillation" />
+                    <Tab label="Proofing" />
+                  </Tabs>
                 </Box>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                md={6}
-                display="flex"
-                justifyContent="flex-end"
-              >
-                {statement.available_transitions &&
-                statement.available_transitions.length > 0 ? (
-                  <GroupedButtons
-                    handleClick={doTransition}
-                    selectedOption={
-                      StatementsLabels[
-                        statement?.available_transitions[selectedIndex]
-                      ]
-                    }
-                    options={statement?.available_transitions}
-                    selectedIndex={selectedIndex}
-                    handleMenuItemClick={handleMenuItemClick}
-                    hasFormat={true}
-                    format={StatementsLabels}
-                  />
-                ) : (
-                  <GroupedButtons
-                    disabled
-                    selectedOption="No options available"
-                  />
-                )}
-              </Grid>
-            </Grid>
-          </Grid>
-
-          <Grid item xl={12} mb={4}>
-            <Box>
-              <Tabs
-                value={activeTab}
-                variant="standard"
-                onChange={(e, i: number) => setActiveTab(i)}
-                sx={{
-                  borderBottom: "1px solid #EAECF0",
-                }}
-              >
-                <Tab label="Distillation" />
-                <Tab label="Proofing" />
-              </Tabs>
-            </Box>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item md={12}>
-                <TabPanel value={activeTab} index={0}>
-                  <DistillationTab
-                    statement={statement}
-                    setStatement={setStatement}
-                    refreshStatement={refreshStatement}
-                    disabled={disabled}
-                    refs={refs}
-                  />
-                </TabPanel>
-                <TabPanel value={activeTab} index={1}>
-                  <ProofingTab
-                    statement={statement}
-                    setStatement={setStatement}
-                    refreshStatement={refreshStatement}
-                    disabled={disabled}
-                    refs={refs}
-                  />
-                </TabPanel>
               </Grid>
 
               <Grid item xs={12}>
-                <Box ref={refs[7]}>
-                  <Paper
-                    sx={{ ...sectionStyle, "& .MuiBox-root": { padding: 0 } }}
-                  >
-                    <Typography variant="h5" mb={1}>
-                      Notes
-                    </Typography>
-                    <TagForm
-                      data={statement.tags}
-                      extraData={{
-                        parentId: statement.id,
-                        service: statementService,
-                      }}
-                      setter={refreshStatement}
-                    />
-                    <Divider sx={{ margin: "36px 0" }} />
-                    <NoteDetails
-                      extraData={{ connectivity_statement_id: statement.id }}
-                    />
-                  </Paper>
-                </Box>
+                <Grid container spacing={2}>
+                  <Grid item md={12}>
+                    <TabPanel value={activeTab} index={0}>
+                      <DistillationTab
+                        statement={statement}
+                        setStatement={setStatement}
+                        refreshStatement={refreshStatement}
+                        disabled={disabled}
+                        refs={refs}
+                      />
+                    </TabPanel>
+                    <TabPanel value={activeTab} index={1}>
+                      <ProofingTab
+                        statement={statement}
+                        setStatement={setStatement}
+                        refreshStatement={refreshStatement}
+                        disabled={disabled}
+                        refs={refs}
+                      />
+                    </TabPanel>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <Box ref={refs[7]}>
+                      <Paper
+                        sx={{
+                          ...sectionStyle,
+                          "& .MuiBox-root": { padding: 0 },
+                        }}
+                      >
+                        <Typography variant="h5" mb={1}>
+                          Notes
+                        </Typography>
+                        <TagForm
+                          data={statement.tags}
+                          extraData={{
+                            parentId: statement.id,
+                            service: statementService,
+                          }}
+                          setter={refreshStatement}
+                        />
+                        <Divider sx={{ margin: "36px 0" }} />
+                        <NoteDetails
+                          extraData={{
+                            connectivity_statement_id: statement.id,
+                          }}
+                        />
+                      </Paper>
+                    </Box>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
           </Grid>
-        </Grid>
-      </Grid>
+        </>
+      )}
     </Grid>
   );
 };

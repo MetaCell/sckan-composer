@@ -284,7 +284,6 @@ const StatementForm = (props: any) => {
           searchPlaceholder: "Search for connections",
           noResultReason: "No prior connections found",
           disabledReason: "",
-
           onSearch: async (
             searchValue: string,
             formId: string,
