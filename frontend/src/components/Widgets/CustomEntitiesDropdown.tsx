@@ -322,6 +322,7 @@ export default function CustomEntitiesDropdown({
   };
 
   const handleInputChange = (event: any) => {
+    setHoveredOption(null);
     setInputValue(event.target.value);
   };
 
@@ -817,7 +818,7 @@ export default function CustomEntitiesDropdown({
                       justifyContent="center"
                     >
                       <Typography variant="body2">
-                        Hover over each nerve to its details
+                        Hover over each nerve to show its details
                       </Typography>
                     </Box>
                   ))}
