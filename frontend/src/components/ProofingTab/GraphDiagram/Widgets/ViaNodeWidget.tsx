@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { PortWidget } from "@metacell/meta-diagram";
+import { PortWidget } from "@projectstorm/react-diagrams";
 import { Typography, Box } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import { DestinationIcon, OriginIcon, ViaIcon } from "../../../icons";
