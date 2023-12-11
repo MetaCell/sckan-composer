@@ -11,8 +11,8 @@ class Laterality(models.TextChoices):
 
 
 class Projection(models.TextChoices):
-    IPSI = "IPSI", "Ipsi"
-    CONTRAT = "CONTRAT", "Contrat"
+    IPSI = "IPSI", "Ipsilateral"
+    CONTRAT = "CONTRAT", "Contralateral"
     BI = "BI", "Bilateral"
     UNKNOWN = "UNKNOWN", "Not specified"
 

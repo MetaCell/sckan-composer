@@ -481,14 +481,14 @@ class ConnectivityStatementSerializer(
         if not species:
             species = "{species}"
 
-        phenotype = instance.phenotype.name if instance.phenotype else "{phenotype}"
+        phenotype = instance.get_phenotype_display().lower() if instance.phenotype else "{phenotype}"
         origin_names = [origin.name for origin in instance.origins.all()]
         origins = join_entities(origin_names)
         if not origins:
             origins = "{species}"
 
-        circuit_type = instance.circuit_type if instance.circuit_type else "{circuit_type}"
-        projection = instance.projection if instance.projection else "{projection}"
+        circuit_type = instance.get_circuit_type_display().lower() if instance.circuit_type else "{circuit_type}"
+        projection = instance.get_projection_display().lower() if instance.projection else "{projection}"
 
         laterality_description = instance.get_laterality_description()
         if not laterality_description:
@@ -504,7 +504,7 @@ class ConnectivityStatementSerializer(
 
         # Creating the statement
         statement = f"In a {sex} {species}, a {phenotype} connection goes from:\n{journey}\n"
-        statement += f" This {projection}{circuit_type} projects from the {origins} and is found {laterality_description}."
+        statement += f"This {projection} {circuit_type} connection projects from the {origins} and is found {laterality_description}."
 
         if forward_connection:
             statement += f" This neuron population connects to connectivity statements with id {forward_connection}."
