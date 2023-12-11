@@ -97,6 +97,9 @@ const processData = (
             NodeTypes.Origin,
             origin.name,
             getExternalID(origin.ontology_uri),
+            {
+                to: [],
+            }
         );
         originNode.setPosition(xOrigin, yStart);
         nodes.push(originNode);
@@ -116,7 +119,8 @@ const processData = (
                 entity.name,
                 getExternalID(entity.ontology_uri),
                 {
-                    from: via.from_entities,
+                    from: [],
+                    to: [],
                     anatomicalType: via.type
                 }
             );
@@ -131,6 +135,10 @@ const processData = (
                     const link = createLink(sourceNode, viaNode, 'out', 'in');
                     if (link) {
                         links.push(link);
+                        // @ts-ignore
+                        sourceNode.getOptions()["to"]?.push({name: viaNode.name, type: NodeTypes.Via})
+                        // @ts-ignore
+                        viaNode.getOptions()["from"]?.push({name: sourceNode.name, type: sourceNode.getCustomType()})
                     }
                 }
             });
@@ -151,7 +159,7 @@ const processData = (
                 entity.name,
                 getExternalID(entity.ontology_uri),
                 {
-                    from: destination.from_entities,
+                    from: [],
                     anatomicalType: destination.type
                 }
             );
@@ -165,6 +173,10 @@ const processData = (
                     const link = createLink(sourceNode, destinationNode, 'out', 'in');
                     if (link) {
                         links.push(link);
+                        // @ts-ignore
+                        sourceNode.getOptions()["to"]?.push({name: destinationNode.name, type: NodeTypes.Destination})
+                        // @ts-ignore
+                        destinationNode.getOptions()["from"]?.push({name: sourceNode.name, type: sourceNode.getCustomType()})
                     }
                 }
             });

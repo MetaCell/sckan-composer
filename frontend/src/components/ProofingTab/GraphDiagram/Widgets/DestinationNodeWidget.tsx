@@ -1,12 +1,13 @@
-import React, { useState } from "react";
-import { PortWidget } from "@projectstorm/react-diagrams";
-import { Typography, Box } from "@mui/material";
+import React, {useState} from "react";
+import {PortWidget} from "@projectstorm/react-diagrams";
+import {Typography, Box} from "@mui/material";
 import Stack from "@mui/material/Stack";
-import { DestinationIcon, ViaIcon } from "../../../icons";
+import {DestinationIcon, OriginIcon, ViaIcon} from "../../../icons";
 import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
-import { vars } from "../../../../theme/variables";
+import {vars} from "../../../../theme/variables";
 import {AnatomicalEntity} from "../../../../apiclient/backend";
+import {NodeTypes} from "../GraphDiagram";
 
 interface DestinationNodeProps {
     model: any;
@@ -58,7 +59,7 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
                 {model.name}
             </Typography>
             <PortWidget engine={engine} port={model.getPort("in")}>
-                <div className="circle-port" />
+                <div className="circle-port"/>
             </PortWidget>
 
             {isActive && (
@@ -105,7 +106,10 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
                             width: "100%",
                         }}
                     >
-                        {model.options.from && model.options.from.map((item: AnatomicalEntity, index: number) => (
+                        {model.options.from && model.options.from.map((item: {
+                            type: NodeTypes;
+                            name: string
+                        }, index: number) => (
                             <React.Fragment key={index}>
                                 <Stack
                                     padding=".5rem"
@@ -113,7 +117,10 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
                                     direction="row"
                                     alignItems="center"
                                 >
-                                    <ViaIcon fill="#088AB2" width={"1rem"} height={"1rem"} />
+                                    {item.type === NodeTypes.Origin &&
+                                        <OriginIcon fill="#088AB2" width={"1rem"} height={"1rem"}/>}
+                                    {item.type === NodeTypes.Via &&
+                                        <ViaIcon fill="#088AB2" width={"1rem"} height={"1rem"}/>}
                                     <Typography
                                         sx={{
                                             color: "#667085",
@@ -125,7 +132,7 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
                                         {item.name}
                                     </Typography>
                                 </Stack>
-                                {index < model.options.from.length - 1 && <Divider />}
+                                {index < model.options.from.length - 1 && <Divider/>}
                             </React.Fragment>
                         ))}
                     </Box>
@@ -146,7 +153,7 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
                                 transform: "rotate(90deg)",
                             }}
                         />
-                        <DestinationIcon fill="#088AB2" />
+                        <DestinationIcon fill="#088AB2"/>
                         <Typography
                             sx={{
                                 color: " #088AB2",
