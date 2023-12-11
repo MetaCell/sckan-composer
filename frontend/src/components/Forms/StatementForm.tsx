@@ -524,7 +524,7 @@ const StatementForm = (props: any) => {
       },
       statement: statement,
       errors: statement?.errors?.includes("Invalid forward connection")
-        ? statement.errors
+        ? "Forward connection(s) not found"
         : "",
       mapValueToOption: (connectivityStatements: ConnectivityStatement[]) =>
         createOptionsFromStatements(
