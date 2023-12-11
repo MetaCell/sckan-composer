@@ -13,14 +13,12 @@ const NavigationMenu = (props: any) => {
     const zoomOut = () => {
         let zoomLevel = engine.model.getZoomLevel();
         engine.model.setZoomLevel(zoomLevel - ZOOM_CHANGE);
-        console.log("New Zoom Level (Out):", engine.model.getZoomLevel());
         engine.repaintCanvas();
     };
 
     const zoomIn = () => {
         let zoomLevel = engine.model.getZoomLevel();
         engine.model.setZoomLevel(zoomLevel + ZOOM_CHANGE);
-        console.log("New Zoom Level (In):", engine.model.getZoomLevel());
         engine.repaintCanvas();
 
     };
