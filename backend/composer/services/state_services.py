@@ -1,10 +1,12 @@
-from django.db import transaction
+from typing import List
+
 from django.apps import apps
+from django.db import transaction
 from django.db.models import Q, Count
+
 from composer.enums import CSState
 from .graph_service import generate_paths, consolidate_paths
 from ..enums import SentenceState
-from ..utils import join_entities
 
 
 class BaseServiceMixin:
@@ -108,7 +110,7 @@ class SentenceService(StateServiceMixin):
 
 class ConnectivityStatementService(StateServiceMixin):
     @staticmethod
-    def compile_journey(connectivity_statement):
+    def compile_journey(connectivity_statement) -> List[str]:
         """
        Generates a string of descriptions of journey paths for a given connectivity statement.
 
@@ -141,7 +143,7 @@ class ConnectivityStatementService(StateServiceMixin):
 
             journey_descriptions.append(sentence)
 
-        return '. '.join(journey_descriptions)
+        return journey_descriptions
 
     @staticmethod
     def can_be_reviewed(connectivity_statement):

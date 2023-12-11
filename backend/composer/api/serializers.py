@@ -462,7 +462,7 @@ class ConnectivityStatementSerializer(
     )
     available_transitions = serializers.SerializerMethodField()
     has_notes = serializers.SerializerMethodField()
-    journey = serializers.CharField(read_only=True)
+    journey = serializers.ListField(child=serializers.CharField(), read_only=True)
     statement_preview = serializers.SerializerMethodField()
     errors = serializers.SerializerMethodField()
 
@@ -500,10 +500,11 @@ class ConnectivityStatementSerializer(
             else "{forward_connection}"
         )
         apinatomy = instance.apinatomy_model if instance.apinatomy_model else "{apinatomy}"
+        journey = '\n'.join(instance.journey)
 
         # Creating the statement
-        statement = f"In a {sex} {species}, a {phenotype} connection goes from {instance.journey}"
-        statement += f" This {circuit_type} projects {projection} from the {origins} and is found {laterality_description}."
+        statement = f"In a {sex} {species}, a {phenotype} connection goes from:\n{journey}\n"
+        statement += f" This {projection}{circuit_type} projects from the {origins} and is found {laterality_description}."
 
         if forward_connection:
             statement += f" This neuron population connects to connectivity statements with id {forward_connection}."

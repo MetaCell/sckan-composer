@@ -75,7 +75,13 @@ const ProofingTab = (props: any) => {
                 </Box>
                 <Stack spacing={2}>
                   <Typography variant="h5">Journey</Typography>
-                  <Typography>{statement.journey}</Typography>
+                    <ul>
+                        {statement.journey.map((journeyStep: string, index: number) => (
+                            <li key={index}>
+                                <Typography>{journeyStep}</Typography>
+                            </li>
+                        ))}
+                    </ul>
                 </Stack>
               </>
             )}
