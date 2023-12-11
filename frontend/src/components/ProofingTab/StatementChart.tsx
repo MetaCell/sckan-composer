@@ -9,14 +9,9 @@ const StatementChart = (props: { statement: ConnectivityStatement }) => {
     const {statement} = props;
     const theme = useTheme();
 
-    // const displayChart =
-    //   statement.origins &&
-    //   statement.destination &&
-    //   statement.path &&
-    //   statement.path.length > 0;
+    const displayChart = statement.origins && statement.origins.length > 0
+        && statement.destinations && statement.destinations.length > 0
 
-    // TODO: Update to work with multiple paths @ afonsobspinto
-    const displayChart = true
     return (
         <Box
             display="flex"
@@ -31,7 +26,7 @@ const StatementChart = (props: { statement: ConnectivityStatement }) => {
             ) : (
                 <Box p={3}>
                     <Typography>
-                        Add Origin, Destination and Via entities to visualize the statement
+                        Add Origin and Destination entities to visualize the statement
                         preview
                     </Typography>
                 </Box>
