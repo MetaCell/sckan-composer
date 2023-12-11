@@ -44,6 +44,10 @@ interface GraphDiagramProps {
     destinations: DestinationSerializerDetails[] | undefined;
 }
 
+function getExternalID(url: string) {
+    const parts = url.split('/');
+    return parts[parts.length - 1].replace('_', ':');
+}
 
 function getId(layerId: string, entity: AnatomicalEntity) {
     return layerId + entity.id.toString();
@@ -92,6 +96,7 @@ const processData = (
         const originNode = new CustomNodeModel(
             NodeTypes.Origin,
             origin.name,
+            getExternalID(origin.ontology_uri),
         );
         originNode.setPosition(xOrigin, yStart);
         nodes.push(originNode);
@@ -109,6 +114,11 @@ const processData = (
             const viaNode = new CustomNodeModel(
                 NodeTypes.Via,
                 entity.name,
+                getExternalID(entity.ontology_uri),
+                {
+                    from: via.from_entities,
+                    anatomicalType: via.type
+                }
             );
             viaNode.setPosition(xVia, yVia);
             nodes.push(viaNode);
@@ -139,6 +149,11 @@ const processData = (
             const destinationNode = new CustomNodeModel(
                 NodeTypes.Destination,
                 entity.name,
+                getExternalID(entity.ontology_uri),
+                {
+                    from: destination.from_entities,
+                    anatomicalType: destination.type
+                }
             );
             destinationNode.setPosition(xDestination, yDestination);
             nodes.push(destinationNode);

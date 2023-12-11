@@ -6,6 +6,7 @@ import { DestinationIcon, OriginIcon, ViaIcon } from "../../../icons";
 import Divider from "@mui/material/Divider";
 import { vars } from "../../../../theme/variables";
 import Chip from "@mui/material/Chip";
+import {AnatomicalEntity} from "../../../../apiclient/backend";
 
 interface ViaNodeProps {
   model: any;
@@ -96,91 +97,38 @@ export const ViaNodeWidget: React.FC<ViaNodeProps> = ({ model, engine }) => {
               From
             </Typography>
           </Box>
-          <Box
-            sx={{
-              borderRadius: "0.625rem",
-              border: "1px solid #EAECF0",
-              background: "#FFF",
-              width: "100%",
-            }}
-          >
-            <Stack
-              padding=".5rem"
-              spacing={1}
-              direction="row"
-              alignItems="center"
-            >
-              <OriginIcon fill="#039855" width={"1rem"} height={"1rem"} />
-              <Typography
+            <Box
                 sx={{
-                  color: "#667085",
-                  fontSize: "0.875rem",
-                  fontWeight: 500,
-                  lineHeight: "1.25rem",
+                    borderRadius: "0.625rem",
+                    border: "1px solid #EAECF0",
+                    background: "#FFF",
+                    width: "100%",
                 }}
-              >
-                Intermediolateral nucleus of fifth thoracic segment
-              </Typography>
-            </Stack>
-
-            <Divider />
-            <Stack
-              padding=".5rem"
-              spacing={1}
-              direction="row"
-              alignItems="center"
             >
-              <OriginIcon fill="#039855" width={"1rem"} height={"1rem"} />
-              <Typography
-                sx={{
-                  color: "#667085",
-                  fontSize: "0.875rem",
-                  fontWeight: 500,
-                  lineHeight: "1.25rem",
-                }}
-              >
-                Intermediolateral nucleus of fifth thoracic segment
-              </Typography>
-            </Stack>
-            <Divider />
-            <Stack
-              padding=".5rem"
-              spacing={1}
-              direction="row"
-              alignItems="center"
-            >
-              <OriginIcon fill="#039855" width={"1rem"} height={"1rem"} />
-              <Typography
-                sx={{
-                  color: "#667085",
-                  fontSize: "0.875rem",
-                  fontWeight: 500,
-                  lineHeight: "1.25rem",
-                }}
-              >
-                Intermediolateral nucleus of fifth thoracic segment
-              </Typography>
-            </Stack>
-            <Divider />
-            <Stack
-              padding=".5rem"
-              spacing={1}
-              direction="row"
-              alignItems="center"
-            >
-              <OriginIcon fill="#039855" width={"1rem"} height={"1rem"} />
-              <Typography
-                sx={{
-                  color: "#667085",
-                  fontSize: "0.875rem",
-                  fontWeight: 500,
-                  lineHeight: "1.25rem",
-                }}
-              >
-                Intermediolateral nucleus of fifth thoracic segment
-              </Typography>
-            </Stack>
-          </Box>
+                {model.options.from && model.options.from.map((item: AnatomicalEntity, index: number) => (
+                    <React.Fragment key={index}>
+                        <Stack
+                            padding=".5rem"
+                            spacing={1}
+                            direction="row"
+                            alignItems="center"
+                        >
+                            <ViaIcon fill="#088AB2" width={"1rem"} height={"1rem"} />
+                            <Typography
+                                sx={{
+                                    color: "#667085",
+                                    fontSize: "0.875rem",
+                                    fontWeight: 500,
+                                    lineHeight: "1.25rem",
+                                }}
+                            >
+                                {item.name}
+                            </Typography>
+                        </Stack>
+                        {index < model.options.from.length - 1 && <Divider />}
+                    </React.Fragment>
+                ))}
+            </Box>
 
           <Stack
             padding="0.75rem 0.5rem"
@@ -206,7 +154,7 @@ export const ViaNodeWidget: React.FC<ViaNodeProps> = ({ model, engine }) => {
                 lineHeight: "1.25rem",
               }}
             >
-              Greater Splanchnic Nerve
+                {model.name}
             </Typography>
             <Typography
               sx={{
@@ -217,10 +165,10 @@ export const ViaNodeWidget: React.FC<ViaNodeProps> = ({ model, engine }) => {
                 marginTop: ".25rem !important",
               }}
             >
-              ILX:0793815
+                {model.externalId}
             </Typography>
             <Chip
-              label={"Dendrite"}
+              label={model.options.anatomicalType}
               variant="filled"
               sx={{
                 background: vars.lightBlue,

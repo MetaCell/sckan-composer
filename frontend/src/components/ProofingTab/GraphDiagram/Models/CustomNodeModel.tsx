@@ -4,17 +4,20 @@ import {NodeTypes} from "../GraphDiagram";
 export class CustomNodeModel extends NodeModel {
     customType: NodeTypes;
     name: string;
-    constructor(type: NodeTypes, name: string, color = 'rgb(0,192,255)') {
+    externalId: string;
+    constructor(customType: NodeTypes, name: string, externalId: string = '',  options: any = {}) {
         super({
+            ...options,
             type: 'custom',
         });
-        this.customType = type;
+        this.customType = customType;
         this.name = name;
+        this.externalId = externalId;
 
-        if (type === NodeTypes.Origin || type === NodeTypes.Via) {
+        if (customType === NodeTypes.Origin || customType === NodeTypes.Via) {
             this.addPort(new DefaultPortModel(false, 'out', 'Out'));
         }
-        if (type === NodeTypes.Via || type === NodeTypes.Destination) {
+        if (customType === NodeTypes.Via || customType === NodeTypes.Destination) {
             this.addPort(new DefaultPortModel(true, 'in', 'In'));
         }
     }
