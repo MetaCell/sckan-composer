@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import {
     AnatomicalEntity,
-    DestinationSerializerDetails,
+    DestinationSerializerDetails, TypeB60Enum, TypeC11Enum,
     ViaSerializerDetails
 } from "../../../apiclient/backend";
 import InfoMenu from "./InfoMenu";
@@ -34,9 +34,16 @@ export enum NodeTypes {
     Destination = 'Destination'
 }
 
-export enum LinkTypes {
-    Default = 'Default'
-}
+const ViaTypeMapping: Record<TypeB60Enum, string> = {
+    [TypeB60Enum.Axon]: 'Axon',
+    [TypeB60Enum.Dendrite]: 'Dendrite'
+};
+
+const DestinationTypeMapping: Record<TypeC11Enum, string> = {
+    [TypeC11Enum.AxonT]: 'Axon terminal',
+    [TypeC11Enum.AfferentT]: 'Afferent terminal',
+    [TypeC11Enum.Unknown]: 'Not specified'
+};
 
 interface GraphDiagramProps {
     origins: AnatomicalEntity[] | undefined;
@@ -121,7 +128,7 @@ const processData = (
                 {
                     from: [],
                     to: [],
-                    anatomicalType: via.type
+                    anatomicalType: via?.type ? ViaTypeMapping[via.type] : ''
                 }
             );
             viaNode.setPosition(xVia, yVia);
@@ -160,7 +167,7 @@ const processData = (
                 getExternalID(entity.ontology_uri),
                 {
                     from: [],
-                    anatomicalType: destination.type
+                    anatomicalType: destination?.type ? DestinationTypeMapping[destination.type] : ''
                 }
             );
             destinationNode.setPosition(xDestination, yDestination);
@@ -176,7 +183,10 @@ const processData = (
                         // @ts-ignore
                         sourceNode.getOptions()["to"]?.push({name: destinationNode.name, type: NodeTypes.Destination})
                         // @ts-ignore
-                        destinationNode.getOptions()["from"]?.push({name: sourceNode.name, type: sourceNode.getCustomType()})
+                        destinationNode.getOptions()["from"]?.push({
+                            name: sourceNode.name,
+                            type: sourceNode.getCustomType()
+                        })
                     }
                 }
             });
