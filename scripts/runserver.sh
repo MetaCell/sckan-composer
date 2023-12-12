@@ -13,7 +13,7 @@ fi
 python3 manage.py collectstatic --noinput
 python3 manage.py migrate
 
-if [ "${DEBUG}" -eq "True" ]; then
+if [ "${DEBUG,,}" = "true" ]; then
     # start the Django dev server
     echo running dev server
     if [ -z "${HTTPS}" ]; then
