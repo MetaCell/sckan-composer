@@ -95,7 +95,7 @@ class AnatomicalEntityAdmin(admin.ModelAdmin):
     search_fields = ("name",)  # or ("^name",) for search to start with
 
 
-class PathInline(SortableStackedInline):
+class ViaInline(SortableStackedInline):
     model = Via
     extra = 0
     raw_id_fields = ("anatomical_entities", "from_entities")
@@ -142,7 +142,7 @@ class ConnectivityStatementAdmin(
 
     fieldsets = ()
 
-    inlines = (ProvenanceInline, NoteConnectivityStatementInline, PathInline, DestinationInline)
+    inlines = (ProvenanceInline, NoteConnectivityStatementInline, ViaInline, DestinationInline)
 
     @admin.display(description="Knowledge Statement")
     def short_ks(self, obj):
