@@ -17,9 +17,9 @@ if [ -z "${PRODUCTION}" ]; then
     # start the Django dev server
     echo running dev server
     if [ -z "${HTTPS}" ]; then
-        python3 manage.py runsslserver 0.0.0.0:${PORT}
-    else
         python3 manage.py runserver 0.0.0.0:${PORT}
+    else
+        python3 manage.py runsslserver 0.0.0.0:${PORT}
     fi
 else
     python3 -m uvicorn --workers ${WORKERS} --host 0.0.0.0 --port ${PORT} ${MODULE_NAME}.asgi:application
