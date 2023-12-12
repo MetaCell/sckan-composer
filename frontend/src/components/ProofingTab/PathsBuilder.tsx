@@ -106,7 +106,7 @@ const PathsBuilder = (props: any) => {
               ml={1}
               mb={1}
             >
-              Forward connections(s)
+              Forward connection(s)
             </Typography>
             <Box
               sx={{ ...sectionStyle, padding: ".75rem .88rem .75rem .50rem" }}
