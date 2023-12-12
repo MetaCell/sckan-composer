@@ -481,7 +481,7 @@ class ConnectivityStatementSerializer(
         if not species:
             species = "{species}"
 
-        phenotype = instance.get_phenotype_display().lower() if instance.phenotype else "{phenotype}"
+        phenotype = instance.phenotype.name.lower() if instance.phenotype else "{phenotype}"
         origin_names = [origin.name for origin in instance.origins.all()]
         origins = join_entities(origin_names)
         if not origins:
