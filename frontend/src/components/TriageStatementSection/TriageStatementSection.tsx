@@ -2,6 +2,7 @@ import React from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
+import { Typography } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import StatementDetailsAccordion from "./StatementDetailsAccordion";
@@ -37,6 +38,7 @@ const TriageStatementSection = (props: any) => {
       >
         <Grid container spacing={1} alignItems="center">
           <Grid item xs={11}>
+          {statement?.id ? <Typography variant="h6" ml={1}>Statement {statement.id}</Typography> : <></>}
             <Paper sx={{...sectionStyle, p:0}}>
               <StatementForm
                 statement={statement}
