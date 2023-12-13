@@ -493,28 +493,6 @@ class ConnectivityStatement(models.Model):
     def tag_list(self):
         return ", ".join(self.tags.all().values_list("tag", flat=True))
 
-    @property
-    def has_shortcuts(self):
-        # Check Destinations
-        if self.destinations.exists():
-            highest_via_order = self.via_set.aggregate(Max('order')).get('order__max')
-            highest_via_order = -1 if highest_via_order is None else highest_via_order
-            previous_layer_entities = self.get_previous_layer_entities(highest_via_order + 1)
-
-            for dest in self.destinations.all():
-                if not set(dest.from_entities.all()).issubset(previous_layer_entities):
-                    return True
-
-        # Check Vias in descending order
-        for via_order in range(highest_via_order, -1, -1):
-            via = self.via_set.get(order=via_order)
-            previous_layer_entities = self.get_previous_layer_entities(via_order)
-
-            if not set(via.from_entities.all()).issubset(previous_layer_entities):
-                return True
-
-        return False
-
     def get_previous_layer_entities(self, via_order):
         if via_order == 0:
             return set(self.origins.all())
@@ -544,7 +522,7 @@ class ConnectivityStatement(models.Model):
             self.reference_uri = create_reference_uri(self.pk)
             self.save(update_fields=["reference_uri"])
 
-    def update_origins(self, origin_ids):
+    def set_origins(self, origin_ids):
         self.origins.clear()
         self.origins.add(*origin_ids)
         self.save()
