@@ -23,11 +23,9 @@ doLogin().then(() => {
         sexes.setSexes().then(() => {
           phenotypes.setPhenotypes().then(() => {
             root.render(
-              <React.StrictMode>
                 <Provider store={store}>
                   <App />
                 </Provider>
-              </React.StrictMode>
             );
           });
         });
