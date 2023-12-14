@@ -523,8 +523,7 @@ class ConnectivityStatement(models.Model):
             self.save(update_fields=["reference_uri"])
 
     def set_origins(self, origin_ids):
-        self.origins.clear()
-        self.origins.add(*origin_ids)
+        self.origins.set(origin_ids, clear=True)
         self.save()
 
     class Meta:
