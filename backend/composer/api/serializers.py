@@ -162,9 +162,7 @@ class ViaSerializerDetails(serializers.ModelSerializer):
         many=True,
     )
 
-    from_entities = AnatomicalEntitySerializer(
-        many=True,
-    )
+    from_entities = serializers.SerializerMethodField()
 
     class Meta:
         model = Via
@@ -177,21 +175,18 @@ class ViaSerializerDetails(serializers.ModelSerializer):
             "from_entities"
         )
 
-    def to_representation(self, instance):
+    def get_from_entities(self, instance):
         """
-        Custom representation for Via.
+        Custom method to compute 'from_entities'.
         """
-        representation = super().to_representation(instance)
-
         # Check if from_entities is empty
         if not instance.from_entities.exists():
-            # Get the order of the current via
             current_order = instance.order
 
             if current_order == 0:
                 # Use the origins of the ConnectivityStatement if order is 0
                 origins = instance.connectivity_statement.origins.all()
-                representation['from_entities'] = AnatomicalEntitySerializer(origins, many=True).data
+                return AnatomicalEntitySerializer(origins, many=True).data
             else:
                 # Fetch the Via with order - 1
                 previous_via = Via.objects.filter(
@@ -201,13 +196,13 @@ class ViaSerializerDetails(serializers.ModelSerializer):
 
                 if previous_via:
                     # Serialize anatomical_entities from previous via
-                    previous_entities = AnatomicalEntitySerializer(
+                    return AnatomicalEntitySerializer(
                         previous_via.anatomical_entities.all(),
                         many=True
                     ).data
-                    representation['from_entities'] = previous_entities
 
-        return representation
+        # Return the default from_entities if not empty
+        return AnatomicalEntitySerializer(instance.from_entities.all(), many=True).data
 
 
 class ViaSerializer(serializers.ModelSerializer):
@@ -267,9 +262,7 @@ class DestinationSerializerDetails(serializers.ModelSerializer):
         many=True,
     )
 
-    from_entities = AnatomicalEntitySerializer(
-        many=True,
-    )
+    from_entities = serializers.SerializerMethodField()
 
     class Meta:
         model = Destination
@@ -281,12 +274,10 @@ class DestinationSerializerDetails(serializers.ModelSerializer):
             "from_entities"
         )
 
-    def to_representation(self, instance):
+    def get_from_entities(self, instance):
         """
-        Custom representation for Destination.
+        Custom method to compute 'from_entities' for Destination.
         """
-        representation = super().to_representation(instance)
-
         # Check if from_entities is empty
         if not instance.from_entities.exists():
             # Get the Via with the highest order in the same ConnectivityStatement
@@ -296,17 +287,17 @@ class DestinationSerializerDetails(serializers.ModelSerializer):
 
             if highest_order_via:
                 # Serialize anatomical_entities from highest order via
-                highest_entities = AnatomicalEntitySerializer(
+                return AnatomicalEntitySerializer(
                     highest_order_via.anatomical_entities.all(),
                     many=True
                 ).data
-                representation['from_entities'] = highest_entities
             else:
                 # Use the origins of the ConnectivityStatement if no vias exist
                 origins = instance.connectivity_statement.origins.all()
-                representation['from_entities'] = AnatomicalEntitySerializer(origins, many=True).data
+                return AnatomicalEntitySerializer(origins, many=True).data
 
-        return representation
+        # Return the default from_entities if not empty
+        return AnatomicalEntitySerializer(instance.from_entities.all(), many=True).data
 
 
 class ProvenanceSerializer(serializers.ModelSerializer):
@@ -452,7 +443,7 @@ class ConnectivityStatementSerializer(
     provenances = ProvenanceSerializer(source="provenance_set", many=True, read_only=False, required=False)
     origins = AnatomicalEntitySerializer(many=True, required=False)
     vias = ViaSerializerDetails(source="via_set", many=True, read_only=False, required=False)
-    destinations = DestinationSerializerDetails(many=True, required=False)
+    destinations = DestinationSerializerDetails(many=True, read_only=False, required=False)
     owner = UserSerializer(required=False, read_only=True)
     phenotype = PhenotypeSerializer(required=False, read_only=True)
     sex = SexSerializer(required=False, read_only=True)
