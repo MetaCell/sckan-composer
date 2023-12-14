@@ -503,7 +503,7 @@ class ConnectivityStatementSerializer(
         journey = '\n'.join(instance.journey)
 
         # Creating the statement
-        statement = f"In a {sex} {species}, a {phenotype} connection goes from:\n{journey}\n"
+        statement = f"In a {sex} {species}, a {phenotype} connection goes: \n{journey}\n"
         statement += f"This {projection} {circuit_type} connection projects from the {origins} and is found {laterality_description}."
 
         if forward_connection:

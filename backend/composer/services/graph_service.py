@@ -86,7 +86,7 @@ def consolidate_paths(paths):
 
         paths = consolidated + [paths[i] for i in range(len(paths)) if i not in used_indices]
 
-    return [[(node.replace(JOURNEY_DELIMITER, ', '), layer) for node, layer in path] for path in paths]
+    return [[((node.replace(JOURNEY_DELIMITER, ' or '), layer) if (layer == 0 or layer == len(path) - 1)  else (node.replace(JOURNEY_DELIMITER, ', '), layer)) for node, layer in path] for path in paths]
 
 
 def can_merge(path1, path2):
