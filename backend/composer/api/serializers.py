@@ -465,7 +465,20 @@ class ConnectivityStatementSerializer(
     def get_has_notes(self, instance) -> bool:
         return instance.has_notes
 
-    def get_statement_preview(self, instance) -> str:
+    def get_journey(self, instance):
+        if not self.context.get('is_list_view', False):
+            if 'journey' not in self.context:
+                self.context['journey'] = instance.get_journey()
+            return self.context['journey']
+        return None
+
+    def get_statement_preview(self, instance):
+        if not self.context.get('is_list_view', False):
+            journey = self.context.get('journey', instance.get_journey())
+            return self.create_statement_preview(instance, journey)
+        return None
+
+    def create_statement_preview(self, instance, journey):
         sex = instance.sex.name if instance.sex else "{sex}"
         species_list = [specie.name for specie in instance.species.all()]
         species = join_entities(species_list)
@@ -491,10 +504,10 @@ class ConnectivityStatementSerializer(
             else "{forward_connection}"
         )
         apinatomy = instance.apinatomy_model if instance.apinatomy_model else "{apinatomy}"
-        journey = '\n'.join(instance.journey)
+        journey_sentence = '\n'.join(journey)
 
         # Creating the statement
-        statement = f"In a {sex} {species}, a {phenotype} connection goes: \n{journey}\n"
+        statement = f"In a {sex} {species}, a {phenotype} connection goes: \n{journey_sentence}\n"
         statement += f"This {projection} {circuit_type} connection projects from the {origins} and is found {laterality_description}."
 
         if forward_connection:

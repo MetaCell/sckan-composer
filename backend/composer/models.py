@@ -499,8 +499,7 @@ class ConnectivityStatement(models.Model):
         else:
             return set(self.via_set.get(order=via_order - 1).anatomical_entities.all())
 
-    @property
-    def journey(self):
+    def get_journey(self):
         return ConnectivityStatementService.compile_journey(self)
 
     def get_laterality_description(self):

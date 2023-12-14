@@ -307,6 +307,14 @@ class ConnectivityStatementViewSet(
     filterset_class = ConnectivityStatementFilter
     service = ConnectivityStatementService
 
+    def get_serializer_context(self):
+        """
+        Add 'is_list_view' to the serializer context.
+        """
+        context = super().get_serializer_context()
+        context['is_list_view'] = self.action == 'list'
+        return context
+
     def get_queryset(self):
         if self.action == "list" and "sentence_id" not in self.request.query_params:
             return ConnectivityStatement.objects.excluding_draft()
@@ -427,6 +435,7 @@ class DestinationViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = DestinationFilter
+
 
 @extend_schema(
     responses=OpenApiTypes.OBJECT,
