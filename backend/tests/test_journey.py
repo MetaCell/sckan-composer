@@ -1,64 +1,63 @@
-from django.test import TestCase
+from django.db import connection
+from django.test import TestCase, override_settings
 
 from composer.models import Sentence, ConnectivityStatement, AnatomicalEntity, Via, Destination
 from composer.services.graph_service import generate_paths, consolidate_paths
 
 
+@override_settings(DEBUG=True)
 class JourneyTestCase(TestCase):
 
     def test_journey_simple_graph_with_jump(self):
-        #####################################################################
-
-        # Oa -> V1a -> Da
-        # Ob -> Da
-
+        # Test setup
         sentence = Sentence.objects.create()
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
-        # Create Anatomical Entities
         origin1 = AnatomicalEntity.objects.create(name='Oa')
         origin2 = AnatomicalEntity.objects.create(name='Ob')
         via1 = AnatomicalEntity.objects.create(name='V1a')
         destination1 = AnatomicalEntity.objects.create(name='Da')
 
-        # Add origins
         cs.origins.add(origin1, origin2)
 
-        # Create Via
         via = Via.objects.create(connectivity_statement=cs, order=0)
         via.anatomical_entities.add(via1)
         via.from_entities.add(origin1)
 
-        # Create Destination
         destination = Destination.objects.create(connectivity_statement=cs)
         destination.anatomical_entities.add(destination1)
         destination.from_entities.add(via1, origin2)
 
-        ######################################################################
-
+        # Prefetch related data
         origins = list(cs.origins.all())
-        vias = list(Via.objects.filter(connectivity_statement=cs))
-        destinations = list(Destination.objects.filter(connectivity_statement=cs))
+        vias = list(
+            Via.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities', 'from_entities'))
+        destinations = list(
+            Destination.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities',
+                                                                                   'from_entities'))
 
+        # Test execution
         expected_paths = [
             [('Oa', 0), ('V1a', 1), ('Da', 2)],
             [('Ob', 0), ('Da', 2)]
         ]
 
+        initial_query_count = len(connection.queries)
         all_paths = generate_paths(origins, vias, destinations)
+        new_query_count = len(connection.queries) - initial_query_count
+        self.assertTrue(new_query_count == 0)
 
         all_paths.sort()
         expected_paths.sort()
         self.assertTrue(all_paths == expected_paths)
 
+        journey_paths = consolidate_paths(all_paths)
         expected_journey = [
             [('Oa', 0), ('V1a', 1), ('Da', 2)],
             [('Ob', 0), ('Da', 2)]
         ]
-
-        journey_paths = consolidate_paths(all_paths)
-        expected_journey.sort()
         journey_paths.sort()
+        expected_journey.sort()
         self.assertTrue(journey_paths == expected_journey)
 
     def test_journey_simple_direct_graph(self):
@@ -85,8 +84,11 @@ class JourneyTestCase(TestCase):
 
         ######################################################################
 
+        # Prefetch related data
         origins = list(cs.origins.all())
-        destinations = list(Destination.objects.filter(connectivity_statement=cs))
+        destinations = list(
+            Destination.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities',
+                                                                                   'from_entities'))
 
         expected_paths = [
             [('Oa', 0), ('Da', 1)],
@@ -133,9 +135,13 @@ class JourneyTestCase(TestCase):
 
         ######################################################################
 
+        # Prefetch related data
         origins = list(cs.origins.all())
-        vias = list(Via.objects.filter(connectivity_statement=cs))
-        destinations = list(Destination.objects.filter(connectivity_statement=cs))
+        vias = list(
+            Via.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities', 'from_entities'))
+        destinations = list(
+            Destination.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities',
+                                                                                   'from_entities'))
 
         expected_paths = [
             [('Ob', 0), ('V1a', 1), ('Da', 2)],
@@ -185,9 +191,13 @@ class JourneyTestCase(TestCase):
 
         ######################################################################
 
+        # Prefetch related data
         origins = list(cs.origins.all())
-        vias = list(Via.objects.filter(connectivity_statement=cs))
-        destinations = list(Destination.objects.filter(connectivity_statement=cs))
+        vias = list(
+            Via.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities', 'from_entities'))
+        destinations = list(
+            Destination.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities',
+                                                                                   'from_entities'))
 
         all_paths = generate_paths(origins, vias, destinations)
 
@@ -259,9 +269,13 @@ class JourneyTestCase(TestCase):
 
         ######################################################################
 
+        # Prefetch related data
         origins = list(cs.origins.all())
-        vias = list(Via.objects.filter(connectivity_statement=cs))
-        destinations = list(Destination.objects.filter(connectivity_statement=cs))
+        vias = list(
+            Via.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities', 'from_entities'))
+        destinations = list(
+            Destination.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities',
+                                                                                   'from_entities'))
 
         all_paths = generate_paths(origins, vias, destinations)
 
@@ -338,9 +352,13 @@ class JourneyTestCase(TestCase):
 
         ######################################################################
 
+        # Prefetch related data
         origins = list(cs.origins.all())
-        vias = list(Via.objects.filter(connectivity_statement=cs))
-        destinations = list(Destination.objects.filter(connectivity_statement=cs))
+        vias = list(
+            Via.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities', 'from_entities'))
+        destinations = list(
+            Destination.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities',
+                                                                                   'from_entities'))
 
         all_paths = generate_paths(origins, vias, destinations)
         expected_paths = [
@@ -406,9 +424,13 @@ class JourneyTestCase(TestCase):
 
         ######################################################################
 
+        # Prefetch related data
         origins = list(cs.origins.all())
-        vias = list(Via.objects.filter(connectivity_statement=cs))
-        destinations = list(Destination.objects.filter(connectivity_statement=cs))
+        vias = list(
+            Via.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities', 'from_entities'))
+        destinations = list(
+            Destination.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities',
+                                                                                   'from_entities'))
 
         expected_paths = [
             [('Oa', 0), ('Da', 2)],

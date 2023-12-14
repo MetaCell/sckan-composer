@@ -9,10 +9,9 @@ def generate_paths(origins, vias, destinations):
     # Handle direct connections from origins to destinations
     for origin in origins:
         for destination in destinations:
-            # Check if there's a direct connection between the origin and the destination
-            if origin in destination.from_entities.all() or (not destination.from_entities.exists() and len(vias) == 0):
+            # Directly use pre-fetched 'from_entities' without triggering additional queries
+            if origin in destination.from_entities.all() or (not destination.from_entities.all() and len(vias) == 0):
                 for dest_entity in destination.anatomical_entities.all():
-                    # Add path with origin and destination at their respective layers
                     paths.append([(origin.name, 0), (dest_entity.name, number_of_layers - 1)])
 
     # Handle connections involving vias
@@ -34,7 +33,7 @@ def create_paths_from_origin(origin, vias, destinations, current_path, number_of
         return [current_path + [(dest_entity.name, number_of_layers - 1)] for dest in destinations
                 for dest_entity in dest.anatomical_entities.all()
                 if current_path[-1][0] in list(
-                a.name for a in dest.from_entities.all()) or not dest.from_entities.exists()]
+                a.name for a in dest.from_entities.all()) or not dest.from_entities.all()]
 
     new_paths = []
     for idx, current_via in enumerate(vias):
@@ -44,7 +43,7 @@ def create_paths_from_origin(origin, vias, destinations, current_path, number_of
         # In other words, it checks if there is a valid connection
         # from the last node in the current path to the current via.
         if current_path[-1][0] in list(
-                a.name for a in current_via.from_entities.all()) or not current_via.from_entities.exists():
+                a.name for a in current_via.from_entities.all()) or not current_via.from_entities.all():
             for entity in current_via.anatomical_entities.all():
                 # Build new sub-paths including the current via entity
                 new_sub_path = current_path + [(entity.name, via_layer)]
@@ -86,7 +85,7 @@ def consolidate_paths(paths):
 
         paths = consolidated + [paths[i] for i in range(len(paths)) if i not in used_indices]
 
-    return [[((node.replace(JOURNEY_DELIMITER, ' or '), layer) if (layer == 0 or layer == len(path) - 1)  else (node.replace(JOURNEY_DELIMITER, ', '), layer)) for node, layer in path] for path in paths]
+    return [[(node.replace(JOURNEY_DELIMITER, ', '), layer) for node, layer in path] for path in paths]
 
 
 def can_merge(path1, path2):

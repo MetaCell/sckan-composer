@@ -121,9 +121,16 @@ class ConnectivityStatementService(StateServiceMixin):
            A string with each journey path description on a new line.
        """
         # Extract origins, vias, and destinations from the connectivity statement
+        Via = apps.get_model('composer', 'Via')
+        Destination = apps.get_model('composer', 'Destination')
+
         origins = list(connectivity_statement.origins.all())
-        vias = list(connectivity_statement.via_set.all())
-        destinations = list(connectivity_statement.destinations.all())
+
+        vias = list(
+            Via.objects.filter(connectivity_statement=connectivity_statement).prefetch_related('anatomical_entities',
+                                                                                               'from_entities'))
+        destinations = list(Destination.objects.filter(connectivity_statement=connectivity_statement).prefetch_related(
+            'anatomical_entities', 'from_entities'))
 
         # Generate all paths and then consolidate them
         all_paths = generate_paths(origins, vias, destinations)
@@ -133,7 +140,6 @@ class ConnectivityStatementService(StateServiceMixin):
         journey_descriptions = []
         for path in journey_paths:
             origin_names = path[0][0]
-            print('origin names', origin_names)
             destination_names = path[-1][0]
             via_names = ' via '.join([node for node, layer in path if 0 < layer < len(vias) + 1])
 
