@@ -216,7 +216,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
         model.addAll(...nodes, ...links);
 
         engine.setModel(model);
-        engine.getModel().setLocked(true)
+        // engine.getModel().setLocked(true)
         setModelUpdated(true)
     }, [origins, vias, destinations, engine]);
 
@@ -249,4 +249,3 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
 }
 
 export default GraphDiagram;
-
