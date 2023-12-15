@@ -21,6 +21,8 @@ from ..models import (
     Tag,
     Via, Destination,
 )
+from ..services.connections_service import get_complete_from_entities_for_destination, \
+    get_complete_from_entities_for_via
 from ..services.errors_service import get_connectivity_errors
 from ..utils import join_entities
 
@@ -185,27 +187,8 @@ class ViaSerializerDetails(serializers.ModelSerializer):
 
         # Check if from_entities is empty
         if not instance.from_entities.exists():
-            # Get the order of the current via
-            current_order = instance.order
-
-            if current_order == 0:
-                # Use the origins of the ConnectivityStatement if order is 0
-                origins = instance.connectivity_statement.origins.all()
-                representation['from_entities'] = AnatomicalEntitySerializer(origins, many=True).data
-            else:
-                # Fetch the Via with order - 1
-                previous_via = Via.objects.filter(
-                    connectivity_statement=instance.connectivity_statement,
-                    order=current_order - 1
-                ).first()
-
-                if previous_via:
-                    # Serialize anatomical_entities from previous via
-                    previous_entities = AnatomicalEntitySerializer(
-                        previous_via.anatomical_entities.all(),
-                        many=True
-                    ).data
-                    representation['from_entities'] = previous_entities
+            appropriate_entities = get_complete_from_entities_for_via(instance)
+            representation['from_entities'] = AnatomicalEntitySerializer(appropriate_entities, many=True).data
 
         return representation
 
@@ -289,22 +272,8 @@ class DestinationSerializerDetails(serializers.ModelSerializer):
 
         # Check if from_entities is empty
         if not instance.from_entities.exists():
-            # Get the Via with the highest order in the same ConnectivityStatement
-            highest_order_via = Via.objects.filter(
-                connectivity_statement=instance.connectivity_statement
-            ).order_by('-order').first()
-
-            if highest_order_via:
-                # Serialize anatomical_entities from highest order via
-                highest_entities = AnatomicalEntitySerializer(
-                    highest_order_via.anatomical_entities.all(),
-                    many=True
-                ).data
-                representation['from_entities'] = highest_entities
-            else:
-                # Use the origins of the ConnectivityStatement if no vias exist
-                origins = instance.connectivity_statement.origins.all()
-                representation['from_entities'] = AnatomicalEntitySerializer(origins, many=True).data
+            appropriate_entities = get_complete_from_entities_for_destination(instance)
+            representation['from_entities'] = AnatomicalEntitySerializer(appropriate_entities, many=True).data
 
         return representation
 

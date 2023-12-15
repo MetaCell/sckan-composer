@@ -24,6 +24,8 @@ from composer.models import (
     Specie,
     Via, AnatomicalEntity, Destination,
 )
+from composer.services.connections_service import get_complete_from_entities_for_destination, \
+    get_complete_from_entities_for_via
 from composer.services.filesystem_service import create_dir_if_not_exists
 from composer.services.state_services import ConnectivityStatementService
 
@@ -209,26 +211,39 @@ def get_origin_row(origin: AnatomicalEntity, review_notes: str, curation_notes: 
     )
 
 
-def get_destination_row(destination_instance: Destination, total_vias: int):
-    connected_from = ', '.join([fe.name for fe in destination_instance.from_entities.all()])
+def get_destination_row(destination: Destination, total_vias: int):
+    if destination.from_entities.exists():
+        connected_from_entities = destination.from_entities.all()
+    else:
+        connected_from_entities = get_complete_from_entities_for_destination(destination)
+
+    connected_from_names = [entity.name for entity in connected_from_entities] if connected_from_entities else []
+    connected_from = ', '.join(connected_from_names)
+
     layer_value = str(total_vias + 2)
     return [
         Row(
             ae.name,
             ae.ontology_uri,
-            destination_instance.get_type_display(),
-            TEMP_DESTINATION_PREDICATE_MAP.get(destination_instance.type),
+            destination.get_type_display(),
+            TEMP_DESTINATION_PREDICATE_MAP.get(destination.type),
             "",
             "",
             layer=layer_value,
             connected_from=connected_from
         )
-        for ae in destination_instance.anatomical_entities.all()
+        for ae in destination.anatomical_entities.all()
     ]
 
 
 def get_via_row(via: Via):
-    connected_from = ', '.join([fe.name for fe in via.from_entities.all()])
+    if via.from_entities.exists():
+        connected_from_entities = via.from_entities.all()
+    else:
+        connected_from_entities = get_complete_from_entities_for_via(via)
+
+    connected_from_names = [entity.name for entity in connected_from_entities] if connected_from_entities else []
+    connected_from = ', '.join(connected_from_names)
     layer_value = str(via.order + 2)
 
     return [
@@ -366,9 +381,9 @@ def get_rows(cs: ConnectivityStatement) -> List:
             raise UnexportableConnectivityStatement("Error getting via row")
 
     total_vias = cs.via_set.count()
-    for destination_instance in cs.destinations.all():
+    for destination in cs.destinations.all():
         try:
-            destination_rows = get_destination_row(destination_instance, total_vias)
+            destination_rows = get_destination_row(destination, total_vias)
             rows.extend(destination_rows)
         except Exception:
             raise UnexportableConnectivityStatement("Error getting destination row")
