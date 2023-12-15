@@ -88,7 +88,7 @@ def get_nlp_id(cs: ConnectivityStatement, row: Row):
 
 
 def get_neuron_population_label(cs: ConnectivityStatement, row: Row):
-    return cs.journey
+    return cs.get_journey()
 
 
 def get_type(cs: ConnectivityStatement, row: Row):
