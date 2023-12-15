@@ -23,7 +23,7 @@ export const PROVENANCE_FIELD ='div:has(> input[placeholder="Enter Provenances (
 export const RIGHT_ROOT_LATERALITY ='span:has(> input[id="root_laterality-0"]'
 export const IPSI_PROJECTION ='span:has(> input[id="root_projection-0"]'
 export const SENSORY_CIRCUIT_TYPE ='span:has(> input[id="root_circuit_type-0"]'
-export const APINATOMY_MODEL ='div:has(> input[placeholder="Enter Apinatomay Model Name"]'
+export const APINATOMY_MODEL ='div:has(> input[placeholder="Enter ApiNATOMY Model Name"]'
 export const ADDITIONAL_INFORMATION ='div:has(> textarea[placeholder="Enter additional information on the knowledge statement"]'
 export const PROGRESS_LOADER = 'span[role="progressbar"]'
 export const STATUS_BUTTON = 'div.MuiButtonGroup-root.MuiButtonGroup-contained'
@@ -40,3 +40,5 @@ export const STATEMENT_PREVIEW_TITLE= 'h5.MuiTypography-root.MuiTypography-h5 + 
 export const LOGOUT = 'button[aria-label="logout"]'
 export const SEND_BUTTON = 'button[label= "Send"]'
 export const STATUS_DROPDOWN = 'button[aria-label="select merge strategy"]'
+export const COOKIE_MODAL = "#onetrust-policy-title"
+export const ACCEPT_COOKIES = "#onetrust-accept-btn-handler"
