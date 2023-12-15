@@ -90,8 +90,9 @@ class ConnectivityStatementManager(models.Manager):
                 "owner",
                 "phenotype",
                 "sentence",
+                "sex",
             )
-            .prefetch_related("notes", "tags", "species", "origins", "destinations")
+            .prefetch_related("notes", "tags", "provenance_set", "species", "origins", "destinations")
         )
 
     def excluding_draft(self):
@@ -116,6 +117,24 @@ class NoteManager(models.Manager):
             super()
             .get_queryset()
             .select_related("user", "sentence", "connectivity_statement")
+        )
+
+
+class ViaManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related('anatomical_entities', 'from_entities')
+        )
+
+
+class DestinationManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related('anatomical_entities', 'from_entities')
         )
 
 
@@ -563,7 +582,6 @@ class Destination(AbstractConnectionLayer):
         on_delete=models.CASCADE,
         related_name="destinations"  # Overridden related_name
     )
-
     anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True,
                                                  related_name='destination_connection_layers')
 
@@ -572,6 +590,8 @@ class Destination(AbstractConnectionLayer):
         choices=DestinationType.choices,
         default=DestinationType.UNKNOWN
     )
+    
+    objects = DestinationManager()
 
     class Meta:
         constraints = [
@@ -584,6 +604,8 @@ class Destination(AbstractConnectionLayer):
 
 class Via(AbstractConnectionLayer):
     anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True, related_name='via_connection_layers')
+    
+    objects = ViaManager()
 
     type = models.CharField(
         max_length=10,

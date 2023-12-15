@@ -126,11 +126,8 @@ class ConnectivityStatementService(StateServiceMixin):
 
         origins = list(connectivity_statement.origins.all())
 
-        vias = list(
-            Via.objects.filter(connectivity_statement=connectivity_statement).prefetch_related('anatomical_entities',
-                                                                                               'from_entities'))
-        destinations = list(Destination.objects.filter(connectivity_statement=connectivity_statement).prefetch_related(
-            'anatomical_entities', 'from_entities'))
+        vias = list(Via.objects.filter(connectivity_statement=connectivity_statement))
+        destinations = list(Destination.objects.filter(connectivity_statement=connectivity_statement))
 
         # Generate all paths and then consolidate them
         all_paths = generate_paths(origins, vias, destinations)
