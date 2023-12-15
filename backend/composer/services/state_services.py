@@ -195,6 +195,10 @@ class ConnectivityStatementService(StateServiceMixin):
 
     @staticmethod
     def is_forward_connection_valid(connectivity_statement):
+
+        if not connectivity_statement.forward_connection.exists():
+            return True
+
         AnatomicalEntity = apps.get_model('composer', 'AnatomicalEntity')
 
         # Get all anatomical_entities associated with the destinations of the connectivity statement
