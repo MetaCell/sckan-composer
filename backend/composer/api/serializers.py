@@ -462,7 +462,7 @@ class ConnectivityStatementSerializer(
     )
     available_transitions = serializers.SerializerMethodField()
     has_notes = serializers.SerializerMethodField()
-    journey = serializers.ListField(child=serializers.CharField(), read_only=True)
+    journey = serializers.SerializerMethodField()
     statement_preview = serializers.SerializerMethodField()
     errors = serializers.SerializerMethodField()
 
@@ -483,8 +483,9 @@ class ConnectivityStatementSerializer(
 
     def get_statement_preview(self, instance):
         if not self.context.get('is_list_view', False):
-            journey = self.context.get('journey', instance.get_journey())
-            return self.create_statement_preview(instance, journey)
+            if 'journey' not in self.context:
+                self.context['journey'] = instance.get_journey()
+            return self.create_statement_preview(instance, self.context['journey'])
         return None
 
     def create_statement_preview(self, instance, journey):
