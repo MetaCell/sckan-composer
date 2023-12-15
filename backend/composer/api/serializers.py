@@ -403,26 +403,45 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
         )
 
 
-class ConnectivityStatementSerializer(
-    FixManyToManyMixin, FixedWritableNestedModelSerializer
-):
-    """Connectivity Statement"""
-
+class BaseConnectivityStatementSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer):
     id = serializers.IntegerField(
         required=False, default=None, allow_null=True, read_only=True
     )
-    sentence_id = serializers.IntegerField(required=False)
     knowledge_statement = serializers.CharField(allow_blank=True, required=False)
+    tags = TagSerializer(many=True, read_only=True, required=False)
+    owner = UserSerializer(required=False, read_only=True)
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
+    has_notes = serializers.SerializerMethodField()
+
+    def get_has_notes(self, instance) -> bool:
+        return instance.has_notes
+
+    class Meta:
+        model = ConnectivityStatement
+        fields = (
+            "id",
+            "knowledge_statement",
+            "tags",
+            "owner",
+            "owner_id",
+            "state",
+            "modified_date",
+            "has_notes",
+        )
+        read_only_fields = ("state",)
+
+
+class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
+    """Connectivity Statement"""
+
+    sentence_id = serializers.IntegerField(required=False)
     phenotype_id = serializers.IntegerField(required=False, allow_null=True)
     sex_id = serializers.IntegerField(required=False, allow_null=True)
-    tags = TagSerializer(many=True, read_only=True, required=False)
     species = SpecieSerializer(many=True, read_only=False, required=False)
     provenances = ProvenanceSerializer(source="provenance_set", many=True, read_only=False, required=False)
     origins = AnatomicalEntitySerializer(many=True, required=False)
     vias = ViaSerializerDetails(source="via_set", many=True, read_only=False, required=False)
     destinations = DestinationSerializerDetails(many=True, required=False)
-    owner = UserSerializer(required=False, read_only=True)
     phenotype = PhenotypeSerializer(required=False, read_only=True)
     sex = SexSerializer(required=False, read_only=True)
     sentence = SentenceSerializer(required=False, read_only=True)
@@ -430,7 +449,6 @@ class ConnectivityStatementSerializer(
         many=True, queryset=ConnectivityStatement.objects.all(), required=False
     )
     available_transitions = serializers.SerializerMethodField()
-    has_notes = serializers.SerializerMethodField()
     journey = serializers.SerializerMethodField()
     statement_preview = serializers.SerializerMethodField()
     errors = serializers.SerializerMethodField()
@@ -440,22 +458,15 @@ class ConnectivityStatementSerializer(
         user = request.user if request else None
         return [t.name for t in instance.get_available_user_state_transitions(user)]
 
-    def get_has_notes(self, instance) -> bool:
-        return instance.has_notes
-
     def get_journey(self, instance):
-        if not self.context.get('is_list_view', False):
-            if 'journey' not in self.context:
-                self.context['journey'] = instance.get_journey()
-            return self.context['journey']
-        return None
+        if 'journey' not in self.context:
+            self.context['journey'] = instance.get_journey()
+        return self.context['journey']
 
     def get_statement_preview(self, instance):
-        if not self.context.get('is_list_view', False):
-            if 'journey' not in self.context:
-                self.context['journey'] = instance.get_journey()
-            return self.create_statement_preview(instance, self.context['journey'])
-        return None
+        if 'journey' not in self.context:
+            self.context['journey'] = instance.get_journey()
+        return self.create_statement_preview(instance, self.context['journey'])
 
     def create_statement_preview(self, instance, journey):
         sex = instance.sex.name if instance.sex else "{sex}"
@@ -523,8 +534,7 @@ class ConnectivityStatementSerializer(
         # Call the super class's update method with the modified validated_data
         return super(ConnectivityStatementSerializer, self).update(instance, validated_data)
 
-    class Meta:
-        model = ConnectivityStatement
+    class Meta(BaseConnectivityStatementSerializer.Meta):
         fields = (
             "id",
             "sentence_id",
@@ -556,7 +566,6 @@ class ConnectivityStatementSerializer(
             "statement_preview",
             "errors"
         )
-        read_only_fields = ("state",)
 
 
 class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):

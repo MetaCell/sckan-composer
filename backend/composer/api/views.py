@@ -33,7 +33,7 @@ from .serializers import (
     TagSerializer,
     ViaSerializer,
     ProvenanceSerializer,
-    SexSerializer, ConnectivityStatementUpdateSerializer, DestinationSerializer,
+    SexSerializer, ConnectivityStatementUpdateSerializer, DestinationSerializer, BaseConnectivityStatementSerializer,
 )
 from ..models import (
     AnatomicalEntity,
@@ -307,13 +307,11 @@ class ConnectivityStatementViewSet(
     filterset_class = ConnectivityStatementFilter
     service = ConnectivityStatementService
 
-    def get_serializer_context(self):
-        """
-        Add 'is_list_view' to the serializer context.
-        """
-        context = super().get_serializer_context()
-        context['is_list_view'] = self.action == 'list'
-        return context
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return BaseConnectivityStatementSerializer
+        return ConnectivityStatementSerializer
 
     def get_queryset(self):
         if self.action == "list" and "sentence_id" not in self.request.query_params:
