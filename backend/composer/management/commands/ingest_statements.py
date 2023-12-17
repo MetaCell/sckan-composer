@@ -1,7 +1,5 @@
-
 from django.core.management.base import BaseCommand, CommandError
 from composer.services.cs_ingestion.cs_ingestion_services import ingest_statements
-
 
 
 class Command(BaseCommand):

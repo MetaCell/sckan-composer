@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
-from django.db import models
-from django.db.models import Q
-from django.db.models.expressions import RawSQL, F
+from django.db import models, transaction
+from django.db.models import Q, Max
+from django.db.models.expressions import F
 from django.db.models.functions import Upper
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
@@ -88,12 +88,11 @@ class ConnectivityStatementManager(models.Manager):
             .get_queryset()
             .select_related(
                 "owner",
-                "origin",
-                "destination",
                 "phenotype",
                 "sentence",
+                "sex",
             )
-            .prefetch_related("notes", "tags", "species")
+            .prefetch_related("notes", "tags", "provenance_set", "species", "origins", "destinations")
         )
 
     def excluding_draft(self):
@@ -118,6 +117,24 @@ class NoteManager(models.Manager):
             super()
             .get_queryset()
             .select_related("user", "sentence", "connectivity_statement")
+        )
+
+
+class ViaManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related('anatomical_entities', 'from_entities')
+        )
+
+
+class DestinationManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related('anatomical_entities', 'from_entities')
         )
 
 
@@ -336,53 +353,20 @@ class Sentence(models.Model):
             ),
             models.CheckConstraint(
                 check=~Q(state=SentenceState.COMPOSE_NOW)
-                | (
-                    Q(state=SentenceState.COMPOSE_NOW)
-                    & (
-                        Q(pmid__isnull=False)
-                        | Q(pmcid__isnull=False)
-                        | Q(doi__isnull=False)
-                    )
-                ),
+                      | (
+                              Q(state=SentenceState.COMPOSE_NOW)
+                              & (
+                                      Q(pmid__isnull=False)
+                                      | Q(pmcid__isnull=False)
+                                      | Q(doi__isnull=False)
+                              )
+                      ),
                 name="sentence_pmid_pmcd_valid",
             ),
             models.CheckConstraint(
                 check=(Q(external_ref__isnull=True) & Q(batch_name__isnull=True))
-                | Q(external_ref__isnull=False) & Q(batch_name__isnull=False),
+                      | Q(external_ref__isnull=False) & Q(batch_name__isnull=False),
                 name="sentence_externalref_and_batch_valid",
-            ),
-        ]
-
-
-class Via(models.Model):
-    """Via"""
-
-    connectivity_statement = models.ForeignKey(
-        "ConnectivityStatement",
-        on_delete=models.CASCADE,
-    )
-    anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.DO_NOTHING)
-    display_order = models.PositiveIntegerField(
-        blank=True,
-        null=True,
-    )
-    type = models.CharField(max_length=8, default=ViaType.AXON, choices=ViaType.choices)
-
-    def __str__(self):
-        return f"{self.connectivity_statement} - {self.anatomical_entity}"
-
-    def save(self, *args, **kwargs):
-        if self.display_order is None:
-            self.display_order = self.connectivity_statement.path.all().count()
-        super().save(*args, **kwargs)
-
-    class Meta:
-        ordering = ["display_order"]
-        verbose_name_plural = "Via"
-        constraints = [
-            models.CheckConstraint(
-                check=Q(type__in=[vt[0] for vt in ViaType.choices]),
-                name="via_type_valid",
             ),
         ]
 
@@ -398,29 +382,10 @@ class ConnectivityStatement(models.Model):
     )
     knowledge_statement = models.TextField(db_index=True, blank=True)
     state = FSMField(default=CSState.DRAFT, protected=True)
-    origin = models.ForeignKey(
-        AnatomicalEntity,
-        verbose_name="Origin",
-        on_delete=models.DO_NOTHING,
-        related_name="origin",
-        null=True,
-        blank=True,
-    )
-    destination = models.ForeignKey(
-        AnatomicalEntity,
-        verbose_name="Destination",
-        on_delete=models.DO_NOTHING,
-        related_name="destination",
-        null=True,
-        blank=True,
-    )
-    destination_type = models.CharField(
-        max_length=10, default=DestinationType.UNKNOWN, choices=DestinationType.choices
-    )
+    origins = models.ManyToManyField(AnatomicalEntity, related_name='origins_relations')
     owner = models.ForeignKey(
         User, verbose_name="Curator", on_delete=models.SET_NULL, null=True, blank=True
     )
-    path = models.ManyToManyField(AnatomicalEntity, through=Via, blank=True)
     laterality = models.CharField(
         max_length=20, default=Laterality.UNKNOWN, choices=Laterality.choices
     )
@@ -540,16 +505,21 @@ class ConnectivityStatement(models.Model):
         return f"CPR:{self.id:06d}"
 
     @property
-    def journey(self):
-        return ConnectivityStatementService.compile_journey(self)
-
-    @property
     def has_notes(self):
         return self.notes.exclude(type=NoteType.TRANSITION).exists()
 
     @property
     def tag_list(self):
         return ", ".join(self.tags.all().values_list("tag", flat=True))
+
+    def get_previous_layer_entities(self, via_order):
+        if via_order == 0:
+            return set(self.origins.all())
+        else:
+            return set(self.via_set.get(order=via_order - 1).anatomical_entities.all())
+
+    def get_journey(self):
+        return ConnectivityStatementService.compile_journey(self)
 
     def get_laterality_description(self):
         laterality_map = {
@@ -570,6 +540,10 @@ class ConnectivityStatement(models.Model):
             self.reference_uri = create_reference_uri(self.pk)
             self.save(update_fields=["reference_uri"])
 
+    def set_origins(self, origin_ids):
+        self.origins.set(origin_ids, clear=True)
+        self.save()
+
     class Meta:
         ordering = ["-modified_date"]
         verbose_name_plural = "Connectivity Statements"
@@ -585,13 +559,124 @@ class ConnectivityStatement(models.Model):
                 check=Q(circuit_type__in=[c[0] for c in CircuitType.choices]),
                 name="circuit_type_valid",
             ),
-            models.CheckConstraint(
-                check=Q(destination_type__in=[dt[0] for dt in DestinationType.choices]),
-                name="destination_type_valid",
-            ),
+
             models.CheckConstraint(
                 check=Q(projection__in=[p[0] for p in Projection.choices]),
                 name="projection_valid",
+            ),
+        ]
+
+
+class AbstractConnectionLayer(models.Model):
+    connectivity_statement = models.ForeignKey(ConnectivityStatement, on_delete=models.CASCADE)
+    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True)
+    from_entities = models.ManyToManyField(AnatomicalEntity, blank=True)
+
+    class Meta:
+        abstract = True
+
+
+class Destination(AbstractConnectionLayer):
+    connectivity_statement = models.ForeignKey(
+        ConnectivityStatement,
+        on_delete=models.CASCADE,
+        related_name="destinations"  # Overridden related_name
+    )
+    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True,
+                                                 related_name='destination_connection_layers')
+
+    type = models.CharField(
+        max_length=12,
+        choices=DestinationType.choices,
+        default=DestinationType.UNKNOWN
+    )
+    
+    objects = DestinationManager()
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=Q(type__in=[dt[0] for dt in DestinationType.choices]),
+                name="destination_type_valid",
+            ),
+        ]
+
+
+class Via(AbstractConnectionLayer):
+    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True, related_name='via_connection_layers')
+    
+    objects = ViaManager()
+
+    type = models.CharField(
+        max_length=10,
+        choices=ViaType.choices,
+        default=ViaType.AXON
+    )
+    order = models.IntegerField()
+
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            # Check if the object already exists in the database
+            if not self.pk:
+                self.order = Via.objects.filter(connectivity_statement=self.connectivity_statement).count()
+            else:
+                # Fetch the existing object from the database
+                old_via = Via.objects.get(pk=self.pk)
+                # If the 'order' field has changed, clear the 'from_entities'
+                if old_via.order != self.order:
+                    self._update_order_for_other_vias(old_via.order)
+                    self.from_entities.clear()
+            super(Via, self).save(*args, **kwargs)
+
+    def _update_order_for_other_vias(self, old_order):
+        temp_order = -1  # A temporary order value outside the normal range
+        with transaction.atomic():
+            # Temporarily set the order of the current object to a unique value
+            Via.objects.filter(pk=self.pk).update(order=temp_order)
+
+            # Fetch the affected Vias before updating
+            if old_order < self.order:
+                affected_vias = list(Via.objects.filter(
+                    connectivity_statement=self.connectivity_statement,
+                    order__gt=old_order, order__lte=self.order
+                ))
+                Via.objects.filter(
+                    connectivity_statement=self.connectivity_statement,
+                    order__gt=old_order, order__lte=self.order
+                ).update(order=F('order') - 1)
+            elif old_order > self.order:
+                affected_vias = list(Via.objects.filter(
+                    connectivity_statement=self.connectivity_statement,
+                    order__lt=old_order, order__gte=self.order
+                ))
+                Via.objects.filter(
+                    connectivity_statement=self.connectivity_statement,
+                    order__lt=old_order, order__gte=self.order
+                ).update(order=F('order') + 1)
+
+            # Clear 'from_entities' for the fetched affected Vias
+            for via in affected_vias:
+                via.from_entities.clear()
+
+            # Finally, set the correct order for the current object
+            Via.objects.filter(pk=self.pk).update(order=self.order)
+
+    def delete(self, *args, **kwargs):
+        with transaction.atomic():
+            super().delete(*args, **kwargs)
+            vias_to_update = Via.objects.filter(
+                connectivity_statement=self.connectivity_statement,
+                order__gt=self.order
+            )
+            vias_to_update.update(order=F('order') - 1)
+
+    class Meta:
+        ordering = ["order"]
+        verbose_name_plural = "Via"
+        constraints = [
+            models.CheckConstraint(
+                check=Q(type__in=[vt[0] for vt in ViaType.choices]),
+                name="via_type_valid",
             ),
         ]
 
@@ -652,7 +737,7 @@ class Note(models.Model):
                     sentence__isnull=False,
                     connectivity_statement__isnull=True,
                 )
-                | models.Q(
+                      | models.Q(
                     sentence__isnull=True,
                     connectivity_statement__isnull=False,
                 ),

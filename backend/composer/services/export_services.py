@@ -22,8 +22,10 @@ from composer.models import (
     ExportMetrics,
     Sentence,
     Specie,
-    Via,
+    Via, AnatomicalEntity, Destination,
 )
+from composer.services.connections_service import get_complete_from_entities_for_destination, \
+    get_complete_from_entities_for_via
 from composer.services.filesystem_service import create_dir_if_not_exists
 from composer.services.state_services import ConnectivityStatementService
 
@@ -64,8 +66,10 @@ class Row:
             identifier: str,
             relationship: str,
             predicate: str,
-            curation_notes: str,
-            review_notes: str,
+            curation_notes: str = "",
+            review_notes: str = "",
+            layer: str = "",
+            connected_from: str = ""
     ):
         self.structure = structure
         self.identifier = identifier
@@ -73,6 +77,8 @@ class Row:
         self.predicate = predicate
         self.curation_notes = curation_notes
         self.review_notes = review_notes
+        self.layer = layer
+        self.connected_from = connected_from
 
 
 def get_sentence_number(cs: ConnectivityStatement, row: Row):
@@ -84,7 +90,7 @@ def get_nlp_id(cs: ConnectivityStatement, row: Row):
 
 
 def get_neuron_population_label(cs: ConnectivityStatement, row: Row):
-    return cs.journey
+    return ' '.join(cs.get_journey())
 
 
 def get_type(cs: ConnectivityStatement, row: Row):
@@ -101,6 +107,14 @@ def get_identifier(cs: ConnectivityStatement, row: Row):
 
 def get_relationship(cs: ConnectivityStatement, row: Row):
     return row.relationship
+
+
+def get_layer(cs: ConnectivityStatement, row: Row):
+    return row.layer
+
+
+def get_connected_from(cs: ConnectivityStatement, row: Row):
+    return row.connected_from
 
 
 def get_predicate(cs: ConnectivityStatement, row: Row):
@@ -165,6 +179,8 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
         "Structure": get_structure,
         "Identifier": get_identifier,
         "Relationship": get_relationship,
+        "Axonal course poset": get_layer,
+        "Connected From": get_connected_from,
         "Predicate": get_predicate,
         "Observed in species": get_observed_in_species,
         "Different from existing": get_different_from_existing,
@@ -183,41 +199,66 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
     return attributes_map
 
 
-def get_origin_row(cs: ConnectivityStatement):
-    review_notes = "\n".join(
-        [note.note for note in cs.notes.filter(type=NoteType.PLAIN)]
-    )
-    curation_notes = "\n".join([note.note for note in cs.sentence.notes.all()])
+def get_origin_row(origin: AnatomicalEntity, review_notes: str, curation_notes: str):
     return Row(
-        cs.origin.name,
-        cs.origin.ontology_uri,
+        origin.name,
+        origin.ontology_uri,
         ExportRelationships.hasSomaLocatedIn.label,
         ExportRelationships.hasSomaLocatedIn.value,
         curation_notes,
         review_notes,
+        layer='1'
     )
 
 
-def get_destination_row(cs: ConnectivityStatement):
-    return Row(
-        cs.destination.name,
-        cs.destination.ontology_uri,
-        cs.get_destination_type_display(),
-        TEMP_DESTINATION_PREDICATE_MAP.get(cs.destination_type),
-        "",
-        "",
-    )
+def get_destination_row(destination: Destination, total_vias: int):
+    if destination.from_entities.exists():
+        connected_from_entities = destination.from_entities.all()
+    else:
+        connected_from_entities = get_complete_from_entities_for_destination(destination)
+
+    connected_from_names = [entity.name for entity in connected_from_entities] if connected_from_entities else []
+    connected_from = ', '.join(connected_from_names)
+
+    layer_value = str(total_vias + 2)
+    return [
+        Row(
+            ae.name,
+            ae.ontology_uri,
+            destination.get_type_display(),
+            TEMP_DESTINATION_PREDICATE_MAP.get(destination.type),
+            "",
+            "",
+            layer=layer_value,
+            connected_from=connected_from
+        )
+        for ae in destination.anatomical_entities.all()
+    ]
 
 
 def get_via_row(via: Via):
-    return Row(
-        via.anatomical_entity.name,
-        via.anatomical_entity.ontology_uri,
-        via.get_type_display(),
-        TEMP_VIA_PREDICATE_MAP.get(via.type),
-        "",
-        "",
-    )
+    if via.from_entities.exists():
+        connected_from_entities = via.from_entities.all()
+    else:
+        connected_from_entities = get_complete_from_entities_for_via(via)
+
+    connected_from_names = [entity.name for entity in connected_from_entities] if connected_from_entities else []
+    connected_from = ', '.join(connected_from_names)
+    layer_value = str(via.order + 2)
+
+    return [
+        Row(
+            ae.name,
+            ae.ontology_uri,
+            via.get_type_display(),
+            TEMP_VIA_PREDICATE_MAP.get(via.type),
+            "",
+            "",
+            layer=layer_value,
+            connected_from=connected_from
+        )
+        for ae in via.anatomical_entities.all()
+    ]
 
 
 def get_specie_row(specie: Specie):
@@ -321,21 +362,31 @@ def get_forward_connection_row(forward_conn: ConnectivityStatement):
 
 def get_rows(cs: ConnectivityStatement) -> List:
     rows = []
-    try:
-        rows.append(get_origin_row(cs))
-    except Exception:
-        raise UnexportableConnectivityStatement("Error getting origin row")
-
-    try:
-        rows.append(get_destination_row(cs))
-    except Exception:
-        raise UnexportableConnectivityStatement("Error getting destination row")
-
-    for via in cs.via_set.all().order_by("display_order"):
+    review_notes = "\n".join(
+        [note.note for note in cs.notes.filter(type=NoteType.PLAIN)]
+    )
+    curation_notes = "\n".join([note.note for note in cs.sentence.notes.all()])
+    for origin in cs.origins.all():
         try:
-            rows.append(get_via_row(via))
+            origin_row = get_origin_row(origin, review_notes, curation_notes)
+            rows.append(origin_row)
+        except Exception:
+            raise UnexportableConnectivityStatement("Error getting origin row")
+
+    for via in cs.via_set.all().order_by("order"):
+        try:
+            via_rows = get_via_row(via)
+            rows.extend(via_rows)
         except Exception:
             raise UnexportableConnectivityStatement("Error getting via row")
+
+    total_vias = cs.via_set.count()
+    for destination in cs.destinations.all():
+        try:
+            destination_rows = get_destination_row(destination, total_vias)
+            rows.extend(destination_rows)
+        except Exception:
+            raise UnexportableConnectivityStatement("Error getting destination row")
 
     for specie in cs.species.all():
         try:

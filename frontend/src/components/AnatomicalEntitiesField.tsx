@@ -26,7 +26,7 @@ function AnatomicalEntitiesField(props: any) {
   }, []);
 
   const autoCompleteFetch = (inputValue: string) =>
-    api.composerAnatomicalEntityList(autocompleteRows, inputValue, 0);
+    api.composerAnatomicalEntityList([], autocompleteRows, inputValue, 0);
 
   let inputValue;
   !props.value ? (inputValue = "") : (inputValue = entity?.name);

@@ -1,5 +1,10 @@
 import { composerApi } from "./apis"
-import { ConnectivityStatement, PaginatedConnectivityStatementList } from '../apiclient/backend'
+import {
+  AnatomicalEntity,
+  ConnectivityStatement,
+  ConnectivityStatementUpdate,
+  PaginatedConnectivityStatementList
+} from '../apiclient/backend'
 import { AbstractService } from "./AbstractService"
 import { QueryParams } from "../redux/statementSlice"
 
@@ -9,11 +14,16 @@ class ConnectivityStatementService extends AbstractService {
     connectivityStatement.forward_connection = connectivityStatement.forward_connection?.map((cs:any) => cs.id)
 
     if (connectivityStatement.id) {
-      return this.update(connectivityStatement)
+      const updateData: ConnectivityStatementUpdate = {
+        ...connectivityStatement,
+        origins: connectivityStatement.origins?.map((o: AnatomicalEntity) => o.id) || []
+      };
+
+      return this.update(updateData)
     }
     return composerApi.composerConnectivityStatementCreate(connectivityStatement).then((response: any) => response.data)
   }
-  async update(connectivityStatement: ConnectivityStatement) {
+  async update(connectivityStatement: ConnectivityStatementUpdate) {
     const id = connectivityStatement.id || -1
     return composerApi.composerConnectivityStatementUpdate(id, connectivityStatement).then((response: any) => response.data)
   }
@@ -43,8 +53,8 @@ class ConnectivityStatementService extends AbstractService {
     return composerApi.composerConnectivityStatementDelSpecieCreate(id, specieId).then((response: any) => response.data)
   }
   async getList(queryOptions: QueryParams): Promise<PaginatedConnectivityStatementList> {
-    const { origin, limit, ordering, index, knowledgeStatement, stateFilter, tagFilter, sentenceId, excludeSentenceId } = queryOptions
-    return composerApi.composerConnectivityStatementList(undefined, excludeSentenceId, knowledgeStatement, limit, undefined, index, ordering, origin, sentenceId, stateFilter, tagFilter).then((res: any) => res.data)
+    const { origins, limit, ordering, index, knowledgeStatement, stateFilter, tagFilter, sentenceId, excludeSentenceId, excludeIds } = queryOptions
+    return composerApi.composerConnectivityStatementList(undefined, excludeIds, excludeSentenceId, knowledgeStatement, limit, undefined, index, ordering, origins, sentenceId, stateFilter, tagFilter).then((res: any) => res.data)
   }
   async getPhenotypeList() {
     return composerApi.composerPhenotypeList(undefined).then((res: any) => res.data)

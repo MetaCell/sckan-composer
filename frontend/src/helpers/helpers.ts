@@ -1,72 +1,91 @@
-import { SentenceAvailableTransitionsEnum as sentenceStates } from "../apiclient/backend/api";
-import { ConnectivityStatementAvailableTransitionsEnum as statementStates } from "../apiclient/backend/api";
+import {
+  AnatomicalEntity,
+  SentenceAvailableTransitionsEnum as sentenceStates,
+} from "../apiclient/backend/api";
+import { ComposerConnectivityStatementListStateEnum as statementStates } from "../apiclient/backend/api";
 
 export const hiddenWidget = (fields: string[]) => {
-  let hiddenSchema = {}
+  let hiddenSchema = {};
   for (const f of fields) {
     hiddenSchema = {
       ...hiddenSchema,
       [f]: {
-        "ui:widget": "hidden"
-      }
-    }
+        "ui:widget": "hidden",
+      },
+    };
   }
-  return hiddenSchema
-}
+  return hiddenSchema;
+};
 
 export const removeFieldsFromSchema = (schema: any, fields: string[]) => {
   for (const f of fields) {
-    delete schema.properties[f]
-    const index = schema.required.indexOf(f)
+    delete schema.properties[f];
+    const index = schema.required.indexOf(f);
     if (index > -1) {
-      schema.required.splice(index, 1)
+      schema.required.splice(index, 1);
     }
   }
-  return schema
-}
-
-
+  return schema;
+};
 
 export const mapSortingModel = (ordering: string) => {
-  let model: any[] = []
+  let model: any[] = [];
   if (ordering.charAt(0) === "-") {
-    model.push({ field: ordering.slice(1), sort: "desc" })
+    model.push({ field: ordering.slice(1), sort: "desc" });
+  } else {
+    model.push({ field: ordering, sort: "asc" });
   }
-  else { model.push({ field: ordering, sort: "asc" }) }
   return {
     sorting: {
       sortModel: model,
     },
-  }
-}
+  };
+};
 
-export const mapStateFilterSelectionToCheckbox = (availableFilterOptions: any, currentSelection: any) => {
-  let initialSelection: { [key: string]: boolean } = {}
-  let i: keyof typeof availableFilterOptions
+export const mapStateFilterSelectionToCheckbox = (
+  availableFilterOptions: any,
+  currentSelection: any,
+) => {
+  let initialSelection: { [key: string]: boolean } = {};
+  let i: keyof typeof availableFilterOptions;
   for (i in availableFilterOptions) {
-    const filterOption: string = availableFilterOptions[i]
+    const filterOption: string = availableFilterOptions[i];
     initialSelection = {
       ...initialSelection,
-      [filterOption]: !currentSelection ? false : currentSelection.includes(filterOption),
-    }
+      [filterOption]: !currentSelection
+        ? false
+        : currentSelection.includes(filterOption),
+    };
   }
-  return initialSelection
-}
+  return initialSelection;
+};
 
-export const mapTagFilterSelectionToCheckbox = (tags: any[], currentSelection: any) => {
-  let initialSelection: { [key: string]: boolean } = {}
-  tags.forEach(i => initialSelection = {
-    ...initialSelection,
-    [i.id.toString()]: !currentSelection ? false : currentSelection.includes(i.id.toString())
-  })
-  return initialSelection
-}
+export const mapTagFilterSelectionToCheckbox = (
+  tags: any[],
+  currentSelection: any,
+) => {
+  let initialSelection: { [key: string]: boolean } = {};
+  tags.forEach(
+    (i) =>
+      (initialSelection = {
+        ...initialSelection,
+        [i.id.toString()]: !currentSelection
+          ? false
+          : currentSelection.includes(i.id.toString()),
+      }),
+  );
+  return initialSelection;
+};
 
 export const snakeToSpace = (str: string) => {
-  return str?.replaceAll('_', ' ').split(' ').map((word) => {
-    return word[0].toUpperCase() + word.substring(1)
-  }).join(" ")
-}
+  return str
+    ?.replaceAll("_", " ")
+    .split(" ")
+    .map((word) => {
+      return word[0].toUpperCase() + word.substring(1);
+    })
+    .join(" ");
+};
 export type StateColor =
   | "default"
   | "primary"
@@ -74,27 +93,27 @@ export type StateColor =
   | "error"
   | "info"
   | "success"
-  | "warning"
+  | "warning";
 
 export interface SentenceStateToColor {
-  open: StateColor
-  compose_now: StateColor
-  compose_later: StateColor
-  to_be_reviewed: StateColor
-  excluded: StateColor
-  duplicate: StateColor
+  open: StateColor;
+  compose_now: StateColor;
+  compose_later: StateColor;
+  to_be_reviewed: StateColor;
+  excluded: StateColor;
+  duplicate: StateColor;
 }
 
 export interface StatementStateToColor {
-  compose_now: StateColor
-  curated: StateColor
-  to_be_reviewed: StateColor
-  excluded: StateColor
-  draft: StateColor
-  rejected: StateColor
-  connection_missing: StateColor
-  npo_approved: StateColor
-  exported: StateColor
+  compose_now: StateColor;
+  curated: StateColor;
+  to_be_reviewed: StateColor;
+  excluded: StateColor;
+  draft: StateColor;
+  rejected: StateColor;
+  connection_missing: StateColor;
+  npo_approved: StateColor;
+  exported: StateColor;
 }
 
 export const SentenceLabels = {
@@ -104,7 +123,7 @@ export const SentenceLabels = {
   [sentenceStates.ComposeNow]: "Compose now",
   [sentenceStates.Duplicate]: "Duplicate",
   [sentenceStates.Excluded]: "Excluded",
-}
+};
 export const StatementsLabels = {
   [statementStates.ToBeReviewed]: "To be reviewed",
   [statementStates.ComposeNow]: "Compose now",
@@ -115,23 +134,23 @@ export const StatementsLabels = {
   [statementStates.ConnectionMissing]: "Connection missing",
   [statementStates.NpoApproved]: "NPO approved",
   [statementStates.Exported]: "Exported",
-}
+};
 
 export const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString("en-UK", {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
-}
+};
 
 export const formatTime = (date: string) => {
   return new Date(date).toLocaleDateString("en-UK", {
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
   });
-}
+};
 
 export const timeAgo = (timestamp: string) => {
   const now = new Date();
@@ -144,20 +163,19 @@ export const timeAgo = (timestamp: string) => {
   const years = Math.floor(weeks / 52);
 
   if (years > 0) {
-    return `${years} year${years > 1 ? 's' : ''} ago`;
+    return `${years} year${years > 1 ? "s" : ""} ago`;
   } else if (weeks > 0) {
-    return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+    return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
   } else if (days > 0) {
-    return `${days} day${days > 1 ? 's' : ''} ago`;
+    return `${days} day${days > 1 ? "s" : ""} ago`;
   } else if (hours > 0) {
-    return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
   } else if (minutes > 0) {
-    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
   } else {
-    return `${seconds} second${seconds > 0 ? 's' : ''} ago`;
+    return `${seconds} second${seconds > 0 ? "s" : ""} ago`;
   }
-}
-
+};
 
 export const isEqual = function (obj1: any, obj2: any) {
   const obj1Keys = Object.keys(obj1);
@@ -173,8 +191,7 @@ export const isEqual = function (obj1: any, obj2: any) {
         if (!isEqual(obj1[objKey], obj2[objKey])) {
           return false;
         }
-      }
-      else {
+      } else {
         return false;
       }
     }
@@ -182,3 +199,16 @@ export const isEqual = function (obj1: any, obj2: any) {
 
   return true;
 };
+
+export function searchAnatomicalEntities(
+  entities: AnatomicalEntity[],
+  searchValue: string,
+) {
+  const normalizedSearchValue = searchValue ? searchValue.toLowerCase() : "";
+
+  return entities
+    .filter((entity) =>
+      entity.name.toLowerCase().includes(normalizedSearchValue),
+    )
+    .sort((a, b) => a.name.localeCompare(b.name));
+}

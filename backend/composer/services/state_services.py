@@ -1,7 +1,11 @@
+from typing import List
+
+from django.apps import apps
 from django.db import transaction
+from django.db.models import Q, Count
 
 from composer.enums import CSState
-from django.db.models import Q, Count
+from .graph_service import generate_paths, consolidate_paths
 from ..enums import SentenceState
 
 
@@ -79,9 +83,9 @@ class SentenceService(StateServiceMixin):
         # return True if the sentence can go to state to_be_reviewed
         # it should have at least one provenance (pmid, pmcid, doi) and at least one connectivity statement
         return (
-            sentence.pmid is not None
-            or sentence.pmcid is not None
-            or sentence.doi is not None
+                sentence.pmid is not None
+                or sentence.pmcid is not None
+                or sentence.doi is not None
         ) and (sentence.connectivitystatement_set.count() > 0)
 
     @staticmethod
@@ -106,25 +110,56 @@ class SentenceService(StateServiceMixin):
 
 class ConnectivityStatementService(StateServiceMixin):
     @staticmethod
-    def compile_journey(connectivity_statement):
-        origin = connectivity_statement.origin
-        destination = connectivity_statement.destination
-        journey = f"{origin} to {destination} via "
-        journey += " via ".join(str(path) for path in connectivity_statement.path.order_by('via'))
-        return journey
+    def compile_journey(connectivity_statement) -> List[str]:
+        """
+       Generates a string of descriptions of journey paths for a given connectivity statement.
+
+       Args:
+           connectivity_statement: The connectivity statement containing origins, vias, and destinations.
+
+       Returns:
+           A string with each journey path description on a new line.
+       """
+        # Extract origins, vias, and destinations from the connectivity statement
+        Via = apps.get_model('composer', 'Via')
+        Destination = apps.get_model('composer', 'Destination')
+
+        origins = list(connectivity_statement.origins.all())
+
+        vias = list(Via.objects.filter(connectivity_statement=connectivity_statement))
+        destinations = list(Destination.objects.filter(connectivity_statement=connectivity_statement))
+
+        # Generate all paths and then consolidate them
+        all_paths = generate_paths(origins, vias, destinations)
+        journey_paths = consolidate_paths(all_paths)
+
+        # Create sentences for each journey path
+        journey_descriptions = []
+        for path in journey_paths:
+            origin_names = path[0][0]
+            destination_names = path[-1][0]
+            via_names = ' via '.join([node for node, layer in path if 0 < layer < len(vias) + 1])
+
+            if via_names:
+                sentence = f"From  {origin_names}  to  {destination_names}  via  {via_names}."
+            else:
+                sentence = f"From {origin_names}  to  {destination_names}."
+
+            journey_descriptions.append(sentence)
+
+        return journey_descriptions
 
     @staticmethod
     def can_be_reviewed(connectivity_statement):
         # return True if the state,emt can go to state to_be_reviewed it should have at least one provenance,
         # origin, destination, phenotype, sex, path and species
         return (
-            connectivity_statement.origin is not None
-            and connectivity_statement.destination is not None
-            and connectivity_statement.phenotype is not None
-            and connectivity_statement.sex is not None
-            and connectivity_statement.path.count() > 0
-            and connectivity_statement.species.count() > 0
-            and connectivity_statement.provenance_set.count() > 0
+                connectivity_statement.origins.exists()
+                and connectivity_statement.destinations.exists()
+                and connectivity_statement.phenotype is not None
+                and connectivity_statement.sex is not None
+                and connectivity_statement.species.count() > 0
+                and connectivity_statement.provenance_set.count() > 0
         )
 
     @staticmethod
@@ -157,7 +192,18 @@ class ConnectivityStatementService(StateServiceMixin):
 
     @staticmethod
     def is_forward_connection_valid(connectivity_statement):
+
+        if not connectivity_statement.forward_connection.exists():
+            return True
+
+        AnatomicalEntity = apps.get_model('composer', 'AnatomicalEntity')
+
+        # Get all anatomical_entities associated with the destinations of the connectivity statement
+        destination_anatomical_entities = AnatomicalEntity.objects.filter(
+            destination_connection_layers__in=connectivity_statement.destinations.all())
+
         for forward_connection in connectivity_statement.forward_connection.all():
-            if forward_connection.origin != connectivity_statement.destination:
-                return False
-        return True
+            # Check if any anatomical_entity associated with the destination is in the origins of the forward_connection
+            if any(entity in forward_connection.origins.all() for entity in destination_anatomical_entities):
+                return True
+        return False

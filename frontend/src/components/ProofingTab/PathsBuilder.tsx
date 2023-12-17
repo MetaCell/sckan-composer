@@ -1,142 +1,130 @@
-import React from "react";
-import {
-  Paper,
-  Stack,
-  Typography,
-  Divider,
-  Grid,
-  Box,
-  Table,
-  TableBody,
-} from "@mui/material";
+import React, { useState } from "react";
+import { Paper, Stack, Typography, Divider, Box } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import { useSectionStyle, useGreyBgContainer } from "../../styles/styles";
 import StatementForm from "../Forms/StatementForm";
-import TableRow from "./TableRow";
 import { vars } from "../../theme/variables";
-import OutlinedFlagTwoToneIcon from "@mui/icons-material/OutlinedFlagTwoTone";
-import FmdGoodOutlinedIcon from "@mui/icons-material/FmdGoodOutlined";
+import { OriginIcon } from "../icons";
 
 const PathsBuilder = (props: any) => {
   const { statement, refreshStatement, refs } = props;
   const theme = useTheme();
   const sectionStyle = useSectionStyle(theme);
   const subSectionStyle = useGreyBgContainer(theme);
+
   return (
-    <Paper sx={{ ...sectionStyle, px: 0 }}>
-      <Typography variant="h5" sx={{ px: 3, pb: 2 }}>
-        Path Builder
-      </Typography>
-      <Divider />
-      <Stack sx={{ px: 1.5, mt: 1.5 }}>
-        <Box ref={refs[3]} sx={subSectionStyle}>
-          <Typography
-            variant="subtitle1"
-            color={vars.captionColor}
-            sx={{ mb: 1, pl: 1 }}
-          >
-            Origin
-          </Typography>
-          <Table>
-            <TableBody>
-              <TableRow startIcon={<OutlinedFlagTwoToneIcon/>} action={false}>
-                <Grid
-                  container
-                  columnSpacing={2}
-                  alignItems='center'
-                  sx={{
-                    "& .MuiGrid-container": { mt: "0 !important" },
-                    "& .MuiGrid-item": { pt: 0, mb: "0 !important" },
-                  }}
-                >
-                  <Grid item>
-                    <Typography>Origin</Typography>
-                  </Grid>
-                  <Grid item flex={1}>
-                    <StatementForm
-                      {...props}
-                      statement={statement}
-                      format="noLabel"
-                      setter={refreshStatement}
-                      extraData={{ sentence_id: statement.sentence.id }}
-                      uiFields={["origin_id"]}
-                      enableAutoSave={false}
-                      submitOnChangeFields={["origin_id"]}
-                    />
-                  </Grid>
-                </Grid>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </Box>
-        <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
-        <Box ref={refs[4]} sx={subSectionStyle}>
-          <Typography
-            variant="subtitle1"
-            color={vars.captionColor}
-            sx={{ pl: 1 }}
-          >
-            Vias
-          </Typography>
-          <StatementForm
-            {...props}
-            statement={statement}
-            setter={refreshStatement}
-            extraData={{ sentence_id: statement.sentence.id }}
-            uiFields={["path"]}
-            className="vias"
-            enableAutoSave={false}
-            submitOnChangeFields={["path"]}
-          />
-        </Box>
-        <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
-        <Box sx={subSectionStyle} ref={refs[5]}>
-          <Typography
-            variant="subtitle1"
-            color={vars.captionColor}
-            sx={{ mb: 1, pl: 1 }}
-          >
-            Destination
-          </Typography>
-          <Table>
-            <TableBody>
-              <TableRow startIcon={<FmdGoodOutlinedIcon />}>
-                <StatementForm
-                  {...props}
-                  statement={statement}
-                  format="noLabel"
-                  setter={refreshStatement}
-                  extraData={{ sentence_id: statement.sentence.id }}
-                  uiFields={["destination_id", "destination_type"]}
-                  className="inLineForm"
-                  enableAutoSave={false}
-                  submitOnChangeFields={["destination_id", "destination_type"]}
+    <Box style={{ position: "relative" }}>
+      <Paper sx={{ ...sectionStyle, px: 0, position: "relative", zIndex: 2 }}>
+        <Typography variant="h5" sx={{ px: 3, pb: 2 }}>
+          Path Builder
+        </Typography>
+        <Divider />
+        <Stack sx={{ px: 1.5, mt: 1.5, width: 1 }}>
+          <Box sx={subSectionStyle} ref={refs[3]}>
+            <Typography
+              variant="subtitle1"
+              color={vars.captionColor}
+              ml={1}
+              mb={1}
+            >
+              Origin
+            </Typography>
+            <Box
+              sx={{
+                ...sectionStyle,
+                padding: ".75rem .88rem .75rem .50rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Stack direction="row" alignItems="center" flex={1}>
+                <OriginIcon
+                  fill="#475467"
+                  style={{ marginRight: ".5rem", width: "2rem" }}
                 />
-              </TableRow>
-            </TableBody>
-          </Table>
-        </Box>
-        <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
-        <Box sx={subSectionStyle}>
-          <Typography
-            variant="subtitle1"
-            color={vars.captionColor}
-            sx={{ mb: 1, pl: 1 }}
-          >
-            Forward connections
-          </Typography>
-          <StatementForm
-            statement={statement}
-            format="small"
-            setter={refreshStatement}
-            extraData={{ sentence_id: statement.sentence.id }}
-            uiFields={["forward_connection"]}
-            className="ks"
-            enableAutoSave={true}
+                <Typography color="#667085" fontWeight={500}>
+                  Soma
+                </Typography>
+              </Stack>
+              <StatementForm
+                {...props}
+                statement={statement}
+                format="noLabel"
+                refreshStatement={refreshStatement}
+                extraData={{ sentence_id: statement.sentence.id }}
+                uiFields={["origins"]}
+                enableAutoSave={false}
+                submitOnChangeFields={["origins"]}
+                className="origins"
+              />
+            </Box>
+          </Box>
+          <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
+          <Box sx={subSectionStyle} ref={refs[4]}>
+            <Typography variant="subtitle1" color={vars.captionColor} ml={1}>
+              Via
+            </Typography>
+            <StatementForm
+              {...props}
+              statement={statement}
+              format="noLabel"
+              refreshStatement={refreshStatement}
+              extraData={{ sentence_id: statement.sentence.id }}
+              uiFields={["vias"]}
+              enableAutoSave={false}
+              className="vias"
+            />
+          </Box>
+          <Box
+            height={24}
+            width={2}
+            bgcolor="#D0D5DD"
+            ml="34px"
+            ref={refs[5]}
           />
-        </Box>
-      </Stack>
-    </Paper>
+          <Box sx={subSectionStyle}>
+            <Typography variant="subtitle1" color={vars.captionColor} ml={1}>
+              Destination
+            </Typography>
+            <StatementForm
+              {...props}
+              statement={statement}
+              format="noLabel"
+              refreshStatement={refreshStatement}
+              extraData={{ sentence_id: statement.sentence.id }}
+              uiFields={["destinations"]}
+              enableAutoSave={false}
+              className="vias"
+            />
+          </Box>
+          <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
+          <Box sx={subSectionStyle}>
+            <Typography
+              variant="subtitle1"
+              color={vars.captionColor}
+              ml={1}
+              mb={1}
+            >
+              Forward connection(s)
+            </Typography>
+            <Box
+              sx={{ ...sectionStyle, padding: ".75rem .88rem .75rem .50rem" }}
+            >
+              <StatementForm
+                statement={statement}
+                format="small"
+                refreshStatement={refreshStatement}
+                extraData={{ sentence_id: statement.sentence.id }}
+                uiFields={["forward_connection"]}
+                enableAutoSave={true}
+                className="ks"
+              />
+            </Box>
+          </Box>
+        </Stack>
+      </Paper>
+    </Box>
   );
 };
 

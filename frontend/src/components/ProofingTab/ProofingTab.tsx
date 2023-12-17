@@ -7,7 +7,6 @@ import { useSectionStyle, useGreyBgContainer } from "../../styles/styles";
 import { useTheme } from "@mui/system";
 import PathsBuilder from "./PathsBuilder";
 import StatementPreviewForm from "../Forms/StatementPreviewForm";
-import StatementForm from "../Forms/StatementForm";
 
 const ProofingTab = (props: any) => {
   const { statement, refreshStatement, setStatement, refs } = props;
@@ -15,8 +14,7 @@ const ProofingTab = (props: any) => {
   const sectionStyle = useSectionStyle(theme);
   const greyBgContainer = useGreyBgContainer(theme);
 
-  const hasJourney =
-    statement.origin && statement.destination && statement.path.length > 0;
+  const hasJourney = statement.journey != null;
 
   return (
     <Grid container mb={2} spacing={2}>
@@ -67,10 +65,9 @@ const ProofingTab = (props: any) => {
         <Box ref={refs[6]}>
           <Paper sx={sectionStyle}>
             <Stack spacing={2}>
-              <Typography variant="h5">Statement preview</Typography>
+              <Typography variant="h5">Population Diagram</Typography>
               <StatementChart statement={statement} />
             </Stack>
-
             {hasJourney && (
               <>
                 <Box my={2}>
@@ -78,7 +75,9 @@ const ProofingTab = (props: any) => {
                 </Box>
                 <Stack spacing={2}>
                   <Typography variant="h5">Journey</Typography>
-                  <Typography>{statement.journey}</Typography>
+                    {statement.journey.map((journeyStep: string, index: number) => (
+                      <Typography key={index}>{journeyStep}</Typography>
+                    ))}
                 </Stack>
               </>
             )}

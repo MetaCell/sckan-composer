@@ -150,12 +150,12 @@ const theme = createTheme({
       },
       .inLineForm > div > div > .MuiGrid-container{
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        align-items: start;
+        grid-template-columns: .5fr 3fr 3fr;
+        align-items: center;
         margin-top: 0 !important;
       }
       .inLineForm > div > div > .MuiGrid-container > .MuiGrid-item{
-        padding-top: 0;
+        padding-top: 0 !important;
         margin: 0 !important;
       }
       .vias > div > div > .MuiGrid-container{
@@ -186,6 +186,11 @@ const theme = createTheme({
       * {
         scroll-margin-top: 3rem;
       }
+      
+      .MuiBox-root:has(.origins) {
+        flex: 2
+      }
+      
       `,
     },
     MuiButton: {

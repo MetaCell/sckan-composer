@@ -31,8 +31,8 @@ export const FormBase = (props: any) => {
     submitButtonProps,
     className = false,
     showErrorList,
-    submitOnChangeFields = [], 
-    submitOnBlurFields = []
+    submitOnChangeFields = [],
+    submitOnBlurFields = [],
   } = props;
   const [localData, setLocalData] = useState<any>(data);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -42,7 +42,7 @@ export const FormBase = (props: any) => {
   const [customSchema, setCustomSchema] = useState<any>(schema);
   const [customUiSchema, setCustomUiSchema] = useState<any>(uiSchema);
 
-  const timer = useRef<any>(null)
+  const timer = useRef<any>(null);
 
   const submitButtonRef = useRef<any>(null);
   const removeProp = (obj: any, prop: string) => {
@@ -65,34 +65,33 @@ export const FormBase = (props: any) => {
             properties: removeProp(customSchema.properties, p[0]),
           }));
           setCustomUiSchema((customUiSchema: any) =>
-            removeProp(customUiSchema, p[0])
+            removeProp(customUiSchema, p[0]),
           );
         }
       });
     }
   }, [data]);
 
-  const startTimer = () => timer.current = setTimeout(()=>{
-    if(enableAutoSave){
-      onSave()
-    }
-  },EDIT_DEBOUNCE)
+  const startTimer = () =>
+    (timer.current = setTimeout(() => {
+      if (enableAutoSave) {
+        onSave();
+      }
+    }, EDIT_DEBOUNCE));
 
-  const stopTimer = () =>{
-    clearTimeout(timer.current)
-  }
+  const stopTimer = () => {
+    clearTimeout(timer.current);
+  };
 
-  const resetTimer = () =>{
-    stopTimer()
-    startTimer()
-  }
-
+  const resetTimer = () => {
+    stopTimer();
+    startTimer();
+  };
 
   useEffect(() => {
-    return () => stopTimer()
-  }, [])
-  
-  
+    return () => stopTimer();
+  }, []);
+
   const onError = (errors: any) => {
     log("errors");
     log(errors);
@@ -132,11 +131,13 @@ export const FormBase = (props: any) => {
 
   const handleUpdate = async (event: IChangeEvent, id: any) => {
     const formData = { ...event.formData, ...extraData };
-    if(submitOnBlurFields.some((field:string)=> id.includes(field))){
-      resetTimer()
+    if (submitOnBlurFields.some((field: string) => id && id.includes(field))) {
+      resetTimer();
     }
-    if(submitOnChangeFields.some((field:string)=> id.includes(field))){
-      return onSave()
+    if (
+      submitOnChangeFields.some((field: string) => id && id.includes(field))
+    ) {
+      return onSave();
     }
     setLocalData(formData);
     if (formIsValid && !formIsValid(formData)) {
@@ -147,17 +148,17 @@ export const FormBase = (props: any) => {
   };
 
   const handleBlur = async (id: string) => {
-    if(submitOnBlurFields.some((field:string)=> id.includes(field))){
-      stopTimer()
-      return onSave()
+    if (submitOnBlurFields.some((field: string) => id && id.includes(field))) {
+      stopTimer();
+      return onSave();
     }
-  }
+  };
 
   const handleFocus = (id: string) => {
-    if(submitOnBlurFields.some((field:string)=> id.includes(field))){
-      startTimer()
+    if (submitOnBlurFields.some((field: string) => id.includes(field))) {
+      startTimer();
     }
-  }
+  };
 
   return (
     <>

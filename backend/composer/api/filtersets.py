@@ -1,6 +1,7 @@
 from typing import List
 from django.db.models import Q
 import django_filters
+from django_filters import BaseInFilter, NumberFilter
 
 from composer.enums import SentenceState, CSState
 from composer.models import (
@@ -10,7 +11,7 @@ from composer.models import (
     Note,
     Tag,
     Via,
-    Specie,
+    Specie, Destination,
 )
 
 
@@ -26,6 +27,8 @@ def filter_by_title_or_text(queryset, name, value):
 def exclude_ids(queryset, name, value: List[int]):
     return queryset.exclude(id__in=value)
 
+class NumberInFilter(BaseInFilter, NumberFilter):
+    pass
 
 class SentenceFilter(django_filters.FilterSet):
     title = django_filters.CharFilter(method=filter_by_title_or_text)
@@ -52,11 +55,9 @@ class SentenceFilter(django_filters.FilterSet):
         fields = []
 
 
-def filter_by_ontology_uri(qs, field, anatomical_entity):
-    return qs.filter(Q(**{f"{field}__ontology_uri": anatomical_entity.ontology_uri}))
-
-
 class ConnectivityStatementFilter(django_filters.FilterSet):
+    exclude_ids = NumberInFilter(field_name='id', exclude=True)
+
     sentence_id = django_filters.NumberFilter(field_name="sentence__id")
     exclude_sentence_id = django_filters.NumberFilter(field_name="sentence__id", exclude=True)
 
@@ -69,15 +70,15 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
     tags = django_filters.ModelMultipleChoiceFilter(
         field_name="tags", queryset=Tag.objects.all()
     )
-    origin = django_filters.ModelChoiceFilter(
-        field_name="origin",
+    origins = django_filters.ModelMultipleChoiceFilter(
+        field_name="origins",
         queryset=AnatomicalEntity.objects.all(),
-        method=filter_by_ontology_uri,
+        conjoined=False
     )
-    destination = django_filters.ModelChoiceFilter(
-        field_name="destination",
-        queryset=AnatomicalEntity.objects.all(),
-        method=filter_by_ontology_uri,
+    destinations = django_filters.ModelMultipleChoiceFilter(
+        field_name="destinations",
+        queryset=Destination.objects.all(),
+        conjoined=False
     )
     notes = django_filters.BooleanFilter(
         field_name="notes", label="Checks if entity has notes", method=field_has_content
@@ -96,6 +97,7 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
 
 class AnatomicalEntityFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(method="filter_name")
+    exclude_ids = NumberInFilter(field_name='id', exclude=True)
 
     class Meta:
         model = AnatomicalEntity
@@ -147,4 +149,15 @@ class ViaFilter(django_filters.FilterSet):
 
     class Meta:
         model = Via
+        fields = []
+
+
+class DestinationFilter(django_filters.FilterSet):
+    connectivity_statement_id = django_filters.ModelChoiceFilter(
+        field_name="connectivity_statement_id",
+        queryset=ConnectivityStatement.objects.all(),
+    )
+
+    class Meta:
+        model = Destination
         fields = []

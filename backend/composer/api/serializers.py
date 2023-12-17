@@ -19,9 +19,12 @@ from ..models import (
     Sentence,
     Specie,
     Tag,
-    Via,
+    Via, Destination,
 )
+from ..services.connections_service import get_complete_from_entities_for_destination, \
+    get_complete_from_entities_for_via
 from ..services.errors_service import get_connectivity_errors
+from ..utils import join_entities
 
 
 # MixIns
@@ -154,22 +157,125 @@ class SexSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "ontology_uri")
 
 
-class ViaSerializer(serializers.ModelSerializer):
-    """Via"""
+class ViaSerializerDetails(serializers.ModelSerializer):
+    """Via Serializer with Custom Logic for from_entities"""
 
-    anatomical_entity_id = serializers.IntegerField(required=True)
-    anatomical_entity = AnatomicalEntitySerializer(required=False, read_only=True)
+    anatomical_entities = AnatomicalEntitySerializer(
+        many=True,
+    )
+
+    from_entities = AnatomicalEntitySerializer(
+        many=True,
+    )
 
     class Meta:
         model = Via
         fields = (
             "id",
-            "display_order",
+            "order",
             "connectivity_statement_id",
             "type",
-            "anatomical_entity_id",
-            "anatomical_entity",
+            "anatomical_entities",
+            "from_entities"
         )
+
+    def to_representation(self, instance):
+        """
+        Custom representation for Via.
+        """
+        representation = super().to_representation(instance)
+
+        # Check if from_entities is empty
+        if not instance.from_entities.exists():
+            appropriate_entities = get_complete_from_entities_for_via(instance)
+            representation['from_entities'] = AnatomicalEntitySerializer(appropriate_entities, many=True).data
+
+        return representation
+
+
+class ViaSerializer(serializers.ModelSerializer):
+    """Via"""
+    anatomical_entities = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=AnatomicalEntity.objects.all(),
+        required=False
+    )
+    from_entities = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=AnatomicalEntity.objects.all(),
+        required=False
+    )
+    connectivity_statement = serializers.PrimaryKeyRelatedField(
+        required=False,
+        queryset=ConnectivityStatement.objects.all()
+    )
+
+    class Meta:
+        model = Via
+        fields = (
+            "id",
+            "order",
+            "connectivity_statement",
+            "type",
+            "anatomical_entities",
+            "from_entities"
+        )
+
+
+class DestinationSerializer(serializers.ModelSerializer):
+    """Destination"""
+    anatomical_entities = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=AnatomicalEntity.objects.all(),
+        required=False
+    )
+    from_entities = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=AnatomicalEntity.objects.all(),
+        required=False
+    )
+    connectivity_statement = serializers.PrimaryKeyRelatedField(
+        queryset=ConnectivityStatement.objects.all()
+    )
+
+    class Meta:
+        model = Destination
+        fields = ('id', "connectivity_statement", 'type', 'anatomical_entities', 'from_entities')
+
+
+class DestinationSerializerDetails(serializers.ModelSerializer):
+    """Destination with Custom Logic for from_entities"""
+
+    anatomical_entities = AnatomicalEntitySerializer(
+        many=True,
+    )
+
+    from_entities = AnatomicalEntitySerializer(
+        many=True,
+    )
+
+    class Meta:
+        model = Destination
+        fields = (
+            "id",
+            "connectivity_statement_id",
+            "type",
+            "anatomical_entities",
+            "from_entities"
+        )
+
+    def to_representation(self, instance):
+        """
+        Custom representation for Destination.
+        """
+        representation = super().to_representation(instance)
+
+        # Check if from_entities is empty
+        if not instance.from_entities.exists():
+            appropriate_entities = get_complete_from_entities_for_destination(instance)
+            representation['from_entities'] = AnatomicalEntitySerializer(appropriate_entities, many=True).data
+
+        return representation
 
 
 class ProvenanceSerializer(serializers.ModelSerializer):
@@ -297,30 +403,45 @@ class SentenceSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer)
         )
 
 
-class ConnectivityStatementSerializer(
-    FixManyToManyMixin, FixedWritableNestedModelSerializer
-):
-    """Connectivity Statement"""
-
+class BaseConnectivityStatementSerializer(FixManyToManyMixin, FixedWritableNestedModelSerializer):
     id = serializers.IntegerField(
         required=False, default=None, allow_null=True, read_only=True
     )
-    sentence_id = serializers.IntegerField()
     knowledge_statement = serializers.CharField(allow_blank=True, required=False)
+    tags = TagSerializer(many=True, read_only=True, required=False)
+    owner = UserSerializer(required=False, read_only=True)
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
-    origin_id = serializers.IntegerField(required=False, allow_null=True)
-    destination_id = serializers.IntegerField(required=False, allow_null=True)
+    has_notes = serializers.SerializerMethodField()
+
+    def get_has_notes(self, instance) -> bool:
+        return instance.has_notes
+
+    class Meta:
+        model = ConnectivityStatement
+        fields = (
+            "id",
+            "knowledge_statement",
+            "tags",
+            "owner",
+            "owner_id",
+            "state",
+            "modified_date",
+            "has_notes",
+        )
+        read_only_fields = ("state",)
+
+
+class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
+    """Connectivity Statement"""
+
+    sentence_id = serializers.IntegerField(required=False)
     phenotype_id = serializers.IntegerField(required=False, allow_null=True)
     sex_id = serializers.IntegerField(required=False, allow_null=True)
-    tags = TagSerializer(many=True, read_only=True, required=False)
     species = SpecieSerializer(many=True, read_only=False, required=False)
-    provenances = ProvenanceSerializer(
-        source="provenance_set", many=True, read_only=False, required=False
-    )
-    path = ViaSerializer(source="via_set", many=True, read_only=False, required=False)
-    owner = UserSerializer(required=False, read_only=True)
-    origin = AnatomicalEntitySerializer(required=False, read_only=True)
-    destination = AnatomicalEntitySerializer(required=False, read_only=True)
+    provenances = ProvenanceSerializer(source="provenance_set", many=True, read_only=False, required=False)
+    origins = AnatomicalEntitySerializer(many=True, required=False)
+    vias = ViaSerializerDetails(source="via_set", many=True, read_only=False, required=False)
+    destinations = DestinationSerializerDetails(many=True, required=False)
     phenotype = PhenotypeSerializer(required=False, read_only=True)
     sex = SexSerializer(required=False, read_only=True)
     sentence = SentenceSerializer(required=False, read_only=True)
@@ -328,8 +449,7 @@ class ConnectivityStatementSerializer(
         many=True, queryset=ConnectivityStatement.objects.all(), required=False
     )
     available_transitions = serializers.SerializerMethodField()
-    has_notes = serializers.SerializerMethodField()
-    journey = serializers.CharField(read_only=True)
+    journey = serializers.SerializerMethodField()
     statement_preview = serializers.SerializerMethodField()
     errors = serializers.SerializerMethodField()
 
@@ -338,52 +458,53 @@ class ConnectivityStatementSerializer(
         user = request.user if request else None
         return [t.name for t in instance.get_available_user_state_transitions(user)]
 
-    def get_has_notes(self, instance) -> bool:
-        return instance.has_notes
+    def get_journey(self, instance):
+        if 'journey' not in self.context:
+            self.context['journey'] = instance.get_journey()
+        return self.context['journey']
 
-    def get_statement_preview(self, instance) -> str:
-        sex = instance.sex.name if instance.sex else ""
+    def get_statement_preview(self, instance):
+        if 'journey' not in self.context:
+            self.context['journey'] = instance.get_journey()
+        return self.create_statement_preview(instance, self.context['journey'])
+
+    def create_statement_preview(self, instance, journey):
+        sex = instance.sex.name if instance.sex else "{sex}"
         species_list = [specie.name for specie in instance.species.all()]
-        if len(species_list) > 1:
-            species = f"{', '.join(species_list[:-1])} and {species_list[-1]}"
-        elif species_list:
-            species = species_list[0]
-        else:
-            species = ""
+        species = join_entities(species_list)
+        if not species:
+            species = "{species}"
 
-        phenotype = instance.phenotype.name if instance.phenotype else ""
-        origin = instance.origin.name if instance.origin else ""
-        destination = instance.destination.name if instance.destination else ""
+        phenotype = instance.phenotype.name.lower() if instance.phenotype else "{phenotype}"
+        origin_names = [origin.name for origin in instance.origins.all()]
+        origins = join_entities(origin_names)
+        if not origins:
+            origins = "{species}"
 
-        via_values = [f"via {via.name}" for via in instance.path.all()]
-        if len(via_values) > 1:
-            via_string = f" {', '.join(via_values[:-1])} and {via_values[-1]}"
-        elif via_values:
-            via_string = f" {via_values[0]}"
-        else:
-            via_string = ""
-
-        circuit_type = instance.circuit_type if instance.circuit_type else ""
-        projection = instance.projection if instance.projection else ""
+        circuit_type = instance.get_circuit_type_display().lower() if instance.circuit_type else "{circuit_type}"
+        projection = instance.get_projection_display().lower() if instance.projection else "{projection}"
 
         laterality_description = instance.get_laterality_description()
+        if not laterality_description:
+            laterality_description = "{laterality_description}"
 
         forward_connection = (
-            instance.forward_connection
-            if hasattr(instance, "forward_connection") and instance.forward_connection
-            else ""
+            join_entities(instance.forward_connection.all().values_list('id', flat=True))
+            if instance.forward_connection
+            else "{forward_connection}"
         )
-        apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
+        apinatomy = instance.apinatomy_model if instance.apinatomy_model else "{apinatomy}"
+        journey_sentence = '\n'.join(journey)
 
         # Creating the statement
-        statement = f"In {sex} {species}, a {phenotype} connection goes from {origin} to {destination}{via_string}. "
-        statement += f"This {circuit_type} projects {projection} from the {origin} and is found {laterality_description}. "
+        statement = f"In a {sex} {species}, a {phenotype} connection goes: \n{journey_sentence}\n"
+        statement += f"This {projection} {circuit_type} connection projects from the {origins} and is found {laterality_description}."
 
         if forward_connection:
-            statement += f"This neuron population connects to {forward_connection}. "
+            statement += f" This neuron population connects to connectivity statements with id {forward_connection}."
 
         if apinatomy:
-            statement += f"It is described in {apinatomy} model."
+            statement += f" It is described in {apinatomy} model."
 
         return statement.strip()
 
@@ -405,8 +526,15 @@ class ConnectivityStatementSerializer(
             ).data
         return representation
 
-    class Meta:
-        model = ConnectivityStatement
+    def update(self, instance, validated_data):
+        # Remove 'vias' and 'destinations' from validated_data if they exist
+        validated_data.pop('via_set', None)
+        validated_data.pop('destinations', None)
+
+        # Call the super class's update method with the modified validated_data
+        return super(ConnectivityStatementSerializer, self).update(instance, validated_data)
+
+    class Meta(BaseConnectivityStatementSerializer.Meta):
         fields = (
             "id",
             "sentence_id",
@@ -418,14 +546,11 @@ class ConnectivityStatementSerializer(
             "owner_id",
             "state",
             "available_transitions",
-            "origin_id",
-            "origin",
-            "destination_id",
-            "destination",
+            "origins",
+            "vias",
+            "destinations",
             "phenotype_id",
             "phenotype",
-            "destination_type",
-            "path",
             "journey",
             "laterality",
             "projection",
@@ -441,4 +566,43 @@ class ConnectivityStatementSerializer(
             "statement_preview",
             "errors"
         )
-        read_only_fields = ("state",)
+
+
+class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
+    origins = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=AnatomicalEntity.objects.all()
+    )
+
+    class Meta:
+        model = ConnectivityStatement
+        fields = (
+            "id",
+            "sentence_id",
+            "sentence",
+            "knowledge_statement",
+            "tags",
+            "provenances",
+            "owner",
+            "owner_id",
+            "state",
+            "available_transitions",
+            "origins",
+            "vias",
+            "destinations",
+            "phenotype_id",
+            "phenotype",
+            "journey",
+            "laterality",
+            "projection",
+            "circuit_type",
+            "species",
+            "sex_id",
+            "sex",
+            "forward_connection",
+            "apinatomy_model",
+            "additional_information",
+            "modified_date",
+            "has_notes",
+            "statement_preview",
+            "errors"
+        )

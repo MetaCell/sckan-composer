@@ -13,8 +13,8 @@ import {
 } from "../../helpers/helpers";
 import { useAppDispatch } from "../../redux/hooks";
 import {
-  SentenceAvailableTransitionsEnum as sentenceStates,
-  ConnectivityStatementAvailableTransitionsEnum as statementStates,
+  ComposerSentenceListStateEnum as sentenceStates,
+  ComposerConnectivityStatementListStateEnum as statementStates,
 } from "../../apiclient/backend/api";
 import { setFilters as setSentenceFilters } from "../../redux/sentenceSlice";
 import { setFilters as setStatementFilters } from "../../redux/statementSlice";

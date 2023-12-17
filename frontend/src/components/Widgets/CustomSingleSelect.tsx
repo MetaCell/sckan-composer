@@ -5,29 +5,54 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
-import { styled } from "@mui/material";
 import { vars } from "../../theme/variables";
-
-const StyledSelect = styled(Select)(({ theme }) => ({
-  "&:hover": {
-    border: "1px solid #EAECF0",
-    boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
-  },
-
-  "& .MuiOutlinedInput-notchedOutline": {
-    border: 0,
-    boxShadow: "none",
-  },
-}));
 
 const CustomSingleSelect = ({
   onChange,
   placeholder,
   disabled,
   value,
-  options: { label, data, enumOptions },
+  id,
+  options: {
+    label,
+    data,
+    enumOptions,
+    isPathBuilderComponent = false,
+    InputIcon,
+    onUpdate,
+  },
 }: any) => {
   const selectOptions = enumOptions ? enumOptions : data;
+
+  const pathBuilderComponentStyle = isPathBuilderComponent
+    ? {
+        "& .MuiInputBase-root": {
+          border: 0,
+          boxShadow: "none",
+
+          "&:hover": {
+            border: 0,
+            boxShadow: "none",
+          },
+        },
+        "&:focus-within": {
+          "& .MuiOutlinedInput-notchedOutline": {
+            border: "none !important",
+            boxShadow: "none !important",
+          },
+        },
+
+        "& .MuiOutlinedInput-notchedOutline": {
+          border: "none !important",
+          boxShadow: "none !important",
+        },
+
+        "& .MuiSelect-select": {
+          background: "transparent !important",
+        },
+      }
+    : null;
+
   return (
     <>
       {label && (
@@ -43,20 +68,44 @@ const CustomSingleSelect = ({
       <FormControl
         variant="standard"
         sx={{
+          width: "auto",
           "& .MuiInputLabel-root": {
             color: "#667085",
             fontWeight: "400",
             fontSize: "14px",
             marginLeft: "14px",
           },
+          ...pathBuilderComponentStyle,
         }}
       >
         <InputLabel shrink={false} htmlFor="custom-select">
           {!value && placeholder}
         </InputLabel>
-        <StyledSelect
-          value={value ? value : ""}
-          onChange={(event) => onChange(event.target.value)}
+        <Select
+          startAdornment={
+            isPathBuilderComponent ? (
+              <InputIcon
+                fill="#475467"
+                style={{ marginRight: ".5rem", width: "2rem" }}
+              />
+            ) : null
+          }
+          sx={{
+            "&:hover": {
+              border: "1px solid #EAECF0",
+              boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
+            },
+
+            "& .MuiOutlinedInput-notchedOutline": {
+              border: "none",
+              boxShadow: "none",
+            },
+          }}
+          value={value !== null ? value : ""}
+          onChange={(event) => {
+            onChange(event.target.value);
+            onUpdate && onUpdate(event.target.value, id);
+          }}
           disabled={disabled}
           id="custom-select"
           input={<OutlinedInput id="custom-select-input" />}
@@ -66,7 +115,7 @@ const CustomSingleSelect = ({
               {optionLabel}
             </MenuItem>
           ))}
-        </StyledSelect>
+        </Select>
       </FormControl>
     </>
   );
