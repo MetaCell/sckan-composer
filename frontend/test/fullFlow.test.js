@@ -75,6 +75,7 @@ describe('End to End Tests', () => {
                 width: 1600,
                 height: 1000,
             },
+            // slowMo: 30
         });
 
 
@@ -244,6 +245,8 @@ describe('End to End Tests', () => {
         await page.type(selectors.ADDITIONAL_INFORMATION, additional_info_1)
         await page.waitForTimeout(3000)
 
+         
+
         console.log('Knowledge Statement created')
     })
 
@@ -379,6 +382,7 @@ describe('End to End Tests', () => {
 
     it('Set status as Connection Missing', async () => {
         console.log('Changing Status ...')
+        await page.waitForSelector(selectors.STATUS_BUTTON)
         await page.click(selectors.STATUS_BUTTON)
         await page.waitForTimeout(1000)
         const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
@@ -390,6 +394,7 @@ describe('End to End Tests', () => {
 
     it('Set status as Curate', async () => {
         console.log('Changing Status ...')
+        await page.waitForSelector(selectors.STATUS_BUTTON)
         await page.click(selectors.STATUS_BUTTON)
         await page.waitForTimeout(1000)
         const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
@@ -399,11 +404,86 @@ describe('End to End Tests', () => {
         console.log('Status Changed')
     })
 
+    it('Add elements to path builder', async () => {
+
+        console.log('Filling Proofing section ...')
+        await page.click('button[role="tab"][aria-selected="false"]')
+        await page.waitForTimeout(3000)
+
+        //Add a Via element
+        await page.waitForSelector('button.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium')
+        const add_button = await page.$$('button.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium')
+        await add_button[0].click()
+        await page.waitForSelector('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart')
+        const added_via = await page.$$eval('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart', elements => elements.length);
+        expect(added_via).toBe(1)
+
+        //Add a Destination element
+
+        await add_button[1].click()
+        await page.waitForSelector('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart')
+        const added_destination = await page.$$eval('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart', elements => elements.length);
+        expect(added_destination).toBe(added_via + 1)
+    })
+
+    it('Add Origin', async () => {
+
+        //Origin 
+        await page.waitForSelector('form[class="origins"] > div > div  > div  > div  > div  > div  > div > span > div ')
+        await page.click('form[class="origins"] > div > div  > div  > div  > div  > div  > div > span > div ')
+        await page.waitForSelector('.MuiPopper-root')
+        await page.waitForSelector('div:has(> input[placeholder="Search for Origins"]')
+        await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+        const all_origins = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
+        expect(all_origins).toBeGreaterThan(1)
+        await page.click('div:has(> input[placeholder="Search for Origins"]')
+        await page.type('div:has(> input[placeholder="Search for Origins"]',path_builder_origin_)
+        await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+        await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
+        await page.waitForTimeout(3000)
+        await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+        const searched_origins = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
+        expect(searched_origins).toBe(1)
+        await page.waitForSelector('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+        await page.click('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+        await page.click('form[class="origins"] > div > div  > div  > div  > div  > div  > div > span > div ')
+        await page.waitForTimeout(3000)
+        const added_origin = await page.$$eval('form[class="origins"] > div > div  > div  > div  > div  > div  > div > span > div ', status => {
+            return status.map(status => status.innerText)
+        })
+        expect(added_origin).toContain(path_builder_origin_)
+
+        console.log('Origin added')
+    })
+
+    it('Add Vias', async () => {
+
+    })
+
+    it('Add Destination', async () => {
+
+    })
+
     it.skip('Fill Proofing', async () => {
 
         console.log('Filling Proofing section ...')
         await page.click('button[role="tab"][aria-selected="false"]')
         await page.waitForTimeout(3000)
+
+        //Add a Via element
+        await page.waitForSelector('button.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium')
+        const add_button = await page.$$('button.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium')
+        await add_button[0].click()
+        await page.waitForSelector('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart')
+        const added_via = await page.$$eval('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart', elements => elements.length);
+        expect(added_via).toBe(1)
+
+        //Add a Destination element
+
+        await add_button[1].click()
+        await page.waitForSelector('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart')
+        const added_destination = await page.$$eval('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart', elements => elements.length);
+        expect(added_destination).toBe(added_via + 1)
         
         //Origin 
         await page.waitForSelector(selectors.ORIGIN_FIELD)
@@ -524,9 +604,6 @@ describe('End to End Tests', () => {
         expect(page.url()).toContain('orcid.org/signin')
         console.log('User logged out')
     })
-
-
-
 
 
 })
