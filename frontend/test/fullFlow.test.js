@@ -406,7 +406,7 @@ describe('End to End Tests', () => {
 
     it('Add elements to path builder', async () => {
 
-        console.log('Filling Proofing section ...')
+        console.log('Adding elements to path builder ...')
         await page.click('button[role="tab"][aria-selected="false"]')
         await page.waitForTimeout(3000)
 
@@ -427,6 +427,7 @@ describe('End to End Tests', () => {
     })
 
     it('Add Origin', async () => {
+        console.log('Adding Origin ...')
 
         //Origin 
         await page.waitForSelector('form[class="origins"] > div > div  > div  > div  > div  > div  > div > span > div ')
@@ -434,6 +435,7 @@ describe('End to End Tests', () => {
         await page.waitForSelector('.MuiPopper-root')
         await page.waitForSelector('div:has(> input[placeholder="Search for Origins"]')
         await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+        await page.waitForTimeout(3000)
         const all_origins = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
         expect(all_origins).toBeGreaterThan(1)
         await page.click('div:has(> input[placeholder="Search for Origins"]')
@@ -452,16 +454,55 @@ describe('End to End Tests', () => {
             return status.map(status => status.innerText)
         })
         expect(added_origin).toContain(path_builder_origin_)
+        await page.waitForSelector('svg.MuiCircularProgress-svg', { timeout: 5000, hidden: false });
+        await page.waitForSelector('svg.MuiCircularProgress-svg', { hidden: true });
 
         console.log('Origin added')
     })
 
     it('Add Vias', async () => {
 
+        console.log('Adding Vias ...')
+        await page.waitForTimeout(3000)
+
+        //Vias
+        await page.waitForSelector('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div')
+        const added_via_from_field = await page.$$eval('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div', status => {
+            return status.map(status => status.innerText)
+        })
+        expect(added_via_from_field).toContain(path_builder_origin_)
+
+        await page.waitForSelector('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
+        await page.click('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
+        await page.waitForSelector('div:has(> input[placeholder="Search for vias"]')
+        await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+        await page.waitForTimeout(3000)
+        const all_vias= await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
+        expect(all_vias).toBeGreaterThan(1)
+        await page.click('div:has(> input[placeholder="Search for vias"]')
+        await page.type('div:has(> input[placeholder="Search for vias"]',path_builder_via)
+        await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+        await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
+        await page.waitForTimeout(3000)
+        await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+        const searched_vias = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
+        expect(searched_vias).toBe(1)
+        await page.waitForSelector('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+        await page.click('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+        await page.click('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
+        await page.waitForTimeout(3000)
+        const added_via = await page.$$eval('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div', status => {
+            return status.map(status => status.innerText)
+        })
+        expect(added_via).toContain(path_builder_via)
+
+        console.log('Via added')
+
     })
 
-    it('Add Destination', async () => {
+    it.skip('Add Destination', async () => {
 
+        console.log('Adding Destination ...')
     })
 
     it.skip('Fill Proofing', async () => {
