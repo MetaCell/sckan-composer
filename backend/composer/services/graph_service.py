@@ -42,8 +42,8 @@ def create_paths_from_origin(origin, vias, destinations, current_path, number_of
         # This checks if the last node in the current path is one of the nodes that can lead to the current via.
         # In other words, it checks if there is a valid connection
         # from the last node in the current path to the current via.
-        if current_path[-1][0] in list(
-                a.name for a in current_via.from_entities.all()) or not current_via.from_entities.exists():
+        if len(current_path) == via_layer and (current_path[-1][0] in list(
+            a.name for a in current_via.from_entities.all()) or not current_via.from_entities.exists()):
             for entity in current_via.anatomical_entities.all():
                 # Build new sub-paths including the current via entity
                 new_sub_path = current_path + [(entity.name, via_layer)]
@@ -85,8 +85,7 @@ def consolidate_paths(paths):
 
         paths = consolidated + [paths[i] for i in range(len(paths)) if i not in used_indices]
 
-    return [[(node.replace(JOURNEY_DELIMITER, ', '), layer) for node, layer in path] for path in paths]
-
+    return [[((node[0].replace(JOURNEY_DELIMITER, ' or '), node[1]) if (node[1] == 0 or path.index(node) == len(path)-1)  else (node[0].replace(JOURNEY_DELIMITER, ', '), node[1])) for node in path] for path in paths]
 
 def can_merge(path1, path2):
     # Ensure paths are of the same length
