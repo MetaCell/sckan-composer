@@ -503,84 +503,42 @@ describe('End to End Tests', () => {
     it.skip('Add Destination', async () => {
 
         console.log('Adding Destination ...')
-    })
-
-    it.skip('Fill Proofing', async () => {
-
-        console.log('Filling Proofing section ...')
-        await page.click('button[role="tab"][aria-selected="false"]')
-        await page.waitForTimeout(3000)
-
-        //Add a Via element
-        await page.waitForSelector('button.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium')
-        const add_button = await page.$$('button.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium')
-        await add_button[0].click()
-        await page.waitForSelector('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart')
-        const added_via = await page.$$eval('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart', elements => elements.length);
-        expect(added_via).toBe(1)
-
-        //Add a Destination element
-
-        await add_button[1].click()
-        await page.waitForSelector('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart')
-        const added_destination = await page.$$eval('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart', elements => elements.length);
-        expect(added_destination).toBe(added_via + 1)
-        
-        //Origin 
-        await page.waitForSelector(selectors.ORIGIN_FIELD)
-        await page.click(selectors.ORIGIN_FIELD)
-        await page.type(selectors.ORIGIN_FIELD, path_builder_origin_)
-        await page.waitForTimeout(3000)
-        await page.keyboard.press('ArrowDown');
-        await page.keyboard.press('Enter')
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
-        await page.waitForTimeout(5000)
-
-        //Vias
-        await page.click(selectors.ADD_VIA)
-        await page.waitForSelector(selectors.NOT_SPECIFIED_BUTTON);
-        await page.waitForTimeout(3000)
-
-        const not_specified_buttons = await page.$$('div.MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl:has(> div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input');
-        await not_specified_buttons[0].click()
-        await page.waitForSelector(`li[data-value= "${path_builder_axon}"]`)
-        await page.click(`li[data-value= "${path_builder_axon}"]`)
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
-        await page.waitForTimeout(3000)
-
-        await page.waitForSelector(selectors.VIA_FIELD)
-        await page.click(selectors.VIA_FIELD)
-        await page.type(selectors.VIA_FIELD, path_builder_via)
-        await page.waitForTimeout(3000)
-        await page.keyboard.press('ArrowDown');
-        await page.keyboard.press('Enter')
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
         await page.waitForTimeout(3000)
 
         //Destination
-        await not_specified_buttons[1].click()
-        await not_specified_buttons[1].type(path_builder_axon_terminal)
-        await page.click(`li[data-value= "${path_builder_axon_terminal}"]`)
+        await page.waitForSelector('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div')
+        const added_destination_from_field = await page.$$eval('form[class="destination"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div', status => {
+            return status.map(status => status.innerText)
+        })
+        expect(added_destination_from_field).toContain(path_builder_via)
+
+        await page.waitForSelector('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
+        await page.click('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
+        await page.waitForSelector('div:has(> input[placeholder="Search for Destinations"]')
+        await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+        await page.waitForTimeout(3000)
+        const all_destinations= await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
+        expect(all_destinations).toBeGreaterThan(1)
+        await page.click('div:has(> input[placeholder="Search for Destinations"]')
+        await page.type('div:has(> input[placeholder="Search for Destinations"]',path_builder_destination)
         await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
         await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
         await page.waitForTimeout(3000)
-
-        await page.waitForSelector(selectors.DESTINATION_FIELD)
-        await page.click(selectors.DESTINATION_FIELD)
-        await page.type(selectors.DESTINATION_FIELD, path_builder_destination)
+        await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+        const searched_destination = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
+        expect(searched_destination).toBe(3)
+        await page.waitForSelector('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+        await page.click('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+        await page.click('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
         await page.waitForTimeout(3000)
-        await page.keyboard.press('ArrowDown');
-        await page.keyboard.press('Enter')
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
-        await page.waitForTimeout(3000)
+        const added_destination = await page.$$eval('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div', status => {
+            return status.map(status => status.innerText)
+        })
+        expect(added_destination).toContain(path_builder_destination)
 
-        console.log('Proofing Section filled')
-
+        console.log('Destination added')
     })
+
 
     it.skip('Check Values and Statement Preview', async () => {
         console.log('Checking Values and Statement Preview ...')
