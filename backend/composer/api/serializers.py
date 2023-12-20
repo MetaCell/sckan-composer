@@ -469,36 +469,44 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         return self.create_statement_preview(instance, self.context['journey'])
 
     def create_statement_preview(self, instance, journey):
-        sex = instance.sex.name if instance.sex else "{sex}"
+        sex = instance.sex.name if instance.sex else ""
         species_list = [specie.name for specie in instance.species.all()]
         species = join_entities(species_list)
         if not species:
-            species = "{species}"
+            species = ""
 
-        phenotype = instance.phenotype.name.lower() if instance.phenotype else "{phenotype}"
+        phenotype = instance.phenotype.name.lower() if instance.phenotype else ""
         origin_names = [origin.name for origin in instance.origins.all()]
         origins = join_entities(origin_names)
         if not origins:
-            origins = "{species}"
+            origins = ""
 
-        circuit_type = instance.get_circuit_type_display().lower() if instance.circuit_type else "{circuit_type}"
-        projection = instance.get_projection_display().lower() if instance.projection else "{projection}"
+        circuit_type = instance.get_circuit_type_display().lower() if instance.circuit_type else ""
+        projection = instance.get_projection_display().lower() if instance.projection else ""
 
         laterality_description = instance.get_laterality_description()
         if not laterality_description:
-            laterality_description = "{laterality_description}"
+            laterality_description = ""
 
         forward_connection = (
             join_entities(instance.forward_connection.all().values_list('id', flat=True))
             if instance.forward_connection
-            else "{forward_connection}"
+            else ""
         )
-        apinatomy = instance.apinatomy_model if instance.apinatomy_model else "{apinatomy}"
-        journey_sentence = '\n'.join(journey)
+        apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
+        journey_sentence = ', '.join(journey)
 
         # Creating the statement
-        statement = f"In a {sex} {species}, a {phenotype} connection goes: \n{journey_sentence}\n"
-        statement += f"This {projection} {circuit_type} connection projects from the {origins} and is found {laterality_description}."
+        if sex != "" or species != "":
+            statement = f"In a {sex} {species}, a {phenotype} connection goes {journey_sentence}.\n"
+        else:
+            statement = f"A {phenotype} connection goes {journey_sentence}.\n"
+        statement += f"This "
+        if projection != "not specified":
+            statement += f"{projection} "
+        if circuit_type != "not specified":
+            statement += f"{circuit_type} "
+        statement += f"connection projects from the {origins} and is found {laterality_description}.\n"
 
         if forward_connection:
             statement += f" This neuron population connects to connectivity statements with id {forward_connection}."
