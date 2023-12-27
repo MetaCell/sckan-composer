@@ -70,7 +70,7 @@ describe('End to End Tests', () => {
             args: [
                 "--no-sandbox",
             ],
-            headless: true,
+            headless: false,
             defaultViewport: {
                 width: 1600,
                 height: 1000,
@@ -500,20 +500,20 @@ describe('End to End Tests', () => {
 
     })
 
-    it.skip('Add Destination', async () => {
+    it('Add Destination', async () => {
 
         console.log('Adding Destination ...')
         await page.waitForTimeout(3000)
 
         //Destination
-        await page.waitForSelector('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div')
-        const added_destination_from_field = await page.$$eval('form[class="destination"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div', status => {
+        await page.waitForSelector('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div')
+        const added_destination_from_field = await page.$$eval('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div', status => {
             return status.map(status => status.innerText)
         })
         expect(added_destination_from_field).toContain(path_builder_via)
 
-        await page.waitForSelector('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
-        await page.click('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
+        await page.waitForSelector('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div')
+        await page.click('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div')
         await page.waitForSelector('div:has(> input[placeholder="Search for Destinations"]')
         await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
         await page.waitForTimeout(3000)
@@ -529,9 +529,9 @@ describe('End to End Tests', () => {
         expect(searched_destination).toBe(3)
         await page.waitForSelector('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
         await page.click('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
-        await page.click('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
+        await page.click('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div')
         await page.waitForTimeout(3000)
-        const added_destination = await page.$$eval('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div', status => {
+        const added_destination = await page.$$eval('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div', status => {
             return status.map(status => status.innerText)
         })
         expect(added_destination).toContain(path_builder_destination)
