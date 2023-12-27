@@ -70,7 +70,7 @@ describe('End to End Tests', () => {
             args: [
                 "--no-sandbox",
             ],
-            headless: false,
+            headless: true,
             defaultViewport: {
                 width: 1600,
                 height: 1000,
@@ -94,515 +94,531 @@ describe('End to End Tests', () => {
         await browser.close()
     })
 
-    it('HomePage', async () => {
+    describe('Login Flow', () => {
 
-        const pageTitle = await page.title();
-        console.log(pageTitle);
-        expect(pageTitle).toBe('SCKAN Composer')
-        await page.waitForSelector(selectors.LOGIN_PAGE, { timeout: 60000 })
-        await page.waitForSelector(selectors.COOKIE_MODAL, { timeout: 60000 })
-        await page.waitForSelector(selectors.ACCEPT_COOKIES, { timeout: 60000 })
-        await page.click(selectors.ACCEPT_COOKIES)
-        await page.waitForSelector(selectors.ACCEPT_COOKIES, { hidden: true });
+        it('HomePage', async () => {
 
-    })
+            const pageTitle = await page.title();
+            console.log(pageTitle);
+            expect(pageTitle).toBe('SCKAN Composer')
+            await page.waitForSelector(selectors.LOGIN_PAGE, { timeout: 60000 })
+            await page.waitForSelector(selectors.COOKIE_MODAL, { timeout: 60000 })
+            await page.waitForSelector(selectors.ACCEPT_COOKIES, { timeout: 60000 })
+            await page.click(selectors.ACCEPT_COOKIES)
+            await page.waitForSelector(selectors.ACCEPT_COOKIES, { hidden: true });
 
-    it('Login', async () => {
-
-        console.log('Logging in ...')
-
-        await page.waitForSelector(selectors.USERNAME, { timeout: 60000 })
-        await page.type(selectors.USERNAME, USERNAME)
-        await page.type(selectors.PASSWORD, PASSWORD)
-        await page.waitForSelector(selectors.SIGN_IN_BUTTON)
-        await page.click(selectors.SIGN_IN_BUTTON)
-        await page.waitForSelector(selectors.SEARCH_ICON)
-        
-
-        console.log('Logged In')
-
-    })
-
-    it('Add Record', async () => {
-        console.log('Adding record ...')
-
-        await page.waitForSelector(selectors.ADD_RECORD)
-        await page.click(selectors.ADD_RECORD)
-        await page.waitForSelector(selectors.ARTICLE_LABEL)
-        await page.click(selectors.ARTICLE_FIELD)
-        await page.type(selectors.ARTICLE_FIELD, `${article_title}`)
-        await page.waitForTimeout(3000)
-        await page.click(selectors.PMID_FIELD)
-        await page.type(selectors.PMID_FIELD, `${randomPmid}`)
-        await page.waitForTimeout(3000)
-        await page.click(selectors.PMCID_FIELD)
-        await page.type(selectors.PMCID_FIELD, `${randomPmcid}`)
-        await page.waitForTimeout(3000)
-        await page.click(selectors.DOI_FIELD)
-        await page.type(selectors.DOI_FIELD, `${doi}`)
-        await page.waitForTimeout(3000)
-        await page.click(selectors.SENTENCE_FIELD)
-        await page.type(selectors.SENTENCE_FIELD, `${sentence}`)
-        await page.waitForTimeout(3000)
-        await page.waitForSelector(selectors.CREATE_SENTENCE)
-        await page.click(selectors.CREATE_SENTENCE)
-
-        await page.waitForSelector(selectors.SENTENCE_DETAILS_TITLE)
-
-        const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
-            return status.map(status => status.innerText)
         })
-        expect(sentence_status).toContain("Open")
 
-        console.log('Record successfully added')
+        it('Login', async () => {
 
-    })
+            console.log('Logging in ...')
 
-
-    it('Create 1st Knowledge Statement', async () => {
-        console.log('Creating Knowledge Statement ...')
-
-        await page.waitForTimeout(3000)
-        await page.waitForSelector(selectors.ADD_KNOWLEDGE_STATEMENT)
-        await page.click(selectors.ADD_KNOWLEDGE_STATEMENT)
-        await page.waitForSelector(selectors.KS_FIELD, { timeout: 6000 })
-        
-        // Knowledge Statement
-        await page.click(selectors.KS_FIELD)
-        await page.type(selectors.KS_FIELD, knowledge_statement_1)
-        await page.click(selectors.PROVENANCE_FIELD)
-        await page.waitForTimeout(3000)
-        
-        //Provenance
-        await page.waitForSelector(selectors.PROVENANCE_FIELD)
-        await page.click(selectors.PROVENANCE_FIELD)
-        await page.type(selectors.PROVENANCE_FIELD, provenances_1)
-        await page.keyboard.press('Enter')
-        await page.waitForTimeout(3000)
-        
-        //Species
-        await page.waitForSelector(selectors.SPECIES_FIELD)
-        await page.click(selectors.SPECIES_FIELD)
-        await page.type(selectors.SPECIES_FIELD, species_1)
-        await page.keyboard.press('ArrowDown');
-        await page.keyboard.press('Enter')
-        await page.waitForTimeout(3000)
-        
-        //Phenotype
-        const statement_details_fields = await page.$$('div.MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl')
-        await statement_details_fields[3].click()
-        await page.waitForSelector('ul > li[data-value="1"]')
-        await page.click('ul > li[data-value="1"]')
-        await page.waitForSelector('div:has(> input[value="1"]')
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
-        await page.waitForTimeout(1000)
-        
-        //Laterality
-        await statement_details_fields[4].click()
-        await page.waitForSelector('ul > li[data-value="RIGHT"]')
-        await page.click('ul > li[data-value="RIGHT"]')
-        await page.waitForSelector('div:has(> input[value="RIGHT"]')
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
-        await page.waitForTimeout(1000)
-       
-        //Projection
-        await statement_details_fields[5].click()
-        await page.waitForSelector('ul > li[data-value="BI"]')
-        await page.click('ul > li[data-value="BI"]')
-        await page.waitForSelector('div:has(> input[value="BI"]')
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
-        await page.waitForTimeout(1000)
-        
-        // Circuit Type
-        await statement_details_fields[6].click()
-        await page.waitForSelector('ul > li[data-value="MOTOR"]')
-        await page.click('ul > li[data-value="MOTOR"]')
-        await page.waitForSelector('div:has(> input[value="MOTOR"]')
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
-        await page.waitForTimeout(1000)
-        
-        // Sex 
-        await statement_details_fields[7].click()
-        await page.waitForSelector('ul > li[data-value="2"]')
-        await page.click('ul > li[data-value="2"]')
-        await page.waitForSelector('div:has(> input[value="2"]')
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
-        await page.waitForTimeout(1000)
-
-        // Apinatomy Model Name
-        await page.waitForSelector(selectors.APINATOMY_MODEL)
-        await page.click(selectors.APINATOMY_MODEL)
-        await page.type(selectors.APINATOMY_MODEL, apinatomy_model_name_1)
-        await page.waitForTimeout(3000)
-
-        // Additional Information
-        await page.click(selectors.ADDITIONAL_INFORMATION)
-        await page.type(selectors.ADDITIONAL_INFORMATION, additional_info_1)
-        await page.waitForTimeout(3000)
-
-         
-
-        console.log('Knowledge Statement created')
-    })
-
-    it('Search for created Record', async () => {
-        console.log('Searching for created Record ...')
-
-        await page.waitForTimeout(3000)
-        await page.waitForSelector('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected')
-        const sidebar_buttons = await page.$$('ul.MuiList-root.MuiList-padding > li')
-        await sidebar_buttons[0].click()
-        await page.waitForSelector(selectors.SEARCH_ICON)
-        await page.waitForSelector(selectors.SEARCH_BAR)
-        await page.click(selectors.SEARCH_BAR)
-        await page.waitForTimeout(3000)
-        await page.type(selectors.SEARCH_BAR, `${article_title}`)
-        await page.waitForSelector('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight')
-        await page.waitForTimeout(6000)
-        const searched_records_count = await page.$$eval('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight', elements => elements.length);
-        expect(searched_records_count).toBe(1)
-
-        await page.waitForSelector(selectors.TABLE_ROW)
-        await page.click(selectors.TABLE_ROW)
-
-        await page.waitForSelector(selectors.SENTENCE_PAGE)
-
-        console.log('Record found')
-    })
+            await page.waitForSelector(selectors.USERNAME, { timeout: 60000 })
+            await page.type(selectors.USERNAME, USERNAME)
+            await page.type(selectors.PASSWORD, PASSWORD)
+            await page.waitForSelector(selectors.SIGN_IN_BUTTON)
+            await page.click(selectors.SIGN_IN_BUTTON)
+            await page.waitForSelector(selectors.SEARCH_ICON)
 
 
-    it('Change status -> To Be Reviewed', async () => {
-        console.log('Changing Status ...')
+            console.log('Logged In')
 
-        await page.waitForSelector(selectors.STATUS_BUTTON, {visible: true})
-        await page.click(selectors.STATUS_BUTTON)
-        await page.waitForTimeout(1000)
-       
-
-        console.log('Status Changed')
-
-    })
-
-
-    it('Search for created Record', async () => {
-        console.log('Searching for created Record ...')
-
-        await page.waitForTimeout(3000)
-        await page.waitForSelector('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected')
-        const sidebar_buttons = await page.$$('ul.MuiList-root.MuiList-padding > li')
-        await sidebar_buttons[0].click()
-        await page.waitForSelector(selectors.SEARCH_ICON)
-        await page.waitForSelector(selectors.SEARCH_BAR)
-        // previous Search is already in the search bar
-        // await page.click(selectors.SEARCH_BAR)
-        // await page.waitForTimeout(3000)
-        // await page.type(selectors.SEARCH_BAR, `${article_title}`)
-        await page.waitForSelector('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight')
-        await page.waitForTimeout(6000)
-        const searched_records_count = await page.$$eval('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight', elements => elements.length);
-        expect(searched_records_count).toBe(1)
-
-        await page.waitForSelector(selectors.TABLE_ROW)
-        await page.click(selectors.TABLE_ROW)
-
-        await page.waitForSelector(selectors.SENTENCE_PAGE)
-        const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
-            return status.map(status => status.innerText)
         })
-        expect(sentence_status).toContain("To Be Reviewed")
-
-        console.log('Record found')
     })
 
-    it('Set status as Compose Now', async () => {
-        console.log('Changing Status ...')
-        await page.click(selectors.STATUS_BUTTON)
-        await page.waitForTimeout(1000)
-        
-        console.log('Status Changed')
-    })
+    describe('Sentence List', () => {
 
-    it('Search for the Knowledge Statement in the Statements List page', async () => {
-        console.log('Searching for the created Knowledge Statement ...')
-        await page.waitForTimeout(3000)
-        await page.waitForSelector('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiMenuItem-root.MuiMenuItem-gutters')
-        const sidebar_buttons = await page.$$('ul.MuiList-root.MuiList-padding > li')
-        await sidebar_buttons[1].click()
-        await page.waitForSelector(selectors.SEARCH_ICON)
-        await page.waitForSelector('div:has(> input[placeholder="Search for Knowledge Statements"]', {visible: true})
-        await page.click('div:has(> input[placeholder="Search for Knowledge Statements"]')
-        await page.waitForTimeout(3000)
-        await page.type('div:has(> input[placeholder="Search for Knowledge Statements"]', `${knowledge_statement_1}`)
-        await page.waitForSelector('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight')
-        await page.waitForTimeout(6000)
-        const searched_records_count = await page.$$eval('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight', elements => elements.length);
-        expect(searched_records_count).toBe(1)
+        it('Add Record', async () => {
+            console.log('Adding record ...')
 
-        await page.waitForSelector(selectors.TABLE_ROW)
-        await page.click(selectors.TABLE_ROW)
+            await page.waitForSelector(selectors.ADD_RECORD)
+            await page.click(selectors.ADD_RECORD)
+            await page.waitForSelector(selectors.ARTICLE_LABEL)
+            await page.click(selectors.ARTICLE_FIELD)
+            await page.type(selectors.ARTICLE_FIELD, `${article_title}`)
+            await page.waitForTimeout(3000)
+            await page.click(selectors.PMID_FIELD)
+            await page.type(selectors.PMID_FIELD, `${randomPmid}`)
+            await page.waitForTimeout(3000)
+            await page.click(selectors.PMCID_FIELD)
+            await page.type(selectors.PMCID_FIELD, `${randomPmcid}`)
+            await page.waitForTimeout(3000)
+            await page.click(selectors.DOI_FIELD)
+            await page.type(selectors.DOI_FIELD, `${doi}`)
+            await page.waitForTimeout(3000)
+            await page.click(selectors.SENTENCE_FIELD)
+            await page.type(selectors.SENTENCE_FIELD, `${sentence}`)
+            await page.waitForTimeout(3000)
+            await page.waitForSelector(selectors.CREATE_SENTENCE)
+            await page.click(selectors.CREATE_SENTENCE)
 
-        await page.waitForSelector(selectors.SENTENCE_PAGE)
-        const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
-            return status.map(status => status.innerText)
+            await page.waitForSelector(selectors.SENTENCE_DETAILS_TITLE)
+
+            const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
+                return status.map(status => status.innerText)
+            })
+            expect(sentence_status).toContain("Open")
+
+            console.log('Record successfully added')
+
         })
-        expect(sentence_status).toContain("Compose Now")
 
-        console.log('Statement found')
-    })
 
-    it('Distillation - add tags and notes', async () => {
-        console.log('Adding Tags and Notes ...')
-        // Tags
-        await page.waitForSelector(selectors.TAGS_FIELD, {visible: true})
-        await page.click(selectors.TAGS_FIELD)
-        // await page.type(selectors.TAGS_FIELD, tags)
-        await page.keyboard.press('ArrowDown');
-        await page.keyboard.press('Enter')
-        await page.waitForTimeout(3000)
+        it('Create 1st Knowledge Statement', async () => {
+            console.log('Creating Knowledge Statement ...')
 
-        // Notes
-        await page.click(selectors.NOTES_FIELD)
-        await page.type(selectors.NOTES_FIELD, note)
-        await page.waitForTimeout(3000)
-        await page.click(selectors.SEND_BUTTON)
-        await page.waitForTimeout(3000)
+            await page.waitForTimeout(3000)
+            await page.waitForSelector(selectors.ADD_KNOWLEDGE_STATEMENT)
+            await page.click(selectors.ADD_KNOWLEDGE_STATEMENT)
+            await page.waitForSelector(selectors.KS_FIELD, { timeout: 6000 })
 
-        const history = await page.$$eval('h6.MuiTypography-root.MuiTypography-subtitle2', history => {
-            return history.map(history => history.innerText)
+            // Knowledge Statement
+            await page.click(selectors.KS_FIELD)
+            await page.type(selectors.KS_FIELD, knowledge_statement_1)
+            await page.click(selectors.PROVENANCE_FIELD)
+            await page.waitForTimeout(3000)
+
+            //Provenance
+            await page.waitForSelector(selectors.PROVENANCE_FIELD)
+            await page.click(selectors.PROVENANCE_FIELD)
+            await page.type(selectors.PROVENANCE_FIELD, provenances_1)
+            await page.keyboard.press('Enter')
+            await page.waitForTimeout(3000)
+
+            //Species
+            await page.waitForSelector(selectors.SPECIES_FIELD)
+            await page.click(selectors.SPECIES_FIELD)
+            await page.type(selectors.SPECIES_FIELD, species_1)
+            await page.keyboard.press('ArrowDown');
+            await page.keyboard.press('Enter')
+            await page.waitForTimeout(3000)
+
+            //Phenotype
+            const statement_details_fields = await page.$$('div.MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl')
+            await statement_details_fields[3].click()
+            await page.waitForSelector('ul > li[data-value="1"]')
+            await page.click('ul > li[data-value="1"]')
+            await page.waitForSelector('div:has(> input[value="1"]')
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
+            await page.waitForTimeout(1000)
+
+            //Laterality
+            await statement_details_fields[4].click()
+            await page.waitForSelector('ul > li[data-value="RIGHT"]')
+            await page.click('ul > li[data-value="RIGHT"]')
+            await page.waitForSelector('div:has(> input[value="RIGHT"]')
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
+            await page.waitForTimeout(1000)
+
+            //Projection
+            await statement_details_fields[5].click()
+            await page.waitForSelector('ul > li[data-value="BI"]')
+            await page.click('ul > li[data-value="BI"]')
+            await page.waitForSelector('div:has(> input[value="BI"]')
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
+            await page.waitForTimeout(1000)
+
+            // Circuit Type
+            await statement_details_fields[6].click()
+            await page.waitForSelector('ul > li[data-value="MOTOR"]')
+            await page.click('ul > li[data-value="MOTOR"]')
+            await page.waitForSelector('div:has(> input[value="MOTOR"]')
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
+            await page.waitForTimeout(1000)
+
+            // Sex 
+            await statement_details_fields[7].click()
+            await page.waitForSelector('ul > li[data-value="2"]')
+            await page.click('ul > li[data-value="2"]')
+            await page.waitForSelector('div:has(> input[value="2"]')
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
+            await page.waitForTimeout(1000)
+
+            // Apinatomy Model Name
+            await page.waitForSelector(selectors.APINATOMY_MODEL)
+            await page.click(selectors.APINATOMY_MODEL)
+            await page.type(selectors.APINATOMY_MODEL, apinatomy_model_name_1)
+            await page.waitForTimeout(3000)
+
+            // Additional Information
+            await page.click(selectors.ADDITIONAL_INFORMATION)
+            await page.type(selectors.ADDITIONAL_INFORMATION, additional_info_1)
+            await page.waitForTimeout(3000)
+
+
+
+            console.log('Knowledge Statement created')
         })
-        expect(history[0]).toContain(note)
 
-        console.log('Tags and Notes added')
-    })
+        it('Search for created Record', async () => {
+            console.log('Searching for created Record ...')
 
-    it('Set status as Connection Missing', async () => {
-        console.log('Changing Status ...')
-        await page.waitForSelector(selectors.STATUS_BUTTON)
-        await page.click(selectors.STATUS_BUTTON)
-        await page.waitForTimeout(1000)
-        const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
-            return status.map(status => status.innerText)
+            await page.waitForTimeout(3000)
+            await page.waitForSelector('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected')
+            const sidebar_buttons = await page.$$('ul.MuiList-root.MuiList-padding > li')
+            await sidebar_buttons[0].click()
+            await page.waitForSelector(selectors.SEARCH_ICON)
+            await page.waitForSelector(selectors.SEARCH_BAR)
+            await page.click(selectors.SEARCH_BAR)
+            await page.waitForTimeout(3000)
+            await page.type(selectors.SEARCH_BAR, `${article_title}`)
+            await page.waitForSelector('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight')
+            await page.waitForTimeout(6000)
+            const searched_records_count = await page.$$eval('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight', elements => elements.length);
+            expect(searched_records_count).toBe(1)
+
+            await page.waitForSelector(selectors.TABLE_ROW)
+            await page.click(selectors.TABLE_ROW)
+
+            await page.waitForSelector(selectors.SENTENCE_PAGE)
+
+            console.log('Record found')
         })
-        expect(sentence_status).toContain("Connection Missing")
-        console.log('Status Changed')
-    })
 
-    it('Set status as Curate', async () => {
-        console.log('Changing Status ...')
-        await page.waitForSelector(selectors.STATUS_BUTTON)
-        await page.click(selectors.STATUS_BUTTON)
-        await page.waitForTimeout(1000)
-        const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
-            return status.map(status => status.innerText)
+
+        it('Change status -> To Be Reviewed', async () => {
+            console.log('Changing Status ...')
+
+            await page.waitForSelector(selectors.STATUS_BUTTON, { visible: true })
+            await page.click(selectors.STATUS_BUTTON)
+            await page.waitForTimeout(1000)
+
+
+            console.log('Status Changed')
+
         })
-        expect(sentence_status).toContain("Curated")
-        console.log('Status Changed')
-    })
 
-    it('Add elements to path builder', async () => {
 
-        console.log('Adding elements to path builder ...')
-        await page.click('button[role="tab"][aria-selected="false"]')
-        await page.waitForTimeout(3000)
+        it('Search for created Record', async () => {
+            console.log('Searching for created Record ...')
 
-        //Add a Via element
-        await page.waitForSelector('button.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium')
-        const add_button = await page.$$('button.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium')
-        await add_button[0].click()
-        await page.waitForSelector('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart')
-        const added_via = await page.$$eval('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart', elements => elements.length);
-        expect(added_via).toBe(1)
+            await page.waitForTimeout(3000)
+            await page.waitForSelector('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected')
+            const sidebar_buttons = await page.$$('ul.MuiList-root.MuiList-padding > li')
+            await sidebar_buttons[0].click()
+            await page.waitForSelector(selectors.SEARCH_ICON)
+            await page.waitForSelector(selectors.SEARCH_BAR)
+            // previous Search is already in the search bar
+            // await page.click(selectors.SEARCH_BAR)
+            // await page.waitForTimeout(3000)
+            // await page.type(selectors.SEARCH_BAR, `${article_title}`)
+            await page.waitForSelector('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight')
+            await page.waitForTimeout(6000)
+            const searched_records_count = await page.$$eval('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight', elements => elements.length);
+            expect(searched_records_count).toBe(1)
 
-        //Add a Destination element
+            await page.waitForSelector(selectors.TABLE_ROW)
+            await page.click(selectors.TABLE_ROW)
 
-        await add_button[1].click()
-        await page.waitForSelector('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart')
-        const added_destination = await page.$$eval('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart', elements => elements.length);
-        expect(added_destination).toBe(added_via + 1)
-    })
+            await page.waitForSelector(selectors.SENTENCE_PAGE)
+            const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
+                return status.map(status => status.innerText)
+            })
+            expect(sentence_status).toContain("To Be Reviewed")
 
-    it('Add Origin', async () => {
-        console.log('Adding Origin ...')
-
-        //Origin 
-        await page.waitForSelector('form[class="origins"] > div > div  > div  > div  > div  > div  > div > span > div ')
-        await page.click('form[class="origins"] > div > div  > div  > div  > div  > div  > div > span > div ')
-        await page.waitForSelector('.MuiPopper-root')
-        await page.waitForSelector('div:has(> input[placeholder="Search for Origins"]')
-        await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
-        await page.waitForTimeout(3000)
-        const all_origins = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
-        expect(all_origins).toBeGreaterThan(1)
-        await page.click('div:has(> input[placeholder="Search for Origins"]')
-        await page.type('div:has(> input[placeholder="Search for Origins"]',path_builder_origin_)
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
-        await page.waitForTimeout(3000)
-        await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
-        const searched_origins = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
-        expect(searched_origins).toBe(1)
-        await page.waitForSelector('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
-        await page.click('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
-        await page.click('form[class="origins"] > div > div  > div  > div  > div  > div  > div > span > div ')
-        await page.waitForTimeout(3000)
-        const added_origin = await page.$$eval('form[class="origins"] > div > div  > div  > div  > div  > div  > div > span > div ', status => {
-            return status.map(status => status.innerText)
+            console.log('Record found')
         })
-        expect(added_origin).toContain(path_builder_origin_)
-        await page.waitForSelector('svg.MuiCircularProgress-svg', { timeout: 5000, hidden: false });
-        await page.waitForSelector('svg.MuiCircularProgress-svg', { hidden: true });
 
-        console.log('Origin added')
+        it('Set status as Compose Now', async () => {
+            console.log('Changing Status ...')
+            await page.click(selectors.STATUS_BUTTON)
+            await page.waitForTimeout(1000)
+
+            console.log('Status Changed')
+        })
     })
 
-    it('Add Vias', async () => {
+    describe('Statements List', () => {
 
-        console.log('Adding Vias ...')
-        await page.waitForTimeout(3000)
+        it('Search for the Knowledge Statement in the Statements List page', async () => {
+            console.log('Searching for the created Knowledge Statement ...')
+            await page.waitForTimeout(3000)
+            await page.waitForSelector('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiMenuItem-root.MuiMenuItem-gutters')
+            const sidebar_buttons = await page.$$('ul.MuiList-root.MuiList-padding > li')
+            await sidebar_buttons[1].click()
+            await page.waitForSelector(selectors.SEARCH_ICON)
+            await page.waitForSelector('div:has(> input[placeholder="Search for Knowledge Statements"]', { visible: true })
+            await page.click('div:has(> input[placeholder="Search for Knowledge Statements"]')
+            await page.waitForTimeout(3000)
+            await page.type('div:has(> input[placeholder="Search for Knowledge Statements"]', `${knowledge_statement_1}`)
+            await page.waitForSelector('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight')
+            await page.waitForTimeout(6000)
+            const searched_records_count = await page.$$eval('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight', elements => elements.length);
+            expect(searched_records_count).toBe(1)
 
-        //Vias
-        await page.waitForSelector('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div')
-        const added_via_from_field = await page.$$eval('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div', status => {
-            return status.map(status => status.innerText)
+            await page.waitForSelector(selectors.TABLE_ROW)
+            await page.click(selectors.TABLE_ROW)
+
+            await page.waitForSelector(selectors.SENTENCE_PAGE)
+            const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
+                return status.map(status => status.innerText)
+            })
+            expect(sentence_status).toContain("Compose Now")
+
+            console.log('Statement found')
         })
-        expect(added_via_from_field).toContain(path_builder_origin_)
 
-        await page.waitForSelector('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
-        await page.click('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
-        await page.waitForSelector('div:has(> input[placeholder="Search for vias"]')
-        await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
-        await page.waitForTimeout(3000)
-        const all_vias= await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
-        expect(all_vias).toBeGreaterThan(1)
-        await page.click('div:has(> input[placeholder="Search for vias"]')
-        await page.type('div:has(> input[placeholder="Search for vias"]',path_builder_via)
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
-        await page.waitForTimeout(3000)
-        await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
-        const searched_vias = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
-        expect(searched_vias).toBe(1)
-        await page.waitForSelector('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
-        await page.click('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
-        await page.click('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
-        await page.waitForTimeout(3000)
-        const added_via = await page.$$eval('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div', status => {
-            return status.map(status => status.innerText)
+        it('Distillation - add tags and notes', async () => {
+            console.log('Adding Tags and Notes ...')
+            // Tags
+            await page.waitForSelector(selectors.TAGS_FIELD, { visible: true })
+            await page.click(selectors.TAGS_FIELD)
+            // await page.type(selectors.TAGS_FIELD, tags)
+            await page.keyboard.press('ArrowDown');
+            await page.keyboard.press('Enter')
+            await page.waitForTimeout(3000)
+
+            // Notes
+            await page.click(selectors.NOTES_FIELD)
+            await page.type(selectors.NOTES_FIELD, note)
+            await page.waitForTimeout(3000)
+            await page.click(selectors.SEND_BUTTON)
+            await page.waitForTimeout(3000)
+
+            const history = await page.$$eval('h6.MuiTypography-root.MuiTypography-subtitle2', history => {
+                return history.map(history => history.innerText)
+            })
+            expect(history[0]).toContain(note)
+
+            console.log('Tags and Notes added')
         })
-        expect(added_via).toContain(path_builder_via)
 
-        console.log('Via added')
+        it('Set status as Connection Missing', async () => {
+            console.log('Changing Status ...')
+            await page.waitForSelector(selectors.STATUS_BUTTON)
+            await page.click(selectors.STATUS_BUTTON)
+            await page.waitForTimeout(1000)
+            const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
+                return status.map(status => status.innerText)
+            })
+            expect(sentence_status).toContain("Connection Missing")
+            console.log('Status Changed')
+        })
 
+        it('Set status as Curate', async () => {
+            console.log('Changing Status ...')
+            await page.waitForSelector(selectors.STATUS_BUTTON)
+            await page.click(selectors.STATUS_BUTTON)
+            await page.waitForTimeout(1000)
+            const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
+                return status.map(status => status.innerText)
+            })
+            expect(sentence_status).toContain("Curated")
+            console.log('Status Changed')
+        })
+
+        it('Add elements to path builder', async () => {
+
+            console.log('Adding elements to path builder ...')
+            await page.click('button[role="tab"][aria-selected="false"]')
+            await page.waitForTimeout(3000)
+
+            //Add a Via element
+            await page.waitForSelector('button.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium')
+            const add_button = await page.$$('button.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium')
+            await add_button[0].click()
+            await page.waitForSelector('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart')
+            const added_via = await page.$$eval('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart', elements => elements.length);
+            expect(added_via).toBe(1)
+
+            //Add a Destination element
+
+            await add_button[1].click()
+            await page.waitForSelector('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart')
+            const added_destination = await page.$$eval('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart', elements => elements.length);
+            expect(added_destination).toBe(added_via + 1)
+        })
+
+        it('Add Origin', async () => {
+            console.log('Adding Origin ...')
+
+            //Origin 
+            await page.waitForSelector('form[class="origins"] > div > div  > div  > div  > div  > div  > div > span > div ')
+            await page.click('form[class="origins"] > div > div  > div  > div  > div  > div  > div > span > div ')
+            await page.waitForSelector('.MuiPopper-root')
+            await page.waitForSelector('div:has(> input[placeholder="Search for Origins"]')
+            await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+            await page.waitForTimeout(3000)
+            const all_origins = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
+            expect(all_origins).toBeGreaterThan(1)
+            await page.click('div:has(> input[placeholder="Search for Origins"]')
+            await page.type('div:has(> input[placeholder="Search for Origins"]', path_builder_origin_)
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
+            await page.waitForTimeout(3000)
+            await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+            const searched_origins = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
+            expect(searched_origins).toBe(1)
+            await page.waitForSelector('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+            await page.click('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+            await page.click('form[class="origins"] > div > div  > div  > div  > div  > div  > div > span > div ')
+            await page.waitForTimeout(3000)
+            const added_origin = await page.$$eval('form[class="origins"] > div > div  > div  > div  > div  > div  > div > span > div ', status => {
+                return status.map(status => status.innerText)
+            })
+            expect(added_origin).toContain(path_builder_origin_)
+            await page.waitForSelector('svg.MuiCircularProgress-svg', { timeout: 5000, hidden: false });
+            await page.waitForSelector('svg.MuiCircularProgress-svg', { hidden: true });
+
+            console.log('Origin added')
+        })
+
+        it('Add Vias', async () => {
+
+            console.log('Adding Vias ...')
+            await page.waitForTimeout(3000)
+
+            //Vias
+            await page.waitForSelector('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div')
+            const added_via_from_field = await page.$$eval('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div', status => {
+                return status.map(status => status.innerText)
+            })
+            expect(added_via_from_field).toContain(path_builder_origin_)
+
+            await page.waitForSelector('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
+            await page.click('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
+            await page.waitForSelector('div:has(> input[placeholder="Search for vias"]')
+            await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+            await page.waitForTimeout(3000)
+            const all_vias = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
+            expect(all_vias).toBeGreaterThan(1)
+            await page.click('div:has(> input[placeholder="Search for vias"]')
+            await page.type('div:has(> input[placeholder="Search for vias"]', path_builder_via)
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
+            await page.waitForTimeout(3000)
+            await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+            const searched_vias = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
+            expect(searched_vias).toBe(1)
+            await page.waitForSelector('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+            await page.click('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+            await page.click('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
+            await page.waitForTimeout(3000)
+            const added_via = await page.$$eval('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div', status => {
+                return status.map(status => status.innerText)
+            })
+            expect(added_via).toContain(path_builder_via)
+
+            console.log('Via added')
+
+        })
+
+        it('Add Destination', async () => {
+
+            console.log('Adding Destination ...')
+            await page.waitForTimeout(3000)
+
+            //Destination
+            await page.waitForSelector('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div')
+            const added_destination_from_field = await page.$$eval('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div', status => {
+                return status.map(status => status.innerText)
+            })
+            expect(added_destination_from_field).toContain(path_builder_via)
+
+            await page.waitForSelector('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div')
+            await page.click('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div')
+            await page.waitForSelector('div:has(> input[placeholder="Search for Destinations"]')
+            await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+            await page.waitForTimeout(3000)
+            const all_destinations = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
+            expect(all_destinations).toBeGreaterThan(1)
+            await page.click('div:has(> input[placeholder="Search for Destinations"]')
+            await page.type('div:has(> input[placeholder="Search for Destinations"]', path_builder_destination)
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
+            await page.waitForTimeout(3000)
+            await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+            const searched_destination = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
+            expect(searched_destination).toBe(3)
+            await page.waitForSelector('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+            await page.click('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
+            await page.click('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div')
+            await page.waitForTimeout(3000)
+            const added_destination = await page.$$eval('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div', status => {
+                return status.map(status => status.innerText)
+            })
+            expect(added_destination).toContain(path_builder_destination)
+
+            console.log('Destination added')
+        })
+
+
+        it.skip('Check Statement Preview', async () => {
+            console.log('Checking Statement Preview ...')
+
+            await page.waitForSelector(selectors.STATEMENT_PREVIEW)
+            await page.waitForSelector(selectors.STATEMENT_PREVIEW_TITLE)
+            const journey = await page.$$eval('h5.MuiTypography-root.MuiTypography-h5 + p.MuiTypography-root.MuiTypography-body1', journey => {
+                return journey.map(journey => journey.innerText)
+            })
+            expect(journey).toContain(`${path_builder_origin_} to ${path_builder_destination} via ${path_builder_via}`)
+
+
+            console.log('Statement Preview correct')
+        })
+
+        it.skip('Check Population Diagram', async () => {
+            console.log('Checking Population Diagram ...')
+
+            await page.waitForSelector('div.node')
+            const nodes = await page.$$('div.node');
+            expect(nodes.length).toBe(3);
+
+            const nodesText = await page.$$eval('div.node', nodes => nodes.map(node => node.innerText));
+            expect(nodesText).toEqual([`${path_builder_origin_}`, `${path_builder_via}`, `${path_builder_destination}`]);
+
+            console.log('Population Diagram correct')
+        })
+
+        it.skip('Set status as To be Reviewed', async () => {
+            console.log('Changing Status ...')
+
+            await page.waitForSelector(selectors.STATUS_BUTTON)
+            await page.click(selectors.STATUS_BUTTON)
+            await page.waitForTimeout(1000)
+            const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
+                return status.map(status => status.innerText)
+            })
+            expect(sentence_status).toContain("To Be Reviewed")
+            console.log('Status Changed')
+        })
+
+        it.skip('Set status as NPO Approved', async () => {
+            console.log('Changing Status ...')
+
+            await page.waitForSelector(selectors.STATUS_BUTTON)
+            await page.click(selectors.STATUS_DROPDOWN)
+            await page.waitForSelector('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiMenuItem-root.MuiMenuItem-gutters')
+            await page.evaluate(() => {
+                [...document.querySelectorAll('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiMenuItem-root.MuiMenuItem-gutters')].find(element => element.innerText === 'NPO approved').click();
+            });
+
+            await page.click(selectors.STATUS_BUTTON)
+            await page.waitForTimeout(1000)
+            const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
+                return status.map(status => status.innerText)
+            })
+            expect(sentence_status).toContain("Npo Approved")
+            console.log('Status Changed')
+        })
     })
 
-    it('Add Destination', async () => {
+    describe('Logout Flow', () => {
 
-        console.log('Adding Destination ...')
-        await page.waitForTimeout(3000)
+        it('Logout', async () => {
+            console.log('Logging out ...')
 
-        //Destination
-        await page.waitForSelector('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div')
-        const added_destination_from_field = await page.$$eval('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div', status => {
-            return status.map(status => status.innerText)
+            await page.waitForSelector(selectors.LOGOUT)
+            await page.click(selectors.LOGOUT)
+            await page.waitForSelector(selectors.LOGIN_PAGE, { timeout: 60000 })
+            expect(page.url()).toContain('orcid.org/signin')
+            console.log('User logged out')
         })
-        expect(added_destination_from_field).toContain(path_builder_via)
-
-        await page.waitForSelector('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div')
-        await page.click('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div')
-        await page.waitForSelector('div:has(> input[placeholder="Search for Destinations"]')
-        await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
-        await page.waitForTimeout(3000)
-        const all_destinations= await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
-        expect(all_destinations).toBeGreaterThan(1)
-        await page.click('div:has(> input[placeholder="Search for Destinations"]')
-        await page.type('div:has(> input[placeholder="Search for Destinations"]',path_builder_destination)
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-        await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
-        await page.waitForTimeout(3000)
-        await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
-        const searched_destination = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
-        expect(searched_destination).toBe(3)
-        await page.waitForSelector('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
-        await page.click('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
-        await page.click('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div')
-        await page.waitForTimeout(3000)
-        const added_destination = await page.$$eval('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div', status => {
-            return status.map(status => status.innerText)
-        })
-        expect(added_destination).toContain(path_builder_destination)
-
-        console.log('Destination added')
     })
-
-
-    it.skip('Check Values and Statement Preview', async () => {
-        console.log('Checking Values and Statement Preview ...')
-        
-        //Check Statement Preview 
-        await page.waitForSelector(selectors.STATEMENT_PREVIEW)
-        await page.waitForSelector(selectors.STATEMENT_PREVIEW_TITLE)
-        const journey = await page.$$eval('h5.MuiTypography-root.MuiTypography-h5 + p.MuiTypography-root.MuiTypography-body1', journey => {
-            return journey.map(journey => journey.innerText)
-        })
-        expect(journey).toContain(`${path_builder_origin_} to ${path_builder_destination} via ${path_builder_via}`)
-
-        //Check values
-        await page.waitForSelector(`input[value= "${path_builder_origin_}"]`)
-        await page.waitForSelector(`input[value= "${path_builder_via}"]`)
-        await page.waitForSelector(`input[value= "${path_builder_axon}"]`)
-        await page.waitForSelector(`input[value= "${path_builder_axon_terminal}"]`)
-        await page.waitForSelector(`input[value= "${path_builder_destination}"]`)
-
-        console.log('Values and Statement Preview correct')
-    })
-
-    it.skip('Set status as To be Reviewed', async () => {
-        console.log('Changing Status ...')
-        
-        await page.waitForSelector(selectors.STATUS_BUTTON)
-        await page.click(selectors.STATUS_BUTTON)
-        await page.waitForTimeout(1000)
-        const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
-            return status.map(status => status.innerText)
-        })
-        expect(sentence_status).toContain("To Be Reviewed")
-        console.log('Status Changed')
-    })
-
-    it.skip('Set status as NPO Approved', async () => {
-        console.log('Changing Status ...')
-        
-        await page.waitForSelector(selectors.STATUS_BUTTON)
-        await page.click(selectors.STATUS_DROPDOWN)
-        await page.waitForSelector('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiMenuItem-root.MuiMenuItem-gutters')
-        await page.evaluate(() => {
-            [...document.querySelectorAll('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiMenuItem-root.MuiMenuItem-gutters')].find(element => element.innerText === 'NPO approved').click();
-        });
-
-        await page.click(selectors.STATUS_BUTTON)
-        await page.waitForTimeout(1000)
-        const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
-            return status.map(status => status.innerText)
-        })
-        expect(sentence_status).toContain("Npo Approved")
-        console.log('Status Changed')
-    })
-
-
-    it('Logout', async () => {
-        console.log('Logging out ...')
-        
-        await page.waitForSelector(selectors.LOGOUT)
-        await page.click(selectors.LOGOUT)
-        await page.waitForSelector(selectors.LOGIN_PAGE, { timeout: 60000 })
-        expect(page.url()).toContain('orcid.org/signin')
-        console.log('User logged out')
-    })
-
 
 })
