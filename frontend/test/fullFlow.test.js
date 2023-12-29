@@ -592,11 +592,16 @@ describe('End to End Tests', () => {
             await page.waitForSelector(selectors.STATUS_BUTTON)
             await page.click(selectors.STATUS_BUTTON)
             await page.waitForTimeout(2000)
-            await page.waitForSelector('span.MuiChip-label.MuiChip-labelSmall')
+            await page.waitForFunction((selector, expectedText) => {
+                const elements = document.querySelectorAll(selector);
+                return Array.from(elements, element => element.innerText).includes(expectedText);
+            }, {timeout: 15000}, 'span.MuiChip-label.MuiChip-labelSmall', "To Be Reviewed");
+            
             const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
-                return status.map(status => status.innerText)
-            })
-            expect(sentence_status).toContain("To Be Reviewed")
+                return status.map(status => status.innerText);
+            });
+            
+            expect(sentence_status).toContain("To Be Reviewed");
             console.log('Status Changed')
         })
 
@@ -612,10 +617,16 @@ describe('End to End Tests', () => {
 
             await page.click(selectors.STATUS_BUTTON)
             await page.waitForTimeout(2000)
+            await page.waitForFunction((selector, expectedText) => {
+                const elements = document.querySelectorAll(selector);
+                return Array.from(elements, element => element.innerText).includes(expectedText);
+            }, {timeout: 15000}, 'span.MuiChip-label.MuiChip-labelSmall', "Npo Approved");
+            
             const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
-                return status.map(status => status.innerText)
-            })
-            expect(sentence_status).toContain("Npo Approved")
+                return status.map(status => status.innerText);
+            });
+            
+            expect(sentence_status).toContain("Npo Approved");
             console.log('Status Changed')
         })
     })
