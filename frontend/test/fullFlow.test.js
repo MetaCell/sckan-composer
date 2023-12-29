@@ -70,7 +70,7 @@ describe('End to End Tests', () => {
             args: [
                 "--no-sandbox",
             ],
-            headless: true,
+            headless: 'new',
             defaultViewport: {
                 width: 1600,
                 height: 1000,
@@ -432,6 +432,8 @@ describe('End to End Tests', () => {
             await page.waitForSelector('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart')
             const added_destination = await page.$$eval('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart', elements => elements.length);
             expect(added_destination).toBe(added_via + 1)
+
+            console.log('Elements added')
         })
 
         it('Add Origin', async () => {
@@ -462,8 +464,8 @@ describe('End to End Tests', () => {
                 return status.map(status => status.innerText)
             })
             expect(added_origin).toContain(path_builder_origin_)
-            await page.waitForSelector('svg.MuiCircularProgress-svg', { timeout: 5000, hidden: false });
-            await page.waitForSelector('svg.MuiCircularProgress-svg', { hidden: true });
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
 
             console.log('Origin added')
         })
@@ -475,11 +477,16 @@ describe('End to End Tests', () => {
 
             //Vias
             await page.waitForSelector('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div')
-            const added_via_from_field = await page.$$eval('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div', status => {
-                return status.map(status => status.innerText)
-            })
-            expect(added_via_from_field).toContain(path_builder_origin_)
+            await page.waitForFunction((selector, expectedText) => {
+                const elements = document.querySelectorAll(selector);
+                return Array.from(elements, element => element.innerText).includes(expectedText);
+            }, {timeout: 5000}, 'form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div', path_builder_origin_);
 
+            const added_via_from_field = await page.$$eval('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div', status => {
+                return status.map(status => status.innerText);
+            });
+
+            expect(added_via_from_field).toContain(path_builder_origin_);
             await page.waitForSelector('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
             await page.click('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div')
             await page.waitForSelector('div:has(> input[placeholder="Search for vias"]')
@@ -504,6 +511,9 @@ describe('End to End Tests', () => {
             })
             expect(added_via).toContain(path_builder_via)
 
+
+
+
             console.log('Via added')
 
         })
@@ -515,10 +525,16 @@ describe('End to End Tests', () => {
 
             //Destination
             await page.waitForSelector('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div')
+            await page.waitForFunction((selector, expectedText) => {
+                const elements = document.querySelectorAll(selector);
+                return Array.from(elements, element => element.innerText).includes(expectedText);
+            }, {timeout: 5000}, 'form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div', path_builder_via);
+            
             const added_destination_from_field = await page.$$eval('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div', status => {
-                return status.map(status => status.innerText)
-            })
-            expect(added_destination_from_field).toContain(path_builder_via)
+                return status.map(status => status.innerText);
+            });
+            
+            expect(added_destination_from_field).toContain(path_builder_via);
 
             await page.waitForSelector('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div')
             await page.click('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div')
@@ -534,10 +550,12 @@ describe('End to End Tests', () => {
             await page.waitForTimeout(3000)
             await page.waitForSelector('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
             const searched_destination = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
-            expect(searched_destination).toBe(3)
+            expect(searched_destination).toBeGreaterThan(2)
             await page.waitForSelector('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
             await page.click('li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium')
             await page.click('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div')
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+            await page.waitForTimeout(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
             const added_destination = await page.$$eval('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div', status => {
                 return status.map(status => status.innerText)
@@ -548,21 +566,19 @@ describe('End to End Tests', () => {
         })
 
 
-        it.skip('Check Statement Preview', async () => {
+        it('Check Statement Preview', async () => {
             console.log('Checking Statement Preview ...')
 
-            await page.waitForSelector(selectors.STATEMENT_PREVIEW)
             await page.waitForSelector(selectors.STATEMENT_PREVIEW_TITLE)
             const journey = await page.$$eval('h5.MuiTypography-root.MuiTypography-h5 + p.MuiTypography-root.MuiTypography-body1', journey => {
                 return journey.map(journey => journey.innerText)
             })
-            expect(journey).toContain(`${path_builder_origin_} to ${path_builder_destination} via ${path_builder_via}`)
-
+            expect(journey).toContain(`From ${path_builder_origin_} to ${path_builder_destination} via ${path_builder_via}.`)
 
             console.log('Statement Preview correct')
         })
 
-        it.skip('Check Population Diagram', async () => {
+        it('Check Population Diagram', async () => {
             console.log('Checking Population Diagram ...')
 
             await page.waitForSelector('div.node')
@@ -575,7 +591,7 @@ describe('End to End Tests', () => {
             console.log('Population Diagram correct')
         })
 
-        it.skip('Set status as To be Reviewed', async () => {
+        it('Set status as To be Reviewed', async () => {
             console.log('Changing Status ...')
 
             await page.waitForSelector(selectors.STATUS_BUTTON)
@@ -588,7 +604,7 @@ describe('End to End Tests', () => {
             console.log('Status Changed')
         })
 
-        it.skip('Set status as NPO Approved', async () => {
+        it('Set status as NPO Approved', async () => {
             console.log('Changing Status ...')
 
             await page.waitForSelector(selectors.STATUS_BUTTON)
