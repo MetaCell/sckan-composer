@@ -591,7 +591,7 @@ describe('End to End Tests', () => {
 
             await page.waitForSelector(selectors.STATUS_BUTTON)
             await page.click(selectors.STATUS_BUTTON)
-            await page.waitForTimeout(1000)
+            await page.waitForTimeout(2000)
             await page.waitForSelector('span.MuiChip-label.MuiChip-labelSmall')
             const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
                 return status.map(status => status.innerText)
@@ -611,7 +611,7 @@ describe('End to End Tests', () => {
             });
 
             await page.click(selectors.STATUS_BUTTON)
-            await page.waitForTimeout(1000)
+            await page.waitForTimeout(2000)
             const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
                 return status.map(status => status.innerText)
             })
