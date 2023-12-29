@@ -28,7 +28,6 @@ export const ADDITIONAL_INFORMATION ='div:has(> textarea[placeholder="Enter addi
 export const PROGRESS_LOADER = 'span[role="progressbar"]'
 export const STATUS_BUTTON = 'div.MuiButtonGroup-root.MuiButtonGroup-contained'
 export const PROOFING_TAB= 'button[role="tab"][aria-selected="false"]'
-export const ORIGIN_FIELD= 'div:has(> input[placeholder="Select Origin"]'
 export const NOT_SPECIFIED_BUTTON= 'div.MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl:has(> div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input'
 export const ADD_VIA = 'button.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium'
 export const VIA_FIELD= 'div:has(> input[placeholder="Select Via"]'
@@ -42,3 +41,16 @@ export const SEND_BUTTON = 'button[label= "Send"]'
 export const STATUS_DROPDOWN = 'button[aria-label="select merge strategy"]'
 export const COOKIE_MODAL = "#onetrust-policy-title"
 export const ACCEPT_COOKIES = "#onetrust-accept-btn-handler"
+export const SEARCH_FOR_KS = 'div:has(> input[placeholder="Search for Knowledge Statements"]';
+export const ADD_BUTTON_PATH_BUILDER = 'button.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium';
+export const ADDED_ELEMENT = 'div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart';
+export const ORIGIN_FIELD = 'form[class="origins"] > div > div  > div  > div  > div  > div  > div > span > div ';
+export const SEARCH_ORIGINS = 'div:has(> input[placeholder="Search for Origins"]';
+export const CHECKBOX_ITEM = '.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium';
+export const FIRST_SEARCHED_ELEMENT = 'li:has(> .MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium';
+export const VIAS_FROM_FIELD = 'form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div';
+export const VIAS_FIELD = 'form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div';
+export const SEARCH_FOR_VIAS = 'div:has(> input[placeholder="Search for vias"]';
+export const DESTINATION_FROM_FIELD = 'form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div';
+export const FROM_FIELD = 'form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div';
+export const SEARCH_FOR_DESTINATIONS = 'div:has(> input[placeholder="Search for Destinations"]';
