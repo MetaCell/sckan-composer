@@ -240,7 +240,10 @@ def add_vias(connectivity_statement, statement):
         Via(connectivity_statement=connectivity_statement, type=via[TYPE], order=index)
         for index, via in enumerate(statement[VIAS])
     ]
+    # Crate vias
     created_vias = Via.objects.bulk_create(vias_data)
+
+    # Add anatomical entities to vias
     for via_instance, via_data in zip(created_vias, statement[VIAS]):
         anatomical_entities = AnatomicalEntity.objects.filter(
             ontology_uri__in=via_data[ENTITY_URI]
@@ -249,15 +252,18 @@ def add_vias(connectivity_statement, statement):
 
 
 def add_destinations(connectivity_statement, statement):
-    for dest in statement[DESTINATION]:
-        destination_entity = AnatomicalEntity.objects.filter(ontology_uri=dest[ENTITY_URI]).first()
+    destinations_data = [
+        Destination(connectivity_statement=connectivity_statement, type=dest.get(TYPE, DestinationType.UNKNOWN))
+        for dest in statement[DESTINATION]
+    ]
 
+    # Create destinations
+    created_destinations = Destination.objects.bulk_create(destinations_data)
+
+    # Add anatomical entities to destinations
+    for destination_instance, dest_data in zip(created_destinations, statement[DESTINATION]):
+        destination_entity = AnatomicalEntity.objects.filter(ontology_uri=dest_data[ENTITY_URI]).first()
         if destination_entity:
-            destination_type = dest.get(TYPE, DestinationType.UNKNOWN)
-            destination_instance, _ = Destination.objects.create(
-                connectivity_statement=connectivity_statement,
-                type=destination_type
-            )
             destination_instance.anatomical_entities.add(destination_entity)
 
 
