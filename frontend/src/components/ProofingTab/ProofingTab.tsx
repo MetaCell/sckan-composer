@@ -75,9 +75,17 @@ const ProofingTab = (props: any) => {
                 </Box>
                 <Stack spacing={2}>
                   <Typography variant="h5">Journey</Typography>
-                    {statement.journey.map((journeyStep: string, index: number) => (
-                      <Typography key={index}>{journeyStep}</Typography>
-                    ))}
+                    {statement.journey.map((journeyStep: string, index: number) => {
+                      if (index === 0) {
+                          return <>{journeyStep.charAt(0).toUpperCase() + journeyStep.slice(1)}, </>;
+                      } else {
+                        if (index === statement.journey.length - 1) {
+                          return <>{journeyStep}.</>;
+                        } else {
+                          return <>{journeyStep}, </>;
+                        }
+                      }
+                    })}
                 </Stack>
               </>
             )}
