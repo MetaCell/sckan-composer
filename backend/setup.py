@@ -5,7 +5,7 @@ import sys
 from setuptools import find_packages, setup
 
 NAME = "SCKAN Composer"
-VERSION = "2.0.1"
+VERSION = "2.1.0"
 
 # To install the library, run the following
 #
