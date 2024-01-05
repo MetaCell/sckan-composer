@@ -116,6 +116,7 @@ class ConnectivityStatementAdmin(
     fsm_field = ("state",)
     readonly_fields = ("state",)
     autocomplete_fields = ("sentence", "origins")
+    date_hierarchy = "modified_date"
     list_display = (
         "sentence",
         "pmid",
