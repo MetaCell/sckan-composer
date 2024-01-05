@@ -14,7 +14,7 @@ from ...enums import (
 from ..state_services import SentenceService, ConnectivityStatementService
 
 ID = "id"
-ORIGIN = "origin"
+ORIGINS = "origins"
 DESTINATION = "dest"
 VIAS = "path"
 LABEL = "label"
@@ -49,8 +49,8 @@ def not_found_entity(entity):
 def has_invalid_entities(statement):
     invalid_entities = [
     ]
-    if has_prop(statement[ORIGIN]) and not_found_entity(statement[ORIGIN][0]):
-        invalid_entities.append({"entity": statement[ORIGIN][0], "prop": ORIGIN})
+    if has_prop(statement[ORIGINS]) and not_found_entity(statement[ORIGINS][0]):
+        invalid_entities.append({"entity": statement[ORIGINS][0], "prop": ORIGINS})
     if has_prop(statement[DESTINATION]) and not_found_entity(statement[DESTINATION][0][ENTITY_URI]):
         invalid_entities.append({"entity": statement[DESTINATION][0][ENTITY_URI], "prop": DESTINATION})
     if has_prop(statement[VIAS]):
@@ -112,7 +112,7 @@ def get_first_phenotype(statement):
 def validate_statements(statement_list):
     valid_statements = []
     for statement in statement_list:
-        # skip statements with entities not found in db (log the ones skipped)
+        #skip statements with entities not found in db (log the ones skipped)
         if has_invalid_entities(statement):
             continue
         # skip statements with sex not found in db
@@ -141,7 +141,7 @@ def get_or_create_sentence(statement):
     if created:
         logging.info(f"Sentence for neuron {statement[LABEL]} created.")
         sentence.save()
-    return sentence
+    return sentence, created
 
 
 def has_prop(prop):
@@ -174,42 +174,43 @@ def ingest_statements():
 
     valid_statements = validate_statements(statements_list)
     for statement in valid_statements:
-        # create an artifact sentence to relate to the statements
-        sentence = get_or_create_sentence(statement)
-        connectivity_statement, skip_update = get_or_create_connectivity_statement(statement, sentence)
-        # add the many-to-many fields:  species, provenances, notes, origins, vias, destinations
-        if not skip_update:
-            update_many_to_many_fields(connectivity_statement, statement)
+        # get or create an artifact sentence to relate to the statements
+        sentence, sentence_created = get_or_create_sentence(statement)
+        if sentence_created:
+            transition_sentence_to_compose_now(sentence)
+
+        # get or create statement
+        connectivity_statement, created = get_or_create_connectivity_statement(statement, sentence)
+
+        if created:
+            transition_statement_to_exported(connectivity_statement)
+        else:
+            if should_overwrite(connectivity_statement, statement):
+                defaults = generate_connectivity_statement_defaults(statement, sentence)
+                ConnectivityStatement.objects.filter(id=connectivity_statement.id).update(**defaults)
+                update_many_to_many_fields(connectivity_statement, statement)
+                Note.objects.create(connectivity_statement=connectivity_statement,
+                                    user=User.objects.get(username="system"),
+                                    type=NoteType.ALERT,
+                                    note=f"Overwritten by manual ingestion in {NOW}")
 
 
-def update_many_to_many_fields(connectivity_statement, statement):
-    # Clear existing many-to-many relations
-    connectivity_statement.origins.clear()
-    connectivity_statement.destinations.clear()
-    connectivity_statement.vias.clear()
-    connectivity_statement.species.clear()
-    connectivity_statement.provenances.clear()
-    # Notes are kept
+def should_overwrite(connectivity_statement, statement):
+    if connectivity_statement.destinations.count() > 1:
+        logging.warning(f'Skip statement {statement[LABEL]} due to:'
+                        f' statement already found and has multiple destinations')
+        return False
 
-    # Add new many-to-many relations
-    add_origins(connectivity_statement, statement)
-    add_vias(connectivity_statement, statement)
-    add_destinations(connectivity_statement, statement)
-    add_species(connectivity_statement, statement)
-    add_provenances(connectivity_statement, statement)
-    add_notes(connectivity_statement, statement)
+    if connectivity_statement != CSState.EXPORTED:
+        logging.warning(f'Skip statement {statement[LABEL]} due to:'
+                        f' statement already found and is not in {CSState.EXPORTED} state')
+        return False
+
+    return True
 
 
-def get_or_create_connectivity_statement(statement, sentence):
-    reference_uri = statement[ID]
-    existing_cs = ConnectivityStatement.objects.filter(reference_uri__exact=reference_uri).first()
-
-    # If CS exists and is in 'compose now' state, skip
-    if existing_cs and existing_cs.state == CSState.COMPOSE_NOW:
-        return existing_cs, True
-
-    # Update or create ConnectivityStatement
-    defaults = {
+def generate_connectivity_statement_defaults(statement, sentence):
+    return {
         "sentence": sentence,
         "knowledge_statement": statement[LABEL],
         "circuit_type": CIRCUIT_TYPE_MAPPING.get(statement.get(CIRCUIT_TYPE, [""])[0], CircuitType.UNKNOWN),
@@ -221,17 +222,42 @@ def get_or_create_connectivity_statement(statement, sentence):
         "projection_phenotype": get_projetion_phenotype(statement)
     }
 
-    connectivity_statement = ConnectivityStatement.objects.update_or_create(
+
+def get_or_create_connectivity_statement(statement, sentence):
+    reference_uri = statement[ID]
+    defaults = generate_connectivity_statement_defaults(statement, sentence)
+    connectivity_statement, created = ConnectivityStatement.objects.get_or_create(
         reference_uri__exact=reference_uri,
         defaults=defaults
     )
+    if created:
+        update_many_to_many_fields(connectivity_statement, statement)
 
-    return connectivity_statement, False
+    return connectivity_statement, created
+
+
+def update_many_to_many_fields(connectivity_statement, statement):
+    # Clear existing many-to-many relations
+    connectivity_statement.origins.clear()
+    connectivity_statement.destinations.clear()
+    connectivity_statement.vias.clear()
+    connectivity_statement.species.clear()
+    connectivity_statement.provenances.clear()
+    # Notes should be kept
+
+    # Add new many-to-many relations
+    add_origins(connectivity_statement, statement)
+    add_vias(connectivity_statement, statement)
+    add_destinations(connectivity_statement, statement)
+    add_species(connectivity_statement, statement)
+    add_provenances(connectivity_statement, statement)
+    add_notes(connectivity_statement, statement)
+    # todo:address forward connection
 
 
 def add_origins(connectivity_statement, statement):
     origins = [origin for origin in (get_value_or_none(AnatomicalEntity, o)
-                                     for o in statement[ORIGIN]) if origin]
+                                     for o in statement[ORIGINS]) if origin]
     connectivity_statement.origins.add(*origins)
 
 
@@ -268,8 +294,6 @@ def add_destinations(connectivity_statement, statement):
 
 
 def add_notes(connectivity_statement, statement):
-    # only 5 statements have a note_alert but they were all filtered out
-    # since at least one of their anatomical entities was not found in composer db
     if has_prop(statement[NOTE_ALERT]):
         Note.objects.create(connectivity_statement=connectivity_statement,
                             user=User.objects.get(username="system"), type=NoteType.ALERT,
@@ -289,29 +313,26 @@ def add_species(connectivity_statement, statement):
     connectivity_statement.species.add(*species)
 
 
-def do_state_transitions(sentence: Sentence, connectivity_statement: ConnectivityStatement):
+def transition_sentence_to_compose_now(sentence: Sentence):
     system_user = User.objects.get(username="system")
-    transition_sentence_to_compose_now(sentence, system_user)
-    transition_statement_to_exported(connectivity_statement, system_user)
-
-
-def transition_sentence_to_compose_now(sentence: Sentence, user: User):
     available_transitions = [
         available_state.target
         for available_state in sentence.get_available_user_state_transitions(
-            user
+            system_user
         )
     ]
     if SentenceState.COMPOSE_NOW in available_transitions:
         # we need to update the state to compose_now when the system user has the permission to do so
         sentence = SentenceService(sentence).do_transition(
-            SentenceState.COMPOSE_NOW, user
+            SentenceState.COMPOSE_NOW, system_user
         )
         sentence.save()
     return sentence
 
 
-def transition_statement_to_exported(connectivity_statement: ConnectivityStatement, system_user: User):
+def transition_statement_to_exported(connectivity_statement: ConnectivityStatement):
+    system_user = User.objects.get(username="system")
+
     available_transitions = [
         available_state.target
         for available_state in connectivity_statement.get_available_user_state_transitions(
