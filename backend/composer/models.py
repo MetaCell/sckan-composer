@@ -413,7 +413,7 @@ class ConnectivityStatement(models.Model):
     )
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
     additional_information = models.TextField(null=True, blank=True)
-    reference_uri = models.URLField(null=True, blank=True)
+    reference_uri = models.URLField(null=True, blank=True, unique=True)
     functional_circuit_role = models.ForeignKey(
         FunctionalCircuitRole,
         on_delete=models.DO_NOTHING,
