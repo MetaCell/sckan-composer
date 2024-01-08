@@ -74,8 +74,6 @@ const styles = {
       right: "0.0625rem",
       top: "0.0625rem",
       pointerEvents: "none",
-      background:
-        "linear-gradient(270deg, #FFF 67.69%, rgba(255, 255, 255, 0.00) 116.94%)",
       borderRadius: "0 0.5rem 0.5rem 0",
     },
   },
@@ -233,7 +231,7 @@ export default function CustomEntitiesDropdown({
   const [allOptions, setAllOptions] = useState<Option[]>([]);
 
   const [hasValueChanged, setHasValueChanged] = useState(false);
-
+  
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setIsDropdownOpened(true);
     setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -383,7 +381,7 @@ export default function CustomEntitiesDropdown({
       document.removeEventListener("mousedown", closePopperOnClickOutside);
     };
   }, [hasValueChanged]);
-
+  
   return isFormDisabled() ? (
     <Box
       sx={{ background: theme.palette.grey[100], borderRadius: 1 }}
@@ -432,7 +430,12 @@ export default function CustomEntitiesDropdown({
                               <CustomInputChip sx={styles.chip} entity={item} />
                             ) : (
                               <Chip
-                                sx={{ ...styles.chip }}
+                                sx={{
+                                  ...styles.chip,
+                                  flex: 1,
+                                  minWidth: 0,
+                                  maxWidth: 'auto',
+                                }}
                                 variant={"outlined"}
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -449,8 +452,8 @@ export default function CustomEntitiesDropdown({
                         );
                       })
                   : null}
-                {selectedOptions.length > chipsNumber &&
-                  `+${selectedOptions.length - chipsNumber}`}
+                <span style={{marginRight: '.5rem'}}>{selectedOptions.length > chipsNumber &&
+                  `+${selectedOptions.length - chipsNumber}`}</span>
               </Box>
             )}
             {open ? (
