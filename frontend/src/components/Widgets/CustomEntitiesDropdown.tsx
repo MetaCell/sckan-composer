@@ -256,34 +256,41 @@ export default function CustomEntitiesDropdown({
     {},
   );
 
-  const handleSelectAll = (group: string) => {
+  const handleSelectDeselectGroup = (group: string) => {
     const newSelectedOptions = [...selectedOptions];
-    autocompleteOptions
-      .filter((option: Option) => option.group === group)
-      .forEach((item) => {
-        if (
-          !newSelectedOptions.some(
-            (selectedItem) => selectedItem.id === item.id,
-          )
-        ) {
-          newSelectedOptions.push(item);
+    const groupOptions = autocompleteOptions.filter((option: Option) => option.group === group);
+    
+    // Check if all options in this group are already selected
+    const allSelectedInGroup = groupOptions.every(
+      (groupOption) => newSelectedOptions.some((selectedOption) => selectedOption.id === groupOption.id)
+    );
+    
+    if (allSelectedInGroup) {
+      // Deselect all options in this group
+      groupOptions.forEach((option) => {
+        const index = newSelectedOptions.findIndex((selected) => selected.id === option.id);
+        if (index !== -1) {
+          newSelectedOptions.splice(index, 1);
         }
       });
+    } else {
+      // Select all options in this group
+      groupOptions.forEach((option) => {
+        if (!newSelectedOptions.some((selected) => selected.id === option.id)) {
+          newSelectedOptions.push(option);
+        }
+      });
+    }
+    
     handleSelectedOptionsChange(newSelectedOptions);
   };
-
-  const handleDeselectAll = (group: string) => {
-    const newSelectedOptions = selectedOptions.filter(
-      (item) =>
-        !autocompleteOptions
-          .filter((option: Option) => option.group === group)
-          .some((selectedItem) => selectedItem.id === item.id),
-    );
-    handleSelectedOptionsChange(newSelectedOptions);
-  };
-
+  
   const getGroupButton = (group: string) => {
-    const allObjectsExist = selectedOptions.length === allOptions.length;
+    const groupOptions = autocompleteOptions.filter((option: Option) => option.group === group);
+    const allSelectedInGroup = groupOptions.every(
+      (groupOption) => selectedOptions.some((selectedOption) => selectedOption.id === groupOption.id)
+    );
+    
     return (
       <Button
         variant="text"
@@ -293,11 +300,9 @@ export default function CustomEntitiesDropdown({
           fontWeight: 600,
           lineHeight: "1.125rem",
         }}
-        onClick={() =>
-          allObjectsExist ? handleDeselectAll(group) : handleSelectAll(group)
-        }
+        onClick={() => handleSelectDeselectGroup(group)}
       >
-        {allObjectsExist ? `Deselect` : `Select`} All
+        {allSelectedInGroup ? `Deselect all` : `Select all`}
       </Button>
     );
   };
