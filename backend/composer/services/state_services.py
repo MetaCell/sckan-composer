@@ -141,9 +141,9 @@ class ConnectivityStatementService(StateServiceMixin):
             via_names = ' via '.join([node for node, layer in path if 0 < layer < len(vias) + 1])
 
             if via_names:
-                sentence = f"From  {origin_names}  to  {destination_names}  via  {via_names}."
+                sentence = f"from {origin_names} to {destination_names} via {via_names}"
             else:
-                sentence = f"From {origin_names}  to  {destination_names}."
+                sentence = f"from {origin_names} to {destination_names}"
 
             journey_descriptions.append(sentence)
 

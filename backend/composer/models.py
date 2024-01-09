@@ -525,7 +525,7 @@ class ConnectivityStatement(models.Model):
         laterality_map = {
             Laterality.RIGHT.value: "on the right side of the body",
             Laterality.LEFT.value: "on the left side of the body",
-            Laterality.UNKNOWN.value: "at an unknown location",
+            Laterality.UNKNOWN.value: "at an unknown location of the body",
         }
         return laterality_map.get(self.laterality, "at an unknown location")
 
