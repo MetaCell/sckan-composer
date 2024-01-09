@@ -6,12 +6,8 @@ from .neurondm_script import main as get_statements_from_neurondm
 from ...enums import (
     CircuitType,
     NoteType,
-    DestinationType,
-    SentenceState,
-    CSState
+    CSState, SentenceState
 )
-
-from ..state_services import SentenceService, ConnectivityStatementService
 
 ID = "id"
 ORIGINS = "origins"
@@ -46,14 +42,10 @@ def ingest_statements():
     valid_statements = validate_statements(statements_list)
     for statement in valid_statements:
         sentence, sentence_created = get_or_create_sentence(statement)
-        if sentence_created:
-            transition_sentence_to_compose_now(sentence)
 
         connectivity_statement, statement_created = get_or_create_connectivity_statement(statement, sentence)
 
-        if statement_created:
-            transition_statement_to_exported(connectivity_statement)
-        else:
+        if not statement_created:
             if should_overwrite(connectivity_statement, statement):
                 defaults = generate_connectivity_statement_defaults(statement, sentence)
                 ConnectivityStatement.objects.filter(id=connectivity_statement.id).update(**defaults)
@@ -146,7 +138,8 @@ def get_or_create_sentence(statement):
                   "text": text,
                   "doi": statement[ID],
                   "external_ref": statement[SENTENCE_NUMBER][0] if has_sentence_reference else None,
-                  "batch_name": f"neurondm-{NOW}" if has_sentence_reference else None
+                  "batch_name": f"neurondm-{NOW}" if has_sentence_reference else None,
+                  "state": SentenceState.COMPOSE_NOW
                   },
     )
     if created:
@@ -190,7 +183,8 @@ def generate_connectivity_statement_defaults(statement, sentence):
         "circuit_type": get_circuit_type(statement),
         "functional_circuit_role": get_functional_circuit_role(statement),
         "phenotype": get_phenotype(statement),
-        "projection_phenotype": get_projection_phenotype(statement)
+        "projection_phenotype": get_projection_phenotype(statement),
+        "state": CSState.EXPORTED  # TODO: Confirm if this is fine
     }
 
 
@@ -260,7 +254,6 @@ def update_many_to_many_fields(connectivity_statement, statement):
     # Notes are not cleared because they should be kept
 
     for provenance in connectivity_statement.provenance_set.all():
-        # TODO: Confirm if we should delete or disassociate
         provenance.delete()
 
     for destination in connectivity_statement.destinations.all():
@@ -348,40 +341,6 @@ def add_ingestion_system_note(connectivity_statement):
                         user=User.objects.get(username="system"),
                         type=NoteType.ALERT,
                         note=f"Overwritten by manual ingestion in {NOW}")
-
-
-def transition_sentence_to_compose_now(sentence: Sentence):
-    system_user = User.objects.get(username="system")
-    available_transitions = [
-        available_state.target
-        for available_state in sentence.get_available_user_state_transitions(
-            system_user
-        )
-    ]
-    if SentenceState.COMPOSE_NOW in available_transitions:
-        # we need to update the state to compose_now when the system user has the permission to do so
-        sentence = SentenceService(sentence).do_transition(
-            SentenceState.COMPOSE_NOW, system_user
-        )
-        sentence.save()
-    return sentence
-
-
-def transition_statement_to_exported(connectivity_statement: ConnectivityStatement):
-    system_user = User.objects.get(username="system")
-
-    available_transitions = [
-        available_state.target
-        for available_state in connectivity_statement.get_available_user_state_transitions(
-            system_user
-        )
-    ]
-    # we need to update the statement state to exported
-    if CSState.EXPORTED in available_transitions:
-        cs = ConnectivityStatementService(connectivity_statement).do_transition(
-            CSState.EXPORTED, system_user
-        )
-        cs.save()
 
 
 def get_value_or_none(model, prop):
