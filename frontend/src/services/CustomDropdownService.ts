@@ -209,17 +209,21 @@ export async function searchForwardConnection(
   statement: ConnectivityStatement,
   excludeIds?: number[],
 ): Promise<Option[]> {
+
   try {
+    const forwardConnectionOrigins = statement.destinations?.flatMap(
+        (destination) =>
+            destination.anatomical_entities?.map((entity) => entity.id) ?? [],
+        ) ?? [];
+    if (forwardConnectionOrigins.length == 0) {
+      return []
+    }
     const sameSentencePromise = connectivityStatementService.getList({
       ...queryOptions,
       excludeIds,
       excludeSentenceId: undefined,
       sentenceId: statement.sentence_id,
-      origins:
-        statement.destinations?.flatMap(
-          (destination) =>
-            destination.anatomical_entities?.map((entity) => entity.id) ?? [],
-        ) ?? [],
+      origins: forwardConnectionOrigins,
       knowledgeStatement: searchValue,
     });
 
@@ -228,11 +232,7 @@ export async function searchForwardConnection(
       excludeIds,
       excludeSentenceId: statement.sentence_id,
       sentenceId: undefined,
-      origins:
-        statement.destinations?.flatMap(
-          (destination) =>
-            destination.anatomical_entities?.map((entity) => entity.id) ?? [],
-        ) ?? [],
+      origins: forwardConnectionOrigins,
       knowledgeStatement: searchValue,
     });
 
