@@ -212,3 +212,19 @@ export function searchAnatomicalEntities(
     )
     .sort((a, b) => a.name.localeCompare(b.name));
 }
+
+
+export function getForwardConnectionText(connections: any[]) {
+  const BASE_FORWARD_CONNECTION_TEXT = "This neuron population connects to connectivity statement with id:";
+  let text = ''
+  if (connections.length) {
+    text += BASE_FORWARD_CONNECTION_TEXT
+    connections.slice(0, connections.length - 1).forEach((connection: any) => {
+      text = text.concat(` <a style="text-decoration: none" href="/statement/${connection.id}">${connection.id}</a>,`);
+    });
+    text = text.slice(0, -1);  // remove the last comma
+    text = text.concat(" and");
+    text = text.concat(` <a style="text-decoration: none" href="/statement/${connections[connections.length - 1].id}">${connections[connections.length - 1].id}</a>.`);
+  }
+  return text;
+}
