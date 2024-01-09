@@ -96,10 +96,10 @@ def get_connections(n, lpes):
                                                                   expected_destinations
                                                                   )
 
-    # origins = merge_origins(tmp_origins)
+    origins = merge_origins(tmp_origins)
     vias = merge_vias(tmp_vias)
     destinations = merge_destinations(tmp_destinations)
-    return tmp_origins, vias, destinations
+    return origins, vias, destinations
 
 
 def create_uri_type_dict(lpes_func, predicate_type_map):
@@ -153,6 +153,14 @@ def process_entity(entity):
         return entity.layer
     else:
         return entity
+
+
+def merge_origins(origins):
+    merged_anatomical_entities = set()
+    for origin in origins:
+        merged_anatomical_entities.update(origin.anatomical_entities)
+
+    return Origin(merged_anatomical_entities)
 
 
 def merge_vias(vias):
