@@ -220,7 +220,7 @@ class AnatomicalEntity(models.Model):
     """Anatomical Entity"""
 
     name = models.CharField(max_length=200, db_index=True)
-    ontology_uri = models.URLField()
+    ontology_uri = models.URLField()  # TODO: Confirm it is acceptable to have multiple anatomical entities with the same uri.
 
     def __str__(self):
         return self.name
@@ -590,7 +590,7 @@ class Destination(AbstractConnectionLayer):
         choices=DestinationType.choices,
         default=DestinationType.UNKNOWN
     )
-    
+
     objects = DestinationManager()
 
     class Meta:
@@ -604,7 +604,7 @@ class Destination(AbstractConnectionLayer):
 
 class Via(AbstractConnectionLayer):
     anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True, related_name='via_connection_layers')
-    
+
     objects = ViaManager()
 
     type = models.CharField(
