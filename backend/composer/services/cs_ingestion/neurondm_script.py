@@ -156,11 +156,11 @@ def process_entity(entity):
 
 
 def merge_vias(vias):
-    vias = merge_vias_from_entities(vias)
-    return merge_vias_anatomical_entities(vias)
+    vias = merge_vias_by_from_entities(vias)
+    return merge_vias_by_anatomical_entities(vias)
 
 
-def merge_vias_from_entities(vias):
+def merge_vias_by_from_entities(vias):
     merged_vias = {}
     for via in vias:
         key = (frozenset(via.anatomical_entities), via.order, via.type)
@@ -171,7 +171,7 @@ def merge_vias_from_entities(vias):
     return list(merged_vias.values())
 
 
-def merge_vias_anatomical_entities(vias):
+def merge_vias_by_anatomical_entities(vias):
     merged_vias = {}
     for via in vias:
         key = (via.order, via.type, frozenset(via.from_entities))
@@ -183,12 +183,28 @@ def merge_vias_anatomical_entities(vias):
 
 
 def merge_destinations(destinations):
+    destinations = merge_destinations_by_from_entities(destinations)
+    return merge_destinations_by_anatomical_entities(destinations)
+
+
+def merge_destinations_by_anatomical_entities(destinations):
     merged_destinations = {}
     for destination in destinations:
         key = (frozenset(destination.anatomical_entities), destination.type)
         if key not in merged_destinations:
             merged_destinations[key] = Destination(destination.anatomical_entities, set(), destination.type)
         merged_destinations[key].from_entities.update(destination.from_entities)
+
+    return list(merged_destinations.values())
+
+
+def merge_destinations_by_from_entities(destinations):
+    merged_destinations = {}
+    for destination in destinations:
+        key = frozenset(destination.from_entities)
+        if key not in merged_destinations:
+            merged_destinations[key] = Destination(set(), destination.from_entities, destination.type)
+        merged_destinations[key].anatomical_entities.update(destination.anatomical_entities)
 
     return list(merged_destinations.values())
 
