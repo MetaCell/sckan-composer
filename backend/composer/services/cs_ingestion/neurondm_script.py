@@ -110,6 +110,10 @@ def create_uri_type_dict(lpes_func, predicate_type_map):
     return uri_type_dict
 
 
+# FIXME: The following algorithm will behave incorrectly for cases:
+#  where an anatomical entity has more than one 'role' (Origin, Via, Destinaion)
+#  where we have connections that jump layers
+#  where we have complex entities that use the layer instead of region
 def process_connections(path, expected_origins, expected_vias, expected_destinations, from_entities=None, depth=0,
                         result=None):
     if result is None:
@@ -150,7 +154,7 @@ def process_entity(entity):
     # TODO: Confirm what to use @afonsobspinto
     # Check if the entity is a complex object
     if isinstance(entity, orders.rl):
-        return entity.layer
+        return entity.region
     else:
         return entity
 
@@ -274,7 +278,7 @@ def main(local=False, anatomical_entities=False, anatent_simple=False, do_reconc
     myFile = open('./composer/services/cs_ingestion/neurons.csv', 'w')
     writer = csv.DictWriter(myFile,
                             fieldnames=['id', 'label', 'origins', 'vias', 'destinations', 'species', 'sex',
-                                        'circuit_type', 'circuit_role' 'phenotype', 'other_phenotypes',
+                                        'circuit_type', 'circuit_role', 'phenotype', 'other_phenotypes',
                                         'forward_connection', 'provenance', 'sentence_number', 'note_alert',
                                         'classification_phenotype'])
     writer.writeheader()
