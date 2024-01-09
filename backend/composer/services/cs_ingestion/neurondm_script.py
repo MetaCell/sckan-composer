@@ -1,6 +1,8 @@
 import csv
 import logging
 import os
+from typing import Set, Dict
+
 import rdflib
 from pyontutils.core import OntGraph, OntResIri, OntResPath
 from pyontutils.namespaces import rdfs, ilxtr
@@ -15,18 +17,18 @@ class Origin:
 
 
 class Via:
-    def __init__(self, anatomical_entity_uri, from_entities, order):
+    def __init__(self, anatomical_entity_uri, from_entities, order, type):
         self.anatomical_entity = anatomical_entity_uri
         self.from_entities = from_entities
         self.order = order
-        self.type = None
+        self.type = type
 
 
 class Destination:
-    def __init__(self, anatomical_entity_uri, from_entities):
+    def __init__(self, anatomical_entity_uri, from_entities, type):
         self.anatomical_entity = anatomical_entity_uri
         self.from_entities = from_entities
-        self.type = None
+        self.type = type
 
 
 def makelpesrdf():
@@ -50,11 +52,7 @@ def makelpesrdf():
 def for_composer(n, cull=False):
     lpes, lrdf, collect = makelpesrdf()
 
-    try:
-        origins, vias, destinations = get_connections(n, lambda predicate: lpes(n, predicate))
-    except ValueError as e:
-        logging.error(f"{e}")
-        return
+    origins, vias, destinations = get_connections(n, lambda predicate: lpes(n, predicate))
 
     fc = dict(
         id=str(n.id_),
@@ -88,22 +86,18 @@ def for_composer(n, cull=False):
 
 def get_connections(n, lpes):
     partial_order = n.partialOrder()
-    origins_partial_order, vias_partial_order, destinations_partial_order = process_connections(partial_order)
+    expected_origins = lpes(ilxtr.hasSomaLocatedIn)
+    expected_destinations = create_uri_type_dict(lpes, {ilxtr.hasAxonPresynapticElementIn: 'AXON-T',
+                                                        ilxtr.hasAxonSensorySubcellularElementIn: 'AFFERENT-T'})
+    expected_vias = create_uri_type_dict(lpes, {ilxtr.hasAxonLocatedIn: 'AXON', ilxtr.hasDendriteLocatedIn: 'DENDRITE'})
 
-    # expected_origins = lpes(ilxtr.hasSomaLocatedIn)
-    # expected_destinations = create_uri_type_dict(lpes, {ilxtr.hasAxonPresynapticElementIn: 'AXON-T',
-    #                                                     ilxtr.hasAxonSensorySubcellularElementIn: 'AFFERENT-T'})
-    # expected_vias = create_uri_type_dict(lpes, {ilxtr.hasAxonLocatedIn: 'AXON', ilxtr.hasDendriteLocatedIn: 'DENDRITE'})
-    #
-    # validated_origins = validate_entities(origins_partial_order, expected_origins, 'origin')
-    # validated_destinations = validate_entities(destinations_partial_order, list(expected_destinations.keys()),
-    #                                            'destination')
-    # validated_vias = validate_entities(vias_partial_order, list(expected_vias.keys()), 'via')
-    #
-    # extended_vias = extend_with_type(validated_vias, expected_vias)
-    # extended_destinations = extend_with_type(validated_destinations, expected_destinations)
+    origins, vias, destinations = process_connections(partial_order,
+                                                      set(expected_origins),
+                                                      expected_vias,
+                                                      expected_destinations
+                                                      )
 
-    return origins_partial_order, vias_partial_order, destinations_partial_order
+    return origins, vias, destinations
 
 
 def create_uri_type_dict(lpes_func, predicate_type_map):
@@ -114,59 +108,45 @@ def create_uri_type_dict(lpes_func, predicate_type_map):
     return uri_type_dict
 
 
-def process_connections(structure, from_entities=None, order=0, result=None):
+def process_connections(path, expected_origins, expected_vias, expected_destinations, from_entities=None, depth=0,
+                        result=None):
     if result is None:
         result = {'origins': [], 'destinations': [], 'vias': []}
 
-    if isinstance(structure, tuple):
-        if structure[0] == rdflib.term.Literal('blank'):
-            for origin in structure[1:]:
-                process_connections(origin, order=0, result=result)
+    if isinstance(path, tuple):
+        if path[0] == rdflib.term.Literal('blank'):
+            for remaining_path in path[1:]:
+                process_connections(remaining_path, expected_origins, expected_vias, expected_destinations,
+                                    from_entities, depth, result=result)
         else:
-            current_entity = process_entity(structure[0]).toPython()
+            current_entity_uri = process_entity(path[0]).toPython()
 
-            if order == 0:
-                result['origins'].append(Origin(current_entity))
-            elif len(structure) == 1:
-                result['destinations'].append(Destination(current_entity, from_entities))
-            else:
-                result['vias'].append(Via(current_entity, from_entities, order - 1))
+            # Determine the type of the current entity based on the expected lists
+            if current_entity_uri in expected_origins:
+                result['origins'].append(Origin(current_entity_uri))
+                depth = 0  # Reset depth after each origin
+            elif current_entity_uri in expected_vias:
+                result['vias'].append(Via(current_entity_uri, from_entities, depth, expected_vias[current_entity_uri]))
+                depth += 1  # Increment depth only for vias
+            elif current_entity_uri in expected_destinations:
+                result['destinations'].append(
+                    Destination(current_entity_uri, from_entities, expected_destinations[current_entity_uri]))
 
-            for next_structure in structure[1:]:
-                process_connections(next_structure, current_entity, order + 1, result)
+            # Process the next level structures
+            for next_structure in path[1:]:
+                process_connections(next_structure, expected_origins, expected_vias, expected_destinations,
+                                    current_entity_uri, depth, result)
 
     return result['origins'], result['vias'], result['destinations']
 
 
 def process_entity(entity):
+    # TODO: Confirm what to use
     # Check if the entity is a complex object
     if isinstance(entity, orders.rl):
         return entity.layer
     else:
         return entity
-
-
-def validate_entities(processed, expected_uris, entity_type):
-    """
-    Validate processed entities against the expected list of URIs.
-    Log warnings for discrepancies and raise an error if any expected URI is missing.
-    """
-    # Extract URIs from processed entities
-    processed_uris = set(entity.anatomical_entity for entity in processed)
-
-    # Convert expected URIs to a set for efficient comparison
-    expected_uris = set(expected_uris)
-
-    # Log warnings for processed URIs not in expected list
-    for uri in processed_uris - expected_uris:
-        logging.warning(f"Unexpected {entity_type} URI: {uri}")
-
-    # Check for missing URIs
-    missing_uris = expected_uris - processed_uris
-    if missing_uris:
-        raise ValueError(f"Missing {entity_type}(s) in processed data: {missing_uris}")
-
-    return processed
 
 
 def extend_with_type(processed, uri_type_dict):
@@ -179,34 +159,9 @@ def extend_with_type(processed, uri_type_dict):
     return processed
 
 
-def reconcile(n):
-    lobjs = set(o for p in n._location_predicates._litmap.values() for o in n.getObjects(p))
-    po_rl = set(e for pair in orders.nst_to_adj(n.partialOrder()) for e in pair)
-    po_r = set(t.region if isinstance(t, orders.rl) else t for t in po_rl)
-    po_rl.difference_update({rdflib.Literal('blank')})
-    po_r.difference_update({rdflib.Literal('blank')})
-    # [if isinstance(e, orders.rl) else ]
-    both = po_r & lobjs
-    either = po_r | lobjs
-    missing_axioms = po_r - lobjs
-    missing_orders = lobjs - po_r
-    withl_missing_axioms = po_rl - lobjs
-    withl_missing_orders = lobjs - po_rl
-    ok_reg = not (missing_axioms or missing_orders)
-    ok_rl = not (withl_missing_axioms or withl_missing_orders)
-    return {
-        'ok_reg': ok_reg,
-        'ok_rl': ok_rl,
-        'withl_missing_axioms': withl_missing_axioms,
-        'withl_missing_orders': withl_missing_orders,
-        'missing_axioms': withl_missing_axioms,
-        'missing_orders': withl_missing_orders,
-    }
-
-
 ## Based on:
 ## https://github.com/tgbugs/pyontutils/blob/30c415207b11644808f70c8caecc0c75bd6acb0a/neurondm/docs/composer.py#L668-L698
-def main(local=False, anatomical_entities=False, anatent_simple=False, do_reconcile=True, viz=False, chains=False):
+def main(local=False, anatomical_entities=False, anatent_simple=False, do_reconcile=False, viz=False, chains=False):
     config = Config('random-merge')
     g = OntGraph()  # load and query graph
 
@@ -255,18 +210,6 @@ def main(local=False, anatomical_entities=False, anatent_simple=False, do_reconc
 
     config.load_existing(g)
     neurons = config.neurons()
-
-    if do_reconcile:
-        _recs = [(n, reconcile(n)) for n in neurons]
-        recs_reg = [(n, r) for n, r in _recs if not r['ok_reg']]
-        recs_rl = [(n, r) for n, r in _recs if not r['ok_rl']]
-        msg = f'{len(recs_reg)} pops with reg issues, {len(recs_rl)} pops with rl issues'
-        log.info(msg)
-        sigh_reg = sorted([(len(r["missing_axioms"]), len(r["missing_orders"]), n, r) for n, r in recs_reg],
-                          key=lambda t: (t[0] + t[1], t[0], t[1]), reverse=True)
-        sigh_how = [s[:2] + tuple(OntId(_.id_).curie for _ in s[2:3]) for s in sigh_reg]
-        rep_reg = 'a  o  i\n' + '\n'.join(f'{a: >2} {o: >2} {i}' for a, o, i in sigh_how)
-        print(rep_reg)
 
     fcs = [for_composer(n) for n in neurons]
 
