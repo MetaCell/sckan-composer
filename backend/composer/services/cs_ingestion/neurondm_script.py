@@ -1,4 +1,5 @@
 import csv
+import logging
 import os
 from typing import Set
 
@@ -51,7 +52,11 @@ def makelpesrdf():
 def for_composer(n, cull=False):
     lpes, lrdf, collect = makelpesrdf()
 
-    origins, vias, destinations = get_connections(n, lambda predicate: lpes(n, predicate))
+    try:
+        origins, vias, destinations = get_connections(n, lambda predicate: lpes(n, predicate))
+    except Exception as e:
+        logging.error(f"{e}. Skipping population.")
+        return None
 
     fc = dict(
         id=str(n.id_),
@@ -113,50 +118,42 @@ def create_uri_type_dict(lpes_func, predicate_type_map):
 # FIXME: The following algorithm will behave incorrectly for cases:
 #  where an anatomical entity has more than one 'role' (Origin, Via, Destinaion)
 #  where we have connections that jump layers
-#  where we have complex entities that use the layer instead of region
-def process_connections(path, expected_origins, expected_vias, expected_destinations, from_entities=None, depth=0,
-                        result=None):
+def process_connections(path, expected_origins, expected_vias, expected_destinations, from_entities=None, depth=0, result=None):
     if result is None:
         result = {'origins': [], 'destinations': [], 'vias': []}
 
     if isinstance(path, tuple):
         if path[0] == rdflib.term.Literal('blank'):
             for remaining_path in path[1:]:
-                process_connections(remaining_path, expected_origins, expected_vias, expected_destinations, set(),
-                                    depth=0, result=result)
+                process_connections(remaining_path, expected_origins, expected_vias, expected_destinations, set(), depth=0, result=result)
         else:
-            current_entity_uri = process_entity(path[0]).toPython()
+            current_entity = path[0]
+            primary_uri = current_entity.toPython() if not isinstance(current_entity, orders.rl) else current_entity.region.toPython()
+            secondary_uri = current_entity.layer.toPython() if isinstance(current_entity, orders.rl) else None
 
             # Initialize from_entities as an empty set if None
             from_entities = from_entities or set()
 
-            # Determine the type of the current entity based on the expected lists
-            if current_entity_uri in expected_origins:
-                result['origins'].append(Origin({current_entity_uri}))
-                depth = 0  # Reset depth after each origin
-            elif current_entity_uri in expected_vias:
-                result['vias'].append(
-                    Via({current_entity_uri}, from_entities, depth, expected_vias[current_entity_uri]))
+            # Check primary and secondary URIs against expected lists
+            if primary_uri in expected_origins or secondary_uri in expected_origins:
+                matched_uri = primary_uri if primary_uri in expected_origins else secondary_uri
+                result['origins'].append(Origin({matched_uri}))
+                depth = 0
+            elif primary_uri in expected_vias or secondary_uri in expected_vias:
+                matched_uri = primary_uri if primary_uri in expected_vias else secondary_uri
+                result['vias'].append(Via({matched_uri}, from_entities, depth, expected_vias.get(matched_uri)))
                 depth += 1
-            elif current_entity_uri in expected_destinations:
-                result['destinations'].append(
-                    Destination({current_entity_uri}, from_entities, expected_destinations[current_entity_uri]))
+            elif primary_uri in expected_destinations or secondary_uri in expected_destinations:
+                matched_uri = primary_uri if primary_uri in expected_destinations else secondary_uri
+                result['destinations'].append(Destination({matched_uri}, from_entities, expected_destinations.get(matched_uri)))
+            else:
+                raise Exception(f"{current_entity} not found in axiom.")
 
             # Process the next level structures, carrying over from_entities as a set
-            for next_structure in path[1:]:
-                process_connections(next_structure, expected_origins, expected_vias, expected_destinations,
-                                    {current_entity_uri}, depth, result)
+            for remaining_path in path[1:]:
+                process_connections(remaining_path, expected_origins, expected_vias, expected_destinations, {matched_uri}, depth, result)
 
     return result['origins'], result['vias'], result['destinations']
-
-
-def process_entity(entity):
-    # TODO: Confirm what to use @afonsobspinto
-    # Check if the entity is a complex object
-    if isinstance(entity, orders.rl):
-        return entity.region
-    else:
-        return entity
 
 
 def merge_origins(origins):
@@ -274,18 +271,20 @@ def main(local=False, anatomical_entities=False, anatent_simple=False, do_reconc
     neurons = config.neurons()
 
     fcs = [for_composer(n) for n in neurons]
+    composer_statements = [item for item in fcs if item is not None]
 
-    myFile = open('./composer/services/cs_ingestion/neurons.csv', 'w')
-    writer = csv.DictWriter(myFile,
-                            fieldnames=['id', 'label', 'origins', 'vias', 'destinations', 'species', 'sex',
-                                        'circuit_type', 'circuit_role', 'phenotype', 'other_phenotypes',
-                                        'forward_connection', 'provenance', 'sentence_number', 'note_alert',
-                                        'classification_phenotype'])
-    writer.writeheader()
-    writer.writerows(fcs)
-    myFile.close()
+    # TODO: Confirm if this can be deleted
+    # myFile = open('./composer/services/cs_ingestion/neurons.csv', 'w')
+    # writer = csv.DictWriter(myFile,
+    #                         fieldnames=['id', 'label', 'origins', 'vias', 'destinations', 'species', 'sex',
+    #                                     'circuit_type', 'circuit_role', 'phenotype', 'other_phenotypes',
+    #                                     'forward_connection', 'provenance', 'sentence_number', 'note_alert',
+    #                                     'classification_phenotype'])
+    # writer.writeheader()
+    # writer.writerows(fcs)
+    # myFile.close()
 
-    return fcs
+    return composer_statements
 
 
 if __name__ == '__main__':
