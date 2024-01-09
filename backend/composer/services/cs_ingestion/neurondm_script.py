@@ -90,20 +90,20 @@ def get_connections(n, lpes):
     partial_order = n.partialOrder()
     origins_partial_order, vias_partial_order, destinations_partial_order = process_connections(partial_order)
 
-    expected_origins = lpes(ilxtr.hasSomaLocatedIn)
-    expected_destinations = create_uri_type_dict(lpes, {ilxtr.hasAxonPresynapticElementIn: 'AXON-T',
-                                                        ilxtr.hasAxonSensorySubcellularElementIn: 'AFFERENT-T'})
-    expected_vias = create_uri_type_dict(lpes, {ilxtr.hasAxonLocatedIn: 'AXON', ilxtr.hasDendriteLocatedIn: 'DENDRITE'})
+    # expected_origins = lpes(ilxtr.hasSomaLocatedIn)
+    # expected_destinations = create_uri_type_dict(lpes, {ilxtr.hasAxonPresynapticElementIn: 'AXON-T',
+    #                                                     ilxtr.hasAxonSensorySubcellularElementIn: 'AFFERENT-T'})
+    # expected_vias = create_uri_type_dict(lpes, {ilxtr.hasAxonLocatedIn: 'AXON', ilxtr.hasDendriteLocatedIn: 'DENDRITE'})
+    #
+    # validated_origins = validate_entities(origins_partial_order, expected_origins, 'origin')
+    # validated_destinations = validate_entities(destinations_partial_order, list(expected_destinations.keys()),
+    #                                            'destination')
+    # validated_vias = validate_entities(vias_partial_order, list(expected_vias.keys()), 'via')
+    #
+    # extended_vias = extend_with_type(validated_vias, expected_vias)
+    # extended_destinations = extend_with_type(validated_destinations, expected_destinations)
 
-    validated_origins = validate_entities(origins_partial_order, expected_origins, 'origin')
-    validated_destinations = validate_entities(destinations_partial_order, list(expected_destinations.keys()),
-                                               'destination')
-    validated_vias = validate_entities(vias_partial_order, list(expected_vias.keys()), 'via')
-
-    extended_vias = extend_with_type(validated_vias, expected_vias)
-    extended_destinations = extend_with_type(validated_destinations, expected_destinations)
-
-    return validated_origins, extended_vias, extended_destinations
+    return origins_partial_order, vias_partial_order, destinations_partial_order
 
 
 def create_uri_type_dict(lpes_func, predicate_type_map):
