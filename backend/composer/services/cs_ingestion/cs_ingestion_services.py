@@ -261,8 +261,7 @@ def update_many_to_many_fields(connectivity_statement, statement):
 
     for provenance in connectivity_statement.provenance_set.all():
         # TODO: Confirm if we should delete or disassociate
-        provenance.connectivity_statement = None
-        provenance.save()
+        provenance.delete()
 
     for destination in connectivity_statement.destinations.all():
         destination.delete()
@@ -300,12 +299,10 @@ def add_vias(connectivity_statement, statement):
     for via_instance, via_data in zip(created_vias, statement[VIAS]):
         for uri in via_data.anatomical_entities:
             anatomical_entities = AnatomicalEntity.objects.filter(ontology_uri=uri)
-            if anatomical_entities.exists():
-                via_instance.anatomical_entities.add(anatomical_entities.first())
+            via_instance.anatomical_entities.add(anatomical_entities.first())
         for uri in via_data.from_entities:
             from_entity = AnatomicalEntity.objects.filter(ontology_uri=uri).first()
-            if from_entity:
-                via_instance.from_entities.add(from_entity)
+            via_instance.from_entities.add(from_entity)
 
 
 def add_destinations(connectivity_statement, statement):
@@ -319,13 +316,11 @@ def add_destinations(connectivity_statement, statement):
     for destination_instance, dest_data in zip(created_destinations, statement[DESTINATIONS]):
         for uri in dest_data.anatomical_entities:
             anatomical_entity = AnatomicalEntity.objects.filter(ontology_uri=uri).first()
-            if anatomical_entity:
-                destination_instance.anatomical_entities.add(anatomical_entity)
+            destination_instance.anatomical_entities.add(anatomical_entity)
 
         for uri in dest_data.from_entities:
             from_entity = AnatomicalEntity.objects.filter(ontology_uri=uri).first()
-            if from_entity:
-                destination_instance.from_entities.add(from_entity)
+            destination_instance.from_entities.add(from_entity)
 
 
 def add_notes(connectivity_statement, statement):
