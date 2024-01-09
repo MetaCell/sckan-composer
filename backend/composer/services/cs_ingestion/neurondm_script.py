@@ -12,12 +12,12 @@ from neurondm import orders
 
 
 class Origin:
-    def __init__(self, anatomical_entity_uri):
+    def __init__(self, anatomical_entity_uri: str):
         self.anatomical_entity = anatomical_entity_uri
 
 
 class Via:
-    def __init__(self, anatomical_entity_uri, from_entities, order, type):
+    def __init__(self, anatomical_entity_uri: str, from_entities: Set, order: int, type: str):
         self.anatomical_entity = anatomical_entity_uri
         self.from_entities = from_entities
         self.order = order
@@ -25,7 +25,7 @@ class Via:
 
 
 class Destination:
-    def __init__(self, anatomical_entity_uri, from_entities, type):
+    def __init__(self, anatomical_entity_uri: str, from_entities: Set, type: str):
         self.anatomical_entity = anatomical_entity_uri
         self.from_entities = from_entities
         self.type = type
@@ -91,12 +91,13 @@ def get_connections(n, lpes):
                                                         ilxtr.hasAxonSensorySubcellularElementIn: 'AFFERENT-T'})
     expected_vias = create_uri_type_dict(lpes, {ilxtr.hasAxonLocatedIn: 'AXON', ilxtr.hasDendriteLocatedIn: 'DENDRITE'})
 
-    origins, vias, destinations = process_connections(partial_order,
-                                                      set(expected_origins),
-                                                      expected_vias,
-                                                      expected_destinations
-                                                      )
+    origins, vias_temp, destinations = process_connections(partial_order,
+                                                           set(expected_origins),
+                                                           expected_vias,
+                                                           expected_destinations
+                                                           )
 
+    vias = merge_vias(vias_temp)
     return origins, vias, destinations
 
 
@@ -117,9 +118,12 @@ def process_connections(path, expected_origins, expected_vias, expected_destinat
         if path[0] == rdflib.term.Literal('blank'):
             for remaining_path in path[1:]:
                 process_connections(remaining_path, expected_origins, expected_vias, expected_destinations,
-                                    from_entities, depth, result=result)
+                                    from_entities=set(), depth=0, result=result)
         else:
             current_entity_uri = process_entity(path[0]).toPython()
+
+            # Initialize from_entities as an empty set if None
+            from_entities = from_entities or set()
 
             # Determine the type of the current entity based on the expected lists
             if current_entity_uri in expected_origins:
@@ -132,16 +136,16 @@ def process_connections(path, expected_origins, expected_vias, expected_destinat
                 result['destinations'].append(
                     Destination(current_entity_uri, from_entities, expected_destinations[current_entity_uri]))
 
-            # Process the next level structures
+            # Process the next level structures, carrying over from_entities as a set
             for next_structure in path[1:]:
                 process_connections(next_structure, expected_origins, expected_vias, expected_destinations,
-                                    current_entity_uri, depth, result)
+                                    {current_entity_uri}, depth, result)
 
     return result['origins'], result['vias'], result['destinations']
 
 
 def process_entity(entity):
-    # TODO: Confirm what to use
+    # TODO: Confirm what to use @afonsobspinto
     # Check if the entity is a complex object
     if isinstance(entity, orders.rl):
         return entity.layer
@@ -149,14 +153,15 @@ def process_entity(entity):
         return entity
 
 
-def extend_with_type(processed, uri_type_dict):
-    for entity in processed:
-        uri = entity.anatomical_entity.toPython() if isinstance(entity.anatomical_entity,
-                                                                rdflib.term.URIRef) else entity.anatomical_entity
-        entity_type = uri_type_dict.get(uri)
-        if entity_type:
-            entity.type = entity_type
-    return processed
+def merge_vias(vias):
+    merged_vias = {}
+    for via in vias:
+        key = (via.anatomical_entity, via.order, via.type)
+        if key not in merged_vias:
+            merged_vias[key] = Via(via.anatomical_entity, set(), via.order, via.type)
+        merged_vias[key].from_entities.update(via.from_entities)
+
+    return list(merged_vias.values())
 
 
 ## Based on:
