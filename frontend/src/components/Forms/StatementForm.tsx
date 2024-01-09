@@ -15,7 +15,7 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
   createOptionsFromStatements,
   getAnatomicalEntities,
-  getConnectionId,
+  getConnectionId, getFirstNumberFromString,
   searchForwardConnection,
   searchFromEntitiesDestination,
   searchFromEntitiesVia,
@@ -27,7 +27,7 @@ import {
   mapAnatomicalEntitiesToOptions,
   DROPDOWN_MAPPER_STATE,
   getViasGroupLabel,
-  findMatchingEntities,
+  findMatchingEntities, areArraysOfObjectsEqual, processFromEntitiesData,
 } from "../../helpers/dropdownMappers";
 import { DestinationIcon, ViaIcon } from "../icons";
 import {
@@ -311,6 +311,26 @@ const StatementForm = (props: any) => {
               propertyToUpdate: "from_entities",
             });
           },
+          getPreLevelSelectedValues: (formId: any) => {
+            const id = getFirstNumberFromString(formId)
+            let entity: any = []
+            if (id !== null) {
+              const preLevelItems = id === 0 ? statement['origins'] :  statement['vias'][id-1]['anatomical_entities']
+              const selected = findMatchingEntities(
+                statement,
+                preLevelItems,
+              );
+              selected.forEach((row: any) => {
+                entity.push(
+                  mapAnatomicalEntitiesToOptions(
+                    [row],
+                    getViasGroupLabel(row.order + 1),
+                  )[0],
+                );
+              });
+              return entity
+            }
+          },
           refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[], formId: any) => {
@@ -462,6 +482,23 @@ const StatementForm = (props: any) => {
               entityType: "destination",
               propertyToUpdate: "from_entities",
             });
+          },
+          getPreLevelSelectedValues: () => {
+            let entity: any = []
+            const preLevelItems = statement['vias'][statement.vias.length - 1]['anatomical_entities']
+            const selected = findMatchingEntities(
+              statement,
+              preLevelItems,
+            );
+            selected.forEach((row: any) => {
+              entity.push(
+                mapAnatomicalEntitiesToOptions(
+                  [row],
+                  getViasGroupLabel(row.order + 1),
+                )[0],
+              );
+            });
+            return entity
           },
           refreshStatement: () => refreshStatement(),
           errors: "",

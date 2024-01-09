@@ -16,7 +16,7 @@ import {
   ListSubheader,
   Chip,
 } from "@mui/material";
-import { CheckedItemIcon, UncheckedItemIcon } from "../icons";
+import {CheckedItemIcon, CheckedItemIconBG, UncheckedItemIcon} from "../icons";
 import HoveredOptionContent from "./HoveredOptionContent";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -28,7 +28,7 @@ import NoResultField from "./NoResultField";
 import { vars } from "../../theme/variables";
 import { Option } from "../../types";
 import Stack from "@mui/material/Stack";
-import { processFromEntitiesData } from "../../helpers/dropdownMappers";
+import {areArraysOfObjectsEqual, processFromEntitiesData} from "../../helpers/dropdownMappers";
 
 const {
   buttonOutlinedBorderColor,
@@ -211,6 +211,7 @@ export default function CustomEntitiesDropdown({
     refreshStatement,
     statement,
     fieldName = "",
+    getPreLevelSelectedValues
   },
 }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -232,6 +233,7 @@ export default function CustomEntitiesDropdown({
 
   const [hasValueChanged, setHasValueChanged] = useState(false);
   
+  const preLevelItems = postProcessOptions && getPreLevelSelectedValues ? getPreLevelSelectedValues(id) : [];
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setIsDropdownOpened(true);
     setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -346,6 +348,7 @@ export default function CustomEntitiesDropdown({
       console.error("Error fetching data:", error);
     }
   }, [inputValue, id, onSearch, postProcessOptions]);
+  
 
   useEffect(() => {
     if (!isDropdownOpened) return;
@@ -373,15 +376,18 @@ export default function CustomEntitiesDropdown({
           refreshStatement();
           setHasValueChanged(false);
         }
+        if (postProcessOptions && selectedOptions.length === 0) {
+          setSelectedOptions(processFromEntitiesData(preLevelItems))
+        }
       }
     };
-
+    
     document.addEventListener("mousedown", closePopperOnClickOutside);
     return () => {
       document.removeEventListener("mousedown", closePopperOnClickOutside);
     };
   }, [hasValueChanged]);
-  
+
   return isFormDisabled() ? (
     <Box
       sx={{ background: theme.palette.grey[100], borderRadius: 1 }}
@@ -411,7 +417,8 @@ export default function CustomEntitiesDropdown({
             }
             onClick={handleClick}
           >
-            {selectedOptions.length === 0 ? (
+            {(areArraysOfObjectsEqual(selectedOptions, preLevelItems)
+              || selectedOptions.length === 0) ? (
               <Typography sx={styles.placeholder}>{placeholder}</Typography>
             ) : (
               <Box gap={1} display="flex" flexWrap="wrap" alignItems="center">
@@ -664,6 +671,14 @@ export default function CustomEntitiesDropdown({
                                 background: bodyBgColor,
                               },
 
+                              "&.selected-unchecked": {
+                                "& .MuiButtonBase-root": {
+                                  "&.Mui-checked": {
+                                    color: 'red'
+                                  }
+                                }
+                              },
+
                               "& .MuiTypography-body1": {
                                 color: buttonOutlinedColor,
                                 fontSize: "0.875rem",
@@ -729,7 +744,9 @@ export default function CustomEntitiesDropdown({
                                   disableRipple
                                   icon={<UncheckedItemIcon fontSize="small" />}
                                   checkedIcon={
-                                    <CheckedItemIcon fontSize="small" />
+                                    (areArraysOfObjectsEqual(selectedOptions, preLevelItems))
+                                      ? <CheckedItemIconBG  fontSize="small" style={{color: '#C6D9F6'}} />
+                                      : <CheckedItemIcon  fontSize="small" />
                                   }
                                   checked={isOptionSelected(option)}
                                 />
