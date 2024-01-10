@@ -234,6 +234,7 @@ export default function CustomEntitiesDropdown({
   const [hasValueChanged, setHasValueChanged] = useState(false);
   
   const preLevelItems = postProcessOptions && getPreLevelSelectedValues ? getPreLevelSelectedValues(id) : [];
+  const isAllSelectedValuesFromTheAboveLayer = areArraysOfObjectsEqual(selectedOptions, preLevelItems)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setIsDropdownOpened(true);
     setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -404,7 +405,7 @@ export default function CustomEntitiesDropdown({
 
         <Badge
           sx={{ ...styles.badge, flex: 1 }}
-          badgeContent={selectedOptions?.length}
+          badgeContent={isAllSelectedValuesFromTheAboveLayer ? 0 : selectedOptions?.length}
         >
           <Box
             aria-describedby={aria}
@@ -417,8 +418,7 @@ export default function CustomEntitiesDropdown({
             }
             onClick={handleClick}
           >
-            {(areArraysOfObjectsEqual(selectedOptions, preLevelItems)
-              || selectedOptions.length === 0) ? (
+            {(isAllSelectedValuesFromTheAboveLayer || selectedOptions.length === 0) ? (
               <Typography sx={styles.placeholder}>{placeholder}</Typography>
             ) : (
               <Box gap={1} display="flex" flexWrap="wrap" alignItems="center">
@@ -744,7 +744,7 @@ export default function CustomEntitiesDropdown({
                                   disableRipple
                                   icon={<UncheckedItemIcon fontSize="small" />}
                                   checkedIcon={
-                                    (areArraysOfObjectsEqual(selectedOptions, preLevelItems))
+                                    isAllSelectedValuesFromTheAboveLayer
                                       ? <CheckedItemIconBG  fontSize="small" style={{color: '#C6D9F6'}} />
                                       : <CheckedItemIcon  fontSize="small" />
                                   }

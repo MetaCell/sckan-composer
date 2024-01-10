@@ -124,28 +124,12 @@ export function getViasGroupLabel(currentIndex: number | null) {
 export function areArraysOfObjectsEqual(a: any[], b: any[]): boolean {
   if (a.length !== b.length) return false;
   
-  // Function to remove the 'sort' property from each object
-  const removeSortProperty = (arr: any[]) => {
-    return arr.map(obj => {
-      const { sort, ...rest } = obj;
-      return rest;
-    });
-  };
+  const setA = new Set(a.map(obj => obj.id));
+  const setB = new Set(b.map(obj => obj.id));
   
-  const cleanedA = removeSortProperty(a);
-  const cleanedB = removeSortProperty(b);
-  
-  for (let i = 0; i < cleanedA.length; i++) {
-    const objA = cleanedA[i];
-    const objB = cleanedB.find(item => item.id === objA.id);
-    
-    if (!objB) return false;
-    
-    if (JSON.stringify(objA) !== JSON.stringify(objB)) return false;
-  }
-  
-  return true;
+  return JSON.stringify([...setA].sort()) === JSON.stringify([...setB].sort());
 }
+
 
 export function findMatchingEntities(
   statement: ConnectivityStatement,
