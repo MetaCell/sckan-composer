@@ -215,17 +215,16 @@ export function searchAnatomicalEntities(
 
 
 export function getForwardConnectionText(connections: any[]) {
-  const BASE_FORWARD_CONNECTION_TEXT = "This neuron population connects to connectivity statement with id:";
-  let text = BASE_FORWARD_CONNECTION_TEXT
-  if (connections.length > 1) {
-    connections.slice(0, connections.length - 1).forEach((connection: any) => {
-      text = text.concat(` <a style="color:#0000ee" href="/statement/${connection.id}">${connection.id}</a>,`);
-    });
-    text = text.slice(0, -1);  // remove the last comma
-    text = text.concat(" and");
-    text = text.concat(` <a style="color:#0000ee" href="/statement/${connections[connections.length - 1].id}">${connections[connections.length - 1].id}</a>.`);
-  } else if (connections.length === 1) {
-    text = text.concat(` <a style="color:#0000ee" href="/statement/${connections[0].id}">${connections[0].id}</a>.`);
+  if (connections.length === 0) {
+    return "";
   }
-  return connections.length > 0 ? text : "";
+  const BASE_FORWARD_CONNECTION_TEXT = "This neuron population connects to connectivity statement with id:";
+  let text = BASE_FORWARD_CONNECTION_TEXT;
+  text = text.concat(` <a style="color:#0000ee" href="/statement/${connections[0].id}">${connections[0].id}</a>`);
+  connections?.slice(1, connections.length).forEach((connection: any, index: number) => {
+    text = (index === connections.length - 2) ? text.concat(" and") : text.concat(",");
+    text = text.concat(` <a style="color:#0000ee" href="/statement/${connection.id}">${connection.id}</a>`);
+  });
+  text = text.concat(".");
+  return text;
 }
