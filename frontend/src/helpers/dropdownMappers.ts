@@ -127,7 +127,13 @@ export function areArraysOfObjectsEqual(a: any[], b: any[]): boolean {
   const setA = new Set(a.map(obj => obj.id));
   const setB = new Set(b.map(obj => obj.id));
   
-  return JSON.stringify([...setA].sort()) === JSON.stringify([...setB].sort());
+  if (setA.size !== setB.size) return false;
+  
+  for (let id of setA) {
+    if (!setB.has(id)) return false;
+  }
+  
+  return true;
 }
 
 
