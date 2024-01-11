@@ -232,14 +232,13 @@ export default function CustomEntitiesDropdown({
   const [allOptions, setAllOptions] = useState<Option[]>([]);
 
   const [hasValueChanged, setHasValueChanged] = useState(false);
-  
   const preLevelItems = postProcessOptions && getPreLevelSelectedValues ? getPreLevelSelectedValues(id) : [];
   const isAllSelectedValuesFromTheAboveLayer = postProcessOptions && areConnectionsExplicit ? areConnectionsExplicit(id) : true
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setIsDropdownOpened(true);
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
-
+  console.log(value, selectedOptions)
   const handleSelectedOptionsChange = async (newSelectedOptions: Option[]) => {
     setSelectedOptions(newSelectedOptions);
     setHasValueChanged(true);
@@ -745,7 +744,7 @@ export default function CustomEntitiesDropdown({
                                   disableRipple
                                   icon={<UncheckedItemIcon fontSize="small" />}
                                   checkedIcon={
-                                    !isAllSelectedValuesFromTheAboveLayer
+                                    !isAllSelectedValuesFromTheAboveLayer && !hasValueChanged
                                       ? <CheckedItemIconBG  fontSize="small" style={{color: '#C6D9F6'}} />
                                       : <CheckedItemIcon  fontSize="small" />
                                   }
