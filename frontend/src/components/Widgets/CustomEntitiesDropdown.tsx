@@ -122,7 +122,6 @@ const styles = {
       margin: 0,
       color: grey400,
       fontSize: "0.75rem",
-      // zIndex: 10000
     },
   },
 
@@ -211,7 +210,8 @@ export default function CustomEntitiesDropdown({
     refreshStatement,
     statement,
     fieldName = "",
-    getPreLevelSelectedValues
+    getPreLevelSelectedValues,
+    areConnectionsExplicit
   },
 }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -234,7 +234,7 @@ export default function CustomEntitiesDropdown({
   const [hasValueChanged, setHasValueChanged] = useState(false);
   
   const preLevelItems = postProcessOptions && getPreLevelSelectedValues ? getPreLevelSelectedValues(id) : [];
-  const isAllSelectedValuesFromTheAboveLayer = areArraysOfObjectsEqual(selectedOptions, preLevelItems)
+  const isAllSelectedValuesFromTheAboveLayer = postProcessOptions && areConnectionsExplicit ? areConnectionsExplicit(id) : true
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setIsDropdownOpened(true);
     setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -405,7 +405,7 @@ export default function CustomEntitiesDropdown({
 
         <Badge
           sx={{ ...styles.badge, flex: 1 }}
-          badgeContent={isAllSelectedValuesFromTheAboveLayer ? 0 : selectedOptions?.length}
+          badgeContent={!isAllSelectedValuesFromTheAboveLayer ? 0 : selectedOptions?.length}
         >
           <Box
             aria-describedby={aria}
@@ -418,7 +418,7 @@ export default function CustomEntitiesDropdown({
             }
             onClick={handleClick}
           >
-            {(isAllSelectedValuesFromTheAboveLayer || selectedOptions.length === 0) ? (
+            {(!isAllSelectedValuesFromTheAboveLayer || selectedOptions.length === 0) ? (
               <Typography sx={styles.placeholder}>{placeholder}</Typography>
             ) : (
               <Box gap={1} display="flex" flexWrap="wrap" alignItems="center">
@@ -441,7 +441,7 @@ export default function CustomEntitiesDropdown({
                                   ...styles.chip,
                                   flex: 1,
                                   minWidth: 0,
-                                  maxWidth: 'auto',
+                                  maxWidth: 'fit-content',
                                 }}
                                 variant={"outlined"}
                                 onClick={(e) => {
@@ -512,6 +512,7 @@ export default function CustomEntitiesDropdown({
                     sx={{
                       ...styles.chip,
                       display: "flex",
+                      textAlign: "left"
                     }}
                     variant="outlined"
                     label={
@@ -744,7 +745,7 @@ export default function CustomEntitiesDropdown({
                                   disableRipple
                                   icon={<UncheckedItemIcon fontSize="small" />}
                                   checkedIcon={
-                                    isAllSelectedValuesFromTheAboveLayer
+                                    !isAllSelectedValuesFromTheAboveLayer
                                       ? <CheckedItemIconBG  fontSize="small" style={{color: '#C6D9F6'}} />
                                       : <CheckedItemIcon  fontSize="small" />
                                   }

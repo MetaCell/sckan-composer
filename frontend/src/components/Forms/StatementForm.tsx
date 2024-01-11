@@ -311,6 +311,12 @@ const StatementForm = (props: any) => {
               propertyToUpdate: "from_entities",
             });
           },
+          areConnectionsExplicit: (formId: any) => {
+            const id = getFirstNumberFromString(formId)
+            if (id !== null) {
+              return statement?.vias[id]?.are_connections_explicit ? statement?.vias[id]?.are_connections_explicit : false;
+            }
+          },
           getPreLevelSelectedValues: (formId: any) => {
             const id = getFirstNumberFromString(formId)
             let entity: any = []
@@ -482,6 +488,12 @@ const StatementForm = (props: any) => {
               entityType: "destination",
               propertyToUpdate: "from_entities",
             });
+          },
+          areConnectionsExplicit: (formId: any) => {
+            const id = getFirstNumberFromString(formId)
+            if (id !== null) {
+              return statement?.destinations[id]?.are_connections_explicit ? statement?.destinations[id]?.are_connections_explicit : false;
+            }
           },
           getPreLevelSelectedValues: (formId: any) => {
             const id = getFirstNumberFromString(formId)
