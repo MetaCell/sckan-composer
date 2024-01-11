@@ -238,7 +238,6 @@ export default function CustomEntitiesDropdown({
     setIsDropdownOpened(true);
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
-  console.log(value, selectedOptions)
   const handleSelectedOptionsChange = async (newSelectedOptions: Option[]) => {
     setSelectedOptions(newSelectedOptions);
     setHasValueChanged(true);
