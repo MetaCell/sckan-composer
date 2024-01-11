@@ -525,9 +525,9 @@ class ConnectivityStatement(models.Model):
         laterality_map = {
             Laterality.RIGHT.value: "on the right side of the body",
             Laterality.LEFT.value: "on the left side of the body",
-            Laterality.UNKNOWN.value: "at an unknown location of the body",
+            Laterality.UNKNOWN.value: "",
         }
-        return laterality_map.get(self.laterality, "at an unknown location")
+        return laterality_map.get(self.laterality, "")
 
     def assign_owner(self, request):
         if ConnectivityStatementService(self).should_set_owner(request):

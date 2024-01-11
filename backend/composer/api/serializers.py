@@ -498,7 +498,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
 
         # Creating the statement
         if sex != "" or species != "":
-            statement = f"In a {sex} {species}, a {phenotype} connection goes {journey_sentence}.\n"
+            statement = f"In {sex} {species}, the {phenotype} connection goes {journey_sentence}.\n"
         else:
             statement = f"A {phenotype} connection goes {journey_sentence}.\n"
         statement += f"This "
@@ -506,7 +506,10 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             statement += f"{projection} "
         if circuit_type != "not specified":
             statement += f"{circuit_type} "
-        statement += f"connection projects from the {origins} and is found {laterality_description}.\n"
+
+        statement += f"connection projects from the {origins}."
+        if laterality_description != "":
+            statement = statement[:-1] + f" and is found {laterality_description}.\n"
 
         if forward_connection:
             statement += f" This neuron population connects to connectivity statements with id {forward_connection}."
