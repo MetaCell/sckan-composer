@@ -488,11 +488,6 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         if not laterality_description:
             laterality_description = ""
 
-        forward_connection = (
-            join_entities(instance.forward_connection.all().values_list('id', flat=True))
-            if instance.forward_connection
-            else ""
-        )
         apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
         journey_sentence = ', '.join(journey)
 
@@ -507,9 +502,6 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         if circuit_type != "not specified":
             statement += f"{circuit_type} "
         statement += f"connection projects from the {origins} and is found {laterality_description}.\n"
-
-        if forward_connection:
-            statement += f" This neuron population connects to connectivity statements with id {forward_connection}."
 
         if apinatomy:
             statement += f" It is described in {apinatomy} model."

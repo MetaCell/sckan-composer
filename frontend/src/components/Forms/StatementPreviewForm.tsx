@@ -22,7 +22,10 @@ const StatementPreviewForm = (props: any) => {
 
     copiedUISchema["ui:order"] = ["statement_preview"];
     copiedUISchema.statement_preview = {
-        "ui:widget": StatementPreviewWidget
+        "ui:widget": StatementPreviewWidget,
+        "ui:option": {
+            statement: statement,
+        }
     };
 
     const widgets = {
