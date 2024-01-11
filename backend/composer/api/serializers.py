@@ -168,6 +168,8 @@ class ViaSerializerDetails(serializers.ModelSerializer):
         many=True,
     )
 
+    are_connections_explicit = serializers.SerializerMethodField()
+
     class Meta:
         model = Via
         fields = (
@@ -176,8 +178,15 @@ class ViaSerializerDetails(serializers.ModelSerializer):
             "connectivity_statement_id",
             "type",
             "anatomical_entities",
-            "from_entities"
+            "from_entities",
+            "are_connections_explicit",
         )
+
+    def get_are_connections_explicit(self, instance):
+        """
+        Determine if 'from_entities' are explicitly set for the Via instance.
+        """
+        return instance.from_entities.exists()
 
     def to_representation(self, instance):
         """
@@ -254,6 +263,8 @@ class DestinationSerializerDetails(serializers.ModelSerializer):
         many=True,
     )
 
+    are_connections_explicit = serializers.SerializerMethodField()
+
     class Meta:
         model = Destination
         fields = (
@@ -261,8 +272,15 @@ class DestinationSerializerDetails(serializers.ModelSerializer):
             "connectivity_statement_id",
             "type",
             "anatomical_entities",
-            "from_entities"
+            "from_entities",
+            "are_connections_explicit",
         )
+
+    def get_are_connections_explicit(self, instance):
+        """
+        Determine if 'from_entities' are explicitly set for the Via instance.
+        """
+        return instance.from_entities.exists()
 
     def to_representation(self, instance):
         """
