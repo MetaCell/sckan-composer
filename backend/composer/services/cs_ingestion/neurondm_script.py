@@ -1,7 +1,4 @@
-import csv
-import logging
 import os
-from typing import Set
 
 import rdflib
 from neurondm import orders
@@ -10,25 +7,9 @@ from neurondm.core import OntTerm, OntId, RDFL
 from pyontutils.core import OntGraph, OntResIri, OntResPath
 from pyontutils.namespaces import rdfs, ilxtr
 
-
-class Origin:
-    def __init__(self, anatomical_entities_uri: Set):
-        self.anatomical_entities = anatomical_entities_uri
-
-
-class Via:
-    def __init__(self, anatomical_entities_uri: Set, from_entities: Set, order: int, type: str):
-        self.anatomical_entities = anatomical_entities_uri
-        self.from_entities = from_entities
-        self.order = order
-        self.type = type
-
-
-class Destination:
-    def __init__(self, anatomical_entities_uri: Set, from_entities: Set, type: str):
-        self.anatomical_entities = anatomical_entities_uri
-        self.from_entities = from_entities
-        self.type = type
+from composer.services.cs_ingestion.exceptions import NeuronDMInconsistency
+from composer.services.cs_ingestion.logging_service import AXIOM_NOT_FOUND
+from composer.services.cs_ingestion.models import NeuronDMVia, NeuronDMOrigin, NeuronDMDestination, LoggableError
 
 
 def makelpesrdf():
@@ -49,13 +30,14 @@ def makelpesrdf():
     return lpes, lrdf, collect
 
 
-def for_composer(n, cull=False):
+def for_composer(n, logger_service, cull=False):
     lpes, lrdf, collect = makelpesrdf()
 
     try:
         origins, vias, destinations = get_connections(n, lambda predicate: lpes(n, predicate))
-    except Exception as e:
-        logging.error(f"{e}. Skipping population.")
+    except NeuronDMInconsistency as e:
+        if logger_service:
+            logger_service.add_error(LoggableError(e.statement_id, e.entity_id, e.message))
         return None
 
     fc = dict(
@@ -95,11 +77,15 @@ def get_connections(n, lpes):
                                                         ilxtr.hasAxonSensorySubcellularElementIn: 'AFFERENT-T'})
     expected_vias = create_uri_type_dict(lpes, {ilxtr.hasAxonLocatedIn: 'AXON', ilxtr.hasDendriteLocatedIn: 'DENDRITE'})
 
-    tmp_origins, tmp_vias, tmp_destinations = process_connections(partial_order,
-                                                                  set(expected_origins),
-                                                                  expected_vias,
-                                                                  expected_destinations
-                                                                  )
+    try:
+        tmp_origins, tmp_vias, tmp_destinations = process_connections(partial_order,
+                                                                      set(expected_origins),
+                                                                      expected_vias,
+                                                                      expected_destinations
+                                                                      )
+    except NeuronDMInconsistency as e:
+        e.statement_id = n.identifier
+        raise e
 
     origins = merge_origins(tmp_origins)
     vias = merge_vias(tmp_vias)
@@ -118,17 +104,20 @@ def create_uri_type_dict(lpes_func, predicate_type_map):
 # FIXME: The following algorithm will behave incorrectly for cases:
 #  where an anatomical entity has more than one 'role' (Origin, Via, Destinaion)
 #  where we have connections that jump layers
-def process_connections(path, expected_origins, expected_vias, expected_destinations, from_entities=None, depth=0, result=None):
+def process_connections(path, expected_origins, expected_vias, expected_destinations, from_entities=None, depth=0,
+                        result=None):
     if result is None:
         result = {'origins': [], 'destinations': [], 'vias': []}
 
     if isinstance(path, tuple):
         if path[0] == rdflib.term.Literal('blank'):
             for remaining_path in path[1:]:
-                process_connections(remaining_path, expected_origins, expected_vias, expected_destinations, set(), depth=0, result=result)
+                process_connections(remaining_path, expected_origins, expected_vias, expected_destinations, set(),
+                                    depth=0, result=result)
         else:
             current_entity = path[0]
-            primary_uri = current_entity.toPython() if not isinstance(current_entity, orders.rl) else current_entity.region.toPython()
+            primary_uri = current_entity.toPython() if not isinstance(current_entity,
+                                                                      orders.rl) else current_entity.region.toPython()
             secondary_uri = current_entity.layer.toPython() if isinstance(current_entity, orders.rl) else None
 
             # Initialize from_entities as an empty set if None
@@ -137,21 +126,23 @@ def process_connections(path, expected_origins, expected_vias, expected_destinat
             # Check primary and secondary URIs against expected lists
             if primary_uri in expected_origins or secondary_uri in expected_origins:
                 matched_uri = primary_uri if primary_uri in expected_origins else secondary_uri
-                result['origins'].append(Origin({matched_uri}))
+                result['origins'].append(NeuronDMOrigin({matched_uri}))
                 depth = 0
             elif primary_uri in expected_vias or secondary_uri in expected_vias:
                 matched_uri = primary_uri if primary_uri in expected_vias else secondary_uri
-                result['vias'].append(Via({matched_uri}, from_entities, depth, expected_vias.get(matched_uri)))
+                result['vias'].append(NeuronDMVia({matched_uri}, from_entities, depth, expected_vias.get(matched_uri)))
                 depth += 1
             elif primary_uri in expected_destinations or secondary_uri in expected_destinations:
                 matched_uri = primary_uri if primary_uri in expected_destinations else secondary_uri
-                result['destinations'].append(Destination({matched_uri}, from_entities, expected_destinations.get(matched_uri)))
+                result['destinations'].append(
+                    NeuronDMDestination({matched_uri}, from_entities, expected_destinations.get(matched_uri)))
             else:
-                raise Exception(f"{current_entity} not found in axiom.")
+                raise NeuronDMInconsistency(None, current_entity, AXIOM_NOT_FOUND)
 
             # Process the next level structures, carrying over from_entities as a set
             for remaining_path in path[1:]:
-                process_connections(remaining_path, expected_origins, expected_vias, expected_destinations, {matched_uri}, depth, result)
+                process_connections(remaining_path, expected_origins, expected_vias, expected_destinations,
+                                    {matched_uri}, depth, result)
 
     return result['origins'], result['vias'], result['destinations']
 
@@ -161,7 +152,7 @@ def merge_origins(origins):
     for origin in origins:
         merged_anatomical_entities.update(origin.anatomical_entities)
 
-    return Origin(merged_anatomical_entities)
+    return NeuronDMOrigin(merged_anatomical_entities)
 
 
 def merge_vias(vias):
@@ -174,7 +165,7 @@ def merge_vias_by_from_entities(vias):
     for via in vias:
         key = (frozenset(via.anatomical_entities), via.order, via.type)
         if key not in merged_vias:
-            merged_vias[key] = Via(via.anatomical_entities, set(), via.order, via.type)
+            merged_vias[key] = NeuronDMVia(via.anatomical_entities, set(), via.order, via.type)
         merged_vias[key].from_entities.update(via.from_entities)
 
     return list(merged_vias.values())
@@ -185,7 +176,7 @@ def merge_vias_by_anatomical_entities(vias):
     for via in vias:
         key = (via.order, via.type, frozenset(via.from_entities))
         if key not in merged_vias:
-            merged_vias[key] = Via(set(), via.from_entities, via.order, via.type)
+            merged_vias[key] = NeuronDMVia(set(), via.from_entities, via.order, via.type)
         merged_vias[key].anatomical_entities.update(via.anatomical_entities)
 
     return list(merged_vias.values())
@@ -201,7 +192,7 @@ def merge_destinations_by_anatomical_entities(destinations):
     for destination in destinations:
         key = (frozenset(destination.anatomical_entities), destination.type)
         if key not in merged_destinations:
-            merged_destinations[key] = Destination(destination.anatomical_entities, set(), destination.type)
+            merged_destinations[key] = NeuronDMDestination(destination.anatomical_entities, set(), destination.type)
         merged_destinations[key].from_entities.update(destination.from_entities)
 
     return list(merged_destinations.values())
@@ -212,7 +203,7 @@ def merge_destinations_by_from_entities(destinations):
     for destination in destinations:
         key = frozenset(destination.from_entities)
         if key not in merged_destinations:
-            merged_destinations[key] = Destination(set(), destination.from_entities, destination.type)
+            merged_destinations[key] = NeuronDMDestination(set(), destination.from_entities, destination.type)
         merged_destinations[key].anatomical_entities.update(destination.anatomical_entities)
 
     return list(merged_destinations.values())
@@ -220,7 +211,7 @@ def merge_destinations_by_from_entities(destinations):
 
 ## Based on:
 ## https://github.com/tgbugs/pyontutils/blob/30c415207b11644808f70c8caecc0c75bd6acb0a/neurondm/docs/composer.py#L668-L698
-def main(local=False, anatomical_entities=False, anatent_simple=False, do_reconcile=False, viz=False, chains=False):
+def main(local=False, logger_service=None):
     config = Config('random-merge')
     g = OntGraph()  # load and query graph
 
@@ -270,19 +261,8 @@ def main(local=False, anatomical_entities=False, anatent_simple=False, do_reconc
     config.load_existing(g)
     neurons = config.neurons()
 
-    fcs = [for_composer(n) for n in neurons]
+    fcs = [for_composer(n, logger_service) for n in neurons]
     composer_statements = [item for item in fcs if item is not None]
-
-    # TODO: Confirm if this can be deleted
-    # myFile = open('./composer/services/cs_ingestion/neurons.csv', 'w')
-    # writer = csv.DictWriter(myFile,
-    #                         fieldnames=['id', 'label', 'origins', 'vias', 'destinations', 'species', 'sex',
-    #                                     'circuit_type', 'circuit_role', 'phenotype', 'other_phenotypes',
-    #                                     'forward_connection', 'provenance', 'sentence_number', 'note_alert',
-    #                                     'classification_phenotype'])
-    # writer.writeheader()
-    # writer.writerows(fcs)
-    # myFile.close()
 
     return composer_statements
 

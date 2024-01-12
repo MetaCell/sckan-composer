@@ -1,9 +1,14 @@
+import csv
 from typing import List, Dict, Optional, Tuple
 
 from composer.models import AnatomicalEntity, Sentence, ConnectivityStatement, Sex, FunctionalCircuitRole, \
     ProjectionPhenotype, Phenotype, Specie, Provenance, Via, Note, User, Destination
 import logging
 from datetime import datetime
+
+from .logging_service import LoggerService, ENTITY_NOT_FOUND, SEX_NOT_FOUND, SPECIES_NOT_FOUND, MULTIPLE_DESTINATIONS, \
+    INCORRECT_STATE, FORWARD_CONNECTION_NOT_FOUND
+from .models import LoggableError
 from .neurondm_script import main as get_statements_from_neurondm
 from ...enums import (
     CircuitType,
@@ -38,41 +43,48 @@ CIRCUIT_TYPE_MAPPING = {
 
 NOW = datetime.now().strftime("%Y%m%d%H%M%S")
 
+logger_service = LoggerService()
+
 
 def ingest_statements():
-    statements_list = get_statements_from_neurondm()
-
+    statements_list = get_statements_from_neurondm(logger_service=logger_service)
     valid_statements = validate_statements(statements_list)
+
     for statement in valid_statements:
         sentence, sentence_created = get_or_create_sentence(statement)
 
         connectivity_statement, statement_created = get_or_create_connectivity_statement(statement, sentence)
 
         if not statement_created:
-            if should_overwrite(connectivity_statement, statement):
-                defaults = generate_connectivity_statement_defaults(statement, sentence)
-                ConnectivityStatement.objects.filter(id=connectivity_statement.id).update(**defaults)
-                update_many_to_many_fields(connectivity_statement, statement)
-                add_ingestion_system_note(connectivity_statement)
+            defaults = generate_connectivity_statement_defaults(statement, sentence)
+            ConnectivityStatement.objects.filter(id=connectivity_statement.id).update(**defaults)
+            update_many_to_many_fields(connectivity_statement, statement)
+            add_ingestion_system_note(connectivity_statement)
 
     update_forward_connections(valid_statements)
+    logger_service.write_errors_to_file()
+    logger_service.write_ingested_statements_to_file(valid_statements)
 
 
 def validate_statements(statement_list: List):
+    valid_statements = validate_statement_properties(statement_list)
+    return validate_statement_dependencies(valid_statements)
+
+
+def validate_statement_properties(statement_list: List):
     valid_statements = []
     for statement in statement_list:
-        # skip statements with entities not found in db (log the ones skipped)
-        if has_invalid_entities(statement):
-            continue
-        # skip statements with sex not found in db
-        if has_invalid_sex(statement):
-            continue
-        # skip statements with species not found in db
-        if has_invalid_species(statement):
+        # Skip statements with invalid entities, sex, or species
+        if has_invalid_entities(statement) or has_invalid_sex(statement) or has_invalid_species(statement):
             continue
 
-        if len(statement[ORIGINS].anatomical_entities) == 0:
-            continue
+        # Check if existing statements can be overwritten
+        try:
+            connectivity_statement = get_connectivity_statement_by_reference_uri(statement[ID])
+            if not can_be_overwritten(connectivity_statement, statement):
+                continue
+        except ConnectivityStatement.DoesNotExist:
+            pass
 
         valid_statements.append(statement)
 
@@ -80,41 +92,31 @@ def validate_statements(statement_list: List):
 
 
 def has_invalid_entities(statement: Dict) -> bool:
-    invalid_entities = []
+    found_invalid_entities = False
 
-    # Check origins
-    for uri in statement[ORIGINS].anatomical_entities:
+    # Consolidate all URIs to check
+    uris_to_check = statement[ORIGINS].anatomical_entities[:]
+    uris_to_check.extend(uri for dest in statement[DESTINATIONS] for uri in dest.anatomical_entities)
+    uris_to_check.extend(uri for via in statement[VIAS] for uri in via.anatomical_entities)
+
+    # Check all URIs and log if not found
+    for uri in uris_to_check:
         if not found_entity(uri):
-            invalid_entities.append({"entity": uri, "prop": ORIGINS})
+            logger_service.add_error(LoggableError(statement[LABEL], uri, ENTITY_NOT_FOUND))
+            found_invalid_entities = True
 
-    # Check destinations
-    for destination in statement[DESTINATIONS]:
-        for uri in destination.anatomical_entities:
-            if not found_entity(uri):
-                invalid_entities.append({"entity": uri, "prop": DESTINATIONS})
-
-    # Check vias
-    for via in statement[VIAS]:
-        for uri in via.anatomical_entities:
-            if not found_entity(uri):
-                invalid_entities.append({"entity": uri, "prop": VIAS})
-
-    if invalid_entities:
-        logging.warning(
-            f'Skip statement {statement[LABEL]} due to the following entities not found in composer db: {invalid_entities}')
-        return True
-    return False
+    return found_invalid_entities
 
 
 def has_invalid_sex(statement: Dict) -> bool:
     if statement[SEX]:
         if len(statement[SEX]) > 1:
-            logging.warning(
-                f'Warning: Multiple sexes found in statement for {statement[LABEL]}. Only checking the first one.')
+            logging.warning(f'Warning: Multiple sexes found in statement for {statement[LABEL]}.'
+                            f' Only checking the first one.')
 
         first_sex_uri = statement[SEX][0]
         if not Sex.objects.filter(ontology_uri=first_sex_uri).exists():
-            logging.warning(f'Skip statement {statement[LABEL]} due to sex {first_sex_uri} not found in composer db')
+            logger_service.add_error(LoggableError(statement[LABEL], first_sex_uri, SEX_NOT_FOUND))
             return True
     return False
 
@@ -122,10 +124,37 @@ def has_invalid_sex(statement: Dict) -> bool:
 def has_invalid_species(statement: Dict) -> bool:
     for species_uri in statement[SPECIES]:
         if not Specie.objects.filter(ontology_uri=species_uri).exists():
-            logging.warning(
-                f'Skip statement {statement[LABEL]} due to species {species_uri} not found in composer db')
+            logger_service.add_error(LoggableError(statement[LABEL], species_uri, SPECIES_NOT_FOUND))
             return True
     return False
+
+
+def can_be_overwritten(connectivity_statement: ConnectivityStatement, statement) -> bool:
+    if connectivity_statement.destinations.count() > 1:
+        logger_service.add_error(LoggableError(statement[LABEL], None, MULTIPLE_DESTINATIONS))
+        return False
+
+    if connectivity_statement.state != CSState.EXPORTED:
+        logger_service.add_error(LoggableError(statement[LABEL], None, INCORRECT_STATE))
+        return False
+
+    return True
+
+
+def validate_statement_dependencies(valid_statements: List):
+    final_statements = []
+    for statement in valid_statements:
+        if has_valid_forward_connections(statement):
+            final_statements.append(statement)
+    return final_statements
+
+
+def has_valid_forward_connections(statement: Dict) -> bool:
+    for reference_uri in statement[FORWARD_CONNECTION]:
+        if not ConnectivityStatement.objects.filter(reference_uri__exact=reference_uri).exists():
+            logger_service.add_error(LoggableError(statement[ID], reference_uri, FORWARD_CONNECTION_NOT_FOUND))
+            return False
+    return True
 
 
 def get_or_create_sentence(statement: Dict) -> Tuple[Sentence, bool]:
@@ -149,20 +178,6 @@ def get_or_create_sentence(statement: Dict) -> Tuple[Sentence, bool]:
         logging.info(f"Sentence for neuron {statement[LABEL]} created.")
         sentence.save()
     return sentence, created
-
-
-def should_overwrite(connectivity_statement: ConnectivityStatement, statement: Dict) -> bool:
-    if connectivity_statement.destinations.count() > 1:
-        logging.warning(f'Skip statement {statement[LABEL]} due to:'
-                        f' statement already found and has multiple destinations')
-        return False
-
-    if connectivity_statement.state != CSState.EXPORTED:
-        logging.warning(f'Skip statement {statement[LABEL]} due to:'
-                        f' statement already found and is not in {CSState.EXPORTED} state')
-        return False
-
-    return True
 
 
 def get_or_create_connectivity_statement(statement: Dict, sentence: Sentence) -> Tuple[ConnectivityStatement, bool]:
@@ -197,7 +212,6 @@ def get_sex(statement: Dict) -> Sex:
 
 
 def get_functional_circuit_role(statement: Dict) -> Optional[FunctionalCircuitRole]:
-    # Log a warning if there are multiple functional circuit roles
     if len(statement[FUNCTIONAL_CIRCUIT_ROLE]) > 1:
         logging.warning(
             f'Warning: Multiple functional circuit roles found in statement for {statement[LABEL]}. '
@@ -347,24 +361,13 @@ def add_ingestion_system_note(connectivity_statement: ConnectivityStatement):
 
 
 def update_forward_connections(statements: List):
+    # This method doesn't check if the statements exist because they should have been validated prior
     for statement in statements:
         connectivity_statement = get_connectivity_statement_by_reference_uri(statement[ID])
-        if connectivity_statement:
-            if should_overwrite(connectivity_statement, statement):
-                # Clear existing forward connections
-                connectivity_statement.forward_connection.clear()
-
-                for uri in statement[FORWARD_CONNECTION]:
-                    forward_statement = get_connectivity_statement_by_reference_uri(uri)
-                    if forward_statement:
-                        connectivity_statement.forward_connection.add(forward_statement)
-                    else:
-                        logging.warning(
-                            f"No statement found for forward connection URI: "
-                            f"{uri} in statement {statement[LABEL]}")
-        else:
-            # Should never happen because we create them prior
-            logging.warning(f"No connectivity statement found for reference URI: {statement[ID]}")
+        connectivity_statement.forward_connection.clear()
+        for uri in statement[FORWARD_CONNECTION]:
+            forward_statement = get_connectivity_statement_by_reference_uri(uri)
+            connectivity_statement.forward_connection.add(forward_statement)
 
 
 def get_connectivity_statement_by_reference_uri(reference_uri: str) -> Optional[ConnectivityStatement]:
