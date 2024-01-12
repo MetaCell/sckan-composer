@@ -16,7 +16,7 @@ import {
   ListSubheader,
   Chip,
 } from "@mui/material";
-import { CheckedItemIcon, UncheckedItemIcon } from "../icons";
+import {CheckedItemIcon, CheckedItemIconBG, UncheckedItemIcon} from "../icons";
 import HoveredOptionContent from "./HoveredOptionContent";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -28,7 +28,7 @@ import NoResultField from "./NoResultField";
 import { vars } from "../../theme/variables";
 import { Option } from "../../types";
 import Stack from "@mui/material/Stack";
-import { processFromEntitiesData } from "../../helpers/dropdownMappers";
+import {areArraysOfObjectsEqual, processFromEntitiesData} from "../../helpers/dropdownMappers";
 
 const {
   buttonOutlinedBorderColor,
@@ -74,8 +74,6 @@ const styles = {
       right: "0.0625rem",
       top: "0.0625rem",
       pointerEvents: "none",
-      background:
-        "linear-gradient(270deg, #FFF 67.69%, rgba(255, 255, 255, 0.00) 116.94%)",
       borderRadius: "0 0.5rem 0.5rem 0",
     },
   },
@@ -124,7 +122,6 @@ const styles = {
       margin: 0,
       color: grey400,
       fontSize: "0.75rem",
-      // zIndex: 10000
     },
   },
 
@@ -213,6 +210,8 @@ export default function CustomEntitiesDropdown({
     refreshStatement,
     statement,
     fieldName = "",
+    getPreLevelSelectedValues,
+    areConnectionsExplicit
   },
 }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -233,12 +232,12 @@ export default function CustomEntitiesDropdown({
   const [allOptions, setAllOptions] = useState<Option[]>([]);
 
   const [hasValueChanged, setHasValueChanged] = useState(false);
-
+  const preLevelItems = postProcessOptions && getPreLevelSelectedValues ? getPreLevelSelectedValues(id) : [];
+  const isAllSelectedValuesFromTheAboveLayer = postProcessOptions && areConnectionsExplicit ? areConnectionsExplicit(id) : true
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setIsDropdownOpened(true);
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
-
   const handleSelectedOptionsChange = async (newSelectedOptions: Option[]) => {
     setSelectedOptions(newSelectedOptions);
     setHasValueChanged(true);
@@ -256,34 +255,41 @@ export default function CustomEntitiesDropdown({
     {},
   );
 
-  const handleSelectAll = (group: string) => {
+  const handleSelectDeselectGroup = (group: string) => {
     const newSelectedOptions = [...selectedOptions];
-    autocompleteOptions
-      .filter((option: Option) => option.group === group)
-      .forEach((item) => {
-        if (
-          !newSelectedOptions.some(
-            (selectedItem) => selectedItem.id === item.id,
-          )
-        ) {
-          newSelectedOptions.push(item);
+    const groupOptions = autocompleteOptions.filter((option: Option) => option.group === group);
+    
+    // Check if all options in this group are already selected
+    const allSelectedInGroup = groupOptions.every(
+      (groupOption) => newSelectedOptions.some((selectedOption) => selectedOption.id === groupOption.id)
+    );
+    
+    if (allSelectedInGroup) {
+      // Deselect all options in this group
+      groupOptions.forEach((option) => {
+        const index = newSelectedOptions.findIndex((selected) => selected.id === option.id);
+        if (index !== -1) {
+          newSelectedOptions.splice(index, 1);
         }
       });
+    } else {
+      // Select all options in this group
+      groupOptions.forEach((option) => {
+        if (!newSelectedOptions.some((selected) => selected.id === option.id)) {
+          newSelectedOptions.push(option);
+        }
+      });
+    }
+    
     handleSelectedOptionsChange(newSelectedOptions);
   };
-
-  const handleDeselectAll = (group: string) => {
-    const newSelectedOptions = selectedOptions.filter(
-      (item) =>
-        !autocompleteOptions
-          .filter((option: Option) => option.group === group)
-          .some((selectedItem) => selectedItem.id === item.id),
-    );
-    handleSelectedOptionsChange(newSelectedOptions);
-  };
-
+  
   const getGroupButton = (group: string) => {
-    const allObjectsExist = selectedOptions.length === allOptions.length;
+    const groupOptions = autocompleteOptions.filter((option: Option) => option.group === group);
+    const allSelectedInGroup = groupOptions.every(
+      (groupOption) => selectedOptions.some((selectedOption) => selectedOption.id === groupOption.id)
+    );
+    
     return (
       <Button
         variant="text"
@@ -293,11 +299,9 @@ export default function CustomEntitiesDropdown({
           fontWeight: 600,
           lineHeight: "1.125rem",
         }}
-        onClick={() =>
-          allObjectsExist ? handleDeselectAll(group) : handleSelectAll(group)
-        }
+        onClick={() => handleSelectDeselectGroup(group)}
       >
-        {allObjectsExist ? `Deselect` : `Select`} All
+        {allSelectedInGroup ? `Deselect all` : `Select all`}
       </Button>
     );
   };
@@ -343,6 +347,7 @@ export default function CustomEntitiesDropdown({
       console.error("Error fetching data:", error);
     }
   }, [inputValue, id, onSearch, postProcessOptions]);
+  
 
   useEffect(() => {
     if (!isDropdownOpened) return;
@@ -370,9 +375,12 @@ export default function CustomEntitiesDropdown({
           refreshStatement();
           setHasValueChanged(false);
         }
+        if (postProcessOptions && selectedOptions.length === 0) {
+          setSelectedOptions(processFromEntitiesData(preLevelItems))
+        }
       }
     };
-
+    
     document.addEventListener("mousedown", closePopperOnClickOutside);
     return () => {
       document.removeEventListener("mousedown", closePopperOnClickOutside);
@@ -395,7 +403,7 @@ export default function CustomEntitiesDropdown({
 
         <Badge
           sx={{ ...styles.badge, flex: 1 }}
-          badgeContent={selectedOptions?.length}
+          badgeContent={!isAllSelectedValuesFromTheAboveLayer ? 0 : selectedOptions?.length}
         >
           <Box
             aria-describedby={aria}
@@ -408,7 +416,7 @@ export default function CustomEntitiesDropdown({
             }
             onClick={handleClick}
           >
-            {selectedOptions.length === 0 ? (
+            {(!isAllSelectedValuesFromTheAboveLayer || selectedOptions.length === 0) ? (
               <Typography sx={styles.placeholder}>{placeholder}</Typography>
             ) : (
               <Box gap={1} display="flex" flexWrap="wrap" alignItems="center">
@@ -427,7 +435,12 @@ export default function CustomEntitiesDropdown({
                               <CustomInputChip sx={styles.chip} entity={item} />
                             ) : (
                               <Chip
-                                sx={{ ...styles.chip }}
+                                sx={{
+                                  ...styles.chip,
+                                  flex: 1,
+                                  minWidth: 0,
+                                  maxWidth: 'fit-content',
+                                }}
                                 variant={"outlined"}
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -444,8 +457,8 @@ export default function CustomEntitiesDropdown({
                         );
                       })
                   : null}
-                {selectedOptions.length > chipsNumber &&
-                  `+${selectedOptions.length - chipsNumber}`}
+                <span style={{marginRight: '.5rem'}}>{selectedOptions.length > chipsNumber &&
+                  `+${selectedOptions.length - chipsNumber}`}</span>
               </Box>
             )}
             {open ? (
@@ -497,6 +510,7 @@ export default function CustomEntitiesDropdown({
                     sx={{
                       ...styles.chip,
                       display: "flex",
+                      textAlign: "left"
                     }}
                     variant="outlined"
                     label={
@@ -656,6 +670,14 @@ export default function CustomEntitiesDropdown({
                                 background: bodyBgColor,
                               },
 
+                              "&.selected-unchecked": {
+                                "& .MuiButtonBase-root": {
+                                  "&.Mui-checked": {
+                                    color: 'red'
+                                  }
+                                }
+                              },
+
                               "& .MuiTypography-body1": {
                                 color: buttonOutlinedColor,
                                 fontSize: "0.875rem",
@@ -721,7 +743,9 @@ export default function CustomEntitiesDropdown({
                                   disableRipple
                                   icon={<UncheckedItemIcon fontSize="small" />}
                                   checkedIcon={
-                                    <CheckedItemIcon fontSize="small" />
+                                    !isAllSelectedValuesFromTheAboveLayer && !hasValueChanged
+                                      ? <CheckedItemIconBG  fontSize="small" style={{color: '#C6D9F6'}} />
+                                      : <CheckedItemIcon  fontSize="small" />
                                   }
                                   checked={isOptionSelected(option)}
                                 />
