@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional, Tuple, Set
 
 from django.db import transaction
 
@@ -135,17 +135,21 @@ def can_sentence_be_overwritten(sentence: Sentence, statement: Dict) -> bool:
     return True
 
 
-def validate_statement_dependencies(valid_statements: List) -> List[Dict]:
-    final_statements = []
-    for statement in valid_statements:
-        if has_valid_forward_connections(statement):
-            final_statements.append(statement)
-    return final_statements
+def validate_statement_dependencies(statements: List) -> List[Dict]:
+    statement_ids = {statement[ID] for statement in statements}
+
+    valid_statements = []
+
+    for statement in statements:
+        if has_valid_forward_connections(statement, statement_ids):
+            valid_statements.append(statement)
+
+    return valid_statements
 
 
-def has_valid_forward_connections(statement: Dict) -> bool:
+def has_valid_forward_connections(statement: Dict, statement_ids: Set[str]) -> bool:
     for reference_uri in statement[FORWARD_CONNECTION]:
-        if not ConnectivityStatement.objects.filter(reference_uri__exact=reference_uri).exists():
+        if reference_uri not in statement_ids:
             logger_service.add_error(LoggableError(statement[ID], reference_uri, FORWARD_CONNECTION_NOT_FOUND))
             return False
     return True
