@@ -500,6 +500,15 @@ class ConnectivityStatement(models.Model):
     def exported(self, *args, **kwargs):
         ...
 
+    @transition(
+        field=state,
+        source=CSState.DRAFT,
+        target=CSState.EXPORTED,
+        permission=lambda instance, user: user.username == "system",
+    )
+    def exported_from_ingestion(self, *args, **kwargs):
+        ...
+
     @property
     def export_id(self):
         return f"CPR:{self.id:06d}"

@@ -180,30 +180,34 @@ def get_or_create_sentence(statement: Dict) -> Tuple[Sentence, bool]:
 
 def create_or_update_connectivity_statement(statement: Dict, sentence: Sentence) -> Tuple[ConnectivityStatement, bool]:
     reference_uri = statement[ID]
-    defaults = generate_connectivity_statement_defaults(statement, sentence)
 
-    connectivity_statement, created = ConnectivityStatement.objects.get_or_create(
+    connectivity_statement, created = ConnectivityStatement.objects.update_or_create(
         reference_uri__exact=reference_uri,
-        defaults=defaults
+        defaults={
+            "sentence": sentence,
+            "knowledge_statement": statement[LABEL],
+            "sex": get_sex(statement),
+            "circuit_type": get_circuit_type(statement),
+            "functional_circuit_role": get_functional_circuit_role(statement),
+            "phenotype": get_phenotype(statement),
+            "projection_phenotype": get_projection_phenotype(statement),
+            "reference_uri": statement[ID],
+        }
     )
 
-    update_connectivity_statement(connectivity_statement, statement, created, defaults)
+    update_many_to_many_fields(connectivity_statement, statement)
+    if created:
+        do_transition_to_exported(connectivity_statement)
+    else:
+        add_ingestion_system_note(connectivity_statement)
 
     return connectivity_statement, created
 
 
-def generate_connectivity_statement_defaults(statement: Dict, sentence: Sentence) -> Dict:
-    return {
-        "sentence": sentence,
-        "knowledge_statement": statement[LABEL],
-        "sex": get_sex(statement),
-        "circuit_type": get_circuit_type(statement),
-        "functional_circuit_role": get_functional_circuit_role(statement),
-        "phenotype": get_phenotype(statement),
-        "projection_phenotype": get_projection_phenotype(statement),
-        "state": CSState.EXPORTED,
-        "reference_uri": statement[ID],
-    }
+def do_transition_to_exported(connectivity_statement):
+    # Change state from draft (default) to exported
+    system_user = User.objects.get(username="system")
+    connectivity_statement.exported_from_ingestion(by=system_user)
 
 
 def get_sex(statement: Dict) -> Sex:
@@ -256,20 +260,6 @@ def get_projection_phenotype(statement: Dict) -> Optional[ProjectionPhenotype]:
     else:
         logging.warning(f'No projection phenotypes found for statement {statement[LABEL]}')
     return None
-
-
-def update_connectivity_statement(connectivity_statement, statement, created, defaults):
-    # Update fields, excluding the FSMField (state), it doesn't need to get updated because it must
-    # be in exported state
-    updates = {key: value for key, value in defaults.items() if key != 'state'}
-
-    if not created:
-        update_model_instance(connectivity_statement, updates)
-        # Adds a system note to inform about the manual overwrite
-        add_ingestion_system_note(connectivity_statement)
-
-    # Update many-to-many fields
-    update_many_to_many_fields(connectivity_statement, statement)
 
 
 def update_many_to_many_fields(connectivity_statement: ConnectivityStatement, statement: Dict):
