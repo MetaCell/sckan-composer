@@ -220,7 +220,7 @@ class AnatomicalEntity(models.Model):
     """Anatomical Entity"""
 
     name = models.CharField(max_length=200, db_index=True)
-    ontology_uri = models.URLField()  # TODO: Confirm it is acceptable to have multiple anatomical entities with the same uri.
+    ontology_uri = models.URLField()
 
     def __str__(self):
         return self.name
