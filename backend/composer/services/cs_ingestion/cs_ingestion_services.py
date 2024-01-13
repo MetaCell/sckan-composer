@@ -208,6 +208,7 @@ def do_transition_to_exported(connectivity_statement):
     # Change state from draft (default) to exported
     system_user = User.objects.get(username="system")
     connectivity_statement.exported_from_ingestion(by=system_user)
+    connectivity_statement.save()
 
 
 def get_sex(statement: Dict) -> Sex:
