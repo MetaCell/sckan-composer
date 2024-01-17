@@ -157,7 +157,8 @@ def merge_origins(origins):
 
 def merge_vias(vias):
     vias = merge_vias_by_from_entities(vias)
-    return merge_vias_by_anatomical_entities(vias)
+    vias = merge_vias_by_anatomical_entities(vias)
+    return assign_unique_order_to_vias(vias)
 
 
 def merge_vias_by_from_entities(vias):
@@ -180,6 +181,17 @@ def merge_vias_by_anatomical_entities(vias):
         merged_vias[key].anatomical_entities.update(via.anatomical_entities)
 
     return list(merged_vias.values())
+
+
+def assign_unique_order_to_vias(vias):
+    # Sort vias by their original order
+    sorted_vias = sorted(vias, key=lambda x: x.order)
+
+    # Assign new orders to maintain uniqueness and relative order
+    for new_order, via in enumerate(sorted_vias):
+        via.order = new_order
+
+    return sorted_vias
 
 
 def merge_destinations(destinations):
