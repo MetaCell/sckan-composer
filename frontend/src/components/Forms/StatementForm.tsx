@@ -605,6 +605,7 @@ const StatementForm = (props: any) => {
           }}
           deleteIcon={<OpenInNewIcon sx={{ fill: "#548CE5" }} />}
           onDelete={(e) => {
+            window.open(window.location.origin + "/statement/" + entity?.id, '_blank')
             e.stopPropagation();
           }}
           label={entity?.label}
