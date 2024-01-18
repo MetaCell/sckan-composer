@@ -192,15 +192,23 @@ def create_or_update_connectivity_statement(statement: Dict, sentence: Sentence)
             "phenotype": get_phenotype(statement),
             "projection_phenotype": get_projection_phenotype(statement),
             "reference_uri": statement[ID],
-            "state": CSState.EXPORTED,
         }
     )
 
     update_many_to_many_fields(connectivity_statement, statement)
-    if not created:
+    if created:
+        do_transition_to_exported(connectivity_statement)
+    else:
         add_ingestion_system_note(connectivity_statement)
 
     return connectivity_statement, created
+
+
+def do_transition_to_exported(connectivity_statement):
+    # Change state from draft (default) to exported
+    system_user = User.objects.get(username="system")
+    connectivity_statement.exported_from_ingestion(by=system_user)
+    connectivity_statement.save()
 
 
 def get_sex(statement: Dict) -> Sex:
