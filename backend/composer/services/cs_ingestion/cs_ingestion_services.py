@@ -180,21 +180,25 @@ def get_or_create_sentence(statement: Dict) -> Tuple[Sentence, bool]:
 
 def create_or_update_connectivity_statement(statement: Dict, sentence: Sentence) -> Tuple[ConnectivityStatement, bool]:
     reference_uri = statement[ID]
+    defaults = {
+        "sentence": sentence,
+        "knowledge_statement": statement[LABEL],
+        "sex": get_sex(statement),
+        "circuit_type": get_circuit_type(statement),
+        "functional_circuit_role": get_functional_circuit_role(statement),
+        "phenotype": get_phenotype(statement),
+        "projection_phenotype": get_projection_phenotype(statement),
+        "reference_uri": statement[ID],
+        "state": CSState.EXPORTED,
+    }
 
-    connectivity_statement, created = ConnectivityStatement.objects.update_or_create(
-        reference_uri__exact=reference_uri,
-        defaults={
-            "sentence": sentence,
-            "knowledge_statement": statement[LABEL],
-            "sex": get_sex(statement),
-            "circuit_type": get_circuit_type(statement),
-            "functional_circuit_role": get_functional_circuit_role(statement),
-            "phenotype": get_phenotype(statement),
-            "projection_phenotype": get_projection_phenotype(statement),
-            "reference_uri": statement[ID],
-            "state": CSState.EXPORTED,
-        }
-    )
+    if ConnectivityStatement.objects.filter(reference_uri__exact=reference_uri).exists():
+        ConnectivityStatement.objects.filter(reference_uri__exact=reference_uri).update(**defaults)
+        connectivity_statement = ConnectivityStatement.objects.get(reference_uri__exact=reference_uri)
+        created = False
+    else:
+        connectivity_statement = ConnectivityStatement.objects.create(**defaults)
+        created = True
 
     update_many_to_many_fields(connectivity_statement, statement)
     if not created:
