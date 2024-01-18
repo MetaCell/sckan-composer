@@ -123,6 +123,8 @@ def process_connections(path, expected_origins, expected_vias, expected_destinat
             # Initialize from_entities as an empty set if None
             from_entities = from_entities or set()
 
+            matched_uri = None
+
             # Check primary and secondary URIs against expected lists
             if primary_uri in expected_origins or secondary_uri in expected_origins:
                 matched_uri = primary_uri if primary_uri in expected_origins else secondary_uri
@@ -136,13 +138,13 @@ def process_connections(path, expected_origins, expected_vias, expected_destinat
                 matched_uri = primary_uri if primary_uri in expected_destinations else secondary_uri
                 result['destinations'].append(
                     NeuronDMDestination({matched_uri}, from_entities, expected_destinations.get(matched_uri)))
-            else:
-                raise NeuronDMInconsistency(None, current_entity, AXIOM_NOT_FOUND)
+
+            next_from_entities = {matched_uri} if matched_uri else from_entities
 
             # Process the next level structures, carrying over from_entities as a set
             for remaining_path in path[1:]:
                 process_connections(remaining_path, expected_origins, expected_vias, expected_destinations,
-                                    {matched_uri}, depth, result)
+                                    next_from_entities, depth, result)
 
     return result['origins'], result['vias'], result['destinations']
 
