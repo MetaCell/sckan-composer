@@ -192,17 +192,16 @@ def create_or_update_connectivity_statement(statement: Dict, sentence: Sentence)
         "state": CSState.EXPORTED,
     }
 
-    if ConnectivityStatement.objects.filter(reference_uri__exact=reference_uri).exists():
+    connectivity_statement, created = ConnectivityStatement.objects.get_or_create(
+        reference_uri=reference_uri,
+        defaults=defaults
+    )
+    if not created:
         ConnectivityStatement.objects.filter(reference_uri__exact=reference_uri).update(**defaults)
-        connectivity_statement = ConnectivityStatement.objects.get(reference_uri__exact=reference_uri)
-        created = False
-    else:
-        connectivity_statement = ConnectivityStatement.objects.create(**defaults)
-        created = True
+        connectivity_statement.refresh_from_db()
+        add_ingestion_system_note(connectivity_statement)
 
     update_many_to_many_fields(connectivity_statement, statement)
-    if not created:
-        add_ingestion_system_note(connectivity_statement)
 
     return connectivity_statement, created
 
@@ -350,7 +349,7 @@ def add_ingestion_system_note(connectivity_statement: ConnectivityStatement):
     Note.objects.create(connectivity_statement=connectivity_statement,
                         user=User.objects.get(username="system"),
                         type=NoteType.ALERT,
-                        note=f"Overwritten by manual ingestion in {NOW}")
+                        note=f"Overwritten by manual ingestion")
 
 
 def update_forward_connections(statements: List):
