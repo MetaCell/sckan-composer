@@ -51,7 +51,7 @@ def for_composer(n, logger_service, cull=False):
         circuit_type=lpes(n, ilxtr.hasCircuitRolePhenotype),
         circuit_role=lpes(n, ilxtr.hasFunctionalCircuitRolePhenotype),
         phenotype=lpes(n, ilxtr.hasAnatomicalSystemPhenotype),
-        classification_phenotype=lpes(n, ilxtr.hasClassificationPhenotype),
+        #classification_phenotype=lpes(n, ilxtr.hasClassificationPhenotype),
         other_phenotypes=(lpes(n, ilxtr.hasPhenotype)
                           + lpes(n, ilxtr.hasMolecularPhenotype)
                           + lpes(n, ilxtr.hasProjectionPhenotype)),

@@ -7,7 +7,7 @@ from django.db import transaction
 from composer.models import AnatomicalEntity, Sentence, ConnectivityStatement, Sex, FunctionalCircuitRole, \
     ProjectionPhenotype, Phenotype, Specie, Provenance, Via, Note, User, Destination
 from .helpers import get_value_or_none, found_entity, \
-    update_model_instance, ORIGINS, DESTINATIONS, VIAS, LABEL, SEX, SPECIES, ID, FORWARD_CONNECTION, SENTENCE_NUMBER, \
+    ORIGINS, DESTINATIONS, VIAS, LABEL, SEX, SPECIES, ID, FORWARD_CONNECTION, SENTENCE_NUMBER, \
     FUNCTIONAL_CIRCUIT_ROLE, CIRCUIT_TYPE, CIRCUIT_TYPE_MAPPING, PHENOTYPE, OTHER_PHENOTYPE, NOTE_ALERT, PROVENANCE
 from .logging_service import LoggerService, ENTITY_NOT_FOUND, SEX_NOT_FOUND, SPECIES_NOT_FOUND, MULTIPLE_DESTINATIONS, \
     STATEMENT_INCORRECT_STATE, FORWARD_CONNECTION_NOT_FOUND, SENTENCE_INCORRECT_STATE
@@ -39,6 +39,7 @@ def ingest_statements():
     except Exception as e:
         logger_service.add_error(LoggableError(statement_id=None, entity_id=None, message=str(e)))
         successful_transaction = False
+        logging.error(f"Ingestion aborted due to {e}")
 
     logger_service.write_errors_to_file()
 
@@ -197,13 +198,104 @@ def create_or_update_connectivity_statement(statement: Dict, sentence: Sentence)
         defaults=defaults
     )
     if not created:
-        ConnectivityStatement.objects.filter(reference_uri=reference_uri).update(**defaults)
-        connectivity_statement.refresh_from_db()
-        add_ingestion_system_note(connectivity_statement)
+        if has_changes(connectivity_statement, statement, defaults):
+            ConnectivityStatement.objects.filter(reference_uri=reference_uri).update(**defaults)
+            fields_to_refresh = [field for field in defaults.keys() if field != 'state']
+            connectivity_statement.refresh_from_db(fields=fields_to_refresh)
+            add_ingestion_system_note(connectivity_statement)
 
     update_many_to_many_fields(connectivity_statement, statement)
 
     return connectivity_statement, created
+
+
+def has_changes(connectivity_statement, statement, defaults):
+    for field, value in defaults.items():
+        if field in ['sex', 'functional_circuit_role', 'phenotype', 'projection_phenotype']:
+            current_fk_id = getattr(connectivity_statement, f'{field}_id')
+            new_fk_id = value.id if value is not None else None
+            if current_fk_id != new_fk_id:
+                return True
+        else:
+            # For simple fields, directly compare the values
+            if getattr(connectivity_statement, field) != value:
+                return True
+
+    # Check for changes in species
+    current_species = set(species.ontology_uri for species in connectivity_statement.species.all())
+    new_species = set(statement.get(SPECIES, []))
+    if current_species != new_species:
+        return True
+
+    # Check for changes in provenance
+    current_provenance = set(provenance.uri for provenance in connectivity_statement.provenance_set.all())
+    new_provenance = set(statement.get(PROVENANCE, []))
+    if current_provenance != new_provenance:
+        return True
+
+    # Check for changes in forward_connection
+    current_forward_connections = set(connection.id for connection in connectivity_statement.forward_connection.all())
+    new_forward_connections = set(statement.get(FORWARD_CONNECTION, []))
+    if current_forward_connections != new_forward_connections:
+        return True
+
+    # Check for changes in origins
+    current_origins = set(origin.ontology_uri for origin in connectivity_statement.origins.all())
+    new_origins = statement[ORIGINS].anatomical_entities
+    if current_origins != new_origins:
+        return True
+
+    # Check for changes in vias
+    current_vias = [
+        {
+            'anatomical_entities': set(via.anatomical_entities.all().values_list('ontology_uri', flat=True)),
+            'from_entities': set(via.from_entities.all().values_list('ontology_uri', flat=True))
+        }
+        for via in connectivity_statement.via_set.order_by('order').all()
+    ]
+    new_vias = statement[VIAS]
+
+    if len(current_vias) != len(new_vias):
+        return True
+
+    for current_via, new_via in zip(current_vias, new_vias):
+        if (new_via.anatomical_entities != current_via['anatomical_entities'] or
+                new_via.from_entities != current_via['from_entities']):
+            return True
+
+    # Check for changes in destinations
+    # Fixme: We may need to change this algorithm when multi-destination is supported by neurondm
+    current_destinations = connectivity_statement.destinations.all()
+    new_destinations = statement[DESTINATIONS]
+
+    if len(current_destinations) != len(new_destinations):
+        return True
+
+    current_destinations_anatomical_entities = set(
+        uri for destination in current_destinations
+        for uri in destination.anatomical_entities.all().values_list('ontology_uri', flat=True)
+    )
+    current_destinations_from_entities = set(
+        uri for destination in current_destinations
+        for uri in destination.from_entities.all().values_list('ontology_uri', flat=True)
+    )
+
+    new_destinations_anatomical_entities = set(
+        uri for destination in new_destinations
+        for uri in destination.anatomical_entities
+    )
+    new_destinations_from_entities = set(
+        uri for destination in new_destinations
+        for uri in destination.from_entities
+    )
+
+    if (current_destinations_anatomical_entities != new_destinations_anatomical_entities or
+            current_destinations_from_entities != new_destinations_from_entities):
+        return True
+
+    # Not checking the Notes because they are kept
+
+    return False
 
 
 def get_sex(statement: Dict) -> Sex:
@@ -334,7 +426,8 @@ def add_notes(connectivity_statement: ConnectivityStatement, statement: Dict):
 
 
 def add_provenances(connectivity_statement: ConnectivityStatement, statement: Dict):
-    provenances_list = statement[PROVENANCE][0].split(", ") if statement[PROVENANCE] else [statement[ID]]
+    # todo: check if it's fine to add all provenances, in the past we were only adding the first
+    provenances_list = statement[PROVENANCE] if statement[PROVENANCE] else [statement[ID]]
     provenances = (Provenance(connectivity_statement=connectivity_statement, uri=provenance) for provenance in
                    provenances_list)
     Provenance.objects.bulk_create(provenances)
