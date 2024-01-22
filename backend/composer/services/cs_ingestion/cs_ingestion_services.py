@@ -110,7 +110,7 @@ def has_invalid_sentence(statement: Dict) -> bool:
 
 def has_invalid_statement(statement: Dict) -> bool:
     try:
-        connectivity_statement = ConnectivityStatement.objects.get(reference_uri__exact=statement[ID])
+        connectivity_statement = ConnectivityStatement.objects.get(reference_uri=statement[ID])
     except ConnectivityStatement.DoesNotExist:
         return False
     return not can_statement_be_overwritten(connectivity_statement, statement)
@@ -197,7 +197,7 @@ def create_or_update_connectivity_statement(statement: Dict, sentence: Sentence)
         defaults=defaults
     )
     if not created:
-        ConnectivityStatement.objects.filter(reference_uri__exact=reference_uri).update(**defaults)
+        ConnectivityStatement.objects.filter(reference_uri=reference_uri).update(**defaults)
         connectivity_statement.refresh_from_db()
         add_ingestion_system_note(connectivity_statement)
 
@@ -355,8 +355,8 @@ def add_ingestion_system_note(connectivity_statement: ConnectivityStatement):
 def update_forward_connections(statements: List):
     # This method doesn't check if the statements exist because they should have been validated prior
     for statement in statements:
-        connectivity_statement = ConnectivityStatement.objects.get(reference_uri__exact=statement[ID])
+        connectivity_statement = ConnectivityStatement.objects.get(reference_uri=statement[ID])
         connectivity_statement.forward_connection.clear()
         for uri in statement[FORWARD_CONNECTION]:
-            forward_statement = ConnectivityStatement.objects.get(reference_uri__exact=uri)
+            forward_statement = ConnectivityStatement.objects.get(reference_uri=uri)
             connectivity_statement.forward_connection.add(forward_statement)
