@@ -133,6 +133,7 @@ const StatementForm = (props: any) => {
       disabledReason: "",
       fieldName: "origins",
       chipsNumber: 5,
+      minWidth: "50rem",
       onSearch: async (
         searchValue: string,
         formId: string,
