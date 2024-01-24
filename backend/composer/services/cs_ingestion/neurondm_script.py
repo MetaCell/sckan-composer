@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 import rdflib
 from neurondm import orders
@@ -8,9 +9,11 @@ from pyontutils.core import OntGraph, OntResIri, OntResPath
 from pyontutils.namespaces import rdfs, ilxtr
 
 from composer.services.cs_ingestion.exceptions import NeuronDMInconsistency
-from composer.services.cs_ingestion.logging_service import AXIOM_NOT_FOUND
-from composer.services.cs_ingestion.models import NeuronDMVia, NeuronDMOrigin, NeuronDMDestination, LoggableError
+from composer.services.cs_ingestion.logging_service import LoggerService, AXIOM_NOT_FOUND
+from composer.services.cs_ingestion.models import NeuronDMVia, NeuronDMOrigin, NeuronDMDestination, LoggableEvent
 
+
+logger_service : Optional[LoggerService] = None
 
 def makelpesrdf():
     collect = []
@@ -30,14 +33,14 @@ def makelpesrdf():
     return lpes, lrdf, collect
 
 
-def for_composer(n, logger_service, cull=False):
+def for_composer(n, cull=False):
     lpes, lrdf, collect = makelpesrdf()
 
     try:
         origins, vias, destinations = get_connections(n, lambda predicate: lpes(n, predicate))
     except NeuronDMInconsistency as e:
         if logger_service:
-            logger_service.add_error(LoggableError(e.statement_id, e.entity_id, e.message))
+            logger_service.add_error(LoggableEvent(e.statement_id, e.entity_id, e.message))
         return None
 
     fc = dict(
@@ -138,6 +141,9 @@ def process_connections(path, expected_origins, expected_vias, expected_destinat
                 matched_uri = primary_uri if primary_uri in expected_destinations else secondary_uri
                 result['destinations'].append(
                     NeuronDMDestination({matched_uri}, from_entities, expected_destinations.get(matched_uri)))
+            else:
+                if logger_service:
+                    logger_service.add_warning(NeuronDMInconsistency(None, current_entity, AXIOM_NOT_FOUND))
 
             next_from_entities = {matched_uri} if matched_uri else from_entities
 
@@ -225,7 +231,10 @@ def merge_destinations_by_from_entities(destinations):
 
 ## Based on:
 ## https://github.com/tgbugs/pyontutils/blob/30c415207b11644808f70c8caecc0c75bd6acb0a/neurondm/docs/composer.py#L668-L698
-def main(local=False, logger_service=None):
+def main(local=False, logger_service_param=Optional[LoggerService]):
+    global logger_service
+    logger_service = logger_service_param
+
     config = Config('random-merge')
     g = OntGraph()  # load and query graph
 
@@ -275,7 +284,7 @@ def main(local=False, logger_service=None):
     config.load_existing(g)
     neurons = config.neurons()
 
-    fcs = [for_composer(n, logger_service) for n in neurons]
+    fcs = [for_composer(n) for n in neurons]
     composer_statements = [item for item in fcs if item is not None]
 
     return composer_statements

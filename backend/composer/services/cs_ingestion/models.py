@@ -21,7 +21,7 @@ class NeuronDMDestination:
         self.type = type
 
 
-class LoggableError:
+class LoggableEvent:
     def __init__(self, statement_id, entity_id, message):
         self.statement_id = statement_id
         self.entity_id = entity_id

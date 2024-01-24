@@ -11,7 +11,7 @@ from .helpers import get_value_or_none, found_entity, \
     FUNCTIONAL_CIRCUIT_ROLE, CIRCUIT_TYPE, CIRCUIT_TYPE_MAPPING, PHENOTYPE, OTHER_PHENOTYPE, NOTE_ALERT, PROVENANCE
 from .logging_service import LoggerService, ENTITY_NOT_FOUND, SEX_NOT_FOUND, SPECIES_NOT_FOUND, MULTIPLE_DESTINATIONS, \
     STATEMENT_INCORRECT_STATE, FORWARD_CONNECTION_NOT_FOUND, SENTENCE_INCORRECT_STATE
-from .models import LoggableError
+from .models import LoggableEvent
 from .neurondm_script import main as get_statements_from_neurondm
 from ...enums import (
     CircuitType,
@@ -37,7 +37,7 @@ def ingest_statements():
 
             update_forward_connections(valid_statements)
     except Exception as e:
-        logger_service.add_error(LoggableError(statement_id=None, entity_id=None, message=str(e)))
+        logger_service.add_error(LoggableEvent(statement_id=None, entity_id=None, message=str(e)))
         successful_transaction = False
         logging.error(f"Ingestion aborted due to {e}")
 
@@ -75,7 +75,7 @@ def has_invalid_entities(statement: Dict) -> bool:
     # Check all URIs and log if not found
     for uri in uris_to_check:
         if not found_entity(uri):
-            logger_service.add_error(LoggableError(statement[ID], uri, ENTITY_NOT_FOUND))
+            logger_service.add_error(LoggableEvent(statement[ID], uri, ENTITY_NOT_FOUND))
             found_invalid_entities = True
 
     return found_invalid_entities
@@ -88,7 +88,7 @@ def has_invalid_sex(statement: Dict) -> bool:
 
         first_sex_uri = statement[SEX][0]
         if not Sex.objects.filter(ontology_uri=first_sex_uri).exists():
-            logger_service.add_error(LoggableError(statement[ID], first_sex_uri, SEX_NOT_FOUND))
+            logger_service.add_error(LoggableEvent(statement[ID], first_sex_uri, SEX_NOT_FOUND))
             return True
     return False
 
@@ -96,7 +96,7 @@ def has_invalid_sex(statement: Dict) -> bool:
 def has_invalid_species(statement: Dict) -> bool:
     for species_uri in statement[SPECIES]:
         if not Specie.objects.filter(ontology_uri=species_uri).exists():
-            logger_service.add_error(LoggableError(statement[ID], species_uri, SPECIES_NOT_FOUND))
+            logger_service.add_error(LoggableEvent(statement[ID], species_uri, SPECIES_NOT_FOUND))
             return True
     return False
 
@@ -119,11 +119,11 @@ def has_invalid_statement(statement: Dict) -> bool:
 
 def can_statement_be_overwritten(connectivity_statement: ConnectivityStatement, statement) -> bool:
     if connectivity_statement.destinations.count() > 1:
-        logger_service.add_error(LoggableError(statement[ID], None, MULTIPLE_DESTINATIONS))
+        logger_service.add_error(LoggableEvent(statement[ID], None, MULTIPLE_DESTINATIONS))
         return False
 
     if connectivity_statement.state != CSState.EXPORTED:
-        logger_service.add_error(LoggableError(statement[ID], None, STATEMENT_INCORRECT_STATE))
+        logger_service.add_error(LoggableEvent(statement[ID], None, STATEMENT_INCORRECT_STATE))
         return False
 
     return True
@@ -131,7 +131,7 @@ def can_statement_be_overwritten(connectivity_statement: ConnectivityStatement, 
 
 def can_sentence_be_overwritten(sentence: Sentence, statement: Dict) -> bool:
     if sentence.state != SentenceState.COMPOSE_NOW:
-        logger_service.add_error(LoggableError(statement[ID], None, SENTENCE_INCORRECT_STATE))
+        logger_service.add_error(LoggableEvent(statement[ID], None, SENTENCE_INCORRECT_STATE))
         return False
     return True
 
@@ -151,7 +151,7 @@ def validate_statement_dependencies(statements: List) -> List[Dict]:
 def has_valid_forward_connections(statement: Dict, statement_ids: Set[str]) -> bool:
     for reference_uri in statement[FORWARD_CONNECTION]:
         if reference_uri not in statement_ids:
-            logger_service.add_error(LoggableError(statement[ID], reference_uri, FORWARD_CONNECTION_NOT_FOUND))
+            logger_service.add_error(LoggableEvent(statement[ID], reference_uri, FORWARD_CONNECTION_NOT_FOUND))
             return False
     return True
 

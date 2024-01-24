@@ -94,6 +94,7 @@ class TestProcessConnections(unittest.TestCase):
         via_orders = [via.order for via in vias]
         self.assertEqual(len(via_orders), len(set(via_orders)), "Via orders are not unique")
 
+    # FIXME: To fix after neurodm defines their modelling
     def test_process_connections_multiple_predicates(self):
         expected_origins = {'Oa', 'Ob'}
         expected_vias = {
@@ -125,7 +126,6 @@ class TestProcessConnections(unittest.TestCase):
                 )
             ),
         )
-
         tmp_origins, tmp_vias, tmp_destinations = process_connections(
             mock_path,
             expected_origins,

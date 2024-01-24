@@ -3,7 +3,7 @@ from typing import List, Dict
 
 from composer.enums import CSState, SentenceState
 from composer.services.cs_ingestion.helpers import ID, LABEL
-from composer.services.cs_ingestion.models import LoggableError
+from composer.services.cs_ingestion.models import LoggableEvent
 
 AXIOM_NOT_FOUND = "Entity not found in any axiom"
 ENTITY_NOT_FOUND = "Entity not found in composer db"
@@ -20,15 +20,21 @@ class LoggerService:
         self.error_log_path = error_log_path
         self.success_log_path = success_log_path
         self.errors = []
+        self.warnings = []
 
-    def add_error(self, error: LoggableError):
+    def add_error(self, error: LoggableEvent):
         self.errors.append(error)
+
+    def add_warning(self, error: LoggableEvent):
+        self.warnings.append(error)
 
     def write_errors_to_file(self):
         with open(self.error_log_path, 'w', newline='') as file:
             writer = csv.writer(file)
             for error in self.errors:
-                writer.writerow([error.statement_id, error.entity_id, error.message])
+                writer.writerow(['Error', error.statement_id, error.entity_id, error.message])
+            for warning in self.warnings:
+                writer.writerow(['Warning', warning.statement_id, warning.entity_id, warning.message])
 
     def write_ingested_statements_to_file(self, statements: List[Dict]):
         with open(self.success_log_path, 'w', newline='') as file:
