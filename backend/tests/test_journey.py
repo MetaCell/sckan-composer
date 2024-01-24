@@ -102,7 +102,7 @@ class JourneyTestCase(TestCase):
         self.assertTrue(all_paths == expected_paths)
 
         journey_paths = consolidate_paths(all_paths)
-        expected_journey = [[('Oa, Ob', 0), ('Da', 1)]]
+        expected_journey = [[('Oa or Ob', 0), ('Da', 1)]]
         self.assertTrue(journey_paths == expected_journey)
 
     def test_journey_simple_graph_no_jumps(self):
@@ -154,7 +154,7 @@ class JourneyTestCase(TestCase):
         expected_paths.sort()
         self.assertTrue(all_paths == expected_paths)
 
-        expected_journey = [[('Oa, Ob', 0), ('V1a', 1), ('Da', 2)]]
+        expected_journey = [[('Oa or Ob', 0), ('V1a', 1), ('Da', 2)]]
         journey_paths = consolidate_paths(all_paths)
         self.assertTrue(journey_paths == expected_journey)
 
@@ -213,7 +213,7 @@ class JourneyTestCase(TestCase):
         self.assertTrue(all_paths == expected_paths)
 
         expected_journey = [
-            [('Oa, Ob', 0), ('V1a, V1b', 1), ('Da', 2)]
+            [('Oa or Ob', 0), ('V1a, V1b', 1), ('Da', 2)]
         ]
         journey_paths = consolidate_paths(all_paths)
         self.assertTrue(journey_paths == expected_journey)
@@ -293,9 +293,9 @@ class JourneyTestCase(TestCase):
         expected_paths.sort()
         self.assertTrue(all_paths == expected_paths)
 
-        expected_journey = [[('Oa, Ob', 0), ('V1a', 1), ('V2a', 2), ('V3a', 3), ('Da', 5)],
-                            [('Oa, Ob', 0), ('V1a', 1), ('V2a', 2), ('V4a', 4), ('Da', 5)],
-                            [('Oa, Ob', 0), ('V1a', 1), ('V2b', 2), ('Da', 5)],
+        expected_journey = [[('Oa or Ob', 0), ('V1a', 1), ('V2a', 2), ('V3a', 3), ('Da', 5)],
+                            [('Oa or Ob', 0), ('V1a', 1), ('V2a', 2), ('V4a', 4), ('Da', 5)],
+                            [('Oa or Ob', 0), ('V1a', 1), ('V2b', 2), ('Da', 5)],
                             [('Oa', 0), ('V3a', 3), ('Da', 5)]]
         journey_paths = consolidate_paths(all_paths)
         self.assertTrue(journey_paths == expected_journey)
@@ -382,12 +382,12 @@ class JourneyTestCase(TestCase):
         self.assertTrue(all_paths == expected_paths)
 
         expected_journey = [
-            [('Oa, Ob', 0), ('V1a', 1), ('V2a', 2), ('V3a', 3), ('V4a', 4), ('V5a', 5), ('V6a', 6), ('Da', 7)],
-            [('Oa, Ob', 0), ('V1a', 1), ('V2b', 2), ('V4a', 4), ('V5a', 5), ('V6a', 6), ('Da', 7)],
-            [('Oa, Ob', 0), ('V1a', 1), ('V2a', 2), ('V3a', 3), ('V4a', 4), ('V5b', 5), ('Da', 7)],
-            [('Oa, Ob', 0), ('V1a', 1), ('V3a', 3), ('V4a', 4), ('V5a', 5), ('V6a', 6), ('Da', 7)],
-            [('Oa, Ob', 0), ('V1a', 1), ('V2b', 2), ('V4a', 4), ('V5b', 5), ('Da', 7)],
-            [('Oa, Ob', 0), ('V1a', 1), ('V3a', 3), ('V4a', 4), ('V5b', 5), ('Da', 7)]
+            [('Oa or Ob', 0), ('V1a', 1), ('V2a', 2), ('V3a', 3), ('V4a', 4), ('V5a', 5), ('V6a', 6), ('Da', 7)],
+            [('Oa or Ob', 0), ('V1a', 1), ('V2b', 2), ('V4a', 4), ('V5a', 5), ('V6a', 6), ('Da', 7)],
+            [('Oa or Ob', 0), ('V1a', 1), ('V2a', 2), ('V3a', 3), ('V4a', 4), ('V5b', 5), ('Da', 7)],
+            [('Oa or Ob', 0), ('V1a', 1), ('V3a', 3), ('V4a', 4), ('V5a', 5), ('V6a', 6), ('Da', 7)],
+            [('Oa or Ob', 0), ('V1a', 1), ('V2b', 2), ('V4a', 4), ('V5b', 5), ('Da', 7)],
+            [('Oa or Ob', 0), ('V1a', 1), ('V3a', 3), ('V4a', 4), ('V5b', 5), ('Da', 7)]
         ]
 
         journey_paths = consolidate_paths(all_paths)
@@ -446,7 +446,7 @@ class JourneyTestCase(TestCase):
 
         expected_journey = [
             [('Oa', 0), ('Oa', 1), ('Da', 2)],
-            [('Oa, Ob', 0), ('Da', 2)]
+            [('Oa or Ob', 0), ('Da', 2)]
         ]
 
         journey_paths = consolidate_paths(all_paths)
