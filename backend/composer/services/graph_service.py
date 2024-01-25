@@ -42,8 +42,8 @@ def create_paths_from_origin(origin, vias, destinations, current_path, number_of
         # This checks if the last node in the current path is one of the nodes that can lead to the current via.
         # In other words, it checks if there is a valid connection
         # from the last node in the current path to the current via.
-        if len(current_path) == via_layer and (current_path[-1][0] in list(
-            a.name for a in current_via.from_entities.all()) or not current_via.from_entities.exists()):
+        if current_path[-1][0] in list(
+                a.name for a in current_via.from_entities.all()) or not current_via.from_entities.exists():
             for entity in current_via.anatomical_entities.all():
                 # Build new sub-paths including the current via entity
                 new_sub_path = current_path + [(entity.name, via_layer)]
