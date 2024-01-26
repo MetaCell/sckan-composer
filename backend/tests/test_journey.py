@@ -20,7 +20,7 @@ class JourneyTestCase(TestCase):
 
         cs.origins.add(origin1, origin2)
 
-        via = Via.objects.create(connectivity_statement=cs, order=0)
+        via = Via.objects.create(connectivity_statement=cs)
         via.anatomical_entities.add(via1)
         via.from_entities.add(origin1)
 
@@ -124,7 +124,7 @@ class JourneyTestCase(TestCase):
         cs.origins.add(origin1, origin2)
 
         # Create Via
-        via = Via.objects.create(connectivity_statement=cs, order=0)
+        via = Via.objects.create(connectivity_statement=cs)
         via.anatomical_entities.add(via1)
         via.from_entities.add(origin1, origin2)
 
@@ -180,7 +180,7 @@ class JourneyTestCase(TestCase):
         cs.origins.add(origin1, origin2)
 
         # Create Via
-        via = Via.objects.create(connectivity_statement=cs, order=0)
+        via = Via.objects.create(connectivity_statement=cs)
         via.anatomical_entities.add(via1, via2)
         via.from_entities.add(origin1, origin2)
 
@@ -246,19 +246,19 @@ class JourneyTestCase(TestCase):
         cs.origins.add(origin_a, origin_b)
 
         # Create Vias
-        via1 = Via.objects.create(connectivity_statement=cs, order=0)
+        via1 = Via.objects.create(connectivity_statement=cs)
         via1.anatomical_entities.add(via1_a)
         via1.from_entities.add(origin_a, origin_b)
 
-        via2 = Via.objects.create(connectivity_statement=cs, order=1)
+        via2 = Via.objects.create(connectivity_statement=cs)
         via2.anatomical_entities.add(via2_a, via2_b)
         via2.from_entities.add(via1_a)
 
-        via3 = Via.objects.create(connectivity_statement=cs, order=2)
+        via3 = Via.objects.create(connectivity_statement=cs)
         via3.anatomical_entities.add(via3_a)
         via3.from_entities.add(via2_a, origin_a)
 
-        via4 = Via.objects.create(connectivity_statement=cs, order=3)
+        via4 = Via.objects.create(connectivity_statement=cs)
         via4.anatomical_entities.add(via4_a)
         via4.from_entities.add(via2_a)
 
@@ -321,27 +321,27 @@ class JourneyTestCase(TestCase):
         cs.origins.add(origin_a, origin_b)
 
         # Create Vias
-        via1 = Via.objects.create(connectivity_statement=cs, order=0)
+        via1 = Via.objects.create(connectivity_statement=cs)
         via1.anatomical_entities.add(via1_a)
         via1.from_entities.add(origin_a, origin_b)
 
-        via2 = Via.objects.create(connectivity_statement=cs, order=1)
+        via2 = Via.objects.create(connectivity_statement=cs)
         via2.anatomical_entities.add(via2_a, via2_b)
         via2.from_entities.add(via1_a)
 
-        via3 = Via.objects.create(connectivity_statement=cs, order=2)
+        via3 = Via.objects.create(connectivity_statement=cs)
         via3.anatomical_entities.add(via3_a)
         via3.from_entities.add(via2_a, via1_a)
 
-        via4 = Via.objects.create(connectivity_statement=cs, order=3)
+        via4 = Via.objects.create(connectivity_statement=cs)
         via4.anatomical_entities.add(via4_a)
         via4.from_entities.add(via2_b, via3_a)
 
-        via5 = Via.objects.create(connectivity_statement=cs, order=4)
+        via5 = Via.objects.create(connectivity_statement=cs)
         via5.anatomical_entities.add(via5_a, via5_b)
         via5.from_entities.add(via4_a)
 
-        via6 = Via.objects.create(connectivity_statement=cs, order=5)
+        via6 = Via.objects.create(connectivity_statement=cs)
         via6.anatomical_entities.add(via6_a)
         via6.from_entities.add(via5_a)
 
@@ -413,7 +413,7 @@ class JourneyTestCase(TestCase):
         cs.origins.add(origin1, origin2)
 
         # Create Via
-        via = Via.objects.create(connectivity_statement=cs, order=0)
+        via = Via.objects.create(connectivity_statement=cs)
         via.anatomical_entities.add(origin1)
         via.from_entities.add(origin1)
 
@@ -466,13 +466,17 @@ class JourneyTestCase(TestCase):
 
         cs.origins.add(origin1)
 
-        via_a = Via.objects.create(connectivity_statement=cs, order=2)  # Non-zero start
+        via_a = Via.objects.create(connectivity_statement=cs)
         via_a.anatomical_entities.add(via1)
         via_a.from_entities.add(origin1)
 
-        via_b = Via.objects.create(connectivity_statement=cs, order=5)  # Non-consecutive
+        via_b = Via.objects.create(connectivity_statement=cs)
         via_b.anatomical_entities.add(via2)
         via_b.from_entities.add(via1)
+
+        # Directly change the order of vias in the database
+        Via.objects.filter(pk=via_a.pk).update(order=2)  # Change to non-zero start
+        Via.objects.filter(pk=via_b.pk).update(order=5)  # Change to non-consecutive
 
         destination = Destination.objects.create(connectivity_statement=cs)
         destination.anatomical_entities.add(destination1)
@@ -487,7 +491,7 @@ class JourneyTestCase(TestCase):
                                                                                    'from_entities'))
 
         expected_paths = [
-            [('Oa', 0), ('V1a', 1), ('V2a', 2), ('Da', 3)],
+            [('Oa', 0), ('V1a', 3), ('V2a', 6), ('Da', 7)],
         ]
 
         all_paths = generate_paths(origins, vias, destinations)
@@ -498,7 +502,7 @@ class JourneyTestCase(TestCase):
 
         journey_paths = consolidate_paths(all_paths)
         expected_journey = [
-            [('Oa', 0), ('V1a', 1), ('V2a', 2), ('Da', 3)],
+            [('Oa', 0), ('V1a', 3), ('V2a', 6), ('Da', 7)],
         ]
         journey_paths.sort()
         expected_journey.sort()

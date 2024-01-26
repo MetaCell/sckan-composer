@@ -4,7 +4,7 @@ JOURNEY_DELIMITER = '\\'
 def generate_paths(origins, vias, destinations):
     paths = []
     # Calculate the total number of layers, including origins and destinations
-    number_of_layers = len(vias) + 2 if vias else 2
+    destination_layer = max([via.order for via in vias] + [0]) + 2 if vias else 1
 
     # Handle direct connections from origins to destinations
     for origin in origins:
@@ -12,13 +12,13 @@ def generate_paths(origins, vias, destinations):
             # Directly use pre-fetched 'from_entities' without triggering additional queries
             if origin in destination.from_entities.all() or (not destination.from_entities.exists() and len(vias) == 0):
                 for dest_entity in destination.anatomical_entities.all():
-                    paths.append([(origin.name, 0), (dest_entity.name, number_of_layers - 1)])
+                    paths.append([(origin.name, 0), (dest_entity.name, destination_layer)])
 
     # Handle connections involving vias
     if vias:
         for origin in origins:
             # Generate paths through vias for each origin
-            paths.extend(create_paths_from_origin(origin, vias, destinations, [(origin.name, 0)], number_of_layers))
+            paths.extend(create_paths_from_origin(origin, vias, destinations, [(origin.name, 0)], destination_layer))
 
     # Remove duplicates from the generated paths
     unique_paths = [list(path) for path in set(tuple(path) for path in paths)]
@@ -26,11 +26,11 @@ def generate_paths(origins, vias, destinations):
     return unique_paths
 
 
-def create_paths_from_origin(origin, vias, destinations, current_path, number_of_layers):
+def create_paths_from_origin(origin, vias, destinations, current_path, destination_layer):
     # Base case: if there are no more vias to process
     if not vias:
         # Generate direct connections from the current path to destinations
-        return [current_path + [(dest_entity.name, number_of_layers - 1)] for dest in destinations
+        return [current_path + [(dest_entity.name, destination_layer)] for dest in destinations
                 for dest_entity in dest.anatomical_entities.all()
                 if current_path[-1][0] in list(
                 a.name for a in dest.from_entities.all()) or not dest.from_entities.exists()]
@@ -49,14 +49,14 @@ def create_paths_from_origin(origin, vias, destinations, current_path, number_of
                 new_sub_path = current_path + [(entity.name, via_layer)]
                 # Recursively call to build paths from the next vias
                 new_paths.extend(
-                    create_paths_from_origin(origin, vias[idx + 1:], destinations, new_sub_path, number_of_layers))
+                    create_paths_from_origin(origin, vias[idx + 1:], destinations, new_sub_path, destination_layer))
 
                 # Check for direct connections to destinations from the current via
                 for dest in destinations:
                     for dest_entity in dest.anatomical_entities.all():
                         if entity.name in list(a.name for a in dest.from_entities.all()):
                             # Add path to destinations directly from the current via
-                            new_paths.append(new_sub_path + [(dest_entity.name, number_of_layers - 1)])
+                            new_paths.append(new_sub_path + [(dest_entity.name, destination_layer)])
 
     return new_paths
 
@@ -85,7 +85,10 @@ def consolidate_paths(paths):
 
         paths = consolidated + [paths[i] for i in range(len(paths)) if i not in used_indices]
 
-    return [[((node[0].replace(JOURNEY_DELIMITER, ' or '), node[1]) if (node[1] == 0 or path.index(node) == len(path)-1)  else (node[0].replace(JOURNEY_DELIMITER, ', '), node[1])) for node in path] for path in paths]
+    return [[((node[0].replace(JOURNEY_DELIMITER, ' or '), node[1]) if (
+                node[1] == 0 or path.index(node) == len(path) - 1) else (
+    node[0].replace(JOURNEY_DELIMITER, ', '), node[1])) for node in path] for path in paths]
+
 
 def can_merge(path1, path2):
     # Ensure paths are of the same length
