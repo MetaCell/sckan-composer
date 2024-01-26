@@ -208,17 +208,19 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
 
     // This effect prevents the default scroll and touchmove behavior
     useEffect(() => {
-        if (modelUpdated && containerRef.current) {
+        const currentContainer = containerRef.current;
+
+        if (modelUpdated && currentContainer) {
             const disableScroll = (event: any) => {
                 event.stopPropagation();
             };
 
-            containerRef.current.addEventListener('wheel', disableScroll, {passive: false});
-            containerRef.current.addEventListener('touchmove', disableScroll, {passive: false});
+            currentContainer.addEventListener('wheel', disableScroll, {passive: false});
+            currentContainer.addEventListener('touchmove', disableScroll, {passive: false});
 
             return () => {
-                containerRef.current?.removeEventListener('wheel', disableScroll);
-                containerRef.current?.removeEventListener('touchmove', disableScroll);
+                currentContainer?.removeEventListener('wheel', disableScroll);
+                currentContainer?.removeEventListener('touchmove', disableScroll);
             };
         }
     }, [modelUpdated]);
