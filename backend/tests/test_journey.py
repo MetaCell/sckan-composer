@@ -453,3 +453,54 @@ class JourneyTestCase(TestCase):
         expected_journey.sort()
         journey_paths.sort()
         self.assertTrue(journey_paths == expected_journey)
+
+    def test_journey_nonconsecutive_vias(self):
+        # Test setup
+        sentence = Sentence.objects.create()
+        cs = ConnectivityStatement.objects.create(sentence=sentence)
+
+        origin1 = AnatomicalEntity.objects.create(name='Oa')
+        via1 = AnatomicalEntity.objects.create(name='V1a')
+        via2 = AnatomicalEntity.objects.create(name='V2a')
+        destination1 = AnatomicalEntity.objects.create(name='Da')
+
+        cs.origins.add(origin1)
+
+        via_a = Via.objects.create(connectivity_statement=cs, order=2)  # Non-zero start
+        via_a.anatomical_entities.add(via1)
+        via_a.from_entities.add(origin1)
+
+        via_b = Via.objects.create(connectivity_statement=cs, order=5)  # Non-consecutive
+        via_b.anatomical_entities.add(via2)
+        via_b.from_entities.add(via1)
+
+        destination = Destination.objects.create(connectivity_statement=cs)
+        destination.anatomical_entities.add(destination1)
+        destination.from_entities.add(via2)
+
+        # Prefetch related data
+        origins = list(cs.origins.all())
+        vias = list(
+            Via.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities', 'from_entities'))
+        destinations = list(
+            Destination.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities',
+                                                                                   'from_entities'))
+
+        expected_paths = [
+            [('Oa', 0), ('V1a', 1), ('V2a', 2), ('Da', 3)],
+        ]
+
+        all_paths = generate_paths(origins, vias, destinations)
+
+        all_paths.sort()
+        expected_paths.sort()
+        self.assertTrue(all_paths == expected_paths, f"Expected paths {expected_paths}, but found {all_paths}")
+
+        journey_paths = consolidate_paths(all_paths)
+        expected_journey = [
+            [('Oa', 0), ('V1a', 1), ('V2a', 2), ('Da', 3)],
+        ]
+        journey_paths.sort()
+        expected_journey.sort()
+        self.assertTrue(journey_paths == expected_journey,
+                        f"Expected journey {expected_journey}, but found {journey_paths}")
