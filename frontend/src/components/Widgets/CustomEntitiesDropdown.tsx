@@ -211,7 +211,8 @@ export default function CustomEntitiesDropdown({
     statement,
     fieldName = "",
     getPreLevelSelectedValues,
-    areConnectionsExplicit
+    areConnectionsExplicit,
+    minWidth = ''
   },
 }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -403,20 +404,24 @@ export default function CustomEntitiesDropdown({
 
         <Badge
           sx={{ ...styles.badge, flex: 1 }}
-          badgeContent={!isAllSelectedValuesFromTheAboveLayer ? 0 : selectedOptions?.length}
+          badgeContent={
+            !isAllSelectedValuesFromTheAboveLayer ? 0 : selectedOptions?.length
+          }
         >
           <Box
             aria-describedby={aria}
-            sx={
-              open
+            sx={{
+              minWidth: minWidth ? minWidth : "auto",
+              ...(open
                 ? { ...styles.root, ...styles.rootOpen }
                 : selectedOptions.length === 0
                 ? styles.root
-                : { ...styles.root, ...styles.rootHover }
-            }
+                : { ...styles.root, ...styles.rootHover }),
+            }}
             onClick={handleClick}
           >
-            {(!isAllSelectedValuesFromTheAboveLayer || selectedOptions.length === 0) ? (
+            {!isAllSelectedValuesFromTheAboveLayer ||
+            selectedOptions.length === 0 ? (
               <Typography sx={styles.placeholder}>{placeholder}</Typography>
             ) : (
               <Box gap={1} display="flex" flexWrap="wrap" alignItems="center">
@@ -439,7 +444,7 @@ export default function CustomEntitiesDropdown({
                                   ...styles.chip,
                                   flex: 1,
                                   minWidth: 0,
-                                  maxWidth: 'fit-content',
+                                  maxWidth: "fit-content",
                                 }}
                                 variant={"outlined"}
                                 onClick={(e) => {
@@ -457,8 +462,10 @@ export default function CustomEntitiesDropdown({
                         );
                       })
                   : null}
-                <span style={{marginRight: '.5rem'}}>{selectedOptions.length > chipsNumber &&
-                  `+${selectedOptions.length - chipsNumber}`}</span>
+                <span style={{ marginRight: ".5rem" }}>
+                  {selectedOptions.length > chipsNumber &&
+                    `+${selectedOptions.length - chipsNumber}`}
+                </span>
               </Box>
             )}
             {open ? (
@@ -510,7 +517,7 @@ export default function CustomEntitiesDropdown({
                     sx={{
                       ...styles.chip,
                       display: "flex",
-                      textAlign: "left"
+                      textAlign: "left",
                     }}
                     variant="outlined"
                     label={
@@ -673,9 +680,9 @@ export default function CustomEntitiesDropdown({
                               "&.selected-unchecked": {
                                 "& .MuiButtonBase-root": {
                                   "&.Mui-checked": {
-                                    color: 'red'
-                                  }
-                                }
+                                    color: "red",
+                                  },
+                                },
                               },
 
                               "& .MuiTypography-body1": {
@@ -743,9 +750,15 @@ export default function CustomEntitiesDropdown({
                                   disableRipple
                                   icon={<UncheckedItemIcon fontSize="small" />}
                                   checkedIcon={
-                                    !isAllSelectedValuesFromTheAboveLayer && !hasValueChanged
-                                      ? <CheckedItemIconBG  fontSize="small" style={{color: '#C6D9F6'}} />
-                                      : <CheckedItemIcon  fontSize="small" />
+                                    !isAllSelectedValuesFromTheAboveLayer &&
+                                    !hasValueChanged ? (
+                                      <CheckedItemIconBG
+                                        fontSize="small"
+                                        style={{ color: "#C6D9F6" }}
+                                      />
+                                    ) : (
+                                      <CheckedItemIcon fontSize="small" />
+                                    )
                                   }
                                   checked={isOptionSelected(option)}
                                 />
