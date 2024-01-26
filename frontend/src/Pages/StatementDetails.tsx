@@ -37,7 +37,6 @@ const StatementDetails = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
-  const [open, setOpen] = React.useState(false);
   const [refetch, setRefetch] = useState(false);
   const refs = [
     useRef<HTMLElement | null>(null),
@@ -75,7 +74,6 @@ const StatementDetails = () => {
     index: number,
   ) => {
     setSelectedIndex(index);
-    setOpen(false);
   };
 
   const refreshStatement = () => {
