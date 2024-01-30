@@ -272,12 +272,13 @@ def has_changes(connectivity_statement, statement, defaults):
             return True
 
     # Check for changes in destinations
-    # TODO: We may need to change this algorithm when multi-destination is supported by neurondm
     current_destinations = connectivity_statement.destinations.all()
     new_destinations = statement[DESTINATIONS]
 
     if len(current_destinations) != len(new_destinations):
         return True
+
+    # We may need to change this algorithm when multi-destination is supported by neurondm
 
     current_destinations_anatomical_entities = set(
         uri for destination in current_destinations
