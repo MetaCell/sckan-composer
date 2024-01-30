@@ -29,6 +29,8 @@ CIRCUIT_TYPE_MAPPING = {
     "": CircuitType.UNKNOWN
 }
 
+VALIDATION_ERRORS = "validation_errors"
+
 
 def get_value_or_none(model, prop: str):
     if prop:

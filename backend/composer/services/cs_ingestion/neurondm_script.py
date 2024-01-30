@@ -12,8 +12,8 @@ from composer.services.cs_ingestion.exceptions import NeuronDMInconsistency
 from composer.services.cs_ingestion.logging_service import LoggerService, AXIOM_NOT_FOUND
 from composer.services.cs_ingestion.models import NeuronDMVia, NeuronDMOrigin, NeuronDMDestination, LoggableEvent
 
+logger_service: Optional[LoggerService] = None
 
-logger_service : Optional[LoggerService] = None
 
 def makelpesrdf():
     collect = []
@@ -33,11 +33,11 @@ def makelpesrdf():
     return lpes, lrdf, collect
 
 
-def for_composer(n, cull=False):
+def for_composer(n):
     lpes, lrdf, collect = makelpesrdf()
 
     try:
-        origins, vias, destinations = get_connections(n, lambda predicate: lpes(n, predicate))
+        origins, vias, destinations, validation_errors = get_connections(n, lambda predicate: lpes(n, predicate))
     except NeuronDMInconsistency as e:
         if logger_service:
             logger_service.add_error(LoggableEvent(e.statement_id, e.entity_id, e.message))
@@ -54,7 +54,7 @@ def for_composer(n, cull=False):
         circuit_type=lpes(n, ilxtr.hasCircuitRolePhenotype),
         circuit_role=lpes(n, ilxtr.hasFunctionalCircuitRolePhenotype),
         phenotype=lpes(n, ilxtr.hasAnatomicalSystemPhenotype),
-        #classification_phenotype=lpes(n, ilxtr.hasClassificationPhenotype),
+        # classification_phenotype=lpes(n, ilxtr.hasClassificationPhenotype),
         other_phenotypes=(lpes(n, ilxtr.hasPhenotype)
                           + lpes(n, ilxtr.hasMolecularPhenotype)
                           + lpes(n, ilxtr.hasProjectionPhenotype)),
@@ -62,38 +62,33 @@ def for_composer(n, cull=False):
         provenance=lrdf(n, ilxtr.literatureCitation),
         sentence_number=lrdf(n, ilxtr.sentenceNumber),
         note_alert=lrdf(n, ilxtr.alertNote),
+        validation_errors=validation_errors,
     )
-    npo = set((p.e, p.p) for p in n.pes)
-    cpo = set(collect)
-    unaccounted_pos = npo - cpo
-    if unaccounted_pos:
-        log.warning(
-            (n.id_, [[n.in_graph.namespace_manager.qname(e) for e in pos]
-                     for pos in unaccounted_pos]))
-    return {k: v for k, v in fc.items() if v} if cull else fc
+
+    return fc
 
 
 def get_connections(n, lpes):
     partial_order = n.partialOrder()
+
+    if partial_order is None or len(partial_order) == 0:
+        raise NeuronDMInconsistency(n.identifier, None, "No partial order found")
+
     expected_origins = lpes(ilxtr.hasSomaLocatedIn)
     expected_destinations = create_uri_type_dict(lpes, {ilxtr.hasAxonPresynapticElementIn: 'AXON-T',
                                                         ilxtr.hasAxonSensorySubcellularElementIn: 'AFFERENT-T'})
     expected_vias = create_uri_type_dict(lpes, {ilxtr.hasAxonLocatedIn: 'AXON', ilxtr.hasDendriteLocatedIn: 'DENDRITE'})
 
-    try:
-        tmp_origins, tmp_vias, tmp_destinations = process_connections(partial_order,
-                                                                      set(expected_origins),
-                                                                      expected_vias,
-                                                                      expected_destinations
-                                                                      )
-    except NeuronDMInconsistency as e:
-        e.statement_id = n.identifier
-        raise e
+    tmp_origins, tmp_vias, tmp_destinations, validation_errors = process_connections(partial_order,
+                                                                                     set(expected_origins),
+                                                                                     expected_vias,
+                                                                                     expected_destinations
+                                                                                     )
 
     origins = merge_origins(tmp_origins)
     vias = merge_vias(tmp_vias)
     destinations = merge_destinations(tmp_destinations)
-    return origins, vias, destinations
+    return origins, vias, destinations, validation_errors
 
 
 def create_uri_type_dict(lpes_func, predicate_type_map):
@@ -110,7 +105,7 @@ def create_uri_type_dict(lpes_func, predicate_type_map):
 def process_connections(path, expected_origins, expected_vias, expected_destinations, from_entities=None, depth=0,
                         result=None):
     if result is None:
-        result = {'origins': [], 'destinations': [], 'vias': []}
+        result = {'origins': [], 'destinations': [], 'vias': [], 'validation_errors': []}
 
     if isinstance(path, tuple):
         if path[0] == rdflib.term.Literal('blank'):
@@ -142,8 +137,9 @@ def process_connections(path, expected_origins, expected_vias, expected_destinat
                 result['destinations'].append(
                     NeuronDMDestination({matched_uri}, from_entities, expected_destinations.get(matched_uri)))
             else:
+                result['validation_errors'].append(f"{AXIOM_NOT_FOUND}: {current_entity}")
                 if logger_service:
-                    logger_service.add_warning(NeuronDMInconsistency(None, current_entity, AXIOM_NOT_FOUND))
+                    logger_service.add_warning(LoggableEvent(None, current_entity, AXIOM_NOT_FOUND))
 
             next_from_entities = {matched_uri} if matched_uri else from_entities
 
@@ -152,7 +148,7 @@ def process_connections(path, expected_origins, expected_vias, expected_destinat
                 process_connections(remaining_path, expected_origins, expected_vias, expected_destinations,
                                     next_from_entities, depth, result)
 
-    return result['origins'], result['vias'], result['destinations']
+    return result['origins'], result['vias'], result['destinations'], result['validation_errors']
 
 
 def merge_origins(origins):

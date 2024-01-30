@@ -443,6 +443,7 @@ class ConnectivityStatement(models.Model):
             CSState.REJECTED,
             CSState.NPO_APPROVED,
             CSState.EXPORTED,
+            CSState.INVALID
         ],
         permission=lambda instance, user: ConnectivityStatementService.has_permission_to_transition_to_compose_now(
             instance, user
@@ -498,6 +499,16 @@ class ConnectivityStatement(models.Model):
         conditions=[ConnectivityStatementService.is_valid]
     )
     def exported(self, *args, **kwargs):
+        ...
+
+    @transition(
+        field=state,
+        source=CSState.EXPORTED,
+        target=CSState.INVALID,
+        permission=lambda instance, user: ConnectivityStatementService.has_permission_to_transition_to_invalid(
+            instance, user
+        ), )
+    def invalid(self, *args, **kwargs):
         ...
 
     @property

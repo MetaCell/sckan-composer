@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import List, Dict, Optional, Tuple, Set
+from typing import List, Dict, Optional, Tuple, Set, Any
 
 from django.db import transaction
 
@@ -8,7 +8,8 @@ from composer.models import AnatomicalEntity, Sentence, ConnectivityStatement, S
     ProjectionPhenotype, Phenotype, Specie, Provenance, Via, Note, User, Destination
 from .helpers import get_value_or_none, found_entity, \
     ORIGINS, DESTINATIONS, VIAS, LABEL, SEX, SPECIES, ID, FORWARD_CONNECTION, SENTENCE_NUMBER, \
-    FUNCTIONAL_CIRCUIT_ROLE, CIRCUIT_TYPE, CIRCUIT_TYPE_MAPPING, PHENOTYPE, OTHER_PHENOTYPE, NOTE_ALERT, PROVENANCE
+    FUNCTIONAL_CIRCUIT_ROLE, CIRCUIT_TYPE, CIRCUIT_TYPE_MAPPING, PHENOTYPE, OTHER_PHENOTYPE, NOTE_ALERT, PROVENANCE, \
+    VALIDATION_ERRORS
 from .logging_service import LoggerService, ENTITY_NOT_FOUND, SEX_NOT_FOUND, SPECIES_NOT_FOUND, MULTIPLE_DESTINATIONS, \
     STATEMENT_INCORRECT_STATE, FORWARD_CONNECTION_NOT_FOUND, SENTENCE_INCORRECT_STATE
 from .models import LoggableEvent
@@ -24,18 +25,19 @@ NOW = datetime.now().strftime("%Y%m%d%H%M%S")
 logger_service = LoggerService()
 
 
-def ingest_statements():
-    statements_list = get_statements_from_neurondm(logger_service=logger_service)
-    valid_statements = validate_statements(statements_list)
+def ingest_statements(update_upstream=False):
+    statements_list = get_statements_from_neurondm(logger_service_param=logger_service)
+    overridable_statements = get_overwritable_statements(statements_list)
+    statements = validate_statements(overridable_statements)
 
     successful_transaction = True
     try:
         with transaction.atomic():
-            for statement in valid_statements:
+            for statement in statements:
                 sentence, _ = get_or_create_sentence(statement)
                 create_or_update_connectivity_statement(statement, sentence)
 
-            update_forward_connections(valid_statements)
+            update_forward_connections(statements)
     except Exception as e:
         logger_service.add_error(LoggableEvent(statement_id=None, entity_id=None, message=str(e)))
         successful_transaction = False
@@ -44,61 +46,18 @@ def ingest_statements():
     logger_service.write_errors_to_file()
 
     if successful_transaction:
-        logger_service.write_ingested_statements_to_file(valid_statements)
+        if update_upstream:
+            statements_dict = fetch_all_statements()
+            update_upstream_statements(statements_dict)
+        logger_service.write_ingested_statements_to_file(statements)
 
 
-def validate_statements(statement_list: List) -> List[Dict]:
-    valid_statements = validate_statement_properties(statement_list)
-    return validate_statement_dependencies(valid_statements)
-
-
-def validate_statement_properties(statement_list: List) -> List[Dict]:
-    valid_statements = []
-    for statement in statement_list:
-        if has_invalid_entities(statement) or has_invalid_sex(statement) or has_invalid_species(statement) \
-                or has_invalid_sentence(statement) or has_invalid_statement(statement):
-            continue
-
-        valid_statements.append(statement)
-
-    return valid_statements
-
-
-def has_invalid_entities(statement: Dict) -> bool:
-    found_invalid_entities = False
-
-    # Consolidate all URIs to check
-    uris_to_check = list(statement[ORIGINS].anatomical_entities)
-    uris_to_check.extend(uri for dest in statement[DESTINATIONS] for uri in dest.anatomical_entities)
-    uris_to_check.extend(uri for via in statement[VIAS] for uri in via.anatomical_entities)
-
-    # Check all URIs and log if not found
-    for uri in uris_to_check:
-        if not found_entity(uri):
-            logger_service.add_error(LoggableEvent(statement[ID], uri, ENTITY_NOT_FOUND))
-            found_invalid_entities = True
-
-    return found_invalid_entities
-
-
-def has_invalid_sex(statement: Dict) -> bool:
-    if statement[SEX]:
-        if len(statement[SEX]) > 1:
-            logging.warning(f'Multiple sexes found in statement for {statement[LABEL]}.')
-
-        first_sex_uri = statement[SEX][0]
-        if not Sex.objects.filter(ontology_uri=first_sex_uri).exists():
-            logger_service.add_error(LoggableEvent(statement[ID], first_sex_uri, SEX_NOT_FOUND))
-            return True
-    return False
-
-
-def has_invalid_species(statement: Dict) -> bool:
-    for species_uri in statement[SPECIES]:
-        if not Specie.objects.filter(ontology_uri=species_uri).exists():
-            logger_service.add_error(LoggableEvent(statement[ID], species_uri, SPECIES_NOT_FOUND))
-            return True
-    return False
+def get_overwritable_statements(statements_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    overwritable_statements = [
+        statement for statement in statements_list
+        if not has_invalid_sentence(statement) and not has_invalid_statement(statement)
+    ]
+    return overwritable_statements
 
 
 def has_invalid_sentence(statement: Dict) -> bool:
@@ -118,12 +77,8 @@ def has_invalid_statement(statement: Dict) -> bool:
 
 
 def can_statement_be_overwritten(connectivity_statement: ConnectivityStatement, statement) -> bool:
-    if connectivity_statement.destinations.count() > 1:
-        logger_service.add_error(LoggableEvent(statement[ID], None, MULTIPLE_DESTINATIONS))
-        return False
-
-    if connectivity_statement.state != CSState.EXPORTED:
-        logger_service.add_error(LoggableEvent(statement[ID], None, STATEMENT_INCORRECT_STATE))
+    if connectivity_statement.state != CSState.EXPORTED or connectivity_statement != CSState.INVALID:
+        logger_service.add_warning(LoggableEvent(statement[ID], None, STATEMENT_INCORRECT_STATE))
         return False
 
     return True
@@ -131,29 +86,78 @@ def can_statement_be_overwritten(connectivity_statement: ConnectivityStatement, 
 
 def can_sentence_be_overwritten(sentence: Sentence, statement: Dict) -> bool:
     if sentence.state != SentenceState.COMPOSE_NOW:
-        logger_service.add_error(LoggableEvent(statement[ID], None, SENTENCE_INCORRECT_STATE))
+        logger_service.add_warning(LoggableEvent(statement[ID], None, SENTENCE_INCORRECT_STATE))
         return False
     return True
 
 
-def validate_statement_dependencies(statements: List) -> List[Dict]:
-    statement_ids = {statement[ID] for statement in statements}
-
-    valid_statements = []
+def validate_statements(statements: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    db_reference_uris = set(ConnectivityStatement.objects.values_list('reference_uri', flat=True))
+    input_statement_ids = {statement[ID] for statement in statements}
+    statement_ids = input_statement_ids.union(db_reference_uris)
 
     for statement in statements:
-        if has_valid_forward_connections(statement, statement_ids):
-            valid_statements.append(statement)
+        # Initialize validation_errors if not already present
+        if VALIDATION_ERRORS not in statement:
+            statement[VALIDATION_ERRORS] = []
 
-    return valid_statements
+        # Validate entities, sex, and species, updating validation_errors accordingly
+        annotate_invalid_entities(statement)
+        annotate_invalid_sex(statement)
+        annotate_invalid_species(statement)
+
+        # Validate forward connection
+        annotate_invalid_forward_connections(statement, statement_ids)
+
+    return statements
 
 
-def has_valid_forward_connections(statement: Dict, statement_ids: Set[str]) -> bool:
+def annotate_invalid_entities(statement: Dict) -> bool:
+    has_invalid_entities = False
+
+    # Consolidate all URIs to check
+    uris_to_check = list(statement[ORIGINS].anatomical_entities)
+    uris_to_check.extend(uri for dest in statement[DESTINATIONS] for uri in dest.anatomical_entities)
+    uris_to_check.extend(uri for via in statement[VIAS] for uri in via.anatomical_entities)
+
+    # Check all URIs and log if not found
+    for uri in uris_to_check:
+        if not found_entity(uri):
+            statement[VALIDATION_ERRORS].append(f"{ENTITY_NOT_FOUND}: {uri}")
+            has_invalid_entities = True
+
+    return has_invalid_entities
+
+
+def annotate_invalid_sex(statement: Dict) -> bool:
+    if statement[SEX]:
+        if len(statement[SEX]) > 1:
+            logger_service.add_warning(
+                LoggableEvent(statement[ID], None, f'Multiple sexes found in statement.'))
+
+            first_sex_uri = statement[SEX][0]
+            if not Sex.objects.filter(ontology_uri=first_sex_uri).exists():
+                statement[VALIDATION_ERRORS].append(f"{SEX_NOT_FOUND}: {first_sex_uri}")
+            return True
+    return False
+
+
+def annotate_invalid_species(statement: Dict) -> bool:
+    has_invalid_species = False
+    for species_uri in statement[SPECIES]:
+        if not Specie.objects.filter(ontology_uri=species_uri).exists():
+            statement[VALIDATION_ERRORS].append(f"{SPECIES_NOT_FOUND}: {species_uri}")
+            has_invalid_species = True
+    return has_invalid_species
+
+
+def annotate_invalid_forward_connections(statement: Dict, statement_ids: Set[str]) -> bool:
+    has_invalid_forward_connection = False
     for reference_uri in statement[FORWARD_CONNECTION]:
         if reference_uri not in statement_ids:
-            logger_service.add_error(LoggableEvent(statement[ID], reference_uri, FORWARD_CONNECTION_NOT_FOUND))
-            return False
-    return True
+            statement[VALIDATION_ERRORS].append(f"{FORWARD_CONNECTION_NOT_FOUND}: {reference_uri}")
+            has_invalid_forward_connection = True
+    return has_invalid_forward_connection
 
 
 def get_or_create_sentence(statement: Dict) -> Tuple[Sentence, bool]:
@@ -161,7 +165,8 @@ def get_or_create_sentence(statement: Dict) -> Tuple[Sentence, bool]:
     has_sentence_reference = len(statement[SENTENCE_NUMBER]) > 0
 
     if len(statement[SENTENCE_NUMBER]) > 1:
-        logging.warning(f'Multiple sentence numbers found in statement for {statement[LABEL]}.')
+        logger_service.add_warning(
+            LoggableEvent(statement[ID], None, f'Multiple sentence numbers found.'))
 
     sentence, created = Sentence.objects.get_or_create(
         doi__iexact=statement[ID],
@@ -203,6 +208,10 @@ def create_or_update_connectivity_statement(statement: Dict, sentence: Sentence)
             fields_to_refresh = [field for field in defaults.keys() if field != 'state']
             connectivity_statement.refresh_from_db(fields=fields_to_refresh)
             add_ingestion_system_note(connectivity_statement)
+
+    if statement.get(VALIDATION_ERRORS):
+        errors = '; '.join(statement[VALIDATION_ERRORS])
+        do_transition_to_invalid(connectivity_statement, errors)
 
     update_many_to_many_fields(connectivity_statement, statement)
 
@@ -264,7 +273,7 @@ def has_changes(connectivity_statement, statement, defaults):
             return True
 
     # Check for changes in destinations
-    # Fixme: We may need to change this algorithm when multi-destination is supported by neurondm
+    # TODO: We may need to change this algorithm when multi-destination is supported by neurondm
     current_destinations = connectivity_statement.destinations.all()
     new_destinations = statement[DESTINATIONS]
 
@@ -304,7 +313,8 @@ def get_sex(statement: Dict) -> Sex:
 
 def get_functional_circuit_role(statement: Dict) -> Optional[FunctionalCircuitRole]:
     if len(statement[FUNCTIONAL_CIRCUIT_ROLE]) > 1:
-        logging.warning(f'Multiple functional circuit roles found in statement for {statement[LABEL]}.')
+        logger_service.add_warning(
+            LoggableEvent(statement[ID], None, f'Multiple functional circuit roles found.'))
 
     return get_value_or_none(
         FunctionalCircuitRole, statement[FUNCTIONAL_CIRCUIT_ROLE][0]) if statement[FUNCTIONAL_CIRCUIT_ROLE] else None
@@ -313,26 +323,26 @@ def get_functional_circuit_role(statement: Dict) -> Optional[FunctionalCircuitRo
 def get_circuit_type(statement: Dict):
     if statement[CIRCUIT_TYPE]:
         if len(statement[CIRCUIT_TYPE]) > 1:
-            logging.warning(f'Multiple circuit types found in statement for {statement[LABEL]}.')
+            logger_service.add_warning(LoggableEvent(statement[ID], None, f'Multiple circuit types found'))
         return CIRCUIT_TYPE_MAPPING.get(statement[CIRCUIT_TYPE][0], CircuitType.UNKNOWN)
     else:
-        logging.warning(f'No circuit type found for statement {statement[LABEL]}. Using UNKNOWN.')
+        logger_service.add_warning(LoggableEvent(statement[ID], None, f'No circuit type found.'))
         return CircuitType.UNKNOWN
 
 
 def get_phenotype(statement: Dict) -> Optional[Phenotype]:
     if statement[PHENOTYPE]:
         if len(statement[PHENOTYPE]) > 1:
-            logging.warning(f'Multiple circuit types found in statement for {statement[LABEL]}.')
+            logger_service.add_warning(LoggableEvent(statement[ID], None, f'Multiple phenotypes found.'))
 
         for p in statement[PHENOTYPE]:
             try:
                 phenotype = Phenotype.objects.get(ontology_uri=p)
                 return phenotype
             except Phenotype.DoesNotExist:
-                logging.warning(f'Phenotype {p} not found in composer db')
+                pass
 
-        logging.warning(f'No valid phenotype found at statement {statement[LABEL]}')
+        logger_service.add_warning(LoggableEvent(statement[ID], None, f'No valid phenotype found.'))
 
     return None
 
@@ -344,10 +354,23 @@ def get_projection_phenotype(statement: Dict) -> Optional[ProjectionPhenotype]:
             projection_phenotype = ProjectionPhenotype.objects.get(ontology_uri=last_phenotype_uri)
             return projection_phenotype
         except ProjectionPhenotype.DoesNotExist:
-            logging.warning(f'Projection phenotype {last_phenotype_uri} not found in composer db')
+            pass
     else:
-        logging.warning(f'No projection phenotypes found for statement {statement[LABEL]}')
+        logger_service.add_warning(LoggableEvent(statement[ID], None, f'No projection phenotypes found.'))
     return None
+
+
+def do_transition_to_invalid(connectivity_statement: ConnectivityStatement, note: str):
+    system_user = User.objects.get(username="system")
+    connectivity_statement.invalid(by=system_user)
+    connectivity_statement.save()
+
+    Note.objects.create(
+        connectivity_statement=connectivity_statement,
+        user=User.objects.get(username="system"),
+        type=NoteType.ALERT,
+        note=f"Invalidated due to the following reasons: {note}"
+    )
 
 
 def update_many_to_many_fields(connectivity_statement: ConnectivityStatement, statement: Dict):
@@ -446,10 +469,76 @@ def add_ingestion_system_note(connectivity_statement: ConnectivityStatement):
 
 
 def update_forward_connections(statements: List):
-    # This method doesn't check if the statements exist because they should have been validated prior
     for statement in statements:
         connectivity_statement = ConnectivityStatement.objects.get(reference_uri=statement[ID])
         connectivity_statement.forward_connection.clear()
         for uri in statement[FORWARD_CONNECTION]:
-            forward_statement = ConnectivityStatement.objects.get(reference_uri=uri)
+            try:
+                forward_statement = ConnectivityStatement.objects.get(reference_uri=uri)
+            except ConnectivityStatement.DoesNotExist:
+                # connectivity statement state should have been set to invalid prior
+                continue
             connectivity_statement.forward_connection.add(forward_statement)
+
+
+def update_upstream_statements(statements_dict):
+    invalid_visited = set()
+    for statement_uri in statements_dict:
+        propagate_invalid_state(statement_uri, statements_dict, invalid_visited)
+
+
+def propagate_invalid_state(statement_uri, statements_dict, invalid_visited, previous_reason=''):
+    if statement_uri in invalid_visited:
+        return
+
+    statement_data = statements_dict[statement_uri]
+    connectivity_statement = statement_data['connectivity_statement']
+
+    if connectivity_statement.state == CSState.INVALID:
+        invalid_visited.add(statement_uri)
+
+        for backward_cs in statement_data['backward_connections']:
+            current_reason = ''
+            if backward_cs.state != CSState.INVALID:
+                # Build the reason string
+                current_reason = (f"statement with id {backward_cs.id} is invalid because its"
+                                  f"forward connection with id {connectivity_statement.id} is invalid")
+                if previous_reason:
+                    current_reason += f" because {previous_reason}"
+
+                # Transition the backward statement to an invalid state with the built reason
+                do_transition_to_invalid(backward_cs, current_reason)
+
+            else:
+                # todo: Reason can be different, should we write a new note?
+                pass
+
+            # Recursively propagate invalid state
+            propagate_invalid_state(backward_cs.reference_uri, statements_dict, invalid_visited, current_reason)
+
+
+def fetch_all_statements() -> Dict[str, Any]:
+    # todo: This algorithm doesn't scale well
+    all_statements = ConnectivityStatement.objects.prefetch_related('forward_connection').all()
+    statements_dict = {}
+
+    for cs in all_statements:
+        # Initialize the structure for each statement if not already present
+        if cs.reference_uri not in statements_dict:
+            statements_dict[cs.reference_uri] = {
+                'connectivity_statement': cs,
+                'backward_connections': [],
+            }
+
+        # Populate backward_connections based on forward connections in the database
+        for forward_statement in cs.forward_connection.all():
+            forward_uri = forward_statement.reference_uri
+            # Ensure the forward_statement's structure is initialized
+            if forward_uri not in statements_dict:
+                statements_dict[forward_uri] = {
+                    'connectivity_statement': forward_statement,
+                    'backward_connections': [],
+                }
+            statements_dict[forward_uri]['backward_connections'].append(cs)
+
+    return statements_dict

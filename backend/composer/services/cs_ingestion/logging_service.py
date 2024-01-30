@@ -11,8 +11,10 @@ SEX_NOT_FOUND = "Sex not found in composer db"
 SPECIES_NOT_FOUND = "Species not found in composer db"
 MULTIPLE_DESTINATIONS = "Statement already found and has multiple destinations"
 SENTENCE_INCORRECT_STATE = f"Sentence already found and is not in {SentenceState.COMPOSE_NOW} state"
-STATEMENT_INCORRECT_STATE = f"Statement already found and is not in {CSState.EXPORTED} state"
+STATEMENT_INCORRECT_STATE = f"Statement already found and is not in {CSState.EXPORTED} or {CSState.INVALID} state"
 FORWARD_CONNECTION_NOT_FOUND = "Forward connection reference not found"
+
+INVALID_DUE_TO_COMPOSITION_PROBLEM = "has a composition error"
 
 
 class LoggerService:
