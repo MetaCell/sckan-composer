@@ -47,8 +47,7 @@ def ingest_statements(update_upstream=False):
 
     if successful_transaction:
         if update_upstream:
-            statements_dict = fetch_all_statements()
-            update_upstream_statements(statements_dict)
+            update_upstream_statements()
         logger_service.write_ingested_statements_to_file(statements)
 
 
@@ -481,64 +480,43 @@ def update_forward_connections(statements: List):
             connectivity_statement.forward_connection.add(forward_statement)
 
 
-def update_upstream_statements(statements_dict):
+def update_upstream_statements():
     invalid_visited = set()
-    for statement_uri in statements_dict:
-        propagate_invalid_state(statement_uri, statements_dict, invalid_visited)
+    initial_invalid_statements = ConnectivityStatement.objects.filter(state=CSState.INVALID)
+
+    for statement in initial_invalid_statements:
+        propagate_invalid_state(statement, invalid_visited)
 
 
-def propagate_invalid_state(statement_uri, statements_dict, invalid_visited, previous_reason=''):
+def propagate_invalid_state(connectivity_statement: ConnectivityStatement, invalid_visited: Set,
+                            previous_reason: str = ''):
+    statement_uri = connectivity_statement.reference_uri
+
     if statement_uri in invalid_visited:
         return
-
-    statement_data = statements_dict[statement_uri]
-    connectivity_statement = statement_data['connectivity_statement']
 
     if connectivity_statement.state == CSState.INVALID:
         invalid_visited.add(statement_uri)
 
-        for backward_cs in statement_data['backward_connections']:
+        # Fetch backward connections directly from the database
+        backward_connections = ConnectivityStatement.objects.filter(
+            forward_connection=connectivity_statement
+        )
+
+        for backward_cs in backward_connections:
             current_reason = ''
             if backward_cs.state != CSState.INVALID:
                 # Build the reason string
-                current_reason = (f"statement with id {backward_cs.id} is invalid because its"
+                current_reason = (f"statement with id {backward_cs.id} is invalid because its "
                                   f"forward connection with id {connectivity_statement.id} is invalid")
                 if previous_reason:
                     current_reason += f" because {previous_reason}"
 
                 # Transition the backward statement to an invalid state with the built reason
                 do_transition_to_invalid(backward_cs, current_reason)
-
             else:
-                # todo: Reason can be different, should we write a new note?
+                # TODO: Should we update the reason?
                 pass
 
             # Recursively propagate invalid state
-            propagate_invalid_state(backward_cs.reference_uri, statements_dict, invalid_visited, current_reason)
-
-
-def fetch_all_statements() -> Dict[str, Any]:
-    # todo: This algorithm doesn't scale well
-    all_statements = ConnectivityStatement.objects.prefetch_related('forward_connection').all()
-    statements_dict = {}
-
-    for cs in all_statements:
-        # Initialize the structure for each statement if not already present
-        if cs.reference_uri not in statements_dict:
-            statements_dict[cs.reference_uri] = {
-                'connectivity_statement': cs,
-                'backward_connections': [],
-            }
-
-        # Populate backward_connections based on forward connections in the database
-        for forward_statement in cs.forward_connection.all():
-            forward_uri = forward_statement.reference_uri
-            # Ensure the forward_statement's structure is initialized
-            if forward_uri not in statements_dict:
-                statements_dict[forward_uri] = {
-                    'connectivity_statement': forward_statement,
-                    'backward_connections': [],
-                }
-            statements_dict[forward_uri]['backward_connections'].append(cs)
-
-    return statements_dict
+            propagate_invalid_state(backward_cs, invalid_visited, current_reason)
