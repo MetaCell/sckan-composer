@@ -365,11 +365,15 @@ def do_transition_to_invalid(connectivity_statement: ConnectivityStatement, note
     connectivity_statement.invalid(by=system_user)
     connectivity_statement.save()
 
+    create_invalid_note(connectivity_statement, note)
+
+
+def create_invalid_note(connectivity_statement, note):
     Note.objects.create(
         connectivity_statement=connectivity_statement,
         user=User.objects.get(username="system"),
         type=NoteType.ALERT,
-        note=f"Invalidated due to the following reasons: {note}"
+        note=f"Invalidated due to the following reason(s): {note}"
     )
 
 
@@ -516,8 +520,7 @@ def propagate_invalid_state(connectivity_statement: ConnectivityStatement, inval
                 # Transition the backward statement to an invalid state with the built reason
                 do_transition_to_invalid(backward_cs, current_reason)
             else:
-                # TODO: Should we update the reason?
-                pass
+                create_invalid_note(backward_cs, current_reason)
 
             # Recursively propagate invalid state
             propagate_invalid_state(backward_cs, invalid_visited, current_reason)
