@@ -21,7 +21,7 @@ class TestProcessConnections(unittest.TestCase):
             )
         )
 
-        tmp_origins, tmp_vias, tmp_destinations = process_connections(
+        tmp_origins, tmp_vias, tmp_destinations, validation_errors = process_connections(
             mock_path,
             expected_origins,
             expected_vias,
@@ -53,9 +53,12 @@ class TestProcessConnections(unittest.TestCase):
                 (
                     rdflib.term.URIRef('V1a'),
                     (
-                        rdflib.term.URIRef('V3a'),
+                        rdflib.term.URIRef('V2a'),
                         (
-                            rdflib.term.URIRef('Da'),
+                            rdflib.term.URIRef('V3a'),
+                            (
+                                rdflib.term.URIRef('Da'),
+                            )
                         )
                     )
 
@@ -65,7 +68,19 @@ class TestProcessConnections(unittest.TestCase):
             (
                 rdflib.term.URIRef('Ob'),
                 (
-                    rdflib.term.URIRef('V2a'),
+                    rdflib.term.Literal('blank'),
+                    (
+                        rdflib.term.URIRef('V1a'),
+                        (
+                            rdflib.term.URIRef('V2a'),
+                            (
+                                rdflib.term.URIRef('V3a'),
+                                (
+                                    rdflib.term.URIRef('Da'),
+                                )
+                            )
+                        )
+                    ),
                     (
                         rdflib.term.URIRef('V3a'),
                         (
@@ -77,7 +92,7 @@ class TestProcessConnections(unittest.TestCase):
             ),
         )
 
-        tmp_origins, tmp_vias, tmp_destinations = process_connections(
+        tmp_origins, tmp_vias, tmp_destinations, validation_errors = process_connections(
             mock_path_complex,
             expected_origins,
             expected_vias,
@@ -126,7 +141,7 @@ class TestProcessConnections(unittest.TestCase):
                 )
             ),
         )
-        tmp_origins, tmp_vias, tmp_destinations = process_connections(
+        tmp_origins, tmp_vias, tmp_destinations, validation_errors = process_connections(
             mock_path,
             expected_origins,
             expected_vias,

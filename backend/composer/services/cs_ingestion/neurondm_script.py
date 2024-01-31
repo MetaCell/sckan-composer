@@ -101,7 +101,6 @@ def create_uri_type_dict(lpes_func, predicate_type_map):
 
 # FIXME: The following algorithm will behave incorrectly for cases:
 #  where an anatomical entity has more than one 'role' (Origin, Via, Destinaion)
-#  where we have connections that jump layers
 def process_connections(path, expected_origins, expected_vias, expected_destinations, from_entities=None, depth=0,
                         result=None):
     if result is None:
@@ -110,12 +109,12 @@ def process_connections(path, expected_origins, expected_vias, expected_destinat
     if isinstance(path, tuple):
         if path[0] == rdflib.term.Literal('blank'):
             for remaining_path in path[1:]:
-                process_connections(remaining_path, expected_origins, expected_vias, expected_destinations, set(),
-                                    depth=0, result=result)
+                process_connections(remaining_path, expected_origins, expected_vias, expected_destinations,
+                                    from_entities, depth=depth, result=result)
         else:
             current_entity = path[0]
-            primary_uri = current_entity.toPython() if not isinstance(current_entity,
-                                                                      orders.rl) else current_entity.region.toPython()
+            primary_uri = current_entity.toPython() if not isinstance(current_entity, orders.rl)\
+                else current_entity.region.toPython()
             secondary_uri = current_entity.layer.toPython() if isinstance(current_entity, orders.rl) else None
 
             # Initialize from_entities as an empty set if None
@@ -168,10 +167,11 @@ def merge_vias(vias):
 def merge_vias_by_from_entities(vias):
     merged_vias = {}
     for via in vias:
-        key = (frozenset(via.anatomical_entities), via.order, via.type)
+        key = (frozenset(via.anatomical_entities), via.type)
         if key not in merged_vias:
             merged_vias[key] = NeuronDMVia(via.anatomical_entities, set(), via.order, via.type)
         merged_vias[key].from_entities.update(via.from_entities)
+        merged_vias[key].order = max(merged_vias[key].order, via.order)
 
     return list(merged_vias.values())
 
@@ -179,10 +179,11 @@ def merge_vias_by_from_entities(vias):
 def merge_vias_by_anatomical_entities(vias):
     merged_vias = {}
     for via in vias:
-        key = (via.order, via.type, frozenset(via.from_entities))
+        key = (via.type, frozenset(via.from_entities))
         if key not in merged_vias:
             merged_vias[key] = NeuronDMVia(set(), via.from_entities, via.order, via.type)
         merged_vias[key].anatomical_entities.update(via.anatomical_entities)
+        merged_vias[key].order = max(merged_vias[key].order, via.order)
 
     return list(merged_vias.values())
 
