@@ -503,7 +503,17 @@ class ConnectivityStatement(models.Model):
 
     @transition(
         field=state,
-        source=CSState.EXPORTED,
+        source=[
+            CSState.DRAFT,
+            CSState.COMPOSE_NOW,
+            CSState.CURATED,
+            CSState.EXCLUDED,
+            CSState.REJECTED,
+            CSState.TO_BE_REVIEWED,
+            CSState.CONNECTION_MISSING,
+            CSState.NPO_APPROVED,
+            CSState.EXPORTED,
+        ],
         target=CSState.INVALID,
         permission=lambda instance, user: ConnectivityStatementService.has_permission_to_transition_to_invalid(
             instance, user
