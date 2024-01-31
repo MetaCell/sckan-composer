@@ -3,7 +3,6 @@ import {
   SentenceAvailableTransitionsEnum as sentenceStates,
 } from "../apiclient/backend/api";
 import { ComposerConnectivityStatementListStateEnum as statementStates } from "../apiclient/backend/api";
-import moment from 'moment-timezone';
 
 export const hiddenWidget = (fields: string[]) => {
   let hiddenSchema = {};
@@ -154,36 +153,31 @@ export const formatTime = (date: string) => {
 };
 
 export const timeAgo = (timestamp: string) => {
-  const machineTimeZone = moment.tz.guess();
+  const nowCET = new Date().toLocaleString('en-US', { timeZone: 'CET' });
+  const timeDiff = new Date(nowCET).getTime() - new Date(timestamp).getTime();
   
-  const timestampMoment = moment.tz(timestamp, 'CET');
-  const now = moment.tz(machineTimeZone);
+  const seconds = Math.floor(timeDiff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const years = Math.floor(weeks / 52);
   
-  if (timestampMoment.isAfter(now)) {
+  if (timeDiff <= 0) {
     return 'Just now';
   }
-  
-  const duration = moment.duration(now.diff(timestampMoment));
-  
-  const years = Math.floor(duration.asYears());
-  const weeks = Math.floor(duration.asWeeks());
-  const days = Math.floor(duration.asDays());
-  const hours = Math.floor(duration.asHours());
-  const minutes = Math.floor(duration.asMinutes());
-  const seconds = Math.floor(duration.asSeconds());
-  
   if (years > 0) {
-    return `${years} year${years > 1 ? 's' : ''} ago`;
+    return `${years} year${years > 1 ? "s" : ""} ago`;
   } else if (weeks > 0) {
-    return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+    return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
   } else if (days > 0) {
-    return `${days} day${days > 1 ? 's' : ''} ago`;
+    return `${days} day${days > 1 ? "s" : ""} ago`;
   } else if (hours > 0) {
-    return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
   } else if (minutes > 0) {
-    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
   } else {
-    return `${seconds} second${seconds > 1 ? 's' : ''} ago`;
+    return `${seconds} second${seconds > 0 ? "s" : ""} ago`;
   }
 };
 export const isEqual = function (obj1: any, obj2: any) {
