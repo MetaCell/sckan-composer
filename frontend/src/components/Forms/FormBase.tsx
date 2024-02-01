@@ -106,7 +106,6 @@ export const FormBase = (props: any) => {
   const handleSubmit = async (event: IChangeEvent) => {
     const formData = { ...event.formData, ...extraData };
     setIsSaving(true);
-    setLocalData(formData);
     service
       .save(formData)
       .then((newData: any) => {
@@ -116,6 +115,7 @@ export const FormBase = (props: any) => {
           action(newData);
         }
         log("Saved");
+        setLocalData(formData);
       })
       .catch((error: any) => {
         // todo: handle errors here

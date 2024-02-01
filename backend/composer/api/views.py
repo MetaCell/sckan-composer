@@ -35,6 +35,7 @@ from .serializers import (
     ProvenanceSerializer,
     SexSerializer, ConnectivityStatementUpdateSerializer, DestinationSerializer, BaseConnectivityStatementSerializer,
 )
+from .permissions import IsStaffUserIfExportedStateInConnectivityStatement
 from ..models import (
     AnatomicalEntity,
     Phenotype,
@@ -302,6 +303,7 @@ class ConnectivityStatementViewSet(
     queryset = ConnectivityStatement.objects.all()
     serializer_class = ConnectivityStatementSerializer
     permission_classes = [
+        IsStaffUserIfExportedStateInConnectivityStatement,
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = ConnectivityStatementFilter
