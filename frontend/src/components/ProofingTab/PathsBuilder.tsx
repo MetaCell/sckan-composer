@@ -95,7 +95,7 @@ const PathsBuilder = (props: any) => {
               extraData={{ sentence_id: statement.sentence.id }}
               uiFields={["destinations"]}
               enableAutoSave={false}
-              className="vias"
+              className="destinations"
             />
           </Box>
           <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />

@@ -133,6 +133,7 @@ const StatementForm = (props: any) => {
       disabledReason: "",
       fieldName: "origins",
       chipsNumber: 5,
+      minWidth: "50rem",
       onSearch: async (
         searchValue: string,
         formId: string,
@@ -605,6 +606,7 @@ const StatementForm = (props: any) => {
           }}
           deleteIcon={<OpenInNewIcon sx={{ fill: "#548CE5" }} />}
           onDelete={(e) => {
+            window.open(window.location.origin + "/statement/" + entity?.id, '_blank')
             e.stopPropagation();
           }}
           label={entity?.label}

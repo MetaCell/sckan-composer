@@ -164,6 +164,12 @@ const theme = createTheme({
       .vias > div > div > .MuiGrid-container> .MuiGrid-item{
         margin: 0 !important;
       }
+      .destinations > div > div > .MuiGrid-container{
+        margin-top: -16px !important;
+      }
+      .destinations > div > div > .MuiGrid-container> .MuiGrid-item{
+        margin: 0 !important;
+      }
       .ks > div > div > .MuiGrid-container{
         margin-top: -16px !important;
       }
