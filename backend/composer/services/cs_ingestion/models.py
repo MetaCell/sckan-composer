@@ -49,12 +49,12 @@ class ValidationErrors:
         if self.entities:
             error_messages.append(f"Entities not found: {', '.join(self.entities)}")
         if self.sex:
-            error_messages.append(f"Sex information not found or inconsistent for: {', '.join(self.sex)}")
+            error_messages.append(f"Sex information not found: {', '.join(self.sex)}")
         if self.species:
-            error_messages.append(f"Species not found or inconsistent for: {', '.join(self.species)}")
+            error_messages.append(f"Species not found: {', '.join(self.species)}")
         if self.forward_connection:
             error_messages.append(
-                f"Forward connections not found or inconsistent for: {', '.join(self.forward_connection)}")
+                f"Forward connections not found: {', '.join(self.forward_connection)}")
         if self.axiom_not_found:
             error_messages.append(f"Axioms not found for: {', '.join(self.axiom_not_found)}")
         if self.non_specified:
