@@ -7,9 +7,9 @@ from composer.services.cs_ingestion.neurondm_script import process_connections, 
 
 class TestProcessConnections(unittest.TestCase):
     def test_process_connections_basic(self):
-        expected_origins = {'Oa'}
-        expected_vias = {'V1a': 'AXON'}
-        expected_destinations = {'Da': 'AXON-T'}
+        origins_from_axioms = {'Oa'}
+        vias_from_axioms = {'V1a': 'AXON'}
+        destinations_from_axioms = {'Da': 'AXON-T'}
 
         mock_path = (
             rdflib.term.URIRef('Oa'),
@@ -23,9 +23,9 @@ class TestProcessConnections(unittest.TestCase):
 
         tmp_origins, tmp_vias, tmp_destinations, validation_errors = process_connections(
             mock_path,
-            expected_origins,
-            expected_vias,
-            expected_destinations
+            origins_from_axioms,
+            vias_from_axioms,
+            destinations_from_axioms
         )
 
         origins = merge_origins(tmp_origins)
@@ -37,13 +37,13 @@ class TestProcessConnections(unittest.TestCase):
         self.assertEqual(len(destinations), 1)
 
     def test_process_connections_jump(self):
-        expected_origins = {'Oa', 'Ob'}
-        expected_vias = {
+        origins_from_axioms = {'Oa', 'Ob'}
+        vias_from_axioms = {
             'V1a': 'AXON',
             'V2a': 'AXON',
             'V3a': 'AXON'
         }
-        expected_destinations = {'Da': 'AXON-T'}
+        destinations_from_axioms = {'Da': 'AXON-T'}
 
         mock_path_complex = (
             rdflib.term.Literal('blank'),
@@ -94,9 +94,9 @@ class TestProcessConnections(unittest.TestCase):
 
         tmp_origins, tmp_vias, tmp_destinations, validation_errors = process_connections(
             mock_path_complex,
-            expected_origins,
-            expected_vias,
-            expected_destinations
+            origins_from_axioms,
+            vias_from_axioms,
+            destinations_from_axioms
         )
 
         origins = merge_origins(tmp_origins)
@@ -111,12 +111,12 @@ class TestProcessConnections(unittest.TestCase):
 
     # FIXME: To fix after neurodm defines their modelling
     def test_process_connections_multiple_predicates(self):
-        expected_origins = {'Oa', 'Ob'}
-        expected_vias = {
+        origins_from_axioms = {'Oa', 'Ob'}
+        vias_from_axioms = {
             'V1a': 'AXON',
             'Ob': 'AXON'
         }
-        expected_destinations = {'Da': 'AXON-T'}
+        destinations_from_axioms = {'Da': 'AXON-T'}
 
         mock_path = (
             rdflib.term.Literal('blank'),
@@ -143,9 +143,9 @@ class TestProcessConnections(unittest.TestCase):
         )
         tmp_origins, tmp_vias, tmp_destinations, validation_errors = process_connections(
             mock_path,
-            expected_origins,
-            expected_vias,
-            expected_destinations
+            origins_from_axioms,
+            vias_from_axioms,
+            destinations_from_axioms
         )
 
         origins = merge_origins(tmp_origins)

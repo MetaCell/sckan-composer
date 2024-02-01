@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Set
 
 
@@ -27,3 +28,8 @@ class LoggableEvent:
         self.entity_id = entity_id
         self.message = message
 
+
+class AxiomType(Enum):
+    ORIGIN = 'origin'
+    VIA = 'via'
+    DESTINATION = 'destination'

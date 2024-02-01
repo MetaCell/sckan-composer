@@ -14,7 +14,7 @@ SENTENCE_INCORRECT_STATE = f"Sentence already found and is not in {SentenceState
 STATEMENT_INCORRECT_STATE = f"Statement already found and is not in {CSState.EXPORTED} or {CSState.INVALID} state"
 FORWARD_CONNECTION_NOT_FOUND = "Forward connection reference not found"
 
-INVALID_DUE_TO_COMPOSITION_PROBLEM = "has a composition error"
+INCONSISTENT_AXIOMS = "Region and layer found in different axioms"
 
 
 class LoggerService:
