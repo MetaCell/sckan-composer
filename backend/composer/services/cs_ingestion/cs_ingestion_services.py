@@ -10,9 +10,8 @@ from .helpers import get_value_or_none, found_entity, \
     ORIGINS, DESTINATIONS, VIAS, LABEL, SEX, SPECIES, ID, FORWARD_CONNECTION, SENTENCE_NUMBER, \
     FUNCTIONAL_CIRCUIT_ROLE, CIRCUIT_TYPE, CIRCUIT_TYPE_MAPPING, PHENOTYPE, OTHER_PHENOTYPE, NOTE_ALERT, PROVENANCE, \
     VALIDATION_ERRORS
-from .logging_service import LoggerService, ENTITY_NOT_FOUND, SEX_NOT_FOUND, SPECIES_NOT_FOUND, MULTIPLE_DESTINATIONS, \
-    STATEMENT_INCORRECT_STATE, FORWARD_CONNECTION_NOT_FOUND, SENTENCE_INCORRECT_STATE
-from .models import LoggableEvent
+from .logging_service import LoggerService, STATEMENT_INCORRECT_STATE, SENTENCE_INCORRECT_STATE
+from .models import LoggableEvent, ValidationErrors
 from .neurondm_script import main as get_statements_from_neurondm
 from ...enums import (
     CircuitType,
@@ -76,7 +75,7 @@ def has_invalid_statement(statement: Dict) -> bool:
 
 
 def can_statement_be_overwritten(connectivity_statement: ConnectivityStatement, statement) -> bool:
-    if connectivity_statement.state != CSState.EXPORTED or connectivity_statement != CSState.INVALID:
+    if connectivity_statement.state != CSState.EXPORTED and connectivity_statement.state != CSState.INVALID:
         logger_service.add_warning(LoggableEvent(statement[ID], None, STATEMENT_INCORRECT_STATE))
         return False
 
@@ -98,7 +97,7 @@ def validate_statements(statements: List[Dict[str, Any]]) -> List[Dict[str, Any]
     for statement in statements:
         # Initialize validation_errors if not already present
         if VALIDATION_ERRORS not in statement:
-            statement[VALIDATION_ERRORS] = []
+            statement[VALIDATION_ERRORS] = ValidationErrors()
 
         # Validate entities, sex, and species, updating validation_errors accordingly
         annotate_invalid_entities(statement)
@@ -122,7 +121,7 @@ def annotate_invalid_entities(statement: Dict) -> bool:
     # Check all URIs and log if not found
     for uri in uris_to_check:
         if not found_entity(uri):
-            statement[VALIDATION_ERRORS].append(f"{ENTITY_NOT_FOUND}: {uri}")
+            statement[VALIDATION_ERRORS].entities.add(uri)
             has_invalid_entities = True
 
     return has_invalid_entities
@@ -136,7 +135,7 @@ def annotate_invalid_sex(statement: Dict) -> bool:
 
             first_sex_uri = statement[SEX][0]
             if not Sex.objects.filter(ontology_uri=first_sex_uri).exists():
-                statement[VALIDATION_ERRORS].append(f"{SEX_NOT_FOUND}: {first_sex_uri}")
+                statement[VALIDATION_ERRORS].sex.add(first_sex_uri)
             return True
     return False
 
@@ -145,7 +144,7 @@ def annotate_invalid_species(statement: Dict) -> bool:
     has_invalid_species = False
     for species_uri in statement[SPECIES]:
         if not Specie.objects.filter(ontology_uri=species_uri).exists():
-            statement[VALIDATION_ERRORS].append(f"{SPECIES_NOT_FOUND}: {species_uri}")
+            statement[VALIDATION_ERRORS].species.add(species_uri)
             has_invalid_species = True
     return has_invalid_species
 
@@ -154,7 +153,7 @@ def annotate_invalid_forward_connections(statement: Dict, statement_ids: Set[str
     has_invalid_forward_connection = False
     for reference_uri in statement[FORWARD_CONNECTION]:
         if reference_uri not in statement_ids:
-            statement[VALIDATION_ERRORS].append(f"{FORWARD_CONNECTION_NOT_FOUND}: {reference_uri}")
+            statement[VALIDATION_ERRORS].forward_connection.add(reference_uri)
             has_invalid_forward_connection = True
     return has_invalid_forward_connection
 
@@ -208,9 +207,11 @@ def create_or_update_connectivity_statement(statement: Dict, sentence: Sentence)
             connectivity_statement.refresh_from_db(fields=fields_to_refresh)
             add_ingestion_system_note(connectivity_statement)
 
-    if statement.get(VALIDATION_ERRORS):
-        errors = '; '.join(statement[VALIDATION_ERRORS])
-        do_transition_to_invalid(connectivity_statement, errors)
+    validation_errors = statement.get(VALIDATION_ERRORS, ValidationErrors())
+
+    if validation_errors.has_errors() and connectivity_statement.state != CSState.INVALID:
+        error_message = validation_errors.to_string()
+        do_transition_to_invalid(connectivity_statement, error_message)
 
     update_many_to_many_fields(connectivity_statement, statement)
 
@@ -218,7 +219,12 @@ def create_or_update_connectivity_statement(statement: Dict, sentence: Sentence)
 
 
 def has_changes(connectivity_statement, statement, defaults):
+    validation_errors = statement.get(VALIDATION_ERRORS, ValidationErrors())
+
     for field, value in defaults.items():
+        if field == 'state':
+            continue
+
         if field in ['sex', 'functional_circuit_role', 'phenotype', 'projection_phenotype']:
             current_fk_id = getattr(connectivity_statement, f'{field}_id')
             new_fk_id = value.id if value is not None else None
@@ -231,25 +237,27 @@ def has_changes(connectivity_statement, statement, defaults):
 
     # Check for changes in species
     current_species = set(species.ontology_uri for species in connectivity_statement.species.all())
-    new_species = set(statement.get(SPECIES, []))
+    new_species = set(uri for uri in statement.get(SPECIES, []) if uri not in validation_errors.species)
     if current_species != new_species:
         return True
 
     # Check for changes in provenance
     current_provenance = set(provenance.uri for provenance in connectivity_statement.provenance_set.all())
-    new_provenance = set(statement.get(PROVENANCE, []))
+    new_provenance = set(statement.get(PROVENANCE) or [statement[ID]])
     if current_provenance != new_provenance:
         return True
 
     # Check for changes in forward_connection
-    current_forward_connections = set(connection.id for connection in connectivity_statement.forward_connection.all())
-    new_forward_connections = set(statement.get(FORWARD_CONNECTION, []))
+    current_forward_connections = set(
+        connection.reference_uri for connection in connectivity_statement.forward_connection.all())
+    new_forward_connections = set(
+        uri for uri in statement.get(FORWARD_CONNECTION, []) if uri not in validation_errors.forward_connection)
     if current_forward_connections != new_forward_connections:
         return True
 
     # Check for changes in origins
     current_origins = set(origin.ontology_uri for origin in connectivity_statement.origins.all())
-    new_origins = statement[ORIGINS].anatomical_entities
+    new_origins = set(uri for uri in statement[ORIGINS].anatomical_entities if uri not in validation_errors.entities)
     if current_origins != new_origins:
         return True
 
@@ -267,8 +275,13 @@ def has_changes(connectivity_statement, statement, defaults):
         return True
 
     for current_via, new_via in zip(current_vias, new_vias):
-        if (new_via.anatomical_entities != current_via['anatomical_entities'] or
-                new_via.from_entities != current_via['from_entities']):
+        new_via_anatomical_entities = set(
+            uri for uri in new_via.anatomical_entities if uri not in validation_errors.entities)
+
+        new_via_from_entities = set(uri for uri in new_via.from_entities if uri not in validation_errors.entities)
+
+        if (new_via_anatomical_entities != current_via['anatomical_entities'] or
+                new_via_from_entities != current_via['from_entities']):
             return True
 
     # Check for changes in destinations
@@ -289,14 +302,11 @@ def has_changes(connectivity_statement, statement, defaults):
         for uri in destination.from_entities.all().values_list('ontology_uri', flat=True)
     )
 
-    new_destinations_anatomical_entities = set(
-        uri for destination in new_destinations
-        for uri in destination.anatomical_entities
-    )
-    new_destinations_from_entities = set(
-        uri for destination in new_destinations
-        for uri in destination.from_entities
-    )
+    new_destinations_anatomical_entities = {uri for new_dest in statement[DESTINATIONS] for uri in
+                                            new_dest.anatomical_entities if uri not in validation_errors.entities}
+
+    new_destinations_from_entities = {uri for new_dest in statement[DESTINATIONS] for uri in new_dest.from_entities if
+                                      uri not in validation_errors.entities}
 
     if (current_destinations_anatomical_entities != new_destinations_anatomical_entities or
             current_destinations_from_entities != new_destinations_from_entities):
@@ -480,7 +490,7 @@ def update_forward_connections(statements: List):
             try:
                 forward_statement = ConnectivityStatement.objects.get(reference_uri=uri)
             except ConnectivityStatement.DoesNotExist:
-                # connectivity statement state should have been set to invalid prior
+                assert connectivity_statement.state == CSState.INVALID
                 continue
             connectivity_statement.forward_connection.add(forward_statement)
 
