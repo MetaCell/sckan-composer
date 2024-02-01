@@ -5,7 +5,7 @@ import statementService from "../../services/StatementService";
 import StatementPreviewWidget from "../StatementPreviewWidget";
 
 const StatementPreviewForm = (props: any) => {
-    const { statement, setter } = props;
+    const { statement } = props;
     const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
     const copiedSchema = JSON.parse(JSON.stringify(schema));
     const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));

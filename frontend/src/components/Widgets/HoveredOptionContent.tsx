@@ -1,6 +1,6 @@
 import React from "react";
 import { Stack, Typography, Box, Chip } from "@mui/material";
-import { Option, OptionDetail } from "../../types";
+import { OptionDetail } from "../../types";
 import { DROPDOWN_MAPPER_ONTOLOGY_URL } from "../../helpers/dropdownMappers";
 import { snakeToSpace } from "../../helpers/helpers";
 

@@ -6,7 +6,6 @@ import { Typography } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import StatementDetailsAccordion from "./StatementDetailsAccordion";
-import { vars } from "../../theme/variables";
 import statementService from "../../services/StatementService";
 import StatementForm from "../Forms/StatementForm";
 import ProvenancesForm from "../Forms/ProvenanceForm";

@@ -3,7 +3,6 @@ import validator from "@rjsf/validator-ajv8";
 import { IChangeEvent, withTheme } from "@rjsf/core";
 import { Backdrop, Box, CircularProgress } from "@mui/material";
 import { Theme } from "@rjsf/mui";
-import { useDebouncedCallback } from "use-debounce";
 import { EDIT_DEBOUNCE } from "../../settings";
 import Button from "@mui/material/Button";
 
@@ -36,7 +35,6 @@ export const FormBase = (props: any) => {
   } = props;
   const [localData, setLocalData] = useState<any>(data);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const triggerAutoSave = useDebouncedCallback(() => onSave(), EDIT_DEBOUNCE);
   const [isSubmitButtonDisabled, setIsSubmitButtonDisabled] =
     useState<boolean>(false);
   const [customSchema, setCustomSchema] = useState<any>(schema);
@@ -70,7 +68,7 @@ export const FormBase = (props: any) => {
         }
       });
     }
-  }, [data]);
+  }, [data, schema, uiFields, uiSchema]);
 
   const startTimer = () =>
     (timer.current = setTimeout(() => {

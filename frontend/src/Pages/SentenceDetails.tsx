@@ -67,7 +67,6 @@ const SentencesDetails = () => {
   const [connectivityStatements, setConnectivityStatements] =
     useState<SentenceConnectivityStatement[]>();
 
-  const [open, setOpen] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [refetch, setRefetch] = useState(false);
 
@@ -167,7 +166,6 @@ const SentencesDetails = () => {
     index: number,
   ) => {
     setSelectedIndex(index);
-    setOpen(false);
   };
 
   const refreshSentence = () => {

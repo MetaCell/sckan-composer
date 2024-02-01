@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {
   Badge,
   CircularProgress,
@@ -25,10 +25,10 @@ import theme from "../../theme/Theme";
 import PlaylistRemoveOutlinedIcon from "@mui/icons-material/PlaylistRemoveOutlined";
 import PlaylistAddCheckOutlinedIcon from "@mui/icons-material/PlaylistAddCheckOutlined";
 import NoResultField from "./NoResultField";
-import { vars } from "../../theme/variables";
-import { Option } from "../../types";
+import {vars} from "../../theme/variables";
+import {Option} from "../../types";
 import Stack from "@mui/material/Stack";
-import {areArraysOfObjectsEqual, processFromEntitiesData} from "../../helpers/dropdownMappers";
+import {processFromEntitiesData} from "../../helpers/dropdownMappers";
 
 const {
   buttonOutlinedBorderColor,
@@ -187,34 +187,34 @@ const styles = {
 };
 
 export default function CustomEntitiesDropdown({
-  value,
-  id,
-  options: {
-    isFormDisabled = () => false,
-    errors,
-    searchPlaceholder,
-    noResultReason,
-    disabledReason,
-    onSearch,
-    onUpdate,
-    mapValueToOption,
-    CustomHeader = null,
-    CustomBody = null,
-    CustomFooter = null,
-    header = {},
-    CustomInputChip = null,
-    placeholder,
-    label,
-    chipsNumber = 2,
-    postProcessOptions = false,
-    refreshStatement,
-    statement,
-    fieldName = "",
-    getPreLevelSelectedValues,
-    areConnectionsExplicit,
-    minWidth = ''
-  },
-}: any) {
+                                                 value,
+                                                 id,
+                                                 options: {
+                                                   isFormDisabled = () => false,
+                                                   errors,
+                                                   searchPlaceholder,
+                                                   noResultReason,
+                                                   disabledReason,
+                                                   onSearch,
+                                                   onUpdate,
+                                                   mapValueToOption,
+                                                   CustomHeader = null,
+                                                   CustomBody = null,
+                                                   CustomFooter = null,
+                                                   header = {},
+                                                   CustomInputChip = null,
+                                                   placeholder,
+                                                   label,
+                                                   chipsNumber = 2,
+                                                   postProcessOptions = false,
+                                                   refreshStatement,
+                                                   statement,
+                                                   fieldName = "",
+                                                   getPreLevelSelectedValues,
+                                                   areConnectionsExplicit,
+                                                   minWidth = ''
+                                                 },
+                                               }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const aria = open ? "simple-popper" : undefined;
@@ -233,7 +233,6 @@ export default function CustomEntitiesDropdown({
   const [allOptions, setAllOptions] = useState<Option[]>([]);
 
   const [hasValueChanged, setHasValueChanged] = useState(false);
-  const preLevelItems = postProcessOptions && getPreLevelSelectedValues ? getPreLevelSelectedValues(id) : [];
   const isAllSelectedValuesFromTheAboveLayer = postProcessOptions && areConnectionsExplicit ? areConnectionsExplicit(id) : true
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setIsDropdownOpened(true);
@@ -259,12 +258,12 @@ export default function CustomEntitiesDropdown({
   const handleSelectDeselectGroup = (group: string) => {
     const newSelectedOptions = [...selectedOptions];
     const groupOptions = autocompleteOptions.filter((option: Option) => option.group === group);
-    
+
     // Check if all options in this group are already selected
     const allSelectedInGroup = groupOptions.every(
       (groupOption) => newSelectedOptions.some((selectedOption) => selectedOption.id === groupOption.id)
     );
-    
+
     if (allSelectedInGroup) {
       // Deselect all options in this group
       groupOptions.forEach((option) => {
@@ -281,16 +280,16 @@ export default function CustomEntitiesDropdown({
         }
       });
     }
-    
+
     handleSelectedOptionsChange(newSelectedOptions);
   };
-  
+
   const getGroupButton = (group: string) => {
     const groupOptions = autocompleteOptions.filter((option: Option) => option.group === group);
     const allSelectedInGroup = groupOptions.every(
       (groupOption) => selectedOptions.some((selectedOption) => selectedOption.id === groupOption.id)
     );
-    
+
     return (
       <Button
         variant="text"
@@ -347,23 +346,25 @@ export default function CustomEntitiesDropdown({
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [inputValue, id, onSearch, postProcessOptions]);
-  
+  }, [inputValue, id, onSearch, postProcessOptions, selectedOptions]);
+
 
   useEffect(() => {
     if (!isDropdownOpened) return;
     setIsLoading(true);
     fetchData().then(() => setIsLoading(false));
-  }, [isDropdownOpened, id, onSearch]);
+  }, [isDropdownOpened, id, onSearch, fetchData]);
 
   useEffect(() => {
     if (inputValue !== undefined) {
       setIsLoading(true);
       fetchData().then(() => setIsLoading(false));
     }
-  }, [inputValue, id]);
+  }, [inputValue, id, fetchData]);
 
   useEffect(() => {
+    const preLevelItems = postProcessOptions && getPreLevelSelectedValues ? getPreLevelSelectedValues(id) : [];
+
     const closePopperOnClickOutside = (event: MouseEvent) => {
       if (
         popperRef.current &&
@@ -381,16 +382,16 @@ export default function CustomEntitiesDropdown({
         }
       }
     };
-    
+
     document.addEventListener("mousedown", closePopperOnClickOutside);
     return () => {
       document.removeEventListener("mousedown", closePopperOnClickOutside);
     };
-  }, [hasValueChanged]);
+  }, [hasValueChanged, postProcessOptions, getPreLevelSelectedValues, refreshStatement, selectedOptions.length, id]);
 
   return isFormDisabled() ? (
     <Box
-      sx={{ background: theme.palette.grey[100], borderRadius: 1 }}
+      sx={{background: theme.palette.grey[100], borderRadius: 1}}
       p={2}
       display="flex"
       justifyContent="center"
@@ -403,7 +404,7 @@ export default function CustomEntitiesDropdown({
         <Typography>{label}</Typography>
 
         <Badge
-          sx={{ ...styles.badge, flex: 1 }}
+          sx={{...styles.badge, flex: 1}}
           badgeContent={
             !isAllSelectedValuesFromTheAboveLayer ? 0 : selectedOptions?.length
           }
@@ -413,10 +414,10 @@ export default function CustomEntitiesDropdown({
             sx={{
               minWidth: minWidth ? minWidth : "auto",
               ...(open
-                ? { ...styles.root, ...styles.rootOpen }
+                ? {...styles.root, ...styles.rootOpen}
                 : selectedOptions.length === 0
-                ? styles.root
-                : { ...styles.root, ...styles.rootHover }),
+                  ? styles.root
+                  : {...styles.root, ...styles.rootHover}),
             }}
             onClick={handleClick}
           >
@@ -427,51 +428,51 @@ export default function CustomEntitiesDropdown({
               <Box gap={1} display="flex" flexWrap="wrap" alignItems="center">
                 {selectedOptions?.length
                   ? selectedOptions
-                      ?.slice(0, chipsNumber)
-                      .map((item: Option, index) => {
-                        return (
-                          <Tooltip
-                            title={item?.label}
-                            placement="top"
-                            arrow
-                            key={item.id}
-                          >
-                            {CustomInputChip ? (
-                              <CustomInputChip sx={styles.chip} entity={item} />
-                            ) : (
-                              <Chip
-                                sx={{
-                                  ...styles.chip,
-                                  flex: 1,
-                                  minWidth: 0,
-                                  maxWidth: "fit-content",
-                                }}
-                                variant={"outlined"}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                }}
-                                deleteIcon={<ClearOutlinedIcon />}
-                                onDelete={(e) => {
-                                  e.stopPropagation();
-                                  handleChipRemove(item);
-                                }}
-                                label={item?.label}
-                              />
-                            )}
-                          </Tooltip>
-                        );
-                      })
+                    ?.slice(0, chipsNumber)
+                    .map((item: Option, index) => {
+                      return (
+                        <Tooltip
+                          title={item?.label}
+                          placement="top"
+                          arrow
+                          key={item.id}
+                        >
+                          {CustomInputChip ? (
+                            <CustomInputChip sx={styles.chip} entity={item}/>
+                          ) : (
+                            <Chip
+                              sx={{
+                                ...styles.chip,
+                                flex: 1,
+                                minWidth: 0,
+                                maxWidth: "fit-content",
+                              }}
+                              variant={"outlined"}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
+                              deleteIcon={<ClearOutlinedIcon/>}
+                              onDelete={(e) => {
+                                e.stopPropagation();
+                                handleChipRemove(item);
+                              }}
+                              label={item?.label}
+                            />
+                          )}
+                        </Tooltip>
+                      );
+                    })
                   : null}
-                <span style={{ marginRight: ".5rem" }}>
+                <span style={{marginRight: ".5rem"}}>
                   {selectedOptions.length > chipsNumber &&
                     `+${selectedOptions.length - chipsNumber}`}
                 </span>
               </Box>
             )}
             {open ? (
-              <ArrowDropUpIcon sx={styles.toggleIcon} />
+              <ArrowDropUpIcon sx={styles.toggleIcon}/>
             ) : (
-              <ArrowDropDownIcon sx={styles.toggleIcon} />
+              <ArrowDropDownIcon sx={styles.toggleIcon}/>
             )}
           </Box>
         </Badge>
@@ -605,7 +606,7 @@ export default function CustomEntitiesDropdown({
                     startAdornment: (
                       <InputAdornment position="start">
                         <SearchIcon
-                          sx={{ fontSize: "1rem", color: captionColor }}
+                          sx={{fontSize: "1rem", color: captionColor}}
                         />
                       </InputAdornment>
                     ),
@@ -617,9 +618,9 @@ export default function CustomEntitiesDropdown({
                   display="flex"
                   justifyContent="center"
                   alignItems="center"
-                  sx={{ height: "100%" }}
+                  sx={{height: "100%"}}
                 >
-                  <CircularProgress />
+                  <CircularProgress/>
                 </Box>
               ) : autocompleteOptions.length > 0 ? (
                 <>
@@ -748,16 +749,16 @@ export default function CustomEntitiesDropdown({
                               >
                                 <Checkbox
                                   disableRipple
-                                  icon={<UncheckedItemIcon fontSize="small" />}
+                                  icon={<UncheckedItemIcon fontSize="small"/>}
                                   checkedIcon={
                                     !isAllSelectedValuesFromTheAboveLayer &&
                                     !hasValueChanged ? (
                                       <CheckedItemIconBG
                                         fontSize="small"
-                                        style={{ color: "#C6D9F6" }}
+                                        style={{color: "#C6D9F6"}}
                                       />
                                     ) : (
-                                      <CheckedItemIcon fontSize="small" />
+                                      <CheckedItemIcon fontSize="small"/>
                                     )
                                   }
                                   checked={isOptionSelected(option)}
@@ -809,7 +810,7 @@ export default function CustomEntitiesDropdown({
                     {allOptions.length === selectedOptions.length ? (
                       <Button
                         disableRipple
-                        startIcon={<PlaylistRemoveOutlinedIcon />}
+                        startIcon={<PlaylistRemoveOutlinedIcon/>}
                         variant="text"
                         onClick={(e) => {
                           e.preventDefault();
@@ -821,7 +822,7 @@ export default function CustomEntitiesDropdown({
                     ) : (
                       <Button
                         disableRipple
-                        startIcon={<PlaylistAddCheckOutlinedIcon />}
+                        startIcon={<PlaylistAddCheckOutlinedIcon/>}
                         variant="text"
                         onClick={(e) => {
                           e.preventDefault();
@@ -834,7 +835,7 @@ export default function CustomEntitiesDropdown({
                   </Box>
                 </>
               ) : (
-                <NoResultField noResultReason={noResultReason} />
+                <NoResultField noResultReason={noResultReason}/>
               )}
             </Box>
             {autocompleteOptions.length > 0 && (

@@ -215,7 +215,7 @@ export async function searchForwardConnection(
         (destination) =>
             destination.anatomical_entities?.map((entity) => entity.id) ?? [],
         ) ?? [];
-    if (forwardConnectionOrigins.length == 0) {
+    if (forwardConnectionOrigins.length === 0) {
       return []
     }
     const sameSentencePromise = connectivityStatementService.getList({
