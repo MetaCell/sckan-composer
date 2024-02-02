@@ -7,14 +7,12 @@ from django.db import models
 class Laterality(models.TextChoices):
     RIGHT = "RIGHT", "Right"
     LEFT = "LEFT", "Left"
-    UNKNOWN = "UNKNOWN", "Not specified"
 
 
 class Projection(models.TextChoices):
     IPSI = "IPSI", "Ipsilateral"
     CONTRAT = "CONTRAT", "Contralateral"
     BI = "BI", "Bilateral"
-    UNKNOWN = "UNKNOWN", "Not specified"
 
 
 # todo: motor and sensory should move to phenotype options per csv
@@ -25,7 +23,6 @@ class CircuitType(models.TextChoices):
     INTRINSIC = "INTRINSIC", "Intrinsic"
     PROJECTION = "PROJECTION", "Projection"
     ANAXONIC = "ANAXONIC", "Anaxonic"
-    UNKNOWN = "UNKNOWN", "Not specified"
 
 
 class ViaType(models.TextChoices):

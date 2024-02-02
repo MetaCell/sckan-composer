@@ -386,14 +386,15 @@ class ConnectivityStatement(models.Model):
     owner = models.ForeignKey(
         User, verbose_name="Curator", on_delete=models.SET_NULL, null=True, blank=True
     )
+
     laterality = models.CharField(
-        max_length=20, default=Laterality.UNKNOWN, choices=Laterality.choices
+        max_length=20, choices=Laterality.choices, null=True
     )
     projection = models.CharField(
-        max_length=20, default=Projection.UNKNOWN, choices=Projection.choices
+        max_length=20, choices=Projection.choices, null=True
     )
     circuit_type = models.CharField(
-        max_length=20, default=CircuitType.UNKNOWN, choices=CircuitType.choices
+        max_length=20, choices=CircuitType.choices, null=True
     )
     # TODO for next releases we could have only 1 field for phenotype + an intermediate table with the phenotype's categories such as circuit_type, laterality, projection, functional_circuit_role, projection_phenotype among others
     phenotype = models.ForeignKey(
@@ -525,7 +526,6 @@ class ConnectivityStatement(models.Model):
         laterality_map = {
             Laterality.RIGHT.value: "on the right side of the body",
             Laterality.LEFT.value: "on the left side of the body",
-            Laterality.UNKNOWN.value: "",
         }
         return laterality_map.get(self.laterality, "")
 
