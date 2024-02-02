@@ -486,25 +486,39 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             self.context['journey'] = instance.get_journey()
         return self.create_statement_preview(instance, self.context['journey'])
 
+    def get_property_or_empty_string(self, instance, property_name, sub_property_name=None):
+        if hasattr(instance, property_name):
+            property_attr = getattr(instance, property_name)
+            if property_attr:
+                if sub_property_name and hasattr(property_attr, sub_property_name):
+                    subproperty_attr = getattr(property_attr, sub_property_name)
+                    return subproperty_attr() if callable(subproperty_attr) else subproperty_attr
+                
+                if callable(property_attr):
+                    return property_attr() if property_attr() else ""
+                else:
+                    return property_attr
+        return ""
+
+    
     def create_statement_preview(self, instance, journey):
-        sex = instance.sex.name if instance.sex else ""
+        sex = self.get_property_or_empty_string(instance, 'sex', 'name')
+
         species_list = [specie.name for specie in instance.species.all()]
         species = join_entities(species_list)
         if not species:
             species = ""
 
-        phenotype = instance.phenotype.name.lower() if instance.phenotype else ""
+        phenotype = self.get_property_or_empty_string(instance, 'phenotype', 'name').lower()
         origin_names = [origin.name for origin in instance.origins.all()]
         origins = join_entities(origin_names)
         if not origins:
             origins = ""
 
-        circuit_type = instance.get_circuit_type_display().lower() if instance.circuit_type else ""
-        projection = instance.get_projection_display().lower() if instance.projection else ""
+        circuit_type = self.get_property_or_empty_string(instance, 'get_circuit_type_display').lower()
+        projection = self.get_property_or_empty_string(instance, 'get_projection_display').lower()
 
-        laterality_description = instance.get_laterality_description()
-        if not laterality_description:
-            laterality_description = ""
+        laterality_description = self.get_property_or_empty_string(instance, 'get_laterality_description')
 
         apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
         journey_sentence = ', '.join(journey)
@@ -514,10 +528,11 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             statement = f"In {sex} {species}, the {phenotype} connection goes {journey_sentence}.\n"
         else:
             statement = f"A {phenotype} connection goes {journey_sentence}.\n"
+        
         statement += f"This "
-        if projection != "not specified":
+        if projection != "":
             statement += f"{projection} "
-        if circuit_type != "not specified":
+        if circuit_type != "":
             statement += f"{circuit_type} "
 
         statement += f"connection projects from the {origins}."
