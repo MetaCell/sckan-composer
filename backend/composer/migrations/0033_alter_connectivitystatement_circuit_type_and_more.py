@@ -60,13 +60,6 @@ class Migration(migrations.Migration):
                 null=True,
             ),
         ),
-        migrations.AlterField(
-            model_name="connectivitystatement",
-            name="species",
-            field=models.ManyToManyField(
-                blank=True, null=True, to="composer.specie", verbose_name="Species"
-            ),
-        ),
 
         # CONVERT UNKNOWN TO NULL
         migrations.RunPython(change_not_specified_to_null),
