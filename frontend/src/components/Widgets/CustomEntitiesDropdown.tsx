@@ -249,36 +249,36 @@ const CommonChipBox = ({
 };
 
 export default function CustomEntitiesDropdown({
-                                                 value,
-                                                 id,
-                                                 placeholder: placeholder1,
-                                                 options: {
-                                                   isFormDisabled = () => false,
-                                                   errors,
-                                                   searchPlaceholder,
-                                                   noResultReason,
-                                                   disabledReason,
-                                                   onSearch,
-                                                   onUpdate,
-                                                   mapValueToOption,
-                                                   CustomHeader = null,
-                                                   CustomBody = null,
-                                                   CustomFooter = null,
-                                                   header = {},
-                                                   CustomInputChip = null,
-                                                   placeholder,
-                                                   label,
-                                                   chipsNumber = 2,
-                                                   postProcessOptions = false,
-                                                   refreshStatement,
-                                                   statement,
-                                                   fieldName = "",
-                                                   getPreLevelSelectedValues,
-                                                   areConnectionsExplicit,
-                                                   minWidth = '',
-                                                   disabled
-                                                 },
-                                               }: any) {
+   value,
+   id,
+   placeholder: plcholder,
+   options: {
+     isFormDisabled = () => false,
+     errors,
+     searchPlaceholder,
+     noResultReason,
+     disabledReason,
+     onSearch,
+     onUpdate,
+     mapValueToOption,
+     CustomHeader = null,
+     CustomBody = null,
+     CustomFooter = null,
+     header = {},
+     CustomInputChip = null,
+     placeholder,
+     label,
+     chipsNumber = 2,
+     postProcessOptions = false,
+     refreshStatement,
+     statement,
+     fieldName = "",
+     getPreLevelSelectedValues,
+     areConnectionsExplicit,
+     minWidth = '',
+     disabled
+   },
+ }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const aria = open ? "simple-popper" : undefined;
@@ -501,7 +501,7 @@ export default function CustomEntitiesDropdown({
                 >
                   {!isAllSelectedValuesFromTheAboveLayer ||
                   selectedOptions.length === 0 ? (
-                    <Typography sx={styles.placeholder}>{placeholder || placeholder1}</Typography>
+                    <Typography sx={styles.placeholder}>{placeholder || plcholder}</Typography>
                   ) : (
                     <CommonChipBox
                       selectedOptions={selectedOptions}
