@@ -497,49 +497,14 @@ export default function CustomEntitiesDropdown({
                 selectedOptions.length === 0 ? (
                   <Typography sx={styles.placeholder}>{placeholder || plcholder}</Typography>
                 ) : (
-                  <Box gap={1} display="flex" flexWrap="wrap" alignItems="center">
-                    {selectedOptions?.length
-                      ? selectedOptions
-                        ?.slice(0, chipsNumber)
-                        .map((item: Option, index) => {
-                          return (
-                            <Tooltip
-                              title={item?.label}
-                              placement="top"
-                              arrow
-                              key={item.id}
-                            >
-                              {CustomInputChip ? (
-                                <CustomInputChip sx={styles.chip} entity={item}/>
-                              ) : (
-                                <Chip
-                                  sx={{
-                                    ...styles.chip,
-                                    flex: 1,
-                                    minWidth: 0,
-                                    maxWidth: "fit-content",
-                                  }}
-                                  variant={"outlined"}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                  }}
-                                  deleteIcon={<ClearOutlinedIcon/>}
-                                  onDelete={(e) => {
-                                    e.stopPropagation();
-                                    handleChipRemove(item);
-                                  }}
-                                  label={item?.label}
-                                />
-                              )}
-                            </Tooltip>
-                          );
-                        })
-                      : null}
-                    <span style={{marginRight: ".5rem"}}>
-                  {selectedOptions.length > chipsNumber &&
-                    `+${selectedOptions.length - chipsNumber}`}
-                </span>
-                  </Box>
+                  <CommonChipBox
+                    selectedOptions={selectedOptions}
+                    CustomInputChip={CustomInputChip}
+                    styles={styles}
+                    disabled={disabled}
+                    handleChipRemove={handleChipRemove}
+                    chipsNumber={chipsNumber}
+                  />
                 )}
                 {open ? (
                   <ArrowDropUpIcon sx={styles.toggleIcon}/>
