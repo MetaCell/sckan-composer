@@ -45,9 +45,3 @@ def get_value_or_none(model, prop: str):
 
 def found_entity(uri: str) -> bool:
     return AnatomicalEntity.objects.filter(ontology_uri=uri).exists()
-
-
-def update_model_instance(instance, updates: Dict):
-    for field, value in updates.items():
-        setattr(instance, field, value)
-    instance.save()
