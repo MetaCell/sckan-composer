@@ -174,6 +174,11 @@ class ConnectivityStatementService(StateServiceMixin):
         return user.username == 'system'
 
     @staticmethod
+    def has_permission_to_transition_to_invalid(connectivity_statement, user):
+        # only system users can transition to INVALID
+        return user.username == 'system'
+
+    @staticmethod
     def add_important_tag(connectivity_statement):
         # when a ConnectivityStatement record goes to compose_now state and the previous
         # state is in NPO Approved or Exported then flag the CS with Tag IMPORTANT
