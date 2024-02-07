@@ -5,11 +5,12 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import logo from "../assets/logo.svg";
-
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import { userProfile, logout } from "../services/UserService";
-
+import theme from "../theme/Theme";
+import { vars } from "../theme/variables";
+const { titleFontColor } = vars
 const Topbar = () => {
   const profile = userProfile.getProfile();
 
@@ -37,7 +38,7 @@ const Topbar = () => {
       <Toolbar>
         <Box display="flex">
           <Box sx={{height: 24, width: 24}} component="img" display="block" src={logo} alt="Composer logo" />
-          <Typography variant="h6" component="div" ml={1.5}>
+          <Typography variant="h6" component="div" ml={1.5} color={titleFontColor}>
             SCKAN Composer
           </Typography>
         </Box>
@@ -52,12 +53,12 @@ const Topbar = () => {
           </Typography>
         </Box>
         <Box display="flex" alignItems="center">
-          <Typography variant="h6">
+          <Typography variant="h6" color={theme.palette.info.main}>
             Welcome, {profile.user.first_name}
           </Typography>
           <Tooltip title="logout">
-            <IconButton color="info" onClick={handleClick}>
-              <MoreVertIcon />
+            <IconButton onClick={handleClick}>
+              <LogoutRoundedIcon sx={{ fontSize: '1.25rem', color: theme.palette.info.main}} />
             </IconButton>
           </Tooltip>
         </Box>

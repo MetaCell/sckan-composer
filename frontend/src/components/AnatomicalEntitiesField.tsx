@@ -1,29 +1,31 @@
-import React from "react";
+import React, {useCallback} from "react";
 import AutoComplete from "./AutoComplete";
-import { AnatomicalEntity } from "../apiclient/backend";
-import { composerApi as api } from "../services/apis";
-import { autocompleteRows } from "../helpers/settings";
+import {AnatomicalEntity} from "../apiclient/backend";
+import {composerApi as api} from "../services/apis";
+import {autocompleteRows} from "../helpers/settings";
 import theme from "../theme/Theme";
 import Typography from "@mui/material/Typography";
 
 function AnatomicalEntitiesField(props: any) {
-  const { label, errors } = props.options;
+  const {label, errors} = props.options;
   const placeholder = "Select " + props.label?.slice(0, -3);
 
   const [entity, setEntity] = React.useState<AnatomicalEntity>();
   const [loading, setLoading] = React.useState(true);
 
-  const fetchEntity = () => api.composerAnatomicalEntityRetrieve(props.value);
+  const fetchEntity = useCallback(() => {
+    return api.composerAnatomicalEntityRetrieve(props.value);
+  }, [props.value]);
 
   const autoCompleteNoOptionsText = "No entities found";
 
   React.useEffect(() => {
     props.value
       ? fetchEntity()
-          .then((res) => setEntity(res.data))
-          .finally(() => setLoading(false))
+        .then((res) => setEntity(res.data))
+        .finally(() => setLoading(false))
       : setLoading(false);
-  }, []);
+  }, [fetchEntity, props.value]);
 
   const autoCompleteFetch = (inputValue: string) =>
     api.composerAnatomicalEntityList([], autocompleteRows, inputValue, 0);

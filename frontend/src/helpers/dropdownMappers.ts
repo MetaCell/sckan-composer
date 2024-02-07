@@ -121,6 +121,22 @@ export const processFromEntitiesData = (allOptions: tempOption[]) => {
 export function getViasGroupLabel(currentIndex: number | null) {
   return currentIndex ? `${ViasGroupLabel}-${currentIndex}` : OriginsGroupLabel;
 }
+export function areArraysOfObjectsEqual(a: any[], b: any[]): boolean {
+  if (a.length !== b.length) return false;
+  
+  const setA = new Set(a.map(obj => obj.id));
+  const setB = new Set(b.map(obj => obj.id));
+  
+  if (setA.size !== setB.size) return false;
+  
+  for (let id of setA) {
+    if (!setB.has(id)) return false;
+  }
+  
+  return true;
+}
+
+
 export function findMatchingEntities(
   statement: ConnectivityStatement,
   entities: Option[],

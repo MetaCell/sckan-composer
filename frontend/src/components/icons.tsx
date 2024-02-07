@@ -39,6 +39,13 @@ export const CheckedItemIcon = (props: SvgIconProps) => (
   </SvgIcon>
 );
 
+export const CheckedItemIconBG = (props: SvgIconProps) => (
+  <SvgIcon {...props} viewBox="0 0 16 16" sx={{ width: 16, height: 16 }}>
+    <rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#C6D9F6"/>
+    <rect x="0.5" y="0.5" width="15" height="15" rx="3.5" stroke="#3779E1"/>
+  </SvgIcon>
+);
+
 export const ViaIcon = (props: SvgIconProps) => (
   <SvgIcon
     {...props}

@@ -48,7 +48,7 @@ export default function AutoComplete({
           setOptions(entities);
         });
       }, SEARCH_DEBOUNCE),
-    [inputValue],
+    [inputValue, fetch],
   );
 
   useEffect(() => {

@@ -44,7 +44,7 @@ const NoteDetails = (props: any) => {
         setRefresh(false)
       })
     }
-  }, [extraData?.connectivity_statement_id, extraData?.sentence_id, refresh])
+  }, [extraData?.connectivity_statement_id, extraData?.sentence_id, refresh, extraData])
 
   return (
     <Box display='flex' flexDirection='column' >

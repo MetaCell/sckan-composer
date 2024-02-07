@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import { FormBase } from "./FormBase";
 import { jsonSchemas } from "../../services/JsonSchema";
 import sentenceService from "../../services/SentenceService";
@@ -10,7 +10,6 @@ const SentenceAddForm = (props: any) => {
   const { format } = props;
   const { schema, uiSchema } = jsonSchemas.getSentenceSchema();
 
-  const [disabled, setDisabled] = React.useState(true);
 
   const uiFields =
     format === "small"
@@ -89,7 +88,6 @@ const SentenceAddForm = (props: any) => {
         uiFields={uiFields}
         enableAutoSave={false}
         formIsValid={format === "create" && formIsValid}
-        disableSubmitButton={setDisabled}
         submitButtonProps={submitButtonProps}
         {...props}
       />

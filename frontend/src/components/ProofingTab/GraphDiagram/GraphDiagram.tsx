@@ -6,8 +6,6 @@ import {
 } from "../../../apiclient/backend";
 import InfoMenu from "./InfoMenu";
 import NavigationMenu from "./NavigationMenu";
-import {makeStyles} from "@mui/styles";
-import {Theme} from "@mui/material/styles";
 import createEngine, {
     DefaultLinkModel,
     DiagramModel,
@@ -16,17 +14,6 @@ import {CanvasWidget} from '@projectstorm/react-canvas-core';
 import {CustomNodeModel} from "./Models/CustomNodeModel";
 import {CustomNodeFactory} from "./Factories/CustomNodeFactory";
 
-const useStyles = makeStyles((theme: Theme) => ({
-    canvasBG: {
-        background: 'silver',
-    },
-    container: {
-        height: '100%',
-        width: '100%',
-        position: 'relative',
-    },
-
-}));
 
 export enum NodeTypes {
     Origin = 'Origin',
@@ -197,7 +184,6 @@ const processData = (
 };
 
 const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}) => {
-    const classes = useStyles();
     const [engine] = useState(() => createEngine());
     const [modelUpdated, setModelUpdated] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null);
@@ -222,27 +208,29 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations}
 
     // This effect prevents the default scroll and touchmove behavior
     useEffect(() => {
-        if (modelUpdated && containerRef.current) {
+        const currentContainer = containerRef.current;
+
+        if (modelUpdated && currentContainer) {
             const disableScroll = (event: any) => {
                 event.stopPropagation();
             };
 
-            containerRef.current.addEventListener('wheel', disableScroll, {passive: false});
-            containerRef.current.addEventListener('touchmove', disableScroll, {passive: false});
+            currentContainer.addEventListener('wheel', disableScroll, {passive: false});
+            currentContainer.addEventListener('touchmove', disableScroll, {passive: false});
 
             return () => {
-                containerRef.current?.removeEventListener('wheel', disableScroll);
-                containerRef.current?.removeEventListener('touchmove', disableScroll);
+                currentContainer?.removeEventListener('wheel', disableScroll);
+                currentContainer?.removeEventListener('touchmove', disableScroll);
             };
         }
     }, [modelUpdated]);
 
     return (
         modelUpdated ? (
-                <div ref={containerRef} className={classes.container}>
+                <div ref={containerRef} className={"graphContainer"}>
                     <NavigationMenu engine={engine}/>
                     <InfoMenu engine={engine}/>
-                    <CanvasWidget className={classes.container} engine={engine}/>
+                    <CanvasWidget className={"graphContainer"} engine={engine}/>
                 </div>)
             : null
     );

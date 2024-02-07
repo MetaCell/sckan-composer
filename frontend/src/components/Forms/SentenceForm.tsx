@@ -10,7 +10,6 @@ import Paper from "@mui/material/Paper";
 import {vars} from "../../theme/variables";
 import Chip from "@mui/material/Chip";
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import {useNavigate} from "react-router";
 import { useSectionStyle } from "../../styles/styles";
 import { useTheme } from "@mui/system";
 
@@ -49,21 +48,12 @@ const linkedChip = (data: any) => {
 const SentenceForm = (props: any) => {
   const { format, data } = props
   const { schema, uiSchema } = jsonSchemas.getSentenceSchema()
-  const navigate = useNavigate();
   const theme = useTheme()
   const sectionStyle = useSectionStyle(theme)
 
   const uiFields = format === 'small'
     ? ["title"]
     : undefined
-
-  const uiOrder = format === "create" ? ["*", "text"] : undefined;
-  // TODO: set up the widgets for the schema
-
-  const handleOpenPmid = (e: any) => {
-    e.preventDefault()
-    window.open(data?.pmid_uri, '_blank')
-  }
 
   const customUiSchema: UiSchema = {
     ...uiSchema,

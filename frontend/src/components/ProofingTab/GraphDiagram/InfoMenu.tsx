@@ -1,5 +1,5 @@
 import React from "react";
-import {Stack, Divider, Typography} from "@mui/material";
+import {Stack, Typography} from "@mui/material";
 import {
     DestinationInfoIcon,
     OriginInfoIcon,

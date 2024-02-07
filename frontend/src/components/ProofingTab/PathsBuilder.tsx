@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Paper, Stack, Typography, Divider, Box } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import { useSectionStyle, useGreyBgContainer } from "../../styles/styles";
@@ -95,7 +95,7 @@ const PathsBuilder = (props: any) => {
               extraData={{ sentence_id: statement.sentence.id }}
               uiFields={["destinations"]}
               enableAutoSave={false}
-              className="vias"
+              className="destinations"
             />
           </Box>
           <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />

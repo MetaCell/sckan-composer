@@ -1,0 +1,33 @@
+name: Lint Code Base
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint:
+    name: Run ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-modules-${{ hashFiles('frontend/package-lock.json') }}
+
+      - name: Install Node.js dev dependencies
+        run: npm install --only=dev
+        working-directory: ./frontend
+
+      - name: Run lint
+        run: npm run lint
+        working-directory: ./frontend
+

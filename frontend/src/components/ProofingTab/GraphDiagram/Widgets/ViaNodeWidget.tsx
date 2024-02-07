@@ -6,7 +6,6 @@ import {DestinationIcon, OriginIcon, ViaIcon} from "../../../icons";
 import Divider from "@mui/material/Divider";
 import {vars} from "../../../../theme/variables";
 import Chip from "@mui/material/Chip";
-import {AnatomicalEntity} from "../../../../apiclient/backend";
 import {NodeTypes} from "../GraphDiagram";
 
 interface ViaNodeProps {

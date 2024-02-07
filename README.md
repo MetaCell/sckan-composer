@@ -87,7 +87,7 @@ browse the Django [admin](http://127.0.0.1:8000/admin/) interface
 ### Install openapi generator
 
 For generating the frontend api client use the openapi generator
-isntall:
+install:
 
 ```bash
 npm install -g @openapitools/openapi-generator-cli

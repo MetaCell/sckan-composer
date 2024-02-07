@@ -14,7 +14,6 @@ import { GridRowsProp } from "@mui/x-data-grid";
 import { useState } from "react";
 import { Fab } from "@mui/material";
 import {
-  AnatomicalEntity,
   PaginatedConnectivityStatementList,
 } from "../../apiclient/backend";
 import {
@@ -108,7 +107,7 @@ export default function CheckDuplicates() {
 
   const rows: GridRowsProp =
     statementsList?.results?.map((statement) => {
-      const { id, sentence, knowledge_statement, state } = statement;
+      const { id, knowledge_statement, state } = statement;
       return {
         id,
         knowledge_statement,
@@ -117,7 +116,7 @@ export default function CheckDuplicates() {
     }) || [];
 
   const results = statementsList
-    ? statementsList.count == 0
+    ? statementsList.count === 0
       ? NoResults({ handleClearSearch: () => handleClearSearch() })
       : ResultsGrid({
           rows,
