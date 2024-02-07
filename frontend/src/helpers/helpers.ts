@@ -153,15 +153,19 @@ export const formatTime = (date: string) => {
 };
 
 export const timeAgo = (timestamp: string) => {
-  const now = new Date();
-  const timeDiff = now.getTime() - new Date(timestamp).getTime();
+  const nowCET = new Date().toLocaleString('en-US', { timeZone: 'CET' });
+  const timeDiff = new Date(nowCET).getTime() - new Date(timestamp).getTime();
+  
   const seconds = Math.floor(timeDiff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
   const weeks = Math.floor(days / 7);
   const years = Math.floor(weeks / 52);
-
+  
+  if (timeDiff <= 0) {
+    return 'Just now';
+  }
   if (years > 0) {
     return `${years} year${years > 1 ? "s" : ""} ago`;
   } else if (weeks > 0) {
@@ -176,7 +180,6 @@ export const timeAgo = (timestamp: string) => {
     return `${seconds} second${seconds > 0 ? "s" : ""} ago`;
   }
 };
-
 export const isEqual = function (obj1: any, obj2: any) {
   const obj1Keys = Object.keys(obj1);
   const obj2Keys = Object.keys(obj2);

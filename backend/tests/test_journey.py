@@ -20,7 +20,7 @@ class JourneyTestCase(TestCase):
 
         cs.origins.add(origin1, origin2)
 
-        via = Via.objects.create(connectivity_statement=cs, order=0)
+        via = Via.objects.create(connectivity_statement=cs)
         via.anatomical_entities.add(via1)
         via.from_entities.add(origin1)
 
@@ -102,7 +102,7 @@ class JourneyTestCase(TestCase):
         self.assertTrue(all_paths == expected_paths)
 
         journey_paths = consolidate_paths(all_paths)
-        expected_journey = [[('Oa, Ob', 0), ('Da', 1)]]
+        expected_journey = [[('Oa or Ob', 0), ('Da', 1)]]
         self.assertTrue(journey_paths == expected_journey)
 
     def test_journey_simple_graph_no_jumps(self):
@@ -124,7 +124,7 @@ class JourneyTestCase(TestCase):
         cs.origins.add(origin1, origin2)
 
         # Create Via
-        via = Via.objects.create(connectivity_statement=cs, order=0)
+        via = Via.objects.create(connectivity_statement=cs)
         via.anatomical_entities.add(via1)
         via.from_entities.add(origin1, origin2)
 
@@ -154,7 +154,7 @@ class JourneyTestCase(TestCase):
         expected_paths.sort()
         self.assertTrue(all_paths == expected_paths)
 
-        expected_journey = [[('Oa, Ob', 0), ('V1a', 1), ('Da', 2)]]
+        expected_journey = [[('Oa or Ob', 0), ('V1a', 1), ('Da', 2)]]
         journey_paths = consolidate_paths(all_paths)
         self.assertTrue(journey_paths == expected_journey)
 
@@ -180,7 +180,7 @@ class JourneyTestCase(TestCase):
         cs.origins.add(origin1, origin2)
 
         # Create Via
-        via = Via.objects.create(connectivity_statement=cs, order=0)
+        via = Via.objects.create(connectivity_statement=cs)
         via.anatomical_entities.add(via1, via2)
         via.from_entities.add(origin1, origin2)
 
@@ -213,7 +213,7 @@ class JourneyTestCase(TestCase):
         self.assertTrue(all_paths == expected_paths)
 
         expected_journey = [
-            [('Oa, Ob', 0), ('V1a, V1b', 1), ('Da', 2)]
+            [('Oa or Ob', 0), ('V1a, V1b', 1), ('Da', 2)]
         ]
         journey_paths = consolidate_paths(all_paths)
         self.assertTrue(journey_paths == expected_journey)
@@ -246,19 +246,19 @@ class JourneyTestCase(TestCase):
         cs.origins.add(origin_a, origin_b)
 
         # Create Vias
-        via1 = Via.objects.create(connectivity_statement=cs, order=0)
+        via1 = Via.objects.create(connectivity_statement=cs)
         via1.anatomical_entities.add(via1_a)
         via1.from_entities.add(origin_a, origin_b)
 
-        via2 = Via.objects.create(connectivity_statement=cs, order=1)
+        via2 = Via.objects.create(connectivity_statement=cs)
         via2.anatomical_entities.add(via2_a, via2_b)
         via2.from_entities.add(via1_a)
 
-        via3 = Via.objects.create(connectivity_statement=cs, order=2)
+        via3 = Via.objects.create(connectivity_statement=cs)
         via3.anatomical_entities.add(via3_a)
         via3.from_entities.add(via2_a, origin_a)
 
-        via4 = Via.objects.create(connectivity_statement=cs, order=3)
+        via4 = Via.objects.create(connectivity_statement=cs)
         via4.anatomical_entities.add(via4_a)
         via4.from_entities.add(via2_a)
 
@@ -293,9 +293,9 @@ class JourneyTestCase(TestCase):
         expected_paths.sort()
         self.assertTrue(all_paths == expected_paths)
 
-        expected_journey = [[('Oa, Ob', 0), ('V1a', 1), ('V2a', 2), ('V3a', 3), ('Da', 5)],
-                            [('Oa, Ob', 0), ('V1a', 1), ('V2a', 2), ('V4a', 4), ('Da', 5)],
-                            [('Oa, Ob', 0), ('V1a', 1), ('V2b', 2), ('Da', 5)],
+        expected_journey = [[('Oa or Ob', 0), ('V1a', 1), ('V2a', 2), ('V3a', 3), ('Da', 5)],
+                            [('Oa or Ob', 0), ('V1a', 1), ('V2a', 2), ('V4a', 4), ('Da', 5)],
+                            [('Oa or Ob', 0), ('V1a', 1), ('V2b', 2), ('Da', 5)],
                             [('Oa', 0), ('V3a', 3), ('Da', 5)]]
         journey_paths = consolidate_paths(all_paths)
         self.assertTrue(journey_paths == expected_journey)
@@ -321,27 +321,27 @@ class JourneyTestCase(TestCase):
         cs.origins.add(origin_a, origin_b)
 
         # Create Vias
-        via1 = Via.objects.create(connectivity_statement=cs, order=0)
+        via1 = Via.objects.create(connectivity_statement=cs)
         via1.anatomical_entities.add(via1_a)
         via1.from_entities.add(origin_a, origin_b)
 
-        via2 = Via.objects.create(connectivity_statement=cs, order=1)
+        via2 = Via.objects.create(connectivity_statement=cs)
         via2.anatomical_entities.add(via2_a, via2_b)
         via2.from_entities.add(via1_a)
 
-        via3 = Via.objects.create(connectivity_statement=cs, order=2)
+        via3 = Via.objects.create(connectivity_statement=cs)
         via3.anatomical_entities.add(via3_a)
         via3.from_entities.add(via2_a, via1_a)
 
-        via4 = Via.objects.create(connectivity_statement=cs, order=3)
+        via4 = Via.objects.create(connectivity_statement=cs)
         via4.anatomical_entities.add(via4_a)
         via4.from_entities.add(via2_b, via3_a)
 
-        via5 = Via.objects.create(connectivity_statement=cs, order=4)
+        via5 = Via.objects.create(connectivity_statement=cs)
         via5.anatomical_entities.add(via5_a, via5_b)
         via5.from_entities.add(via4_a)
 
-        via6 = Via.objects.create(connectivity_statement=cs, order=5)
+        via6 = Via.objects.create(connectivity_statement=cs)
         via6.anatomical_entities.add(via6_a)
         via6.from_entities.add(via5_a)
 
@@ -382,12 +382,12 @@ class JourneyTestCase(TestCase):
         self.assertTrue(all_paths == expected_paths)
 
         expected_journey = [
-            [('Oa, Ob', 0), ('V1a', 1), ('V2a', 2), ('V3a', 3), ('V4a', 4), ('V5a', 5), ('V6a', 6), ('Da', 7)],
-            [('Oa, Ob', 0), ('V1a', 1), ('V2b', 2), ('V4a', 4), ('V5a', 5), ('V6a', 6), ('Da', 7)],
-            [('Oa, Ob', 0), ('V1a', 1), ('V2a', 2), ('V3a', 3), ('V4a', 4), ('V5b', 5), ('Da', 7)],
-            [('Oa, Ob', 0), ('V1a', 1), ('V3a', 3), ('V4a', 4), ('V5a', 5), ('V6a', 6), ('Da', 7)],
-            [('Oa, Ob', 0), ('V1a', 1), ('V2b', 2), ('V4a', 4), ('V5b', 5), ('Da', 7)],
-            [('Oa, Ob', 0), ('V1a', 1), ('V3a', 3), ('V4a', 4), ('V5b', 5), ('Da', 7)]
+            [('Oa or Ob', 0), ('V1a', 1), ('V2a', 2), ('V3a', 3), ('V4a', 4), ('V5a', 5), ('V6a', 6), ('Da', 7)],
+            [('Oa or Ob', 0), ('V1a', 1), ('V2b', 2), ('V4a', 4), ('V5a', 5), ('V6a', 6), ('Da', 7)],
+            [('Oa or Ob', 0), ('V1a', 1), ('V2a', 2), ('V3a', 3), ('V4a', 4), ('V5b', 5), ('Da', 7)],
+            [('Oa or Ob', 0), ('V1a', 1), ('V3a', 3), ('V4a', 4), ('V5a', 5), ('V6a', 6), ('Da', 7)],
+            [('Oa or Ob', 0), ('V1a', 1), ('V2b', 2), ('V4a', 4), ('V5b', 5), ('Da', 7)],
+            [('Oa or Ob', 0), ('V1a', 1), ('V3a', 3), ('V4a', 4), ('V5b', 5), ('Da', 7)]
         ]
 
         journey_paths = consolidate_paths(all_paths)
@@ -413,7 +413,7 @@ class JourneyTestCase(TestCase):
         cs.origins.add(origin1, origin2)
 
         # Create Via
-        via = Via.objects.create(connectivity_statement=cs, order=0)
+        via = Via.objects.create(connectivity_statement=cs)
         via.anatomical_entities.add(origin1)
         via.from_entities.add(origin1)
 
@@ -446,10 +446,65 @@ class JourneyTestCase(TestCase):
 
         expected_journey = [
             [('Oa', 0), ('Oa', 1), ('Da', 2)],
-            [('Oa, Ob', 0), ('Da', 2)]
+            [('Oa or Ob', 0), ('Da', 2)]
         ]
 
         journey_paths = consolidate_paths(all_paths)
         expected_journey.sort()
         journey_paths.sort()
         self.assertTrue(journey_paths == expected_journey)
+
+    def test_journey_nonconsecutive_vias(self):
+        # Test setup
+        sentence = Sentence.objects.create()
+        cs = ConnectivityStatement.objects.create(sentence=sentence)
+
+        origin1 = AnatomicalEntity.objects.create(name='Oa')
+        via1 = AnatomicalEntity.objects.create(name='V1a')
+        via2 = AnatomicalEntity.objects.create(name='V2a')
+        destination1 = AnatomicalEntity.objects.create(name='Da')
+
+        cs.origins.add(origin1)
+
+        via_a = Via.objects.create(connectivity_statement=cs)
+        via_a.anatomical_entities.add(via1)
+        via_a.from_entities.add(origin1)
+
+        via_b = Via.objects.create(connectivity_statement=cs)
+        via_b.anatomical_entities.add(via2)
+        via_b.from_entities.add(via1)
+
+        # Directly change the order of vias in the database
+        Via.objects.filter(pk=via_a.pk).update(order=2)  # Change to non-zero start
+        Via.objects.filter(pk=via_b.pk).update(order=5)  # Change to non-consecutive
+
+        destination = Destination.objects.create(connectivity_statement=cs)
+        destination.anatomical_entities.add(destination1)
+        destination.from_entities.add(via2)
+
+        # Prefetch related data
+        origins = list(cs.origins.all())
+        vias = list(
+            Via.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities', 'from_entities'))
+        destinations = list(
+            Destination.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities',
+                                                                                   'from_entities'))
+
+        expected_paths = [
+            [('Oa', 0), ('V1a', 3), ('V2a', 6), ('Da', 7)],
+        ]
+
+        all_paths = generate_paths(origins, vias, destinations)
+
+        all_paths.sort()
+        expected_paths.sort()
+        self.assertTrue(all_paths == expected_paths, f"Expected paths {expected_paths}, but found {all_paths}")
+
+        journey_paths = consolidate_paths(all_paths)
+        expected_journey = [
+            [('Oa', 0), ('V1a', 3), ('V2a', 6), ('Da', 7)],
+        ]
+        journey_paths.sort()
+        expected_journey.sort()
+        self.assertTrue(journey_paths == expected_journey,
+                        f"Expected journey {expected_journey}, but found {journey_paths}")

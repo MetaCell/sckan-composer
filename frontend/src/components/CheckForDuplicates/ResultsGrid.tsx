@@ -41,7 +41,7 @@ export default function ResultsGrid({
       renderCell: renderTitle,
     },
   ];
-  const resultStr = totalResults != 1 ? "Results" : "Result";
+  const resultStr = totalResults !== 1 ? "Results" : "Result";
   return (
     <Box
       sx={{

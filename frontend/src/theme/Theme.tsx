@@ -8,7 +8,6 @@ const {
   colorPrimary,
   borderRadius,
   titleFontColor,
-  paperShadow,
   grey400,
   topbarShadow,
   menuItemSelectedBg,

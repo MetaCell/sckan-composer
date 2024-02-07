@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {
   Badge,
   CircularProgress,
@@ -25,10 +25,10 @@ import theme from "../../theme/Theme";
 import PlaylistRemoveOutlinedIcon from "@mui/icons-material/PlaylistRemoveOutlined";
 import PlaylistAddCheckOutlinedIcon from "@mui/icons-material/PlaylistAddCheckOutlined";
 import NoResultField from "./NoResultField";
-import { vars } from "../../theme/variables";
-import { Option } from "../../types";
+import {vars} from "../../theme/variables";
+import {Option} from "../../types";
 import Stack from "@mui/material/Stack";
-import {areArraysOfObjectsEqual, processFromEntitiesData} from "../../helpers/dropdownMappers";
+import {processFromEntitiesData} from "../../helpers/dropdownMappers";
 
 const {
   buttonOutlinedBorderColor,
@@ -249,36 +249,36 @@ const CommonChipBox = ({
 };
 
 export default function CustomEntitiesDropdown({
-  value,
-  id,
-  placeholder: placeholder1,
-  isFormDisabled = () => false,
-  options: {
-    errors,
-    searchPlaceholder,
-    noResultReason,
-    disabledReason,
-    onSearch,
-    onUpdate,
-    mapValueToOption,
-    CustomHeader = null,
-    CustomBody = null,
-    CustomFooter = null,
-    header = {},
-    CustomInputChip = null,
-    placeholder,
-    label,
-    chipsNumber = 2,
-    postProcessOptions = false,
-    refreshStatement,
-    statement,
-    fieldName = "",
-    getPreLevelSelectedValues,
-    areConnectionsExplicit,
-    minWidth = '',
-    disabled
-  },
-}: any) {
+                                                 value,
+                                                 id,
+                                                 placeholder: placeholder1,
+                                                 options: {
+                                                   isFormDisabled = () => false,
+                                                   errors,
+                                                   searchPlaceholder,
+                                                   noResultReason,
+                                                   disabledReason,
+                                                   onSearch,
+                                                   onUpdate,
+                                                   mapValueToOption,
+                                                   CustomHeader = null,
+                                                   CustomBody = null,
+                                                   CustomFooter = null,
+                                                   header = {},
+                                                   CustomInputChip = null,
+                                                   placeholder,
+                                                   label,
+                                                   chipsNumber = 2,
+                                                   postProcessOptions = false,
+                                                   refreshStatement,
+                                                   statement,
+                                                   fieldName = "",
+                                                   getPreLevelSelectedValues,
+                                                   areConnectionsExplicit,
+                                                   minWidth = '',
+                                                   disabled
+                                                 },
+                                               }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const aria = open ? "simple-popper" : undefined;
@@ -297,7 +297,6 @@ export default function CustomEntitiesDropdown({
   const [allOptions, setAllOptions] = useState<Option[]>([]);
 
   const [hasValueChanged, setHasValueChanged] = useState(false);
-  const preLevelItems = postProcessOptions && getPreLevelSelectedValues ? getPreLevelSelectedValues(id) : [];
   const isAllSelectedValuesFromTheAboveLayer = postProcessOptions && areConnectionsExplicit ? areConnectionsExplicit(id) : true
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     if (!disabled) {
@@ -325,12 +324,12 @@ export default function CustomEntitiesDropdown({
   const handleSelectDeselectGroup = (group: string) => {
     const newSelectedOptions = [...selectedOptions];
     const groupOptions = autocompleteOptions.filter((option: Option) => option.group === group);
-    
+
     // Check if all options in this group are already selected
     const allSelectedInGroup = groupOptions.every(
       (groupOption) => newSelectedOptions.some((selectedOption) => selectedOption.id === groupOption.id)
     );
-    
+
     if (allSelectedInGroup) {
       // Deselect all options in this group
       groupOptions.forEach((option) => {
@@ -347,16 +346,16 @@ export default function CustomEntitiesDropdown({
         }
       });
     }
-    
+
     handleSelectedOptionsChange(newSelectedOptions);
   };
-  
+
   const getGroupButton = (group: string) => {
     const groupOptions = autocompleteOptions.filter((option: Option) => option.group === group);
     const allSelectedInGroup = groupOptions.every(
       (groupOption) => selectedOptions.some((selectedOption) => selectedOption.id === groupOption.id)
     );
-    
+
     return (
       <Button
         variant="text"
@@ -413,23 +412,25 @@ export default function CustomEntitiesDropdown({
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [inputValue, id, onSearch, postProcessOptions]);
-  
+  }, [inputValue, id, onSearch, postProcessOptions, selectedOptions]);
+
 
   useEffect(() => {
     if (!isDropdownOpened) return;
     setIsLoading(true);
     fetchData().then(() => setIsLoading(false));
-  }, [isDropdownOpened, id, onSearch]);
+  }, [isDropdownOpened, id, onSearch, fetchData]);
 
   useEffect(() => {
     if (inputValue !== undefined) {
       setIsLoading(true);
       fetchData().then(() => setIsLoading(false));
     }
-  }, [inputValue, id]);
+  }, [inputValue, id, fetchData]);
 
   useEffect(() => {
+    const preLevelItems = postProcessOptions && getPreLevelSelectedValues ? getPreLevelSelectedValues(id) : [];
+
     const closePopperOnClickOutside = (event: MouseEvent) => {
       if (
         popperRef.current &&
@@ -447,16 +448,16 @@ export default function CustomEntitiesDropdown({
         }
       }
     };
-    
+
     document.addEventListener("mousedown", closePopperOnClickOutside);
     return () => {
       document.removeEventListener("mousedown", closePopperOnClickOutside);
     };
-  }, [hasValueChanged]);
+  }, [hasValueChanged, postProcessOptions, getPreLevelSelectedValues, refreshStatement, selectedOptions.length, id]);
 
   return isFormDisabled() ? (
     <Box
-      sx={{ background: theme.palette.grey[100], borderRadius: 1 }}
+      sx={{background: theme.palette.grey[100], borderRadius: 1}}
       p={2}
       display="flex"
       justifyContent="center"

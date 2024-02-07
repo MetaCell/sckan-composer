@@ -1,17 +1,15 @@
 import React from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Box } from "@mui/material";
 import { IconButton, TableRow as MuiTableRow, TableCell } from "@mui/material";
 import DragHandleIcon from "@mui/icons-material/DragHandle";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import Typography from "@mui/material/Typography";
 
 export function SortableItem(props: any) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: props.id });
 
-  const { id, children, onDropIndexClick, disabled, hideDeleteBtn } = props;
+  const { children, onDropIndexClick, disabled, hideDeleteBtn } = props;
 
   const style = {
     transform: CSS.Transform.toString(transform),
