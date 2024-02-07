@@ -413,8 +413,11 @@ def add_origins(connectivity_statement: ConnectivityStatement, statement: Dict):
     origin_uris = statement[ORIGINS].anatomical_entities
     origins = []
     for uri in origin_uris:
-        anatomical_entities = AnatomicalEntity.objects.filter(ontology_uri=uri)
-        origins.append(anatomical_entities.first())
+        anatomical_entity = AnatomicalEntity.objects.filter(ontology_uri=uri).first()
+        if anatomical_entity:
+            origins.append(anatomical_entity)
+        else:
+            assert connectivity_statement.state == CSState.INVALID
 
     if origins:
         connectivity_statement.origins.add(*origins)
@@ -429,11 +432,18 @@ def add_vias(connectivity_statement: ConnectivityStatement, statement: Dict):
 
     for via_instance, via_data in zip(created_vias, statement[VIAS]):
         for uri in via_data.anatomical_entities:
-            anatomical_entities = AnatomicalEntity.objects.filter(ontology_uri=uri)
-            via_instance.anatomical_entities.add(anatomical_entities.first())
+            anatomical_entity = AnatomicalEntity.objects.filter(ontology_uri=uri).first()
+            if anatomical_entity:
+                via_instance.anatomical_entities.add(anatomical_entity)
+            else:
+                assert connectivity_statement.state == CSState.INVALID
+
         for uri in via_data.from_entities:
             from_entity = AnatomicalEntity.objects.filter(ontology_uri=uri).first()
-            via_instance.from_entities.add(from_entity)
+            if from_entity:
+                via_instance.from_entities.add(from_entity)
+            else:
+                assert connectivity_statement.state == CSState.INVALID
 
 
 def add_destinations(connectivity_statement: ConnectivityStatement, statement: Dict):
@@ -441,17 +451,22 @@ def add_destinations(connectivity_statement: ConnectivityStatement, statement: D
         Destination(connectivity_statement=connectivity_statement, type=dest.type)
         for dest in statement[DESTINATIONS]
     ]
-
     created_destinations = Destination.objects.bulk_create(destinations_data)
 
     for destination_instance, dest_data in zip(created_destinations, statement[DESTINATIONS]):
         for uri in dest_data.anatomical_entities:
             anatomical_entity = AnatomicalEntity.objects.filter(ontology_uri=uri).first()
-            destination_instance.anatomical_entities.add(anatomical_entity)
+            if anatomical_entity:
+                destination_instance.anatomical_entities.add(anatomical_entity)
+            else:
+                assert connectivity_statement.state == CSState.INVALID
 
         for uri in dest_data.from_entities:
             from_entity = AnatomicalEntity.objects.filter(ontology_uri=uri).first()
-            destination_instance.from_entities.add(from_entity)
+            if from_entity:
+                destination_instance.from_entities.add(from_entity)
+            else:
+                assert connectivity_statement.state == CSState.INVALID
 
 
 def add_notes(connectivity_statement: ConnectivityStatement, statement: Dict):
