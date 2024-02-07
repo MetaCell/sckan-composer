@@ -9,7 +9,7 @@ import PathsBuilder from "./PathsBuilder";
 import StatementPreviewForm from "../Forms/StatementPreviewForm";
 
 const ProofingTab = (props: any) => {
-  const { statement, refreshStatement, setStatement, refs } = props;
+  const { statement, refreshStatement, setStatement, refs, disabled } = props;
   const theme = useTheme();
   const sectionStyle = useSectionStyle(theme);
   const greyBgContainer = useGreyBgContainer(theme);
@@ -52,13 +52,14 @@ const ProofingTab = (props: any) => {
                 statement={statement}
                 refreshStatement={refreshStatement}
                 setStatement={setStatement}
+                disabled={disabled}
               />
             </Box>
           </Paper>
         </Box>
       </Grid>
       <Grid item xs={12}>
-        <PathsBuilder {...props} refs={refs} />
+        <PathsBuilder {...props} refs={refs} disabled={disabled} />
       </Grid>
 
       <Grid item xs={12}>

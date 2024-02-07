@@ -23,6 +23,7 @@ export function SortableItem(props: any) {
     backgroundColor: "common.white",
     border: "1px solid #EAECF0",
     borderRadius: "12px",
+    display: 'flex', alignItems: 'center'
   });
 
   return (
@@ -52,6 +53,10 @@ export function SortableItem(props: any) {
         width="100%"
         sx={{
           borderBottom: 0,
+          display: "flex",
+          "& .form-group": {
+            width: "100%",
+          },
         }}
       >
         {children}

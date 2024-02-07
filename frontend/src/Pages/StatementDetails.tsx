@@ -9,7 +9,10 @@ import TabPanel from "../components/Widgets/TabPanel";
 import { useParams } from "react-router-dom";
 import statementService from "../services/StatementService";
 import TagForm from "../components/Forms/TagForm";
-import { ConnectivityStatement } from "../apiclient/backend";
+import {
+  ComposerConnectivityStatementListStateEnum as statementStates,
+  ConnectivityStatement
+} from "../apiclient/backend";
 import { userProfile } from "../services/UserService";
 import ProofingTab from "../components/ProofingTab/ProofingTab";
 import { SentenceStateChip } from "../components/Widgets/StateChip";
@@ -114,8 +117,8 @@ const StatementDetails = () => {
   }, [statementId, refetch]);
 
   //TODO add logic for disabled
-  // something like this statement.owner?.id !== userProfile.getUser().id;
-  const disabled = false;
+  // TODO add an extra check for invalid state;
+  const disabled = statement?.state === statementStates.Excluded;
   return (
     <Grid p={6} container>
       {loading && (
@@ -312,12 +315,14 @@ const StatementDetails = () => {
                             service: statementService,
                           }}
                           setter={refreshStatement}
+                          disabled={disabled}
                         />
                         <Divider sx={{ margin: "36px 0" }} />
                         <NoteDetails
                           extraData={{
                             connectivity_statement_id: statement.id,
                           }}
+                          disabled={disabled}
                         />
                       </Paper>
                     </Box>

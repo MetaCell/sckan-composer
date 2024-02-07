@@ -46,7 +46,7 @@ import { CustomFooter } from "../Widgets/HoveredOptionContent";
 import { StatementStateChip } from "../Widgets/StateChip";
 
 const StatementForm = (props: any) => {
-  const { uiFields, statement, refreshStatement } = props;
+  const { uiFields, statement, refreshStatement, disabled } = props;
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
@@ -126,6 +126,7 @@ const StatementForm = (props: any) => {
   copiedUISchema.origins = {
     "ui:widget": CustomEntitiesDropdown,
     "ui:options": {
+      disabled,
       statement: statement,
       placeholder: "Origin",
       searchPlaceholder: "Search for Origins",
@@ -206,9 +207,10 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
-        hideDeleteBtn={statement?.vias?.length <= 1}
+        hideDeleteBtn={statement?.vias?.length <= 1 || disabled}
         showReOrderingIcon={true}
         addButtonPlaceholder={"Via"}
+        canAdd={!disabled}
       />
     ),
     items: {
@@ -241,6 +243,7 @@ const StatementForm = (props: any) => {
       anatomical_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          disabled,
           statement: statement,
           label: "Via",
           fieldName: "vias.anatomical_entities",
@@ -281,6 +284,7 @@ const StatementForm = (props: any) => {
       from_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          disabled,
           statement: statement,
           label: "From",
           fieldName: "vias.from_entities",
@@ -382,9 +386,10 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
-        hideDeleteBtn={statement?.destinations?.length <= 1}
+        hideDeleteBtn={statement?.destinations?.length <= 1 || disabled}
         showReOrderingIcon={false}
         addButtonPlaceholder={"Destination"}
+        canAdd={!disabled}
       />
     ),
     items: {
@@ -417,6 +422,7 @@ const StatementForm = (props: any) => {
       anatomical_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          disabled,
           statement: statement,
           placeholder: "Look for Destinations",
           searchPlaceholder: "Search for Destinations",
@@ -459,6 +465,7 @@ const StatementForm = (props: any) => {
       from_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          disabled,
           statement: statement,
           label: "From",
           fieldName: "destinations.from_entities",
@@ -555,6 +562,7 @@ const StatementForm = (props: any) => {
   copiedUISchema.forward_connection = {
     "ui:widget": CustomEntitiesDropdown,
     "ui:options": {
+      disabled,
       isFormDisabled: () => statement?.destinations?.length === 0,
       placeholder: "Forward connection(s)",
       searchPlaceholder: "Search for Connectivity Statements",

@@ -23,7 +23,6 @@ const CustomSingleSelect = ({
   },
 }: any) => {
   const selectOptions = enumOptions ? enumOptions : data;
-
   const pathBuilderComponentStyle = isPathBuilderComponent
     ? {
         "& .MuiInputBase-root": {
@@ -52,7 +51,7 @@ const CustomSingleSelect = ({
         },
       }
     : null;
-
+  const reasOnlyValue = selectOptions.find(({ value: id }: any) => id === value)?.label
   return (
     <>
       {label && (
@@ -65,58 +64,61 @@ const CustomSingleSelect = ({
           {label}
         </Typography>
       )}
-      <FormControl
-        variant="standard"
-        sx={{
-          width: "auto",
-          "& .MuiInputLabel-root": {
-            color: "#667085",
-            fontWeight: "400",
-            fontSize: "14px",
-            marginLeft: "14px",
-          },
-          ...pathBuilderComponentStyle,
-        }}
-      >
-        <InputLabel shrink={false} htmlFor="custom-select">
-          {!value && placeholder}
-        </InputLabel>
-        <Select
-          startAdornment={
-            isPathBuilderComponent ? (
-              <InputIcon
-                fill="#475467"
-                style={{ marginRight: ".5rem", width: "2rem" }}
-              />
-            ) : null
-          }
+      {
+        disabled ? <Typography>{value ? reasOnlyValue : '-'}</Typography> :
+        <FormControl
+          variant="standard"
           sx={{
-            "&:hover": {
-              border: "1px solid #EAECF0",
-              boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
+            width: "auto",
+            "& .MuiInputLabel-root": {
+              color: "#667085",
+              fontWeight: "400",
+              fontSize: "14px",
+              marginLeft: "14px",
             },
-
-            "& .MuiOutlinedInput-notchedOutline": {
-              border: "none",
-              boxShadow: "none",
-            },
+            ...pathBuilderComponentStyle,
           }}
-          value={value !== null ? value : ""}
-          onChange={(event) => {
-            onChange(event.target.value);
-            onUpdate && onUpdate(event.target.value, id);
-          }}
-          disabled={disabled}
-          id="custom-select"
-          input={<OutlinedInput id="custom-select-input" />}
         >
-          {selectOptions?.map(({ label: optionLabel, value: id }: any) => (
-            <MenuItem key={id} value={id}>
-              {optionLabel}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+          <InputLabel shrink={false} htmlFor="custom-select">
+            {!value && placeholder}
+          </InputLabel>
+          <Select
+            startAdornment={
+              isPathBuilderComponent ? (
+                <InputIcon
+                  fill="#475467"
+                  style={{ marginRight: ".5rem", width: "2rem" }}
+                />
+              ) : null
+            }
+            sx={{
+              "&:hover": {
+                border: "1px solid #EAECF0",
+                boxShadow: "0px 1px 2px rgba(16, 24, 40, 0.05)",
+              },
+              
+              "& .MuiOutlinedInput-notchedOutline": {
+                border: "none",
+                boxShadow: "none",
+              },
+            }}
+            value={value !== null ? value : ""}
+            onChange={(event) => {
+              onChange(event.target.value);
+              onUpdate && onUpdate(event.target.value, id);
+            }}
+            disabled={disabled}
+            id="custom-select"
+            input={<OutlinedInput id="custom-select-input" />}
+          >
+            {selectOptions?.map(({ label: optionLabel, value: id }: any) => (
+              <MenuItem key={id} value={id}>
+                {optionLabel}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      }
     </>
   );
 };

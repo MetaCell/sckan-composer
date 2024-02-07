@@ -112,6 +112,7 @@ const PathsBuilder = (props: any) => {
               sx={{ ...sectionStyle, padding: ".75rem .88rem .75rem .50rem" }}
             >
               <StatementForm
+                {...props}
                 statement={statement}
                 format="small"
                 refreshStatement={refreshStatement}

@@ -7,6 +7,7 @@ import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import { vars } from "../../theme/variables";
 import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
+import Box from "@mui/material/Box";
 
 const { buttonOutlinedColor, grey400, buttonOutlinedBorderColor, titleFontColor } = vars;
 
@@ -18,6 +19,34 @@ const StyledInput = styled(TextField)(({ theme }) => ({
     border: 0,
   },
 }));
+
+const CustomChip = ({ id, label, onDelete, disabled }: any) => {
+  return (
+    <Chip
+      deleteIcon={<ClearOutlinedIcon />}
+      variant="outlined"
+      label={label}
+      key={id}
+      onDelete={!disabled ? (e) => {
+        e.stopPropagation();
+        onDelete(id)
+      } : undefined}
+      sx={{
+        border: `1px solid ${buttonOutlinedBorderColor}`,
+        borderRadius: "6px",
+        margin: "4px",
+        "& .MuiChip-label": {
+          color: buttonOutlinedColor,
+          fontSize: "14px",
+        },
+        "& .MuiChip-deleteIcon": {
+          color: grey400,
+          fontSize: "14px",
+        },
+      }}
+    />
+  );
+};
 
 export const AutocompleteWithChips = ({
   placeholder,
@@ -42,75 +71,76 @@ const handleDeleteAll = () => {
         handleDelete(ele.id);
     });
     };
-
   return (
     <FormControl variant="standard">
-        <Typography variant="h6" fontWeight={500} marginBottom={2} color={titleFontColor}>
-          {label}
-        </Typography>
-      <Autocomplete
-        multiple
-        disableClearable
-        disabled={disabled}
-        options={options}
-        onChange={(e, value) => onAutocompleteChange(e, value)}
-        freeSolo
-        defaultValue={options.length>0 ? [options[0].label]: [{}]}
-        renderTags={(value:any, getTagProps) => data.map((ele:{id:number, label:string}, index: number) => (
-            <Chip
-              {...getTagProps({ index })}
-              deleteIcon={<ClearOutlinedIcon />}
-              variant="outlined"
+      <Typography
+        variant="h6"
+        fontWeight={500}
+        marginBottom={2}
+        color={titleFontColor}
+      >
+        {label}
+      </Typography>
+      {disabled ? (
+        <Box>
+          {data.length === 0 ? '-' : data.map((ele: { id: number; label: string }, index: number) => (
+            <CustomChip
+              id={ele.id}
               label={ele.label}
-              key={ele.id}
-              onDelete={() => handleDelete(ele.id)}
-              sx={{
-                border: `1px solid ${buttonOutlinedBorderColor}`,
-                borderRadius: "6px",
-                margin: "4px",
-
-                "& .MuiChip-label": {
-                  color: buttonOutlinedColor,
-                  fontSize: "14px",
-                },
-                "& .MuiChip-deleteIcon": {
-                  color: grey400,
-                  fontSize: "14px",
-                },
-              }}
+              disabled={disabled}
             />
-          ))
-        }
-        renderInput={(params) => (
-          <StyledInput
-            {...params}
-            disabled={disabled}
-            id="custom-input"
-            placeholder={placeholder}
-            onFocus={() => setInputFocus(true)}
-            onBlur={() => setInputFocus(false)}
-            InputProps={{
+          ))}
+        </Box>
+      ) : (
+        <Autocomplete
+          multiple
+          disableClearable
+          disabled={disabled}
+          options={options}
+          onChange={(e, value) => onAutocompleteChange(e, value)}
+          freeSolo
+          defaultValue={options.length > 0 ? [options[0].label] : [{}]}
+          renderTags={(value: any, getTagProps) =>
+            data.map((ele: { id: number; label: string }, index: number) => (
+              <CustomChip
+                id={ele.id}
+                label={ele.label}
+                onDelete={handleDelete}
+                disabled={disabled}
+              />
+            ))
+          }
+          renderInput={(params) => (
+            <StyledInput
+              {...params}
+              disabled={disabled}
+              id="custom-input"
+              placeholder={placeholder}
+              onFocus={() => setInputFocus(true)}
+              onBlur={() => setInputFocus(false)}
+              InputProps={{
                 ...params.InputProps,
                 endAdornment: (
-                    <>
-                        {isInputFocused ? (
-                            <CloseIcon
-                                color="action"
-                                fontSize="small"
-                                sx={{ cursor: "pointer", mr: 0.6 }}
-                                onMouseDown={(e) => {
-                                    e.preventDefault();
-                                    handleDeleteAll();
-                                }}
-                            />
-                        ) : null}
-                        {params.InputProps.endAdornment}
-                    </>
+                  <>
+                    {isInputFocused ? (
+                      <CloseIcon
+                        color="action"
+                        fontSize="small"
+                        sx={{ cursor: "pointer", mr: 0.6 }}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleDeleteAll();
+                        }}
+                      />
+                    ) : null}
+                    {params.InputProps.endAdornment}
+                  </>
                 ),
-            }}
-          />
-        )}
-      />
+              }}
+            />
+          )}
+        />
+      )}
     </FormControl>
   );
 };

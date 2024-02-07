@@ -17,6 +17,7 @@ const DistillationTab = ({
   setStatement,
   refreshStatement,
   refs,
+  disabled
 }: any) => {
   const theme = useTheme();
   const sectionStyle = useSectionStyle(theme);
@@ -52,12 +53,14 @@ const DistillationTab = ({
                   uiFields={["knowledge_statement"]}
                   className="ks"
                   enableAutoSave={true}
+                  disabled={disabled}
                 />
                 <ProvenancesForm
                   provenancesData={statement.provenances}
                   extraData={{ connectivity_statement_id: statement.id }}
                   setter={refreshStatement}
                   className="provenance"
+                  disabled={disabled}
                 />
                 <Box ref={refs[2]}>
                   <StatementDetailsAccordion
@@ -65,6 +68,7 @@ const DistillationTab = ({
                     index={0}
                     statement={statement}
                     sentence={statement.sentence}
+                    disabled={disabled}
                   />
                 </Box>
               </Paper>
