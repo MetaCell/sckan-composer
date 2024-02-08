@@ -17,6 +17,7 @@ const StatementDetailsAccordion = (props: any) => {
     statement,
     setter,
     sentence,
+    isDisabled
   } = props;
 
   const [expanded, setExpanded] = React.useState<string | false>("panel-0");
@@ -50,6 +51,7 @@ const StatementDetailsAccordion = (props: any) => {
           data={statement.species}
           extraData={{ parentId: statement.id, service: statementService }}
           setter={setter}
+          isDisabled={isDisabled}
         />
         <StatementForm
           statement={statement}
@@ -69,6 +71,7 @@ const StatementDetailsAccordion = (props: any) => {
             "phenotype_id",
             "additional_information"
           ]}
+          isDisabled={isDisabled}
         />
       </AccordionDetails>
     </Accordion>

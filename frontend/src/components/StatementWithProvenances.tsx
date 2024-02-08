@@ -3,7 +3,7 @@ import {Box} from "@mui/material";
 import StatementForm from "./Forms/StatementForm";
 import ProvenancesForm from "./Forms/ProvenanceForm";
 
-const StatementWithProvenances = ({ statement, background = "#fff", refreshStatement, disabled } : any) => {
+const StatementWithProvenances = ({ statement, background = "#fff", refreshStatement, isDisabled } : any) => {
 
 
   return (
@@ -25,17 +25,17 @@ const StatementWithProvenances = ({ statement, background = "#fff", refreshState
             extraData={{ sentence_id: statement.sentence_id }}
             uiFields={["knowledge_statement"]}
             className='ks'
-            disabled={disabled}
+            isDisabled={isDisabled}
             enableAutoSave={true}
           />
-
-          <ProvenancesForm
-            provenancesData={statement.provenances}
-            extraData={{ connectivity_statement_id: statement.id }}
-            setter={refreshStatement}
-            className='provenance'
-            disabled={disabled}
-          />
+          
+          {/*<ProvenancesForm*/}
+          {/*  provenancesData={statement.provenances}*/}
+          {/*  extraData={{ connectivity_statement_id: statement.id }}*/}
+          {/*  setter={refreshStatement}*/}
+          {/*  className='provenance'*/}
+          {/*  isDisabled={isDisabled}*/}
+          {/*/>*/}
     </Box>
   );
 };

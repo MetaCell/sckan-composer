@@ -9,7 +9,10 @@ import TabPanel from "../components/Widgets/TabPanel";
 import { useParams } from "react-router-dom";
 import statementService from "../services/StatementService";
 import TagForm from "../components/Forms/TagForm";
-import { ConnectivityStatement } from "../apiclient/backend";
+import {
+  ComposerConnectivityStatementListStateEnum as statementStates,
+  ConnectivityStatement
+} from "../apiclient/backend";
 import { userProfile } from "../services/UserService";
 import ProofingTab from "../components/ProofingTab/ProofingTab";
 import { SentenceStateChip } from "../components/Widgets/StateChip";
@@ -111,9 +114,9 @@ const StatementDetails = () => {
     }
   }, [statementId, refetch]);
 
-  //TODO add logic for disabled
-  // something like this statement.owner?.id !== userProfile.getUser().id;
-  const disabled = false;
+  //TODO add logic for isDisabled
+  // TODO add an extra check for invalid state;
+  const isDisabled = statement?.state === statementStates.Exported;
   return (
     <Grid p={6} container>
       {loading && (
@@ -245,7 +248,7 @@ const StatementDetails = () => {
                       />
                     ) : (
                       <GroupedButtons
-                        disabled
+                        isDisabled
                         selectedOption="No options available"
                       />
                     )}
@@ -277,7 +280,7 @@ const StatementDetails = () => {
                         statement={statement}
                         setStatement={setStatement}
                         refreshStatement={refreshStatement}
-                        disabled={disabled}
+                        isDisabled={isDisabled}
                         refs={refs}
                       />
                     </TabPanel>
@@ -286,7 +289,7 @@ const StatementDetails = () => {
                         statement={statement}
                         setStatement={setStatement}
                         refreshStatement={refreshStatement}
-                        disabled={disabled}
+                        isDisabled={isDisabled}
                         refs={refs}
                       />
                     </TabPanel>
@@ -310,12 +313,14 @@ const StatementDetails = () => {
                             service: statementService,
                           }}
                           setter={refreshStatement}
+                          isDisabled={isDisabled}
                         />
                         <Divider sx={{ margin: "36px 0" }} />
                         <NoteDetails
                           extraData={{
                             connectivity_statement_id: statement.id,
                           }}
+                          isDisabled={isDisabled}
                         />
                       </Paper>
                     </Box>

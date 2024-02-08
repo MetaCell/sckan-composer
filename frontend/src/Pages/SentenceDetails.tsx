@@ -225,7 +225,7 @@ const SentencesDetails = () => {
     );
   }
 
-  const disabled = sentence.owner?.id !== userProfile.getUser().id;
+  const isDisabled = sentence.owner?.id !== userProfile.getUser().id;
 
   return (
     <Grid p={6} container>
@@ -295,7 +295,7 @@ const SentencesDetails = () => {
                 display="flex"
                 justifyContent="flex-end"
               >
-                {!disabled && sentence?.available_transitions?.length !== 0 && (
+                {!isDisabled && sentence?.available_transitions?.length !== 0 && (
                   <GroupedButtons
                     handleClick={handleClick}
                     selectedOption={
@@ -362,7 +362,7 @@ const SentencesDetails = () => {
                 <Box ref={refs[1]}>
                   <SentenceForm
                     data={sentence}
-                    disabled={disabled}
+                    isDisabled={isDisabled}
                     format="small"
                     setter={setSentence}
                     enableAutoSave={true}

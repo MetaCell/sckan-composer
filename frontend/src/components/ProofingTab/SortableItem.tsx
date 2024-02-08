@@ -9,7 +9,7 @@ export function SortableItem(props: any) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: props.id });
 
-  const { children, onDropIndexClick, disabled, hideDeleteBtn } = props;
+  const { children, onDropIndexClick, isDisabled, hideDeleteBtn } = props;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -21,6 +21,7 @@ export function SortableItem(props: any) {
     backgroundColor: "common.white",
     border: "1px solid #EAECF0",
     borderRadius: "12px",
+    display: 'flex', alignItems: 'center'
   });
 
   return (
@@ -35,7 +36,7 @@ export function SortableItem(props: any) {
         >
           <IconButton
             size="small"
-            disabled={disabled}
+            disabled={isDisabled}
             {...attributes}
             {...listeners}
             sx={{ p: 0 }}
@@ -50,6 +51,10 @@ export function SortableItem(props: any) {
         width="100%"
         sx={{
           borderBottom: 0,
+          display: "flex",
+          "& .form-group": {
+            width: "100%",
+          },
         }}
       >
         {children}
@@ -65,7 +70,7 @@ export function SortableItem(props: any) {
           <IconButton
             size="small"
             onClick={onDropIndexClick}
-            disabled={disabled}
+            disabled={isDisabled}
           >
             <DeleteOutlineOutlinedIcon fontSize="small" />
           </IconButton>

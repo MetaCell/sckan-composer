@@ -149,7 +149,7 @@ const theme = createTheme({
       },
       .inLineForm > div > div > .MuiGrid-container{
         display: grid;
-        grid-template-columns: .5fr 3fr 3fr;
+        grid-template-columns: 1fr 3fr 3fr;
         align-items: center;
         margin-top: 0 !important;
       }
