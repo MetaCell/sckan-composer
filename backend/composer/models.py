@@ -388,13 +388,13 @@ class ConnectivityStatement(models.Model):
     )
 
     laterality = models.CharField(
-        max_length=20, choices=Laterality.choices, null=True
+        max_length=20, choices=Laterality.choices, null=True, blank=True
     )
     projection = models.CharField(
-        max_length=20, choices=Projection.choices, null=True
+        max_length=20, choices=Projection.choices, null=True, blank=True
     )
     circuit_type = models.CharField(
-        max_length=20, choices=CircuitType.choices, null=True
+        max_length=20, choices=CircuitType.choices, null=True, blank=True
     )
     # TODO for next releases we could have only 1 field for phenotype + an intermediate table with the phenotype's categories such as circuit_type, laterality, projection, functional_circuit_role, projection_phenotype among others
     phenotype = models.ForeignKey(

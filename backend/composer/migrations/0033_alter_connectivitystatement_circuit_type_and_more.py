@@ -139,4 +139,48 @@ class Migration(migrations.Migration):
                 name="projection_valid",
             ),
         ),
+
+
+        # add blank=True to Laterality, Projections, Circuit Type
+        migrations.AlterField(
+            model_name="connectivitystatement",
+            name="circuit_type",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("SENSORY", "Sensory"),
+                    ("MOTOR", "Motor"),
+                    ("INTRINSIC", "Intrinsic"),
+                    ("PROJECTION", "Projection"),
+                    ("ANAXONIC", "Anaxonic"),
+                ],
+                max_length=20,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="connectivitystatement",
+            name="laterality",
+            field=models.CharField(
+                blank=True,
+                choices=[("RIGHT", "Right"), ("LEFT", "Left")],
+                max_length=20,
+                null=True,
+            ),
+        ),
+        migrations.AlterField(
+            model_name="connectivitystatement",
+            name="projection",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("IPSI", "Ipsilateral"),
+                    ("CONTRAT", "Contralateral"),
+                    ("BI", "Bilateral"),
+                ],
+                max_length=20,
+                null=True,
+            ),
+        ),
+
     ]
