@@ -10,7 +10,6 @@ import { vars } from "../../theme/variables";
 const CustomSingleSelect = ({
   onChange,
   placeholder,
-  disabled,
   value,
   id,
   options: {
@@ -20,6 +19,7 @@ const CustomSingleSelect = ({
     isPathBuilderComponent = false,
     InputIcon,
     onUpdate,
+    isDisabled,
   },
 }: any) => {
   const selectOptions = enumOptions ? enumOptions : data;
@@ -51,7 +51,7 @@ const CustomSingleSelect = ({
         },
       }
     : null;
-  const reasOnlyValue = selectOptions.find(({ value: id }: any) => id === value)?.label
+  const isReadOnlyValue = selectOptions.find(({ value: id }: any) => id === value)?.label
   return (
     <>
       {label && (
@@ -65,7 +65,7 @@ const CustomSingleSelect = ({
         </Typography>
       )}
       {
-        disabled ? <Typography>{value ? reasOnlyValue : '-'}</Typography> :
+        isDisabled ? <Typography>{value ? isReadOnlyValue : '-'}</Typography> :
         <FormControl
           variant="standard"
           sx={{
@@ -107,7 +107,7 @@ const CustomSingleSelect = ({
               onChange(event.target.value);
               onUpdate && onUpdate(event.target.value, id);
             }}
-            disabled={disabled}
+            disabled={isDisabled}
             id="custom-select"
             input={<OutlinedInput id="custom-select-input" />}
           >

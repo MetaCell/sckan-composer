@@ -7,7 +7,7 @@ import theme from "../theme/Theme";
 import Typography from "@mui/material/Typography";
 
 function AnatomicalEntitiesField(props: any) {
-  const {label, errors} = props.options;
+  const {label, errors, isDisabled} = props.options;
   const placeholder = "Select " + props.label?.slice(0, -3);
 
   const [entity, setEntity] = React.useState<AnatomicalEntity>();
@@ -43,7 +43,7 @@ function AnatomicalEntitiesField(props: any) {
         borderColor={
           errors?.length !== 0 ? theme.palette.error.main : "#EAECF0"
         }
-        disabled={props.disabled}
+        disabled={isDisabled}
         onChange={(newValue: AnatomicalEntity) => props.onChange(newValue?.id)}
         placeholder={
           props.label === "Anatomical entity id" ? "Select Via" : placeholder

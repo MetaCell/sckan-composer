@@ -7,7 +7,7 @@ import TextfieldWithChips from "../Widgets/TextfieldWithChips";
 
 
 const ProvenancesForm = (props: any) => {
-  const { provenancesData, setter, extraData, disabled } = props
+  const { provenancesData, setter, extraData, isDisabled } = props
 
   const { schema, uiSchema } = jsonSchemas.getProvenanceSchema()
   const copiedSchema = JSON.parse(JSON.stringify(schema));
@@ -41,9 +41,9 @@ const ProvenancesForm = (props: any) => {
   copiedUISchema.uri = {
     "ui:widget": TextfieldWithChips,
     "ui:options": {
-      disabled: !extraData.connectivity_statement_id || disabled,
+      isDisabled: !extraData.connectivity_statement_id || isDisabled,
       data: provenancesData?.map((row: Provenance) => ({id: row.id, label: row.uri, enableClick: isValidUrl(row.uri) })) || [],
-      placeholder: disabled ? null : 'Enter Provenances (Press Enter to add a Provenance)',
+      placeholder: isDisabled ? null : 'Enter Provenances (Press Enter to add a Provenance)',
       removeChip: function(provenanceId: any) {
         provenanceService.delete(provenanceId, extraData.connectivity_statement_id)
         refresh()
@@ -61,7 +61,6 @@ const ProvenancesForm = (props: any) => {
   }
 
   return (
-
       <FormBase
         {...props}
         service={provenanceService}
@@ -73,6 +72,7 @@ const ProvenancesForm = (props: any) => {
         children={true}
         extraData={extraData}
         setter={() => refresh()}
+        disabled={isDisabled}
       />
   )
 }

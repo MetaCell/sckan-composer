@@ -6,8 +6,7 @@ import Chip from "@mui/material/Chip";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import { vars } from "../../theme/variables";
 import Box from "@mui/material/Box";
-
-const { buttonOutlinedColor, grey400, buttonOutlinedBorderColor } = vars;
+import CustomTextFieldChip from "./CustomTextFieldChip";
 
 const StyledInput = styled(TextField)(({ theme }) => ({
 
@@ -29,38 +28,9 @@ const StyledInput = styled(TextField)(({ theme }) => ({
   },
 
 }));
-
-const CustomChip = ({ id, label, onDelete, onClick, disabled }: any) => {
-  return (
-    <Chip
-      deleteIcon={<ClearOutlinedIcon />}
-      variant="outlined"
-      label={label}
-      key={id}
-      onClick={!disabled ? onClick : undefined}
-      onDelete={!disabled ? (e) => {
-        e.stopPropagation();
-        onDelete(id)
-      } : undefined}
-      sx={{
-        border: `1px solid ${buttonOutlinedBorderColor}`,
-        borderRadius: "6px",
-        margin: "4px",
-        "& .MuiChip-label": {
-          color: buttonOutlinedColor,
-          fontSize: "14px",
-        },
-        "& .MuiChip-deleteIcon": {
-          color: grey400,
-          fontSize: "14px",
-        },
-      }}
-    />
-  );
-};
 const TextfieldWithChips = ({
   placeholder,
-  options: { data, removeChip, disabled, onAutocompleteChange },
+  options: { data, removeChip, isDisabled, onAutocompleteChange },
 }: any) => {
 
   const handleDelete = (id: number) => {
@@ -74,18 +44,18 @@ const TextfieldWithChips = ({
 
   return (
     <>
-      { disabled ? <Box>
+      { isDisabled ? <Box>
         {
           data.map(
             (
               ele: { id: number; label: string; enableClick: boolean },
               index: number,
             ) => (
-              <CustomChip
+              <CustomTextFieldChip
                 id={ele.id}
                 label={ele.label}
                 onClick={ele.enableClick ? handleOpenExternalLink(ele.label) : undefined}
-                disabled={disabled}
+                isDisabled={isDisabled}
               />
             ),
           )
@@ -96,7 +66,7 @@ const TextfieldWithChips = ({
           <Autocomplete
             multiple
             disableClearable
-            disabled={disabled}
+            disabled={isDisabled}
             options={[]}
             onChange={(e, value) => onAutocompleteChange(e, value)}
             freeSolo
@@ -108,13 +78,13 @@ const TextfieldWithChips = ({
                   ele: { id: number; label: string; enableClick: boolean },
                   index: number,
                 ) => (
-                  <CustomChip
+                  <CustomTextFieldChip
                     {...getTagProps({ index })}
                     id={ele.id}
                     label={ele.label}
                     onClick={ele.enableClick ? handleOpenExternalLink(ele.label) : undefined}
                     onDelete={() => handleDelete(ele.id)}
-                    disabled={disabled}
+                    isDisabled={isDisabled}
                   />
                 ),
               )
@@ -122,7 +92,7 @@ const TextfieldWithChips = ({
             renderInput={(params) => (
               <StyledInput
                 {...params}
-                disabled={disabled}
+                disabled={isDisabled}
                 placeholder={placeholder}
               />
             )}

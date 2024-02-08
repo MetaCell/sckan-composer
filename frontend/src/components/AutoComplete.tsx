@@ -20,7 +20,7 @@ const StyledAutoComplete = styled(Autocomplete)(({ theme }) => ({
 export default function AutoComplete({
   onChange,
   placeholder,
-  disabled,
+  isDisabled,
   value,
   setValue,
   fetch,
@@ -84,7 +84,7 @@ export default function AutoComplete({
         filterOptions={(x) => x}
         options={options}
         autoComplete
-        disabled={disabled}
+        disabled={isDisabled}
         includeInputInList
         filterSelectedOptions
         defaultValue={null}

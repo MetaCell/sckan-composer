@@ -29,7 +29,7 @@ const TimeLineIcon = () => {
   </Box>
 }
 const NoteDetails = (props: any) => {
-  const { extraData, disabled } = props
+  const { extraData, isDisabled } = props
   const [noteList, setNoteList] = useState<Note[]>([])
   const [refresh, setRefresh] = useState(false)
 
@@ -49,7 +49,7 @@ const NoteDetails = (props: any) => {
   return (
     <Box display='flex' flexDirection='column' >
       {
-        !disabled &&  <Box sx={{
+        !isDisabled &&  <Box sx={{
           ...greyBgContainer,
           padding: '0 8px 8px !important',
           textAlign: 'center',

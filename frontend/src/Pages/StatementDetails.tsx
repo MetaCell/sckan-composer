@@ -114,9 +114,9 @@ const StatementDetails = () => {
     }
   }, [statementId, refetch]);
 
-  //TODO add logic for disabled
+  //TODO add logic for isDisabled
   // TODO add an extra check for invalid state;
-  const disabled = statement?.state === statementStates.Excluded;
+  const isDisabled = statement?.state === statementStates.Exported;
   return (
     <Grid p={6} container>
       {loading && (
@@ -248,7 +248,7 @@ const StatementDetails = () => {
                       />
                     ) : (
                       <GroupedButtons
-                        disabled
+                        isDisabled
                         selectedOption="No options available"
                       />
                     )}
@@ -280,7 +280,7 @@ const StatementDetails = () => {
                         statement={statement}
                         setStatement={setStatement}
                         refreshStatement={refreshStatement}
-                        disabled={disabled}
+                        isDisabled={isDisabled}
                         refs={refs}
                       />
                     </TabPanel>
@@ -289,7 +289,7 @@ const StatementDetails = () => {
                         statement={statement}
                         setStatement={setStatement}
                         refreshStatement={refreshStatement}
-                        disabled={disabled}
+                        isDisabled={isDisabled}
                         refs={refs}
                       />
                     </TabPanel>
@@ -313,14 +313,14 @@ const StatementDetails = () => {
                             service: statementService,
                           }}
                           setter={refreshStatement}
-                          disabled={disabled}
+                          isDisabled={isDisabled}
                         />
                         <Divider sx={{ margin: "36px 0" }} />
                         <NoteDetails
                           extraData={{
                             connectivity_statement_id: statement.id,
                           }}
-                          disabled={disabled}
+                          isDisabled={isDisabled}
                         />
                       </Paper>
                     </Box>

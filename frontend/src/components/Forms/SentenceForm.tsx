@@ -46,7 +46,7 @@ const linkedChip = (data: any) => {
 }
 
 const SentenceForm = (props: any) => {
-  const { format, data } = props
+  const { format, data, isDisabled } = props
   const { schema, uiSchema } = jsonSchemas.getSentenceSchema()
   const theme = useTheme()
   const sectionStyle = useSectionStyle(theme)
@@ -60,6 +60,7 @@ const SentenceForm = (props: any) => {
     title: {
       "ui:widget": CustomTextField,
       "ui:options": {
+        isDisabled,
         label: 'Article Title',
         placeholder: "Enter Article Title",
       }
@@ -91,6 +92,7 @@ const SentenceForm = (props: any) => {
         enableAutoSave={false}
         children={true}
         submitOnBlurFields={['title']}
+        disabled={isDisabled}
         {...props}
       />
       <Box mt={2}>

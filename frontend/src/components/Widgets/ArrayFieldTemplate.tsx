@@ -119,8 +119,8 @@ function ArrayFieldTemplate(props: any) {
             id={element.id}
             children={element.children}
             onDropIndexClick={() => handleDelete(element)}
-            disabled={props.disabled}
-            showReOrderingIcon={!props.disabled && props.showReOrderingIcon}
+            isDisabled={props.isDisabled}
+            showReOrderingIcon={!props.isDisabled && props.showReOrderingIcon}
             hideDeleteBtn={props.hideDeleteBtn}
           />
         ))}
@@ -132,7 +132,7 @@ function ArrayFieldTemplate(props: any) {
             color="info"
             onClick={handleAdd}
             startIcon={<AddCircleIcon />}
-            disabled={props.disabled}
+            disabled={props.isDisabled}
           >
             Add a {props.addButtonPlaceholder}
           </Button>

@@ -29,6 +29,7 @@ import {vars} from "../../theme/variables";
 import {Option} from "../../types";
 import Stack from "@mui/material/Stack";
 import {processFromEntitiesData} from "../../helpers/dropdownMappers";
+import CustomChipBoxComponent from "./CustomChipBoxComponent";
 
 const {
   buttonOutlinedBorderColor,
@@ -185,73 +186,12 @@ const styles = {
     },
   },
 };
-const CommonChipBox = ({
-                         selectedOptions,
-                         CustomInputChip,
-                         styles,
-                         disabled,
-                         handleChipRemove,
-                         chipsNumber,
-                       }: any) => {
-  const extraChipStyle = !disabled ?
-    { flex: 1,
-      minWidth: 0,
-      maxWidth: "fit-content",
-      cursor: "pointer"
-    }:
-    {cursor:  "initial",
-      width: 'fit-content',
-      maxWidth: 'fit-content',
-    }
-  return (
-    <Box gap={1} display="flex" flexWrap="wrap" alignItems="center">
-      {selectedOptions?.length ? (
-        selectedOptions
-          .slice(0, chipsNumber)
-          .map((item: Option, index: number) => (
-            <Tooltip
-              title={item?.label}
-              placement="top"
-              arrow
-              key={item.id}
-            >
-              {CustomInputChip ? (
-                <CustomInputChip sx={styles.chip} entity={item} />
-              ) : (
-                <Chip
-                  sx={{
-                    ...styles.chip,
-                    ...extraChipStyle
-                  }}
-                  variant={"outlined"}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  deleteIcon={<ClearOutlinedIcon />}
-                  onDelete={!disabled ? (e) => {
-                    e.stopPropagation();
-                    handleChipRemove(item);
-                  } : undefined}
-                  label={item?.label}
-                />
-              )}
-            </Tooltip>
-          ))
-      ) : null}
-      {!disabled && selectedOptions.length > chipsNumber && (
-        <span style={{ marginRight: ".5rem" }}>
-          +{selectedOptions.length - chipsNumber}
-        </span>
-      )}
-    </Box>
-  );
-};
+
 export default function CustomEntitiesDropdown({
      value,
      id,
      placeholder: plcholder,
      options: {
-       isFormDisabled = () => false,
        errors,
        searchPlaceholder,
        noResultReason,
@@ -274,7 +214,7 @@ export default function CustomEntitiesDropdown({
        getPreLevelSelectedValues,
        areConnectionsExplicit,
        minWidth = '',
-       disabled
+       isDisabled
      },
    }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -295,9 +235,9 @@ export default function CustomEntitiesDropdown({
   const [allOptions, setAllOptions] = useState<Option[]>([]);
   
   const [hasValueChanged, setHasValueChanged] = useState(false);
-  const isAllSelectedValuesFromTheAboveLayer = postProcessOptions && areConnectionsExplicit ? areConnectionsExplicit(id) : true
+  const areAllSelectedValuesFromTheAboveLayer = postProcessOptions && areConnectionsExplicit ? areConnectionsExplicit(id) : true
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    if (!disabled) {
+    if (!isDisabled) {
       setIsDropdownOpened(true);
       setAnchorEl(anchorEl ? null : event.currentTarget);
     }
@@ -452,33 +392,38 @@ export default function CustomEntitiesDropdown({
       document.removeEventListener("mousedown", closePopperOnClickOutside);
     };
   }, [hasValueChanged, postProcessOptions, getPreLevelSelectedValues, refreshStatement, selectedOptions.length, id]);
-  
-  return isFormDisabled() ? (
-    <Box
-      sx={{background: theme.palette.grey[100], borderRadius: 1}}
-      p={2}
-      display="flex"
-      justifyContent="center"
-    >
-      <Typography>{disabledReason}</Typography>
-    </Box>
+
+  return isDisabled ? (
+    disabledReason ? (
+      <Box
+        sx={{ background: theme.palette.grey[100], borderRadius: 1 }}
+        p={2}
+        display="flex"
+        justifyContent="center"
+      >
+        <Typography>{disabledReason}</Typography>
+      </Box>
+    ) : (
+      <Stack direction="row" spacing={1} alignItems="center" width={1}>
+        <Typography>{label}</Typography>
+        <CustomChipBoxComponent
+          selectedOptions={selectedOptions}
+          CustomInputChip={CustomInputChip}
+          styles={styles}
+          isDisabled={isDisabled}
+          handleChipRemove={handleChipRemove}
+          chipsNumber={chipsNumber}
+        />
+      </Stack>
+    )
   ) : (
     <>
       <Stack direction="row" spacing={1} alignItems="center" width={1}>
         <Typography>{label}</Typography>
-        {
-          disabled ? <CommonChipBox
-              selectedOptions={selectedOptions}
-              CustomInputChip={CustomInputChip}
-              styles={styles}
-              disabled={disabled}
-              handleChipRemove={handleChipRemove}
-              chipsNumber={chipsNumber}
-            />: <>
             <Badge
               sx={{...styles.badge, flex: 1}}
               badgeContent={
-                !isAllSelectedValuesFromTheAboveLayer ? 0 : selectedOptions?.length
+                !areAllSelectedValuesFromTheAboveLayer ? 0 : selectedOptions?.length
               }
             >
               <Box
@@ -493,15 +438,15 @@ export default function CustomEntitiesDropdown({
                 }}
                 onClick={handleClick}
               >
-                {!isAllSelectedValuesFromTheAboveLayer ||
+                {!areAllSelectedValuesFromTheAboveLayer ||
                 selectedOptions.length === 0 ? (
                   <Typography sx={styles.placeholder}>{placeholder || plcholder}</Typography>
                 ) : (
-                  <CommonChipBox
+                  <CustomChipBoxComponent
                     selectedOptions={selectedOptions}
                     CustomInputChip={CustomInputChip}
                     styles={styles}
-                    disabled={disabled}
+                    isDisabled={isDisabled}
                     handleChipRemove={handleChipRemove}
                     chipsNumber={chipsNumber}
                   />
@@ -788,7 +733,7 @@ export default function CustomEntitiesDropdown({
                                       disableRipple
                                       icon={<UncheckedItemIcon fontSize="small"/>}
                                       checkedIcon={
-                                        !isAllSelectedValuesFromTheAboveLayer &&
+                                        !areAllSelectedValuesFromTheAboveLayer &&
                                         !hasValueChanged ? (
                                           <CheckedItemIconBG
                                             fontSize="small"
@@ -901,8 +846,6 @@ export default function CustomEntitiesDropdown({
                 )}
               </Box>
             </Popper>
-          </> }
-       
       </Stack>
       {errors && (
         <Typography color={theme.palette.error.main} mt={1} ml={2}>

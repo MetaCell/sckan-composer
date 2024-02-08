@@ -8,7 +8,7 @@ import { AutocompleteWithChips } from '../Widgets/AutocompleteWithChips';
 
 
 const SpeciesForm = (props: any) => {
-  const { data, extraData, setter, disabled } = props
+  const { data, extraData, setter, isDisabled } = props
 
   const { schema, uiSchema } = jsonSchemas.getSpeciesSchema()
 
@@ -40,7 +40,7 @@ const SpeciesForm = (props: any) => {
     name: {
       "ui:widget": AutocompleteWithChips,
       "ui:options": {
-        disabled,
+        isDisabled,
         data: data?.map((row: Specie)=>({id:row.id, label: row.name})),
         label: 'Species',
         placeholder: 'Select Species',
@@ -62,7 +62,7 @@ const SpeciesForm = (props: any) => {
       enableAutoSave={false}
       clearOnSave={true}
       children={true}
-      disabled={disabled}
+      isDisabled={isDisabled}
       {...props}
     />
   )

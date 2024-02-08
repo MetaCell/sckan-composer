@@ -20,14 +20,14 @@ const StyledInput = styled(TextField)(({ theme }) => ({
   },
 }));
 
-const CustomChip = ({ id, label, onDelete, disabled }: any) => {
+const CustomChip = ({ id, label, onDelete, isDisabled }: any) => {
   return (
     <Chip
       deleteIcon={<ClearOutlinedIcon />}
       variant="outlined"
       label={label}
       key={id}
-      onDelete={!disabled ? (e) => {
+      onDelete={!isDisabled ? (e) => {
         e.stopPropagation();
         onDelete(id)
       } : undefined}
@@ -54,7 +54,7 @@ export const AutocompleteWithChips = ({
     data,
     removeChip,
     label,
-    disabled,
+    isDisabled,
     options,
     onAutocompleteChange,
   },
@@ -81,13 +81,13 @@ const handleDeleteAll = () => {
       >
         {label}
       </Typography>
-      {disabled ? (
+      {isDisabled ? (
         <Box>
           {data.length === 0 ? '-' : data.map((ele: { id: number; label: string }, index: number) => (
             <CustomChip
               id={ele.id}
               label={ele.label}
-              disabled={disabled}
+              isDisabled={isDisabled}
             />
           ))}
         </Box>
@@ -95,7 +95,7 @@ const handleDeleteAll = () => {
         <Autocomplete
           multiple
           disableClearable
-          disabled={disabled}
+          disabled={isDisabled}
           options={options}
           onChange={(e, value) => onAutocompleteChange(e, value)}
           freeSolo
@@ -106,14 +106,14 @@ const handleDeleteAll = () => {
                 id={ele.id}
                 label={ele.label}
                 onDelete={handleDelete}
-                disabled={disabled}
+                isDisabled={isDisabled}
               />
             ))
           }
           renderInput={(params) => (
             <StyledInput
               {...params}
-              disabled={disabled}
+              disabled={isDisabled}
               id="custom-input"
               placeholder={placeholder}
               onFocus={() => setInputFocus(true)}
