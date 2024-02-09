@@ -40,6 +40,7 @@ export default function GroupedButtons({handleClick, selectedOption, options, se
           aria-label="select merge strategy"
           aria-haspopup="menu"
           onClick={handleToggle}
+          disabled={options?.length > 0 ? false : true}
         >
           <ArrowDropDownIcon />
         </Button>
@@ -65,7 +66,7 @@ export default function GroupedButtons({handleClick, selectedOption, options, se
             <Paper sx={{p:3}}>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList id="split-button-menu" autoFocusItem>
-                  {options.map((option: string, index: number) => (
+                  {options?.map((option: string, index: number) => (
                     <MenuItem
                       key={option}
                       selected={index === selectedIndex}
