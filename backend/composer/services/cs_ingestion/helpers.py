@@ -30,6 +30,7 @@ CIRCUIT_TYPE_MAPPING = {
 }
 
 VALIDATION_ERRORS = "validation_errors"
+STATE = "state"
 
 
 def get_value_or_none(model, prop: str):

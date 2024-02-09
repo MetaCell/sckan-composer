@@ -9,9 +9,9 @@ from composer.models import AnatomicalEntity, Sentence, ConnectivityStatement, S
 from .helpers import get_value_or_none, found_entity, \
     ORIGINS, DESTINATIONS, VIAS, LABEL, SEX, SPECIES, ID, FORWARD_CONNECTION, SENTENCE_NUMBER, \
     FUNCTIONAL_CIRCUIT_ROLE, CIRCUIT_TYPE, CIRCUIT_TYPE_MAPPING, PHENOTYPE, OTHER_PHENOTYPE, NOTE_ALERT, PROVENANCE, \
-    VALIDATION_ERRORS
+    VALIDATION_ERRORS, STATE
 from .logging_service import LoggerService, STATEMENT_INCORRECT_STATE, SENTENCE_INCORRECT_STATE
-from .models import LoggableEvent, ValidationErrors
+from .models import LoggableAnomaly, ValidationErrors, Severity
 from .neurondm_script import main as get_statements_from_neurondm
 from ...enums import (
     CircuitType,
@@ -38,11 +38,12 @@ def ingest_statements(update_upstream=False):
 
             update_forward_connections(statements)
     except Exception as e:
-        logger_service.add_error(LoggableEvent(statement_id=None, entity_id=None, message=str(e)))
+        logger_service.add_anomaly(
+            LoggableAnomaly(statement_id=None, entity_id=None, message=str(e), severity=Severity.ERROR))
         successful_transaction = False
         logging.error(f"Ingestion aborted due to {e}")
 
-    logger_service.write_errors_to_file()
+    logger_service.write_anomalies_to_file()
 
     if successful_transaction:
         if update_upstream:
@@ -76,7 +77,7 @@ def has_invalid_statement(statement: Dict) -> bool:
 
 def can_statement_be_overwritten(connectivity_statement: ConnectivityStatement, statement) -> bool:
     if connectivity_statement.state != CSState.EXPORTED and connectivity_statement.state != CSState.INVALID:
-        logger_service.add_warning(LoggableEvent(statement[ID], None, STATEMENT_INCORRECT_STATE))
+        logger_service.add_anomaly(LoggableAnomaly(statement[ID], None, STATEMENT_INCORRECT_STATE))
         return False
 
     return True
@@ -84,7 +85,7 @@ def can_statement_be_overwritten(connectivity_statement: ConnectivityStatement, 
 
 def can_sentence_be_overwritten(sentence: Sentence, statement: Dict) -> bool:
     if sentence.state != SentenceState.COMPOSE_NOW:
-        logger_service.add_warning(LoggableEvent(statement[ID], None, SENTENCE_INCORRECT_STATE))
+        logger_service.add_anomaly(LoggableAnomaly(statement[ID], None, SENTENCE_INCORRECT_STATE))
         return False
     return True
 
@@ -130,8 +131,8 @@ def annotate_invalid_entities(statement: Dict) -> bool:
 def annotate_invalid_sex(statement: Dict) -> bool:
     if statement[SEX]:
         if len(statement[SEX]) > 1:
-            logger_service.add_warning(
-                LoggableEvent(statement[ID], None, f'Multiple sexes found in statement.'))
+            logger_service.add_anomaly(
+                LoggableAnomaly(statement[ID], None, f'Multiple sexes found in statement.'))
 
             first_sex_uri = statement[SEX][0]
             if not Sex.objects.filter(ontology_uri=first_sex_uri).exists():
@@ -163,8 +164,8 @@ def get_or_create_sentence(statement: Dict) -> Tuple[Sentence, bool]:
     has_sentence_reference = len(statement[SENTENCE_NUMBER]) > 0
 
     if len(statement[SENTENCE_NUMBER]) > 1:
-        logger_service.add_warning(
-            LoggableEvent(statement[ID], None, f'Multiple sentence numbers found.'))
+        logger_service.add_anomaly(
+            LoggableAnomaly(statement[ID], None, f'Multiple sentence numbers found.'))
 
     sentence, created = Sentence.objects.get_or_create(
         doi__iexact=statement[ID],
@@ -214,6 +215,7 @@ def create_or_update_connectivity_statement(statement: Dict, sentence: Sentence)
         do_transition_to_invalid(connectivity_statement, error_message)
 
     update_many_to_many_fields(connectivity_statement, statement)
+    statement[STATE] = connectivity_statement.state
 
     return connectivity_statement, created
 
@@ -323,8 +325,8 @@ def get_sex(statement: Dict) -> Sex:
 
 def get_functional_circuit_role(statement: Dict) -> Optional[FunctionalCircuitRole]:
     if len(statement[FUNCTIONAL_CIRCUIT_ROLE]) > 1:
-        logger_service.add_warning(
-            LoggableEvent(statement[ID], None, f'Multiple functional circuit roles found.'))
+        logger_service.add_anomaly(
+            LoggableAnomaly(statement[ID], None, f'Multiple functional circuit roles found.'))
 
     return get_value_or_none(
         FunctionalCircuitRole, statement[FUNCTIONAL_CIRCUIT_ROLE][0]) if statement[FUNCTIONAL_CIRCUIT_ROLE] else None
@@ -333,17 +335,17 @@ def get_functional_circuit_role(statement: Dict) -> Optional[FunctionalCircuitRo
 def get_circuit_type(statement: Dict):
     if statement[CIRCUIT_TYPE]:
         if len(statement[CIRCUIT_TYPE]) > 1:
-            logger_service.add_warning(LoggableEvent(statement[ID], None, f'Multiple circuit types found'))
+            logger_service.add_anomaly(LoggableAnomaly(statement[ID], None, f'Multiple circuit types found'))
         return CIRCUIT_TYPE_MAPPING.get(statement[CIRCUIT_TYPE][0], CircuitType.UNKNOWN)
     else:
-        logger_service.add_warning(LoggableEvent(statement[ID], None, f'No circuit type found.'))
+        logger_service.add_anomaly(LoggableAnomaly(statement[ID], None, f'No circuit type found.'))
         return CircuitType.UNKNOWN
 
 
 def get_phenotype(statement: Dict) -> Optional[Phenotype]:
     if statement[PHENOTYPE]:
         if len(statement[PHENOTYPE]) > 1:
-            logger_service.add_warning(LoggableEvent(statement[ID], None, f'Multiple phenotypes found.'))
+            logger_service.add_anomaly(LoggableAnomaly(statement[ID], None, f'Multiple phenotypes found.'))
 
         for p in statement[PHENOTYPE]:
             try:
@@ -352,7 +354,7 @@ def get_phenotype(statement: Dict) -> Optional[Phenotype]:
             except Phenotype.DoesNotExist:
                 pass
 
-        logger_service.add_warning(LoggableEvent(statement[ID], None, f'No valid phenotype found.'))
+        logger_service.add_anomaly(LoggableAnomaly(statement[ID], None, f'No valid phenotype found.'))
 
     return None
 
@@ -366,7 +368,7 @@ def get_projection_phenotype(statement: Dict) -> Optional[ProjectionPhenotype]:
         except ProjectionPhenotype.DoesNotExist:
             pass
     else:
-        logger_service.add_warning(LoggableEvent(statement[ID], None, f'No projection phenotypes found.'))
+        logger_service.add_anomaly(LoggableAnomaly(statement[ID], None, f'No projection phenotypes found.'))
     return None
 
 
@@ -478,7 +480,6 @@ def add_notes(connectivity_statement: ConnectivityStatement, statement: Dict):
 
 
 def add_provenances(connectivity_statement: ConnectivityStatement, statement: Dict):
-    # todo: check if it's fine to add all provenances, in the past we were only adding the first
     provenances_list = statement[PROVENANCE] if statement[PROVENANCE] else [statement[ID]]
     provenances = (Provenance(connectivity_statement=connectivity_statement, uri=provenance) for provenance in
                    provenances_list)
