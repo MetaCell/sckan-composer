@@ -18,7 +18,6 @@ import {
 } from "@mui/material";
 import {CheckedItemIcon, CheckedItemIconBG, UncheckedItemIcon} from "../icons";
 import HoveredOptionContent from "./HoveredOptionContent";
-import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import theme from "../../theme/Theme";
@@ -209,8 +208,6 @@ export default function CustomEntitiesDropdown({
        chipsNumber = 2,
        postProcessOptions = false,
        refreshStatement,
-       statement,
-       fieldName = "",
        getPreLevelSelectedValues,
        areConnectionsExplicit,
        minWidth = '',
