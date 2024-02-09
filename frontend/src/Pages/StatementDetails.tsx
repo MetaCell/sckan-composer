@@ -320,7 +320,6 @@ const StatementDetails = () => {
                           extraData={{
                             connectivity_statement_id: statement.id,
                           }}
-                          isDisabled={isDisabled}
                         />
                       </Paper>
                     </Box>
