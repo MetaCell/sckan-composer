@@ -9,9 +9,10 @@ from pyontutils.core import OntGraph, OntResIri, OntResPath
 from pyontutils.namespaces import rdfs, ilxtr
 
 from composer.services.cs_ingestion.exceptions import NeuronDMInconsistency
+from composer.services.cs_ingestion.helpers import VALIDATION_ERRORS, DESTINATIONS, VIAS, ORIGINS
 from composer.services.cs_ingestion.logging_service import LoggerService, AXIOM_NOT_FOUND, INCONSISTENT_AXIOMS
-from composer.services.cs_ingestion.models import NeuronDMVia, NeuronDMOrigin, NeuronDMDestination, LoggableEvent, \
-    AxiomType, ValidationErrors
+from composer.services.cs_ingestion.models import NeuronDMVia, NeuronDMOrigin, NeuronDMDestination, LoggableAnomaly, \
+    AxiomType, ValidationErrors, Severity
 
 logger_service: Optional[LoggerService] = None
 
@@ -41,7 +42,7 @@ def for_composer(n):
         origins, vias, destinations, validation_errors = get_connections(n, lambda predicate: lpes(n, predicate))
     except NeuronDMInconsistency as e:
         if logger_service:
-            logger_service.add_error(LoggableEvent(e.statement_id, e.entity_id, e.message))
+            logger_service.add_anomaly(LoggableAnomaly(e.statement_id, e.entity_id, e.message, severity=Severity.ERROR))
         return None
 
     fc = dict(
@@ -110,7 +111,7 @@ def process_connections(path, origins_from_axioms: Set[str], vias_from_axioms: D
                         depth: int = 0, result: Optional[Dict] = None) -> Tuple[
     List[NeuronDMOrigin], List[NeuronDMVia], List[NeuronDMDestination], ValidationErrors]:
     if result is None:
-        result = {'origins': [], 'destinations': [], 'vias': [], 'validation_errors': ValidationErrors()}
+        result = {ORIGINS: [], DESTINATIONS: [], VIAS: [], VALIDATION_ERRORS: ValidationErrors()}
 
     if isinstance(path, tuple):
         if path[0] == rdflib.term.Literal('blank'):
@@ -126,9 +127,9 @@ def process_connections(path, origins_from_axioms: Set[str], vias_from_axioms: D
                                                                                          destinations_from_axioms)
 
             if not current_entity_uri or len(current_entity_axiom_types) == 0:
-                result['validation_errors'].axiom_not_found.add(str(current_entity))
+                result[VALIDATION_ERRORS].axiom_not_found.add(entity_to_string(current_entity))
                 if logger_service:
-                    logger_service.add_warning(LoggableEvent(None, current_entity, AXIOM_NOT_FOUND))
+                    logger_service.add_anomaly(LoggableAnomaly(None, current_entity, AXIOM_NOT_FOUND))
             else:
                 from_entities = from_entities or set()
 
@@ -145,7 +146,14 @@ def process_connections(path, origins_from_axioms: Set[str], vias_from_axioms: D
                 process_connections(remaining_path, origins_from_axioms, vias_from_axioms, destinations_from_axioms,
                                     next_from_entities, depth, result)
 
-    return result['origins'], result['vias'], result['destinations'], result['validation_errors']
+    return result[ORIGINS], result[VIAS], result[DESTINATIONS], result[VALIDATION_ERRORS]
+
+
+def entity_to_string(entity):
+    if isinstance(entity, orders.rl):
+        return f"{entity.region} (region) nor {entity.layer} (layer)"
+    else:
+        return str(entity)
 
 
 def get_current_entity_metadata(current_entity, origins_from_axioms: Set[str], vias_from_axioms: Dict[str, str],
@@ -196,7 +204,6 @@ def get_axiom_type(current_entity_axiom_types: List[AxiomType], path, depth: int
         if axiom_type in current_entity_axiom_types:
             return axiom_type
 
-    # If no possible type is found, return None
     return None
 
 
@@ -204,12 +211,12 @@ def update_result(current_entity_uri: str, axiom_type: AxiomType, from_entities:
                   vias_from_axioms: Dict[str, str],
                   destinations_from_axioms: Dict[str, str]) -> Dict:
     if axiom_type == AxiomType.ORIGIN:
-        result['origins'].append(NeuronDMOrigin({current_entity_uri}))
+        result[ORIGINS].append(NeuronDMOrigin({current_entity_uri}))
     elif axiom_type == AxiomType.VIA:
-        result['vias'].append(
+        result[VIAS].append(
             NeuronDMVia({current_entity_uri}, from_entities, depth, vias_from_axioms.get(current_entity_uri)))
     elif axiom_type == AxiomType.DESTINATION:
-        result['destinations'].append(
+        result[DESTINATIONS].append(
             NeuronDMDestination({current_entity_uri}, from_entities, destinations_from_axioms.get(current_entity_uri)))
     return result
 
@@ -221,18 +228,29 @@ def validate_partial_order_and_axioms(origins_from_axioms, vias_from_axioms, des
     anatomical_uris_vias = extract_anatomical_uris(tmp_vias)
     anatomical_uris_destinations = extract_anatomical_uris(tmp_destinations)
 
-    # Validate that all axioms were used
-    if anatomical_uris_origins != set(origins_from_axioms):
-        validation_errors.non_specified.append(
-            f"Mismatch in anatomical URIs for origins: expected {origins_from_axioms}, found {anatomical_uris_origins}")
-    if anatomical_uris_vias != set(vias_from_axioms.keys()):
-        validation_errors.non_specified.append(
-            f"Mismatch in anatomical URIs for vias: expected {vias_from_axioms.keys()}, found {anatomical_uris_vias}")
-    if anatomical_uris_destinations != set(destinations_from_axioms.keys()):
-        validation_errors.non_specified.append(
-            f"Mismatch in anatomical URIs for destinations: expected {destinations_from_axioms.keys()}, found {anatomical_uris_destinations}")
+    validate_partial_order_and_axioms_aux(set(origins_from_axioms), anatomical_uris_origins, "origins",
+                                          validation_errors)
+
+    validate_partial_order_and_axioms_aux(set(vias_from_axioms.keys()), anatomical_uris_vias, "vias", validation_errors)
+
+    validate_partial_order_and_axioms_aux(set(destinations_from_axioms.keys()), anatomical_uris_destinations,
+                                          "destinations",
+                                          validation_errors)
 
     return validation_errors
+
+
+def validate_partial_order_and_axioms_aux(axiom_uris: Set[str], actual_uris: Set[str], category: str,
+                                          validation_errors: ValidationErrors):
+    missing_uris = axiom_uris - actual_uris
+    extra_uris = actual_uris - axiom_uris
+    if missing_uris:
+        validation_errors.non_specified.append(
+            f"Missing anatomical URIs in {category}: {', '.join(missing_uris)}")
+    if extra_uris:
+        validation_errors.non_specified.append(
+            f"Unexpected anatomical URIs in {category}: {', '.join(extra_uris)}"
+        )
 
 
 def extract_anatomical_uris(entities_list):

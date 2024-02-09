@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Set
+from typing import Set, Optional
 
 
 class NeuronDMOrigin:
@@ -22,11 +22,18 @@ class NeuronDMDestination:
         self.type = type
 
 
-class LoggableEvent:
-    def __init__(self, statement_id, entity_id, message):
+class Severity(Enum):
+    ERROR = 'error'
+    WARNING = 'warning'
+
+
+class LoggableAnomaly:
+    def __init__(self, statement_id: Optional[str], entity_id: Optional[str], message: str,
+                 severity: Severity = Severity.WARNING):
         self.statement_id = statement_id
         self.entity_id = entity_id
         self.message = message
+        self.severity = severity
 
 
 class AxiomType(Enum):
@@ -54,9 +61,9 @@ class ValidationErrors:
             error_messages.append(f"Species not found: {', '.join(self.species)}")
         if self.forward_connection:
             error_messages.append(
-                f"Forward connections not found: {', '.join(self.forward_connection)}")
+                f"Forward connection(s) not found: {', '.join(self.forward_connection)}")
         if self.axiom_not_found:
-            error_messages.append(f"Axioms not found for: {', '.join(self.axiom_not_found)}")
+            error_messages.append(f"Axiom(s) not found for: {', '.join(self.axiom_not_found)}")
         if self.non_specified:
             error_messages.extend(self.non_specified)
 
