@@ -3,14 +3,14 @@ from typing import Optional, Tuple, List, Set, Dict
 
 import rdflib
 from neurondm import orders
-from neurondm.core import Config, graphBase, log
+from neurondm.core import Config, graphBase
 from neurondm.core import OntTerm, OntId, RDFL
 from pyontutils.core import OntGraph, OntResIri, OntResPath
 from pyontutils.namespaces import rdfs, ilxtr
 
 from composer.services.cs_ingestion.exceptions import NeuronDMInconsistency
 from composer.services.cs_ingestion.helpers import VALIDATION_ERRORS, DESTINATIONS, VIAS, ORIGINS
-from composer.services.cs_ingestion.logging_service import LoggerService, AXIOM_NOT_FOUND, INCONSISTENT_AXIOMS
+from composer.services.cs_ingestion.logging_service import LoggerService, AXIOM_NOT_FOUND
 from composer.services.cs_ingestion.models import NeuronDMVia, NeuronDMOrigin, NeuronDMDestination, LoggableAnomaly, \
     AxiomType, ValidationErrors, Severity
 
@@ -95,6 +95,9 @@ def get_connections(n, lpes):
     origins = merge_origins(tmp_origins)
     vias = merge_vias(tmp_vias)
     destinations = merge_destinations(tmp_destinations)
+
+    origins, vias, destinations = update_from_entities(origins, vias, destinations)
+
     return origins, vias, destinations, validation_errors
 
 
@@ -331,6 +334,24 @@ def merge_destinations_by_from_entities(destinations: List[NeuronDMDestination])
         merged_destinations[key].anatomical_entities.update(destination.anatomical_entities)
 
     return list(merged_destinations.values())
+
+
+def update_from_entities(origins: NeuronDMOrigin, vias: List[NeuronDMVia], destinations: List[NeuronDMDestination]):
+    # Step 1: Initialize "previous anatomical entities" with origins
+    previous_anatomical_entities = origins.anatomical_entities
+
+    # Step 2: Process vias
+    for via in sorted(vias, key=lambda v: v.order):
+        if via.from_entities == previous_anatomical_entities:
+            via.from_entities = set()
+        previous_anatomical_entities = via.anatomical_entities
+
+    # Step 3: Process destinations
+    for destination in destinations:
+        if destination.from_entities == previous_anatomical_entities:
+            destination.from_entities = set()
+
+    return origins, vias, destinations
 
 
 ## Based on:
