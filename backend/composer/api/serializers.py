@@ -495,7 +495,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         if not species:
             species = ""
 
-        phenotype = instance.phenotype.phenotype_str if instance.phenotype else None
+        phenotype = instance.phenotype.phenotype_str if instance.phenotype else ''
         origin_names = [origin.name for origin in instance.origins.all()]
         origins = join_entities(origin_names)
         if not origins:
@@ -511,19 +511,19 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
 
         # Creating the statement
         if sex or species != "":
-            statement = f"In {sex or ''} {species}, the {phenotype.lower() if phenotype else '' } connection goes {journey_sentence}.\n"
+            statement = f"In {sex or ''} {species}, the {phenotype.lower()} connection goes {journey_sentence}.\n"
         else:
-            statement = f"A {phenotype} connection goes {journey_sentence}.\n"
+            statement = f"A {phenotype.lower()} connection goes {journey_sentence}.\n"
         
         statement += f"This "
         if projection:
-            statement += f"{projection.lower() or ''} "
+            statement += f"{projection.lower()} "
         if circuit_type:
-            statement += f"{circuit_type.lower() or ''} "
+            statement += f"{circuit_type.lower()} "
 
         statement += f"connection projects from the {origins}."
         if laterality_description:
-            statement = statement[:-1] + f" and is found {laterality_description or ''}.\n"
+            statement = statement[:-1] + f" and is found {laterality_description}.\n"
 
         if apinatomy:
             statement += f" It is described in {apinatomy} model."
