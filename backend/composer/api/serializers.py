@@ -501,10 +501,10 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         if not origins:
             origins = ""
 
-        circuit_type = get_method_value(instance, 'get_circuit_type_display')
-        projection = get_method_value(instance, 'get_projection_display')
+        circuit_type = instance.get_circuit_type_display() if instance.circuit_type else None
+        projection = instance.get_projection_display() if instance.projection else None
 
-        laterality_description = get_method_value(instance, 'get_laterality_description')
+        laterality_description = instance.get_laterality_description()
 
         apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
         journey_sentence = ', '.join(journey)
