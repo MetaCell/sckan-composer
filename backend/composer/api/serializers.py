@@ -24,7 +24,7 @@ from ..models import (
 from ..services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
 from ..services.errors_service import get_connectivity_errors
-from ..utils import join_entities
+from ..utils import join_entities, get_property_value, get_method_value
 
 
 # MixIns
@@ -486,63 +486,49 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             self.context['journey'] = instance.get_journey()
         return self.create_statement_preview(instance, self.context['journey'])
 
-    def get_property_or_empty_string(self, instance, property_name, sub_property_name=None):
-        if hasattr(instance, property_name):
-            property_attr = getattr(instance, property_name)
-            if property_attr:
-                if sub_property_name and hasattr(property_attr, sub_property_name):
-                    subproperty_attr = getattr(property_attr, sub_property_name)
-                    return subproperty_attr() if callable(subproperty_attr) else subproperty_attr
-                
-                if callable(property_attr):
-                    return property_attr() if property_attr() else ""
-                else:
-                    return property_attr
-        return ""
-
     
     def create_statement_preview(self, instance, journey):
-        sex = self.get_property_or_empty_string(instance, 'sex', 'name')
+        sex = get_property_value(instance, 'sex', 'name')
 
         species_list = [specie.name for specie in instance.species.all()]
         species = join_entities(species_list)
         if not species:
             species = ""
 
-        phenotype = self.get_property_or_empty_string(instance, 'phenotype', 'name').lower()
+        phenotype = get_property_value(instance, 'phenotype', 'name')
         origin_names = [origin.name for origin in instance.origins.all()]
         origins = join_entities(origin_names)
         if not origins:
             origins = ""
 
-        circuit_type = self.get_property_or_empty_string(instance, 'get_circuit_type_display').lower()
-        projection = self.get_property_or_empty_string(instance, 'get_projection_display').lower()
+        circuit_type = get_method_value(instance, 'get_circuit_type_display')
+        projection = get_method_value(instance, 'get_projection_display')
 
-        laterality_description = self.get_property_or_empty_string(instance, 'get_laterality_description')
+        laterality_description = get_method_value(instance, 'get_laterality_description')
 
         apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
         journey_sentence = ', '.join(journey)
 
         # Creating the statement
-        if sex != "" or species != "":
-            statement = f"In {sex} {species}, the {phenotype} connection goes {journey_sentence}.\n"
+        if sex is not None or species != "":
+            statement = f"In {sex or ''} {species}, the {phenotype.lower() if phenotype else '' } connection goes {journey_sentence}.\n"
         else:
             statement = f"A {phenotype} connection goes {journey_sentence}.\n"
         
         statement += f"This "
-        if projection != "":
-            statement += f"{projection} "
-        if circuit_type != "":
-            statement += f"{circuit_type} "
+        if projection is not None:
+            statement += f"{projection.lower() or ''} "
+        if circuit_type is not None:
+            statement += f"{circuit_type.lower() or ''} "
 
         statement += f"connection projects from the {origins}."
-        if laterality_description != "":
-            statement = statement[:-1] + f" and is found {laterality_description}.\n"
+        if laterality_description is not None:
+            statement = statement[:-1] + f" and is found {laterality_description or ''}.\n"
 
         if apinatomy:
             statement += f" It is described in {apinatomy} model."
 
-        return statement.strip()
+        return statement.strip().replace("  ", " ")
 
     def get_errors(self, instance) -> List:
         return get_connectivity_errors(instance)

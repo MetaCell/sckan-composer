@@ -22,3 +22,17 @@ def join_entities(entities):
     elif entities_list:
         return entities_list[0]
     return ''
+
+def get_property_value(instance, property_name, sub_property_name=None):
+    """
+    Get the value of a sub-property of an instance property or the value of the property itself. 
+    """
+    if sub_property_name:
+        return getattr(getattr(instance, property_name, None), sub_property_name, None)
+    return getattr(instance, property_name, None)
+
+def get_method_value(instance, method_name):
+    """
+    Get the value of a method of an instance.
+    """
+    return getattr(instance, method_name, None)()

@@ -527,7 +527,7 @@ class ConnectivityStatement(models.Model):
             Laterality.RIGHT.value: "on the right side of the body",
             Laterality.LEFT.value: "on the left side of the body",
         }
-        return laterality_map.get(self.laterality, "")
+        return laterality_map.get(self.laterality, None)
 
     def assign_owner(self, request):
         if ConnectivityStatementService(self).should_set_owner(request):
