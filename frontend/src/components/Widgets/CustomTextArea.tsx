@@ -20,7 +20,7 @@ const StyledInput = styled(TextField)(({ theme }) => ({
 }));
 
 
-export default function TextArea({ id, value, placeholder, required, disabled, onChange, onBlur, onFocus, options: { rows } }: any) {
+export default function TextArea({ id, value, placeholder, required, onChange, onBlur, onFocus, options: { rows, isDisabled } }: any) {
 
 
   return (
@@ -35,7 +35,7 @@ export default function TextArea({ id, value, placeholder, required, disabled, o
       onChange={(e)=>onChange(e.target.value)}
       onBlur={(e)=>onBlur(id,e.target.value)}
       onFocus={(e)=>onFocus(id,e.target.value)}
-      disabled={disabled}
+      disabled={isDisabled}
       />
     </FormControl>
   );

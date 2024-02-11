@@ -29,7 +29,7 @@ const TimeLineIcon = () => {
   </Box>
 }
 const NoteDetails = (props: any) => {
-  const { extraData } = props
+  const { extraData, isDisabled } = props
   const [noteList, setNoteList] = useState<Note[]>([])
   const [refresh, setRefresh] = useState(false)
 
@@ -44,26 +44,28 @@ const NoteDetails = (props: any) => {
         setRefresh(false)
       })
     }
-  }, [extraData?.connectivity_statement_id, extraData?.sentence_id, refresh])
+  }, [extraData?.connectivity_statement_id, extraData?.sentence_id, refresh, extraData])
 
   return (
     <Box display='flex' flexDirection='column' >
-      <Box sx={{
-        ...greyBgContainer,
-        padding: '0 8px 8px !important',
-        textAlign: 'center',
-        "& .MuiGrid-item":
-          {
-            paddingTop: 0
-          },
-        "& .MuiInputBase-root": {
-          background: '#fff',
-          borderRadius: '12px'
-        }
-      }}>
-        <NoteForm setRefresh={setRefresh} extraData={extraData} />
-      </Box>
-
+      {
+        !isDisabled &&  <Box sx={{
+          ...greyBgContainer,
+          padding: '0 8px 8px !important',
+          textAlign: 'center',
+          "& .MuiGrid-item":
+            {
+              paddingTop: 0
+            },
+          "& .MuiInputBase-root": {
+            background: '#fff',
+            borderRadius: '12px'
+          }
+        }}>
+              <NoteForm setRefresh={setRefresh} extraData={extraData} />
+          </Box>
+      }
+     
       <Timeline sx={{
         "& .MuiTimelineItem-root": {
           "&:before": {

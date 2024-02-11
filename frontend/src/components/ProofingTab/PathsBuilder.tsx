@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Paper, Stack, Typography, Divider, Box } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import { useSectionStyle, useGreyBgContainer } from "../../styles/styles";
@@ -7,7 +7,7 @@ import { vars } from "../../theme/variables";
 import { OriginIcon } from "../icons";
 
 const PathsBuilder = (props: any) => {
-  const { statement, refreshStatement, refs } = props;
+  const { statement, refreshStatement, refs, isDisabled } = props;
   const theme = useTheme();
   const sectionStyle = useSectionStyle(theme);
   const subSectionStyle = useGreyBgContainer(theme);
@@ -57,6 +57,7 @@ const PathsBuilder = (props: any) => {
                 enableAutoSave={false}
                 submitOnChangeFields={["origins"]}
                 className="origins"
+                isDisabled={isDisabled}
               />
             </Box>
           </Box>
@@ -74,6 +75,8 @@ const PathsBuilder = (props: any) => {
               uiFields={["vias"]}
               enableAutoSave={false}
               className="vias"
+              isDisabled={isDisabled}
+              
             />
           </Box>
           <Box
@@ -96,6 +99,7 @@ const PathsBuilder = (props: any) => {
               uiFields={["destinations"]}
               enableAutoSave={false}
               className="destinations"
+              isDisabled={isDisabled}
             />
           </Box>
           <Box height={24} width={2} bgcolor="#D0D5DD" ml="34px" />
@@ -112,6 +116,7 @@ const PathsBuilder = (props: any) => {
               sx={{ ...sectionStyle, padding: ".75rem .88rem .75rem .50rem" }}
             >
               <StatementForm
+                {...props}
                 statement={statement}
                 format="small"
                 refreshStatement={refreshStatement}
@@ -119,6 +124,7 @@ const PathsBuilder = (props: any) => {
                 uiFields={["forward_connection"]}
                 enableAutoSave={true}
                 className="ks"
+                isDisabled={isDisabled}
               />
             </Box>
           </Box>

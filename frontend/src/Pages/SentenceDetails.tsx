@@ -67,7 +67,6 @@ const SentencesDetails = () => {
   const [connectivityStatements, setConnectivityStatements] =
     useState<SentenceConnectivityStatement[]>();
 
-  const [open, setOpen] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [refetch, setRefetch] = useState(false);
 
@@ -167,7 +166,6 @@ const SentencesDetails = () => {
     index: number,
   ) => {
     setSelectedIndex(index);
-    setOpen(false);
   };
 
   const refreshSentence = () => {
@@ -227,7 +225,7 @@ const SentencesDetails = () => {
     );
   }
 
-  const disabled = sentence.owner?.id !== userProfile.getUser().id;
+  const isDisabled = sentence.owner?.id !== userProfile.getUser().id;
 
   return (
     <Grid p={6} container>
@@ -297,7 +295,7 @@ const SentencesDetails = () => {
                 display="flex"
                 justifyContent="flex-end"
               >
-                {!disabled && sentence?.available_transitions?.length !== 0 && (
+                {!isDisabled && sentence?.available_transitions?.length !== 0 && (
                   <GroupedButtons
                     handleClick={handleClick}
                     selectedOption={
@@ -364,7 +362,7 @@ const SentencesDetails = () => {
                 <Box ref={refs[1]}>
                   <SentenceForm
                     data={sentence}
-                    disabled={disabled}
+                    isDisabled={isDisabled}
                     format="small"
                     setter={setSentence}
                     enableAutoSave={true}

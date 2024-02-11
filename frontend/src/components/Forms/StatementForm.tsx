@@ -46,7 +46,7 @@ import { CustomFooter } from "../Widgets/HoveredOptionContent";
 import { StatementStateChip } from "../Widgets/StateChip";
 
 const StatementForm = (props: any) => {
-  const { uiFields, statement, refreshStatement } = props;
+  const { uiFields, statement, refreshStatement, isDisabled } = props;
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
@@ -59,6 +59,7 @@ const StatementForm = (props: any) => {
   copiedUISchema.circuit_type = {
     "ui:widget": "CustomSingleSelect",
     "ui:options": {
+      isDisabled,
       label: "Circuit Type",
       classNames: "col-xs-12 col-md-6",
       placeholder: "Enter Circuit Type",
@@ -68,6 +69,7 @@ const StatementForm = (props: any) => {
   copiedUISchema.laterality = {
     "ui:widget": "CustomSingleSelect",
     "ui:options": {
+      isDisabled,
       label: "Laterality",
       classNames: "col-xs-12 col-md-6",
       placeholder: "Enter Laterality",
@@ -77,6 +79,7 @@ const StatementForm = (props: any) => {
   copiedUISchema.projection = {
     "ui:widget": "CustomSingleSelect",
     "ui:options": {
+      isDisabled,
       label: "Projection",
       classNames: "col-xs-12 col-md-6",
       placeholder: "Enter Projection",
@@ -86,6 +89,7 @@ const StatementForm = (props: any) => {
   copiedUISchema.apinatomy_model = {
     "ui:widget": "CustomTextField",
     "ui:options": {
+      isDisabled,
       label: "ApiNATOMY Model Name",
       placeholder: "Enter ApiNATOMY Model Name",
     },
@@ -95,6 +99,7 @@ const StatementForm = (props: any) => {
   copiedUISchema.sex_id = {
     "ui:widget": "CustomSingleSelect",
     "ui:options": {
+      isDisabled,
       label: "Sex",
       placeholder: "Enter Sex",
       data: sexes
@@ -107,6 +112,7 @@ const StatementForm = (props: any) => {
   copiedUISchema.phenotype_id = {
     "ui:widget": "CustomSingleSelect",
     "ui:options": {
+      isDisabled,
       label: "Phenotype",
       placeholder: "Select Phenotype",
       data: phenotypes
@@ -119,6 +125,7 @@ const StatementForm = (props: any) => {
   copiedUISchema.knowledge_statement = {
     "ui:widget": "CustomTextArea",
     "ui:options": {
+      isDisabled,
       label: "Knowledge Statement",
       placeholder: "Enter Knowledge Statement",
       rows: 4,
@@ -129,6 +136,7 @@ const StatementForm = (props: any) => {
   copiedUISchema.origins = {
     "ui:widget": CustomEntitiesDropdown,
     "ui:options": {
+      isDisabled,
       statement: statement,
       placeholder: "Origin",
       searchPlaceholder: "Search for Origins",
@@ -209,9 +217,10 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
-        hideDeleteBtn={statement?.vias?.length <= 1}
+        hideDeleteBtn={statement?.vias?.length <= 1 || isDisabled}
         showReOrderingIcon={true}
         addButtonPlaceholder={"Via"}
+        canAdd={!isDisabled}
       />
     ),
     items: {
@@ -244,6 +253,7 @@ const StatementForm = (props: any) => {
       anatomical_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          isDisabled,
           statement: statement,
           label: "Via",
           fieldName: "vias.anatomical_entities",
@@ -284,6 +294,7 @@ const StatementForm = (props: any) => {
       from_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          isDisabled,
           statement: statement,
           label: "From",
           fieldName: "vias.from_entities",
@@ -385,9 +396,10 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
-        hideDeleteBtn={statement?.destinations?.length <= 1}
+        hideDeleteBtn={statement?.destinations?.length <= 1 || isDisabled}
         showReOrderingIcon={false}
         addButtonPlaceholder={"Destination"}
+        canAdd={!isDisabled}
       />
     ),
     items: {
@@ -420,6 +432,7 @@ const StatementForm = (props: any) => {
       anatomical_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          isDisabled,
           statement: statement,
           placeholder: "Look for Destinations",
           searchPlaceholder: "Search for Destinations",
@@ -462,6 +475,7 @@ const StatementForm = (props: any) => {
       from_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          isDisabled,
           statement: statement,
           label: "From",
           fieldName: "destinations.from_entities",
@@ -547,6 +561,7 @@ const StatementForm = (props: any) => {
   copiedUISchema.additional_information = {
     "ui:widget": "CustomTextField",
     "ui:options": {
+      isDisabled,
       label: "Additional Information",
       placeholder: "Enter additional information on the knowledge statement",
       multiline: true,
@@ -558,13 +573,13 @@ const StatementForm = (props: any) => {
   copiedUISchema.forward_connection = {
     "ui:widget": CustomEntitiesDropdown,
     "ui:options": {
-      isFormDisabled: () => statement?.destinations?.length === 0,
+      isDisabled,
       placeholder: "Forward connection(s)",
       searchPlaceholder: "Search for Connectivity Statements",
       noResultReason:
         "We couldn’t find any record with these origin in the database.",
-      disabledReason:
-        "Add Destination entity to get access to the forward connection form",
+      disabledReason: statement?.destinations?.length === 0 ?
+        "Add Destination entity to get access to the forward connection form" : "",
       fieldName: "forward_connection",
 
       onSearch: async (searchValue: string) => {
@@ -673,6 +688,7 @@ const StatementForm = (props: any) => {
       enableAutoSave={false}
       widgets={widgets}
       showErrorList={false}
+      disabled={isDisabled}
       submitOnBlurFields={[
         "knowledge_statement",
         "additional_information",

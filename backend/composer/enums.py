@@ -58,6 +58,7 @@ class CSState(models.TextChoices):
     CONNECTION_MISSING = "connection_missing"
     NPO_APPROVED = "npo_approved"
     EXPORTED = "exported"
+    INVALID = "invalid"
 
 
 class NoteType(models.TextChoices):

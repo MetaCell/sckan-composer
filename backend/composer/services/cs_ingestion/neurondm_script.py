@@ -1,21 +1,25 @@
 import os
+from typing import Optional, Tuple, List, Set, Dict
+
+import rdflib
+from neurondm import orders
+from neurondm.core import Config, graphBase
+from neurondm.core import OntTerm, OntId, RDFL
 from pyontutils.core import OntGraph, OntResIri, OntResPath
 from pyontutils.namespaces import rdfs, ilxtr
-from neurondm.core import Config, graphBase, log
-from neurondm.core import OntTerm, OntId, RDFL
-import csv
 
+from composer.services.cs_ingestion.exceptions import NeuronDMInconsistency
+from composer.services.cs_ingestion.helpers import VALIDATION_ERRORS, DESTINATIONS, VIAS, ORIGINS
+from composer.services.cs_ingestion.logging_service import LoggerService, AXIOM_NOT_FOUND
+from composer.services.cs_ingestion.models import NeuronDMVia, NeuronDMOrigin, NeuronDMDestination, LoggableAnomaly, \
+    AxiomType, ValidationErrors, Severity
 
-def multi_orig_dest(neuron):
-    for dim in neuron.edges:
-        if 'hasAxonPre' in dim or 'hasAxonSens' in dim or 'hasSoma' in dim:
-            objs = list(neuron.getObjects(dim))
-            if len(objs) > 1:
-                return True
+logger_service: Optional[LoggerService] = None
 
 
 def makelpesrdf():
     collect = []
+
     def lpes(neuron, predicate):
         """ get predicates from python bags """
         # TODO could add expected cardinality here if needed
@@ -31,98 +35,330 @@ def makelpesrdf():
     return lpes, lrdf, collect
 
 
-def for_composer(n, cull=False):
+def for_composer(n):
     lpes, lrdf, collect = makelpesrdf()
+
+    try:
+        origins, vias, destinations, validation_errors = get_connections(n, lambda predicate: lpes(n, predicate))
+    except NeuronDMInconsistency as e:
+        if logger_service:
+            logger_service.add_anomaly(LoggableAnomaly(e.statement_id, e.entity_id, e.message, severity=Severity.ERROR))
+        return None
+
     fc = dict(
-        id = str(n.id_),
-        label = str(n.origLabel),
-        origin = lpes(n, ilxtr.hasSomaLocatedIn),
-        dest = (
-            # XXX looking at this there seems to be a fault assumption that
-            # there is only a single destination type per statement, this is
-            # not the case, there is destination type per destination
-            [dict(loc=l, type='AXON-T') for l in lpes(n, ilxtr.hasAxonPresynapticElementIn)] +
-            # XXX I strongly reccoment renaming this to SENSORY-T so that the
-            # short forms are harder to confuse A-T and S-T
-            [dict(loc=l, type='AFFERENT-T') for l in lpes(n, ilxtr.hasAxonSensorySubcellularElementIn)]
-        ),
-        path = (  # TODO pull ordering from partial orders (not implemented in core atm)
-            [dict(loc=l, type='AXON') for l in lpes(n, ilxtr.hasAxonLocatedIn)] +
-            # XXX dendrites don't really ... via ... they are all both terminal and via at the same time ...
-            [dict(loc=l, type='DENDRITE') for l in lpes(n, ilxtr.hasDendriteLocatedIn)]
-        ),
-        #laterality = lpes(n, ilxtr.hasLaterality),  # left/rigth tricky ?
-        #projection_laterality = lpes(n, ilxtr.???),  # axon located in contra ?
-        species =            lpes(n, ilxtr.hasInstanceInTaxon),
-        sex =                lpes(n, ilxtr.hasBiologicalSex),
-        circuit_type =       lpes(n, ilxtr.hasCircuitRolePhenotype),
-        phenotype =          lpes(n, ilxtr.hasAnatomicalSystemPhenotype),  # current meaning of composer phenotype
-        anatomical_system =  lpes(n, ilxtr.hasAnatomicalSystemPhenotype),
-        # there are a number of dimensions that we aren't converting right now
-        dont_know_fcrp =     lpes(n, ilxtr.hasFunctionalCircuitRolePhenotype),
-        other_phenotype = (  lpes(n, ilxtr.hasPhenotype)
-                           + lpes(n, ilxtr.hasMolecularPhenotype)
-                           + lpes(n, ilxtr.hasProjectionPhenotype)),
-        forward_connection = lpes(n, ilxtr.hasForwardConnectionPhenotype),
-
-        # direct references from individual individual neurons
-        provenance =      lrdf(n, ilxtr.literatureCitation),
-        sentence_number = lrdf(n, ilxtr.sentenceNumber),
-        note_alert =      lrdf(n, ilxtr.alertNote),
-        # XXX provenance from ApiNATOMY models as a whole is not ingested
-        # right now because composer lacks support for 1:n from neuron to
-        # prov, (or rather lacks prov collections) and because it attaches
-        # prov to the sentece, which does not exist for all neurons
-
-        # TODO more ...
-        # notes = ?
-
-        # for _ignore, hasClassificationPhenotype is used for ApiNATOMY
-        # unlikely to be encountered for real neurons any time soon
-        _ignore = lpes(n, ilxtr.hasClassificationPhenotype),  # used to ensure we account for all phenotypes
+        id=str(n.id_),
+        label=str(n.origLabel),
+        origins=origins,
+        destinations=destinations,
+        vias=vias,
+        species=lpes(n, ilxtr.hasInstanceInTaxon),
+        sex=lpes(n, ilxtr.hasBiologicalSex),
+        circuit_type=lpes(n, ilxtr.hasCircuitRolePhenotype),
+        circuit_role=lpes(n, ilxtr.hasFunctionalCircuitRolePhenotype),
+        phenotype=lpes(n, ilxtr.hasAnatomicalSystemPhenotype),
+        # classification_phenotype=lpes(n, ilxtr.hasClassificationPhenotype),
+        other_phenotypes=(lpes(n, ilxtr.hasPhenotype)
+                          + lpes(n, ilxtr.hasMolecularPhenotype)
+                          + lpes(n, ilxtr.hasProjectionPhenotype)),
+        forward_connection=lpes(n, ilxtr.hasForwardConnectionPhenotype),
+        provenance=lrdf(n, ilxtr.literatureCitation),
+        sentence_number=lrdf(n, ilxtr.sentenceNumber),
+        note_alert=lrdf(n, ilxtr.alertNote),
+        validation_errors=validation_errors,
     )
-    npo = set((p.e, p.p) for p in n.pes)
-    cpo = set(collect)
-    unaccounted_pos = npo - cpo
-    if unaccounted_pos:
-        log.warning(
-            (n.id_, [[n.in_graph.namespace_manager.qname(e) for e in pos]
-                     for pos in unaccounted_pos]))
-    return {k:v for k, v in fc.items() if v} if cull else fc
+
+    return fc
 
 
-def location_summary(neurons, services, anatent_simple=False):
-    import csv
-    OntTerm.query._services = services
-    locations = sorted(set(
-        OntTerm(pe.p) for n in neurons for pe in n.pes
-        if pe.e in n._location_predicates))
-    [_.fetch() for _ in locations]
-    def key(t):
-        return (t.prefix, t.label[0].lower()
-                if isinstance(t, tuple)
-                else t.lower())
+def get_connections(n, lpes):
+    partial_order = n.partialOrder()
 
-    if anatent_simple:
-        header = 'label', 'curie', 'iri'
-        rows = (
-            [header] +
-            [(_.label, _.curie, _.iri) for _ in sorted(locations, key=key)])
-        with open('/tmp/npo-nlp-apinat-location-summary.csv', 'wt') as f:
-            csv.writer(f, lineterminator='\n').writerows(rows)
+    if partial_order is None or len(partial_order) == 0:
+        raise NeuronDMInconsistency(n.identifier, None, "No partial order found")
 
+    origins_from_axioms = lpes(ilxtr.hasSomaLocatedIn)
+    destinations_from_axioms = create_uri_type_dict(lpes, {ilxtr.hasAxonPresynapticElementIn: 'AXON-T',
+                                                           ilxtr.hasAxonSensorySubcellularElementIn: 'AFFERENT-T'})
+    vias_from_axioms = create_uri_type_dict(lpes,
+                                            {ilxtr.hasAxonLocatedIn: 'AXON', ilxtr.hasDendriteLocatedIn: 'DENDRITE'})
+
+    tmp_origins, tmp_vias, tmp_destinations, validation_errors = process_connections(partial_order,
+                                                                                     set(origins_from_axioms),
+                                                                                     vias_from_axioms,
+                                                                                     destinations_from_axioms
+                                                                                     )
+
+    validation_errors = validate_partial_order_and_axioms(origins_from_axioms, vias_from_axioms,
+                                                          destinations_from_axioms, tmp_origins,
+                                                          tmp_vias, tmp_destinations, validation_errors)
+
+    origins = merge_origins(tmp_origins)
+    vias = merge_vias(tmp_vias)
+    destinations = merge_destinations(tmp_destinations)
+
+    origins, vias, destinations = update_from_entities(origins, vias, destinations)
+
+    return origins, vias, destinations, validation_errors
+
+
+def create_uri_type_dict(lpes_func, predicate_type_map):
+    uri_type_dict = {}
+    for predicate, type_name in predicate_type_map.items():
+        for uri in lpes_func(predicate):
+            uri_type_dict[uri] = type_name
+    return uri_type_dict
+
+
+def process_connections(path, origins_from_axioms: Set[str], vias_from_axioms: Dict[str, str],
+                        destinations_from_axioms: Dict[str, str], from_entities: Optional[Set[str]] = None,
+                        depth: int = 0, result: Optional[Dict] = None) -> Tuple[
+    List[NeuronDMOrigin], List[NeuronDMVia], List[NeuronDMDestination], ValidationErrors]:
+    if result is None:
+        result = {ORIGINS: [], DESTINATIONS: [], VIAS: [], VALIDATION_ERRORS: ValidationErrors()}
+
+    if isinstance(path, tuple):
+        if path[0] == rdflib.term.Literal('blank'):
+            for remaining_path in path[1:]:
+                process_connections(remaining_path, origins_from_axioms, vias_from_axioms, destinations_from_axioms,
+                                    from_entities, depth=depth, result=result)
+        else:
+            current_entity = path[0]
+
+            current_entity_uri, current_entity_axiom_types = get_current_entity_metadata(current_entity,
+                                                                                         origins_from_axioms,
+                                                                                         vias_from_axioms,
+                                                                                         destinations_from_axioms)
+
+            if not current_entity_uri or len(current_entity_axiom_types) == 0:
+                result[VALIDATION_ERRORS].axiom_not_found.add(entity_to_string(current_entity))
+                if logger_service:
+                    logger_service.add_anomaly(LoggableAnomaly(None, current_entity, AXIOM_NOT_FOUND))
+            else:
+                from_entities = from_entities or set()
+
+                axiom_type = get_axiom_type(current_entity_axiom_types, path, depth)
+
+                update_result(current_entity_uri, axiom_type, from_entities, depth, result, vias_from_axioms,
+                              destinations_from_axioms)
+
+                depth += 1
+
+            next_from_entities = {current_entity_uri} if current_entity_uri else from_entities
+            # Process the next level structures, carrying over from_entities as a set
+            for remaining_path in path[1:]:
+                process_connections(remaining_path, origins_from_axioms, vias_from_axioms, destinations_from_axioms,
+                                    next_from_entities, depth, result)
+
+    return result[ORIGINS], result[VIAS], result[DESTINATIONS], result[VALIDATION_ERRORS]
+
+
+def entity_to_string(entity):
+    if isinstance(entity, orders.rl):
+        return f"{entity.region} (region) nor {entity.layer} (layer)"
     else:
-        header = 'o', 'o_label', 'o_synonym'
-        rows = (
-            [header] +
-            [(_.iri, _.label, syn) for _ in sorted(locations, key=key)
-             for syn in _.synonyms])
-        with open('/tmp/anatomical_entities.csv', 'wt') as f:
-            csv.writer(f, lineterminator='\n').writerows(rows)
+        return str(entity)
 
 
-def main(local=False, anatomical_entities=False, anatent_simple=False):
-    # if (local := True, anatomical_entities := True, anatent_simple := False):
+def get_current_entity_metadata(current_entity, origins_from_axioms: Set[str], vias_from_axioms: Dict[str, str],
+                                destinations_from_axioms: Dict[str, str]) -> Tuple[Optional[str], List[AxiomType]]:
+    primary_uri = current_entity.toPython() if not isinstance(current_entity,
+                                                              orders.rl) else current_entity.region.toPython()
+    secondary_uri = current_entity.layer.toPython() if isinstance(current_entity, orders.rl) else None
+
+    uris_in_axioms = [
+        (origins_from_axioms, AxiomType.ORIGIN),
+        (vias_from_axioms, AxiomType.VIA),
+        (destinations_from_axioms, AxiomType.DESTINATION),
+    ]
+
+    uris_found = {}
+    for uri_set, node_type in uris_in_axioms:
+        # Check if the URIs are in the current set of axioms
+        if primary_uri in uri_set or secondary_uri in uri_set:
+            # Prefer layer if both region and layer URIs are found
+            matched_uri = secondary_uri if secondary_uri in uri_set else primary_uri
+            uris_found.setdefault(matched_uri, []).append(node_type)
+
+    if not uris_found:
+        return None, []
+
+    matched_uri, matched_types = next(iter(uris_found.items()), (None, []))
+    return matched_uri, matched_types
+
+
+def get_axiom_type(current_entity_axiom_types: List[AxiomType], path, depth: int) -> Optional[AxiomType]:
+    # Determine the most likely axiom type based on the path context
+    if not path[1:]:
+        # If there's nothing after the current entity, it's most likely a Destination
+        most_likely_type = AxiomType.DESTINATION
+    elif depth == 0:
+        # If there's nothing before the current entity, it's most likely an Origin
+        most_likely_type = AxiomType.ORIGIN
+    else:
+        # Otherwise, it's most likely a Via
+        most_likely_type = AxiomType.VIA
+
+    # Check if the most likely type is possible
+    if most_likely_type in current_entity_axiom_types:
+        return most_likely_type
+
+    # If the most likely type is not possible, choose the first possible one in order of Origin, Via, Destination
+    for axiom_type in [AxiomType.ORIGIN, AxiomType.VIA, AxiomType.DESTINATION]:
+        if axiom_type in current_entity_axiom_types:
+            return axiom_type
+
+    return None
+
+
+def update_result(current_entity_uri: str, axiom_type: AxiomType, from_entities: Set[str], depth: int, result: Dict,
+                  vias_from_axioms: Dict[str, str],
+                  destinations_from_axioms: Dict[str, str]) -> Dict:
+    if axiom_type == AxiomType.ORIGIN:
+        result[ORIGINS].append(NeuronDMOrigin({current_entity_uri}))
+    elif axiom_type == AxiomType.VIA:
+        result[VIAS].append(
+            NeuronDMVia({current_entity_uri}, from_entities, depth, vias_from_axioms.get(current_entity_uri)))
+    elif axiom_type == AxiomType.DESTINATION:
+        result[DESTINATIONS].append(
+            NeuronDMDestination({current_entity_uri}, from_entities, destinations_from_axioms.get(current_entity_uri)))
+    return result
+
+
+def validate_partial_order_and_axioms(origins_from_axioms, vias_from_axioms, destinations_from_axioms, tmp_origins,
+                                      tmp_vias, tmp_destinations,
+                                      validation_errors: ValidationErrors) -> ValidationErrors:
+    anatomical_uris_origins = extract_anatomical_uris(tmp_origins)
+    anatomical_uris_vias = extract_anatomical_uris(tmp_vias)
+    anatomical_uris_destinations = extract_anatomical_uris(tmp_destinations)
+
+    validate_partial_order_and_axioms_aux(set(origins_from_axioms), anatomical_uris_origins, "origins",
+                                          validation_errors)
+
+    validate_partial_order_and_axioms_aux(set(vias_from_axioms.keys()), anatomical_uris_vias, "vias", validation_errors)
+
+    validate_partial_order_and_axioms_aux(set(destinations_from_axioms.keys()), anatomical_uris_destinations,
+                                          "destinations",
+                                          validation_errors)
+
+    return validation_errors
+
+
+def validate_partial_order_and_axioms_aux(axiom_uris: Set[str], actual_uris: Set[str], category: str,
+                                          validation_errors: ValidationErrors):
+    missing_uris = axiom_uris - actual_uris
+    extra_uris = actual_uris - axiom_uris
+    if missing_uris:
+        validation_errors.non_specified.append(
+            f"Missing anatomical URIs in {category}: {', '.join(missing_uris)}")
+    if extra_uris:
+        validation_errors.non_specified.append(
+            f"Unexpected anatomical URIs in {category}: {', '.join(extra_uris)}"
+        )
+
+
+def extract_anatomical_uris(entities_list):
+    return set(uri for entity in entities_list for uri in entity.anatomical_entities)
+
+
+def merge_origins(origins: List[NeuronDMOrigin]) -> NeuronDMOrigin:
+    merged_anatomical_entities = set()
+    for origin in origins:
+        merged_anatomical_entities.update(origin.anatomical_entities)
+
+    return NeuronDMOrigin(merged_anatomical_entities)
+
+
+def merge_vias(vias: List[NeuronDMVia]) -> List[NeuronDMVia]:
+    vias = merge_vias_by_from_entities(vias)
+    vias = merge_vias_by_anatomical_entities(vias)
+    return assign_unique_order_to_vias(vias)
+
+
+def merge_vias_by_from_entities(vias: List[NeuronDMVia]) -> List[NeuronDMVia]:
+    merged_vias = {}
+    for via in vias:
+        key = (frozenset(via.anatomical_entities), via.type)
+        if key not in merged_vias:
+            merged_vias[key] = NeuronDMVia(via.anatomical_entities, set(), via.order, via.type)
+        merged_vias[key].from_entities.update(via.from_entities)
+        merged_vias[key].order = max(merged_vias[key].order, via.order)
+
+    return list(merged_vias.values())
+
+
+def merge_vias_by_anatomical_entities(vias: List[NeuronDMVia]) -> List[NeuronDMVia]:
+    merged_vias = {}
+    for via in vias:
+        key = (via.type, frozenset(via.from_entities))
+        if key not in merged_vias:
+            merged_vias[key] = NeuronDMVia(set(), via.from_entities, via.order, via.type)
+        merged_vias[key].anatomical_entities.update(via.anatomical_entities)
+        merged_vias[key].order = max(merged_vias[key].order, via.order)
+
+    return list(merged_vias.values())
+
+
+def assign_unique_order_to_vias(vias: List[NeuronDMVia]) -> List[NeuronDMVia]:
+    # Sort vias by their original order
+    sorted_vias = sorted(vias, key=lambda x: x.order)
+
+    # Assign new orders to maintain uniqueness and relative order
+    for new_order, via in enumerate(sorted_vias):
+        via.order = new_order
+
+    return sorted_vias
+
+
+def merge_destinations(destinations: List[NeuronDMDestination]) -> List[NeuronDMDestination]:
+    destinations = merge_destinations_by_from_entities(destinations)
+    return merge_destinations_by_anatomical_entities(destinations)
+
+
+def merge_destinations_by_anatomical_entities(destinations: List[NeuronDMDestination]) -> List[NeuronDMDestination]:
+    merged_destinations = {}
+    for destination in destinations:
+        key = (frozenset(destination.anatomical_entities), destination.type)
+        if key not in merged_destinations:
+            merged_destinations[key] = NeuronDMDestination(destination.anatomical_entities, set(), destination.type)
+        merged_destinations[key].from_entities.update(destination.from_entities)
+
+    return list(merged_destinations.values())
+
+
+def merge_destinations_by_from_entities(destinations: List[NeuronDMDestination]) -> List[NeuronDMDestination]:
+    merged_destinations = {}
+    for destination in destinations:
+        key = frozenset(destination.from_entities)
+        if key not in merged_destinations:
+            merged_destinations[key] = NeuronDMDestination(set(), destination.from_entities, destination.type)
+        merged_destinations[key].anatomical_entities.update(destination.anatomical_entities)
+
+    return list(merged_destinations.values())
+
+
+def update_from_entities(origins: NeuronDMOrigin, vias: List[NeuronDMVia], destinations: List[NeuronDMDestination]):
+    # Step 1: Initialize "previous anatomical entities" with origins
+    previous_anatomical_entities = origins.anatomical_entities
+
+    # Step 2: Process vias
+    for via in sorted(vias, key=lambda v: v.order):
+        if via.from_entities == previous_anatomical_entities:
+            via.from_entities = set()
+        previous_anatomical_entities = via.anatomical_entities
+
+    # Step 3: Process destinations
+    for destination in destinations:
+        if destination.from_entities == previous_anatomical_entities:
+            destination.from_entities = set()
+
+    return origins, vias, destinations
+
+
+## Based on:
+## https://github.com/tgbugs/pyontutils/blob/30c415207b11644808f70c8caecc0c75bd6acb0a/neurondm/docs/composer.py#L668-L698
+def main(local=False, logger_service_param=Optional[LoggerService]):
+    global logger_service
+    logger_service = logger_service_param
 
     config = Config('random-merge')
     g = OntGraph()  # load and query graph
@@ -171,31 +407,12 @@ def main(local=False, anatomical_entities=False, anatent_simple=False):
         [g.add((s, rdfs.label, o)) for s, o in ori.graph[:rdfs.label:]]
 
     config.load_existing(g)
-    neurons = config.neurons()  # scigraph required here if deps not removed above
+    neurons = config.neurons()
 
-    # ingest to composer starts here
-    mvp_ingest = [n for n in neurons if not multi_orig_dest(n)]
+    fcs = [for_composer(n) for n in neurons]
+    composer_statements = [item for item in fcs if item is not None]
 
-    dims = set(p for n in neurons for p in n.edges)  # for reference
-    fcs = [for_composer(n) for n in mvp_ingest]
-    _fcne = [for_composer(n, cull=True) for n in mvp_ingest]  # exclude empties for easier manual review
-
-    # example neuron
-    n = mvp_ingest[0]
-    fc = for_composer(n)
-
-    if anatomical_entities:
-        location_summary(neurons, _noloc_query_services, anatent_simple)
-
-
-    myFile = open('./composer/services/cs_ingestion/neurons.csv', 'w')
-    writer = csv.DictWriter(myFile, fieldnames=['id','label', 'origin','dest', 'path', 'species', 'sex', 'circuit_type', 'phenotype', 'anatomical_system',  'dont_know_fcrp', 'other_phenotype','forward_connection', 'provenance', 'sentence_number', 'note_alert', '_ignore'])
-    writer.writeheader()
-    writer.writerows(fcs)
-    myFile.close()
-
-   # breakpoint()
-    return fcs
+    return composer_statements
 
 
 if __name__ == '__main__':

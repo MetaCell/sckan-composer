@@ -18,31 +18,31 @@ export default function CustomTextField({
   id,
   value,
   placeholder,
-  disabled,
   onChange,
   onBlur,
   onFocus,
-  options: { label, multiline, rows },
+  options: { label, multiline, rows , isDisabled},
 }: any) {
-
 
   return (
     <FormControl variant="standard">
         <Typography variant="h6" fontWeight={500} marginBottom={2} color={vars.titleFontColor}>
           {label}
         </Typography>
-
-      <StyledInput
-        onChange={(event) => onChange(event.target.value)}
-        id="custom-input"
-        placeholder={placeholder}
-        multiline={multiline}
-        rows={rows}
-        value={value ? value : ''}
-        disabled={disabled}
-        onBlur={(e=>onBlur(id,e.target.value))}
-        onFocus={(e=>onFocus(id,e.target.value))}
-      />
+      {
+        isDisabled ? <Typography>{value ? value : '-'}</Typography> : <StyledInput
+          onChange={(event) => onChange(event.target.value)}
+          id="custom-input"
+          placeholder={placeholder}
+          multiline={multiline}
+          rows={rows}
+          value={value ? value : ''}
+          disabled={isDisabled}
+          onBlur={(e=>onBlur(id,e.target.value))}
+          onFocus={(e=>onFocus(id,e.target.value))}
+        />
+      }
+      
     </FormControl>
   );
 }

@@ -7,8 +7,6 @@ import Typography from '@mui/material/Typography';
 import logo from '../assets/logo.svg'
 import Grid from '@mui/material/Grid';
 
-import { Link } from 'react-router-dom'
-
 import { logout } from '../services/UserService'
 import { userProfile } from '../services/UserService'
 

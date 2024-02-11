@@ -13,3 +13,9 @@ code {
 @supports (font-variation-settings: normal) {
   :root { font-family: 'Inter var', sans-serif; }
 }
+
+.graphContainer {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}

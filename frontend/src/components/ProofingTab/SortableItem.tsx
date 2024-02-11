@@ -1,17 +1,15 @@
 import React from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Box } from "@mui/material";
 import { IconButton, TableRow as MuiTableRow, TableCell } from "@mui/material";
 import DragHandleIcon from "@mui/icons-material/DragHandle";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import Typography from "@mui/material/Typography";
 
 export function SortableItem(props: any) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: props.id });
 
-  const { id, children, onDropIndexClick, disabled, hideDeleteBtn } = props;
+  const { children, onDropIndexClick, isDisabled, hideDeleteBtn } = props;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -23,6 +21,7 @@ export function SortableItem(props: any) {
     backgroundColor: "common.white",
     border: "1px solid #EAECF0",
     borderRadius: "12px",
+    display: 'flex', alignItems: 'center'
   });
 
   return (
@@ -37,7 +36,7 @@ export function SortableItem(props: any) {
         >
           <IconButton
             size="small"
-            disabled={disabled}
+            disabled={isDisabled}
             {...attributes}
             {...listeners}
             sx={{ p: 0 }}
@@ -52,6 +51,10 @@ export function SortableItem(props: any) {
         width="100%"
         sx={{
           borderBottom: 0,
+          display: "flex",
+          "& .form-group": {
+            width: "100%",
+          },
         }}
       >
         {children}
@@ -67,7 +70,7 @@ export function SortableItem(props: any) {
           <IconButton
             size="small"
             onClick={onDropIndexClick}
-            disabled={disabled}
+            disabled={isDisabled}
           >
             <DeleteOutlineOutlinedIcon fontSize="small" />
           </IconButton>
