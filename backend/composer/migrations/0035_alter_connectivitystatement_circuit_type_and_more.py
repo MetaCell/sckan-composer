@@ -12,7 +12,7 @@ def change_not_specified_to_null(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("composer", "0032_alter_connectivitystatement_projection"),
+        ("composer", "0034_remove_connectivitystatement_state_valid_and_more"),
     ]
 
     operations = [
