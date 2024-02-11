@@ -24,7 +24,7 @@ from ..models import (
 from ..services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
 from ..services.errors_service import get_connectivity_errors
-from ..utils import join_entities, get_property_value, get_method_value
+from ..utils import join_entities
 
 
 # MixIns
@@ -488,14 +488,14 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
 
     
     def create_statement_preview(self, instance, journey):
-        sex = get_property_value(instance, 'sex', 'name')
+        sex = instance.sex.sex_str if instance.sex else None
 
         species_list = [specie.name for specie in instance.species.all()]
         species = join_entities(species_list)
         if not species:
             species = ""
 
-        phenotype = get_property_value(instance, 'phenotype', 'name')
+        phenotype = instance.phenotype.phenotype_str if instance.phenotype else None
         origin_names = [origin.name for origin in instance.origins.all()]
         origins = join_entities(origin_names)
         if not origins:

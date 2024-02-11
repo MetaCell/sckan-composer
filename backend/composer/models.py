@@ -154,6 +154,10 @@ class Phenotype(models.Model):
 
     def __str__(self):
         return self.name
+    
+    @property
+    def phenotype_str(self):
+        return str(self.name) if self.name else ''
 
     class Meta:
         ordering = ["name"]
@@ -182,6 +186,10 @@ class Sex(models.Model):
 
     def __str__(self):
         return self.name
+    
+    @property
+    def sex_str(self):
+        return str(self.name) if self.name else ''
 
     class Meta:
         ordering = ["name"]
