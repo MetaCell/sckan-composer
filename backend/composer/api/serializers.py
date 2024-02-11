@@ -510,19 +510,19 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         journey_sentence = ', '.join(journey)
 
         # Creating the statement
-        if sex is not None or species != "":
+        if sex or species != "":
             statement = f"In {sex or ''} {species}, the {phenotype.lower() if phenotype else '' } connection goes {journey_sentence}.\n"
         else:
             statement = f"A {phenotype} connection goes {journey_sentence}.\n"
         
         statement += f"This "
-        if projection is not None:
+        if projection:
             statement += f"{projection.lower() or ''} "
-        if circuit_type is not None:
+        if circuit_type:
             statement += f"{circuit_type.lower() or ''} "
 
         statement += f"connection projects from the {origins}."
-        if laterality_description is not None:
+        if laterality_description:
             statement = statement[:-1] + f" and is found {laterality_description or ''}.\n"
 
         if apinatomy:
