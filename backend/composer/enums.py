@@ -40,11 +40,12 @@ class DestinationType(models.TextChoices):
 
 class SentenceState(models.TextChoices):
     OPEN = "open"
-    TO_BE_REVIEWED = "to_be_reviewed"
+    NEEDS_FURTHER_REVIEW = "needs_further_review"
     COMPOSE_LATER = "compose_later"
+    READY_TO_COMPOSE = "ready_to_compose"
     COMPOSE_NOW = "compose_now"
+    COMPLETED = "completed"
     EXCLUDED = "excluded"
-    DUPLICATE = "duplicate"
 
 
 class CSState(models.TextChoices):

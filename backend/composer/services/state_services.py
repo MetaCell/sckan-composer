@@ -7,6 +7,7 @@ from django.db.models import Q, Count
 from composer.enums import CSState
 from .graph_service import generate_paths, consolidate_paths
 from ..enums import SentenceState
+from ..models import Profile
 
 
 class BaseServiceMixin:
@@ -80,13 +81,39 @@ class SentenceService(StateServiceMixin):
 
     @staticmethod
     def can_be_reviewed(sentence):
-        # return True if the sentence can go to state to_be_reviewed
+        # return True if the sentence can go to state needs_further_review
         # it should have at least one provenance (pmid, pmcid, doi) and at least one connectivity statement
         return (
                 sentence.pmid is not None
                 or sentence.pmcid is not None
                 or sentence.doi is not None
         ) and (sentence.connectivitystatement_set.count() > 0)
+
+    @staticmethod
+    def has_permission_to_transition_to_needs_further_review(instance, user) -> bool:
+        profile = Profile.objects.get(user=user)
+
+        return (profile.is_triage_operator
+                or profile.is_reviewer and instance.state == SentenceState.READY_TO_COMPOSE)
+
+    @staticmethod
+    def has_permission_to_transition_to_compose_later(instance, user) -> bool:
+        profile = Profile.objects.get(user=user)
+
+        return (profile.is_triage_operator or
+                profile.is_reviewer and instance.state == SentenceState.NEEDS_FURTHER_REVIEW)
+
+    @staticmethod
+    def has_permission_to_transition_to_ready_to_compose(instance, user) -> bool:
+        profile = Profile.objects.get(user=user)
+
+        if profile.is_triage_operator and instance.state == SentenceState.COMPOSE_LATER:
+            return True
+
+        if profile.is_reviewer and instance.state in [SentenceState.OPEN, SentenceState.NEEDS_FURTHER_REVIEW]:
+            return True
+
+        return False
 
     @staticmethod
     def can_be_composed(sentence):
@@ -102,10 +129,18 @@ class SentenceService(StateServiceMixin):
 
     @staticmethod
     def has_permission_to_transition_to_compose_now(sentence, user):
-        # only system users can transition from OPEN to COMPOSE_NOW for the statement ingestion process
-        if sentence.state == SentenceState.OPEN:
-            return user.username == 'system'
-        return True
+        profile = Profile.objects.get(user=user)
+        return profile.is_reviewer or profile.is_triage_operator
+
+    @staticmethod
+    def has_permission_to_transition_to_completed(sentence, user):
+        profile = Profile.objects.get(user=user)
+        return profile.is_reviewer or profile.is_triage_operator
+
+    @staticmethod
+    def has_permission_to_transition_to_excluded(sentence, user):
+        profile = Profile.objects.get(user=user)
+        return profile.is_reviewer or profile.is_triage_operator
 
 
 class ConnectivityStatementService(StateServiceMixin):
@@ -166,7 +201,8 @@ class ConnectivityStatementService(StateServiceMixin):
     def has_permission_to_transition_to_compose_now(connectivity_statement, user):
         # if state in NPO APPROVED or EXPORTED and use is a staff user then also allow transition to compose_now
         # other users should not be able to transition to compose_now from these 2 states
-        return user and (connectivity_statement.state not in (CSState.NPO_APPROVED, CSState.EXPORTED) or user.is_staff)
+        return user and (
+                connectivity_statement.state not in (CSState.NPO_APPROVED, CSState.EXPORTED) or user.is_staff)
 
     @staticmethod
     def has_permission_to_transition_to_exported(connectivity_statement, user):

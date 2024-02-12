@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models, transaction
-from django.db.models import Q, Max
+from django.db.models import Q
 from django.db.models.expressions import F
 from django.db.models.functions import Upper
 from django.forms.widgets import Input as InputWidget
@@ -154,7 +154,7 @@ class Phenotype(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     @property
     def phenotype_str(self):
         return str(self.name) if self.name else ''
@@ -186,7 +186,7 @@ class Sex(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     @property
     def sex_str(self):
         return str(self.name) if self.name else ''
@@ -283,47 +283,60 @@ class Sentence(models.Model):
         return self.title
 
     # states
-    @transition(
-        field=state,
-        source=[SentenceState.TO_BE_REVIEWED, SentenceState.COMPOSE_LATER],
-        target=SentenceState.OPEN,
-    )
-    def open(self, *args, **kwargs):
-        ...
 
     @transition(
         field=state,
-        source=SentenceState.OPEN,
-        target=SentenceState.TO_BE_REVIEWED,
+        source=[SentenceState.OPEN, SentenceState.READY_TO_COMPOSE, SentenceState.COMPOSE_LATER,
+                SentenceState.EXCLUDED],
+        target=SentenceState.NEEDS_FURTHER_REVIEW,
         conditions=[SentenceService.can_be_reviewed],
+        permission=SentenceService.has_permission_to_transition_to_needs_further_review,
     )
-    def to_be_reviewed(self, *args, **kwargs):
+    def needs_further_review(self, *args, **kwargs):
         ...
 
     @transition(
-        field=state, source=SentenceState.OPEN, target=SentenceState.COMPOSE_LATER
+        field=state, source=[SentenceState.OPEN, SentenceState.NEEDS_FURTHER_REVIEW],
+        target=SentenceState.COMPOSE_LATER,
+        permission=SentenceService.has_permission_to_transition_to_compose_later,
     )
     def compose_later(self, *args, **kwargs):
         ...
 
     @transition(
+        field=state, source=[SentenceState.OPEN, SentenceState.COMPOSE_LATER,
+                             SentenceState.NEEDS_FURTHER_REVIEW],
+        target=SentenceState.READY_TO_COMPOSE,
+        permission=SentenceService.has_permission_to_transition_to_ready_to_compose,
+    )
+    def ready_to_compose(self, *args, **kwargs):
+        ...
+
+    @transition(
         field=state,
-        source=[SentenceState.TO_BE_REVIEWED, SentenceState.OPEN],
-        permission=lambda instance, user: SentenceService.has_permission_to_transition_to_compose_now(
-            instance, user
-        ),
+        source=SentenceState.READY_TO_COMPOSE,
         target=SentenceState.COMPOSE_NOW,
         conditions=[SentenceService.can_be_composed],
+        permission=SentenceService.has_permission_to_transition_to_compose_now,
+
     )
     def compose_now(self, *args, **kwargs):
         SentenceService(self).do_transition_compose_now(*args, **kwargs)
 
-    @transition(field=state, source=SentenceState.OPEN, target=SentenceState.EXCLUDED)
-    def excluded(self, *args, **kwargs):
+    @transition(
+        field=state,
+        source=[SentenceState.OPEN, SentenceState.COMPOSE_NOW],
+        target=SentenceState.COMPLETED,
+        permission=SentenceService.has_permission_to_transition_to_completed,
+
+    )
+    def completed(self, *args, **kwargs):
         ...
 
-    @transition(field=state, source=SentenceState.OPEN, target=SentenceState.DUPLICATE)
-    def duplicate(self, *args, **kwargs):
+    @transition(field=state, source=[SentenceState.OPEN, SentenceState.COMPLETED],
+                target=SentenceState.EXCLUDED,
+                permission=SentenceService.has_permission_to_transition_to_excluded)
+    def excluded(self, *args, **kwargs):
         ...
 
     def assign_owner(self, request):
