@@ -62,6 +62,7 @@ const StatementForm = (props: any) => {
       isDisabled,
       label: "Circuit Type",
       classNames: "col-xs-12 col-md-6",
+      placeholder: "Enter Circuit Type",
     },
   };
 
@@ -71,6 +72,7 @@ const StatementForm = (props: any) => {
       isDisabled,
       label: "Laterality",
       classNames: "col-xs-12 col-md-6",
+      placeholder: "Enter Laterality",
     },
   };
 
@@ -80,6 +82,7 @@ const StatementForm = (props: any) => {
       isDisabled,
       label: "Projection",
       classNames: "col-xs-12 col-md-6",
+      placeholder: "Enter Projection",
     },
   };
 
@@ -652,6 +655,20 @@ const StatementForm = (props: any) => {
       },
     },
   };
+
+  // Add null option to the fields which have null type in dropdown.
+  Object.keys(copiedSchema.properties).forEach((key) => {
+    if (copiedSchema.properties[key].type.includes("null") && copiedSchema.properties[key]?.enum && copiedSchema.properties[key]?.enumNames) {
+      copiedSchema.properties[key].enum.push(null);
+      copiedSchema.properties[key].enumNames.push("---------");
+    }
+  });
+
+  Object.keys(copiedUISchema).forEach((key) => {
+    if (copiedUISchema[key]["ui:options"] && copiedUISchema[key]["ui:options"].data) {
+      copiedUISchema[key]["ui:options"].data.push({ label: "---------", value: null })
+    }
+  });
 
   const widgets = {
     AnatomicalEntitiesField,

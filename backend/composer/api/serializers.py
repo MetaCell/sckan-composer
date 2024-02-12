@@ -486,48 +486,49 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             self.context['journey'] = instance.get_journey()
         return self.create_statement_preview(instance, self.context['journey'])
 
+    
     def create_statement_preview(self, instance, journey):
-        sex = instance.sex.name if instance.sex else ""
+        sex = instance.sex.sex_str if instance.sex else None
+
         species_list = [specie.name for specie in instance.species.all()]
         species = join_entities(species_list)
         if not species:
             species = ""
 
-        phenotype = instance.phenotype.name.lower() if instance.phenotype else ""
+        phenotype = instance.phenotype.phenotype_str if instance.phenotype else ''
         origin_names = [origin.name for origin in instance.origins.all()]
         origins = join_entities(origin_names)
         if not origins:
             origins = ""
 
-        circuit_type = instance.get_circuit_type_display().lower() if instance.circuit_type else ""
-        projection = instance.get_projection_display().lower() if instance.projection else ""
+        circuit_type = instance.get_circuit_type_display() if instance.circuit_type else None
+        projection = instance.get_projection_display() if instance.projection else None
 
         laterality_description = instance.get_laterality_description()
-        if not laterality_description:
-            laterality_description = ""
 
         apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
         journey_sentence = ', '.join(journey)
 
         # Creating the statement
-        if sex != "" or species != "":
-            statement = f"In {sex} {species}, the {phenotype} connection goes {journey_sentence}.\n"
+        if sex or species != "":
+            statement = f"In {sex or ''} {species}, the {phenotype.lower()} connection goes {journey_sentence}.\n"
         else:
-            statement = f"A {phenotype} connection goes {journey_sentence}.\n"
+            statement = f"A {phenotype.lower()} connection goes {journey_sentence}.\n"
+        
         statement += f"This "
-        if projection != "not specified":
-            statement += f"{projection} "
-        if circuit_type != "not specified":
-            statement += f"{circuit_type} "
+        if projection:
+            statement += f"{projection.lower()} "
+        if circuit_type:
+            statement += f"{circuit_type.lower()} "
 
         statement += f"connection projects from the {origins}."
-        if laterality_description != "":
+        if laterality_description:
             statement = statement[:-1] + f" and is found {laterality_description}.\n"
 
         if apinatomy:
             statement += f" It is described in {apinatomy} model."
 
-        return statement.strip()
+        return statement.strip().replace("  ", " ")
 
     def get_errors(self, instance) -> List:
         return get_connectivity_errors(instance)

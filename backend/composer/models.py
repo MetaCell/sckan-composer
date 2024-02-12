@@ -154,6 +154,10 @@ class Phenotype(models.Model):
 
     def __str__(self):
         return self.name
+    
+    @property
+    def phenotype_str(self):
+        return str(self.name) if self.name else ''
 
     class Meta:
         ordering = ["name"]
@@ -182,6 +186,10 @@ class Sex(models.Model):
 
     def __str__(self):
         return self.name
+    
+    @property
+    def sex_str(self):
+        return str(self.name) if self.name else ''
 
     class Meta:
         ordering = ["name"]
@@ -386,14 +394,15 @@ class ConnectivityStatement(models.Model):
     owner = models.ForeignKey(
         User, verbose_name="Curator", on_delete=models.SET_NULL, null=True, blank=True
     )
+
     laterality = models.CharField(
-        max_length=20, default=Laterality.UNKNOWN, choices=Laterality.choices
+        max_length=20, choices=Laterality.choices, null=True, blank=True
     )
     projection = models.CharField(
-        max_length=20, default=Projection.UNKNOWN, choices=Projection.choices
+        max_length=20, choices=Projection.choices, null=True, blank=True
     )
     circuit_type = models.CharField(
-        max_length=20, default=CircuitType.UNKNOWN, choices=CircuitType.choices
+        max_length=20, choices=CircuitType.choices, null=True, blank=True
     )
     # TODO for next releases we could have only 1 field for phenotype + an intermediate table with the phenotype's categories such as circuit_type, laterality, projection, functional_circuit_role, projection_phenotype among others
     phenotype = models.ForeignKey(
@@ -546,9 +555,8 @@ class ConnectivityStatement(models.Model):
         laterality_map = {
             Laterality.RIGHT.value: "on the right side of the body",
             Laterality.LEFT.value: "on the left side of the body",
-            Laterality.UNKNOWN.value: "",
         }
-        return laterality_map.get(self.laterality, "")
+        return laterality_map.get(self.laterality, None)
 
     def assign_owner(self, request):
         if ConnectivityStatementService(self).should_set_owner(request):
