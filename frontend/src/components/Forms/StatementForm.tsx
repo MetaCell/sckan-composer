@@ -581,7 +581,7 @@ const StatementForm = (props: any) => {
       disabledReason: statement?.destinations?.length === 0 ?
         "Add Destination entity to get access to the forward connection form" : "",
       fieldName: "forward_connection",
-
+      postProcessOptions: true,
       onSearch: async (searchValue: string) => {
         const selectedForwardConnection = statement?.forward_connection?.map(
           (origin: Option) => origin.id,
@@ -592,8 +592,9 @@ const StatementForm = (props: any) => {
       },
       onUpdate: async (selectedOptions: Option[]) => {
         await updateForwardConnections(selectedOptions, statement);
-        refreshStatement();
+        refreshStatement()
       },
+      refreshStatement: () => refreshStatement(),
       statement: statement,
       errors: statement?.errors?.includes("Invalid forward connection")
         ? "Forward connection(s) not found"
