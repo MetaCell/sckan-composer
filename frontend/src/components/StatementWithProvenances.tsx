@@ -1,7 +1,6 @@
 import React  from "react";
 import {Box} from "@mui/material";
 import StatementForm from "./Forms/StatementForm";
-import ProvenancesForm from "./Forms/ProvenanceForm";
 
 const StatementWithProvenances = ({ statement, background = "#fff", refreshStatement, isDisabled } : any) => {
 
