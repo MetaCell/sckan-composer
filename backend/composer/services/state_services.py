@@ -5,7 +5,6 @@ from django.db.models import Q, Count
 
 from composer.enums import CSState
 from ..enums import SentenceState
-from ..models import Profile
 
 
 class BaseServiceMixin:
@@ -89,29 +88,28 @@ class SentenceStateService(StateServiceMixin):
 
     @staticmethod
     def has_permission_to_transition_to_needs_further_review(instance, user) -> bool:
-        profile = Profile.objects.get(user=user)
-
+        profile = get_user_profile(user=user)
         return (profile.is_triage_operator
-                or profile.is_reviewer and instance.state == SentenceState.READY_TO_COMPOSE)
+                or profile.is_reviewer and instance.state == SentenceState.READY_TO_COMPOSE) or user.is_staff
 
     @staticmethod
     def has_permission_to_transition_to_compose_later(instance, user) -> bool:
-        profile = Profile.objects.get(user=user)
-
+        profile = get_user_profile(user=user)
         return (profile.is_triage_operator or
-                profile.is_reviewer and instance.state == SentenceState.NEEDS_FURTHER_REVIEW)
+                profile.is_reviewer and instance.state == SentenceState.NEEDS_FURTHER_REVIEW) or user.is_staff
+
 
     @staticmethod
     def has_permission_to_transition_to_ready_to_compose(instance, user) -> bool:
-        profile = Profile.objects.get(user=user)
-
+        profile = get_user_profile(user=user)
         if profile.is_triage_operator and instance.state == SentenceState.COMPOSE_LATER:
             return True
 
         if profile.is_reviewer and instance.state in [SentenceState.OPEN, SentenceState.NEEDS_FURTHER_REVIEW]:
             return True
 
-        return False
+        return user.is_staff
+
 
     @staticmethod
     def can_be_composed(sentence) -> bool:
@@ -127,45 +125,43 @@ class SentenceStateService(StateServiceMixin):
 
     @staticmethod
     def has_permission_to_transition_to_compose_now(sentence, user) -> bool:
-        profile = Profile.objects.get(user=user)
-        return profile.is_reviewer or profile.is_triage_operator
+        profile = get_user_profile(user=user)
+        return profile.is_reviewer or profile.is_triage_operator or user.is_staff
 
     @staticmethod
     def has_permission_to_transition_to_completed(sentence, user) -> bool:
-        profile = Profile.objects.get(user=user)
-        return profile.is_reviewer or profile.is_triage_operator
+        profile = get_user_profile(user=user)
+        return profile.is_reviewer or profile.is_triage_operator or user.is_staff
 
     @staticmethod
     def has_permission_to_transition_to_excluded(sentence, user) -> bool:
-        profile = Profile.objects.get(user=user)
-        return profile.is_reviewer or profile.is_triage_operator
+        profile = get_user_profile(user=user)
+        return profile.is_reviewer or profile.is_triage_operator or user.is_staff
 
 
 class ConnectivityStatementStateService(StateServiceMixin):
 
     @staticmethod
     def has_permission_to_transition_to_compose_now(connectivity_statement, user) -> bool:
-        profile = Profile.objects.get(user=user)
-
+        profile = get_user_profile(user=user)
         if is_system_user(user) and connectivity_statement.state == CSState.DRAFT:
             return True
 
         if profile.is_curator and connectivity_statement.state in [CSState.INVALID, CSState.IN_PROGRESS]:
             return True
 
-        return False
+        return user.is_staff
 
     @staticmethod
     def has_permission_to_transition_to_in_progress(connectivity_statement, user) -> bool:
-        profile = Profile.objects.get(user=user)
-
+        profile = get_user_profile(user=user)
         if profile.is_curator and connectivity_statement.state in [CSState.COMPOSE_NOW, CSState.REVISE]:
             return True
 
         if profile.is_reviewer and connectivity_statement.state == CSState.TO_BE_REVIEWED:
             return True
 
-        return False
+        return user.is_staff
 
     @staticmethod
     def can_be_reviewed(connectivity_statement):
@@ -182,30 +178,29 @@ class ConnectivityStatementStateService(StateServiceMixin):
 
     @staticmethod
     def has_permission_to_transition_to_to_be_reviewed(connectivity_statement, user) -> bool:
-        profile = Profile.objects.get(user=user)
-
+        profile = get_user_profile(user=user)
         if profile.is_curator and connectivity_statement.state == CSState.IN_PROGRESS:
             return True
 
         if profile.is_reviewer and connectivity_statement.state == CSState.REJECTED:
             return True
 
-        return False
+        return user.is_staff
 
     @staticmethod
     def has_permission_to_transition_to_rejected(connectivity_statement, user) -> bool:
-        profile = Profile.objects.get(user=user)
-        return profile.is_reviewer
+        profile = get_user_profile(user=user)
+        return profile.is_reviewer or user.is_staff
 
     @staticmethod
     def has_permission_to_transition_to_revise(connectivity_statement, user) -> bool:
-        profile = Profile.objects.get(user=user)
-        return profile.is_reviewer
+        profile = get_user_profile(user=user)
+        return profile.is_reviewer or user.is_staff
 
     @staticmethod
     def has_permission_to_transition_to_npo_approval(connectivity_statement, user) -> bool:
-        profile = Profile.objects.get(user=user)
-        return profile.is_reviewer
+        profile = get_user_profile(user=user)
+        return profile.is_reviewer or user.is_staff
 
     @staticmethod
     def has_permission_to_transition_to_exported(connectivity_statement, user) -> bool:
@@ -253,3 +248,8 @@ class ConnectivityStatementStateService(StateServiceMixin):
 
 def is_system_user(user: User) -> bool:
     return user.username == 'system'
+
+
+def get_user_profile(user):
+    from composer.models import Profile
+    return Profile.objects.get(user=user)
