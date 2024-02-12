@@ -7,8 +7,8 @@ from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
 
 from composer.services.state_services import (
-    ConnectivityStatementService,
-    SentenceService,
+    ConnectivityStatementStateService,
+    SentenceStateService,
 )
 from .enums import (
     CircuitType,
@@ -21,6 +21,7 @@ from .enums import (
     ViaType,
     Projection,
 )
+from .services.graph_service import compile_journey
 from .utils import doi_uri, pmcid_uri, pmid_uri, create_reference_uri
 
 
@@ -289,8 +290,8 @@ class Sentence(models.Model):
         source=[SentenceState.OPEN, SentenceState.READY_TO_COMPOSE, SentenceState.COMPOSE_LATER,
                 SentenceState.EXCLUDED],
         target=SentenceState.NEEDS_FURTHER_REVIEW,
-        conditions=[SentenceService.can_be_reviewed],
-        permission=SentenceService.has_permission_to_transition_to_needs_further_review,
+        conditions=[SentenceStateService.can_be_reviewed],
+        permission=SentenceStateService.has_permission_to_transition_to_needs_further_review,
     )
     def needs_further_review(self, *args, **kwargs):
         ...
@@ -298,7 +299,7 @@ class Sentence(models.Model):
     @transition(
         field=state, source=[SentenceState.OPEN, SentenceState.NEEDS_FURTHER_REVIEW],
         target=SentenceState.COMPOSE_LATER,
-        permission=SentenceService.has_permission_to_transition_to_compose_later,
+        permission=SentenceStateService.has_permission_to_transition_to_compose_later,
     )
     def compose_later(self, *args, **kwargs):
         ...
@@ -307,7 +308,7 @@ class Sentence(models.Model):
         field=state, source=[SentenceState.OPEN, SentenceState.COMPOSE_LATER,
                              SentenceState.NEEDS_FURTHER_REVIEW],
         target=SentenceState.READY_TO_COMPOSE,
-        permission=SentenceService.has_permission_to_transition_to_ready_to_compose,
+        permission=SentenceStateService.has_permission_to_transition_to_ready_to_compose,
     )
     def ready_to_compose(self, *args, **kwargs):
         ...
@@ -316,18 +317,18 @@ class Sentence(models.Model):
         field=state,
         source=SentenceState.READY_TO_COMPOSE,
         target=SentenceState.COMPOSE_NOW,
-        conditions=[SentenceService.can_be_composed],
-        permission=SentenceService.has_permission_to_transition_to_compose_now,
+        conditions=[SentenceStateService.can_be_composed],
+        permission=SentenceStateService.has_permission_to_transition_to_compose_now,
 
     )
     def compose_now(self, *args, **kwargs):
-        SentenceService(self).do_transition_compose_now(*args, **kwargs)
+        SentenceStateService(self).do_transition_compose_now(*args, **kwargs)
 
     @transition(
         field=state,
         source=[SentenceState.OPEN, SentenceState.COMPOSE_NOW],
         target=SentenceState.COMPLETED,
-        permission=SentenceService.has_permission_to_transition_to_completed,
+        permission=SentenceStateService.has_permission_to_transition_to_completed,
 
     )
     def completed(self, *args, **kwargs):
@@ -335,12 +336,12 @@ class Sentence(models.Model):
 
     @transition(field=state, source=[SentenceState.OPEN, SentenceState.COMPLETED],
                 target=SentenceState.EXCLUDED,
-                permission=SentenceService.has_permission_to_transition_to_excluded)
+                permission=SentenceStateService.has_permission_to_transition_to_excluded)
     def excluded(self, *args, **kwargs):
         ...
 
     def assign_owner(self, request):
-        if SentenceService(self).should_set_owner(request):
+        if SentenceStateService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
 
@@ -462,63 +463,65 @@ class ConnectivityStatement(models.Model):
         field=state,
         source=[
             CSState.DRAFT,
-            CSState.REJECTED,
-            CSState.NPO_APPROVED,
-            CSState.EXPORTED,
+            CSState.IN_PROGRESS,
             CSState.INVALID
         ],
-        permission=lambda instance, user: ConnectivityStatementService.has_permission_to_transition_to_compose_now(
-            instance, user
-        ),
         target=CSState.COMPOSE_NOW,
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_compose_now,
     )
     def compose_now(self, *args, **kwargs):
         ...
 
     @transition(
         field=state,
-        source=[CSState.COMPOSE_NOW, CSState.CONNECTION_MISSING],
-        target=CSState.CURATED,
+        source=[CSState.COMPOSE_NOW, CSState.TO_BE_REVIEWED, CSState.REVISE],
+        target=CSState.IN_PROGRESS,
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_in_progress,
     )
-    def curated(self, *args, **kwargs):
-        ...
-
-    @transition(
-        field=state, source=CSState.COMPOSE_NOW, target=CSState.CONNECTION_MISSING
-    )
-    def connection_missing(self, *args, **kwargs):
+    def in_progress(self, *args, **kwargs):
         ...
 
     @transition(
         field=state,
-        source=CSState.CURATED,
+        source=[CSState.IN_PROGRESS, CSState.REJECTED],
         target=CSState.TO_BE_REVIEWED,
-        conditions=[ConnectivityStatementService.can_be_reviewed],
+        conditions=[ConnectivityStatementStateService.can_be_reviewed],
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_to_be_reviewed,
     )
     def to_be_reviewed(self, *args, **kwargs):
         ...
 
-    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.EXCLUDED)
-    def excluded(self, *args, **kwargs):
-        ...
-
-    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.REJECTED)
+    @transition(field=state,
+                source=CSState.TO_BE_REVIEWED,
+                target=CSState.REJECTED,
+                permission=ConnectivityStatementStateService.has_permission_to_transition_to_rejected,
+                )
     def rejected(self, *args, **kwargs):
         ...
 
-    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.NPO_APPROVED,
-                conditions=[ConnectivityStatementService.is_valid])
+    @transition(field=state,
+                source=[CSState.TO_BE_REVIEWED, CSState.NPO_APPROVED],
+                target=CSState.REVISE,
+                permission=ConnectivityStatementStateService.has_permission_to_transition_to_revise,
+                )
+    def revise(self, *args, **kwargs):
+        ...
+
+    @transition(field=state,
+                source=CSState.TO_BE_REVIEWED,
+                target=CSState.NPO_APPROVED,
+                conditions=[ConnectivityStatementStateService.is_valid],
+                permission=ConnectivityStatementStateService.has_permission_to_transition_to_npo_approval,
+                )
     def npo_approved(self, *args, **kwargs):
         ...
 
     @transition(
         field=state,
-        source=[CSState.NPO_APPROVED, CSState.COMPOSE_NOW],
-        permission=lambda instance, user: ConnectivityStatementService.has_permission_to_transition_to_exported(
-            instance, user
-        ),
+        source=CSState.NPO_APPROVED,
         target=CSState.EXPORTED,
-        conditions=[ConnectivityStatementService.is_valid]
+        conditions=[ConnectivityStatementStateService.is_valid],
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_exported,
     )
     def exported(self, *args, **kwargs):
         ...
@@ -528,18 +531,16 @@ class ConnectivityStatement(models.Model):
         source=[
             CSState.DRAFT,
             CSState.COMPOSE_NOW,
-            CSState.CURATED,
-            CSState.EXCLUDED,
+            CSState.IN_PROGRESS,
             CSState.REJECTED,
+            CSState.REVISE,
             CSState.TO_BE_REVIEWED,
-            CSState.CONNECTION_MISSING,
             CSState.NPO_APPROVED,
             CSState.EXPORTED,
         ],
         target=CSState.INVALID,
-        permission=lambda instance, user: ConnectivityStatementService.has_permission_to_transition_to_invalid(
-            instance, user
-        ), )
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_invalid,
+    )
     def invalid(self, *args, **kwargs):
         ...
 
@@ -562,7 +563,7 @@ class ConnectivityStatement(models.Model):
             return set(self.via_set.get(order=via_order - 1).anatomical_entities.all())
 
     def get_journey(self):
-        return ConnectivityStatementService.compile_journey(self)
+        return compile_journey(self)
 
     def get_laterality_description(self):
         laterality_map = {
@@ -572,7 +573,7 @@ class ConnectivityStatement(models.Model):
         return laterality_map.get(self.laterality, None)
 
     def assign_owner(self, request):
-        if ConnectivityStatementService(self).should_set_owner(request):
+        if ConnectivityStatementStateService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
 
