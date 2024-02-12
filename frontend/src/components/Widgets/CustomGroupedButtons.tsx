@@ -9,7 +9,7 @@ import MenuList from "@mui/material/MenuList";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 
-export default function GroupedButtons({handleClick, selectedOption, options, selectedIndex, handleMenuItemClick , hasFormat = false, format, disabled}: any) {
+export default function GroupedButtons({handleClick, selectedOption, options, selectedIndex, handleMenuItemClick , hasFormat = false, format, isDisabled}: any) {
   const anchorRef = React.useRef<HTMLDivElement>(null);
   const [open, setOpen] = React.useState(false);
 
@@ -31,7 +31,7 @@ export default function GroupedButtons({handleClick, selectedOption, options, se
 
   return (
     <FormControl>
-      <ButtonGroup variant="contained" ref={anchorRef} disabled={disabled}>
+      <ButtonGroup variant="contained" ref={anchorRef} disabled={isDisabled}>
         <Button onClick={handleClick}>{selectedOption}</Button>
         <Button
           size="small"
@@ -40,6 +40,7 @@ export default function GroupedButtons({handleClick, selectedOption, options, se
           aria-label="select merge strategy"
           aria-haspopup="menu"
           onClick={handleToggle}
+          disabled={options?.length > 0 ? false : true}
         >
           <ArrowDropDownIcon />
         </Button>
@@ -65,7 +66,7 @@ export default function GroupedButtons({handleClick, selectedOption, options, se
             <Paper sx={{p:3}}>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList id="split-button-menu" autoFocusItem>
-                  {options.map((option: string, index: number) => (
+                  {options?.map((option: string, index: number) => (
                     <MenuItem
                       key={option}
                       selected={index === selectedIndex}

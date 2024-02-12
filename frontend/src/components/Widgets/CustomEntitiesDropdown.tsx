@@ -208,8 +208,6 @@ export default function CustomEntitiesDropdown({
        chipsNumber = 2,
        postProcessOptions = false,
        refreshStatement,
-       statement,
-       fieldName = "",
        getPreLevelSelectedValues,
        areConnectionsExplicit,
        minWidth = '',

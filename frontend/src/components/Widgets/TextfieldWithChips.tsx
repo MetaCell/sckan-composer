@@ -5,7 +5,7 @@ import { Autocomplete, styled } from "@mui/material";
 import Box from "@mui/material/Box";
 import CustomTextFieldChip from "./CustomTextFieldChip";
 
-const StyledInput = styled(TextField)(({ theme }) => ({
+const StyledInput = styled(TextField)(() => ({
 
   "& .MuiInputBase-root": {
     boxShadow: 'none',
@@ -46,7 +46,6 @@ const TextfieldWithChips = ({
           data.map(
             (
               ele: { id: number; label: string; enableClick: boolean },
-              index: number,
             ) => (
               <CustomTextFieldChip
                 id={ele.id}
