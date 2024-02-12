@@ -11,8 +11,8 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
 from composer.services.state_services import (
-    ConnectivityStatementService,
-    SentenceService,
+    ConnectivityStatementStateService,
+    SentenceStateService,
 )
 from .filtersets import (
     SentenceFilter,
@@ -307,7 +307,7 @@ class ConnectivityStatementViewSet(
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = ConnectivityStatementFilter
-    service = ConnectivityStatementService
+    service = ConnectivityStatementStateService
 
 
     def get_serializer_class(self):
@@ -370,7 +370,7 @@ class SentenceViewSet(
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = SentenceFilter
-    service = SentenceService
+    service = SentenceStateService
 
 
 class SpecieViewSet(viewsets.ReadOnlyModelViewSet):

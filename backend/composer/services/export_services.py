@@ -27,7 +27,7 @@ from composer.models import (
 from composer.services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
 from composer.services.filesystem_service import create_dir_if_not_exists
-from composer.services.state_services import ConnectivityStatementService
+from composer.services.state_services import ConnectivityStatementStateService
 
 HAS_NERVE_BRANCHES_TAG = "Has nerve branches"
 TEMP_CIRCUIT_MAP = {
@@ -516,7 +516,7 @@ def do_transition_to_exported(export_batch: ExportBatch, user: User):
         ]
         if CSState.EXPORTED in available_transitions:
             # we need to update the state to exported when we are in the NP0 approved state and the system user has the permission to do so
-            cs = ConnectivityStatementService(connectivity_statement).do_transition(
+            cs = ConnectivityStatementStateService(connectivity_statement).do_transition(
                 CSState.EXPORTED, system_user, user
             )
             cs.save()
