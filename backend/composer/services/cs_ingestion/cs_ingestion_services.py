@@ -210,9 +210,12 @@ def create_or_update_connectivity_statement(statement: Dict, sentence: Sentence)
 
     validation_errors = statement.get(VALIDATION_ERRORS, ValidationErrors())
 
-    if validation_errors.has_errors() and connectivity_statement.state != CSState.INVALID:
+    if validation_errors.has_errors():
         error_message = validation_errors.to_string()
-        do_transition_to_invalid(connectivity_statement, error_message)
+        if connectivity_statement.state != CSState.INVALID:
+            do_transition_to_invalid_with_note(connectivity_statement, error_message)
+        else:
+            create_invalid_note(connectivity_statement, error_message)
 
     update_many_to_many_fields(connectivity_statement, statement)
     statement[STATE] = connectivity_statement.state
@@ -372,7 +375,7 @@ def get_projection_phenotype(statement: Dict) -> Optional[ProjectionPhenotype]:
     return None
 
 
-def do_transition_to_invalid(connectivity_statement: ConnectivityStatement, note: str):
+def do_transition_to_invalid_with_note(connectivity_statement: ConnectivityStatement, note: str):
     system_user = User.objects.get(username="system")
     connectivity_statement.invalid(by=system_user)
     connectivity_statement.save()
@@ -525,7 +528,7 @@ def update_upstream_statements():
 
         # Perform transition and create a note only if not already invalid
         if connectivity_statement.state != CSState.INVALID:
-            do_transition_to_invalid(connectivity_statement, all_reasons)
+            do_transition_to_invalid_with_note(connectivity_statement, all_reasons)
         else:
             create_invalid_note(connectivity_statement, all_reasons)
 
