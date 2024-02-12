@@ -2,9 +2,6 @@ import React from "react";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
 import { Autocomplete, styled } from "@mui/material";
-import Chip from "@mui/material/Chip";
-import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
-import { vars } from "../../theme/variables";
 import Box from "@mui/material/Box";
 import CustomTextFieldChip from "./CustomTextFieldChip";
 
