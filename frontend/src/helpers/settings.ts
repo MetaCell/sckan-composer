@@ -13,6 +13,7 @@ export const statementStateToColor: StatementStateToColor = {
   connection_missing: "warning", // orange
   npo_approved: "success", //green
   exported: "success", //green
+  invalid: "warning", //orange
 };
 
 export const sentenceStateToColor: SentenceStateToColor = {

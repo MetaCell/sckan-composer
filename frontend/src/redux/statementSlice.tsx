@@ -11,6 +11,7 @@ export type StateFilter = Array<
   | "npo_approved"
   | "rejected"
   | "to_be_reviewed"
+  | "invalid"
 >;
 
 export interface QueryParams {

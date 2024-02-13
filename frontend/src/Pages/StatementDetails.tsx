@@ -116,7 +116,7 @@ const StatementDetails = () => {
 
   //TODO add logic for isDisabled
   // TODO add an extra check for invalid state;
-  const isDisabled = statement?.state === statementStates.Exported;
+  const isDisabled = statement?.state === statementStates.Exported || statement?.state === statementStates.Invalid;
   return (
     <Grid p={6} container>
       {loading && (
