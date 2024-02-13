@@ -14,7 +14,7 @@ import { GridRowsProp } from "@mui/x-data-grid";
 import { useState } from "react";
 import { Fab } from "@mui/material";
 import {
-  PaginatedConnectivityStatementList,
+  PaginatedBaseConnectivityStatementList,
 } from "../../apiclient/backend";
 import {
   duplicatesRowsPerPage,
@@ -32,7 +32,7 @@ export default function CheckDuplicates() {
   const [origin, setOrigin] = React.useState<number[] | undefined | []>([]);
   const [destination, setDestination] = React.useState<any>("");
   const [statementsList, setStatementsList] =
-    useState<PaginatedConnectivityStatementList>();
+    useState<PaginatedBaseConnectivityStatementList>();
   const [currentPage, setCurrentPage] = useState(0);
   const [sorting, setSorting] = useState<criteria>(undefined);
 
@@ -53,7 +53,7 @@ export default function CheckDuplicates() {
         .then(
           (res: {
             data: React.SetStateAction<
-              PaginatedConnectivityStatementList | undefined
+              PaginatedBaseConnectivityStatementList | undefined
             >;
           }) => {
             setStatementsList(res.data);

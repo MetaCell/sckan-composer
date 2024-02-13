@@ -97,43 +97,45 @@ export type StateColor =
 
 export interface SentenceStateToColor {
   open: StateColor;
-  compose_now: StateColor;
+  needs_further_review: StateColor;
   compose_later: StateColor;
-  to_be_reviewed: StateColor;
+  ready_to_compose: StateColor;
+  compose_now: StateColor;
+  completed: StateColor;
   excluded: StateColor;
-  duplicate: StateColor;
 }
 
 export interface StatementStateToColor {
-  compose_now: StateColor;
-  curated: StateColor;
-  to_be_reviewed: StateColor;
-  excluded: StateColor;
   draft: StateColor;
+  compose_now: StateColor;
+  in_progress: StateColor;
+  to_be_reviewed: StateColor;
+  revise: StateColor;
   rejected: StateColor;
-  connection_missing: StateColor;
   npo_approved: StateColor;
   exported: StateColor;
+  invalid: StateColor;
 }
 
 export const SentenceLabels = {
   [sentenceStates.Open]: "Open",
-  [sentenceStates.ToBeReviewed]: "To be reviewed",
+  [sentenceStates.NeedsFurtherReview]: "Needs further review",
   [sentenceStates.ComposeLater]: "Compose later",
+  [sentenceStates.ReadyToCompose]: "Ready to compose",
   [sentenceStates.ComposeNow]: "Compose now",
-  [sentenceStates.Duplicate]: "Duplicate",
+  [sentenceStates.Completed]: "Completed",
   [sentenceStates.Excluded]: "Excluded",
-};
+}
 export const StatementsLabels = {
-  [statementStates.ToBeReviewed]: "To be reviewed",
   [statementStates.ComposeNow]: "Compose now",
-  [statementStates.Excluded]: "Exclude",
   [statementStates.Draft]: "Draft",
-  [statementStates.Curated]: "Curate",
-  [statementStates.Rejected]: "Reject",
-  [statementStates.ConnectionMissing]: "Connection missing",
-  [statementStates.NpoApproved]: "NPO approved",
   [statementStates.Exported]: "Exported",
+  [statementStates.InProgress]: "In progress",
+  [statementStates.Invalid]: "invalid",
+  [statementStates.NpoApproved]: "NPO approved",
+  [statementStates.Rejected]: "Reject",
+  [statementStates.Revise]: "Revise",
+  [statementStates.ToBeReviewed]: "To be reviewed",
 };
 
 export const formatDate = (date: string) => {

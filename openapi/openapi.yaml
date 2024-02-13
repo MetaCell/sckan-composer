@@ -154,13 +154,13 @@ paths:
             type: string
             enum:
             - compose_now
-            - connection_missing
-            - curated
             - draft
-            - excluded
             - exported
+            - in_progress
+            - invalid
             - npo_approved
             - rejected
+            - revise
             - to_be_reviewed
         explode: true
         style: form
@@ -184,7 +184,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedConnectivityStatementList'
+                $ref: '#/components/schemas/PaginatedBaseConnectivityStatementList'
           description: ''
     post:
       operationId: composer_connectivity_statement_create
@@ -1120,12 +1120,13 @@ paths:
           items:
             type: string
             enum:
+            - completed
             - compose_later
             - compose_now
-            - duplicate
             - excluded
+            - needs_further_review
             - open
-            - to_be_reviewed
+            - ready_to_compose
         explode: true
         style: form
       - in: query
@@ -1778,18 +1779,60 @@ components:
       - id
       - name
       - ontology_uri
-    AvailableTransitionsC67Enum:
+    AvailableTransitions24dEnum:
       enum:
       - draft
       - compose_now
-      - curated
-      - excluded
-      - rejected
+      - in_progress
       - to_be_reviewed
-      - connection_missing
+      - revise
+      - rejected
       - npo_approved
       - exported
+      - invalid
       type: string
+    BaseConnectivityStatement:
+      type: object
+      description: Adds nested create feature
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          nullable: true
+        knowledge_statement:
+          type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+          readOnly: true
+        owner:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        owner_id:
+          type: integer
+          nullable: true
+        state:
+          type: string
+          readOnly: true
+        modified_date:
+          type: string
+          format: date-time
+          readOnly: true
+        has_notes:
+          type: boolean
+          readOnly: true
+      required:
+      - has_notes
+      - id
+      - modified_date
+      - owner
+      - state
+      - tags
+    BlankEnum:
+      enum:
+      - ''
     CircuitTypeEnum:
       enum:
       - SENSORY
@@ -1797,7 +1840,6 @@ components:
       - INTRINSIC
       - PROJECTION
       - ANAXONIC
-      - UNKNOWN
       type: string
     ConnectivityStatement:
       type: object
@@ -1837,7 +1879,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitionsC67Enum'
+            $ref: '#/components/schemas/AvailableTransitions24dEnum'
           readOnly: true
         origins:
           type: array
@@ -1862,11 +1904,23 @@ components:
           type: string
           readOnly: true
         laterality:
-          $ref: '#/components/schemas/LateralityEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/LateralityEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         projection:
-          $ref: '#/components/schemas/ProjectionEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/ProjectionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         circuit_type:
-          $ref: '#/components/schemas/CircuitTypeEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/CircuitTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         species:
           type: array
           items:
@@ -1955,7 +2009,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitionsC67Enum'
+            $ref: '#/components/schemas/AvailableTransitions24dEnum'
           readOnly: true
         origins:
           type: array
@@ -1980,11 +2034,23 @@ components:
           type: string
           readOnly: true
         laterality:
-          $ref: '#/components/schemas/LateralityEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/LateralityEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         projection:
-          $ref: '#/components/schemas/ProjectionEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/ProjectionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         circuit_type:
-          $ref: '#/components/schemas/CircuitTypeEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/CircuitTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         species:
           type: array
           items:
@@ -2077,8 +2143,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnatomicalEntity'
+        are_connections_explicit:
+          type: string
+          readOnly: true
       required:
       - anatomical_entities
+      - are_connections_explicit
       - connectivity_statement_id
       - from_entities
       - id
@@ -2086,7 +2156,6 @@ components:
       enum:
       - RIGHT
       - LEFT
-      - UNKNOWN
       type: string
     Login:
       type: object
@@ -2132,6 +2201,9 @@ components:
       - created_at
       - note
       - user
+    NullEnum:
+      enum:
+      - null
     PaginatedAnatomicalEntityList:
       type: object
       properties:
@@ -2152,7 +2224,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnatomicalEntity'
-    PaginatedConnectivityStatementList:
+    PaginatedBaseConnectivityStatementList:
       type: object
       properties:
         count:
@@ -2171,7 +2243,7 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/ConnectivityStatement'
+            $ref: '#/components/schemas/BaseConnectivityStatement'
     PaginatedDestinationList:
       type: object
       properties:
@@ -2370,7 +2442,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitionsC67Enum'
+            $ref: '#/components/schemas/AvailableTransitions24dEnum'
           readOnly: true
         origins:
           type: array
@@ -2395,11 +2467,23 @@ components:
           type: string
           readOnly: true
         laterality:
-          $ref: '#/components/schemas/LateralityEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/LateralityEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         projection:
-          $ref: '#/components/schemas/ProjectionEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/ProjectionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         circuit_type:
-          $ref: '#/components/schemas/CircuitTypeEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/CircuitTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         species:
           type: array
           items:
@@ -2602,7 +2686,6 @@ components:
       - IPSI
       - CONTRAT
       - BI
-      - UNKNOWN
       type: string
     Provenance:
       type: object
@@ -2706,11 +2789,12 @@ components:
     SentenceAvailableTransitionsEnum:
       enum:
       - open
-      - to_be_reviewed
+      - needs_further_review
       - compose_later
+      - ready_to_compose
       - compose_now
+      - completed
       - excluded
-      - duplicate
       type: string
     SentenceConnectivityStatement:
       type: object
@@ -2736,17 +2820,23 @@ components:
           - $ref: '#/components/schemas/Phenotype'
           readOnly: true
         laterality:
-          allOf:
+          readOnly: true
+          nullable: true
+          oneOf:
           - $ref: '#/components/schemas/LateralityEnum'
-          readOnly: true
+          - $ref: '#/components/schemas/NullEnum'
         projection:
-          allOf:
+          readOnly: true
+          nullable: true
+          oneOf:
           - $ref: '#/components/schemas/ProjectionEnum'
-          readOnly: true
+          - $ref: '#/components/schemas/NullEnum'
         circuit_type:
-          allOf:
-          - $ref: '#/components/schemas/CircuitTypeEnum'
           readOnly: true
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/CircuitTypeEnum'
+          - $ref: '#/components/schemas/NullEnum'
         species:
           type: array
           items:
@@ -2919,8 +3009,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnatomicalEntity'
+        are_connections_explicit:
+          type: string
+          readOnly: true
       required:
       - anatomical_entities
+      - are_connections_explicit
       - connectivity_statement_id
       - from_entities
       - id

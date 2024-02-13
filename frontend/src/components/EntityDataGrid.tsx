@@ -7,7 +7,7 @@ import {
   GridEventListener,
 } from "@mui/x-data-grid";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { ConnectivityStatement, Sentence, Tag } from "../apiclient/backend";
+import { BaseConnectivityStatement, Sentence, Tag } from "../apiclient/backend";
 import {
   renderDate,
   renderNote,
@@ -35,7 +35,7 @@ import Stack from "@mui/material/Stack";
 
 interface DataGridProps {
   entityType: "sentence" | "statement";
-  entityList: (Sentence | ConnectivityStatement)[] | undefined;
+  entityList: (Sentence | BaseConnectivityStatement)[] | undefined;
   queryOptions: SentenceQueryParams | StatementQueryParams;
   loading: boolean;
   totalResults: number;

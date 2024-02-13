@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { ConnectivityStatement } from "../apiclient/backend";
+import { BaseConnectivityStatement } from "../apiclient/backend";
 import { useAppSelector } from "../redux/hooks";
 import connectivityStatementService from "../services/StatementService";
 import EntityDataGrid from "../components/EntityDataGrid";
@@ -10,7 +10,7 @@ import { useGutters } from "../styles/styles";
 import { Typography } from "@mui/material";
 
 const StatementList = () => {
-  const [statementList, setStatementList] = useState<ConnectivityStatement[]>();
+  const [statementList, setStatementList] = useState<BaseConnectivityStatement[]>();
   const [totalResults, setTotalResults] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 

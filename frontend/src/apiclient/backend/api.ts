@@ -54,19 +54,87 @@ export interface AnatomicalEntity {
  * @enum {string}
  */
 
-export const AvailableTransitionsC67Enum = {
+export const AvailableTransitions24dEnum = {
     Draft: 'draft',
     ComposeNow: 'compose_now',
-    Curated: 'curated',
-    Excluded: 'excluded',
-    Rejected: 'rejected',
+    InProgress: 'in_progress',
     ToBeReviewed: 'to_be_reviewed',
-    ConnectionMissing: 'connection_missing',
+    Revise: 'revise',
+    Rejected: 'rejected',
     NpoApproved: 'npo_approved',
-    Exported: 'exported'
+    Exported: 'exported',
+    Invalid: 'invalid'
 } as const;
 
-export type AvailableTransitionsC67Enum = typeof AvailableTransitionsC67Enum[keyof typeof AvailableTransitionsC67Enum];
+export type AvailableTransitions24dEnum = typeof AvailableTransitions24dEnum[keyof typeof AvailableTransitions24dEnum];
+
+
+/**
+ * Adds nested create feature
+ * @export
+ * @interface BaseConnectivityStatement
+ */
+export interface BaseConnectivityStatement {
+    /**
+     * 
+     * @type {number}
+     * @memberof BaseConnectivityStatement
+     */
+    'id': number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof BaseConnectivityStatement
+     */
+    'knowledge_statement'?: string;
+    /**
+     * 
+     * @type {Array<Tag>}
+     * @memberof BaseConnectivityStatement
+     */
+    'tags': Array<Tag>;
+    /**
+     * 
+     * @type {User}
+     * @memberof BaseConnectivityStatement
+     */
+    'owner': User;
+    /**
+     * 
+     * @type {number}
+     * @memberof BaseConnectivityStatement
+     */
+    'owner_id'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof BaseConnectivityStatement
+     */
+    'state': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BaseConnectivityStatement
+     */
+    'modified_date': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof BaseConnectivityStatement
+     */
+    'has_notes': boolean;
+}
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const BlankEnum = {
+    Empty: ''
+} as const;
+
+export type BlankEnum = typeof BlankEnum[keyof typeof BlankEnum];
 
 
 /**
@@ -80,8 +148,7 @@ export const CircuitTypeEnum = {
     Motor: 'MOTOR',
     Intrinsic: 'INTRINSIC',
     Projection: 'PROJECTION',
-    Anaxonic: 'ANAXONIC',
-    Unknown: 'UNKNOWN'
+    Anaxonic: 'ANAXONIC'
 } as const;
 
 export type CircuitTypeEnum = typeof CircuitTypeEnum[keyof typeof CircuitTypeEnum];
@@ -149,10 +216,10 @@ export interface ConnectivityStatement {
     'state': string;
     /**
      * 
-     * @type {Array<AvailableTransitionsC67Enum>}
+     * @type {Array<AvailableTransitions24dEnum>}
      * @memberof ConnectivityStatement
      */
-    'available_transitions': Array<AvailableTransitionsC67Enum>;
+    'available_transitions': Array<AvailableTransitions24dEnum>;
     /**
      * 
      * @type {Array<AnatomicalEntity>}
@@ -191,22 +258,22 @@ export interface ConnectivityStatement {
     'journey': string;
     /**
      * 
-     * @type {LateralityEnum}
+     * @type {ConnectivityStatementLaterality}
      * @memberof ConnectivityStatement
      */
-    'laterality'?: LateralityEnum;
+    'laterality'?: ConnectivityStatementLaterality | null;
     /**
      * 
-     * @type {ProjectionEnum}
+     * @type {ConnectivityStatementProjection}
      * @memberof ConnectivityStatement
      */
-    'projection'?: ProjectionEnum;
+    'projection'?: ConnectivityStatementProjection | null;
     /**
      * 
-     * @type {CircuitTypeEnum}
+     * @type {ConnectivityStatementCircuitType}
      * @memberof ConnectivityStatement
      */
-    'circuit_type'?: CircuitTypeEnum;
+    'circuit_type'?: ConnectivityStatementCircuitType | null;
     /**
      * 
      * @type {Array<Specie>}
@@ -268,7 +335,23 @@ export interface ConnectivityStatement {
      */
     'errors': Array<any>;
 }
+/**
+ * @type ConnectivityStatementCircuitType
+ * @export
+ */
+export type ConnectivityStatementCircuitType = BlankEnum | CircuitTypeEnum;
 
+/**
+ * @type ConnectivityStatementLaterality
+ * @export
+ */
+export type ConnectivityStatementLaterality = BlankEnum | LateralityEnum;
+
+/**
+ * @type ConnectivityStatementProjection
+ * @export
+ */
+export type ConnectivityStatementProjection = BlankEnum | ProjectionEnum;
 
 /**
  * Connectivity Statement
@@ -332,10 +415,10 @@ export interface ConnectivityStatementUpdate {
     'state'?: string;
     /**
      * 
-     * @type {Array<AvailableTransitionsC67Enum>}
+     * @type {Array<AvailableTransitions24dEnum>}
      * @memberof ConnectivityStatementUpdate
      */
-    'available_transitions': Array<AvailableTransitionsC67Enum>;
+    'available_transitions': Array<AvailableTransitions24dEnum>;
     /**
      * 
      * @type {Array<number>}
@@ -374,22 +457,22 @@ export interface ConnectivityStatementUpdate {
     'journey': string;
     /**
      * 
-     * @type {LateralityEnum}
+     * @type {ConnectivityStatementLaterality}
      * @memberof ConnectivityStatementUpdate
      */
-    'laterality'?: LateralityEnum;
+    'laterality'?: ConnectivityStatementLaterality | null;
     /**
      * 
-     * @type {ProjectionEnum}
+     * @type {ConnectivityStatementProjection}
      * @memberof ConnectivityStatementUpdate
      */
-    'projection'?: ProjectionEnum;
+    'projection'?: ConnectivityStatementProjection | null;
     /**
      * 
-     * @type {CircuitTypeEnum}
+     * @type {ConnectivityStatementCircuitType}
      * @memberof ConnectivityStatementUpdate
      */
-    'circuit_type'?: CircuitTypeEnum;
+    'circuit_type'?: ConnectivityStatementCircuitType | null;
     /**
      * 
      * @type {Array<Specie>}
@@ -451,8 +534,6 @@ export interface ConnectivityStatementUpdate {
      */
     'errors': Array<any>;
 }
-
-
 /**
  * Destination
  * @export
@@ -528,6 +609,12 @@ export interface DestinationSerializerDetails {
      * @memberof DestinationSerializerDetails
      */
     'from_entities': Array<AnatomicalEntity>;
+    /**
+     * 
+     * @type {string}
+     * @memberof DestinationSerializerDetails
+     */
+    'are_connections_explicit': string;
 }
 
 
@@ -539,8 +626,7 @@ export interface DestinationSerializerDetails {
 
 export const LateralityEnum = {
     Right: 'RIGHT',
-    Left: 'LEFT',
-    Unknown: 'UNKNOWN'
+    Left: 'LEFT'
 } as const;
 
 export type LateralityEnum = typeof LateralityEnum[keyof typeof LateralityEnum];
@@ -636,6 +722,19 @@ export interface Note {
 /**
  * 
  * @export
+ * @enum {string}
+ */
+
+export const NullEnum = {
+    Null: 'null'
+} as const;
+
+export type NullEnum = typeof NullEnum[keyof typeof NullEnum];
+
+
+/**
+ * 
+ * @export
  * @interface PaginatedAnatomicalEntityList
  */
 export interface PaginatedAnatomicalEntityList {
@@ -667,33 +766,33 @@ export interface PaginatedAnatomicalEntityList {
 /**
  * 
  * @export
- * @interface PaginatedConnectivityStatementList
+ * @interface PaginatedBaseConnectivityStatementList
  */
-export interface PaginatedConnectivityStatementList {
+export interface PaginatedBaseConnectivityStatementList {
     /**
      * 
      * @type {number}
-     * @memberof PaginatedConnectivityStatementList
+     * @memberof PaginatedBaseConnectivityStatementList
      */
     'count'?: number;
     /**
      * 
      * @type {string}
-     * @memberof PaginatedConnectivityStatementList
+     * @memberof PaginatedBaseConnectivityStatementList
      */
     'next'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof PaginatedConnectivityStatementList
+     * @memberof PaginatedBaseConnectivityStatementList
      */
     'previous'?: string | null;
     /**
      * 
-     * @type {Array<ConnectivityStatement>}
-     * @memberof PaginatedConnectivityStatementList
+     * @type {Array<BaseConnectivityStatement>}
+     * @memberof PaginatedBaseConnectivityStatementList
      */
-    'results'?: Array<ConnectivityStatement>;
+    'results'?: Array<BaseConnectivityStatement>;
 }
 /**
  * 
@@ -1005,10 +1104,10 @@ export interface PatchedConnectivityStatementUpdate {
     'state'?: string;
     /**
      * 
-     * @type {Array<AvailableTransitionsC67Enum>}
+     * @type {Array<AvailableTransitions24dEnum>}
      * @memberof PatchedConnectivityStatementUpdate
      */
-    'available_transitions'?: Array<AvailableTransitionsC67Enum>;
+    'available_transitions'?: Array<AvailableTransitions24dEnum>;
     /**
      * 
      * @type {Array<number>}
@@ -1047,22 +1146,22 @@ export interface PatchedConnectivityStatementUpdate {
     'journey'?: string;
     /**
      * 
-     * @type {LateralityEnum}
+     * @type {ConnectivityStatementLaterality}
      * @memberof PatchedConnectivityStatementUpdate
      */
-    'laterality'?: LateralityEnum;
+    'laterality'?: ConnectivityStatementLaterality | null;
     /**
      * 
-     * @type {ProjectionEnum}
+     * @type {ConnectivityStatementProjection}
      * @memberof PatchedConnectivityStatementUpdate
      */
-    'projection'?: ProjectionEnum;
+    'projection'?: ConnectivityStatementProjection | null;
     /**
      * 
-     * @type {CircuitTypeEnum}
+     * @type {ConnectivityStatementCircuitType}
      * @memberof PatchedConnectivityStatementUpdate
      */
-    'circuit_type'?: CircuitTypeEnum;
+    'circuit_type'?: ConnectivityStatementCircuitType | null;
     /**
      * 
      * @type {Array<Specie>}
@@ -1124,8 +1223,6 @@ export interface PatchedConnectivityStatementUpdate {
      */
     'errors'?: Array<any>;
 }
-
-
 /**
  * Destination
  * @export
@@ -1433,8 +1530,7 @@ export interface Profile {
 export const ProjectionEnum = {
     Ipsi: 'IPSI',
     Contrat: 'CONTRAT',
-    Bi: 'BI',
-    Unknown: 'UNKNOWN'
+    Bi: 'BI'
 } as const;
 
 export type ProjectionEnum = typeof ProjectionEnum[keyof typeof ProjectionEnum];
@@ -1594,11 +1690,12 @@ export interface Sentence {
 
 export const SentenceAvailableTransitionsEnum = {
     Open: 'open',
-    ToBeReviewed: 'to_be_reviewed',
+    NeedsFurtherReview: 'needs_further_review',
     ComposeLater: 'compose_later',
+    ReadyToCompose: 'ready_to_compose',
     ComposeNow: 'compose_now',
-    Excluded: 'excluded',
-    Duplicate: 'duplicate'
+    Completed: 'completed',
+    Excluded: 'excluded'
 } as const;
 
 export type SentenceAvailableTransitionsEnum = typeof SentenceAvailableTransitionsEnum[keyof typeof SentenceAvailableTransitionsEnum];
@@ -1651,19 +1748,19 @@ export interface SentenceConnectivityStatement {
      * @type {LateralityEnum}
      * @memberof SentenceConnectivityStatement
      */
-    'laterality': LateralityEnum;
+    'laterality': LateralityEnum | null;
     /**
      * 
      * @type {ProjectionEnum}
      * @memberof SentenceConnectivityStatement
      */
-    'projection': ProjectionEnum;
+    'projection': ProjectionEnum | null;
     /**
      * 
      * @type {CircuitTypeEnum}
      * @memberof SentenceConnectivityStatement
      */
-    'circuit_type': CircuitTypeEnum;
+    'circuit_type': CircuitTypeEnum | null;
     /**
      * 
      * @type {Array<Specie>}
@@ -1931,6 +2028,12 @@ export interface ViaSerializerDetails {
      * @memberof ViaSerializerDetails
      */
     'from_entities': Array<AnatomicalEntity>;
+    /**
+     * 
+     * @type {string}
+     * @memberof ViaSerializerDetails
+     */
+    'are_connections_explicit': string;
 }
 
 
@@ -4648,7 +4751,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementList>> {
+        async composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedBaseConnectivityStatementList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -5240,7 +5343,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedConnectivityStatementList> {
+        composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: any): AxiosPromise<PaginatedBaseConnectivityStatementList> {
             return localVarFp.composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6318,13 +6421,13 @@ export type ComposerConnectivityStatementListOrderingEnum = typeof ComposerConne
  */
 export const ComposerConnectivityStatementListStateEnum = {
     ComposeNow: 'compose_now',
-    ConnectionMissing: 'connection_missing',
-    Curated: 'curated',
     Draft: 'draft',
-    Excluded: 'excluded',
     Exported: 'exported',
+    InProgress: 'in_progress',
+    Invalid: 'invalid',
     NpoApproved: 'npo_approved',
     Rejected: 'rejected',
+    Revise: 'revise',
     ToBeReviewed: 'to_be_reviewed'
 } as const;
 export type ComposerConnectivityStatementListStateEnum = typeof ComposerConnectivityStatementListStateEnum[keyof typeof ComposerConnectivityStatementListStateEnum];
@@ -6342,12 +6445,13 @@ export type ComposerSentenceListOrderingEnum = typeof ComposerSentenceListOrderi
  * @export
  */
 export const ComposerSentenceListStateEnum = {
+    Completed: 'completed',
     ComposeLater: 'compose_later',
     ComposeNow: 'compose_now',
-    Duplicate: 'duplicate',
     Excluded: 'excluded',
+    NeedsFurtherReview: 'needs_further_review',
     Open: 'open',
-    ToBeReviewed: 'to_be_reviewed'
+    ReadyToCompose: 'ready_to_compose'
 } as const;
 export type ComposerSentenceListStateEnum = typeof ComposerSentenceListStateEnum[keyof typeof ComposerSentenceListStateEnum];
 
