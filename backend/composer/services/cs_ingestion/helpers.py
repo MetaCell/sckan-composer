@@ -1,8 +1,7 @@
 import logging
-from typing import Optional, Dict
 
 from composer.enums import CircuitType
-from composer.models import AnatomicalEntity, ConnectivityStatement
+from composer.models import AnatomicalEntity
 
 ID = "id"
 ORIGINS = "origins"
@@ -26,7 +25,7 @@ CIRCUIT_TYPE_MAPPING = {
     "http://uri.interlex.org/tgbugs/uris/readable/ProjectionPhenotype": CircuitType.PROJECTION,
     "http://uri.interlex.org/tgbugs/uris/readable/MotorPhenotype": CircuitType.MOTOR,
     "http://uri.interlex.org/tgbugs/uris/readable/SensoryPhenotype": CircuitType.SENSORY,
-    "": CircuitType.UNKNOWN
+    "": None
 }
 
 VALIDATION_ERRORS = "validation_errors"
