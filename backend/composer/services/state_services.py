@@ -1,11 +1,9 @@
-from typing import List
-
 from django.apps import apps
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Q, Count
 
 from composer.enums import CSState
-from .graph_service import generate_paths, consolidate_paths
 from ..enums import SentenceState
 
 
@@ -67,7 +65,7 @@ class StateServiceMixin(OwnerServiceMixin):
         return self.obj
 
 
-class SentenceService(StateServiceMixin):
+class SentenceStateService(StateServiceMixin):
     @transaction.atomic
     def do_transition_compose_now(self, *args, **kwargs):
         sentence = self.obj
@@ -80,7 +78,7 @@ class SentenceService(StateServiceMixin):
 
     @staticmethod
     def can_be_reviewed(sentence):
-        # return True if the sentence can go to state to_be_reviewed
+        # return True if the sentence can go to state needs_further_review
         # it should have at least one provenance (pmid, pmcid, doi) and at least one connectivity statement
         return (
                 sentence.pmid is not None
@@ -89,69 +87,85 @@ class SentenceService(StateServiceMixin):
         ) and (sentence.connectivitystatement_set.count() > 0)
 
     @staticmethod
-    def can_be_composed(sentence):
+    def has_permission_to_transition_to_needs_further_review(instance, user) -> bool:
+        profile = get_user_profile(user=user)
+        return (profile.is_triage_operator
+                or profile.is_reviewer and instance.state == SentenceState.READY_TO_COMPOSE) or user.is_staff
+
+    @staticmethod
+    def has_permission_to_transition_to_compose_later(instance, user) -> bool:
+        profile = get_user_profile(user=user)
+        return (profile.is_triage_operator or
+                profile.is_reviewer and instance.state == SentenceState.NEEDS_FURTHER_REVIEW) or user.is_staff
+
+
+    @staticmethod
+    def has_permission_to_transition_to_ready_to_compose(instance, user) -> bool:
+        profile = get_user_profile(user=user)
+        if profile.is_triage_operator and instance.state == SentenceState.COMPOSE_LATER:
+            return True
+
+        if profile.is_reviewer and instance.state in [SentenceState.OPEN, SentenceState.NEEDS_FURTHER_REVIEW]:
+            return True
+
+        return user.is_staff
+
+
+    @staticmethod
+    def can_be_composed(sentence) -> bool:
         # return True if the sentence can go to state compose_now
         # it should at least pass the can_be_reviewed test
         # all statements related to the sentence must have knowledge_statement text and at least one provenance
         return (
-            SentenceService.can_be_reviewed(sentence)
+            SentenceStateService.can_be_reviewed(sentence)
         ) and (sentence.connectivitystatement_set.annotate(num_prov=Count('provenance')).filter(
             Q(knowledge_statement__isnull=True)
             | Q(knowledge_statement__exact="")
             | Q(num_prov__lte=0)).count() == 0)
 
     @staticmethod
-    def has_permission_to_transition_to_compose_now(sentence, user):
-        # only system users can transition from OPEN to COMPOSE_NOW for the statement ingestion process
-        if sentence.state == SentenceState.OPEN:
-            return user.username == 'system'
-        return True
+    def has_permission_to_transition_to_compose_now(sentence, user) -> bool:
+        profile = get_user_profile(user=user)
+        return profile.is_reviewer or profile.is_triage_operator or user.is_staff
 
-
-class ConnectivityStatementService(StateServiceMixin):
     @staticmethod
-    def compile_journey(connectivity_statement) -> List[str]:
-        """
-       Generates a string of descriptions of journey paths for a given connectivity statement.
+    def has_permission_to_transition_to_completed(sentence, user) -> bool:
+        profile = get_user_profile(user=user)
+        return profile.is_reviewer or profile.is_triage_operator or user.is_staff
 
-       Args:
-           connectivity_statement: The connectivity statement containing origins, vias, and destinations.
+    @staticmethod
+    def has_permission_to_transition_to_excluded(sentence, user) -> bool:
+        profile = get_user_profile(user=user)
+        return profile.is_reviewer or profile.is_triage_operator or user.is_staff
 
-       Returns:
-           A string with each journey path description on a new line.
-       """
-        # Extract origins, vias, and destinations from the connectivity statement
-        Via = apps.get_model('composer', 'Via')
-        Destination = apps.get_model('composer', 'Destination')
 
-        origins = list(connectivity_statement.origins.all())
+class ConnectivityStatementStateService(StateServiceMixin):
 
-        vias = list(Via.objects.filter(connectivity_statement=connectivity_statement))
-        destinations = list(Destination.objects.filter(connectivity_statement=connectivity_statement))
+    @staticmethod
+    def has_permission_to_transition_to_compose_now(connectivity_statement, user) -> bool:
+        profile = get_user_profile(user=user)
+        if is_system_user(user) and connectivity_statement.state == CSState.DRAFT:
+            return True
 
-        # Generate all paths and then consolidate them
-        all_paths = generate_paths(origins, vias, destinations)
-        journey_paths = consolidate_paths(all_paths)
+        if profile.is_curator and connectivity_statement.state in [CSState.INVALID, CSState.IN_PROGRESS]:
+            return True
 
-        # Create sentences for each journey path
-        journey_descriptions = []
-        for path in journey_paths:
-            origin_names = path[0][0]
-            destination_names = path[-1][0]
-            via_names = ' via '.join([node for node, layer in path if 0 < layer < len(vias) + 1])
+        return user.is_staff
 
-            if via_names:
-                sentence = f"from {origin_names} to {destination_names} via {via_names}"
-            else:
-                sentence = f"from {origin_names} to {destination_names}"
+    @staticmethod
+    def has_permission_to_transition_to_in_progress(connectivity_statement, user) -> bool:
+        profile = get_user_profile(user=user)
+        if profile.is_curator and connectivity_statement.state in [CSState.COMPOSE_NOW, CSState.REVISE]:
+            return True
 
-            journey_descriptions.append(sentence)
+        if profile.is_reviewer and connectivity_statement.state == CSState.TO_BE_REVIEWED:
+            return True
 
-        return journey_descriptions
+        return user.is_staff
 
     @staticmethod
     def can_be_reviewed(connectivity_statement):
-        # return True if the state,emt can go to state to_be_reviewed it should have at least one provenance,
+        # return True if the statememt can go to state to_be_reviewed it should have at least one provenance,
         # origin, destination, phenotype, sex, path and species
         return (
                 connectivity_statement.origins.exists()
@@ -163,20 +177,38 @@ class ConnectivityStatementService(StateServiceMixin):
         )
 
     @staticmethod
-    def has_permission_to_transition_to_compose_now(connectivity_statement, user):
-        # if state in NPO APPROVED or EXPORTED and use is a staff user then also allow transition to compose_now
-        # other users should not be able to transition to compose_now from these 2 states
-        return user and (connectivity_statement.state not in (CSState.NPO_APPROVED, CSState.EXPORTED) or user.is_staff)
+    def has_permission_to_transition_to_to_be_reviewed(connectivity_statement, user) -> bool:
+        profile = get_user_profile(user=user)
+        if profile.is_curator and connectivity_statement.state == CSState.IN_PROGRESS:
+            return True
+
+        if profile.is_reviewer and connectivity_statement.state == CSState.REJECTED:
+            return True
+
+        return user.is_staff
 
     @staticmethod
-    def has_permission_to_transition_to_exported(connectivity_statement, user):
-        # only system users can transition to EXPORTED
-        return user.username == 'system'
+    def has_permission_to_transition_to_rejected(connectivity_statement, user) -> bool:
+        profile = get_user_profile(user=user)
+        return profile.is_reviewer or user.is_staff
 
     @staticmethod
-    def has_permission_to_transition_to_invalid(connectivity_statement, user):
-        # only system users can transition to INVALID
-        return user.username == 'system'
+    def has_permission_to_transition_to_revise(connectivity_statement, user) -> bool:
+        profile = get_user_profile(user=user)
+        return profile.is_reviewer or user.is_staff
+
+    @staticmethod
+    def has_permission_to_transition_to_npo_approval(connectivity_statement, user) -> bool:
+        profile = get_user_profile(user=user)
+        return profile.is_reviewer or user.is_staff
+
+    @staticmethod
+    def has_permission_to_transition_to_exported(connectivity_statement, user) -> bool:
+        return is_system_user(user)
+
+    @staticmethod
+    def has_permission_to_transition_to_invalid(connectivity_statement, user) -> bool:
+        return is_system_user(user)
 
     @staticmethod
     def add_important_tag(connectivity_statement):
@@ -193,7 +225,7 @@ class ConnectivityStatementService(StateServiceMixin):
 
     @staticmethod
     def is_valid(connectivity_statement):
-        return ConnectivityStatementService.is_forward_connection_valid(connectivity_statement)
+        return ConnectivityStatementStateService.is_forward_connection_valid(connectivity_statement)
 
     @staticmethod
     def is_forward_connection_valid(connectivity_statement):
@@ -212,3 +244,12 @@ class ConnectivityStatementService(StateServiceMixin):
             if any(entity in forward_connection.origins.all() for entity in destination_anatomical_entities):
                 return True
         return False
+
+
+def is_system_user(user: User) -> bool:
+    return user.username == 'system'
+
+
+def get_user_profile(user):
+    from composer.models import Profile
+    return Profile.objects.get(user=user)

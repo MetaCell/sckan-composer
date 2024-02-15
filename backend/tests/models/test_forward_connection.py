@@ -1,7 +1,7 @@
 import pytest
 
 from composer.models import ConnectivityStatement, AnatomicalEntity, Sentence, Destination
-from composer.services.state_services import ConnectivityStatementService
+from composer.services.state_services import ConnectivityStatementStateService
 
 @pytest.mark.django_db
 def test_forward_connection_service():
@@ -36,7 +36,7 @@ def test_forward_connection_service():
     statement.forward_connection.add(statement_forward)
 
     # Use the service to check for validity
-    if ConnectivityStatementService.is_forward_connection_valid(statement):
+    if ConnectivityStatementStateService.is_forward_connection_valid(statement):
         pytest.fail("The forward connection should not be valid!")
     else:
         assert True, "The forward connection was signaled as invalid as expected."

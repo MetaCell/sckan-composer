@@ -6,7 +6,7 @@ from django_fsm.signals import post_transition
 
 from .enums import CSState, NoteType
 from .models import ConnectivityStatement, ExportBatch, Note, Sentence
-from .services.export_services import compute_metrics, ConnectivityStatementService
+from .services.export_services import compute_metrics, ConnectivityStatementStateService
 
 
 @receiver(post_save, sender=ExportBatch)
@@ -45,4 +45,4 @@ def post_transition_cs(sender, instance, name, source, target, **kwargs):
             CSState.EXPORTED,
         ):
             # add important tag to CS when transition to COMPOSE_NOW from NPO Approved or Exported
-            instance = ConnectivityStatementService.add_important_tag(instance)
+            instance = ConnectivityStatementStateService.add_important_tag(instance)

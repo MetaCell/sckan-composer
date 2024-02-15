@@ -3,7 +3,7 @@ import {
   AnatomicalEntity,
   ConnectivityStatement,
   ConnectivityStatementUpdate,
-  PaginatedConnectivityStatementList
+  PaginatedBaseConnectivityStatementList
 } from '../apiclient/backend'
 import { AbstractService } from "./AbstractService"
 import { QueryParams } from "../redux/statementSlice"
@@ -52,7 +52,7 @@ class ConnectivityStatementService extends AbstractService {
   async removeSpecie(id: number, specieId: number): Promise<ConnectivityStatement> {
     return composerApi.composerConnectivityStatementDelSpecieCreate(id, specieId).then((response: any) => response.data)
   }
-  async getList(queryOptions: QueryParams): Promise<PaginatedConnectivityStatementList> {
+  async getList(queryOptions: QueryParams): Promise<PaginatedBaseConnectivityStatementList> {
     const { origins, limit, ordering, index, knowledgeStatement, stateFilter, tagFilter, sentenceId, excludeSentenceId, excludeIds } = queryOptions
     return composerApi.composerConnectivityStatementList(undefined, excludeIds, excludeSentenceId, knowledgeStatement, limit, undefined, index, ordering, origins, sentenceId, stateFilter, tagFilter).then((res: any) => res.data)
   }

@@ -296,7 +296,7 @@ describe('End to End Tests', () => {
         })
 
 
-        it('Search for created Record', async () => {
+        it('Search for created Record 2', async () => {
             console.log('Searching for created Record ...')
 
             await page.waitForTimeout(3000)
@@ -321,7 +321,7 @@ describe('End to End Tests', () => {
             const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
                 return status.map(status => status.innerText)
             })
-            expect(sentence_status).toContain("To Be Reviewed")
+            expect(sentence_status).toContain("To be reviewed")
 
             console.log('Record found')
         })
@@ -360,7 +360,7 @@ describe('End to End Tests', () => {
             const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
                 return status.map(status => status.innerText)
             })
-            expect(sentence_status).toContain("Compose Now")
+            expect(sentence_status).toContain("Compose now")
 
             console.log('Statement found')
         })
@@ -389,19 +389,8 @@ describe('End to End Tests', () => {
             console.log('Tags and Notes added')
         })
 
-        it('Set status as Connection Missing', async () => {
-            console.log('Changing Status ...')
-            await page.waitForSelector(selectors.STATUS_BUTTON)
-            await page.click(selectors.STATUS_BUTTON)
-            await page.waitForTimeout(1000)
-            const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
-                return status.map(status => status.innerText)
-            })
-            expect(sentence_status).toContain("Connection Missing")
-            console.log('Status Changed')
-        })
 
-        it('Set status as Curate', async () => {
+        it('Set status as In progress', async () => {
             console.log('Changing Status ...')
             await page.waitForSelector(selectors.STATUS_BUTTON)
             await page.click(selectors.STATUS_BUTTON)
@@ -409,7 +398,7 @@ describe('End to End Tests', () => {
             const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
                 return status.map(status => status.innerText)
             })
-            expect(sentence_status).toContain("Curated")
+            expect(sentence_status).toContain("In progress")
             console.log('Status Changed')
         })
 
@@ -595,13 +584,13 @@ describe('End to End Tests', () => {
             await page.waitForFunction((selector, expectedText) => {
                 const elements = document.querySelectorAll(selector);
                 return Array.from(elements, element => element.innerText).includes(expectedText);
-            }, {timeout: 15000}, 'span.MuiChip-label.MuiChip-labelSmall', "To Be Reviewed");
+            }, {timeout: 15000}, 'span.MuiChip-label.MuiChip-labelSmall', "To be reviewed");
             
             const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
                 return status.map(status => status.innerText);
             });
             
-            expect(sentence_status).toContain("To Be Reviewed");
+            expect(sentence_status).toContain("To be reviewed");
             console.log('Status Changed')
         })
 
@@ -620,13 +609,13 @@ describe('End to End Tests', () => {
             await page.waitForFunction((selector, expectedText) => {
                 const elements = document.querySelectorAll(selector);
                 return Array.from(elements, element => element.innerText).includes(expectedText);
-            }, {timeout: 15000}, 'span.MuiChip-label.MuiChip-labelSmall', "Npo Approved");
+            }, {timeout: 15000}, 'span.MuiChip-label.MuiChip-labelSmall', "NPO approved");
             
             const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
                 return status.map(status => status.innerText);
             });
             
-            expect(sentence_status).toContain("Npo Approved");
+            expect(sentence_status).toContain("Npo approved");
             console.log('Status Changed')
         })
     })

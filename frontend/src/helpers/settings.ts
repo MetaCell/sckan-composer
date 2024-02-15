@@ -4,25 +4,25 @@ export const duplicatesRowsPerPage = 10;
 export const autocompleteRows = 100;
 
 export const statementStateToColor: StatementStateToColor = {
-  compose_now: "success", //red
-  curated: "success", // green
-  to_be_reviewed: "warning", //orange
-  excluded: "info", //grey
   draft: "primary", // blue
+  compose_now: "success", //red
+  in_progress: "success", // green
+  to_be_reviewed: "warning", //orange
+  revise: "warning", //grey
   rejected: "info", //grey,
-  connection_missing: "warning", // orange
-  npo_approved: "success", //green
-  exported: "success", //green
-  invalid: "warning", //orange
+  npo_approved: "info", //green
+  exported: "info", //green
+  invalid: "warning", //green
 };
 
 export const sentenceStateToColor: SentenceStateToColor = {
   open: "primary", //blue,
-  compose_now: "success", //green
+  needs_further_review: "warning", //orange
   compose_later: "warning", // orange
-  to_be_reviewed: "warning", //orange
+  ready_to_compose: "success", //green
+  compose_now: "success", //green
+  completed: "info", //grey
   excluded: "info", //grey
-  duplicate: "info", //grey
 };
 
 export const OriginsGroupLabel = "Origins";

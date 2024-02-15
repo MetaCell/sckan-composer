@@ -1,17 +1,9 @@
 import React from "react"
 import { Stack, Typography } from "@mui/material"
 import ControlledCheckbox from "../Widgets/ControlledCheckbox"
-import { SentenceAvailableTransitionsEnum as sentenceStates } from "../../apiclient/backend/api"
+import {SentenceLabels} from "../../helpers/helpers";
 
-const sentenceLabels = {
-  [sentenceStates.Open]: "Open",
-  [sentenceStates.ToBeReviewed]: "to_be_reviewed",
-  [sentenceStates.ComposeLater]: "Compose later",
-  [sentenceStates.ComposeNow]: "compose_now",
-  [sentenceStates.Duplicate]: "Duplicate",
-  [sentenceStates.Excluded]: "Excluded",
-}
-
+const sentenceLabels = {...SentenceLabels}
 const statementLabels = {}
 
 const StateFilter = (props: any) => {

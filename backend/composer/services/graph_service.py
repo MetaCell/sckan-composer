@@ -1,3 +1,6 @@
+from typing import List
+from django.apps import apps
+
 JOURNEY_DELIMITER = '\\'
 
 
@@ -86,8 +89,8 @@ def consolidate_paths(paths):
         paths = consolidated + [paths[i] for i in range(len(paths)) if i not in used_indices]
 
     return [[((node[0].replace(JOURNEY_DELIMITER, ' or '), node[1]) if (
-                node[1] == 0 or path.index(node) == len(path) - 1) else (
-    node[0].replace(JOURNEY_DELIMITER, ', '), node[1])) for node in path] for path in paths]
+            node[1] == 0 or path.index(node) == len(path) - 1) else (
+        node[0].replace(JOURNEY_DELIMITER, ', '), node[1])) for node in path] for path in paths]
 
 
 def can_merge(path1, path2):
@@ -127,3 +130,43 @@ def merge_paths(path1, path2):
             merged_nodes = set(p1.split(JOURNEY_DELIMITER) + p2.split(JOURNEY_DELIMITER))
             merged_path.append((JOURNEY_DELIMITER.join(sorted(merged_nodes)), layer1))
     return merged_path
+
+
+def compile_journey(connectivity_statement) -> List[str]:
+    """
+   Generates a string of descriptions of journey paths for a given connectivity statement.
+
+   Args:
+       connectivity_statement: The connectivity statement containing origins, vias, and destinations.
+
+   Returns:
+       A string with each journey path description on a new line.
+   """
+    # Extract origins, vias, and destinations from the connectivity statement
+    Via = apps.get_model('composer', 'Via')
+    Destination = apps.get_model('composer', 'Destination')
+
+    origins = list(connectivity_statement.origins.all())
+
+    vias = list(Via.objects.filter(connectivity_statement=connectivity_statement))
+    destinations = list(Destination.objects.filter(connectivity_statement=connectivity_statement))
+
+    # Generate all paths and then consolidate them
+    all_paths = generate_paths(origins, vias, destinations)
+    journey_paths = consolidate_paths(all_paths)
+
+    # Create sentences for each journey path
+    journey_descriptions = []
+    for path in journey_paths:
+        origin_names = path[0][0]
+        destination_names = path[-1][0]
+        via_names = ' via '.join([node for node, layer in path if 0 < layer < len(vias) + 1])
+
+        if via_names:
+            sentence = f"from {origin_names} to {destination_names} via {via_names}"
+        else:
+            sentence = f"from {origin_names} to {destination_names}"
+
+        journey_descriptions.append(sentence)
+
+    return journey_descriptions
