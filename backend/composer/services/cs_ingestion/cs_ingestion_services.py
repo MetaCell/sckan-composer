@@ -339,10 +339,10 @@ def get_circuit_type(statement: Dict):
     if statement[CIRCUIT_TYPE]:
         if len(statement[CIRCUIT_TYPE]) > 1:
             logger_service.add_anomaly(LoggableAnomaly(statement[ID], None, f'Multiple circuit types found'))
-        return CIRCUIT_TYPE_MAPPING.get(statement[CIRCUIT_TYPE][0], CircuitType.UNKNOWN)
+        return CIRCUIT_TYPE_MAPPING.get(statement[CIRCUIT_TYPE][0], None)
     else:
         logger_service.add_anomaly(LoggableAnomaly(statement[ID], None, f'No circuit type found.'))
-        return CircuitType.UNKNOWN
+        return None
 
 
 def get_phenotype(statement: Dict) -> Optional[Phenotype]:

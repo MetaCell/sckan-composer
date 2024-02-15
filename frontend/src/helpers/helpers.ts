@@ -132,7 +132,7 @@ export const StatementsLabels = {
   [statementStates.Exported]: "Exported",
   [statementStates.InProgress]: "In progress",
   [statementStates.Invalid]: "invalid",
-  [statementStates.NpoApproved]: "NPO approved",
+  [statementStates.NpoApproved]: "NPO approval",
   [statementStates.Rejected]: "Reject",
   [statementStates.Revise]: "Revise",
   [statementStates.ToBeReviewed]: "To be reviewed",

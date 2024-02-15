@@ -162,6 +162,7 @@ paths:
             - rejected
             - revise
             - to_be_reviewed
+            - invalid
         explode: true
         style: form
       - in: query
