@@ -143,10 +143,10 @@ class ConnectivityStatementStateService(StateServiceMixin):
 
     @staticmethod
     def has_permission_to_transition_to_compose_now(connectivity_statement, user) -> bool:
-        profile = get_user_profile(user=user)
         if is_system_user(user) and connectivity_statement.state == CSState.DRAFT:
             return True
 
+        profile = get_user_profile(user=user)
         if profile.is_curator and connectivity_statement.state in [CSState.INVALID, CSState.IN_PROGRESS]:
             return True
 
@@ -154,6 +154,9 @@ class ConnectivityStatementStateService(StateServiceMixin):
 
     @staticmethod
     def has_permission_to_transition_to_in_progress(connectivity_statement, user) -> bool:
+        if is_system_user(user):
+            return False
+
         profile = get_user_profile(user=user)
         if profile.is_curator and connectivity_statement.state in [CSState.COMPOSE_NOW, CSState.REVISE]:
             return True
@@ -178,6 +181,10 @@ class ConnectivityStatementStateService(StateServiceMixin):
 
     @staticmethod
     def has_permission_to_transition_to_to_be_reviewed(connectivity_statement, user) -> bool:
+
+        if is_system_user(user):
+            return False
+
         profile = get_user_profile(user=user)
         if profile.is_curator and connectivity_statement.state == CSState.IN_PROGRESS:
             return True
@@ -189,16 +196,24 @@ class ConnectivityStatementStateService(StateServiceMixin):
 
     @staticmethod
     def has_permission_to_transition_to_rejected(connectivity_statement, user) -> bool:
+        if is_system_user(user):
+            return False
+
         profile = get_user_profile(user=user)
         return profile.is_reviewer or user.is_staff
 
     @staticmethod
     def has_permission_to_transition_to_revise(connectivity_statement, user) -> bool:
+        if is_system_user(user):
+            return False
+
         profile = get_user_profile(user=user)
         return profile.is_reviewer or user.is_staff
 
     @staticmethod
     def has_permission_to_transition_to_npo_approval(connectivity_statement, user) -> bool:
+        if is_system_user(user):
+            return False
         profile = get_user_profile(user=user)
         return profile.is_reviewer or user.is_staff
 
