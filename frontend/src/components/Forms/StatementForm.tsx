@@ -517,11 +517,17 @@ const StatementForm = (props: any) => {
             const id = getFirstNumberFromString(formId)
             let entity: any = []
             if (id !== null) {
-              const preLevelItems = (id === 0 && statement['vias'].length === 0)
-                ? statement['origins']
-                : statement['vias'].length === 0
-                  ? []
-                  : statement['vias'][statement.vias.length - 1]['anatomical_entities'];
+             let preLevelItems;
+              if (id === 0 && statement['vias'].length === 0) {
+                preLevelItems = statement['origins'];
+              }
+              else if (statement['origins'].length === 0 && statement['vias'].length === 0) {
+                preLevelItems = [];
+              }
+              else {
+                preLevelItems = statement['vias'][statement.vias.length - 1]['anatomical_entities'];
+              }
+              
               const selected = findMatchingEntities(
                 statement,
                 preLevelItems,
