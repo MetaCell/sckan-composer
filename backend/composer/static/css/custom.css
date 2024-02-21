@@ -32,3 +32,7 @@ fieldset.sortable :is(.inline-related, td.original) span.sort {
     margin-left: 20px;
     color: #000;
 }
+
+.select2-container--admin-autocomplete .select2-selection--multiple .select2-selection__rendered {
+    border: 1px solid #ccc;
+}
