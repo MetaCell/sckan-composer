@@ -124,7 +124,6 @@ const StatementForm = (props: any) => {
 
   copiedUISchema.knowledge_statement = {
     "ui:widget": "CustomTextArea",
-    "ui:emptyValue": "",
     "ui:options": {
       isDisabled,
       label: "Knowledge Statement",
