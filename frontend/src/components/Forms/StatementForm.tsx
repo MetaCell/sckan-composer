@@ -124,6 +124,7 @@ const StatementForm = (props: any) => {
 
   copiedUISchema.knowledge_statement = {
     "ui:widget": "CustomTextArea",
+    "ui:emptyValue": "",
     "ui:options": {
       isDisabled,
       label: "Knowledge Statement",
@@ -517,7 +518,7 @@ const StatementForm = (props: any) => {
             const id = getFirstNumberFromString(formId)
             let entity: any = []
             if (id !== null) {
-              const preLevelItems = id === 0 && statement['vias'].length === 0 ? statement['origins'] :  statement['vias'][statement.vias.length - 1]['anatomical_entities']
+              const preLevelItems = id === 0 && statement['vias'].length === 0 ? statement['origins'] :  statement['vias'][statement?.vias?.length - 1]?.anatomical_entities
               const selected = findMatchingEntities(
                 statement,
                 preLevelItems,
@@ -532,7 +533,7 @@ const StatementForm = (props: any) => {
               });
               return entity
             }
-           
+
           },
           refreshStatement: () => refreshStatement(),
           errors: "",
