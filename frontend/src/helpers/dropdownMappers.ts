@@ -147,6 +147,9 @@ export function findMatchingEntities(
   statement: ConnectivityStatement,
   entities: Option[],
 ) {
+  if (entities === undefined) {
+    return [];
+  }
   const matchingOrigins: AnatomicalEntity[] = (statement.origins || []).filter(
     (origin: AnatomicalEntity) =>
       entities.some(

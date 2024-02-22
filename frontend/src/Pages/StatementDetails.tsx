@@ -137,7 +137,7 @@ const StatementDetails = () => {
           <CircularProgress />
         </div>
       )}
-      {statement.knowledge_statement && (
+      {(statement.knowledge_statement !== undefined && statement.knowledge_statement !== null) && (
         <>
           <Grid item xs={1}>
             <Stack
