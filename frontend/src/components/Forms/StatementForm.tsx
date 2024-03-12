@@ -198,7 +198,7 @@ const StatementForm = (props: any) => {
           await api.composerViaDestroy(element.children.props.formData.id);
           refreshStatement();
         }}
-        onElementAdd={async (element: any) => {
+        onElementAdd={async () => {
           await api.composerViaCreate({
             id: -1,
             order: statement?.vias?.length,
@@ -354,7 +354,7 @@ const StatementForm = (props: any) => {
           },
           refreshStatement: () => refreshStatement(),
           errors: "",
-          mapValueToOption: (anatomicalEntities: any[], formId: any) => {
+          mapValueToOption: (anatomicalEntities: any[]) => {
             const entities: Option[] = [];
             const selected = findMatchingEntities(
               statement,
@@ -386,7 +386,7 @@ const StatementForm = (props: any) => {
           );
           refreshStatement();
         }}
-        onElementAdd={async (element: any) => {
+        onElementAdd={async () => {
           await api.composerDestinationCreate({
             id: -1,
             connectivity_statement: statement.id,
@@ -536,7 +536,7 @@ const StatementForm = (props: any) => {
           },
           refreshStatement: () => refreshStatement(),
           errors: "",
-          mapValueToOption: (anatomicalEntities: any[], formId: any) => {
+          mapValueToOption: (anatomicalEntities: any[]) => {
             const entities: Option[] = [];
             const selected = findMatchingEntities(
               statement,
@@ -573,6 +573,7 @@ const StatementForm = (props: any) => {
   copiedUISchema.forward_connection = {
     "ui:widget": CustomEntitiesDropdown,
     "ui:options": {
+      chipsNumber: 10,
       isDisabled,
       placeholder: "Forward connection(s)",
       searchPlaceholder: "Search for Connectivity Statements",

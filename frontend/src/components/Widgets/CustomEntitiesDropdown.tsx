@@ -98,7 +98,6 @@ const styles = {
     height: "1.5rem",
     borderRadius: "0.375rem",
     fontSize: "0.875rem",
-    maxWidth: "8rem",
     fontWeight: 500,
     
     "&.MuiChip-filled": {
@@ -484,7 +483,6 @@ export default function CustomEntitiesDropdown({
                   gap={1}
                   sx={{
                     borderBottom: `0.0625rem solid ${popperBorderColor}`,
-                    height: autocompleteOptions.length > 0 ? "2.75rem" : "auto",
                     padding:
                       autocompleteOptions.length > 0 ? "0 0.875rem" : "0.875rem",
                   }}
