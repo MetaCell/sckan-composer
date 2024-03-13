@@ -1,8 +1,8 @@
 import csv
-
+import time
 from django.core.management.base import BaseCommand
-
-from composer.models import AnatomicalEntity
+from django.db.utils import IntegrityError
+from composer.models import AnatomicalEntity, Synonym
 
 URI = "o"
 NAME = "o_label"
@@ -10,55 +10,66 @@ SYNONYM = "o_synonym"
 
 
 class Command(BaseCommand):
-    help = "Ingests Anatomical Entities CSV file(s)"
+    help = "Ingests Anatomical Entities CSV file(s), with robust error handling."
 
     def add_arguments(self, parser):
         parser.add_argument("csv_files", nargs="+", type=str)
+        parser.add_argument("--update_names", action='store_true',
+                            help="Update the name even if the entity already exists")
+        parser.add_argument("--show_complete_logs", action='store_true',
+                            help="Show detailed logs during processing")
 
-    def _create_ae(self, name, ontology_uri):
-        found = AnatomicalEntity.objects.filter(name__iexact=name).exists()
-        if not found:
-            return AnatomicalEntity(
-                name=name,
-                ontology_uri=ontology_uri
+    def _process_anatomical_entity(self, name, ontology_uri, synonym, update_names, show_complete_logs):
+        try:
+            anatomical_entity, created = AnatomicalEntity.objects.get_or_create(
+                ontology_uri=ontology_uri,
+                defaults={"name": name},
             )
-        return None
-        # anatomical_entity, created = AnatomicalEntity.objects.get_or_create(
-        #     name__iexact=name,
-        #     defaults={"ontology_uri": ontology_uri, "name": name},
-        # )
-        # if created:
-        #     self.stdout.write(f"Anatomical Entity {name} created.")
-        #     anatomical_entity.save()
+            if not created and update_names:
+                if anatomical_entity.name != name:
+                    anatomical_entity.name = name
+                    anatomical_entity.save()
+                    if show_complete_logs:
+                        self.stdout.write(
+                            self.style.SUCCESS(f"Updated {anatomical_entity.ontology_uri} name to {name}."))
+
+            if synonym:
+                synonym_exists = anatomical_entity.synonyms.filter(alias__iexact=synonym).exists()
+                if not synonym_exists:
+                    Synonym.objects.create(anatomical_entity=anatomical_entity, alias=synonym)
+                    if show_complete_logs:
+                        self.stdout.write(
+                            self.style.SUCCESS(f"Synonym '{synonym}' added for {anatomical_entity.ontology_uri}."))
+        except IntegrityError as e:
+            self.stdout.write(self.style.ERROR(f"Error processing {ontology_uri}: {e}"))
 
     def handle(self, *args, **options):
+        start_time = time.time()
+        update_names = options['update_names']
+        show_complete_logs = options['show_complete_logs']
+
         for csv_file in options["csv_files"]:
-            with open(
-                csv_file, newline="", encoding="utf-8", errors="ignore"
-            ) as csvfile:
-                aereader = csv.DictReader(
-                    csvfile,
-                    delimiter=";",
-                    quotechar='"',
-                )
-                bulk = []
-                self.stdout.write("Start ingestion of Anatomical Entities")
-                for row in aereader:
-                    ontology_uri = row[URI]
-                    name = row[NAME]
-                    synonym = row[SYNONYM] or None
-                    ae = self._create_ae(name, ontology_uri)
-                    if ae:
-                        bulk.append(ae)
-                    if synonym:
-                        ae = self._create_ae(synonym, ontology_uri)
-                        if ae:
-                            bulk.append(ae)
-                    if len(bulk) > 100:
-                        self.stdout.write(f"{len(bulk)} new Anatomical Entities created.")
-                        AnatomicalEntity.objects.bulk_create(bulk, ignore_conflicts=True)
-                        bulk = []
-                if len(bulk) > 0:
-                    # insert the remaining
-                    self.stdout.write(f"{len(bulk)} new Anatomical Entities created.")
-                    AnatomicalEntity.objects.bulk_create(bulk, ignore_conflicts=True)
+            try:
+                with open(csv_file, "r", encoding="utf-8", errors="ignore") as f:
+                    total_lines = sum(1 for _ in f)
+
+                with open(csv_file, newline="", encoding="utf-8", errors="ignore") as csvfile:
+                    reader = csv.DictReader(csvfile, delimiter=";", quotechar='"')
+                    current_line = 0
+                    for row in reader:
+                        current_line += 1
+                        if current_line % 100 == 0 or current_line == total_lines:
+                            self.stdout.write(self.style.NOTICE(f"Processing line {current_line}/{total_lines}"))
+
+                        ontology_uri = row[URI].strip()
+                        name = row[NAME].strip()
+                        synonym = row[SYNONYM].strip() if row[SYNONYM] else None
+
+                        self._process_anatomical_entity(name, ontology_uri, synonym, update_names, show_complete_logs)
+            except FileNotFoundError:
+                self.stdout.write(self.style.ERROR(f"File {csv_file} does not exist."))
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f"An error occurred while processing {csv_file}: {e}"))
+
+        end_time = time.time()
+        self.stdout.write(self.style.SUCCESS(f"Operation completed in {end_time - start_time:.2f} seconds."))
