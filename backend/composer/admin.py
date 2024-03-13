@@ -19,7 +19,7 @@ from composer.models import (
     Tag,
     Via,
     FunctionalCircuitRole,
-    ProjectionPhenotype, Destination
+    ProjectionPhenotype, Destination, Synonym
 )
 
 
@@ -89,10 +89,16 @@ class SentenceAdmin(
     )
 
 
+class SynonymInline(admin.TabularInline):
+    model = Synonym
+    extra = 1
+
+
 class AnatomicalEntityAdmin(admin.ModelAdmin):
     list_display = ("name", "ontology_uri")
     list_display_links = ("name", "ontology_uri")
     search_fields = ("name",)  # or ("^name",) for search to start with
+    inlines = [SynonymInline]
 
 
 class ViaInline(SortableStackedInline):
