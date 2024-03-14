@@ -6,21 +6,46 @@ from django.db import migrations
 def deduplicate_anatomical_entities(apps, schema_editor):
     AnatomicalEntity = apps.get_model('composer', 'AnatomicalEntity')
     Synonym = apps.get_model('composer', 'Synonym')
+    ConnectivityStatement = apps.get_model('composer', 'ConnectivityStatement')
+    Destination = apps.get_model('composer', 'Destination')
+    Via = apps.get_model('composer', 'Via')
 
-    unique_uris = {}
+    primary_anatomical_entities = {}
 
     for entity in AnatomicalEntity.objects.all().order_by('id'):
-        if entity.ontology_uri in unique_uris:
+        if entity.ontology_uri in primary_anatomical_entities:
             # If the ontology_uri is a duplicate, move this entity to Synonym
-            primary_entity = AnatomicalEntity.objects.get(id=unique_uris[entity.ontology_uri])
+            primary_entity = AnatomicalEntity.objects.get(id=primary_anatomical_entities[entity.ontology_uri])
+            # Create a synonym for the duplicate entity
             Synonym.objects.create(anatomical_entity=primary_entity, alias=entity.name)
+
+            # Update ConnectivityStatement origins to point to the primary entity
+            for cs in ConnectivityStatement.objects.filter(origins=entity):
+                cs.origins.remove(entity)
+                cs.origins.add(primary_entity)
+
+            # Update Destination and Via for anatomical_entities and from_entities
+            for destination in Destination.objects.filter(anatomical_entities=entity):
+                destination.anatomical_entities.remove(entity)
+                destination.anatomical_entities.add(primary_entity)
+
+            for destination in Destination.objects.filter(from_entities=entity):
+                destination.from_entities.remove(entity)
+                destination.from_entities.add(primary_entity)
+
+            for via in Via.objects.filter(anatomical_entities=entity):
+                via.anatomical_entities.remove(entity)
+                via.anatomical_entities.add(primary_entity)
+
+            for via in Via.objects.filter(from_entities=entity):
+                via.from_entities.remove(entity)
+                via.from_entities.add(primary_entity)
+
+            # Finally, delete the duplicate entity
             entity.delete()
+
         else:
-            # Update the name of the anatomical entity to be the same as the ontology_uri
-            # Since we don't have the  rdfs label this will make it clear that the anatomical entity needs curation
-            entity.name = entity.ontology_uri
-            entity.save()
-            unique_uris[entity.ontology_uri] = entity.id
+            primary_anatomical_entities[entity.ontology_uri] = entity.id
 
 
 class Migration(migrations.Migration):
