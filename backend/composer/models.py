@@ -239,6 +239,20 @@ class AnatomicalEntity(models.Model):
         verbose_name_plural = "Anatomical Entities"
 
 
+class Layer(AnatomicalEntity):
+    ...
+
+
+class Region(AnatomicalEntity):
+    ...
+    layers = models.ManyToManyField(Layer, through='RegionLayerPair')
+
+
+class RegionLayerPair(models.Model):
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
+    layer = models.ForeignKey(Layer, on_delete=models.CASCADE)
+
+
 class Synonym(models.Model):
     anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.CASCADE, related_name="synonyms")
     alias = models.CharField(max_length=200, db_index=True)
