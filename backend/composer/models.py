@@ -2,7 +2,6 @@ from django.contrib.auth.models import User
 from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.expressions import F
-from django.db.models.functions import Upper
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
 
@@ -229,7 +228,7 @@ class AnatomicalEntity(models.Model):
     """Anatomical Entity"""
 
     name = models.CharField(max_length=200, db_index=True)
-    ontology_uri = models.URLField(unique=True)
+    ontology_uri = models.URLField()
 
     def __str__(self):
         return self.name
@@ -245,12 +244,7 @@ class Layer(AnatomicalEntity):
 
 class Region(AnatomicalEntity):
     ...
-    layers = models.ManyToManyField(Layer, through='RegionLayerPair')
-
-
-class RegionLayerPair(models.Model):
-    region = models.ForeignKey(Region, on_delete=models.CASCADE)
-    layer = models.ForeignKey(Layer, on_delete=models.CASCADE)
+    associated_layer = models.ForeignKey(Layer, on_delete=models.CASCADE, related_name='regions')
 
 
 class Synonym(models.Model):

@@ -1,11 +1,11 @@
 from django.core.exceptions import ValidationError
 from django.dispatch import receiver
-from django.db.models.signals import post_save, m2m_changed
+from django.db.models.signals import post_save, m2m_changed, pre_save
 
 from django_fsm.signals import post_transition
 
 from .enums import CSState, NoteType
-from .models import ConnectivityStatement, ExportBatch, Note, Sentence
+from .models import ConnectivityStatement, ExportBatch, Note, Sentence, AnatomicalEntity
 from .services.export_services import compute_metrics, ConnectivityStatementStateService
 
 

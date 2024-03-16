@@ -3,9 +3,11 @@ from datetime import datetime
 from typing import List, Dict, Optional, Tuple, Set, Any
 
 from django.db import transaction
+from neurondm import orders
 
 from composer.models import AnatomicalEntity, Sentence, ConnectivityStatement, Sex, FunctionalCircuitRole, \
-    ProjectionPhenotype, Phenotype, Specie, Provenance, Via, Note, User, Destination
+    ProjectionPhenotype, Phenotype, Specie, Provenance, Via, Note, User, Destination, Region, Layer
+from .exceptions import EntityNotFoundException
 from .helpers import get_value_or_none, found_entity, \
     ORIGINS, DESTINATIONS, VIAS, LABEL, SEX, SPECIES, ID, FORWARD_CONNECTION, SENTENCE_NUMBER, \
     FUNCTIONAL_CIRCUIT_ROLE, CIRCUIT_TYPE, CIRCUIT_TYPE_MAPPING, PHENOTYPE, OTHER_PHENOTYPE, NOTE_ALERT, PROVENANCE, \
@@ -14,7 +16,6 @@ from .logging_service import LoggerService, STATEMENT_INCORRECT_STATE, SENTENCE_
 from .models import LoggableAnomaly, ValidationErrors, Severity
 from .neurondm_script import main as get_statements_from_neurondm
 from ...enums import (
-    CircuitType,
     NoteType,
     CSState, SentenceState
 )
@@ -114,16 +115,25 @@ def validate_statements(statements: List[Dict[str, Any]]) -> List[Dict[str, Any]
 def annotate_invalid_entities(statement: Dict) -> bool:
     has_invalid_entities = False
 
-    # Consolidate all URIs to check
-    uris_to_check = list(statement[ORIGINS].anatomical_entities)
-    uris_to_check.extend(uri for dest in statement[DESTINATIONS] for uri in dest.anatomical_entities)
-    uris_to_check.extend(uri for via in statement[VIAS] for uri in via.anatomical_entities)
+    entities_to_check = list(statement[ORIGINS].anatomical_entities)
+    entities_to_check.extend(entity for dest in statement[DESTINATIONS] for entity in dest.anatomical_entities)
+    entities_to_check.extend(entity for via in statement[VIAS] for entity in via.anatomical_entities)
 
-    # Check all URIs and log if not found
-    for uri in uris_to_check:
-        if not found_entity(uri):
-            statement[VALIDATION_ERRORS].entities.add(uri)
-            has_invalid_entities = True
+    for entity in entities_to_check:
+        if isinstance(entity, orders.rl):
+            region_found = found_entity(entity.region)
+            layer_found = found_entity(entity.layer)
+            if not region_found:
+                statement[VALIDATION_ERRORS].entities.add(entity.region)
+                has_invalid_entities = True
+            if not layer_found:
+                statement[VALIDATION_ERRORS].entities.add(entity.layer)
+                has_invalid_entities = True
+        else:
+            uri = str(entity)
+            if not found_entity(uri):
+                statement[VALIDATION_ERRORS].entities.add(uri)
+                has_invalid_entities = True
 
     return has_invalid_entities
 
@@ -318,7 +328,6 @@ def has_changes(connectivity_statement, statement, defaults):
         return True
 
     # Not checking the Notes because they are kept
-
     return False
 
 
@@ -415,63 +424,67 @@ def update_many_to_many_fields(connectivity_statement: ConnectivityStatement, st
 
 
 def add_origins(connectivity_statement: ConnectivityStatement, statement: Dict):
-    origin_uris = statement[ORIGINS].anatomical_entities
-    origins = []
-    for uri in origin_uris:
-        anatomical_entity = AnatomicalEntity.objects.filter(ontology_uri=uri).first()
-        if anatomical_entity:
-            origins.append(anatomical_entity)
-        else:
+    for entity in statement[ORIGINS].anatomical_entities:
+        try:
+            add_entity_to_instance(connectivity_statement, 'origins', entity)
+        except (EntityNotFoundException, AnatomicalEntity.DoesNotExist):
             assert connectivity_statement.state == CSState.INVALID
-
-    if origins:
-        connectivity_statement.origins.add(*origins)
 
 
 def add_vias(connectivity_statement: ConnectivityStatement, statement: Dict):
-    vias_data = [
-        Via(connectivity_statement=connectivity_statement, type=via.type, order=via.order)
-        for via in statement[VIAS]
-    ]
-    created_vias = Via.objects.bulk_create(vias_data)
-
-    for via_instance, via_data in zip(created_vias, statement[VIAS]):
-        for uri in via_data.anatomical_entities:
-            anatomical_entity = AnatomicalEntity.objects.filter(ontology_uri=uri).first()
-            if anatomical_entity:
-                via_instance.anatomical_entities.add(anatomical_entity)
-            else:
-                assert connectivity_statement.state == CSState.INVALID
-
-        for uri in via_data.from_entities:
-            from_entity = AnatomicalEntity.objects.filter(ontology_uri=uri).first()
-            if from_entity:
-                via_instance.from_entities.add(from_entity)
-            else:
-                assert connectivity_statement.state == CSState.INVALID
+    for neurondm_via in statement[VIAS]:
+        via_instance = Via.objects.create(connectivity_statement=connectivity_statement,
+                                          type=neurondm_via.type,
+                                          order=neurondm_via.order)
+        add_entities_to_connection(via_instance,
+                                   neurondm_via.anatomical_entities,
+                                   neurondm_via.from_entities,
+                                   connectivity_statement)
 
 
 def add_destinations(connectivity_statement: ConnectivityStatement, statement: Dict):
-    destinations_data = [
-        Destination(connectivity_statement=connectivity_statement, type=dest.type)
-        for dest in statement[DESTINATIONS]
-    ]
-    created_destinations = Destination.objects.bulk_create(destinations_data)
+    for neurondm_destination in statement[DESTINATIONS]:
+        destination_instance = Destination.objects.create(connectivity_statement=connectivity_statement,
+                                                          type=neurondm_destination.type)
+        add_entities_to_connection(destination_instance,
+                                   neurondm_destination.anatomical_entities,
+                                   neurondm_destination.from_entities,
+                                   connectivity_statement)
 
-    for destination_instance, dest_data in zip(created_destinations, statement[DESTINATIONS]):
-        for uri in dest_data.anatomical_entities:
-            anatomical_entity = AnatomicalEntity.objects.filter(ontology_uri=uri).first()
-            if anatomical_entity:
-                destination_instance.anatomical_entities.add(anatomical_entity)
-            else:
-                assert connectivity_statement.state == CSState.INVALID
 
-        for uri in dest_data.from_entities:
-            from_entity = AnatomicalEntity.objects.filter(ontology_uri=uri).first()
-            if from_entity:
-                destination_instance.from_entities.add(from_entity)
-            else:
-                assert connectivity_statement.state == CSState.INVALID
+def add_entities_to_connection(instance, anatomical_entities, from_entities, connectivity_statement):
+    try:
+        for entity in anatomical_entities:
+            add_entity_to_instance(instance, 'anatomical_entities', entity)
+
+        for entity in from_entities:
+            add_entity_to_instance(instance, 'from_entities', entity)
+
+    except (EntityNotFoundException, AnatomicalEntity.DoesNotExist):
+        assert connectivity_statement.state == CSState.INVALID
+
+
+def add_entity_to_instance(instance, entity_field, entity):
+    if isinstance(entity, orders.rl):
+        region, _ = get_or_create_complex_entity(entity.region, entity.layer)
+        getattr(instance, entity_field).add(region)
+    else:
+        anatomical_entity = AnatomicalEntity.objects.filter(ontology_uri=str(entity)).first()
+        getattr(instance, entity_field).add(anatomical_entity)
+
+
+def get_or_create_complex_entity(region_uri, layer_uri):
+    region_entity = AnatomicalEntity.objects.filter(ontology_uri=region_uri).first()
+    layer_entity = AnatomicalEntity.objects.filter(ontology_uri=layer_uri).first()
+
+    if not region_entity or not layer_entity:
+        raise EntityNotFoundException(f"Region or layer not found for URIs: {region_uri}, {layer_uri}")
+
+
+    layer, _ = Layer.objects.get_or_create(ontology_uri=layer_uri, defaults={'name': layer_entity.name})
+    region, _ = Region.objects.get_or_create(ontology_uri=region_uri,
+                                             defaults={'name': region_entity.name, 'associated_layer': layer})
+    return region, layer
 
 
 def add_notes(connectivity_statement: ConnectivityStatement, statement: Dict):

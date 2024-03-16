@@ -85,8 +85,7 @@ def get_connections(n, lpes):
     tmp_origins, tmp_vias, tmp_destinations, validation_errors = process_connections(partial_order,
                                                                                      set(origins_from_axioms),
                                                                                      vias_from_axioms,
-                                                                                     destinations_from_axioms
-                                                                                     )
+                                                                                     destinations_from_axioms)
 
     validation_errors = validate_partial_order_and_axioms(origins_from_axioms, vias_from_axioms,
                                                           destinations_from_axioms, tmp_origins,
@@ -109,9 +108,13 @@ def create_uri_type_dict(lpes_func, predicate_type_map):
     return uri_type_dict
 
 
-def process_connections(path, origins_from_axioms: Set[str], vias_from_axioms: Dict[str, str],
-                        destinations_from_axioms: Dict[str, str], from_entities: Optional[Set[str]] = None,
-                        depth: int = 0, result: Optional[Dict] = None) -> Tuple[
+def process_connections(path,
+                        origins_from_axioms: Set[str],
+                        vias_from_axioms: Dict[str, str],
+                        destinations_from_axioms: Dict[str, str],
+                        from_entities: Optional[Set[str]] = None,
+                        depth: int = 0,
+                        result: Optional[Dict] = None) -> Tuple[
     List[NeuronDMOrigin], List[NeuronDMVia], List[NeuronDMDestination], ValidationErrors]:
     if result is None:
         result = {ORIGINS: [], DESTINATIONS: [], VIAS: [], VALIDATION_ERRORS: ValidationErrors()}
@@ -124,26 +127,27 @@ def process_connections(path, origins_from_axioms: Set[str], vias_from_axioms: D
         else:
             current_entity = path[0]
 
-            current_entity_uri, current_entity_axiom_types = get_current_entity_metadata(current_entity,
-                                                                                         origins_from_axioms,
-                                                                                         vias_from_axioms,
-                                                                                         destinations_from_axioms)
+            current_entity_axiom_types = get_matched_axiom_types(current_entity,
+                                                                 origins_from_axioms,
+                                                                 vias_from_axioms,
+                                                                 destinations_from_axioms)
 
-            if not current_entity_uri or len(current_entity_axiom_types) == 0:
-                result[VALIDATION_ERRORS].axiom_not_found.add(entity_to_string(current_entity))
+            if not current_entity or len(current_entity_axiom_types) == 0:
+                current_entity_representation = entity_to_string(current_entity)
+                result[VALIDATION_ERRORS].axiom_not_found.add(current_entity_representation)
                 if logger_service:
-                    logger_service.add_anomaly(LoggableAnomaly(None, current_entity, AXIOM_NOT_FOUND))
+                    logger_service.add_anomaly(LoggableAnomaly(None, current_entity_representation, AXIOM_NOT_FOUND))
             else:
                 from_entities = from_entities or set()
 
                 axiom_type = get_axiom_type(current_entity_axiom_types, path, depth)
 
-                update_result(current_entity_uri, axiom_type, from_entities, depth, result, vias_from_axioms,
+                update_result(current_entity, axiom_type, from_entities, depth, result, vias_from_axioms,
                               destinations_from_axioms)
 
                 depth += 1
 
-            next_from_entities = {current_entity_uri} if current_entity_uri else from_entities
+            next_from_entities = {current_entity} if current_entity else from_entities
             # Process the next level structures, carrying over from_entities as a set
             for remaining_path in path[1:]:
                 process_connections(remaining_path, origins_from_axioms, vias_from_axioms, destinations_from_axioms,
@@ -154,36 +158,36 @@ def process_connections(path, origins_from_axioms: Set[str], vias_from_axioms: D
 
 def entity_to_string(entity):
     if isinstance(entity, orders.rl):
-        return f"{entity.region} (region) nor {entity.layer} (layer)"
+        return f"{entity.region} (region), {entity.layer} (layer)"
     else:
         return str(entity)
 
 
-def get_current_entity_metadata(current_entity, origins_from_axioms: Set[str], vias_from_axioms: Dict[str, str],
-                                destinations_from_axioms: Dict[str, str]) -> Tuple[Optional[str], List[AxiomType]]:
-    primary_uri = current_entity.toPython() if not isinstance(current_entity,
-                                                              orders.rl) else current_entity.region.toPython()
-    secondary_uri = current_entity.layer.toPython() if isinstance(current_entity, orders.rl) else None
+def get_matched_axiom_types(current_entity: rdflib.term,
+                            origins_from_axioms: Set[str],
+                            vias_from_axioms: Dict[str, str],
+                            destinations_from_axioms: Dict[str, str]) -> List[AxiomType]:
+    # Check if current_entity is a complex region-layer pair (orders.rl) and extract URIs accordingly
+    if isinstance(current_entity, orders.rl):
+        primary_uri = current_entity.region.toPython()
+        secondary_uri = current_entity.layer.toPython()
+    else:
+        primary_uri = current_entity.toPython()
+        secondary_uri = None
+
+    matched_types = []
 
     uris_in_axioms = [
         (origins_from_axioms, AxiomType.ORIGIN),
-        (vias_from_axioms, AxiomType.VIA),
-        (destinations_from_axioms, AxiomType.DESTINATION),
+        (vias_from_axioms.keys(), AxiomType.VIA),
+        (destinations_from_axioms.keys(), AxiomType.DESTINATION),
     ]
 
-    uris_found = {}
     for uri_set, node_type in uris_in_axioms:
-        # Check if the URIs are in the current set of axioms
         if primary_uri in uri_set or secondary_uri in uri_set:
-            # Prefer layer if both region and layer URIs are found
-            matched_uri = secondary_uri if secondary_uri in uri_set else primary_uri
-            uris_found.setdefault(matched_uri, []).append(node_type)
+            matched_types.append(node_type)
 
-    if not uris_found:
-        return None, []
-
-    matched_uri, matched_types = next(iter(uris_found.items()), (None, []))
-    return matched_uri, matched_types
+    return matched_types
 
 
 def get_axiom_type(current_entity_axiom_types: List[AxiomType], path, depth: int) -> Optional[AxiomType]:
@@ -210,33 +214,48 @@ def get_axiom_type(current_entity_axiom_types: List[AxiomType], path, depth: int
     return None
 
 
-def update_result(current_entity_uri: str, axiom_type: AxiomType, from_entities: Set[str], depth: int, result: Dict,
+def update_result(current_entity: rdflib.term, axiom_type: AxiomType, from_entities: Set[str], depth: int, result: Dict,
                   vias_from_axioms: Dict[str, str],
                   destinations_from_axioms: Dict[str, str]) -> Dict:
     if axiom_type == AxiomType.ORIGIN:
-        result[ORIGINS].append(NeuronDMOrigin({current_entity_uri}))
+        result[ORIGINS].append(NeuronDMOrigin({current_entity}))
     elif axiom_type == AxiomType.VIA:
         result[VIAS].append(
-            NeuronDMVia({current_entity_uri}, from_entities, depth, vias_from_axioms.get(current_entity_uri)))
+            NeuronDMVia({current_entity}, from_entities, depth, get_entity_type(current_entity, vias_from_axioms)))
     elif axiom_type == AxiomType.DESTINATION:
         result[DESTINATIONS].append(
-            NeuronDMDestination({current_entity_uri}, from_entities, destinations_from_axioms.get(current_entity_uri)))
+            NeuronDMDestination({current_entity}, from_entities,
+                                get_entity_type(current_entity, destinations_from_axioms)))
     return result
 
 
-def validate_partial_order_and_axioms(origins_from_axioms, vias_from_axioms, destinations_from_axioms, tmp_origins,
-                                      tmp_vias, tmp_destinations,
+def get_entity_type(current_entity, axiom_dict):
+    if isinstance(current_entity, orders.rl):
+        # Try to find the type based on the layer, then region
+        return axiom_dict.get(str(current_entity.layer)) or axiom_dict.get(str(current_entity.region))
+    else:
+        return axiom_dict.get(str(current_entity))
+
+
+def validate_partial_order_and_axioms(origins_from_axioms, vias_from_axioms, destinations_from_axioms,
+                                      tmp_origins, tmp_vias, tmp_destinations,
                                       validation_errors: ValidationErrors) -> ValidationErrors:
     anatomical_uris_origins = extract_anatomical_uris(tmp_origins)
     anatomical_uris_vias = extract_anatomical_uris(tmp_vias)
     anatomical_uris_destinations = extract_anatomical_uris(tmp_destinations)
 
-    validate_partial_order_and_axioms_aux(set(origins_from_axioms), anatomical_uris_origins, "origins",
+    validate_partial_order_and_axioms_aux(set(origins_from_axioms),
+                                          anatomical_uris_origins,
+                                          "origins",
                                           validation_errors)
 
-    validate_partial_order_and_axioms_aux(set(vias_from_axioms.keys()), anatomical_uris_vias, "vias", validation_errors)
+    validate_partial_order_and_axioms_aux(set(vias_from_axioms.keys()),
+                                          anatomical_uris_vias,
+                                          "vias",
+                                          validation_errors)
 
-    validate_partial_order_and_axioms_aux(set(destinations_from_axioms.keys()), anatomical_uris_destinations,
+    validate_partial_order_and_axioms_aux(set(destinations_from_axioms.keys()),
+                                          anatomical_uris_destinations,
                                           "destinations",
                                           validation_errors)
 
@@ -245,19 +264,54 @@ def validate_partial_order_and_axioms(origins_from_axioms, vias_from_axioms, des
 
 def validate_partial_order_and_axioms_aux(axiom_uris: Set[str], actual_uris: Set[str], category: str,
                                           validation_errors: ValidationErrors):
-    missing_uris = axiom_uris - actual_uris
-    extra_uris = actual_uris - axiom_uris
-    if missing_uris:
-        validation_errors.non_specified.append(
-            f"Missing anatomical URIs in {category}: {', '.join(missing_uris)}")
-    if extra_uris:
-        validation_errors.non_specified.append(
-            f"Unexpected anatomical URIs in {category}: {', '.join(extra_uris)}"
-        )
+    unexpected_uris = get_unexpected_uris(actual_uris, axiom_uris)
+    missing_uris = get_missing_uris(actual_uris, axiom_uris)
+
+    for uri in unexpected_uris:
+        uri_str = f"{uri[0]}, {uri[1]}" if isinstance(uri, tuple) else uri
+        validation_errors.non_specified.append(f"Unexpected {category} URI not in axioms: {uri_str}")
+
+    for uri in missing_uris:
+        validation_errors.non_specified.append(f"Missing {category} URI not found in actual URIs: {uri}")
+
+    return validation_errors
+
+
+def get_missing_uris(actual_uris, axiom_uris):
+    flattened_actual_uris = set()
+    for uri in actual_uris:
+        if isinstance(uri, tuple):
+            flattened_actual_uris.update(uri)
+        else:
+            flattened_actual_uris.add(uri)
+    missing_uris = axiom_uris.difference(flattened_actual_uris)
+    return missing_uris
+
+
+def get_unexpected_uris(actual_uris, axiom_uris):
+    unexpected_uris = set()
+    # Identify actual URIs that are unexpectedly present
+    for actual_uri in actual_uris:
+        if isinstance(actual_uri, tuple):  # Complex entity case (region, layer pairs)
+            region, layer = actual_uri
+            # Count as unexpected if neither region nor layer are in axiom_uris
+            if not (region in axiom_uris or layer in axiom_uris):
+                unexpected_uris.add(actual_uri)
+        else:  # Simple URI case
+            if actual_uri not in axiom_uris:
+                unexpected_uris.add(actual_uri)
+    return unexpected_uris
 
 
 def extract_anatomical_uris(entities_list):
-    return set(uri for entity in entities_list for uri in entity.anatomical_entities)
+    uris = set()
+    for entity in entities_list:
+        for anatomical_entity in entity.anatomical_entities:
+            if isinstance(anatomical_entity, orders.rl):
+                uris.add((anatomical_entity.region.toPython(), anatomical_entity.layer.toPython()))
+            else:  # Simple URIRef
+                uris.add(anatomical_entity.toPython())
+    return uris
 
 
 def merge_origins(origins: List[NeuronDMOrigin]) -> NeuronDMOrigin:

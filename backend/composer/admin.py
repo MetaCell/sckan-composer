@@ -19,7 +19,7 @@ from composer.models import (
     Tag,
     Via,
     FunctionalCircuitRole,
-    ProjectionPhenotype, Destination, Synonym
+    ProjectionPhenotype, Destination, Synonym, Layer, Region
 )
 
 
@@ -99,6 +99,18 @@ class AnatomicalEntityAdmin(admin.ModelAdmin):
     list_display_links = ("name", "ontology_uri")
     search_fields = ("name",)  # or ("^name",) for search to start with
     inlines = [SynonymInline]
+
+
+class LayerAdmin(AnatomicalEntityAdmin):
+    pass
+
+
+class RegionAdmin(AnatomicalEntityAdmin):
+    def associated_layers_display(self, obj):
+        return ", ".join([layer.name for layer in obj.layer.all()])
+
+    associated_layers_display.short_description = 'Associated Layers'
+    list_display = AnatomicalEntityAdmin.list_display + ('associated_layers_display',)
 
 
 class ViaInline(SortableStackedInline):
@@ -206,6 +218,8 @@ admin.site.register(User, UserAdmin)
 
 #
 admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
+admin.site.register(Layer, LayerAdmin)
+admin.site.register(Region, RegionAdmin)
 admin.site.register(Phenotype)
 admin.site.register(Sex)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
