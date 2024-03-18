@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("alias", models.CharField(db_index=True, max_length=200)),
+                ("name", models.CharField(db_index=True, max_length=200)),
                 (
                     "anatomical_entity",
                     models.ForeignKey(

@@ -17,7 +17,7 @@ def deduplicate_anatomical_entities(apps, schema_editor):
             # If the ontology_uri is a duplicate, move this entity to Synonym
             primary_entity = AnatomicalEntity.objects.get(id=primary_anatomical_entities[entity.ontology_uri])
             # Create a synonym for the duplicate entity
-            Synonym.objects.create(anatomical_entity=primary_entity, alias=entity.name)
+            Synonym.objects.create(anatomical_entity=primary_entity, name=entity.name)
 
             # Update ConnectivityStatement origins to point to the primary entity
             for cs in ConnectivityStatement.objects.filter(origins=entity):
