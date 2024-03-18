@@ -16,12 +16,10 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("csv_files", nargs="+", type=str)
-        parser.add_argument("--update_names", action='store_true',
-                            help="Update the name even if the entity already exists")
         parser.add_argument("--show_complete_logs", action='store_true',
                             help="Show detailed logs during processing")
 
-    def _process_anatomical_entity(self, name, ontology_uri, synonym, update_names, show_complete_logs, processed_uris,
+    def _process_anatomical_entity(self, name, ontology_uri, synonym, show_complete_logs, processed_uris,
                                    synonym_accumulator):
         try:
             is_first_occurrence = ontology_uri not in processed_uris
@@ -30,7 +28,7 @@ class Command(BaseCommand):
                 ontology_uri=ontology_uri,
                 defaults={"name": name},
             )
-            if not created and update_names and is_first_occurrence:
+            if not created and is_first_occurrence:
                 if anatomical_entity.name != name:
                     anatomical_entity.name = name
                     anatomical_entity.save()
@@ -51,7 +49,6 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, **options):
         start_time = time.time()
-        update_names = options['update_names']
         show_complete_logs = options['show_complete_logs']
         synonym_accumulator = []
 
@@ -68,7 +65,7 @@ class Command(BaseCommand):
                         name = row[NAME].strip()
                         synonym = row[SYNONYM].strip() if row[SYNONYM] else None
 
-                        self._process_anatomical_entity(name, ontology_uri, synonym, update_names, show_complete_logs,
+                        self._process_anatomical_entity(name, ontology_uri, synonym, show_complete_logs,
                                                         processed_uris, synonym_accumulator)
 
                         if len(synonym_accumulator) >= BULK_LIMIT:
