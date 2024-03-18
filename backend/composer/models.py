@@ -241,7 +241,10 @@ class AnatomicalEntity(models.Model):
 
 class Synonym(models.Model):
     anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.CASCADE, related_name="synonyms")
-    alias = models.CharField(max_length=200, db_index=True)
+    name = models.CharField(max_length=200, db_index=True)
+
+    class Meta:
+        unique_together = ('anatomical_entity', 'name',)
 
 
 class Tag(models.Model):
