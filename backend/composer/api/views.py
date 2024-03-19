@@ -37,7 +37,7 @@ from .serializers import (
 )
 from .permissions import IsStaffUserIfExportedStateInConnectivityStatement
 from ..models import (
-    AnatomicalEntityNew,
+    AnatomicalEntity,
     Phenotype,
     ConnectivityStatement,
     Note,
@@ -242,7 +242,7 @@ class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
     AnatomicalEntityNew
     """
 
-    queryset = AnatomicalEntityNew.objects.all()
+    queryset = AnatomicalEntity.objects.all()
     serializer_class = AnatomicalEntitySerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,

@@ -233,7 +233,7 @@ class AnatomicalEntityMeta(models.Model):
 
     class Meta:
         ordering = ["name"]
-        verbose_name_plural = "Anatomical Entities"
+        verbose_name_plural = "Anatomical Entities Meta"
 
 
 class Layer(AnatomicalEntityMeta):
@@ -250,17 +250,24 @@ class AnatomicalEntityIntersection(models.Model):
     region = models.ForeignKey(Region, on_delete=models.CASCADE)
 
 
-class AnatomicalEntityNew(AnatomicalEntityMeta):
+class AnatomicalEntity(AnatomicalEntityMeta):
     region_layer = models.ForeignKey(AnatomicalEntityIntersection, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Anatomical Entities Meta"
 
 
 class Synonym(models.Model):
-    anatomical_entity_new = models.ForeignKey(AnatomicalEntityNew, on_delete=models.CASCADE,
-                                              related_name="synonyms_new", null=True)
+    anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.CASCADE,
+                                          related_name="synonyms", null=True)
     name = models.CharField(max_length=200, db_index=True)
 
     class Meta:
-        unique_together = ('anatomical_entity_new', 'name',)
+        unique_together = ('anatomical_entity', 'name',)
 
 
 class Tag(models.Model):
@@ -425,7 +432,7 @@ class ConnectivityStatement(models.Model):
     )
     knowledge_statement = models.TextField(db_index=True, blank=True)
     state = FSMField(default=CSState.DRAFT, protected=True)
-    origins_new = models.ManyToManyField(AnatomicalEntityNew, related_name='origins_relations_new')
+    origins = models.ManyToManyField(AnatomicalEntity, related_name='origins_relations')
     owner = models.ForeignKey(
         User, verbose_name="Curator", on_delete=models.SET_NULL, null=True, blank=True
     )
@@ -633,8 +640,8 @@ class ConnectivityStatement(models.Model):
 
 class AbstractConnectionLayer(models.Model):
     connectivity_statement = models.ForeignKey(ConnectivityStatement, on_delete=models.CASCADE)
-    anatomical_entities_new = models.ManyToManyField(AnatomicalEntityNew, blank=True)
-    from_entities_new = models.ManyToManyField(AnatomicalEntityNew, blank=True)
+    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True)
+    from_entities = models.ManyToManyField(AnatomicalEntity, blank=True)
 
     class Meta:
         abstract = True
@@ -646,8 +653,8 @@ class Destination(AbstractConnectionLayer):
         on_delete=models.CASCADE,
         related_name="destinations"  # Overridden related_name
     )
-    anatomical_entities_new = models.ManyToManyField(AnatomicalEntityNew, blank=True,
-                                                     related_name='destination_connection_layers_new')
+    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True,
+                                                 related_name='destination_connection_layers')
 
     type = models.CharField(
         max_length=12,
@@ -667,8 +674,8 @@ class Destination(AbstractConnectionLayer):
 
 
 class Via(AbstractConnectionLayer):
-    anatomical_entities_new = models.ManyToManyField(AnatomicalEntityNew, blank=True,
-                                                     related_name='via_connection_layers_new')
+    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True,
+                                                 related_name='via_connection_layers')
 
     objects = ViaManager()
 

@@ -1,7 +1,7 @@
 from django.db import connection
 from django.test import TestCase, override_settings
 
-from composer.models import Sentence, ConnectivityStatement, AnatomicalEntityNew, Via, Destination
+from composer.models import Sentence, ConnectivityStatement, AnatomicalEntity, Via, Destination
 from composer.services.graph_service import generate_paths, consolidate_paths
 
 
@@ -13,10 +13,10 @@ class JourneyTestCase(TestCase):
         sentence = Sentence.objects.create()
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
-        origin1 = AnatomicalEntityNew.objects.create(name='Oa')
-        origin2 = AnatomicalEntityNew.objects.create(name='Ob')
-        via1 = AnatomicalEntityNew.objects.create(name='V1a')
-        destination1 = AnatomicalEntityNew.objects.create(name='Da')
+        origin1 = AnatomicalEntity.objects.create(name='Oa')
+        origin2 = AnatomicalEntity.objects.create(name='Ob')
+        via1 = AnatomicalEntity.objects.create(name='V1a')
+        destination1 = AnatomicalEntity.objects.create(name='Da')
 
         cs.origins.add(origin1, origin2)
 
@@ -70,9 +70,9 @@ class JourneyTestCase(TestCase):
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
         # Create Anatomical Entities
-        origin1 = AnatomicalEntityNew.objects.create(name='Oa')
-        origin2 = AnatomicalEntityNew.objects.create(name='Ob')
-        destination1 = AnatomicalEntityNew.objects.create(name='Da')
+        origin1 = AnatomicalEntity.objects.create(name='Oa')
+        origin2 = AnatomicalEntity.objects.create(name='Ob')
+        destination1 = AnatomicalEntity.objects.create(name='Da')
 
         # Add origins
         cs.origins.add(origin1, origin2)
@@ -115,10 +115,10 @@ class JourneyTestCase(TestCase):
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
         # Create Anatomical Entities
-        origin1 = AnatomicalEntityNew.objects.create(name='Oa')
-        origin2 = AnatomicalEntityNew.objects.create(name='Ob')
-        via1 = AnatomicalEntityNew.objects.create(name='V1a')
-        destination1 = AnatomicalEntityNew.objects.create(name='Da')
+        origin1 = AnatomicalEntity.objects.create(name='Oa')
+        origin2 = AnatomicalEntity.objects.create(name='Ob')
+        via1 = AnatomicalEntity.objects.create(name='V1a')
+        destination1 = AnatomicalEntity.objects.create(name='Da')
 
         # Add origins
         cs.origins.add(origin1, origin2)
@@ -170,11 +170,11 @@ class JourneyTestCase(TestCase):
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
         # Create Anatomical Entities
-        origin1 = AnatomicalEntityNew.objects.create(name='Oa')
-        origin2 = AnatomicalEntityNew.objects.create(name='Ob')
-        via1 = AnatomicalEntityNew.objects.create(name='V1a')
-        via2 = AnatomicalEntityNew.objects.create(name='V1b')
-        destination1 = AnatomicalEntityNew.objects.create(name='Da')
+        origin1 = AnatomicalEntity.objects.create(name='Oa')
+        origin2 = AnatomicalEntity.objects.create(name='Ob')
+        via1 = AnatomicalEntity.objects.create(name='V1a')
+        via2 = AnatomicalEntity.objects.create(name='V1b')
+        destination1 = AnatomicalEntity.objects.create(name='Da')
 
         # Add origins
         cs.origins.add(origin1, origin2)
@@ -233,14 +233,14 @@ class JourneyTestCase(TestCase):
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
         # Create Anatomical Entities
-        origin_a = AnatomicalEntityNew.objects.create(name='Oa')
-        origin_b = AnatomicalEntityNew.objects.create(name='Ob')
-        via1_a = AnatomicalEntityNew.objects.create(name='V1a')
-        via2_a = AnatomicalEntityNew.objects.create(name='V2a')
-        via2_b = AnatomicalEntityNew.objects.create(name='V2b')
-        via3_a = AnatomicalEntityNew.objects.create(name='V3a')
-        via4_a = AnatomicalEntityNew.objects.create(name='V4a')
-        destination_a = AnatomicalEntityNew.objects.create(name='Da')
+        origin_a = AnatomicalEntity.objects.create(name='Oa')
+        origin_b = AnatomicalEntity.objects.create(name='Ob')
+        via1_a = AnatomicalEntity.objects.create(name='V1a')
+        via2_a = AnatomicalEntity.objects.create(name='V2a')
+        via2_b = AnatomicalEntity.objects.create(name='V2b')
+        via3_a = AnatomicalEntity.objects.create(name='V3a')
+        via4_a = AnatomicalEntity.objects.create(name='V4a')
+        destination_a = AnatomicalEntity.objects.create(name='Da')
 
         # Add origins
         cs.origins.add(origin_a, origin_b)
@@ -305,17 +305,17 @@ class JourneyTestCase(TestCase):
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
         # Create Anatomical Entities
-        origin_a = AnatomicalEntityNew.objects.create(name='Oa')
-        origin_b = AnatomicalEntityNew.objects.create(name='Ob')
-        via1_a = AnatomicalEntityNew.objects.create(name='V1a')
-        via2_a = AnatomicalEntityNew.objects.create(name='V2a')
-        via2_b = AnatomicalEntityNew.objects.create(name='V2b')
-        via3_a = AnatomicalEntityNew.objects.create(name='V3a')
-        via4_a = AnatomicalEntityNew.objects.create(name='V4a')
-        via5_a = AnatomicalEntityNew.objects.create(name='V5a')
-        via5_b = AnatomicalEntityNew.objects.create(name='V5b')
-        via6_a = AnatomicalEntityNew.objects.create(name='V6a')
-        destination_a = AnatomicalEntityNew.objects.create(name='Da')
+        origin_a = AnatomicalEntity.objects.create(name='Oa')
+        origin_b = AnatomicalEntity.objects.create(name='Ob')
+        via1_a = AnatomicalEntity.objects.create(name='V1a')
+        via2_a = AnatomicalEntity.objects.create(name='V2a')
+        via2_b = AnatomicalEntity.objects.create(name='V2b')
+        via3_a = AnatomicalEntity.objects.create(name='V3a')
+        via4_a = AnatomicalEntity.objects.create(name='V4a')
+        via5_a = AnatomicalEntity.objects.create(name='V5a')
+        via5_b = AnatomicalEntity.objects.create(name='V5b')
+        via6_a = AnatomicalEntity.objects.create(name='V6a')
+        destination_a = AnatomicalEntity.objects.create(name='Da')
 
         # Add origins
         cs.origins.add(origin_a, origin_b)
@@ -405,9 +405,9 @@ class JourneyTestCase(TestCase):
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
         # Create Anatomical Entities
-        origin1 = AnatomicalEntityNew.objects.create(name='Oa')
-        origin2 = AnatomicalEntityNew.objects.create(name='Ob')
-        destination1 = AnatomicalEntityNew.objects.create(name='Da')
+        origin1 = AnatomicalEntity.objects.create(name='Oa')
+        origin2 = AnatomicalEntity.objects.create(name='Ob')
+        destination1 = AnatomicalEntity.objects.create(name='Da')
 
         # Add origins
         cs.origins.add(origin1, origin2)
@@ -459,10 +459,10 @@ class JourneyTestCase(TestCase):
         sentence = Sentence.objects.create()
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
-        origin1 = AnatomicalEntityNew.objects.create(name='Oa')
-        via1 = AnatomicalEntityNew.objects.create(name='V1a')
-        via2 = AnatomicalEntityNew.objects.create(name='V2a')
-        destination1 = AnatomicalEntityNew.objects.create(name='Da')
+        origin1 = AnatomicalEntity.objects.create(name='Oa')
+        via1 = AnatomicalEntity.objects.create(name='V1a')
+        via2 = AnatomicalEntity.objects.create(name='V2a')
+        destination1 = AnatomicalEntity.objects.create(name='Da')
 
         cs.origins.add(origin1)
 
