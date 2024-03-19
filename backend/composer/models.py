@@ -258,7 +258,7 @@ class AnatomicalEntity(AnatomicalEntityMeta):
 
     class Meta:
         ordering = ["name"]
-        verbose_name_plural = "Anatomical Entities Meta"
+        verbose_name_plural = "Anatomical Entities"
 
 
 class Synonym(models.Model):

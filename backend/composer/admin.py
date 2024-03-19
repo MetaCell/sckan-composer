@@ -19,7 +19,7 @@ from composer.models import (
     Tag,
     Via,
     FunctionalCircuitRole,
-    ProjectionPhenotype, Destination, Synonym
+    ProjectionPhenotype, Destination, Synonym, AnatomicalEntityMeta, Layer, Region, AnatomicalEntityIntersection
 )
 
 
@@ -94,10 +94,33 @@ class SynonymInline(admin.TabularInline):
     extra = 1
 
 
-class AnatomicalEntityAdmin(admin.ModelAdmin):
+class AnatomicalEntityMetaAdmin(admin.ModelAdmin):
     list_display = ("name", "ontology_uri")
     list_display_links = ("name", "ontology_uri")
-    search_fields = ("name",)  # or ("^name",) for search to start with
+    search_fields = ("name",)
+
+
+class LayerAdmin(admin.ModelAdmin):
+    list_display = ('name', 'ontology_uri',)
+    search_fields = ('name',)
+
+
+class RegionAdmin(admin.ModelAdmin):
+    list_display = ('name', 'ontology_uri',)
+    search_fields = ('name',)
+    filter_horizontal = ('layers',)
+
+
+class AnatomicalEntityIntersectionAdmin(admin.ModelAdmin):
+    list_display = ('layer', 'region',)
+    list_filter = ('layer', 'region',)
+    raw_id_fields = ('layer', 'region',)
+
+
+class AnatomicalEntityAdmin(admin.ModelAdmin):
+    list_display = ('name', 'ontology_uri', 'region_layer',)
+    search_fields = ('name',)
+    raw_id_fields = ('region_layer',)
     inlines = [SynonymInline]
 
 
@@ -205,6 +228,10 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 #
+admin.site.register(AnatomicalEntityMeta, AnatomicalEntityMetaAdmin)
+admin.site.register(Layer, LayerAdmin)
+admin.site.register(Region, RegionAdmin)
+admin.site.register(AnatomicalEntityIntersection, AnatomicalEntityIntersectionAdmin)
 admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
 admin.site.register(Phenotype)
 admin.site.register(Sex)
