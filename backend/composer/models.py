@@ -229,7 +229,7 @@ class AnatomicalEntity(models.Model):
     """Anatomical Entity"""
 
     name = models.CharField(max_length=200, db_index=True)
-    ontology_uri = models.URLField()
+    ontology_uri = models.URLField(unique=True)
 
     def __str__(self):
         return self.name
@@ -237,9 +237,14 @@ class AnatomicalEntity(models.Model):
     class Meta:
         ordering = ["name"]
         verbose_name_plural = "Anatomical Entities"
-        constraints = [
-            models.UniqueConstraint(Upper("name"), name="ae_unique_upper_name")
-        ]
+
+
+class Synonym(models.Model):
+    anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.CASCADE, related_name="synonyms")
+    name = models.CharField(max_length=200, db_index=True)
+
+    class Meta:
+        unique_together = ('anatomical_entity', 'name',)
 
 
 class Tag(models.Model):
