@@ -248,10 +248,10 @@ class ConnectivityStatementStateService(StateServiceMixin):
         if not connectivity_statement.forward_connection.exists():
             return True
 
-        AnatomicalEntity = apps.get_model('composer', 'AnatomicalEntity')
+        AnatomicalEntityNew = apps.get_model('composer', 'AnatomicalEntityNew')
 
         # Get all anatomical_entities associated with the destinations of the connectivity statement
-        destination_anatomical_entities = AnatomicalEntity.objects.filter(
+        destination_anatomical_entities = AnatomicalEntityNew.objects.filter(
             destination_connection_layers__in=connectivity_statement.destinations.all())
 
         for forward_connection in connectivity_statement.forward_connection.all():

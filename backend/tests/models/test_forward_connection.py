@@ -1,6 +1,6 @@
 import pytest
 
-from composer.models import ConnectivityStatement, AnatomicalEntity, Sentence, Destination
+from composer.models import ConnectivityStatement, AnatomicalEntityNew, Sentence, Destination
 from composer.services.state_services import ConnectivityStatementStateService
 
 @pytest.mark.django_db
@@ -8,9 +8,9 @@ def test_forward_connection_service():
     sentence = Sentence.objects.create()
 
     # Create origin and destination entities
-    origin_entity = AnatomicalEntity.objects.create(name="OriginEntity")
-    destination_entity = AnatomicalEntity.objects.create(name="DestinationEntity")
-    wrong_destination_entity = AnatomicalEntity.objects.create(name="WrongDestinationEntity")
+    origin_entity = AnatomicalEntityNew.objects.create(name="OriginEntity")
+    destination_entity = AnatomicalEntityNew.objects.create(name="DestinationEntity")
+    wrong_destination_entity = AnatomicalEntityNew.objects.create(name="WrongDestinationEntity")
 
     # Create a statement
     statement = ConnectivityStatement.objects.create(sentence=sentence)

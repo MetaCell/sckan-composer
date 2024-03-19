@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from fsm_admin.mixins import FSMTransitionMixin
 
 from composer.models import (
-    AnatomicalEntity,
+    AnatomicalEntityNew,
     Phenotype,
     Sex,
     ConnectivityStatement,
@@ -101,18 +101,17 @@ class AnatomicalEntityAdmin(admin.ModelAdmin):
     inlines = [SynonymInline]
 
 
-
 class ViaInline(SortableStackedInline):
     model = Via
     extra = 0
-    raw_id_fields = ("anatomical_entities", "from_entities")
+    raw_id_fields = ("anatomical_entities_new", "from_entities_new")
     default_order_field = "order"
 
 
 class DestinationInline(admin.TabularInline):
     model = Destination
     extra = 0
-    raw_id_fields = ("anatomical_entities", "from_entities")
+    raw_id_fields = ("anatomical_entities_new", "from_entities_new")
 
 
 class ConnectivityStatementAdmin(
@@ -122,7 +121,7 @@ class ConnectivityStatementAdmin(
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
     readonly_fields = ("state",)
-    autocomplete_fields = ("sentence", "origins")
+    autocomplete_fields = ("sentence", "origins_new")
     date_hierarchy = "modified_date"
     list_display = (
         "sentence",
@@ -206,7 +205,7 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 #
-admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
+admin.site.register(AnatomicalEntityNew, AnatomicalEntityAdmin)
 admin.site.register(Phenotype)
 admin.site.register(Sex)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)

@@ -7,7 +7,7 @@ from composer.enums import SentenceState, CSState
 from composer.models import (
     Sentence,
     ConnectivityStatement,
-    AnatomicalEntity,
+    AnatomicalEntityNew,
     Note,
     Tag,
     Via,
@@ -72,7 +72,7 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
     )
     origins = django_filters.ModelMultipleChoiceFilter(
         field_name="origins",
-        queryset=AnatomicalEntity.objects.all(),
+        queryset=AnatomicalEntityNew.objects.all(),
         conjoined=False
     )
     destinations = django_filters.ModelMultipleChoiceFilter(
@@ -100,7 +100,7 @@ class AnatomicalEntityFilter(django_filters.FilterSet):
     exclude_ids = NumberInFilter(field_name='id', exclude=True)
 
     class Meta:
-        model = AnatomicalEntity
+        model = AnatomicalEntityNew
         fields = []
 
     @staticmethod

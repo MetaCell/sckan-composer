@@ -9,7 +9,7 @@ from rest_framework import serializers
 
 from ..enums import SentenceState, CSState
 from ..models import (
-    AnatomicalEntity,
+    AnatomicalEntityNew,
     Phenotype,
     Sex,
     ConnectivityStatement,
@@ -84,7 +84,7 @@ class AnatomicalEntitySerializer(UniqueFieldsMixin, serializers.ModelSerializer)
     """Anatomical Entity"""
 
     class Meta:
-        model = AnatomicalEntity
+        model = AnatomicalEntityNew
         fields = (
             "id",
             "name",
@@ -206,12 +206,12 @@ class ViaSerializer(serializers.ModelSerializer):
     """Via"""
     anatomical_entities = serializers.PrimaryKeyRelatedField(
         many=True,
-        queryset=AnatomicalEntity.objects.all(),
+        queryset=AnatomicalEntityNew.objects.all(),
         required=False
     )
     from_entities = serializers.PrimaryKeyRelatedField(
         many=True,
-        queryset=AnatomicalEntity.objects.all(),
+        queryset=AnatomicalEntityNew.objects.all(),
         required=False
     )
     connectivity_statement = serializers.PrimaryKeyRelatedField(
@@ -235,12 +235,12 @@ class DestinationSerializer(serializers.ModelSerializer):
     """Destination"""
     anatomical_entities = serializers.PrimaryKeyRelatedField(
         many=True,
-        queryset=AnatomicalEntity.objects.all(),
+        queryset=AnatomicalEntityNew.objects.all(),
         required=False
     )
     from_entities = serializers.PrimaryKeyRelatedField(
         many=True,
-        queryset=AnatomicalEntity.objects.all(),
+        queryset=AnatomicalEntityNew.objects.all(),
         required=False
     )
     connectivity_statement = serializers.PrimaryKeyRelatedField(
@@ -592,7 +592,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
 
 class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
     origins = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=AnatomicalEntity.objects.all()
+        many=True, queryset=AnatomicalEntityNew.objects.all()
     )
 
     class Meta:

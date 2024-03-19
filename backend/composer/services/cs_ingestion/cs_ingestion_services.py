@@ -5,7 +5,7 @@ from typing import List, Dict, Optional, Tuple, Set, Any
 from django.db import transaction
 from neurondm import orders
 
-from composer.models import AnatomicalEntity, Sentence, ConnectivityStatement, Sex, FunctionalCircuitRole, \
+from composer.models import AnatomicalEntityNew, Sentence, ConnectivityStatement, Sex, FunctionalCircuitRole, \
     ProjectionPhenotype, Phenotype, Specie, Provenance, Via, Note, User, Destination, Region, Layer
 from .exceptions import EntityNotFoundException
 from .helpers import get_value_or_none, found_entity, \
@@ -427,7 +427,7 @@ def add_origins(connectivity_statement: ConnectivityStatement, statement: Dict):
     for entity in statement[ORIGINS].anatomical_entities:
         try:
             add_entity_to_instance(connectivity_statement, 'origins', entity)
-        except (EntityNotFoundException, AnatomicalEntity.DoesNotExist):
+        except (EntityNotFoundException, AnatomicalEntityNew.DoesNotExist):
             assert connectivity_statement.state == CSState.INVALID
 
 
@@ -460,7 +460,7 @@ def add_entities_to_connection(instance, anatomical_entities, from_entities, con
         for entity in from_entities:
             add_entity_to_instance(instance, 'from_entities', entity)
 
-    except (EntityNotFoundException, AnatomicalEntity.DoesNotExist):
+    except (EntityNotFoundException, AnatomicalEntityNew.DoesNotExist):
         assert connectivity_statement.state == CSState.INVALID
 
 
@@ -469,13 +469,13 @@ def add_entity_to_instance(instance, entity_field, entity):
         region, _ = get_or_create_complex_entity(entity.region, entity.layer)
         getattr(instance, entity_field).add(region)
     else:
-        anatomical_entity = AnatomicalEntity.objects.filter(ontology_uri=str(entity)).first()
+        anatomical_entity = AnatomicalEntityNew.objects.filter(ontology_uri=str(entity)).first()
         getattr(instance, entity_field).add(anatomical_entity)
 
 
 def get_or_create_complex_entity(region_uri, layer_uri):
-    region_entity = AnatomicalEntity.objects.filter(ontology_uri=region_uri).first()
-    layer_entity = AnatomicalEntity.objects.filter(ontology_uri=layer_uri).first()
+    region_entity = AnatomicalEntityNew.objects.filter(ontology_uri=region_uri).first()
+    layer_entity = AnatomicalEntityNew.objects.filter(ontology_uri=layer_uri).first()
 
     if not region_entity or not layer_entity:
         raise EntityNotFoundException(f"Region or layer not found for URIs: {region_uri}, {layer_uri}")

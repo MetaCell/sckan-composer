@@ -3,7 +3,7 @@ import time
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.db.utils import IntegrityError
-from composer.models import AnatomicalEntity, Synonym
+from composer.models import AnatomicalEntityNew, Synonym
 
 URI = "o"
 NAME = "o_label"
@@ -24,7 +24,7 @@ class Command(BaseCommand):
         try:
             is_first_occurrence = ontology_uri not in processed_uris
 
-            anatomical_entity, created = AnatomicalEntity.objects.get_or_create(
+            anatomical_entity, created = AnatomicalEntityNew.objects.get_or_create(
                 ontology_uri=ontology_uri,
                 defaults={"name": name},
             )

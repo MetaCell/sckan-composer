@@ -22,7 +22,7 @@ from composer.models import (
     ExportMetrics,
     Sentence,
     Specie,
-    Via, AnatomicalEntity, Destination,
+    Via, AnatomicalEntityNew, Destination,
 )
 from composer.services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
@@ -199,7 +199,7 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
     return attributes_map
 
 
-def get_origin_row(origin: AnatomicalEntity, review_notes: str, curation_notes: str):
+def get_origin_row(origin: AnatomicalEntityNew, review_notes: str, curation_notes: str):
     return Row(
         origin.name,
         origin.ontology_uri,
