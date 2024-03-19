@@ -250,14 +250,11 @@ class AnatomicalEntityIntersection(models.Model):
     region = models.ForeignKey(Region, on_delete=models.CASCADE)
 
 
-class AnatomicalEntity(AnatomicalEntityMeta):
+class AnatomicalEntity(models.Model):
+    simple_entity = models.OneToOneField(AnatomicalEntityMeta, on_delete=models.CASCADE, null=True, blank=True)
     region_layer = models.ForeignKey(AnatomicalEntityIntersection, on_delete=models.CASCADE, null=True)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
-        ordering = ["name"]
         verbose_name_plural = "Anatomical Entities"
 
 
@@ -653,6 +650,7 @@ class Destination(AbstractConnectionLayer):
         on_delete=models.CASCADE,
         related_name="destinations"  # Overridden related_name
     )
+
     anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True,
                                                  related_name='destination_connection_layers')
 

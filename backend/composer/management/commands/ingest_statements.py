@@ -13,13 +13,19 @@ class Command(BaseCommand):
             action='store_true',
             help='Set this flag to update upstream statements.',
         )
+        parser.add_argument(
+            '--update_anatomic_entities',
+            action='store_true',
+            help='Set this flag to try move anatomical entities to specific layer, region.',
+        )
 
     def handle(self, *args, **options):
         update_upstream = options['update_upstream']
+        update_anatomic_entities = options['update_anatomic_entities']
 
         start_time = time.time()
 
-        ingest_statements(update_upstream)
+        ingest_statements(update_upstream, update_anatomic_entities)
 
         end_time = time.time()
 

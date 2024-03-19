@@ -19,7 +19,8 @@ from composer.models import (
     Tag,
     Via,
     FunctionalCircuitRole,
-    ProjectionPhenotype, Destination, Synonym, AnatomicalEntityMeta, Layer, Region, AnatomicalEntityIntersection
+    ProjectionPhenotype, Destination, Synonym, AnatomicalEntityMeta, Layer, Region, AnatomicalEntityIntersection,
+    AnatomicalEntity
 )
 
 
@@ -117,10 +118,9 @@ class AnatomicalEntityIntersectionAdmin(admin.ModelAdmin):
     raw_id_fields = ('layer', 'region',)
 
 
-class AnatomicalEntityAdmin(admin.ModelAdmin):
-    list_display = ('name', 'ontology_uri', 'region_layer',)
-    search_fields = ('name',)
-    raw_id_fields = ('region_layer',)
+class AnatomicalEntityNewAdmin(admin.ModelAdmin):
+    raw_id_fields = ('simple_entity', 'region_layer')
+    search_fields = ('simple_entity', 'region_layer')
     inlines = [SynonymInline]
 
 
@@ -232,7 +232,7 @@ admin.site.register(AnatomicalEntityMeta, AnatomicalEntityMetaAdmin)
 admin.site.register(Layer, LayerAdmin)
 admin.site.register(Region, RegionAdmin)
 admin.site.register(AnatomicalEntityIntersection, AnatomicalEntityIntersectionAdmin)
-admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
+admin.site.register(AnatomicalEntity, AnatomicalEntityNewAdmin)
 admin.site.register(Phenotype)
 admin.site.register(Sex)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
