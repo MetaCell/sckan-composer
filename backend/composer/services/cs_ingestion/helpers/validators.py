@@ -1,18 +1,18 @@
-from typing import List, Dict, Any, Set
+from typing import List, Dict, Any, Set, Type
 
 from neurondm import orders
 
-from composer.models import ConnectivityStatement, Sex, Specie
+from composer.models import ConnectivityStatement, Sex, Specie, Region, AnatomicalEntityMeta, Layer
 from composer.services.cs_ingestion.helpers.common_helpers import ID, VALIDATION_ERRORS, ORIGINS, DESTINATIONS, VIAS, \
-    found_entity, \
     SEX, SPECIES, FORWARD_CONNECTION
 from composer.services.cs_ingestion.logging_service import LoggerService
 from composer.services.cs_ingestion.models import ValidationErrors, LoggableAnomaly
+from django.db.models import Model as DjangoModel
 
 logger_service = LoggerService()
 
 
-def validate_statements(statements: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def validate_statements(statements: List[Dict[str, Any]], update_anatomical_entities: bool) -> List[Dict[str, Any]]:
     db_reference_uris = set(ConnectivityStatement.objects.values_list('reference_uri', flat=True))
     input_statement_ids = {statement[ID] for statement in statements}
     statement_ids = input_statement_ids.union(db_reference_uris)
@@ -23,7 +23,7 @@ def validate_statements(statements: List[Dict[str, Any]]) -> List[Dict[str, Any]
             statement[VALIDATION_ERRORS] = ValidationErrors()
 
         # Validate entities, sex, and species, updating validation_errors accordingly
-        annotate_invalid_entities(statement)
+        annotate_invalid_entities(statement, update_anatomical_entities)
         annotate_invalid_sex(statement)
         annotate_invalid_species(statement)
 
@@ -33,8 +33,7 @@ def validate_statements(statements: List[Dict[str, Any]]) -> List[Dict[str, Any]
     return statements
 
 
-def annotate_invalid_entities(statement: Dict) -> bool:
-    # TODO: Update validators based on updateAnatomicalEntities flag
+def annotate_invalid_entities(statement: Dict, update_anatomical_entities: bool) -> bool:
     has_invalid_entities = False
 
     entities_to_check = list(statement[ORIGINS].anatomical_entities)
@@ -43,8 +42,8 @@ def annotate_invalid_entities(statement: Dict) -> bool:
 
     for entity in entities_to_check:
         if isinstance(entity, orders.rl):
-            region_found = found_entity(entity.region)
-            layer_found = found_entity(entity.layer)
+            region_found = found_entity(entity.region, Region if not update_anatomical_entities else None)
+            layer_found = found_entity(entity.layer, Layer if not update_anatomical_entities else None)
             if not region_found:
                 statement[VALIDATION_ERRORS].entities.add(entity.region)
                 has_invalid_entities = True
@@ -89,3 +88,9 @@ def annotate_invalid_forward_connections(statement: Dict, statement_ids: Set[str
             statement[VALIDATION_ERRORS].forward_connection.add(reference_uri)
             has_invalid_forward_connection = True
     return has_invalid_forward_connection
+
+
+def found_entity(uri: str, Model: Type[DjangoModel] = None) -> bool:
+    if Model:
+        return Model.objects.filter(ontology_uri=uri).exists()
+    return AnatomicalEntityMeta.objects.filter(ontology_uri=uri).exists()

@@ -41,7 +41,3 @@ def get_value_or_none(model, prop: str):
             return None
     else:
         return None
-
-
-def found_entity(uri: str) -> bool:
-    return AnatomicalEntityMeta.objects.filter(ontology_uri=uri).exists()
