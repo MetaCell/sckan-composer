@@ -9,7 +9,7 @@ from pyontutils.core import OntGraph, OntResIri, OntResPath
 from pyontutils.namespaces import rdfs, ilxtr
 
 from composer.services.cs_ingestion.exceptions import NeuronDMInconsistency
-from composer.services.cs_ingestion.helpers import VALIDATION_ERRORS, DESTINATIONS, VIAS, ORIGINS
+from composer.services.cs_ingestion.helpers.common_helpers import VALIDATION_ERRORS, DESTINATIONS, VIAS, ORIGINS
 from composer.services.cs_ingestion.logging_service import LoggerService, AXIOM_NOT_FOUND
 from composer.services.cs_ingestion.models import NeuronDMVia, NeuronDMOrigin, NeuronDMDestination, LoggableAnomaly, \
     AxiomType, ValidationErrors, Severity

@@ -1,10 +1,7 @@
 import logging
 
-import rdflib
-from neurondm import orders
-
 from composer.enums import CircuitType
-from composer.models import AnatomicalEntity
+from composer.models import AnatomicalEntityMeta
 
 ID = "id"
 ORIGINS = "origins"
@@ -47,4 +44,4 @@ def get_value_or_none(model, prop: str):
 
 
 def found_entity(uri: str) -> bool:
-    return AnatomicalEntity.objects.filter(ontology_uri=uri).exists()
+    return AnatomicalEntityMeta.objects.filter(ontology_uri=uri).exists()
