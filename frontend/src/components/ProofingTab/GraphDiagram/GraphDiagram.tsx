@@ -13,6 +13,7 @@ import createEngine, {
 import {CanvasWidget} from '@projectstorm/react-canvas-core';
 import {CustomNodeModel} from "./Models/CustomNodeModel";
 import {CustomNodeFactory} from "./Factories/CustomNodeFactory";
+import {getURI, getName} from "../../../helpers/anatomicalEntityHelper";
 
 
 export enum NodeTypes {
@@ -43,14 +44,14 @@ function getExternalID(url: string) {
     return parts[parts.length - 1].replace('_', ':');
 }
 
-function getId(layerId: string, entity: AnatomicalEntity) {
+function getOrderId(layerId: string, entity: AnatomicalEntity) {
     return layerId + entity.id.toString();
 }
 
 function findNodeForEntity(entity: AnatomicalEntity, nodeMap: Map<string, CustomNodeModel>, maxLayerIndex: number) {
     for (let layerIndex = 0; layerIndex <= maxLayerIndex; layerIndex++) {
         let layerId = layerIndex === 0 ? NodeTypes.Origin : NodeTypes.Via + layerIndex
-        let id = getId(layerId, entity);
+        let id = getOrderId(layerId, entity);
         if (nodeMap.has(id)) {
             return nodeMap.get(id);
         }
@@ -86,11 +87,11 @@ const processData = (
     let xOrigin = 100
 
     origins?.forEach(origin => {
-        const id = getId(NodeTypes.Origin, origin)
+        const id = getOrderId(NodeTypes.Origin, origin)
         const originNode = new CustomNodeModel(
             NodeTypes.Origin,
-            origin.name,
-            getExternalID(origin.ontology_uri),
+            getName(origin),
+            getExternalID(getURI(origin)),
             {
                 to: [],
             }
@@ -107,11 +108,11 @@ const processData = (
         let xVia = 100
         let yVia = layerIndex * yIncrement + yStart;
         via.anatomical_entities.forEach(entity => {
-            const id = getId(NodeTypes.Via + layerIndex, entity)
+            const id = getOrderId(NodeTypes.Via + layerIndex, entity)
             const viaNode = new CustomNodeModel(
                 NodeTypes.Via,
-                entity.name,
-                getExternalID(entity.ontology_uri),
+                getName(entity),
+                getExternalID(getURI(entity)),
                 {
                     from: [],
                     to: [],
@@ -150,8 +151,8 @@ const processData = (
         destination.anatomical_entities.forEach(entity => {
             const destinationNode = new CustomNodeModel(
                 NodeTypes.Destination,
-                entity.name,
-                getExternalID(entity.ontology_uri),
+                getName(entity),
+                getExternalID(getURI(entity)),
                 {
                     from: [],
                     anatomicalType: destination?.type ? DestinationTypeMapping[destination.type] : ''
