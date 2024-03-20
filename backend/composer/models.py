@@ -257,6 +257,17 @@ class AnatomicalEntity(models.Model):
     class Meta:
         verbose_name_plural = "Anatomical Entities"
 
+    @property
+    def name(self):
+        if self.simple_entity:
+            return self.simple_entity.name
+        elif self.region_layer:
+            layer_name = self.region_layer.layer.name if self.region_layer.layer else "No Layer"
+            region_name = self.region_layer.region.name if self.region_layer.region else "No Region"
+            return f"{region_name},{layer_name}"
+        else:
+            return "Unnamed Entity"
+
 
 class Synonym(models.Model):
     anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.CASCADE,
