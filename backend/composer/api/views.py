@@ -239,7 +239,7 @@ class ModelNoDeleteViewSet(
 
 class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    AnatomicalEntityNew
+    AnatomicalEntity
     """
 
     queryset = AnatomicalEntity.objects.all()

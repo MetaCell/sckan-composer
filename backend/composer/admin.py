@@ -117,7 +117,7 @@ class AnatomicalEntityIntersectionAdmin(admin.ModelAdmin):
     raw_id_fields = ('layer', 'region',)
 
 
-class AnatomicalEntityNewAdmin(admin.ModelAdmin):
+class AnatomicalEntityAdmin(admin.ModelAdmin):
     raw_id_fields = ('simple_entity', 'region_layer')
     search_fields = ('simple_entity', 'region_layer')
     inlines = [SynonymInline]
@@ -229,7 +229,7 @@ admin.site.register(AnatomicalEntityMeta, AnatomicalEntityMetaAdmin)
 admin.site.register(Layer, LayerAdmin)
 admin.site.register(Region, RegionAdmin)
 admin.site.register(AnatomicalEntityIntersection, AnatomicalEntityIntersectionAdmin)
-admin.site.register(AnatomicalEntity, AnatomicalEntityNewAdmin)
+admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
 admin.site.register(Phenotype)
 admin.site.register(Sex)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
