@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 from fsm_admin.mixins import FSMTransitionMixin
 
 from composer.models import (
-    AnatomicalEntity,
     Phenotype,
     Sex,
     ConnectivityStatement,
@@ -166,8 +165,6 @@ class ConnectivityStatementAdmin(
         "sentence__pmid",
         "sentence__pmcid",
         "knowledge_statement",
-        "origins__name",
-        "destinations__anatomical_entities__name",
     )
 
     fieldsets = ()

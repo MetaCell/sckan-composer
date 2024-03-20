@@ -1,5 +1,9 @@
+import rdflib
+from neurondm import orders
+
+from composer.models import AnatomicalEntity
 from composer.services.cs_ingestion.helpers.common_helpers import VALIDATION_ERRORS, SPECIES, PROVENANCE, ID, \
-    FORWARD_CONNECTION
+    FORWARD_CONNECTION, ORIGINS, VIAS, DESTINATIONS
 from composer.services.cs_ingestion.models import ValidationErrors
 
 
@@ -40,64 +44,84 @@ def has_changes(connectivity_statement, statement, defaults):
     if current_forward_connections != new_forward_connections:
         return True
 
-    # TODO: Update
-    # # Check for changes in origins
-    # current_origins = set(origin.ontology_uri for origin in connectivity_statement.origins.all())
-    # new_origins = set(uri for uri in statement[ORIGINS].anatomical_entities if uri not in validation_errors.entities)
-    # if current_origins != new_origins:
-    #     return True
-    #
-    # # Check for changes in vias
-    # current_vias = [
-    #     {
-    #         'anatomical_entities': set(via.anatomical_entities.all().values_list('ontology_uri', flat=True)),
-    #         'from_entities': set(via.from_entities.all().values_list('ontology_uri', flat=True))
-    #     }
-    #     for via in connectivity_statement.via_set.order_by('order').all()
-    # ]
-    # new_vias = statement[VIAS]
-    #
-    # if len(current_vias) != len(new_vias):
-    #     return True
-    #
-    # for current_via, new_via in zip(current_vias, new_vias):
-    #     new_via_anatomical_entities = set(
-    #         uri for uri in new_via.anatomical_entities if uri not in validation_errors.entities)
-    #
-    #     new_via_from_entities = set(uri for uri in new_via.from_entities if uri not in validation_errors.entities)
-    #
-    #     if (new_via_anatomical_entities != current_via['anatomical_entities'] or
-    #             new_via_from_entities != current_via['from_entities']):
-    #         return True
-    #
-    # # Check for changes in destinations
-    # current_destinations = connectivity_statement.destinations.all()
-    # new_destinations = statement[DESTINATIONS]
-    #
-    # if len(current_destinations) != len(new_destinations):
-    #     return True
-    #
-    # # We may need to change this algorithm when multi-destination is supported by neurondm
-    #
-    # current_destinations_anatomical_entities = set(
-    #     uri for destination in current_destinations
-    #     for uri in destination.anatomical_entities.all().values_list('ontology_uri', flat=True)
-    # )
-    # current_destinations_from_entities = set(
-    #     uri for destination in current_destinations
-    #     for uri in destination.from_entities.all().values_list('ontology_uri', flat=True)
-    # )
-    #
-    # new_destinations_anatomical_entities = {uri for new_dest in statement[DESTINATIONS] for uri in
-    #                                         new_dest.anatomical_entities if uri not in validation_errors.entities}
-    #
-    # new_destinations_from_entities = {uri for new_dest in statement[DESTINATIONS] for uri in new_dest.from_entities if
-    #                                   uri not in validation_errors.entities}
-    #
-    # if (current_destinations_anatomical_entities != new_destinations_anatomical_entities or
-    #         current_destinations_from_entities != new_destinations_from_entities):
-    #     return True
+    # Check for changes in origins
+    current_origins = set(
+        get_anatomical_entity_identifier_composer(origin) for origin in connectivity_statement.origins.all())
+    new_origins = set(
+        get_anatomical_entity_identifier_neurondm(uri) for uri in statement[ORIGINS].anatomical_entities if
+        uri not in validation_errors.entities)
+    if current_origins != new_origins:
+        return True
 
-    return True
+    # Check for changes in vias
+    current_vias = [
+        {
+            'anatomical_entities': set(
+                get_anatomical_entity_identifier_composer(ae) for ae in via.anatomical_entities.all()),
+            'from_entities': set(get_anatomical_entity_identifier_composer(ae) for ae in via.from_entities.all())
+        }
+        for via in connectivity_statement.via_set.order_by('order').all()
+    ]
+    new_vias = statement[VIAS]
+
+    if len(current_vias) != len(new_vias):
+        return True
+
+    for current_via, new_via in zip(current_vias, new_vias):
+        new_via_anatomical_entities = set(
+            get_anatomical_entity_identifier_neurondm(uri) for uri in new_via.anatomical_entities if
+            uri not in validation_errors.entities)
+
+        new_via_from_entities = set(get_anatomical_entity_identifier_neurondm(uri) for uri in new_via.from_entities if
+                                    uri not in validation_errors.entities)
+
+        if (new_via_anatomical_entities != current_via['anatomical_entities'] or
+                new_via_from_entities != current_via['from_entities']):
+            return True
+
+    # Check for changes in destinations
+    current_destinations = connectivity_statement.destinations.all()
+    new_destinations = statement[DESTINATIONS]
+
+    if len(current_destinations) != len(new_destinations):
+        return True
+
+    # We may need to change this algorithm when multi-destination is supported by neurondm
+
+    current_destinations_anatomical_entities = set(
+        get_anatomical_entity_identifier_composer(uri) for destination in current_destinations
+        for uri in destination.anatomical_entities.all()
+    )
+    current_destinations_from_entities = set(
+        get_anatomical_entity_identifier_composer(uri) for destination in current_destinations
+        for uri in destination.from_entities.all()
+    )
+
+    new_destinations_anatomical_entities = {get_anatomical_entity_identifier_neurondm(uri) for new_dest in
+                                            statement[DESTINATIONS] for uri in
+                                            new_dest.anatomical_entities if uri not in validation_errors.entities}
+
+    new_destinations_from_entities = {get_anatomical_entity_identifier_neurondm(uri) for new_dest in
+                                      statement[DESTINATIONS] for uri in new_dest.from_entities if
+                                      uri not in validation_errors.entities}
+
+    if (current_destinations_anatomical_entities != new_destinations_anatomical_entities or
+            current_destinations_from_entities != new_destinations_from_entities):
+        return True
+
     # Not checking the Notes because they are kept
     return False
+
+
+def get_anatomical_entity_identifier_composer(entity: AnatomicalEntity):
+    if entity.region_layer:
+        layer_uri = entity.region_layer.layer.ontology_uri
+        region_uri = entity.region_layer.region.ontology_uri
+        return f"{region_uri}:{layer_uri}"
+    return entity.simple_entity.ontology_uri
+
+
+def get_anatomical_entity_identifier_neurondm(entity: rdflib.term):
+    if isinstance(entity, orders.rl):
+        return f"{str(entity.region)}:{str(entity.layer)}"
+    return str(entity)

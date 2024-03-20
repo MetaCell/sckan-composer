@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 
 from django.db import transaction
 
@@ -11,7 +10,6 @@ from .helpers.upstream_changes_helper import update_upstream_statements
 from .logging_service import LoggerService
 from .models import LoggableAnomaly, Severity
 from .neurondm_script import main as get_statements_from_neurondm
-
 
 logger_service = LoggerService()
 
@@ -27,11 +25,14 @@ def ingest_statements(update_upstream=False, update_anatomical_entities=False):
             for statement in statements:
                 sentence, _ = get_or_create_sentence(statement)
                 create_or_update_connectivity_statement(statement, sentence, update_anatomical_entities)
+
             update_forward_connections(statements)
 
     except Exception as e:
         logger_service.add_anomaly(
-            LoggableAnomaly(statement_id=None, entity_id=None, message=str(e), severity=Severity.ERROR))
+            LoggableAnomaly(statement_id=None, entity_id=None, message=str(e),
+                            severity=Severity.ERROR)
+        )
         successful_transaction = False
         logging.error(f"Ingestion aborted due to {e}")
 
@@ -41,6 +42,3 @@ def ingest_statements(update_upstream=False, update_anatomical_entities=False):
         if update_upstream:
             update_upstream_statements()
         logger_service.write_ingested_statements_to_file(statements)
-
-
-

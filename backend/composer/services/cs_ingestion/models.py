@@ -3,21 +3,21 @@ from typing import Set, Optional
 
 
 class NeuronDMOrigin:
-    def __init__(self, anatomical_entities_uri: Set):
-        self.anatomical_entities = anatomical_entities_uri
+    def __init__(self, anatomical_entities: Set):
+        self.anatomical_entities = anatomical_entities
 
 
 class NeuronDMVia:
-    def __init__(self, anatomical_entities_uri: Set, from_entities: Set, order: int, type: str):
-        self.anatomical_entities = anatomical_entities_uri
+    def __init__(self, anatomical_entities: Set, from_entities: Set, order: int, type: str):
+        self.anatomical_entities = anatomical_entities
         self.from_entities = from_entities
         self.order = order
         self.type = type
 
 
 class NeuronDMDestination:
-    def __init__(self, anatomical_entities_uri: Set, from_entities: Set, type: str):
-        self.anatomical_entities = anatomical_entities_uri
+    def __init__(self, anatomical_entities: Set, from_entities: Set, type: str):
+        self.anatomical_entities = anatomical_entities
         self.from_entities = from_entities
         self.type = type
 
