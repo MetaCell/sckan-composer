@@ -5,7 +5,8 @@ from django.db.models.signals import post_save, m2m_changed, pre_save
 from django_fsm.signals import post_transition
 
 from .enums import CSState, NoteType
-from .models import ConnectivityStatement, ExportBatch, Note, Sentence, AnatomicalEntity
+from .models import ConnectivityStatement, ExportBatch, Note, Sentence, AnatomicalEntity, AnatomicalEntityIntersection, \
+    AnatomicalEntityMeta
 from .services.export_services import compute_metrics, ConnectivityStatementStateService
 
 
@@ -41,8 +42,20 @@ def post_transition_callback(sender, instance, name, source, target, **kwargs):
 def post_transition_cs(sender, instance, name, source, target, **kwargs):
     if issubclass(sender, ConnectivityStatement):
         if target == CSState.COMPOSE_NOW and source in (
-            CSState.NPO_APPROVED,
-            CSState.EXPORTED,
+                CSState.NPO_APPROVED,
+                CSState.EXPORTED,
         ):
             # add important tag to CS when transition to COMPOSE_NOW from NPO Approved or Exported
             instance = ConnectivityStatementStateService.add_important_tag(instance)
+
+
+@receiver(post_save, sender=AnatomicalEntityIntersection)
+def create_region_layer_anatomical_entity(sender, instance=None, created=False, **kwargs):
+    if created and instance:
+        AnatomicalEntity.objects.create(region_layer=instance)
+
+
+@receiver(post_save, sender=AnatomicalEntityMeta)
+def create_simple_anatomical_entity(sender, instance=None, created=False, **kwargs):
+    if created and instance:
+        AnatomicalEntity.objects.create(simple_entity=instance)
