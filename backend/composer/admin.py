@@ -119,8 +119,19 @@ class AnatomicalEntityIntersectionAdmin(admin.ModelAdmin):
 
 class AnatomicalEntityAdmin(admin.ModelAdmin):
     raw_id_fields = ('simple_entity', 'region_layer')
-    search_fields = ('simple_entity', 'region_layer')
+    search_fields = ('simple_entity__name', 'region_layer__layer__name', 'region_layer__region__name')
+    list_display = ('simple_entity', 'display_region_layer')
     inlines = [SynonymInline]
+
+    def display_region_layer(self, obj):
+        if obj.region_layer:
+            layer_name = obj.region_layer.layer.name if obj.region_layer.layer else "No Layer"
+            region_name = obj.region_layer.region.name if obj.region_layer.region else "No Region"
+            return f"{region_name} / {layer_name}"
+        return "-"
+
+    display_region_layer.short_description = 'Region Layer'
+    display_region_layer.admin_order_field = 'region_layer__layer__name'
 
 
 class ViaInline(SortableStackedInline):
