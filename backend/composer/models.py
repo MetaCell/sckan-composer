@@ -233,7 +233,8 @@ class AnatomicalEntityMeta(models.Model):
 
     class Meta:
         ordering = ["name"]
-        verbose_name_plural = "Anatomical Entities Meta"
+        verbose_name = "Anatomical Entity"
+        verbose_name_plural = "Anatomical Entities"
 
 
 class Layer(AnatomicalEntityMeta):
@@ -249,13 +250,14 @@ class AnatomicalEntityIntersection(models.Model):
     layer = models.ForeignKey(Layer, on_delete=models.CASCADE)
     region = models.ForeignKey(Region, on_delete=models.CASCADE)
 
+    class Meta:
+        verbose_name = "Region/Layer Combination"
+        verbose_name_plural = "Region/Layer Combinations"
+
 
 class AnatomicalEntity(models.Model):
     simple_entity = models.OneToOneField(AnatomicalEntityMeta, on_delete=models.CASCADE, null=True, blank=True)
     region_layer = models.ForeignKey(AnatomicalEntityIntersection, on_delete=models.CASCADE, null=True)
-
-    class Meta:
-        verbose_name_plural = "Anatomical Entities"
 
     @property
     def name(self):

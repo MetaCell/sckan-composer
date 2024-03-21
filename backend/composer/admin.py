@@ -18,7 +18,8 @@ from composer.models import (
     Tag,
     Via,
     FunctionalCircuitRole,
-    ProjectionPhenotype, Destination, Synonym, AnatomicalEntityMeta, Layer, Region, AnatomicalEntityIntersection,
+    ProjectionPhenotype, Destination, Synonym, AnatomicalEntityMeta, Layer, Region,
+    AnatomicalEntityIntersection,
     AnatomicalEntity
 )
 
@@ -94,6 +95,16 @@ class SynonymInline(admin.TabularInline):
     extra = 1
 
 
+class AnatomicalEntityAdmin(admin.ModelAdmin):
+    search_fields = ('simple_entity__name', 'region_layer__layer__name', 'region_layer__region__name')
+
+    def get_model_perms(self, request):
+        """
+        Return empty dict to hide the model from admin index.
+        """
+        return {}
+
+
 class AnatomicalEntityMetaAdmin(admin.ModelAdmin):
     list_display = ("name", "ontology_uri")
     list_display_links = ("name", "ontology_uri")
@@ -115,23 +126,6 @@ class AnatomicalEntityIntersectionAdmin(admin.ModelAdmin):
     list_display = ('layer', 'region',)
     list_filter = ('layer', 'region',)
     raw_id_fields = ('layer', 'region',)
-
-
-class AnatomicalEntityAdmin(admin.ModelAdmin):
-    raw_id_fields = ('simple_entity', 'region_layer')
-    search_fields = ('simple_entity__name', 'region_layer__layer__name', 'region_layer__region__name')
-    list_display = ('simple_entity', 'display_region_layer')
-    inlines = [SynonymInline]
-
-    def display_region_layer(self, obj):
-        if obj.region_layer:
-            layer_name = obj.region_layer.layer.name if obj.region_layer.layer else "No Layer"
-            region_name = obj.region_layer.region.name if obj.region_layer.region else "No Region"
-            return f"{region_name} / {layer_name}"
-        return "-"
-
-    display_region_layer.short_description = 'Region Layer'
-    display_region_layer.admin_order_field = 'region_layer__layer__name'
 
 
 class ViaInline(SortableStackedInline):
