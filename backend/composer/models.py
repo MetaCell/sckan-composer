@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Q, CheckConstraint
 from django.db.models.expressions import F
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
@@ -257,7 +257,7 @@ class AnatomicalEntityIntersection(models.Model):
 
 class AnatomicalEntity(models.Model):
     simple_entity = models.OneToOneField(AnatomicalEntityMeta, on_delete=models.CASCADE, null=True, blank=True)
-    region_layer = models.ForeignKey(AnatomicalEntityIntersection, on_delete=models.CASCADE, null=True)
+    region_layer = models.ForeignKey(AnatomicalEntityIntersection, on_delete=models.CASCADE, null=True, blank=True)
 
     @property
     def name(self):
@@ -270,6 +270,16 @@ class AnatomicalEntity(models.Model):
         else:
             return "Unnamed Entity"
 
+    class Meta:
+        constraints = [
+            CheckConstraint(
+                check=(
+                    Q(simple_entity__isnull=False, region_layer__isnull=True) |
+                    Q(simple_entity__isnull=True, region_layer__isnull=False)
+                ),
+                name='check_anatomical_entity_exclusivity'
+            )
+        ]
 
 class Synonym(models.Model):
     anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.CASCADE,
