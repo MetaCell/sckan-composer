@@ -2,7 +2,7 @@ import csv
 from typing import List, Dict
 
 from composer.enums import CSState, SentenceState
-from composer.services.cs_ingestion.helpers import ID, LABEL, STATE, VALIDATION_ERRORS
+from composer.services.cs_ingestion.helpers.common_helpers import ID, LABEL, STATE, VALIDATION_ERRORS
 from composer.services.cs_ingestion.models import LoggableAnomaly
 
 AXIOM_NOT_FOUND = "Entity not found in any axiom"
@@ -12,7 +12,20 @@ STATEMENT_INCORRECT_STATE = f"Statement already found and is not in {CSState.EXP
 INCONSISTENT_AXIOMS = "Region and layer found in different axioms"
 
 
-class LoggerService:
+class SingletonMeta(type):
+    """
+    This is a thread-safe implementation of Singleton.
+    """
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            instance = super().__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return cls._instances[cls]
+
+
+class LoggerService(metaclass=SingletonMeta):
     def __init__(self, ingestion_anomalies_log_path='ingestion_anomalies_log.csv',
                  ingested_log_path='ingested_log.csv'):
         self.anomalies_log_path = ingestion_anomalies_log_path

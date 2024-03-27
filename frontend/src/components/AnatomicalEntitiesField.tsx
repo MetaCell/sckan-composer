@@ -5,6 +5,7 @@ import {composerApi as api} from "../services/apis";
 import {autocompleteRows} from "../helpers/settings";
 import theme from "../theme/Theme";
 import Typography from "@mui/material/Typography";
+import { getName } from "../helpers/anatomicalEntityHelper";
 
 function AnatomicalEntitiesField(props: any) {
   const {label, errors, isDisabled} = props.options;
@@ -31,7 +32,7 @@ function AnatomicalEntitiesField(props: any) {
     api.composerAnatomicalEntityList([], autocompleteRows, inputValue, 0);
 
   let inputValue;
-  !props.value ? (inputValue = "") : (inputValue = entity?.name);
+  !props.value ? (inputValue = "") : (inputValue = entity? getName(entity) : '');
 
   if (loading) {
     return <div>Loading...</div>;

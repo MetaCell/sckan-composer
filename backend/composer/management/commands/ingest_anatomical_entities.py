@@ -3,7 +3,7 @@ import time
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.db.utils import IntegrityError
-from composer.models import AnatomicalEntity, Synonym
+from composer.models import AnatomicalEntity, Synonym, AnatomicalEntityMeta
 
 URI = "o"
 NAME = "o_label"
@@ -24,18 +24,23 @@ class Command(BaseCommand):
         try:
             is_first_occurrence = ontology_uri not in processed_uris
 
-            anatomical_entity, created = AnatomicalEntity.objects.get_or_create(
+            entity_meta, meta_created = AnatomicalEntityMeta.objects.get_or_create(
                 ontology_uri=ontology_uri,
                 defaults={"name": name},
             )
-            if not created and is_first_occurrence:
-                if anatomical_entity.name != name:
-                    anatomical_entity.name = name
-                    anatomical_entity.save()
-                    if show_complete_logs:
-                        self.stdout.write(
-                            self.style.SUCCESS(f"Updated {anatomical_entity.ontology_uri} name to {name}.")
-                        )
+
+            # Update the name if it has changed and this is the first occurrence of the ontology URI
+            if not meta_created and is_first_occurrence and entity_meta.name != name:
+                entity_meta.name = name
+                entity_meta.save()
+                if show_complete_logs:
+                    self.stdout.write(
+                        self.style.SUCCESS(f"Updated {entity_meta.ontology_uri} name to {name}.")
+                    )
+
+            anatomical_entity, created = AnatomicalEntity.objects.get_or_create(
+                simple_entity=entity_meta
+            )
 
             processed_uris.add(ontology_uri)
 
@@ -45,7 +50,9 @@ class Command(BaseCommand):
                     unique_synonyms[synonym_key] = Synonym(anatomical_entity=anatomical_entity, name=synonym)
                     if show_complete_logs:
                         self.stdout.write(
-                            self.style.SUCCESS(f"Synonym '{synonym}' added for {anatomical_entity.ontology_uri}."))
+                            self.style.SUCCESS(
+                                f"Synonym '{synonym}' added for {anatomical_entity.simple_entity.ontology_uri}.")
+                        )
         except IntegrityError as e:
             self.stdout.write(self.style.ERROR(f"Error processing {ontology_uri}: {e}"))
 

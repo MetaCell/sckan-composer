@@ -4,6 +4,7 @@ import {
   ConnectivityStatementUpdate,
 } from "../apiclient/backend";
 import {Option, OptionDetail} from "../types";
+import {getURI, getName } from "./anatomicalEntityHelper";
 import {OriginsGroupLabel, ViasGroupLabel} from "./settings";
 
 export const DROPDOWN_MAPPER_ONTOLOGY_URL = "Ontology URI";
@@ -20,16 +21,16 @@ export function mapAnatomicalEntitiesToOptions(
   }
   return entities.map((entity: any) => ({
     id: entity.id.toString(),
-    label: entity.name,
+    label: getName(entity),
     group: groupLabel,
     content: [
       {
         title: "Name",
-        value: entity.name,
+        value: getName(entity),
       },
       {
         title: DROPDOWN_MAPPER_ONTOLOGY_URL,
-        value: entity.ontology_uri,
+        value: getURI(entity),
       },
     ],
   }));

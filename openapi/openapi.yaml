@@ -162,7 +162,6 @@ paths:
             - rejected
             - revise
             - to_be_reviewed
-            - invalid
         explode: true
         style: form
       - in: query
@@ -1764,7 +1763,42 @@ components:
   schemas:
     AnatomicalEntity:
       type: object
-      description: Anatomical Entity
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        simple_entity:
+          allOf:
+          - $ref: '#/components/schemas/AnatomicalEntityMeta'
+          readOnly: true
+        region_layer:
+          allOf:
+          - $ref: '#/components/schemas/AnatomicalEntityIntersection'
+          readOnly: true
+      required:
+      - id
+      - region_layer
+      - simple_entity
+    AnatomicalEntityIntersection:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        layer:
+          allOf:
+          - $ref: '#/components/schemas/Layer'
+          readOnly: true
+        region:
+          allOf:
+          - $ref: '#/components/schemas/Region'
+          readOnly: true
+      required:
+      - id
+      - layer
+      - region
+    AnatomicalEntityMeta:
+      type: object
       properties:
         id:
           type: integer
@@ -1775,7 +1809,7 @@ components:
         ontology_uri:
           type: string
           format: uri
-          readOnly: true
+          maxLength: 200
       required:
       - id
       - name
@@ -2158,6 +2192,23 @@ components:
       - RIGHT
       - LEFT
       type: string
+    Layer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        ontology_uri:
+          type: string
+          format: uri
+          maxLength: 200
+      required:
+      - id
+      - name
+      - ontology_uri
     Login:
       type: object
       properties:
@@ -2703,6 +2754,29 @@ components:
       - connectivity_statement_id
       - id
       - uri
+    Region:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        ontology_uri:
+          type: string
+          format: uri
+          maxLength: 200
+        layers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Layer'
+          readOnly: true
+      required:
+      - id
+      - layers
+      - name
+      - ontology_uri
     Sentence:
       type: object
       description: Sentence

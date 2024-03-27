@@ -1,7 +1,7 @@
 import logging
 
 from composer.enums import CircuitType
-from composer.models import AnatomicalEntity
+from composer.models import AnatomicalEntityMeta
 
 ID = "id"
 ORIGINS = "origins"
@@ -41,7 +41,3 @@ def get_value_or_none(model, prop: str):
             return None
     else:
         return None
-
-
-def found_entity(uri: str) -> bool:
-    return AnatomicalEntity.objects.filter(ontology_uri=uri).exists()

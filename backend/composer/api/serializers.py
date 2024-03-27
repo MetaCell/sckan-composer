@@ -19,7 +19,7 @@ from ..models import (
     Sentence,
     Specie,
     Tag,
-    Via, Destination,
+    Via, Destination, AnatomicalEntityIntersection, Region, Layer, AnatomicalEntityMeta,
 )
 from ..services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
@@ -80,17 +80,63 @@ class ProfileSerializer(serializers.ModelSerializer):
         dept = 2
 
 
-class AnatomicalEntitySerializer(UniqueFieldsMixin, serializers.ModelSerializer):
-    """Anatomical Entity"""
-
+class LayerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = AnatomicalEntity
+        model = Layer
         fields = (
             "id",
             "name",
             "ontology_uri",
         )
-        read_only_fields = ("ontology_uri",)
+
+
+class RegionSerializer(serializers.ModelSerializer):
+    layers = LayerSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Region
+        fields = (
+            "id",
+            "name",
+            "ontology_uri",
+            "layers",
+        )
+
+
+class AnatomicalEntityMetaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AnatomicalEntityMeta
+        fields = (
+            "id",
+            "name",
+            "ontology_uri",
+        )
+
+
+class AnatomicalEntityIntersectionSerializer(serializers.ModelSerializer):
+    layer = LayerSerializer(read_only=True)
+    region = RegionSerializer(read_only=True)
+
+    class Meta:
+        model = AnatomicalEntityIntersection
+        fields = (
+            "id",
+            "layer",
+            "region",
+        )
+
+
+class AnatomicalEntitySerializer(serializers.ModelSerializer):
+    simple_entity = AnatomicalEntityMetaSerializer(read_only=True)
+    region_layer = AnatomicalEntityIntersectionSerializer(read_only=True)
+
+    class Meta:
+        model = AnatomicalEntity
+        fields = (
+            "id",
+            "simple_entity",
+            "region_layer",
+        )
 
 
 class NoteSerializer(serializers.ModelSerializer):
@@ -486,7 +532,6 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             self.context['journey'] = instance.get_journey()
         return self.create_statement_preview(instance, self.context['journey'])
 
-    
     def create_statement_preview(self, instance, journey):
         sex = instance.sex.sex_str if instance.sex else None
 
@@ -514,7 +559,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             statement = f"In {sex or ''} {species}, the {phenotype.lower()} connection goes {journey_sentence}.\n"
         else:
             statement = f"A {phenotype.lower()} connection goes {journey_sentence}.\n"
-        
+
         statement += f"This "
         if projection:
             statement += f"{projection.lower()} "

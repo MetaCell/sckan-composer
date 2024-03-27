@@ -48,7 +48,7 @@ python3 manage.py migrate
 python3 manage.py runsslserver
 ```
 
-### Running on docker with docker-compose
+### Running the Backend on docker with docker-compose
 the command below will start a docker container that maps/uses the backend folder
 into the container. It will also start the Django development server with DEBUG=True
 
@@ -56,9 +56,42 @@ into the container. It will also start the Django development server with DEBUG=
 BUILDKIT_PROGRESS=plain docker-compose -f docker-compose-dev.yaml up --build
 ```
 
-to stop:
+### Running the PostgreSQL database with docker-compose
+the command below will start a docker container that runs the PostgreSQL database.
+To use it within your development Django server you need to set the following env vars
+in your launch(file)
+
+```
+USE_PG=True
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=composer
+DB_USER=composer
+DB_PASSWORD=composer
+```
+
+To start the database server run this command:
+```
+docker-compose --file docker-compose-db.yaml up --build
+```
+
+to stop the database run this command:
 ```bash
-docker-compose -f docker-compose-dev.yaml down
+docker-compose -f docker-compose-db.yaml down
+```
+
+Example to run the backend using the Docker PostgreSQL database
+```
+cd backend
+
+export USE_PG=True
+export DB_HOST=localhost
+export DB_PORT=5432
+export DB_NAME=composer
+export DB_USER=composer
+export DB_PASSWORD=composer
+
+python ./manage.py runsslserver
 ```
 
 ### Ingest sample NLP data
