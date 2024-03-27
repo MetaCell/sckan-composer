@@ -270,16 +270,20 @@ class AnatomicalEntity(models.Model):
         else:
             return "Unnamed Entity"
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         constraints = [
             CheckConstraint(
                 check=(
-                    Q(simple_entity__isnull=False, region_layer__isnull=True) |
-                    Q(simple_entity__isnull=True, region_layer__isnull=False)
+                        Q(simple_entity__isnull=False, region_layer__isnull=True) |
+                        Q(simple_entity__isnull=True, region_layer__isnull=False)
                 ),
                 name='check_anatomical_entity_exclusivity'
             )
         ]
+
 
 class Synonym(models.Model):
     anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.CASCADE,
