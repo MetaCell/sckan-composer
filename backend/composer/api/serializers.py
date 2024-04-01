@@ -681,7 +681,11 @@ class GenericConnectivityStatementSerializer(ConnectivityStatementSerializer):
         fields = (
             "id",
             "sentence_id",
+            "species",
             "origins",
             "vias",
             "destinations",
+            "apinatomy_model",
+            "phenotype_id",
+            "phenotype",
         )
