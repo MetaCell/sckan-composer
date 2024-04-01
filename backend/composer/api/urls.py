@@ -5,6 +5,7 @@ from .views import (
     AnatomicalEntityViewSet,
     PhenotypeViewSet,
     ConnectivityStatementViewSet,
+    GenericConnectivityStatementViewSet,
     jsonschemas,
     NoteViewSet,
     ProfileViewSet,
@@ -26,6 +27,11 @@ router.register(
     r"connectivity-statement",
     ConnectivityStatementViewSet,
     basename="connectivity-statement",
+)
+router.register(
+	r"connectivity-statement-generic",
+	GenericConnectivityStatementViewSet,
+    basename="connectivity-statement-generic",
 )
 router.register(r"note", NoteViewSet, basename="note")
 router.register(r"note-tag", TagViewSet, basename="note-tag")

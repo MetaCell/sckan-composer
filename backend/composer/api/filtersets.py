@@ -95,6 +95,87 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
         fields = []
 
 
+
+    
+class MultiURLReferenceFilter(django_filters.ModelMultipleChoiceFilter):
+    def get_filter_predicate(self, v):
+        return {'reference_uri': v.reference_uri}
+    
+    def filter(self, qs, value):
+        if value:
+            qs = super().filter(qs, value)
+        return qs
+    
+
+class MultipleAnatomicalEntityFilter(django_filters.ModelMultipleChoiceFilter):
+    def get_filter_predicate(self, v):
+        return {'annotated_ontology_uri': v.annotated_ontology_uri}
+    
+    def filter(self, qs, value):
+        if value:
+            qs = qs.filter(origins__in=value)
+
+        return qs
+    
+class MultipleOriginConnectionLayerFilter(django_filters.ModelMultipleChoiceFilter):
+    def get_filter_predicate(self, v):
+        return {'annotated_ontology_uri': v.annotated_ontology_uri}
+    
+    def filter(self, qs, value):
+        if value:
+            qs = qs.filter(origins__in=value)
+        return qs
+
+class MultipleDestinationConnectionLayerFilter(MultipleOriginConnectionLayerFilter):
+    def filter(self, qs, value):
+        if value:
+            qs = qs.filter(destinations__in=value)
+        return qs
+    
+class MultipleViaConnectionLayerFilter(MultipleOriginConnectionLayerFilter):
+    def filter(self, qs, value):
+        if value:
+            qs = qs.filter(via__in=value)
+        return qs
+
+
+class GenericConnectivityStatementFilter(django_filters.FilterSet):
+    origin_uris = MultipleOriginConnectionLayerFilter(
+        to_field_name='annotated_ontology_uri',
+        queryset=AnatomicalEntity.objects.annotate_with_ontology_uri(),
+        conjoined=False,
+    )
+    destination_uris = MultipleDestinationConnectionLayerFilter(
+        to_field_name='annotated_ontology_uri',
+        queryset=Destination.annotated_objects.annotate_with_ontology_uri(),
+        conjoined=False
+    )
+
+    via_uris = MultipleViaConnectionLayerFilter(
+        to_field_name='annotated_ontology_uri',
+        queryset=Via.annotated_objects.annotate_with_ontology_uri(),
+        conjoined=False
+    )
+    
+    population_uris = MultiURLReferenceFilter(
+        to_field_name='reference_uri',
+        queryset=ConnectivityStatement.objects.all(),
+        conjoined=False
+    )
+
+    
+    ordering = django_filters.OrderingFilter(
+        fields=(
+            ("id", "id"),
+            ("modified_date", "last_edited"),
+        ),
+    )
+
+    class Meta:
+        model = ConnectivityStatement
+        fields = []
+
+
 class AnatomicalEntityFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(method="filter_name")
     exclude_ids = NumberInFilter(field_name='id', exclude=True)

@@ -97,6 +97,9 @@ class ConnectivityStatementManager(models.Manager):
 
     def excluding_draft(self):
         return self.get_queryset().exclude(state=CSState.DRAFT)
+        
+    def filter_by_exported_state(self):
+        return self.get_queryset().filter(state=CSState.EXPORTED)
 
 
 class SentenceStatementManager(models.Manager):
@@ -118,6 +121,24 @@ class NoteManager(models.Manager):
             .get_queryset()
             .select_related("user", "sentence", "connectivity_statement")
         )
+
+
+class AnnotatedConnectionLayerQuerySet(models.QuerySet):
+    """
+    Useful for filtering - GenericConnectionStatementFilter
+    """
+    def annotate_with_ontology_uri(self):
+        return self.annotate(annotated_ontology_uri=models.Case(
+            models.When(anatomical_entities__simple_entity__isnull=False, then=models.F('anatomical_entities__simple_entity__ontology_uri')),
+            models.When(anatomical_entities__region_layer__isnull=False, then=models.functions.Concat(
+                models.F('anatomical_entities__region_layer__region__ontology_uri'),
+                models.Value(','),
+                models.F('anatomical_entities__region_layer__layer__ontology_uri')
+            )),
+            default=models.Value(''),
+            output_field=models.URLField()
+        ))
+
 
 
 class ViaManager(models.Manager):
@@ -254,10 +275,33 @@ class AnatomicalEntityIntersection(models.Model):
         verbose_name = "Region/Layer Combination"
         verbose_name_plural = "Region/Layer Combinations"
 
+    def __str__(self):
+        return f"{self.region.name} - {self.layer.name}"
+
+
+class AnnotatedAnatomicalEntityQuerySet(models.QuerySet):
+    """
+    Useful for filtering - GenericConnectionStatementFilter
+    """
+    def annotate_with_ontology_uri(self):
+        return self.annotate(annotated_ontology_uri=models.Case(
+            models.When(simple_entity__isnull=False, then=models.F('simple_entity__ontology_uri')),
+            models.When(region_layer__isnull=False, then=models.functions.Concat(
+                models.F('region_layer__region__ontology_uri'),
+                models.Value(','),
+                models.F('region_layer__layer__ontology_uri')
+            )),
+            default=models.Value(''),
+            output_field=models.URLField()
+        ))
+    
+
 
 class AnatomicalEntity(models.Model):
     simple_entity = models.OneToOneField(AnatomicalEntityMeta, on_delete=models.CASCADE, null=True, blank=True)
     region_layer = models.ForeignKey(AnatomicalEntityIntersection, on_delete=models.CASCADE, null=True, blank=True)
+
+    objects = AnnotatedAnatomicalEntityQuerySet.as_manager()
 
     @property
     def name(self):
@@ -700,6 +744,7 @@ class Destination(AbstractConnectionLayer):
     )
 
     objects = DestinationManager()
+    annotated_objects = AnnotatedConnectionLayerQuerySet.as_manager()
 
     class Meta:
         constraints = [
@@ -715,6 +760,7 @@ class Via(AbstractConnectionLayer):
                                                  related_name='via_connection_layers')
 
     objects = ViaManager()
+    annotated_objects = AnnotatedConnectionLayerQuerySet.as_manager()
 
     type = models.CharField(
         max_length=10,

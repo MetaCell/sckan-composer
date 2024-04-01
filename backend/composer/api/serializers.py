@@ -673,3 +673,15 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
             "statement_preview",
             "errors"
         )
+
+
+class GenericConnectivityStatementSerializer(ConnectivityStatementSerializer):
+    """Generic Connectivity Statement"""
+    class Meta(ConnectivityStatementSerializer.Meta):
+        fields = (
+            "id",
+            "sentence_id",
+            "origins",
+            "vias",
+            "destinations",
+        )
