@@ -1,8 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Q, CheckConstraint
 from django.db.models.expressions import F
-from django.db.models.functions import Upper
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
 
@@ -225,9 +224,7 @@ class ProjectionPhenotype(models.Model):
         verbose_name_plural = "Projection Phenotypes"
 
 
-class AnatomicalEntity(models.Model):
-    """Anatomical Entity"""
-
+class AnatomicalEntityMeta(models.Model):
     name = models.CharField(max_length=200, db_index=True)
     ontology_uri = models.URLField(unique=True)
 
@@ -236,11 +233,61 @@ class AnatomicalEntity(models.Model):
 
     class Meta:
         ordering = ["name"]
+        verbose_name = "Anatomical Entity"
         verbose_name_plural = "Anatomical Entities"
 
 
+class Layer(AnatomicalEntityMeta):
+    ...
+
+
+class Region(AnatomicalEntityMeta):
+    ...
+    layers = models.ManyToManyField(Layer, through='AnatomicalEntityIntersection')
+
+
+class AnatomicalEntityIntersection(models.Model):
+    layer = models.ForeignKey(Layer, on_delete=models.CASCADE)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = "Region/Layer Combination"
+        verbose_name_plural = "Region/Layer Combinations"
+
+
+class AnatomicalEntity(models.Model):
+    simple_entity = models.OneToOneField(AnatomicalEntityMeta, on_delete=models.CASCADE, null=True, blank=True)
+    region_layer = models.ForeignKey(AnatomicalEntityIntersection, on_delete=models.CASCADE, null=True, blank=True)
+
+    @property
+    def name(self):
+        return self.simple_entity.name if self.simple_entity \
+            else f'{self.region_layer.region.name},{self.region_layer.layer.name}'
+        
+    @property
+    def ontology_uri(self):
+        return self.simple_entity.ontology_uri if self.simple_entity \
+            else f'{self.region_layer.region.ontology_uri},{self.region_layer.layer.ontology_uri}'
+
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        constraints = [
+            CheckConstraint(
+                check=(
+                        Q(simple_entity__isnull=False, region_layer__isnull=True) |
+                        Q(simple_entity__isnull=True, region_layer__isnull=False)
+                ),
+                name='check_anatomical_entity_exclusivity'
+            )
+        ]
+
+
 class Synonym(models.Model):
-    anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.CASCADE, related_name="synonyms")
+    anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.CASCADE,
+                                          related_name="synonyms", null=True)
     name = models.CharField(max_length=200, db_index=True)
 
     class Meta:
@@ -630,6 +677,7 @@ class Destination(AbstractConnectionLayer):
         on_delete=models.CASCADE,
         related_name="destinations"  # Overridden related_name
     )
+
     anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True,
                                                  related_name='destination_connection_layers')
 
@@ -651,7 +699,8 @@ class Destination(AbstractConnectionLayer):
 
 
 class Via(AbstractConnectionLayer):
-    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True, related_name='via_connection_layers')
+    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True,
+                                                 related_name='via_connection_layers')
 
     objects = ViaManager()
 

@@ -3,6 +3,7 @@ import {
   SentenceAvailableTransitionsEnum as sentenceStates,
 } from "../apiclient/backend/api";
 import { ComposerConnectivityStatementListStateEnum as statementStates } from "../apiclient/backend/api";
+import { getName } from "./anatomicalEntityHelper";
 
 export const hiddenWidget = (fields: string[]) => {
   let hiddenSchema = {};
@@ -213,9 +214,9 @@ export function searchAnatomicalEntities(
 
   return entities
     .filter((entity) =>
-      entity.name.toLowerCase().includes(normalizedSearchValue),
+      getName(entity).toLowerCase().includes(normalizedSearchValue),
     )
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort((a, b) => getName(a).localeCompare(getName(b)));
 }
 
 

@@ -1,6 +1,6 @@
 import time
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from composer.services.cs_ingestion.cs_ingestion_services import ingest_statements
 
 
@@ -13,13 +13,19 @@ class Command(BaseCommand):
             action='store_true',
             help='Set this flag to update upstream statements.',
         )
+        parser.add_argument(
+            '--update_anatomical_entities',
+            action='store_true',
+            help='Set this flag to try move anatomical entities to specific layer, region.',
+        )
 
     def handle(self, *args, **options):
         update_upstream = options['update_upstream']
+        update_anatomical_entities = options['update_anatomical_entities']
 
         start_time = time.time()
 
-        ingest_statements(update_upstream)
+        ingest_statements(update_upstream, update_anatomical_entities)
 
         end_time = time.time()
 
