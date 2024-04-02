@@ -52,7 +52,7 @@ export const getAnatomicalEntityDetails = (entity: AnatomicalEntity): OptionDeta
 
 export const getName = (anatomicalEntity: AnatomicalEntity) => {
   if (anatomicalEntity.region_layer) {
-    return `${anatomicalEntity.region_layer.region.name} - ${anatomicalEntity.region_layer.layer.name}`
+    return `${anatomicalEntity.region_layer.region.name} (${anatomicalEntity.region_layer.layer.name})`
   }
   return anatomicalEntity.simple_entity.name
 }

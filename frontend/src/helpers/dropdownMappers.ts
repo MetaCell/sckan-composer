@@ -4,7 +4,7 @@ import {
   ConnectivityStatementUpdate,
 } from "../apiclient/backend";
 import {Option, OptionDetail} from "../types";
-import { getURI, getName, getAnatomicalEntityDetails } from "./anatomicalEntityHelper";
+import { getName, getAnatomicalEntityDetails } from "./anatomicalEntityHelper";
 import {OriginsGroupLabel, ViasGroupLabel} from "./settings";
 
 export const DROPDOWN_MAPPER_ONTOLOGY_URL = "Ontology URI";
