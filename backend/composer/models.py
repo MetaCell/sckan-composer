@@ -294,6 +294,18 @@ class AnnotatedAnatomicalEntityQuerySet(models.QuerySet):
             default=models.Value(''),
             output_field=models.URLField()
         ))
+
+    def annotate_with_name(self):
+        return self.annotate(annotated_name=models.Case(
+            models.When(simple_entity__isnull=False, then=models.F('simple_entity__name')),
+            models.When(region_layer__isnull=False, then=models.functions.Concat(
+                models.F('region_layer__region__name'),
+                models.Value(','),
+                models.F('region_layer__layer__name')
+            )),
+            default=models.Value(''),
+            output_field=models.CharField()
+        ))
     
 
 
