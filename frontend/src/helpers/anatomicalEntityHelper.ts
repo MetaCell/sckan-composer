@@ -1,6 +1,10 @@
 import {AnatomicalEntity} from "../apiclient/backend";
 import { OptionDetail } from "../types";
 
+export const DROPDOWN_MAPPER_ONTOLOGY_URL = "Ontology URI";
+export const DROPDOWN_MAPPER_LAYER_URI = "Layer URI";
+export const DROPDOWN_MAPPER_REGION_URI = "Region URI";
+
 
 export const getAnatomicalEntityDetails = (entity: AnatomicalEntity): OptionDetail[] => {
   let details: OptionDetail[] = [
@@ -21,7 +25,7 @@ export const getAnatomicalEntityDetails = (entity: AnatomicalEntity): OptionDeta
           value: getRegionName(entity)
         },
         {
-          title: "Region URI",
+          title: DROPDOWN_MAPPER_REGION_URI,
           value: getRegionURI(entity)
         }
       )
@@ -33,7 +37,7 @@ export const getAnatomicalEntityDetails = (entity: AnatomicalEntity): OptionDeta
           value: getLayerName(entity)
         },
         {
-          title: "Layer URI",
+          title: DROPDOWN_MAPPER_LAYER_URI,
           value: getLayerURI(entity)
         }
       )
@@ -42,7 +46,7 @@ export const getAnatomicalEntityDetails = (entity: AnatomicalEntity): OptionDeta
   if (entity.simple_entity) {
     details.push(
       {
-        title: "Ontology URI",
+        title: DROPDOWN_MAPPER_ONTOLOGY_URL,
         value: getURI(entity)
       }
     )

@@ -7,8 +7,6 @@ import {Option, OptionDetail} from "../types";
 import { getName, getAnatomicalEntityDetails } from "./anatomicalEntityHelper";
 import {OriginsGroupLabel, ViasGroupLabel} from "./settings";
 
-export const DROPDOWN_MAPPER_ONTOLOGY_URL = "Ontology URI";
-
 export const DROPDOWN_MAPPER_STATE = "state";
 
 type tempOption = { sort: number } & Option;
