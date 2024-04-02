@@ -186,18 +186,20 @@ class AnatomicalEntityFilter(django_filters.FilterSet):
 
     @staticmethod
     def filter_name(queryset, name, value):
-        words = value.split()
+        queryset = queryset.annotate_with_ontology_uri().annotate_with_name()
 
-        if not words:
+        if not value:
             return queryset
+        
+        qs_name = queryset.filter(annotated_name__icontains=value)
+        qs_uri = queryset.filter(annotated_ontology_uri__icontains=value)
+        qs_synonyms = queryset.filter(synonyms__name__icontains=value)
 
-        queries = [Q(name__icontains=word) for word in words]
+        merged_queryset = qs_name.union(qs_uri).union(qs_synonyms)
 
-        query = queries.pop()
-        for item in queries:
-            query &= item
+        ids = merged_queryset.values_list('id', flat=True)
+        return queryset.filter(id__in=ids)
 
-        return queryset.filter(query)
 
 
 class SpecieFilter(django_filters.FilterSet):
