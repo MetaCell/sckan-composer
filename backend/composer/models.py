@@ -261,25 +261,13 @@ class AnatomicalEntity(models.Model):
 
     @property
     def name(self):
-        if self.simple_entity:
-            return self.simple_entity.name
-        elif self.region_layer:
-            layer_name = self.region_layer.layer.name if self.region_layer.layer else "No Layer"
-            region_name = self.region_layer.region.name if self.region_layer.region else "No Region"
-            return f"{region_name},{layer_name}"
-        else:
-            return "Unnamed Entity"
+        return self.simple_entity.name if self.simple_entity \
+            else f'{self.region_layer.region.name},{self.region_layer.layer.name}'
         
     @property
     def ontology_uri(self):
-        if self.simple_entity:
-            return self.simple_entity.ontology_uri
-        elif self.region_layer:
-            layer_uri = self.region_layer.layer.ontology_uri if self.region_layer.layer else ""
-            region_uri = self.region_layer.region.ontology_uri if self.region_layer.region else ""
-            return f"{region_uri},{layer_uri}"
-        else:
-            return None
+        return self.simple_entity.ontology_uri if self.simple_entity \
+            else f'{self.region_layer.region.ontology_uri},{self.region_layer.layer.ontology_uri}'
 
 
     def __str__(self):
