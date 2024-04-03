@@ -675,67 +675,6 @@ export interface DestinationSerializerDetails {
 
 
 /**
- * Generic Connectivity Statement
- * @export
- * @interface GenericConnectivityStatement
- */
-export interface GenericConnectivityStatement {
-    /**
-     * 
-     * @type {number}
-     * @memberof GenericConnectivityStatement
-     */
-    'id': number | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof GenericConnectivityStatement
-     */
-    'sentence_id'?: number;
-    /**
-     * 
-     * @type {Array<Specie>}
-     * @memberof GenericConnectivityStatement
-     */
-    'species'?: Array<Specie>;
-    /**
-     * 
-     * @type {Array<AnatomicalEntity>}
-     * @memberof GenericConnectivityStatement
-     */
-    'origins'?: Array<AnatomicalEntity>;
-    /**
-     * 
-     * @type {Array<ViaSerializerDetails>}
-     * @memberof GenericConnectivityStatement
-     */
-    'vias'?: Array<ViaSerializerDetails>;
-    /**
-     * 
-     * @type {Array<DestinationSerializerDetails>}
-     * @memberof GenericConnectivityStatement
-     */
-    'destinations'?: Array<DestinationSerializerDetails>;
-    /**
-     * 
-     * @type {string}
-     * @memberof GenericConnectivityStatement
-     */
-    'apinatomy_model'?: string | null;
-    /**
-     * 
-     * @type {number}
-     * @memberof GenericConnectivityStatement
-     */
-    'phenotype_id'?: number | null;
-    /**
-     * 
-     * @type {Phenotype}
-     * @memberof GenericConnectivityStatement
-     */
-    'phenotype': Phenotype;
-}
-/**
  * 
  * @export
  * @enum {string}
@@ -966,37 +905,6 @@ export interface PaginatedDestinationList {
      * @memberof PaginatedDestinationList
      */
     'results'?: Array<Destination>;
-}
-/**
- * 
- * @export
- * @interface PaginatedGenericConnectivityStatementList
- */
-export interface PaginatedGenericConnectivityStatementList {
-    /**
-     * 
-     * @type {number}
-     * @memberof PaginatedGenericConnectivityStatementList
-     */
-    'count'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof PaginatedGenericConnectivityStatementList
-     */
-    'next'?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof PaginatedGenericConnectivityStatementList
-     */
-    'previous'?: string | null;
-    /**
-     * 
-     * @type {Array<GenericConnectivityStatement>}
-     * @memberof PaginatedGenericConnectivityStatementList
-     */
-    'results'?: Array<GenericConnectivityStatement>;
 }
 /**
  * 
@@ -2794,121 +2702,6 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(connectivityStatement, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * GenericConnectivityStatement that only allows GET to get the list of ConnectivityStatements
-         * @param {Array<string>} [destinationUris] 
-         * @param {number} [limit] Number of results to return per page.
-         * @param {number} [offset] The initial index from which to return the results.
-         * @param {Array<ComposerConnectivityStatementGenericListOrderingEnum>} [ordering] Ordering
-         * @param {Array<string>} [originUris] 
-         * @param {Array<string>} [populationUris] 
-         * @param {Array<string>} [viaUris] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerConnectivityStatementGenericList: async (destinationUris?: Array<string>, limit?: number, offset?: number, ordering?: Array<ComposerConnectivityStatementGenericListOrderingEnum>, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/composer/connectivity-statement-generic/`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication tokenAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
-
-            // authentication cookieAuth required
-
-            if (destinationUris) {
-                localVarQueryParameter['destination_uris'] = destinationUris;
-            }
-
-            if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
-            }
-
-            if (offset !== undefined) {
-                localVarQueryParameter['offset'] = offset;
-            }
-
-            if (ordering) {
-                localVarQueryParameter['ordering'] = ordering.join(COLLECTION_FORMATS.csv);
-            }
-
-            if (originUris) {
-                localVarQueryParameter['origin_uris'] = originUris;
-            }
-
-            if (populationUris) {
-                localVarQueryParameter['population_uris'] = populationUris;
-            }
-
-            if (viaUris) {
-                localVarQueryParameter['via_uris'] = viaUris;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * GenericConnectivityStatement that only allows GET to get the list of ConnectivityStatements
-         * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerConnectivityStatementGenericRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('composerConnectivityStatementGenericRetrieve', 'id', id)
-            const localVarPath = `/api/composer/connectivity-statement-generic/{id}/`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication tokenAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
-
-            // authentication cookieAuth required
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -5054,32 +4847,6 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * GenericConnectivityStatement that only allows GET to get the list of ConnectivityStatements
-         * @param {Array<string>} [destinationUris] 
-         * @param {number} [limit] Number of results to return per page.
-         * @param {number} [offset] The initial index from which to return the results.
-         * @param {Array<ComposerConnectivityStatementGenericListOrderingEnum>} [ordering] Ordering
-         * @param {Array<string>} [originUris] 
-         * @param {Array<string>} [populationUris] 
-         * @param {Array<string>} [viaUris] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async composerConnectivityStatementGenericList(destinationUris?: Array<string>, limit?: number, offset?: number, ordering?: Array<ComposerConnectivityStatementGenericListOrderingEnum>, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedGenericConnectivityStatementList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementGenericList(destinationUris, limit, offset, ordering, originUris, populationUris, viaUris, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * GenericConnectivityStatement that only allows GET to get the list of ConnectivityStatements
-         * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async composerConnectivityStatementGenericRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GenericConnectivityStatement>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementGenericRetrieve(id, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
          * ConnectivityStatement
          * @param {Array<number>} [destinations] 
          * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
@@ -5672,30 +5439,6 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementDoTransitionCreate(id, transition, connectivityStatement, options).then((request) => request(axios, basePath));
         },
         /**
-         * GenericConnectivityStatement that only allows GET to get the list of ConnectivityStatements
-         * @param {Array<string>} [destinationUris] 
-         * @param {number} [limit] Number of results to return per page.
-         * @param {number} [offset] The initial index from which to return the results.
-         * @param {Array<ComposerConnectivityStatementGenericListOrderingEnum>} [ordering] Ordering
-         * @param {Array<string>} [originUris] 
-         * @param {Array<string>} [populationUris] 
-         * @param {Array<string>} [viaUris] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerConnectivityStatementGenericList(destinationUris?: Array<string>, limit?: number, offset?: number, ordering?: Array<ComposerConnectivityStatementGenericListOrderingEnum>, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options?: any): AxiosPromise<PaginatedGenericConnectivityStatementList> {
-            return localVarFp.composerConnectivityStatementGenericList(destinationUris, limit, offset, ordering, originUris, populationUris, viaUris, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * GenericConnectivityStatement that only allows GET to get the list of ConnectivityStatements
-         * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerConnectivityStatementGenericRetrieve(id: number, options?: any): AxiosPromise<GenericConnectivityStatement> {
-            return localVarFp.composerConnectivityStatementGenericRetrieve(id, options).then((request) => request(axios, basePath));
-        },
-        /**
          * ConnectivityStatement
          * @param {Array<number>} [destinations] 
          * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
@@ -6270,34 +6013,6 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * GenericConnectivityStatement that only allows GET to get the list of ConnectivityStatements
-     * @param {Array<string>} [destinationUris] 
-     * @param {number} [limit] Number of results to return per page.
-     * @param {number} [offset] The initial index from which to return the results.
-     * @param {Array<ComposerConnectivityStatementGenericListOrderingEnum>} [ordering] Ordering
-     * @param {Array<string>} [originUris] 
-     * @param {Array<string>} [populationUris] 
-     * @param {Array<string>} [viaUris] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComposerApi
-     */
-    public composerConnectivityStatementGenericList(destinationUris?: Array<string>, limit?: number, offset?: number, ordering?: Array<ComposerConnectivityStatementGenericListOrderingEnum>, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementGenericList(destinationUris, limit, offset, ordering, originUris, populationUris, viaUris, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * GenericConnectivityStatement that only allows GET to get the list of ConnectivityStatements
-     * @param {number} id A unique integer value identifying this connectivity statement.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComposerApi
-     */
-    public composerConnectivityStatementGenericRetrieve(id: number, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementGenericRetrieve(id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * ConnectivityStatement
      * @param {Array<number>} [destinations] 
      * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
@@ -6803,16 +6518,6 @@ export class ComposerApi extends BaseAPI {
     }
 }
 
-/**
- * @export
- */
-export const ComposerConnectivityStatementGenericListOrderingEnum = {
-    Id: '-id',
-    LastEdited: '-last_edited',
-    Id2: 'id',
-    LastEdited2: 'last_edited'
-} as const;
-export type ComposerConnectivityStatementGenericListOrderingEnum = typeof ComposerConnectivityStatementGenericListOrderingEnum[keyof typeof ComposerConnectivityStatementGenericListOrderingEnum];
 /**
  * @export
  */

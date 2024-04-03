@@ -99,7 +99,6 @@ class ConnectivityStatementManager(models.Manager):
         return self.get_queryset().exclude(state=CSState.DRAFT)
 
 
-
 class SentenceStatementManager(models.Manager):
     def get_queryset(self):
         return (
@@ -119,7 +118,6 @@ class NoteManager(models.Manager):
             .get_queryset()
             .select_related("user", "sentence", "connectivity_statement")
         )
-
 
 
 class ViaManager(models.Manager):

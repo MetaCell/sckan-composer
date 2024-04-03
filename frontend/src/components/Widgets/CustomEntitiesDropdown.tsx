@@ -256,7 +256,7 @@ export default function CustomEntitiesDropdown({
     {},
   );
 
-  const isInputInGroupOptionContent = (option: Option, inputValue: string) => {
+  const isInOptions = (option: Option, inputValue: string) => {
     return option.content.map((content) => content.value.toLowerCase())
       .join(' ').includes(inputValue.toLowerCase());
   }
@@ -714,7 +714,7 @@ export default function CustomEntitiesDropdown({
                             <ul>
                               {
                                 groupedOptions[group]
-                                  .filter((option: Option) => isInputInGroupOptionContent(option, inputValue || ''))
+                                  .filter((option: Option) => isInOptions(option, inputValue || ''))
                                 .map((option: Option) => (
                                   <li
                                     key={option.id}
