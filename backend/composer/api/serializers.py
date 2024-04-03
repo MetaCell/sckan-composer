@@ -680,18 +680,3 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
             "errors"
         )
 
-
-class GenericConnectivityStatementSerializer(ConnectivityStatementSerializer):
-    """Generic Connectivity Statement"""
-    class Meta(ConnectivityStatementSerializer.Meta):
-        fields = (
-            "id",
-            "sentence_id",
-            "species",
-            "origins",
-            "vias",
-            "destinations",
-            "apinatomy_model",
-            "phenotype_id",
-            "phenotype",
-        )
