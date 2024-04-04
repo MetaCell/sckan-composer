@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from fsm_admin.mixins import FSMTransitionMixin
+from django import forms
 
 from composer.models import (
     Phenotype,
@@ -89,12 +90,6 @@ class SentenceAdmin(
         NoteSentenceInline,
     )
 
-
-class SynonymInline(admin.TabularInline):
-    model = Synonym
-    extra = 1
-
-
 class AnatomicalEntityAdmin(admin.ModelAdmin):
     search_fields = ('simple_entity__name', 'region_layer__layer__name', 'region_layer__region__name')
 
@@ -105,10 +100,42 @@ class AnatomicalEntityAdmin(admin.ModelAdmin):
         return {}
 
 
+class AnatomicalEntityMetaForm(forms.ModelForm):
+    synonyms = forms.CharField(
+        max_length=255, required=False, validators=[lambda x: x.split(",")]
+    )
+
+    class Meta:
+        model = AnatomicalEntityMeta
+        fields = '__all__'
+
 class AnatomicalEntityMetaAdmin(admin.ModelAdmin):
-    list_display = ("name", "ontology_uri")
+    list_display = ("name", "ontology_uri", "synonyms")
     list_display_links = ("name", "ontology_uri")
-    search_fields = ("name",)
+    search_fields = ("name", "ontology_uri")
+    form = AnatomicalEntityMetaForm
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if obj and getattr(obj, 'anatomicalentity', None):   ## only for simple anatomical entity - check this by - if obj has anatomicalentity attribute
+            form.base_fields['synonyms'].initial = ", ".join([synonym.name for synonym in obj.anatomicalentity.synonyms.all()])
+        else:
+            # show synonyms only for simple anatomical entity (not for Layer or Region)
+            del form.base_fields['synonyms']
+        return form
+    
+    def save_model(self, request, obj, form, change):
+        obj.synonyms = form.cleaned_data.get('synonyms')
+        super().save_model(request, obj, form, change)
+        
+
+    @admin.display(description="Synonyms")
+    def synonyms(self, obj):
+        """
+        ONLY FOR SIMPLE ANATOMICAL ENTITY
+        """
+        synonyms = obj.anatomicalentity.synonyms.all()
+        return ", ".join([synonym.name for synonym in synonyms])
 
 
 class LayerAdmin(admin.ModelAdmin):
@@ -122,10 +149,36 @@ class RegionAdmin(admin.ModelAdmin):
     filter_horizontal = ('layers',)
 
 
-class AnatomicalEntityIntersectionAdmin(admin.ModelAdmin):
-    list_display = ('layer', 'region',)
+class AnatomicalEntityIntersectionForm(forms.ModelForm):
+    synonyms = forms.CharField(
+        max_length=255, required=False, validators=[lambda x: x.split(",")]
+    )
+    
+    class Meta:
+        model = AnatomicalEntityIntersection
+        fields = '__all__'
+
+
+class AnatomicalEntityIntersectionAdmin(nested_admin.NestedModelAdmin, admin.ModelAdmin):
+    list_display = ('layer', 'region', "synonyms")
     list_filter = ('layer', 'region',)
     raw_id_fields = ('layer', 'region',)
+    form = AnatomicalEntityIntersectionForm
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if obj and getattr(obj, 'anatomicalentity', None):
+            form.base_fields['synonyms'].initial = ", ".join([synonym.name for synonym in obj.anatomicalentity.synonyms.all()])
+        return form
+
+    def save_model(self, request, obj, form, change):
+        obj.synonyms = form.cleaned_data.get('synonyms')
+        super().save_model(request, obj, form, change)
+        
+    @admin.display(description="Synonyms")
+    def synonyms(self, obj):
+        synonyms = obj.anatomicalentity.synonyms.all()
+        return ", ".join([synonym.name for synonym in synonyms])     
 
 
 class ViaInline(SortableStackedInline):

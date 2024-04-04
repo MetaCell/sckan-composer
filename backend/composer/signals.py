@@ -6,7 +6,7 @@ from django_fsm.signals import post_transition
 
 from .enums import CSState, NoteType
 from .models import ConnectivityStatement, ExportBatch, Note, Sentence, AnatomicalEntity, AnatomicalEntityIntersection, \
-    AnatomicalEntityMeta
+    AnatomicalEntityMeta, Synonym
 from .services.export_services import compute_metrics, ConnectivityStatementStateService
 
 
@@ -49,13 +49,26 @@ def post_transition_cs(sender, instance, name, source, target, **kwargs):
             instance = ConnectivityStatementStateService.add_important_tag(instance)
 
 
+def create_synonyms_on_save(instance, ae):
+    if instance.synonyms:
+        synonyms = [synonym.strip() for synonym in instance.synonyms.split(",")]
+        synonyms = [ 
+                Synonym.objects.create(name=synonym) if (not Synonym.objects.filter(name=synonym).exists()) \
+                    else Synonym.objects.get(name=synonym) \
+                    for synonym in synonyms
+            ]
+        ae.synonyms.set(synonyms)
+
+
 @receiver(post_save, sender=AnatomicalEntityIntersection)
 def create_region_layer_anatomical_entity(sender, instance=None, created=False, **kwargs):
-    if created and instance:
-        AnatomicalEntity.objects.create(region_layer=instance)
+    if instance:
+        ae = AnatomicalEntity.objects.create(region_layer=instance) if created else instance.anatomicalentity
+        create_synonyms_on_save(instance, ae)
 
 
 @receiver(post_save, sender=AnatomicalEntityMeta)
 def create_simple_anatomical_entity(sender, instance=None, created=False, **kwargs):
-    if created and instance:
-        AnatomicalEntity.objects.create(simple_entity=instance)
+    if instance:
+        ae = AnatomicalEntity.objects.create(simple_entity=instance) if created else instance.anatomicalentity
+        create_synonyms_on_save(instance, ae)

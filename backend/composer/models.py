@@ -254,10 +254,13 @@ class AnatomicalEntityIntersection(models.Model):
         verbose_name = "Region/Layer Combination"
         verbose_name_plural = "Region/Layer Combinations"
 
+    def __str__(self):
+        return f'{self.region.name} - {self.layer.name}'
+
 
 class AnatomicalEntity(models.Model):
     simple_entity = models.OneToOneField(AnatomicalEntityMeta, on_delete=models.CASCADE, null=True, blank=True)
-    region_layer = models.ForeignKey(AnatomicalEntityIntersection, on_delete=models.CASCADE, null=True, blank=True)
+    region_layer = models.OneToOneField(AnatomicalEntityIntersection, on_delete=models.CASCADE, null=True, blank=True)
 
     @property
     def name(self):
