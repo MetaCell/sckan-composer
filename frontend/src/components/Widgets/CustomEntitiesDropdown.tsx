@@ -255,7 +255,12 @@ export default function CustomEntitiesDropdown({
     },
     {},
   );
-  
+
+  const isInOptions = (option: Option, inputValue: string) => {
+    return option.content.map((content) => content.value.toLowerCase())
+      .join(' ').includes(inputValue.toLowerCase());
+  }
+
   const handleSelectDeselectGroup = (group: string) => {
     const newSelectedOptions = [...selectedOptions];
     const groupOptions = autocompleteOptions.filter((option: Option) => option.group === group);
@@ -707,16 +712,9 @@ export default function CustomEntitiesDropdown({
                               {getGroupButton(group)}
                             </ListSubheader>
                             <ul>
-                              {groupedOptions[group]
-                                .filter((option: Option) =>
-                                  option.label
-                                    .toLowerCase()
-                                    .includes(
-                                      inputValue !== undefined
-                                        ? inputValue.toLowerCase()
-                                        : "",
-                                    ),
-                                )
+                              {
+                                groupedOptions[group]
+                                  .filter((option: Option) => isInOptions(option, inputValue || ''))
                                 .map((option: Option) => (
                                   <li
                                     key={option.id}

@@ -1775,10 +1775,14 @@ components:
           allOf:
           - $ref: '#/components/schemas/AnatomicalEntityIntersection'
           readOnly: true
+        synonyms:
+          type: string
+          readOnly: true
       required:
       - id
       - region_layer
       - simple_entity
+      - synonyms
     AnatomicalEntityIntersection:
       type: object
       properties:

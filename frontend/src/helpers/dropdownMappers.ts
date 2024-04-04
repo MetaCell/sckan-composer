@@ -4,10 +4,9 @@ import {
   ConnectivityStatementUpdate,
 } from "../apiclient/backend";
 import {Option, OptionDetail} from "../types";
-import {getURI, getName } from "./anatomicalEntityHelper";
+import { getName, getAnatomicalEntityDetails } from "./anatomicalEntityHelper";
 import {OriginsGroupLabel, ViasGroupLabel} from "./settings";
 
-export const DROPDOWN_MAPPER_ONTOLOGY_URL = "Ontology URI";
 export const DROPDOWN_MAPPER_STATE = "state";
 
 type tempOption = { sort: number } & Option;
@@ -23,16 +22,7 @@ export function mapAnatomicalEntitiesToOptions(
     id: entity.id.toString(),
     label: getName(entity),
     group: groupLabel,
-    content: [
-      {
-        title: "Name",
-        value: getName(entity),
-      },
-      {
-        title: DROPDOWN_MAPPER_ONTOLOGY_URL,
-        value: getURI(entity),
-      },
-    ],
+    content: getAnatomicalEntityDetails(entity),
   }));
 }
 

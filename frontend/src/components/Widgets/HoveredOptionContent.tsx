@@ -1,16 +1,14 @@
 import React from "react";
 import { Stack, Typography, Box, Chip } from "@mui/material";
 import { OptionDetail } from "../../types";
-import { DROPDOWN_MAPPER_ONTOLOGY_URL } from "../../helpers/dropdownMappers";
+import { DROPDOWN_MAPPER_ONTOLOGY_URL, DROPDOWN_MAPPER_LAYER_URI, DROPDOWN_MAPPER_REGION_URI } from "../../helpers/anatomicalEntityHelper";
 import { snakeToSpace } from "../../helpers/helpers";
 
 export const CustomFooter = ({ entity }: any) => {
-  const ontologyUrlDetail = entity.content.find(
-    (detail: OptionDetail) => detail.title === DROPDOWN_MAPPER_ONTOLOGY_URL,
+  const ontologyUrlDetails = entity.content.filter(
+    (detail: OptionDetail) => [DROPDOWN_MAPPER_ONTOLOGY_URL, DROPDOWN_MAPPER_LAYER_URI, DROPDOWN_MAPPER_REGION_URI].includes(detail.title),
   );
-  const ontologyUrl = ontologyUrlDetail
-    ? ontologyUrlDetail.value
-    : "URL not available";
+  const ontologyUrls = ontologyUrlDetails.map((detail: OptionDetail) => detail.value || "URL not available");
 
   return (
     <Box
@@ -23,7 +21,11 @@ export const CustomFooter = ({ entity }: any) => {
         borderTop: "0.0625rem solid #F2F4F7",
       }}
     >
-      <Chip variant="outlined" label={ontologyUrl} />
+      {
+        ontologyUrls.map((url: string) => (
+          <Chip variant="outlined" label={url} />
+        ))
+      }
     </Box>
   );
 };

@@ -47,6 +47,12 @@ export interface AnatomicalEntity {
      * @memberof AnatomicalEntity
      */
     'region_layer': AnatomicalEntityIntersection;
+    /**
+     * 
+     * @type {string}
+     * @memberof AnatomicalEntity
+     */
+    'synonyms': string;
 }
 /**
  * 

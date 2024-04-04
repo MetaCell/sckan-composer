@@ -105,18 +105,24 @@ class AnatomicalEntityFilter(django_filters.FilterSet):
 
     @staticmethod
     def filter_name(queryset, name, value):
-        words = value.split()
-
-        if not words:
+        if not value:
             return queryset
+        
+        qs_name = queryset.filter(simple_entity__name__icontains=value) \
+            .union(queryset.filter(region_layer__layer__name__icontains=value)) \
+            .union(queryset.filter(region_layer__region__name__icontains=value))
+        
+        qs_uri = queryset.filter(simple_entity__ontology_uri__icontains=value) \
+            .union(queryset.filter(region_layer__layer__ontology_uri__icontains=value)) \
+            .union(queryset.filter(region_layer__region__ontology_uri__icontains=value))
+        
+        qs_synonyms = queryset.filter(synonyms__name__icontains=value)
 
-        queries = [Q(name__icontains=word) for word in words]
+        merged_queryset = qs_name.union(qs_uri).union(qs_synonyms)
 
-        query = queries.pop()
-        for item in queries:
-            query &= item
+        ids = merged_queryset.values_list('id', flat=True)
+        return queryset.filter(id__in=ids)
 
-        return queryset.filter(query)
 
 
 class SpecieFilter(django_filters.FilterSet):
