@@ -1,3 +1,6 @@
+from typing import Any
+from django.db.models.query import QuerySet
+from django.http import HttpRequest
 import nested_admin
 from adminsortable2.admin import SortableAdminBase, SortableStackedInline
 from django.contrib import admin
@@ -41,7 +44,9 @@ class ProvenanceInline(admin.StackedInline):
 
 class SynonymeInline(admin.StackedInline):
     model = Synonym
-    extra = 3
+    extra = 1
+
+
 class ProvenanceNestedInline(nested_admin.NestedStackedInline):
     model = Provenance
     extra = 1
@@ -95,57 +100,30 @@ class SentenceAdmin(
 class AnatomicalEntityAdmin(admin.ModelAdmin):
     search_fields = ('simple_entity__name', 'region_layer__layer__name', 'region_layer__region__name')
     autocomplete_fields = ('simple_entity', 'region_layer')
+    list_display = ('simple_entity', 'region_layer', "synonyms")
+    list_display_links = ('simple_entity', 'region_layer')
     inlines = (SynonymeInline,)
 
-    # def get_model_perms(self, request):
-    #     """
-    #     Return empty dict to hide the model from admin index.
-    #     """
-    #     return {}
-
-
-class AnatomicalEntityMetaForm(forms.ModelForm):
-    synonyms = forms.CharField(
-        max_length=255, required=False, validators=[lambda x: x.split(",")]
-    )
-
-    class Meta:
-        model = AnatomicalEntityMeta
-        fields = '__all__'
-
-class AnatomicalEntityMetaAdmin(admin.ModelAdmin):
-    list_display = ("name", "ontology_uri", "synonyms")
-    list_display_links = ("name", "ontology_uri")
-    search_fields = ("name", "ontology_uri")
-    form = AnatomicalEntityMetaForm
-
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs.prefetch_related('anatomicalentity__synonyms')
-        
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        if obj and getattr(obj, 'anatomicalentity', None):   ## only for simple anatomical entity - check this by - if obj has anatomicalentity attribute
-            form.base_fields['synonyms'].initial = ", ".join([synonym.name for synonym in obj.anatomicalentity.synonyms.all()])
-        else:
-            # show synonyms only for simple anatomical entity (not for Layer or Region)
-            del form.base_fields['synonyms']
-        return form
-    
-    def save_model(self, request, obj, form, change):
-        obj.synonyms = form.cleaned_data.get('synonyms')
-        super().save_model(request, obj, form, change)
-        
+    # we need to make efficient queries to the database to get the list of anatomical entities
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
+        return super().get_queryset(request) \
+            .select_related('simple_entity', 'region_layer__layer', 'region_layer__region') \
+            .prefetch_related('synonyms')
 
     @admin.display(description="Synonyms")
     def synonyms(self, obj):
-        """
-        ONLY FOR SIMPLE ANATOMICAL ENTITY
-        """
-        synonyms = obj.anatomicalentity.synonyms.all()
-        return ", ".join([synonym.name for synonym in synonyms])
- 
+        synonyms = obj.synonyms.all()
+        return ', '.join([synonym.name for synonym in synonyms])
+
+
+class AnatomicalEntityMetaAdmin(admin.ModelAdmin):
+    list_display = ("name", "ontology_uri")
+    list_display_links = ("name", "ontology_uri")
+    search_fields = ("name", "ontology_uri")
+
+    def get_model_perms(self, request):
+        return {}
+
 
 class LayerAdmin(admin.ModelAdmin):
     list_display = ('name', 'ontology_uri',)
@@ -158,41 +136,11 @@ class RegionAdmin(admin.ModelAdmin):
     filter_horizontal = ('layers',)
 
 
-class AnatomicalEntityIntersectionForm(forms.ModelForm):
-    synonyms = forms.CharField(
-        max_length=255, required=False, validators=[lambda x: x.split(",")]
-    )
-    
-    class Meta:
-        model = AnatomicalEntityIntersection
-        fields = '__all__'
-
-
 class AnatomicalEntityIntersectionAdmin(nested_admin.NestedModelAdmin, admin.ModelAdmin):
-    list_display = ('layer', 'region', "synonyms")
+    list_display = ('layer', 'region')
     search_fields = ("region__name", "layer__name")
     list_filter = ('layer', 'region',)
     raw_id_fields = ('layer', 'region',)
-    form = AnatomicalEntityIntersectionForm
-
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs.prefetch_related('anatomicalentity__synonyms')
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        if obj and getattr(obj, 'anatomicalentity', None):
-            form.base_fields['synonyms'].initial = ", ".join([synonym.name for synonym in obj.anatomicalentity.synonyms.all()])
-        return form
-
-    def save_model(self, request, obj, form, change):
-        obj.synonyms = form.cleaned_data.get('synonyms')
-        super().save_model(request, obj, form, change)
-        
-    @admin.display(description="Synonyms")
-    def synonyms(self, obj):
-        synonyms = obj.anatomicalentity.synonyms.all()
-        return ", ".join([synonym.name for synonym in synonyms])     
 
 
 class ViaInline(SortableStackedInline):

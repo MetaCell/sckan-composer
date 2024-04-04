@@ -264,19 +264,26 @@ class AnatomicalEntity(models.Model):
 
     @property
     def name(self):
-        return self.simple_entity.name if self.simple_entity \
-            else f'{self.region_layer.region.name},{self.region_layer.layer.name}'
+        if self.simple_entity:
+            return self.simple_entity.name
+        elif self.region_layer:
+            return f'{self.region_layer.region.name},{self.region_layer.layer.name}'
+        return 'Unknown Anatomical Entity'
         
     @property
     def ontology_uri(self):
-        return self.simple_entity.ontology_uri if self.simple_entity \
-            else f'{self.region_layer.region.ontology_uri},{self.region_layer.layer.ontology_uri}'
-
+        if self.simple_entity:
+            return self.simple_entity.ontology_uri
+        elif self.region_layer:
+            return f'{self.region_layer.region.ontology_uri},{self.region_layer.layer.ontology_uri}'
+        return 'Unknown URI'
 
     def __str__(self):
         return self.name
 
     class Meta:
+        verbose_name = "Anatomical Entity"
+        verbose_name_plural = "Anatomical Entities"
         constraints = [
             CheckConstraint(
                 check=(

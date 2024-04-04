@@ -63,16 +63,3 @@ def create_synonyms_on_save(instance, ae):
             ]
         ae.synonyms.set(synonyms)
 
-
-@receiver(post_save, sender=AnatomicalEntityIntersection)
-def create_region_layer_anatomical_entity(sender, instance=None, created=False, **kwargs):
-    if instance:
-        ae = AnatomicalEntity.objects.create(region_layer=instance) if created else instance.anatomicalentity
-        create_synonyms_on_save(instance, ae)
-
-
-@receiver(post_save, sender=AnatomicalEntityMeta)
-def create_simple_anatomical_entity(sender, instance=None, created=False, **kwargs):
-    if instance:
-        ae = AnatomicalEntity.objects.create(simple_entity=instance) if created else instance.anatomicalentity
-        create_synonyms_on_save(instance, ae)
