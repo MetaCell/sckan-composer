@@ -54,7 +54,7 @@ def create_synonyms_on_save(instance, ae):
     ONLY allowed through the admin interface.
     F.E. - check AnatomicalEntityMetaAdmin -> save_model()
     """
-    if instance.synonyms:
+    if getattr(instance, 'synonyms', None):
         synonyms = [synonym.strip() for synonym in instance.synonyms.split(",")]
         synonyms = [ 
                 Synonym.objects.create(name=synonym) if (not Synonym.objects.filter(name=synonym).exists()) \

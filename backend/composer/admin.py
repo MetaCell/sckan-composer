@@ -115,6 +115,11 @@ class AnatomicalEntityMetaAdmin(admin.ModelAdmin):
     search_fields = ("name", "ontology_uri")
     form = AnatomicalEntityMetaForm
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.prefetch_related('anatomicalentity__synonyms')
+        
+
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         if obj and getattr(obj, 'anatomicalentity', None):   ## only for simple anatomical entity - check this by - if obj has anatomicalentity attribute
@@ -136,7 +141,7 @@ class AnatomicalEntityMetaAdmin(admin.ModelAdmin):
         """
         synonyms = obj.anatomicalentity.synonyms.all()
         return ", ".join([synonym.name for synonym in synonyms])
-
+ 
 
 class LayerAdmin(admin.ModelAdmin):
     list_display = ('name', 'ontology_uri',)
@@ -164,6 +169,10 @@ class AnatomicalEntityIntersectionAdmin(nested_admin.NestedModelAdmin, admin.Mod
     list_filter = ('layer', 'region',)
     raw_id_fields = ('layer', 'region',)
     form = AnatomicalEntityIntersectionForm
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.prefetch_related('anatomicalentity__synonyms')
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
