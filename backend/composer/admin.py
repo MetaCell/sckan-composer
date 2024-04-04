@@ -39,7 +39,9 @@ class ProvenanceInline(admin.StackedInline):
     model = Provenance
     extra = 1
 
-
+class SynonymeInline(admin.StackedInline):
+    model = Synonym
+    extra = 3
 class ProvenanceNestedInline(nested_admin.NestedStackedInline):
     model = Provenance
     extra = 1
@@ -92,12 +94,14 @@ class SentenceAdmin(
 
 class AnatomicalEntityAdmin(admin.ModelAdmin):
     search_fields = ('simple_entity__name', 'region_layer__layer__name', 'region_layer__region__name')
+    autocomplete_fields = ('simple_entity', 'region_layer')
+    inlines = (SynonymeInline,)
 
-    def get_model_perms(self, request):
-        """
-        Return empty dict to hide the model from admin index.
-        """
-        return {}
+    # def get_model_perms(self, request):
+    #     """
+    #     Return empty dict to hide the model from admin index.
+    #     """
+    #     return {}
 
 
 class AnatomicalEntityMetaForm(forms.ModelForm):
@@ -166,6 +170,7 @@ class AnatomicalEntityIntersectionForm(forms.ModelForm):
 
 class AnatomicalEntityIntersectionAdmin(nested_admin.NestedModelAdmin, admin.ModelAdmin):
     list_display = ('layer', 'region', "synonyms")
+    search_fields = ("region__name", "layer__name")
     list_filter = ('layer', 'region',)
     raw_id_fields = ('layer', 'region',)
     form = AnatomicalEntityIntersectionForm
