@@ -50,6 +50,10 @@ def post_transition_cs(sender, instance, name, source, target, **kwargs):
 
 
 def create_synonyms_on_save(instance, ae):
+    """
+    ONLY allowed through the admin interface.
+    F.E. - check AnatomicalEntityMetaAdmin -> save_model()
+    """
     if instance.synonyms:
         synonyms = [synonym.strip() for synonym in instance.synonyms.split(",")]
         synonyms = [ 
