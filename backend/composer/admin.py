@@ -1,9 +1,13 @@
+from typing import Any
+from django.db.models.query import QuerySet
+from django.http import HttpRequest
 import nested_admin
 from adminsortable2.admin import SortableAdminBase, SortableStackedInline
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from fsm_admin.mixins import FSMTransitionMixin
+from django import forms
 
 from composer.models import (
     Phenotype,
@@ -36,6 +40,10 @@ class ProfileInline(admin.StackedInline):
 
 class ProvenanceInline(admin.StackedInline):
     model = Provenance
+    extra = 1
+
+class SynonymeInline(admin.StackedInline):
+    model = Synonym
     extra = 1
 
 
@@ -89,26 +97,32 @@ class SentenceAdmin(
         NoteSentenceInline,
     )
 
-
-class SynonymInline(admin.TabularInline):
-    model = Synonym
-    extra = 1
-
-
 class AnatomicalEntityAdmin(admin.ModelAdmin):
     search_fields = ('simple_entity__name', 'region_layer__layer__name', 'region_layer__region__name')
+    autocomplete_fields = ('simple_entity', 'region_layer')
+    list_display = ('simple_entity', 'region_layer', "synonyms")
+    list_display_links = ('simple_entity', 'region_layer')
+    inlines = (SynonymeInline,)
 
-    def get_model_perms(self, request):
-        """
-        Return empty dict to hide the model from admin index.
-        """
-        return {}
+    # we need to make efficient queries to the database to get the list of anatomical entities
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
+        return super().get_queryset(request) \
+            .select_related('simple_entity', 'region_layer__layer', 'region_layer__region') \
+            .prefetch_related('synonyms')
+
+    @admin.display(description="Synonyms")
+    def synonyms(self, obj):
+        synonyms = obj.synonyms.all()
+        return ', '.join([synonym.name for synonym in synonyms])
 
 
 class AnatomicalEntityMetaAdmin(admin.ModelAdmin):
     list_display = ("name", "ontology_uri")
     list_display_links = ("name", "ontology_uri")
-    search_fields = ("name",)
+    search_fields = ("name", "ontology_uri")
+
+    def get_model_perms(self, request):
+        return {}
 
 
 class LayerAdmin(admin.ModelAdmin):
@@ -122,10 +136,14 @@ class RegionAdmin(admin.ModelAdmin):
     filter_horizontal = ('layers',)
 
 
-class AnatomicalEntityIntersectionAdmin(admin.ModelAdmin):
-    list_display = ('layer', 'region',)
+class AnatomicalEntityIntersectionAdmin(nested_admin.NestedModelAdmin, admin.ModelAdmin):
+    list_display = ('layer', 'region')
+    search_fields = ("region__name", "layer__name")
     list_filter = ('layer', 'region',)
     raw_id_fields = ('layer', 'region',)
+
+    def get_model_perms(self, request):
+        return {}
 
 
 class ViaInline(SortableStackedInline):
