@@ -142,6 +142,9 @@ class AnatomicalEntityIntersectionAdmin(nested_admin.NestedModelAdmin, admin.Mod
     list_filter = ('layer', 'region',)
     raw_id_fields = ('layer', 'region',)
 
+    def get_model_perms(self, request):
+        return {}
+
 
 class ViaInline(SortableStackedInline):
     model = Via
