@@ -516,7 +516,8 @@ class ConnectivityStatement(models.Model):
         source=[
             CSState.DRAFT,
             CSState.IN_PROGRESS,
-            CSState.INVALID
+            CSState.INVALID,
+            CSState.EXPORTED,
         ],
         target=CSState.COMPOSE_NOW,
         permission=ConnectivityStatementStateService.has_permission_to_transition_to_compose_now,
