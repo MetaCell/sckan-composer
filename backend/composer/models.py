@@ -276,48 +276,35 @@ class AnatomicalEntityIntersection(models.Model):
         verbose_name_plural = "Region/Layer Combinations"
 
     def __str__(self):
-        return f"{self.region.name} - {self.layer.name}"
-
-
-class AnnotatedAnatomicalEntityQuerySet(models.QuerySet):
-    """
-    Useful for filtering - GenericConnectionStatementFilter
-    """
-    def annotate_with_ontology_uri(self):
-        return self.annotate(annotated_ontology_uri=models.Case(
-            models.When(simple_entity__isnull=False, then=models.F('simple_entity__ontology_uri')),
-            models.When(region_layer__isnull=False, then=models.functions.Concat(
-                models.F('region_layer__region__ontology_uri'),
-                models.Value(','),
-                models.F('region_layer__layer__ontology_uri')
-            )),
-            default=models.Value(''),
-            output_field=models.URLField()
-        ))
-    
+        return f'{self.region.name} - {self.layer.name}'
 
 
 class AnatomicalEntity(models.Model):
     simple_entity = models.OneToOneField(AnatomicalEntityMeta, on_delete=models.CASCADE, null=True, blank=True)
-    region_layer = models.ForeignKey(AnatomicalEntityIntersection, on_delete=models.CASCADE, null=True, blank=True)
-
-    objects = AnnotatedAnatomicalEntityQuerySet.as_manager()
+    region_layer = models.OneToOneField(AnatomicalEntityIntersection, on_delete=models.CASCADE, null=True, blank=True)
 
     @property
     def name(self):
-        return self.simple_entity.name if self.simple_entity \
-            else f'{self.region_layer.region.name},{self.region_layer.layer.name}'
+        if self.simple_entity:
+            return self.simple_entity.name
+        elif self.region_layer:
+            return f'{self.region_layer.region.name},{self.region_layer.layer.name}'
+        return 'Unknown Anatomical Entity'
         
     @property
     def ontology_uri(self):
-        return self.simple_entity.ontology_uri if self.simple_entity \
-            else f'{self.region_layer.region.ontology_uri},{self.region_layer.layer.ontology_uri}'
-
+        if self.simple_entity:
+            return self.simple_entity.ontology_uri
+        elif self.region_layer:
+            return f'{self.region_layer.region.ontology_uri},{self.region_layer.layer.ontology_uri}'
+        return 'Unknown URI'
 
     def __str__(self):
         return self.name
 
     class Meta:
+        verbose_name = "Anatomical Entity"
+        verbose_name_plural = "Anatomical Entities"
         constraints = [
             CheckConstraint(
                 check=(
