@@ -97,6 +97,9 @@ class ConnectivityStatementManager(models.Manager):
 
     def excluding_draft(self):
         return self.get_queryset().exclude(state=CSState.DRAFT)
+        
+    def exported(self):
+        return self.get_queryset().filter(state=CSState.EXPORTED)
 
 
 class SentenceStatementManager(models.Manager):
