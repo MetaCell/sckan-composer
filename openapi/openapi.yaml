@@ -57,7 +57,7 @@ paths:
         name: id
         schema:
           type: integer
-        description: A unique integer value identifying this anatomical entity.
+        description: A unique integer value identifying this Anatomical Entity.
         required: true
       tags:
       - composer

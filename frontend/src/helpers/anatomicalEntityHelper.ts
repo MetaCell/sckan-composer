@@ -1,4 +1,4 @@
-import {AnatomicalEntity} from "../apiclient/backend";
+import { AnatomicalEntity } from "../apiclient/backend";
 import { OptionDetail } from "../types";
 
 export const DROPDOWN_MAPPER_ONTOLOGY_URL = "Ontology URI";

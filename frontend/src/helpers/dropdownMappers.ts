@@ -3,9 +3,9 @@ import {
   BaseConnectivityStatement, ConnectivityStatement,
   ConnectivityStatementUpdate,
 } from "../apiclient/backend";
-import {Option, OptionDetail} from "../types";
+import { Option, OptionDetail } from "../types";
 import { getName, getAnatomicalEntityDetails } from "./anatomicalEntityHelper";
-import {OriginsGroupLabel, ViasGroupLabel} from "./settings";
+import { OriginsGroupLabel, ViasGroupLabel } from "./settings";
 
 export const DROPDOWN_MAPPER_STATE = "state";
 
@@ -153,10 +153,10 @@ export function findMatchingEntities(
   ).reduce((result: any, via: any) => {
     const matchingAnatomicalEntitiesInVia: AnatomicalEntity &
       { order?: number }[] = via.anatomical_entities
-      .filter((fromEntity: Option) =>
-        entities.some((searchItem: Option) => fromEntity.id === searchItem.id),
-      )
-      .map((fromEntity: Option) => ({...fromEntity, order: via.order}));
+        .filter((fromEntity: Option) =>
+          entities.some((searchItem: Option) => fromEntity.id === searchItem.id),
+        )
+        .map((fromEntity: Option) => ({ ...fromEntity, order: via.order }));
 
     if (matchingAnatomicalEntitiesInVia.length > 0) {
       result.push(...matchingAnatomicalEntitiesInVia);

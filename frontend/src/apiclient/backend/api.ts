@@ -2216,7 +2216,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * AnatomicalEntity
-         * @param {number} id A unique integer value identifying this anatomical entity.
+         * @param {number} id A unique integer value identifying this Anatomical Entity.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4730,7 +4730,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * AnatomicalEntity
-         * @param {number} id A unique integer value identifying this anatomical entity.
+         * @param {number} id A unique integer value identifying this Anatomical Entity.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5333,7 +5333,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * AnatomicalEntity
-         * @param {number} id A unique integer value identifying this anatomical entity.
+         * @param {number} id A unique integer value identifying this Anatomical Entity.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5885,7 +5885,7 @@ export class ComposerApi extends BaseAPI {
 
     /**
      * AnatomicalEntity
-     * @param {number} id A unique integer value identifying this anatomical entity.
+     * @param {number} id A unique integer value identifying this Anatomical Entity.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
