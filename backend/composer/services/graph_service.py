@@ -4,6 +4,13 @@ from django.apps import apps
 JOURNEY_DELIMITER = '\\'
 
 
+def get_entity_name(entity):
+    if entity.region_layer is not None:
+        return f"{entity.region_layer.region.name} ({entity.region_layer.layer.name})"
+    else:
+        return entity.name
+
+
 def generate_paths(origins, vias, destinations):
     paths = []
     # Calculate the total number of layers, including origins and destinations
@@ -15,13 +22,13 @@ def generate_paths(origins, vias, destinations):
             # Directly use pre-fetched 'from_entities' without triggering additional queries
             if origin in destination.from_entities.all() or (not destination.from_entities.exists() and len(vias) == 0):
                 for dest_entity in destination.anatomical_entities.all():
-                    paths.append([(origin.name, 0), (dest_entity.name, destination_layer)])
+                    paths.append([(get_entity_name(origin), 0), (get_entity_name(dest_entity), destination_layer)])
 
     # Handle connections involving vias
     if vias:
         for origin in origins:
             # Generate paths through vias for each origin
-            paths.extend(create_paths_from_origin(origin, vias, destinations, [(origin.name, 0)], destination_layer))
+            paths.extend(create_paths_from_origin(origin, vias, destinations, [(get_entity_name(origin), 0)], destination_layer))
 
     # Remove duplicates from the generated paths
     unique_paths = [list(path) for path in set(tuple(path) for path in paths)]
@@ -33,10 +40,10 @@ def create_paths_from_origin(origin, vias, destinations, current_path, destinati
     # Base case: if there are no more vias to process
     if not vias:
         # Generate direct connections from the current path to destinations
-        return [current_path + [(dest_entity.name, destination_layer)] for dest in destinations
+        return [current_path + [(get_entity_name(dest_entity), destination_layer)] for dest in destinations
                 for dest_entity in dest.anatomical_entities.all()
                 if current_path[-1][0] in list(
-                a.name for a in dest.from_entities.all()) or not dest.from_entities.exists()]
+                get_entity_name(a) for a in dest.from_entities.all()) or not dest.from_entities.exists()]
 
     new_paths = []
     for idx, current_via in enumerate(vias):
@@ -46,10 +53,10 @@ def create_paths_from_origin(origin, vias, destinations, current_path, destinati
         # In other words, it checks if there is a valid connection
         # from the last node in the current path to the current via.
         if current_path[-1][0] in list(
-                a.name for a in current_via.from_entities.all()) or not current_via.from_entities.exists():
+                get_entity_name(a) for a in current_via.from_entities.all()) or not current_via.from_entities.exists():
             for entity in current_via.anatomical_entities.all():
                 # Build new sub-paths including the current via entity
-                new_sub_path = current_path + [(entity.name, via_layer)]
+                new_sub_path = current_path + [(get_entity_name(entity), via_layer)]
                 # Recursively call to build paths from the next vias
                 new_paths.extend(
                     create_paths_from_origin(origin, vias[idx + 1:], destinations, new_sub_path, destination_layer))
@@ -57,9 +64,9 @@ def create_paths_from_origin(origin, vias, destinations, current_path, destinati
                 # Check for direct connections to destinations from the current via
                 for dest in destinations:
                     for dest_entity in dest.anatomical_entities.all():
-                        if entity.name in list(a.name for a in dest.from_entities.all()):
+                        if get_entity_name(entity) in list(get_entity_name(a) for a in dest.from_entities.all()):
                             # Add path to destinations directly from the current via
-                            new_paths.append(new_sub_path + [(dest_entity.name, destination_layer)])
+                            new_paths.append(new_sub_path + [(get_entity_name(dest_entity), destination_layer)])
 
     return new_paths
 

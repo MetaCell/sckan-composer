@@ -558,7 +558,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         laterality_description = instance.get_laterality_description()
 
         apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
-        journey_sentence = ', '.join(journey)
+        journey_sentence = ';  '.join(journey)
 
         # Creating the statement
         if sex or species != "":
@@ -679,4 +679,3 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
             "statement_preview",
             "errors"
         )
-
