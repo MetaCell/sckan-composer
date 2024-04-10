@@ -105,18 +105,18 @@ class KnowledgeStatementFilterSet(rest_framework.FilterSet):
     via_uris = ListCharFilter(method='filter_via_uris', label='Via URI')
     destination_uris = ListCharFilter(method='filter_destination_uris', label='Destination URI')
     origin_uris = ListCharFilter(method='filter_origin_uris', label='Origin URI')
-    reference_uris = ListCharFilter(method='filter_reference_uris', label='Reference URI')
+    population_uris = ListCharFilter(method='filter_population_uris', label='Reference URI')
 
     class Meta:
         model = ConnectivityStatement
-        fields = ['via_uris', 'destination_uris', 'origin_uris', 'reference_uris']
+        fields = ['via_uris', 'destination_uris', 'origin_uris', 'population_uris']
         distinct = True
         
     @property
     def qs(self):
         return super().qs.distinct()
     
-    def filter_reference_uris(self, queryset, name, value):
+    def filter_population_uris(self, queryset, name, value):
         return queryset.filter(reference_uri__in=value)
 
     def filter_via_uris(self, queryset, name, value):
