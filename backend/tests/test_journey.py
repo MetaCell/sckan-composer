@@ -52,10 +52,7 @@ class JourneyTestCase(TestCase):
             [('Ob', 0), ('Da', 2)]
         ]
 
-        initial_query_count = len(connection.queries)
         all_paths = generate_paths(origins, vias, destinations)
-        new_query_count = len(connection.queries) - initial_query_count
-        # self.assertTrue(new_query_count == 0)
 
         all_paths.sort()
         expected_paths.sort()
@@ -517,7 +514,7 @@ class JourneyTestCase(TestCase):
         self.assertTrue(journey_paths == expected_journey,
                         f"Expected journey {expected_journey}, but found {journey_paths}")
 
-    def test_journey_sckan_284(self):
+    def test_journey_implicit_from_entities(self):
         # Test setup
         sentence = Sentence.objects.create()
         cs = ConnectivityStatement.objects.create(sentence=sentence)
@@ -532,19 +529,15 @@ class JourneyTestCase(TestCase):
 
         via_a = Via.objects.create(connectivity_statement=cs)
         via_a.anatomical_entities.add(via1)
-        via_a.from_entities.add(origin1)
 
         via_b = Via.objects.create(connectivity_statement=cs)
         via_b.anatomical_entities.add(via2)
-        via_b.from_entities.add(via1)
 
         via_c = Via.objects.create(connectivity_statement=cs)
         via_c.anatomical_entities.add(via3)
-        via_c.from_entities.add(via2)
 
         destination = Destination.objects.create(connectivity_statement=cs)
         destination.anatomical_entities.add(destination1)
-        destination.from_entities.add(via3)
 
         # Prefetch related data
         origins = list(cs.origins.all())
