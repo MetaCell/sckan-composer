@@ -29,7 +29,6 @@ import {Option} from "../../types";
 import Stack from "@mui/material/Stack";
 import {processFromEntitiesData} from "../../helpers/dropdownMappers";
 import CustomChipBoxComponent from "./CustomChipBoxComponent";
-import { useGridNativeEventListener } from "@mui/x-data-grid";
 
 const {
   buttonOutlinedBorderColor,
