@@ -42,7 +42,7 @@ class ProvenanceInline(admin.StackedInline):
     model = Provenance
     extra = 1
 
-class SynonymeInline(admin.StackedInline):
+class SynonymInline(admin.StackedInline):
     model = Synonym
     extra = 1
 
@@ -102,7 +102,7 @@ class AnatomicalEntityAdmin(admin.ModelAdmin):
     autocomplete_fields = ('simple_entity', 'region_layer')
     list_display = ('simple_entity', 'region_layer', "synonyms")
     list_display_links = ('simple_entity', 'region_layer')
-    inlines = (SynonymeInline,)
+    inlines = (SynonymInline,)
 
     # we need to make efficient queries to the database to get the list of anatomical entities
     def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:

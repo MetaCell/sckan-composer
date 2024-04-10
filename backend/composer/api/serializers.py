@@ -129,6 +129,11 @@ class AnatomicalEntityIntersectionSerializer(serializers.ModelSerializer):
 class AnatomicalEntitySerializer(serializers.ModelSerializer):
     simple_entity = AnatomicalEntityMetaSerializer(read_only=True)
     region_layer = AnatomicalEntityIntersectionSerializer(read_only=True)
+    synonyms = serializers.SerializerMethodField(read_only=True)
+
+    @staticmethod
+    def get_synonyms(obj):
+        return ", ".join(obj.synonyms.values_list("name", flat=True))
 
     class Meta:
         model = AnatomicalEntity
@@ -136,6 +141,7 @@ class AnatomicalEntitySerializer(serializers.ModelSerializer):
             "id",
             "simple_entity",
             "region_layer",
+            "synonyms"
         )
 
 
@@ -674,18 +680,3 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
             "errors"
         )
 
-
-class GenericConnectivityStatementSerializer(ConnectivityStatementSerializer):
-    """Generic Connectivity Statement"""
-    class Meta(ConnectivityStatementSerializer.Meta):
-        fields = (
-            "id",
-            "sentence_id",
-            "species",
-            "origins",
-            "vias",
-            "destinations",
-            "apinatomy_model",
-            "phenotype_id",
-            "phenotype",
-        )

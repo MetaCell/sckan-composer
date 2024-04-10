@@ -17,7 +17,6 @@ from composer.services.state_services import (
 from .filtersets import (
     SentenceFilter,
     ConnectivityStatementFilter,
-    GenericConnectivityStatementFilter,
     AnatomicalEntityFilter,
     NoteFilter,
     ViaFilter,
@@ -27,7 +26,6 @@ from .serializers import (
     AnatomicalEntitySerializer,
     PhenotypeSerializer,
     ConnectivityStatementSerializer,
-    GenericConnectivityStatementSerializer,
     NoteSerializer,
     ProfileSerializer,
     SentenceSerializer,
@@ -346,32 +344,6 @@ class ConnectivityStatementViewSet(
     def partial_update(self, request, *args, **kwargs):
         return super().partial_update(request, *args, **kwargs)
 
-
-class GenericConnectivityStatementViewSet(
-    viewsets.ModelViewSet,
-):
-    """
-    GenericConnectivityStatement that only allows GET to get the list of ConnectivityStatements
-    """
-    queryset = ConnectivityStatement.objects.all()
-    serializer_class = GenericConnectivityStatementSerializer
-    permission_classes = [
-        permissions.AllowAny,
-    ]
-    filterset_class = GenericConnectivityStatementFilter
-    http_method_names = ['get']
-
-    @property
-    def allowed_methods(self):
-        return ['GET']
-
-    def get_serializer_class(self):
-        return GenericConnectivityStatementSerializer
-    
-
-    def get_queryset(self):
-        return ConnectivityStatement.objects.filter_by_exported_state()
-        
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """
