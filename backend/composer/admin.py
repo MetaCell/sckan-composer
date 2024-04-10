@@ -117,11 +117,7 @@ class AnatomicalEntityAdmin(admin.ModelAdmin):
     
     @admin.display(description="Ontology URI")
     def ontology_uri(self, obj):
-        if obj.simple_entity:
-            return obj.simple_entity.ontology_uri
-        elif obj.region_layer:
-            return f'{obj.region_layer.region.ontology_uri}, {obj.region_layer.layer.ontology_uri}'
-        return None
+        return obj.ontology_uri
 
 
 
