@@ -3,11 +3,10 @@ import {
   BaseConnectivityStatement, ConnectivityStatement,
   ConnectivityStatementUpdate,
 } from "../apiclient/backend";
-import {Option, OptionDetail} from "../types";
-import {getURI, getName } from "./anatomicalEntityHelper";
-import {OriginsGroupLabel, ViasGroupLabel} from "./settings";
+import { Option, OptionDetail } from "../types";
+import { getName, getAnatomicalEntityDetails } from "./anatomicalEntityHelper";
+import { OriginsGroupLabel, ViasGroupLabel } from "./settings";
 
-export const DROPDOWN_MAPPER_ONTOLOGY_URL = "Ontology URI";
 export const DROPDOWN_MAPPER_STATE = "state";
 
 type tempOption = { sort: number } & Option;
@@ -23,16 +22,7 @@ export function mapAnatomicalEntitiesToOptions(
     id: entity.id.toString(),
     label: getName(entity),
     group: groupLabel,
-    content: [
-      {
-        title: "Name",
-        value: getName(entity),
-      },
-      {
-        title: DROPDOWN_MAPPER_ONTOLOGY_URL,
-        value: getURI(entity),
-      },
-    ],
+    content: getAnatomicalEntityDetails(entity),
   }));
 }
 
@@ -163,10 +153,10 @@ export function findMatchingEntities(
   ).reduce((result: any, via: any) => {
     const matchingAnatomicalEntitiesInVia: AnatomicalEntity &
       { order?: number }[] = via.anatomical_entities
-      .filter((fromEntity: Option) =>
-        entities.some((searchItem: Option) => fromEntity.id === searchItem.id),
-      )
-      .map((fromEntity: Option) => ({...fromEntity, order: via.order}));
+        .filter((fromEntity: Option) =>
+          entities.some((searchItem: Option) => fromEntity.id === searchItem.id),
+        )
+        .map((fromEntity: Option) => ({ ...fromEntity, order: via.order }));
 
     if (matchingAnatomicalEntitiesInVia.length > 0) {
       result.push(...matchingAnatomicalEntitiesInVia);
