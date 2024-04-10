@@ -100,7 +100,7 @@ class SentenceAdmin(
 class AnatomicalEntityAdmin(admin.ModelAdmin):
     search_fields = ('simple_entity__name', 'region_layer__layer__name', 'region_layer__region__name')
     autocomplete_fields = ('simple_entity', 'region_layer')
-    list_display = ('simple_entity', 'region_layer', "synonyms")
+    list_display = ('simple_entity', 'region_layer', "synonyms", "ontology_uri")
     list_display_links = ('simple_entity', 'region_layer')
     inlines = (SynonymeInline,)
 
@@ -114,6 +114,15 @@ class AnatomicalEntityAdmin(admin.ModelAdmin):
     def synonyms(self, obj):
         synonyms = obj.synonyms.all()
         return ', '.join([synonym.name for synonym in synonyms])
+    
+    @admin.display(description="Ontology URI")
+    def ontology_uri(self, obj):
+        if obj.simple_entity:
+            return obj.simple_entity.ontology_uri
+        elif obj.region_layer:
+            return f'{obj.region_layer.region.ontology_uri}, {obj.region_layer.layer.ontology_uri}'
+        return None
+
 
 
 class AnatomicalEntityMetaAdmin(admin.ModelAdmin):

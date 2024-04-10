@@ -13,6 +13,8 @@ from composer.models import (
     Via,
     Specie, Destination,
 )
+from django_filters import rest_framework
+from django_filters import CharFilter, BaseInFilter
 
 
 def field_has_content(queryset, name, value):
@@ -95,85 +97,64 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
         fields = []
 
 
-
-    
-class MultiURLReferenceFilter(django_filters.ModelMultipleChoiceFilter):
-    def get_filter_predicate(self, v):
-        return {'reference_uri': v.reference_uri}
-    
-    def filter(self, qs, value):
-        if value:
-            qs = super().filter(qs, value)
-        return qs
-    
-
-class MultipleAnatomicalEntityFilter(django_filters.ModelMultipleChoiceFilter):
-    def get_filter_predicate(self, v):
-        return {'annotated_ontology_uri': v.annotated_ontology_uri}
-    
-    def filter(self, qs, value):
-        if value:
-            qs = qs.filter(origins__in=value)
-
-        return qs
-    
-class MultipleOriginConnectionLayerFilter(django_filters.ModelMultipleChoiceFilter):
-    def get_filter_predicate(self, v):
-        return {'annotated_ontology_uri': v.annotated_ontology_uri}
-    
-    def filter(self, qs, value):
-        if value:
-            qs = qs.filter(origins__in=value)
-        return qs
-
-class MultipleDestinationConnectionLayerFilter(MultipleOriginConnectionLayerFilter):
-    def filter(self, qs, value):
-        if value:
-            qs = qs.filter(destinations__in=value)
-        return qs
-    
-class MultipleViaConnectionLayerFilter(MultipleOriginConnectionLayerFilter):
-    def filter(self, qs, value):
-        if value:
-            qs = qs.filter(via__in=value)
-        return qs
+class ListCharFilter(BaseInFilter, CharFilter):
+    pass
 
 
-class GenericConnectivityStatementFilter(django_filters.FilterSet):
-    origin_uris = MultipleOriginConnectionLayerFilter(
-        to_field_name='annotated_ontology_uri',
-        queryset=AnatomicalEntity.objects.annotate_with_ontology_uri(),
-        conjoined=False,
-    )
-    destination_uris = MultipleDestinationConnectionLayerFilter(
-        to_field_name='annotated_ontology_uri',
-        queryset=Destination.annotated_objects.annotate_with_ontology_uri(),
-        conjoined=False
-    )
-
-    via_uris = MultipleViaConnectionLayerFilter(
-        to_field_name='annotated_ontology_uri',
-        queryset=Via.annotated_objects.annotate_with_ontology_uri(),
-        conjoined=False
-    )
-    
-    population_uris = MultiURLReferenceFilter(
-        to_field_name='reference_uri',
-        queryset=ConnectivityStatement.objects.all(),
-        conjoined=False
-    )
-
-    
-    ordering = django_filters.OrderingFilter(
-        fields=(
-            ("id", "id"),
-            ("modified_date", "last_edited"),
-        ),
-    )
+class KnowledgeStatementFilterSet(rest_framework.FilterSet):
+    via_uris = ListCharFilter(method='filter_via_uris', label='Via URI')
+    destination_uris = ListCharFilter(method='filter_destination_uris', label='Destination URI')
+    origin_uris = ListCharFilter(method='filter_origin_uris', label='Origin URI')
+    reference_uris = ListCharFilter(method='filter_reference_uris', label='Reference URI')
 
     class Meta:
         model = ConnectivityStatement
-        fields = []
+        fields = ['via_uris', 'destination_uris', 'origin_uris', 'reference_uris']
+        distinct = True
+        
+    @property
+    def qs(self):
+        return super().qs.distinct()
+    
+    def filter_reference_uris(self, queryset, name, value):
+        return queryset.filter(reference_uri__in=value)
+
+    def filter_via_uris(self, queryset, name, value):
+        via_uris = value
+        via_ids = Via.objects.none()
+        for uri in via_uris:
+            via_ids = via_ids.union(
+                Via.objects.filter(anatomical_entities__simple_entity__ontology_uri=uri).prefetch_related('anatomical_entities__simple_entity')
+                .union(Via.objects.filter(anatomical_entities__region_layer__layer__ontology_uri=uri).prefetch_related('anatomical_entities__region_layer__layer'))
+                .union(Via.objects.filter(anatomical_entities__region_layer__region__ontology_uri=uri).prefetch_related('anatomical_entities__region_layer__region'))
+                .values_list("id", flat=True)
+            )
+        return queryset.filter(via__in=via_ids)
+    
+    def filter_destination_uris(self, queryset, name, value):
+        destination_uris = value
+        destination_ids = Destination.objects.none()
+        for uri in destination_uris:
+            destination_ids = destination_ids.union(
+                Destination.objects.filter(anatomical_entities__simple_entity__ontology_uri=uri).prefetch_related('anatomical_entities__simple_entity')
+                .union(Destination.objects.filter(anatomical_entities__region_layer__layer__ontology_uri=uri).prefetch_related('anatomical_entities__region_layer__layer'))
+                .union(Destination.objects.filter(anatomical_entities__region_layer__region__ontology_uri=uri).prefetch_related('anatomical_entities__region_layer__region'))
+                .values_list("id", flat=True)
+            )
+        return queryset.filter(destinations__in=destination_ids)
+    
+    def filter_origin_uris(self, queryset, name, value):
+        origin_uris = value
+        origin_ids = AnatomicalEntity.objects.none()
+        for uri in origin_uris:
+            origin_ids = origin_ids.union(
+                AnatomicalEntity.objects.filter(simple_entity__ontology_uri=uri).prefetch_related('simple_entity')
+                .union(AnatomicalEntity.objects.filter(region_layer__layer__ontology_uri=uri).prefetch_related('region_layer__layer'))
+                .union(AnatomicalEntity.objects.filter(region_layer__region__ontology_uri=uri).prefetch_related('region_layer__region'))
+                .values_list("id", flat=True)
+            )
+        return queryset.filter(origins__in=origin_ids)
+
 
 
 class AnatomicalEntityFilter(django_filters.FilterSet):

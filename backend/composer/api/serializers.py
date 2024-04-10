@@ -675,8 +675,8 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
         )
 
 
-class GenericConnectivityStatementSerializer(ConnectivityStatementSerializer):
-    """Generic Connectivity Statement"""
+class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
+    """Knowledge Statement"""
     class Meta(ConnectivityStatementSerializer.Meta):
         fields = (
             "id",

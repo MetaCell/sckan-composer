@@ -5,7 +5,7 @@ from .views import (
     AnatomicalEntityViewSet,
     PhenotypeViewSet,
     ConnectivityStatementViewSet,
-    GenericConnectivityStatementViewSet,
+	KnowledgeStatementViewSet,
     jsonschemas,
     NoteViewSet,
     ProfileViewSet,
@@ -28,11 +28,6 @@ router.register(
     ConnectivityStatementViewSet,
     basename="connectivity-statement",
 )
-router.register(
-	r"connectivity-statement-generic",
-	GenericConnectivityStatementViewSet,
-    basename="connectivity-statement-generic",
-)
 router.register(r"note", NoteViewSet, basename="note")
 router.register(r"note-tag", TagViewSet, basename="note-tag")
 router.register(r"sentence", SentenceViewSet, basename="sentence")
@@ -48,4 +43,5 @@ app_name = "composer-api"
 urlpatterns = [
     path("", include(router.urls)),
     path("jsonschemas/", jsonschemas, name="jsonschemas"),
+	path("knowledge-statement/", KnowledgeStatementViewSet.as_view(), name="knowledge-statement"),
 ]

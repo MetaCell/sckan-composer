@@ -9,6 +9,8 @@ from rest_framework.decorators import action, api_view
 from rest_framework.renderers import INDENT_SEPARATORS
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
+from rest_framework import generics
+from django_filters.rest_framework import DjangoFilterBackend
 
 from composer.services.state_services import (
     ConnectivityStatementStateService,
@@ -17,7 +19,7 @@ from composer.services.state_services import (
 from .filtersets import (
     SentenceFilter,
     ConnectivityStatementFilter,
-    GenericConnectivityStatementFilter,
+    KnowledgeStatementFilterSet,
     AnatomicalEntityFilter,
     NoteFilter,
     ViaFilter,
@@ -27,7 +29,7 @@ from .serializers import (
     AnatomicalEntitySerializer,
     PhenotypeSerializer,
     ConnectivityStatementSerializer,
-    GenericConnectivityStatementSerializer,
+    KnowledgeStatementSerializer,
     NoteSerializer,
     ProfileSerializer,
     SentenceSerializer,
@@ -347,31 +349,33 @@ class ConnectivityStatementViewSet(
         return super().partial_update(request, *args, **kwargs)
 
 
-class GenericConnectivityStatementViewSet(
-    viewsets.ModelViewSet,
+@extend_schema(tags=["public"])
+class KnowledgeStatementViewSet(
+    generics.ListAPIView,
 ):
     """
-    GenericConnectivityStatement that only allows GET to get the list of ConnectivityStatements
+    KnowledgeStatement that only allows GET to get the list of ConnectivityStatements
     """
-    queryset = ConnectivityStatement.objects.all()
-    serializer_class = GenericConnectivityStatementSerializer
+    model = ConnectivityStatement
+    queryset = ConnectivityStatement.objects.exported()
+    serializer_class = KnowledgeStatementSerializer
     permission_classes = [
         permissions.AllowAny,
     ]
-    filterset_class = GenericConnectivityStatementFilter
-    http_method_names = ['get']
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = KnowledgeStatementFilterSet
 
     @property
     def allowed_methods(self):
         return ['GET']
 
     def get_serializer_class(self):
-        return GenericConnectivityStatementSerializer
-    
+        return KnowledgeStatementSerializer
 
-    def get_queryset(self):
-        return ConnectivityStatement.objects.filter_by_exported_state()
-        
+
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """
