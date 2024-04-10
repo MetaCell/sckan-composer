@@ -1,5 +1,6 @@
 from django.test import TestCase
-from composer.models import ConnectivityStatement, Via, Sentence, AnatomicalEntity
+from composer.models import ConnectivityStatement, Via, Sentence, AnatomicalEntity, AnatomicalEntityMeta
+
 
 class ViaModelTestCase(TestCase):
 
@@ -44,7 +45,8 @@ class ViaModelTestCase(TestCase):
 
     def test_via_order_change_clears_from_entities(self):
         statement, initial_vias = self.create_initial_state()
-        anatomical_entity = AnatomicalEntity.objects.create(name="Test Entity")
+        anatomical_entity_meta = AnatomicalEntityMeta.objects.create(name="Test Entity")
+        anatomical_entity = AnatomicalEntity.objects.create(simple_entity=anatomical_entity_meta)
 
         for via in initial_vias:
             via.from_entities.add(anatomical_entity)
