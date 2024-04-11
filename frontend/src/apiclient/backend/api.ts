@@ -6734,6 +6734,3 @@ export class MetacellAuthApi extends BaseAPI {
         return MetacellAuthApiFp(this.configuration).metacellAuthLogoutRetrieve(options).then((request) => request(this.axios, this.basePath));
     }
 }
-
-
-
