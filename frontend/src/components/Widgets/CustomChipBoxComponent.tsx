@@ -14,7 +14,6 @@ const CustomChipBoxComponent = ({
   const extraChipStyle = !isDisabled ?
     { flex: 1,
       minWidth: 0,
-      maxWidth: "fit-content",
       cursor: "pointer",
       
       '& .MuiTypography-root': {
