@@ -2,6 +2,7 @@ import {Box, Chip, Tooltip} from "@mui/material";
 import {Option} from "../../types";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import React from "react";
+import Typography from "@mui/material/Typography";
 const CustomChipBoxComponent = ({
    selectedOptions,
    CustomInputChip,
@@ -14,7 +15,14 @@ const CustomChipBoxComponent = ({
     { flex: 1,
       minWidth: 0,
       maxWidth: "fit-content",
-      cursor: "pointer"
+      cursor: "pointer",
+      
+      '& .MuiTypography-root': {
+        maxWidth: "21rem",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+      }
     }:
     {cursor:  "initial",
       width: 'fit-content',
@@ -45,7 +53,7 @@ const CustomChipBoxComponent = ({
             e.stopPropagation();
             handleChipRemove(item);
           } : undefined}
-          label={item?.label}
+          label={<Typography>{item?.label}</Typography>}
         />
       )}
     </Tooltip>
