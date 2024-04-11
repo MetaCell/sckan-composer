@@ -92,7 +92,7 @@ export const OriginNodeWidget: React.FC<OriginNodeProps> = ({
                                 lineHeight: "1.25rem",
                             }}
                         >
-                            Intermediolateral nucleus of eleventh thoracic segment
+                            {model.name}
                         </Typography>
                         <Typography
                             sx={{
