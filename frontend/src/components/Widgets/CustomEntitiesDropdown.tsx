@@ -353,6 +353,14 @@ export default function CustomEntitiesDropdown({
     }
   }, [inputValue, id, onSearch, postProcessOptions, selectedOptions]);
   
+  const getLabel = (option: Option) => {
+    if (option?.content.length > 3) {
+      const index = option?.label.lastIndexOf('(');
+      return <> {option?.label.slice(0, index)} <b>{option.label.slice(index)}</b> </>;
+    } else {
+      return option?.label;
+    }
+  }
   
   useEffect(() => {
     if (!isDropdownOpened) return;
@@ -747,7 +755,7 @@ export default function CustomEntitiesDropdown({
                                     >
                                       {option?.label?.length > 100
                                         ? option?.label.slice(0, 100) + "..."
-                                        : option?.label}
+                                        : getLabel(option)}
                                     </Typography>
                                     <Typography whiteSpace="nowrap" variant="body2">
                                       {option?.id}

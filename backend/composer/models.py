@@ -258,7 +258,7 @@ class AnatomicalEntityIntersection(models.Model):
         verbose_name_plural = "Region/Layer Combinations"
 
     def __str__(self):
-        return f'{self.region.name} - {self.layer.name}'
+        return f"{self.region.name} ({self.layer.name})"
 
 
 class AnatomicalEntity(models.Model):
@@ -268,9 +268,9 @@ class AnatomicalEntity(models.Model):
     @property
     def name(self):
         if self.simple_entity:
-            return self.simple_entity.name
-        elif self.region_layer:
-            return f'{self.region_layer.region.name},{self.region_layer.layer.name}'
+            return str(self.simple_entity)
+        if self.region_layer:
+            return str(self.region_layer)
         return 'Unknown Anatomical Entity'
         
     @property
