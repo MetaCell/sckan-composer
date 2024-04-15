@@ -25,10 +25,10 @@ export enum NodeTypes {
 }
 
 export interface CustomNodeOptions extends BasePositionModelOptions {
+    forward_connection: any[];
     to?: Array<{ name: string; type: string }>;
     from?: Array<{ name: string; type: string }>;
     anatomicalType?: string;
-    forward_connection?: any[];
 }
 
 const ViaTypeMapping: Record<TypeB60Enum, string> = {
@@ -81,7 +81,7 @@ const processData = (
     origins: AnatomicalEntity[] | undefined,
     vias: ViaSerializerDetails[] | undefined,
     destinations: DestinationSerializerDetails[] | undefined,
-    forward_connection?: any[] | undefined
+    forward_connection: any[],
 ): { nodes: CustomNodeModel[], links: DefaultLinkModel[] } => {
     const nodes: CustomNodeModel[] = [];
     const links: DefaultLinkModel[] = [];
@@ -97,11 +97,13 @@ const processData = (
         const id = getId(NodeTypes.Origin, origin)
         const name = origin.simple_entity !== null ? origin.simple_entity.name : origin.region_layer.region.name + '(' + origin.region_layer.layer.name + ')';
         const ontology_uri = origin.simple_entity !== null ? origin.simple_entity.ontology_uri : origin.region_layer.region.ontology_uri + ', ' + origin.region_layer.layer.ontology_uri;
+        const fws: never[] = []
         const originNode = new CustomNodeModel(
             NodeTypes.Origin,
             name,
             ontology_uri,
             {
+                forward_connection: fws,
                 to: [],
             }
         );
@@ -120,11 +122,13 @@ const processData = (
             const id = getId(NodeTypes.Via + layerIndex, entity)
             const name = entity.simple_entity !== null ? entity.simple_entity.name : entity.region_layer.region.name + '(' + entity.region_layer.layer.name + ')';
             const ontology_uri = entity.simple_entity !== null ? entity.simple_entity.ontology_uri : entity.region_layer.region.ontology_uri + ', ' + entity.region_layer.layer.ontology_uri;
+            const fws: never[] = []
             const viaNode = new CustomNodeModel(
                 NodeTypes.Via,
                 name,
                 ontology_uri,
                 {
+                    forward_connection: fws,
                     from: [],
                     to: [],
                     anatomicalType: via?.type ? ViaTypeMapping[via.type] : ''
@@ -162,7 +166,7 @@ const processData = (
         destination.anatomical_entities.forEach(entity => {
             const name = entity.simple_entity !== null ? entity.simple_entity.name : entity.region_layer.region.name + '(' + entity.region_layer.layer.name + ')';
             const ontology_uri = entity.simple_entity !== null ? entity.simple_entity.ontology_uri : entity.region_layer.region.ontology_uri + ', ' + entity.region_layer.layer.ontology_uri;
-            const fws = forward_connection?.filter(single_fw => {
+            const fws = forward_connection.filter(single_fw => {
                 const origins = single_fw.origins.map((origin: { id: string } | string) => typeof origin === 'object' ? origin.id : origin);
                 if (origins.includes(entity.id)) {
                     return true;
@@ -174,9 +178,9 @@ const processData = (
                 name,
                 ontology_uri,
                 {
+                    forward_connection: fws,
                     from: [],
                     anatomicalType: destination?.type ? DestinationTypeMapping[destination.type] : '',
-                    forward_connection: fws
                 }
             );
             destinationNode.setPosition(xDestination, yDestination);
@@ -202,7 +206,7 @@ const processData = (
     return {nodes, links};
 };
 
-const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations, forward_connection}) => {
+const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations, forward_connection = []}) => {
     const [engine] = useState(() => createEngine());
     const [modelUpdated, setModelUpdated] = useState(false)
     const [modelFitted, setModelFitted] = useState(false)

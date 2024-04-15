@@ -6,7 +6,9 @@ export class CustomNodeModel extends NodeModel {
     customType: NodeTypes;
     name: string;
     externalId: string;
-    constructor(customType: NodeTypes, name: string, externalId: string = '',  options: CustomNodeOptions = {}) {
+    constructor(customType: NodeTypes, name: string, externalId: string = '',  options: CustomNodeOptions = {
+        forward_connection: []
+    }) {
         super({
             ...options,
             type: 'custom',
