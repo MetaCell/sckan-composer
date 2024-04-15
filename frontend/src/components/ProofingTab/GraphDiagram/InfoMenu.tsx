@@ -1,81 +1,96 @@
-import React from "react";
-import {Stack, Typography} from "@mui/material";
+import {Divider, Stack, Typography} from "@mui/material";
 import {
     DestinationInfoIcon,
+    ForwardConnectionIcon,
     OriginInfoIcon,
     ViaInfoIcon,
-} from "../../icons";
+} from "./Widgets/icons";
+import {DiagramEngine} from "@projectstorm/react-diagrams-core";
 
-const InfoMenu = (props: any) => {
-    const {engine} = props
+
+interface InfoMenuProps {
+    engine: DiagramEngine;
+    forwardConnection: boolean;
+}
+const InfoMenu = (props: InfoMenuProps) => {
+    const {engine, forwardConnection} = props
     return engine ? (
         <Stack
             direction="row"
             spacing="1rem"
+            alignItems='center'
             sx={{
                 borderRadius: "1.75rem",
-                border: "1px solid #F2F4F7",
-                background: "#FFFFFF7F",
-                backgroundFilter: "blur(4px)",
+                border: "0.0394rem solid #EDEFF2",
+                background: "rgba(255, 255, 255, 0.5)",
                 width: "fit-content",
                 boxShadow:
-                    "0px 4px 6px -2px rgba(16, 24, 40, 0.03), 0px 12px 16px -4px rgba(16, 24, 40, 0.08)",
-                padding: "0.75rem 1.25rem",
+                    "0rem 0.1567rem 0.235rem -0.0783rem rgba(16, 24, 40, 0.03), 0rem 0.47rem 0.6267rem -0.1567rem rgba(16, 24, 40, 0.08)",
+                padding: "0 1.25rem",
+                height: '3.625rem',
                 position: "absolute",
-                left: 8,
-                bottom: 8,
+                left: '1.25rem',
+                bottom: '1.25rem',
                 zIndex: 10,
 
-                "& .MuiSvgIcon-root": {
-                    color: "#475467",
-                },
-
                 "& .MuiDivider-root": {
-                    borderColor: "#EAECF0",
-                    borderWidth: 0.5,
-                },
-                "& .MuiButtonBase-root": {
-                    padding: 0,
-
-                    "&:hover": {
-                        backgroundColor: "transparent",
-                    },
+                    width: '0.0313rem',
+                    height: '1.5rem',
+                    background: '#D2D7DF'
                 },
             }}
         >
-            <Stack direction="row" alignItems="center">
+            <Stack direction="row" gap={1} alignItems="center">
                 <OriginInfoIcon/>
                 <Typography
                     sx={{
-                        color: "#039855",
+                        color: "#4A4C4F",
                         fontWeight: 500,
+                        lineHeight: 1,
                     }}
                 >
                     Origins
                 </Typography>
             </Stack>
-            <Stack direction="row" alignItems="center">
+            <Divider />
+            <Stack direction="row" gap={1} alignItems="center">
                 <ViaInfoIcon/>
                 <Typography
                     sx={{
-                        color: "#0E9384",
+                        color: "#4A4C4F",
                         fontWeight: 500,
+                        lineHeight: 1,
                     }}
                 >
                     Via
                 </Typography>
             </Stack>
-            <Stack direction="row" alignItems="center">
+            <Divider />
+            <Stack direction="row" gap={1} alignItems="center">
                 <DestinationInfoIcon/>
                 <Typography
                     sx={{
-                        color: "#088AB2",
+                        color: "#4A4C4F",
+                        lineHeight: 1,
                         fontWeight: 500,
                     }}
                 >
                     Destination
                 </Typography>
             </Stack>
+            { forwardConnection && (<><Divider />
+            <Stack direction="row" gap={1} alignItems="center">
+                <ForwardConnectionIcon />
+                <Typography
+                    sx={{
+                        color: "#4A4C4F",
+                        lineHeight: 1,
+                        fontWeight: 500,
+                    }}
+                >
+                    Forward connection
+                </Typography>
+            </Stack></>) }
         </Stack>
     ) : null;
 };
