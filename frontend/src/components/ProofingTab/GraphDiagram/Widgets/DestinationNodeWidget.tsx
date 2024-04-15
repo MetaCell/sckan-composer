@@ -65,7 +65,7 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
                 >
                     {model.name}
                 </Typography>
-                {model.getOptions().forward_connection?.length > 0 && <ArrowDownwardIcon style={{ position: 'absolute', bottom: '-0.5rem', left: '50%', transform: 'translateX(-50%)' }} />}
+                {hasForwardConnections && <ArrowDownwardIcon style={{ position: 'absolute', bottom: '-0.5rem', left: '50%', transform: 'translateX(-50%)' }} />}
             </Box>
             {inPort && <PortWidget className="inPortDestination" engine={engine} port={inPort}>
               <div className="inPortDestination"/>
@@ -191,7 +191,7 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
                     </Stack>
 
                     <Box width={1} mt={2}>
-                        {model.getOptions()?.forward_connection?.length > 0 && <ArrowDownwardIcon style={{ display: 'block', margin: '0 auto 0.25rem' }} />}
+                        {hasForwardConnections && <ArrowDownwardIcon style={{ display: 'block', margin: '0 auto 0.25rem' }} />}
                         <Box
                             sx={{
                                 borderRadius: "0.625rem",
