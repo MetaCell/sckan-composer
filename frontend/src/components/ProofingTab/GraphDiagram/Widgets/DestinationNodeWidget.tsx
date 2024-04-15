@@ -11,7 +11,6 @@ import {ArrowDownwardIcon, ArrowOutward, DestinationIcon, OriginIcon, ViaIcon} f
 interface DestinationNodeProps {
     model: CustomNodeModel;
     engine: DiagramEngine;
-    forwardConnection: boolean;
 }
 
 export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({

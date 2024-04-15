@@ -25,7 +25,7 @@ export class CustomNodeFactory extends AbstractReactFactory<NodeModel<NodeModelG
             case NodeTypes.Via:
                 return <ViaNodeWidget engine={this.engine} model={event.model} />;
             case NodeTypes.Destination:
-                return <DestinationNodeWidget engine={this.engine} model={event.model} forwardConnection={false}/>;
+                return <DestinationNodeWidget engine={this.engine} model={event.model} />;
             default:
                 return <Fragment></Fragment>;
         }
