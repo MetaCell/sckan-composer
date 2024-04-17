@@ -683,6 +683,11 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
 
 class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
     """Knowledge Statement"""
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep.pop('forward_connection', None)
+        return rep
+    
     class Meta(ConnectivityStatementSerializer.Meta):
         fields = (
             "id",
@@ -694,4 +699,5 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
             "apinatomy_model",
             "phenotype_id",
             "phenotype",
+            "reference_uri"
         )
