@@ -675,6 +675,73 @@ export interface DestinationSerializerDetails {
 
 
 /**
+ * Knowledge Statement
+ * @export
+ * @interface KnowledgeStatement
+ */
+export interface KnowledgeStatement {
+    /**
+     * 
+     * @type {number}
+     * @memberof KnowledgeStatement
+     */
+    'id': number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof KnowledgeStatement
+     */
+    'sentence_id'?: number;
+    /**
+     * 
+     * @type {Array<Specie>}
+     * @memberof KnowledgeStatement
+     */
+    'species'?: Array<Specie>;
+    /**
+     * 
+     * @type {Array<AnatomicalEntity>}
+     * @memberof KnowledgeStatement
+     */
+    'origins'?: Array<AnatomicalEntity>;
+    /**
+     * 
+     * @type {Array<ViaSerializerDetails>}
+     * @memberof KnowledgeStatement
+     */
+    'vias'?: Array<ViaSerializerDetails>;
+    /**
+     * 
+     * @type {Array<DestinationSerializerDetails>}
+     * @memberof KnowledgeStatement
+     */
+    'destinations'?: Array<DestinationSerializerDetails>;
+    /**
+     * 
+     * @type {string}
+     * @memberof KnowledgeStatement
+     */
+    'apinatomy_model'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof KnowledgeStatement
+     */
+    'phenotype_id'?: number | null;
+    /**
+     * 
+     * @type {Phenotype}
+     * @memberof KnowledgeStatement
+     */
+    'phenotype': Phenotype;
+    /**
+     * 
+     * @type {string}
+     * @memberof KnowledgeStatement
+     */
+    'reference_uri'?: string | null;
+}
+/**
  * 
  * @export
  * @enum {string}
@@ -905,6 +972,37 @@ export interface PaginatedDestinationList {
      * @memberof PaginatedDestinationList
      */
     'results'?: Array<Destination>;
+}
+/**
+ * 
+ * @export
+ * @interface PaginatedKnowledgeStatementList
+ */
+export interface PaginatedKnowledgeStatementList {
+    /**
+     * 
+     * @type {number}
+     * @memberof PaginatedKnowledgeStatementList
+     */
+    'count'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedKnowledgeStatementList
+     */
+    'next'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedKnowledgeStatementList
+     */
+    'previous'?: string | null;
+    /**
+     * 
+     * @type {Array<KnowledgeStatement>}
+     * @memberof PaginatedKnowledgeStatementList
+     */
+    'results'?: Array<KnowledgeStatement>;
 }
 /**
  * 
@@ -6734,3 +6832,158 @@ export class MetacellAuthApi extends BaseAPI {
         return MetacellAuthApiFp(this.configuration).metacellAuthLogoutRetrieve(options).then((request) => request(this.axios, this.basePath));
     }
 }
+
+
+
+/**
+ * PublicApi - axios parameter creator
+ * @export
+ */
+export const PublicApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * KnowledgeStatement that only allows GET to get the list of ConnectivityStatements
+         * @param {Array<string>} [destinationUris] Multiple values may be separated by commas.
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {Array<string>} [originUris] Multiple values may be separated by commas.
+         * @param {Array<string>} [populationUris] Multiple values may be separated by commas.
+         * @param {Array<string>} [viaUris] Multiple values may be separated by commas.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerKnowledgeStatementList: async (destinationUris?: Array<string>, limit?: number, offset?: number, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/knowledge-statement/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (destinationUris) {
+                localVarQueryParameter['destination_uris'] = destinationUris.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (originUris) {
+                localVarQueryParameter['origin_uris'] = originUris.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (populationUris) {
+                localVarQueryParameter['population_uris'] = populationUris.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (viaUris) {
+                localVarQueryParameter['via_uris'] = viaUris.join(COLLECTION_FORMATS.csv);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * PublicApi - functional programming interface
+ * @export
+ */
+export const PublicApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = PublicApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * KnowledgeStatement that only allows GET to get the list of ConnectivityStatements
+         * @param {Array<string>} [destinationUris] Multiple values may be separated by commas.
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {Array<string>} [originUris] Multiple values may be separated by commas.
+         * @param {Array<string>} [populationUris] Multiple values may be separated by commas.
+         * @param {Array<string>} [viaUris] Multiple values may be separated by commas.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerKnowledgeStatementList(destinationUris?: Array<string>, limit?: number, offset?: number, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedKnowledgeStatementList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerKnowledgeStatementList(destinationUris, limit, offset, originUris, populationUris, viaUris, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * PublicApi - factory interface
+ * @export
+ */
+export const PublicApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = PublicApiFp(configuration)
+    return {
+        /**
+         * KnowledgeStatement that only allows GET to get the list of ConnectivityStatements
+         * @param {Array<string>} [destinationUris] Multiple values may be separated by commas.
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {Array<string>} [originUris] Multiple values may be separated by commas.
+         * @param {Array<string>} [populationUris] Multiple values may be separated by commas.
+         * @param {Array<string>} [viaUris] Multiple values may be separated by commas.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerKnowledgeStatementList(destinationUris?: Array<string>, limit?: number, offset?: number, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options?: any): AxiosPromise<PaginatedKnowledgeStatementList> {
+            return localVarFp.composerKnowledgeStatementList(destinationUris, limit, offset, originUris, populationUris, viaUris, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * PublicApi - object-oriented interface
+ * @export
+ * @class PublicApi
+ * @extends {BaseAPI}
+ */
+export class PublicApi extends BaseAPI {
+    /**
+     * KnowledgeStatement that only allows GET to get the list of ConnectivityStatements
+     * @param {Array<string>} [destinationUris] Multiple values may be separated by commas.
+     * @param {number} [limit] Number of results to return per page.
+     * @param {number} [offset] The initial index from which to return the results.
+     * @param {Array<string>} [originUris] Multiple values may be separated by commas.
+     * @param {Array<string>} [populationUris] Multiple values may be separated by commas.
+     * @param {Array<string>} [viaUris] Multiple values may be separated by commas.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PublicApi
+     */
+    public composerKnowledgeStatementList(destinationUris?: Array<string>, limit?: number, offset?: number, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options?: AxiosRequestConfig) {
+        return PublicApiFp(this.configuration).composerKnowledgeStatementList(destinationUris, limit, offset, originUris, populationUris, viaUris, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
