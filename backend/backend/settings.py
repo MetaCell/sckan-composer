@@ -67,9 +67,13 @@ INSTALLED_APPS = [
     "nested_admin",
     "django.contrib.admin",
     "social_django",
+
+    #
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
