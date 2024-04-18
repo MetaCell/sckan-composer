@@ -683,6 +683,18 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
 
 class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
     """Knowledge Statement"""
+    def to_representation(self, instance):
+        representation = super(ConnectivityStatementSerializer, self).to_representation(instance)
+        depth = self.context.get('depth', 0)
+
+        if depth < 1:
+            representation["forward_connection"] = KnowledgeStatementSerializer(
+                instance.forward_connection.all(),
+                many=True,
+                context={**self.context, 'depth': depth + 1}
+            ).data
+        return representation
+    
     class Meta(ConnectivityStatementSerializer.Meta):
         fields = (
             "id",
@@ -696,3 +708,4 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
             "phenotype",
             "reference_uri"
         )
+        
