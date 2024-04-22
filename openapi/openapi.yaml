@@ -57,7 +57,7 @@ paths:
         name: id
         schema:
           type: integer
-        description: A unique integer value identifying this anatomical entity.
+        description: A unique integer value identifying this Anatomical Entity.
         required: true
       tags:
       - composer
@@ -154,15 +154,14 @@ paths:
             type: string
             enum:
             - compose_now
-            - connection_missing
-            - curated
             - draft
-            - excluded
             - exported
+            - in_progress
+            - invalid
             - npo_approved
             - rejected
+            - revise
             - to_be_reviewed
-            - invalid
         explode: true
         style: form
       - in: query
@@ -185,7 +184,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedConnectivityStatementList'
+                $ref: '#/components/schemas/PaginatedBaseConnectivityStatementList'
           description: ''
     post:
       operationId: composer_connectivity_statement_create
@@ -757,6 +756,73 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /api/composer/knowledge-statement/:
+    get:
+      operationId: composer_knowledge_statement_list
+      description: KnowledgeStatement that only allows GET to get the list of ConnectivityStatements
+      parameters:
+      - in: query
+        name: destination_uris
+        schema:
+          type: array
+          items:
+            type: string
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - in: query
+        name: origin_uris
+        schema:
+          type: array
+          items:
+            type: string
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: population_uris
+        schema:
+          type: array
+          items:
+            type: string
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: via_uris
+        schema:
+          type: array
+          items:
+            type: string
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      tags:
+      - public
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedKnowledgeStatementList'
+          description: ''
   /api/composer/note/:
     get:
       operationId: composer_note_list
@@ -1121,12 +1187,13 @@ paths:
           items:
             type: string
             enum:
+            - completed
             - compose_later
             - compose_now
-            - duplicate
             - excluded
+            - needs_further_review
             - open
-            - to_be_reviewed
+            - ready_to_compose
         explode: true
         style: form
       - in: query
@@ -1763,7 +1830,46 @@ components:
   schemas:
     AnatomicalEntity:
       type: object
-      description: Anatomical Entity
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        simple_entity:
+          allOf:
+          - $ref: '#/components/schemas/AnatomicalEntityMeta'
+          readOnly: true
+        region_layer:
+          allOf:
+          - $ref: '#/components/schemas/AnatomicalEntityIntersection'
+          readOnly: true
+        synonyms:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - region_layer
+      - simple_entity
+      - synonyms
+    AnatomicalEntityIntersection:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        layer:
+          allOf:
+          - $ref: '#/components/schemas/Layer'
+          readOnly: true
+        region:
+          allOf:
+          - $ref: '#/components/schemas/Region'
+          readOnly: true
+      required:
+      - id
+      - layer
+      - region
+    AnatomicalEntityMeta:
+      type: object
       properties:
         id:
           type: integer
@@ -1774,24 +1880,65 @@ components:
         ontology_uri:
           type: string
           format: uri
-          readOnly: true
+          maxLength: 200
       required:
       - id
       - name
       - ontology_uri
-    AvailableTransitionsC67Enum:
+    AvailableTransitions24dEnum:
       enum:
       - draft
       - compose_now
-      - curated
-      - excluded
-      - rejected
+      - in_progress
       - to_be_reviewed
-      - connection_missing
+      - revise
+      - rejected
       - npo_approved
       - exported
       - invalid
       type: string
+    BaseConnectivityStatement:
+      type: object
+      description: Adds nested create feature
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          nullable: true
+        knowledge_statement:
+          type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+          readOnly: true
+        owner:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        owner_id:
+          type: integer
+          nullable: true
+        state:
+          type: string
+          readOnly: true
+        modified_date:
+          type: string
+          format: date-time
+          readOnly: true
+        has_notes:
+          type: boolean
+          readOnly: true
+      required:
+      - has_notes
+      - id
+      - modified_date
+      - owner
+      - state
+      - tags
+    BlankEnum:
+      enum:
+      - ''
     CircuitTypeEnum:
       enum:
       - SENSORY
@@ -1799,7 +1946,6 @@ components:
       - INTRINSIC
       - PROJECTION
       - ANAXONIC
-      - UNKNOWN
       type: string
     ConnectivityStatement:
       type: object
@@ -1839,7 +1985,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitionsC67Enum'
+            $ref: '#/components/schemas/AvailableTransitions24dEnum'
           readOnly: true
         origins:
           type: array
@@ -1864,11 +2010,23 @@ components:
           type: string
           readOnly: true
         laterality:
-          $ref: '#/components/schemas/LateralityEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/LateralityEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         projection:
-          $ref: '#/components/schemas/ProjectionEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/ProjectionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         circuit_type:
-          $ref: '#/components/schemas/CircuitTypeEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/CircuitTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         species:
           type: array
           items:
@@ -1957,7 +2115,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitionsC67Enum'
+            $ref: '#/components/schemas/AvailableTransitions24dEnum'
           readOnly: true
         origins:
           type: array
@@ -1982,11 +2140,23 @@ components:
           type: string
           readOnly: true
         laterality:
-          $ref: '#/components/schemas/LateralityEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/LateralityEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         projection:
-          $ref: '#/components/schemas/ProjectionEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/ProjectionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         circuit_type:
-          $ref: '#/components/schemas/CircuitTypeEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/CircuitTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         species:
           type: array
           items:
@@ -2079,17 +2249,82 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnatomicalEntity'
+        are_connections_explicit:
+          type: string
+          readOnly: true
       required:
       - anatomical_entities
+      - are_connections_explicit
       - connectivity_statement_id
       - from_entities
       - id
+    KnowledgeStatement:
+      type: object
+      description: Knowledge Statement
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          nullable: true
+        sentence_id:
+          type: integer
+        species:
+          type: array
+          items:
+            $ref: '#/components/schemas/Specie'
+        origins:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnatomicalEntity'
+        vias:
+          type: array
+          items:
+            $ref: '#/components/schemas/ViaSerializerDetails'
+        destinations:
+          type: array
+          items:
+            $ref: '#/components/schemas/DestinationSerializerDetails'
+        apinatomy_model:
+          type: string
+          nullable: true
+          maxLength: 200
+        phenotype_id:
+          type: integer
+          nullable: true
+        phenotype:
+          allOf:
+          - $ref: '#/components/schemas/Phenotype'
+          readOnly: true
+        reference_uri:
+          type: string
+          format: uri
+          nullable: true
+          maxLength: 200
+      required:
+      - id
+      - phenotype
     LateralityEnum:
       enum:
       - RIGHT
       - LEFT
-      - UNKNOWN
       type: string
+    Layer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        ontology_uri:
+          type: string
+          format: uri
+          maxLength: 200
+      required:
+      - id
+      - name
+      - ontology_uri
     Login:
       type: object
       properties:
@@ -2134,6 +2369,9 @@ components:
       - created_at
       - note
       - user
+    NullEnum:
+      enum:
+      - null
     PaginatedAnatomicalEntityList:
       type: object
       properties:
@@ -2154,7 +2392,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnatomicalEntity'
-    PaginatedConnectivityStatementList:
+    PaginatedBaseConnectivityStatementList:
       type: object
       properties:
         count:
@@ -2173,7 +2411,7 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/ConnectivityStatement'
+            $ref: '#/components/schemas/BaseConnectivityStatement'
     PaginatedDestinationList:
       type: object
       properties:
@@ -2194,6 +2432,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Destination'
+    PaginatedKnowledgeStatementList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeStatement'
     PaginatedNoteList:
       type: object
       properties:
@@ -2372,7 +2630,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitionsC67Enum'
+            $ref: '#/components/schemas/AvailableTransitions24dEnum'
           readOnly: true
         origins:
           type: array
@@ -2397,11 +2655,23 @@ components:
           type: string
           readOnly: true
         laterality:
-          $ref: '#/components/schemas/LateralityEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/LateralityEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         projection:
-          $ref: '#/components/schemas/ProjectionEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/ProjectionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         circuit_type:
-          $ref: '#/components/schemas/CircuitTypeEnum'
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/CircuitTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
         species:
           type: array
           items:
@@ -2604,7 +2874,6 @@ components:
       - IPSI
       - CONTRAT
       - BI
-      - UNKNOWN
       type: string
     Provenance:
       type: object
@@ -2621,6 +2890,29 @@ components:
       - connectivity_statement_id
       - id
       - uri
+    Region:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        ontology_uri:
+          type: string
+          format: uri
+          maxLength: 200
+        layers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Layer'
+          readOnly: true
+      required:
+      - id
+      - layers
+      - name
+      - ontology_uri
     Sentence:
       type: object
       description: Sentence
@@ -2708,11 +3000,12 @@ components:
     SentenceAvailableTransitionsEnum:
       enum:
       - open
-      - to_be_reviewed
+      - needs_further_review
       - compose_later
+      - ready_to_compose
       - compose_now
+      - completed
       - excluded
-      - duplicate
       type: string
     SentenceConnectivityStatement:
       type: object
@@ -2738,17 +3031,23 @@ components:
           - $ref: '#/components/schemas/Phenotype'
           readOnly: true
         laterality:
-          allOf:
+          readOnly: true
+          nullable: true
+          oneOf:
           - $ref: '#/components/schemas/LateralityEnum'
-          readOnly: true
+          - $ref: '#/components/schemas/NullEnum'
         projection:
-          allOf:
+          readOnly: true
+          nullable: true
+          oneOf:
           - $ref: '#/components/schemas/ProjectionEnum'
-          readOnly: true
+          - $ref: '#/components/schemas/NullEnum'
         circuit_type:
-          allOf:
-          - $ref: '#/components/schemas/CircuitTypeEnum'
           readOnly: true
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/CircuitTypeEnum'
+          - $ref: '#/components/schemas/NullEnum'
         species:
           type: array
           items:
@@ -2921,8 +3220,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnatomicalEntity'
+        are_connections_explicit:
+          type: string
+          readOnly: true
       required:
       - anatomical_entities
+      - are_connections_explicit
       - connectivity_statement_id
       - from_entities
       - id

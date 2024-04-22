@@ -40,22 +40,22 @@ class DestinationType(models.TextChoices):
 
 class SentenceState(models.TextChoices):
     OPEN = "open"
-    TO_BE_REVIEWED = "to_be_reviewed"
+    NEEDS_FURTHER_REVIEW = "needs_further_review"
     COMPOSE_LATER = "compose_later"
+    READY_TO_COMPOSE = "ready_to_compose"
     COMPOSE_NOW = "compose_now"
+    COMPLETED = "completed"
     EXCLUDED = "excluded"
-    DUPLICATE = "duplicate"
 
 
 class CSState(models.TextChoices):
     # Connectivity Statement States
     DRAFT = "draft"
     COMPOSE_NOW = "compose_now"
-    CURATED = "curated"
-    EXCLUDED = "excluded"
-    REJECTED = "rejected"
+    IN_PROGRESS = "in_progress"
     TO_BE_REVIEWED = "to_be_reviewed"
-    CONNECTION_MISSING = "connection_missing"
+    REVISE = "revise"
+    REJECTED = "rejected"
     NPO_APPROVED = "npo_approved"
     EXPORTED = "exported"
     INVALID = "invalid"

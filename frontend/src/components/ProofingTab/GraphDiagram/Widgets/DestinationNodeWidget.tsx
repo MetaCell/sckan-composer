@@ -2,15 +2,15 @@ import React, {useState} from "react";
 import {PortWidget} from "@projectstorm/react-diagrams";
 import {Typography, Box} from "@mui/material";
 import Stack from "@mui/material/Stack";
-import {DestinationIcon, OriginIcon, ViaIcon} from "../../../icons";
-import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
-import {vars} from "../../../../theme/variables";
+import {CustomNodeModel} from "../Models/CustomNodeModel";
+import {DiagramEngine} from "@projectstorm/react-diagrams-core";
 import {NodeTypes} from "../GraphDiagram";
+import {ArrowDownwardIcon, ArrowOutward, DestinationIcon, OriginIcon, ViaIcon} from "./icons";
 
 interface DestinationNodeProps {
-    model: any;
-    engine: any;
+    model: CustomNodeModel;
+    engine: DiagramEngine;
 }
 
 export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
@@ -27,39 +27,49 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
         setZIndex((prevZIndex) => prevZIndex + 1);
     };
 
+
+    const inPort = model.getPort("in");
+    const hasForwardConnections = model.getOptions()?.forward_connection?.length > 0;
+
     return (
         <Box
             style={{
                 display: "flex",
-                width: "10rem",
-                height: "10rem",
-                padding: "0.5rem",
+                width: "7rem",
+                height: "7rem",
+                padding: "0",
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
                 gap: "0.25rem",
-                borderRadius: "0.75rem",
-                border: "2px solid #088AB2",
-                background: "#ECFDFF",
+                transform: 'rotate(45deg)',
+                borderRadius: "0.5rem",
+                border: "0.0781rem solid #6C707A",
+                background: "#f3f4f8",
                 boxShadow:
-                    "0px 4px 10px -4px rgba(8, 138, 178, 0.20), 0px 0px 26px 0px #A5F0FC inset",
+                    "0rem 0.0625rem 0.125rem 0rem #1018280F,0rem 0.0625rem 0.1875rem 0rem #1018281A",
             }}
             onClick={toggleColor}
         >
-            <Typography
-                sx={{
-                    color: "#088AB2",
-                    textAlign: "center",
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                    lineHeight: "1.25rem",
-                }}
-            >
-                {model.name}
-            </Typography>
-            <PortWidget engine={engine} port={model.getPort("in")}>
-                <div className="circle-port"/>
-            </PortWidget>
+            <Box position='relative' sx={{transform: 'rotate(-45deg)', height: 1, flexShrink: 0, alignItems: "center", display: "flex",}}>
+                <Typography
+                    sx={{
+                        color: "#4A4C4F",
+                        textAlign: "center",
+                        fontSize: '0.875rem',
+                        fontWeight: 500,
+                        lineHeight: "1.25rem",
+                        display: 'flex',
+                        alignItems: 'center'
+                    }}
+                >
+                    {model.name}
+                </Typography>
+                {hasForwardConnections && <ArrowDownwardIcon style={{ position: 'absolute', bottom: '-0.5rem', left: '50%', transform: 'translateX(-50%)' }} />}
+            </Box>
+            {inPort && <PortWidget className="inPortDestination" engine={engine} port={inPort}>
+              <div className="inPortDestination"/>
+            </PortWidget>}
 
             {isActive && (
                 <Box
@@ -70,126 +80,160 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
                         alignItems: "center",
                         gap: "0.25rem",
                         borderRadius: "0.75rem",
-                        border: "2px solid #088AB2",
-                        background: "#ECFDFF",
-                        boxShadow: "0px 4px 10px -4px rgba(8, 138, 178, 0.20)",
+                        border: "0.0781rem solid rgba(108, 112, 122, 1)",
+                        background: "rgba(246, 247, 249, 1)",
+                        boxShadow: "0rem 0.125rem 0.25rem -0.125rem rgba(16, 24, 40, 0.06), 0rem 0.25rem 0.5rem -0.125rem rgba(16, 24, 40, 0.1)",
                         position: "absolute",
-                        top: 0,
+                        top: '-3vw',
+                        left: '-2vw',
                         width: "18rem",
                         zIndex: isActive ? zIndex : "auto",
+                        transform: 'rotate(-45deg)',
                     }}
                 >
-                    <Box
+                    <Typography
                         sx={{
-                            padding: "0.75rem 0.5rem",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            textAlign: "center",
+                            color: "rgba(108, 112, 122, 1)",
+                            textAlign: 'center',
+                            lineHeight: '1.125rem',
+                            fontSize: "0.75rem",
+                            fontWeight: 400,
                         }}
                     >
-                        <Typography
-                            sx={{
-                                color: " #088AB2",
-                                fontSize: "0.875rem",
-                                fontWeight: 500,
-                            }}
-                        >
-                            From
-                        </Typography>
-                    </Box>
+                        From
+                    </Typography>
                     <Box
                         sx={{
                             borderRadius: "0.625rem",
-                            border: "1px solid #EAECF0",
+                            border: "0.0625rem solid rgba(155, 162, 176, 1)",
                             background: "#FFF",
                             width: "100%",
                         }}
                     >
-                        {model.options.from && model.options.from.map((item: {
-                            type: NodeTypes;
+                        {model.getOptions().from?.map((item: {
+                            type: string;
                             name: string
                         }, index: number) => (
                             <React.Fragment key={index}>
                                 <Stack
-                                    padding=".5rem"
+                                    padding="0.5rem"
                                     spacing={1}
                                     direction="row"
                                     alignItems="center"
+                                    borderTop={index === 0 ? 'none' : "0.0625rem solid rgba(155, 162, 176, 1)"}
                                 >
                                     {item.type === NodeTypes.Origin &&
-                                        <OriginIcon fill="#088AB2" width={"1rem"} height={"1rem"}/>}
+                                      <OriginIcon fill="rgba(71, 84, 103, 1)" width={"1rem"} height={"1rem"}/>}
                                     {item.type === NodeTypes.Via &&
-                                        <ViaIcon fill="#088AB2" width={"1rem"} height={"1rem"}/>}
+                                      <ViaIcon fill="rgba(71, 84, 103, 1)" width={"1rem"} height={"1rem"}/>}
                                     <Typography
                                         sx={{
-                                            color: "#667085",
+                                            color: "rgba(108, 112, 122, 1)",
                                             fontSize: "0.875rem",
-                                            fontWeight: 500,
+                                            fontWeight: 400,
                                             lineHeight: "1.25rem",
                                         }}
                                     >
                                         {item.name}
                                     </Typography>
                                 </Stack>
-                                {index < model.options.from.length - 1 && <Divider/>}
                             </React.Fragment>
                         ))}
                     </Box>
 
 
                     <Stack
-                        padding="0.75rem 0.5rem"
+                        padding="0 0.5rem"
                         alignItems="center"
                         justifyContent="center"
                         textAlign="center"
-                        spacing={2}
+                        spacing={0}
                     >
                         <Box
                             style={{
-                                width: "1rem",
-                                height: "0.125rem",
-                                backgroundColor: " #06AED4",
-                                transform: "rotate(90deg)",
+                                width: "0.0625rem",
+                                height: "1rem",
+                                marginBottom: '1rem',
+                                backgroundColor: "#6C707A",
                             }}
                         />
-                        <DestinationIcon fill="#088AB2"/>
+                        <DestinationIcon fill="rgba(108, 112, 122, 1)"/>
                         <Typography
                             sx={{
-                                color: " #088AB2",
+                                color: " rgba(74, 76, 79, 1)",
                                 fontSize: "0.875rem",
                                 fontWeight: 500,
                                 lineHeight: "1.25rem",
+                                marginTop: '0.25rem'
                             }}
                         >
                             {model.name}
                         </Typography>
                         <Typography
                             sx={{
-                                color: " #088AB2",
+                                color: "rgba(108, 112, 122, 1)",
                                 fontSize: "0.75rem",
                                 fontWeight: 400,
                                 lineHeight: "1.125rem",
-                                marginTop: ".25rem !important",
+                                marginTop: "0.125rem",
                             }}
                         >
                             {model.externalId}
                         </Typography>
                         <Chip
-                            label={model.options.anatomicalType}
-                            variant="filled"
+                            label={model.getOptions().anatomicalType}
+                            variant="outlined"
+                            color="secondary"
                             sx={{
-                                background: "#E2ECFB",
-                                color: "#184EA2",
-                                marginLeft: "10px",
-                                marginRight: "10px",
-
-                                "& .MuiChip-deleteIcon": {
-                                    fontSize: "14px",
-                                    color: vars.mediumBlue,
-                                },
+                                marginTop: "0.75rem",
                             }}
                         />
                     </Stack>
+
+                    <Box width={1} mt={2}>
+                        {hasForwardConnections && <ArrowDownwardIcon style={{ display: 'block', margin: '0 auto 0.25rem' }} />}
+                        <Box
+                            sx={{
+                                borderRadius: "0.625rem",
+                                border: "0.0625rem solid rgba(155, 162, 176, 1)",
+                                background: "#FFF",
+                                width: "100%",
+                            }}
+                        >
+                            {model.getOptions().forward_connection?.map((item: {
+                                id: any;
+                                knowledge_statement: string;
+                                type: string;
+                            }, index: number) => (
+                                <React.Fragment key={index}>
+                                    <Stack
+                                        padding="0.5rem"
+                                        spacing={1}
+                                        direction="row"
+                                        alignItems="center"
+                                        borderTop={index === 0 ? 'none' : "0.0625rem solid rgba(155, 162, 176, 1)"}
+                                    >
+                                        <Typography
+                                            sx={{
+                                                color: "rgba(108, 112, 122, 1)",
+                                                fontSize: "0.875rem",
+                                                fontWeight: 400,
+                                                lineHeight: "1.25rem",
+                                                flex: 1
+                                            }}
+                                        >
+                                            {item?.knowledge_statement.length > 25 ? `${item.knowledge_statement.slice(0, 25)}...` : item.knowledge_statement}
+                                        </Typography>
+                                        <span
+                                            style={{cursor: "pointer"}}
+                                            onClick={() => window.open(`${window.location.origin}/statement/${item.id}`)}>
+                                            <ArrowOutward/>
+                                        </span>
+                                    </Stack>
+                                </React.Fragment>
+                            ))}
+                        </Box>
+                    </Box>
                 </Box>
             )}
         </Box>

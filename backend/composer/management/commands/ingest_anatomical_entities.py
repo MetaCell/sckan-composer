@@ -1,64 +1,98 @@
 import csv
-
-from django.core.management.base import BaseCommand
-
-from composer.models import AnatomicalEntity
+import time
+from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
+from django.db.utils import IntegrityError
+from composer.models import AnatomicalEntity, Synonym, AnatomicalEntityMeta
 
 URI = "o"
 NAME = "o_label"
 SYNONYM = "o_synonym"
+BULK_LIMIT = 100
 
 
 class Command(BaseCommand):
-    help = "Ingests Anatomical Entities CSV file(s)"
+    help = "Ingests Anatomical Entities CSV file(s)."
 
     def add_arguments(self, parser):
         parser.add_argument("csv_files", nargs="+", type=str)
+        parser.add_argument("--show_complete_logs", action='store_true',
+                            help="Show detailed logs during processing")
 
-    def _create_ae(self, name, ontology_uri):
-        found = AnatomicalEntity.objects.filter(name__iexact=name).exists()
-        if not found:
-            return AnatomicalEntity(
-                name=name,
-                ontology_uri=ontology_uri
+    def _process_anatomical_entity(self, name, ontology_uri, synonym, show_complete_logs, processed_uris,
+                                   unique_synonyms):
+        try:
+            is_first_occurrence = ontology_uri not in processed_uris
+
+            entity_meta, meta_created = AnatomicalEntityMeta.objects.get_or_create(
+                ontology_uri=ontology_uri,
+                defaults={"name": name},
             )
-        return None
-        # anatomical_entity, created = AnatomicalEntity.objects.get_or_create(
-        #     name__iexact=name,
-        #     defaults={"ontology_uri": ontology_uri, "name": name},
-        # )
-        # if created:
-        #     self.stdout.write(f"Anatomical Entity {name} created.")
-        #     anatomical_entity.save()
 
+            # Update the name if it has changed and this is the first occurrence of the ontology URI
+            if not meta_created and is_first_occurrence and entity_meta.name != name:
+                entity_meta.name = name
+                entity_meta.save()
+                if show_complete_logs:
+                    self.stdout.write(
+                        self.style.SUCCESS(f"Updated {entity_meta.ontology_uri} name to {name}.")
+                    )
+
+            anatomical_entity, created = AnatomicalEntity.objects.get_or_create(
+                simple_entity=entity_meta
+            )
+
+            processed_uris.add(ontology_uri)
+
+            synonym_key = (ontology_uri, synonym.lower()) if synonym else None
+            if synonym and synonym_key not in unique_synonyms:
+                if not Synonym.objects.filter(anatomical_entity=anatomical_entity, name__iexact=synonym).exists():
+                    unique_synonyms[synonym_key] = Synonym(anatomical_entity=anatomical_entity, name=synonym)
+                    if show_complete_logs:
+                        self.stdout.write(
+                            self.style.SUCCESS(
+                                f"Synonym '{synonym}' added for {anatomical_entity.simple_entity.ontology_uri}.")
+                        )
+        except IntegrityError as e:
+            self.stdout.write(self.style.ERROR(f"Error processing {ontology_uri}: {e}"))
+
+    @transaction.atomic
     def handle(self, *args, **options):
+        start_time = time.time()
+        show_complete_logs = options['show_complete_logs']
+        unique_synonyms = {}
+        processed_uris = set()
+
         for csv_file in options["csv_files"]:
-            with open(
-                csv_file, newline="", encoding="utf-8", errors="ignore"
-            ) as csvfile:
-                aereader = csv.DictReader(
-                    csvfile,
-                    delimiter=";",
-                    quotechar='"',
-                )
-                bulk = []
-                self.stdout.write("Start ingestion of Anatomical Entities")
-                for row in aereader:
-                    ontology_uri = row[URI]
-                    name = row[NAME]
-                    synonym = row[SYNONYM] or None
-                    ae = self._create_ae(name, ontology_uri)
-                    if ae:
-                        bulk.append(ae)
-                    if synonym:
-                        ae = self._create_ae(synonym, ontology_uri)
-                        if ae:
-                            bulk.append(ae)
-                    if len(bulk) > 100:
-                        self.stdout.write(f"{len(bulk)} new Anatomical Entities created.")
-                        AnatomicalEntity.objects.bulk_create(bulk, ignore_conflicts=True)
-                        bulk = []
-                if len(bulk) > 0:
-                    # insert the remaining
-                    self.stdout.write(f"{len(bulk)} new Anatomical Entities created.")
-                    AnatomicalEntity.objects.bulk_create(bulk, ignore_conflicts=True)
+            try:
+                with open(csv_file, newline="", encoding="utf-8", errors="ignore") as csvfile:
+                    reader = csv.DictReader(csvfile, delimiter=",", quotechar='"')
+                    for current_line, row in enumerate(reader, start=1):
+                        if current_line % 100 == 0:
+                            self.stdout.write(self.style.NOTICE(f"Processing line {current_line}"))
+
+                        ontology_uri = row[URI].strip()
+                        name = row[NAME].strip()
+                        synonym = row[SYNONYM].strip() if row[SYNONYM] else None
+
+                        self._process_anatomical_entity(name, ontology_uri, synonym, show_complete_logs, processed_uris,
+                                                        unique_synonyms)
+
+                        if len(unique_synonyms) >= BULK_LIMIT:
+                            Synonym.objects.bulk_create(unique_synonyms.values(), ignore_conflicts=True)
+                            unique_synonyms.clear()
+
+            except FileNotFoundError:
+                self.stdout.write(self.style.ERROR(f"File {csv_file} does not exist."))
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f"An error occurred while processing {csv_file}: {e}"))
+
+            # Ensure any remaining synonyms are created
+            if unique_synonyms:
+                try:
+                    Synonym.objects.bulk_create(unique_synonyms.values(), ignore_conflicts=True)
+                except Exception as e:
+                    self.stdout.write(self.style.ERROR(f"An error occurred during bulk creation: {e}"))
+
+        end_time = time.time()
+        self.stdout.write(self.style.SUCCESS(f"Operation completed in {end_time - start_time:.2f} seconds."))

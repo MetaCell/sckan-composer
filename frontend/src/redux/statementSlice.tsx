@@ -1,18 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { ROWS_PER_PAGE } from "../settings";
-
-export type StateFilter = Array<
-  | "exported"
-  | "compose_now"
-  | "connection_missing"
-  | "curated"
-  | "draft"
-  | "excluded"
-  | "npo_approved"
-  | "rejected"
-  | "to_be_reviewed"
-  | "invalid"
->;
+import {ComposerConnectivityStatementListStateEnum} from "../apiclient/backend";
 
 export interface QueryParams {
   knowledgeStatement: string | undefined;
@@ -20,7 +8,7 @@ export interface QueryParams {
   notes: boolean | undefined;
   index: number | undefined;
   ordering: Array<"-last_edited" | "-id" | "last_edited" | "id"> | undefined;
-  stateFilter: StateFilter | undefined;
+  stateFilter: ComposerConnectivityStatementListStateEnum[] | undefined;
   tagFilter: number[] | undefined;
   sentenceId: number | undefined;
   excludeSentenceId: number | undefined;

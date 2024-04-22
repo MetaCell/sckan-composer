@@ -24,6 +24,7 @@ SECRET_KEY = "django-insecure-6dns-bbp&433ugro&j+z6p-w943$uhsax%f1245@7vfo3eyuw2
 
 # SECURITY WARNING: don't run with debug turned on in production!
 PRODUCTION = os.environ.get("PRODUCTION", "False").lower() in ("true", "1")
+USE_PG = os.environ.get("USE_PG", "False").lower() in ("true", "1")
 DEBUG = os.environ.get("DEBUG", str(not PRODUCTION)).lower() in ("true", "1")
 
 ALLOWED_HOSTS = [
@@ -66,9 +67,13 @@ INSTALLED_APPS = [
     "nested_admin",
     "django.contrib.admin",
     "social_django",
+
+    #
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -101,7 +106,7 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-if PRODUCTION:
+if PRODUCTION or USE_PG:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -148,7 +153,7 @@ TIME_ZONE = "CET"
 
 USE_I18N = True
 
-USE_TZ = False
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)

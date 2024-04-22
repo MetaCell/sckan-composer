@@ -13,6 +13,8 @@ from composer.models import (
     Via,
     Specie, Destination,
 )
+from django_filters import rest_framework
+from django_filters import CharFilter, BaseInFilter
 
 
 def field_has_content(queryset, name, value):
@@ -95,6 +97,66 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
         fields = []
 
 
+class ListCharFilter(BaseInFilter, CharFilter):
+    pass
+
+
+class KnowledgeStatementFilterSet(rest_framework.FilterSet):
+    via_uris = ListCharFilter(method='filter_via_uris', label='Via URI')
+    destination_uris = ListCharFilter(method='filter_destination_uris', label='Destination URI')
+    origin_uris = ListCharFilter(method='filter_origin_uris', label='Origin URI')
+    population_uris = ListCharFilter(method='filter_population_uris', label='Reference URI')
+
+    class Meta:
+        model = ConnectivityStatement
+        fields = ['via_uris', 'destination_uris', 'origin_uris', 'population_uris']
+        distinct = True
+        
+    @property
+    def qs(self):
+        return super().qs.distinct()
+    
+    def filter_population_uris(self, queryset, name, value):
+        return queryset.filter(reference_uri__in=value)
+
+    def filter_via_uris(self, queryset, name, value):
+        via_uris = value
+        via_ids = Via.objects.none()
+        for uri in via_uris:
+            via_ids = via_ids.union(
+                Via.objects.filter(anatomical_entities__simple_entity__ontology_uri=uri).prefetch_related('anatomical_entities__simple_entity')
+                .union(Via.objects.filter(anatomical_entities__region_layer__layer__ontology_uri=uri).prefetch_related('anatomical_entities__region_layer__layer'))
+                .union(Via.objects.filter(anatomical_entities__region_layer__region__ontology_uri=uri).prefetch_related('anatomical_entities__region_layer__region'))
+                .values_list("id", flat=True)
+            )
+        return queryset.filter(via__in=via_ids)
+    
+    def filter_destination_uris(self, queryset, name, value):
+        destination_uris = value
+        destination_ids = Destination.objects.none()
+        for uri in destination_uris:
+            destination_ids = destination_ids.union(
+                Destination.objects.filter(anatomical_entities__simple_entity__ontology_uri=uri).prefetch_related('anatomical_entities__simple_entity')
+                .union(Destination.objects.filter(anatomical_entities__region_layer__layer__ontology_uri=uri).prefetch_related('anatomical_entities__region_layer__layer'))
+                .union(Destination.objects.filter(anatomical_entities__region_layer__region__ontology_uri=uri).prefetch_related('anatomical_entities__region_layer__region'))
+                .values_list("id", flat=True)
+            )
+        return queryset.filter(destinations__in=destination_ids)
+    
+    def filter_origin_uris(self, queryset, name, value):
+        origin_uris = value
+        origin_ids = AnatomicalEntity.objects.none()
+        for uri in origin_uris:
+            origin_ids = origin_ids.union(
+                AnatomicalEntity.objects.filter(simple_entity__ontology_uri=uri).prefetch_related('simple_entity')
+                .union(AnatomicalEntity.objects.filter(region_layer__layer__ontology_uri=uri).prefetch_related('region_layer__layer'))
+                .union(AnatomicalEntity.objects.filter(region_layer__region__ontology_uri=uri).prefetch_related('region_layer__region'))
+                .values_list("id", flat=True)
+            )
+        return queryset.filter(origins__in=origin_ids)
+
+
+
 class AnatomicalEntityFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(method="filter_name")
     exclude_ids = NumberInFilter(field_name='id', exclude=True)
@@ -105,18 +167,24 @@ class AnatomicalEntityFilter(django_filters.FilterSet):
 
     @staticmethod
     def filter_name(queryset, name, value):
-        words = value.split()
-
-        if not words:
+        if not value:
             return queryset
+        
+        qs_name = queryset.filter(simple_entity__name__icontains=value) \
+            .union(queryset.filter(region_layer__layer__name__icontains=value)) \
+            .union(queryset.filter(region_layer__region__name__icontains=value))
+        
+        qs_uri = queryset.filter(simple_entity__ontology_uri__icontains=value) \
+            .union(queryset.filter(region_layer__layer__ontology_uri__icontains=value)) \
+            .union(queryset.filter(region_layer__region__ontology_uri__icontains=value))
+        
+        qs_synonyms = queryset.filter(synonyms__name__icontains=value)
 
-        queries = [Q(name__icontains=word) for word in words]
+        merged_queryset = qs_name.union(qs_uri).union(qs_synonyms)
 
-        query = queries.pop()
-        for item in queries:
-            query &= item
+        ids = merged_queryset.values_list('id', flat=True)
+        return queryset.filter(id__in=ids)
 
-        return queryset.filter(query)
 
 
 class SpecieFilter(django_filters.FilterSet):

@@ -9,14 +9,17 @@ from rest_framework.decorators import action, api_view
 from rest_framework.renderers import INDENT_SEPARATORS
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
+from rest_framework import generics
+from django_filters.rest_framework import DjangoFilterBackend
 
 from composer.services.state_services import (
-    ConnectivityStatementService,
-    SentenceService,
+    ConnectivityStatementStateService,
+    SentenceStateService,
 )
 from .filtersets import (
     SentenceFilter,
     ConnectivityStatementFilter,
+    KnowledgeStatementFilterSet,
     AnatomicalEntityFilter,
     NoteFilter,
     ViaFilter,
@@ -26,6 +29,7 @@ from .serializers import (
     AnatomicalEntitySerializer,
     PhenotypeSerializer,
     ConnectivityStatementSerializer,
+    KnowledgeStatementSerializer,
     NoteSerializer,
     ProfileSerializer,
     SentenceSerializer,
@@ -307,7 +311,7 @@ class ConnectivityStatementViewSet(
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = ConnectivityStatementFilter
-    service = ConnectivityStatementService
+    service = ConnectivityStatementStateService
 
 
     def get_serializer_class(self):
@@ -345,6 +349,34 @@ class ConnectivityStatementViewSet(
         return super().partial_update(request, *args, **kwargs)
 
 
+@extend_schema(tags=["public"])
+class KnowledgeStatementViewSet(
+    generics.ListAPIView,
+):
+    """
+    KnowledgeStatement that only allows GET to get the list of ConnectivityStatements
+    """
+    model = ConnectivityStatement
+    queryset = ConnectivityStatement.objects.exported()
+    serializer_class = KnowledgeStatementSerializer
+    permission_classes = [
+        permissions.AllowAny,
+    ]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = KnowledgeStatementFilterSet
+
+    @property
+    def allowed_methods(self):
+        return ['GET']
+
+    def get_serializer_class(self):
+        return KnowledgeStatementSerializer
+
+
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Tag
@@ -370,7 +402,7 @@ class SentenceViewSet(
         permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = SentenceFilter
-    service = SentenceService
+    service = SentenceStateService
 
 
 class SpecieViewSet(viewsets.ReadOnlyModelViewSet):

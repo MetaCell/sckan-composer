@@ -1,14 +1,13 @@
 from django.contrib.auth.models import User
 from django.db import models, transaction
-from django.db.models import Q, Max
+from django.db.models import Q, CheckConstraint
 from django.db.models.expressions import F
-from django.db.models.functions import Upper
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
 
 from composer.services.state_services import (
-    ConnectivityStatementService,
-    SentenceService,
+    ConnectivityStatementStateService,
+    SentenceStateService,
 )
 from .enums import (
     CircuitType,
@@ -21,6 +20,7 @@ from .enums import (
     ViaType,
     Projection,
 )
+from .services.graph_service import compile_journey
 from .utils import doi_uri, pmcid_uri, pmid_uri, create_reference_uri
 
 
@@ -97,6 +97,9 @@ class ConnectivityStatementManager(models.Manager):
 
     def excluding_draft(self):
         return self.get_queryset().exclude(state=CSState.DRAFT)
+        
+    def exported(self):
+        return self.get_queryset().filter(state=CSState.EXPORTED)
 
 
 class SentenceStatementManager(models.Manager):
@@ -154,7 +157,7 @@ class Phenotype(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     @property
     def phenotype_str(self):
         return str(self.name) if self.name else ''
@@ -186,7 +189,7 @@ class Sex(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     @property
     def sex_str(self):
         return str(self.name) if self.name else ''
@@ -224,21 +227,84 @@ class ProjectionPhenotype(models.Model):
         verbose_name_plural = "Projection Phenotypes"
 
 
-class AnatomicalEntity(models.Model):
-    """Anatomical Entity"""
-
+class AnatomicalEntityMeta(models.Model):
     name = models.CharField(max_length=200, db_index=True)
-    ontology_uri = models.URLField()
+    ontology_uri = models.URLField(unique=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
         ordering = ["name"]
+        verbose_name = "Anatomical Entity"
+        verbose_name_plural = "Anatomical Entities"
+
+
+class Layer(AnatomicalEntityMeta):
+    ...
+
+
+class Region(AnatomicalEntityMeta):
+    ...
+    layers = models.ManyToManyField(Layer, through='AnatomicalEntityIntersection')
+
+
+class AnatomicalEntityIntersection(models.Model):
+    layer = models.ForeignKey(Layer, on_delete=models.CASCADE)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = "Region/Layer Combination"
+        verbose_name_plural = "Region/Layer Combinations"
+
+    def __str__(self):
+        return f"{self.region.name} ({self.layer.name})"
+
+
+class AnatomicalEntity(models.Model):
+    simple_entity = models.OneToOneField(AnatomicalEntityMeta, on_delete=models.CASCADE, null=True, blank=True)
+    region_layer = models.OneToOneField(AnatomicalEntityIntersection, on_delete=models.CASCADE, null=True, blank=True)
+
+    @property
+    def name(self):
+        if self.simple_entity:
+            return str(self.simple_entity)
+        if self.region_layer:
+            return str(self.region_layer)
+        return 'Unknown Anatomical Entity'
+        
+    @property
+    def ontology_uri(self):
+        if self.simple_entity:
+            return self.simple_entity.ontology_uri
+        elif self.region_layer:
+            return f'{self.region_layer.region.ontology_uri},{self.region_layer.layer.ontology_uri}'
+        return 'Unknown URI'
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Anatomical Entity"
         verbose_name_plural = "Anatomical Entities"
         constraints = [
-            models.UniqueConstraint(Upper("name"), name="ae_unique_upper_name")
+            CheckConstraint(
+                check=(
+                        Q(simple_entity__isnull=False, region_layer__isnull=True) |
+                        Q(simple_entity__isnull=True, region_layer__isnull=False)
+                ),
+                name='check_anatomical_entity_exclusivity'
+            )
         ]
+
+
+class Synonym(models.Model):
+    anatomical_entity = models.ForeignKey(AnatomicalEntity, on_delete=models.CASCADE,
+                                          related_name="synonyms", null=True)
+    name = models.CharField(max_length=200, db_index=True)
+
+    class Meta:
+        unique_together = ('anatomical_entity', 'name',)
 
 
 class Tag(models.Model):
@@ -283,51 +349,64 @@ class Sentence(models.Model):
         return self.title
 
     # states
-    @transition(
-        field=state,
-        source=[SentenceState.TO_BE_REVIEWED, SentenceState.COMPOSE_LATER],
-        target=SentenceState.OPEN,
-    )
-    def open(self, *args, **kwargs):
-        ...
 
     @transition(
         field=state,
-        source=SentenceState.OPEN,
-        target=SentenceState.TO_BE_REVIEWED,
-        conditions=[SentenceService.can_be_reviewed],
+        source=[SentenceState.OPEN, SentenceState.READY_TO_COMPOSE, SentenceState.COMPOSE_LATER,
+                SentenceState.EXCLUDED],
+        target=SentenceState.NEEDS_FURTHER_REVIEW,
+        conditions=[SentenceStateService.can_be_reviewed],
+        permission=SentenceStateService.has_permission_to_transition_to_needs_further_review,
     )
-    def to_be_reviewed(self, *args, **kwargs):
+    def needs_further_review(self, *args, **kwargs):
         ...
 
     @transition(
-        field=state, source=SentenceState.OPEN, target=SentenceState.COMPOSE_LATER
+        field=state, source=[SentenceState.OPEN, SentenceState.NEEDS_FURTHER_REVIEW],
+        target=SentenceState.COMPOSE_LATER,
+        permission=SentenceStateService.has_permission_to_transition_to_compose_later,
     )
     def compose_later(self, *args, **kwargs):
         ...
 
     @transition(
+        field=state, source=[SentenceState.OPEN, SentenceState.COMPOSE_LATER,
+                             SentenceState.NEEDS_FURTHER_REVIEW],
+        target=SentenceState.READY_TO_COMPOSE,
+        permission=SentenceStateService.has_permission_to_transition_to_ready_to_compose,
+    )
+    def ready_to_compose(self, *args, **kwargs):
+        ...
+
+    @transition(
         field=state,
-        source=[SentenceState.TO_BE_REVIEWED, SentenceState.OPEN],
-        permission=lambda instance, user: SentenceService.has_permission_to_transition_to_compose_now(
-            instance, user
-        ),
+        source=SentenceState.READY_TO_COMPOSE,
         target=SentenceState.COMPOSE_NOW,
-        conditions=[SentenceService.can_be_composed],
+        conditions=[SentenceStateService.can_be_composed],
+        permission=SentenceStateService.has_permission_to_transition_to_compose_now,
+
     )
     def compose_now(self, *args, **kwargs):
-        SentenceService(self).do_transition_compose_now(*args, **kwargs)
+        SentenceStateService(self).do_transition_compose_now(*args, **kwargs)
 
-    @transition(field=state, source=SentenceState.OPEN, target=SentenceState.EXCLUDED)
+    @transition(
+        field=state,
+        source=[SentenceState.OPEN, SentenceState.COMPOSE_NOW],
+        target=SentenceState.COMPLETED,
+        permission=SentenceStateService.has_permission_to_transition_to_completed,
+
+    )
+    def completed(self, *args, **kwargs):
+        ...
+
+    @transition(field=state, source=[SentenceState.OPEN, SentenceState.COMPLETED],
+                target=SentenceState.EXCLUDED,
+                permission=SentenceStateService.has_permission_to_transition_to_excluded)
     def excluded(self, *args, **kwargs):
         ...
 
-    @transition(field=state, source=SentenceState.OPEN, target=SentenceState.DUPLICATE)
-    def duplicate(self, *args, **kwargs):
-        ...
-
     def assign_owner(self, request):
-        if SentenceService(self).should_set_owner(request):
+        if SentenceStateService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
 
@@ -449,63 +528,66 @@ class ConnectivityStatement(models.Model):
         field=state,
         source=[
             CSState.DRAFT,
-            CSState.REJECTED,
-            CSState.NPO_APPROVED,
+            CSState.IN_PROGRESS,
+            CSState.INVALID,
             CSState.EXPORTED,
-            CSState.INVALID
         ],
-        permission=lambda instance, user: ConnectivityStatementService.has_permission_to_transition_to_compose_now(
-            instance, user
-        ),
         target=CSState.COMPOSE_NOW,
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_compose_now,
     )
     def compose_now(self, *args, **kwargs):
         ...
 
     @transition(
         field=state,
-        source=[CSState.COMPOSE_NOW, CSState.CONNECTION_MISSING],
-        target=CSState.CURATED,
+        source=[CSState.COMPOSE_NOW, CSState.TO_BE_REVIEWED, CSState.REVISE],
+        target=CSState.IN_PROGRESS,
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_in_progress,
     )
-    def curated(self, *args, **kwargs):
-        ...
-
-    @transition(
-        field=state, source=CSState.COMPOSE_NOW, target=CSState.CONNECTION_MISSING
-    )
-    def connection_missing(self, *args, **kwargs):
+    def in_progress(self, *args, **kwargs):
         ...
 
     @transition(
         field=state,
-        source=CSState.CURATED,
+        source=[CSState.IN_PROGRESS, CSState.REJECTED],
         target=CSState.TO_BE_REVIEWED,
-        conditions=[ConnectivityStatementService.can_be_reviewed],
+        conditions=[ConnectivityStatementStateService.can_be_reviewed],
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_to_be_reviewed,
     )
     def to_be_reviewed(self, *args, **kwargs):
         ...
 
-    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.EXCLUDED)
-    def excluded(self, *args, **kwargs):
-        ...
-
-    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.REJECTED)
+    @transition(field=state,
+                source=CSState.TO_BE_REVIEWED,
+                target=CSState.REJECTED,
+                permission=ConnectivityStatementStateService.has_permission_to_transition_to_rejected,
+                )
     def rejected(self, *args, **kwargs):
         ...
 
-    @transition(field=state, source=CSState.TO_BE_REVIEWED, target=CSState.NPO_APPROVED,
-                conditions=[ConnectivityStatementService.is_valid])
+    @transition(field=state,
+                source=[CSState.TO_BE_REVIEWED, CSState.NPO_APPROVED],
+                target=CSState.REVISE,
+                permission=ConnectivityStatementStateService.has_permission_to_transition_to_revise,
+                )
+    def revise(self, *args, **kwargs):
+        ...
+
+    @transition(field=state,
+                source=CSState.TO_BE_REVIEWED,
+                target=CSState.NPO_APPROVED,
+                conditions=[ConnectivityStatementStateService.is_valid],
+                permission=ConnectivityStatementStateService.has_permission_to_transition_to_npo_approval,
+                )
     def npo_approved(self, *args, **kwargs):
         ...
 
     @transition(
         field=state,
-        source=[CSState.NPO_APPROVED, CSState.COMPOSE_NOW],
-        permission=lambda instance, user: ConnectivityStatementService.has_permission_to_transition_to_exported(
-            instance, user
-        ),
+        source=CSState.NPO_APPROVED,
         target=CSState.EXPORTED,
-        conditions=[ConnectivityStatementService.is_valid]
+        conditions=[ConnectivityStatementStateService.is_valid],
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_exported,
     )
     def exported(self, *args, **kwargs):
         ...
@@ -515,18 +597,16 @@ class ConnectivityStatement(models.Model):
         source=[
             CSState.DRAFT,
             CSState.COMPOSE_NOW,
-            CSState.CURATED,
-            CSState.EXCLUDED,
+            CSState.IN_PROGRESS,
             CSState.REJECTED,
+            CSState.REVISE,
             CSState.TO_BE_REVIEWED,
-            CSState.CONNECTION_MISSING,
             CSState.NPO_APPROVED,
             CSState.EXPORTED,
         ],
         target=CSState.INVALID,
-        permission=lambda instance, user: ConnectivityStatementService.has_permission_to_transition_to_invalid(
-            instance, user
-        ), )
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_invalid,
+    )
     def invalid(self, *args, **kwargs):
         ...
 
@@ -549,7 +629,7 @@ class ConnectivityStatement(models.Model):
             return set(self.via_set.get(order=via_order - 1).anatomical_entities.all())
 
     def get_journey(self):
-        return ConnectivityStatementService.compile_journey(self)
+        return compile_journey(self)
 
     def get_laterality_description(self):
         laterality_map = {
@@ -559,7 +639,7 @@ class ConnectivityStatement(models.Model):
         return laterality_map.get(self.laterality, None)
 
     def assign_owner(self, request):
-        if ConnectivityStatementService(self).should_set_owner(request):
+        if ConnectivityStatementStateService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
 
@@ -611,6 +691,7 @@ class Destination(AbstractConnectionLayer):
         on_delete=models.CASCADE,
         related_name="destinations"  # Overridden related_name
     )
+
     anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True,
                                                  related_name='destination_connection_layers')
 
@@ -632,7 +713,8 @@ class Destination(AbstractConnectionLayer):
 
 
 class Via(AbstractConnectionLayer):
-    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True, related_name='via_connection_layers')
+    anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True,
+                                                 related_name='via_connection_layers')
 
     objects = ViaManager()
 

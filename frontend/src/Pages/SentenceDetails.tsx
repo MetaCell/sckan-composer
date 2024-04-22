@@ -10,7 +10,7 @@ import TagForm from "../components/Forms/TagForm";
 import {
   Sentence,
   SentenceConnectivityStatement,
-  SentenceAvailableTransitionsEnum,
+  SentenceAvailableTransitionsEnum, ComposerSentenceListStateEnum,
 } from "../apiclient/backend/api";
 import { userProfile } from "../services/UserService";
 import CheckDuplicates from "../components/CheckForDuplicates/CheckDuplicatesDialog";
@@ -93,14 +93,7 @@ const SentencesDetails = () => {
       try {
         const nextSentenceOptions = {
           ...queryOptions,
-          stateFilter: ["open"] as (
-            | "open"
-            | "to_be_reviewed"
-            | "compose_later"
-            | "compose_now"
-            | "excluded"
-            | "duplicate"
-          )[],
+          stateFilter: [ComposerSentenceListStateEnum.Open],
           exclude: [`${sentence.id}`],
           limit: 1,
           index: 0,
@@ -113,14 +106,7 @@ const SentencesDetails = () => {
             tagFilter: undefined,
             title: undefined,
             ordering: queryOptions.ordering,
-            stateFilter: ["open"] as (
-              | "open"
-              | "to_be_reviewed"
-              | "compose_later"
-              | "compose_now"
-              | "excluded"
-              | "duplicate"
-            )[],
+            stateFilter: [ComposerSentenceListStateEnum.Open],
             exclude: [`${sentence.id}`],
             limit: 1,
             index: 0,
@@ -180,7 +166,7 @@ const SentencesDetails = () => {
           setSentence(sentence);
           const foundToBeReviewed = sentence.available_transitions.findIndex(
             (transition) =>
-              transition === SentenceAvailableTransitionsEnum.ToBeReviewed,
+              transition === SentenceAvailableTransitionsEnum.NeedsFurtherReview,
           );
           setSelectedIndex(
             foundToBeReviewed && foundToBeReviewed !== -1

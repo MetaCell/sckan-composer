@@ -1,13 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { ROWS_PER_PAGE } from '../settings'
+import {ComposerSentenceListStateEnum} from "../apiclient/backend";
 
-export type StateFilter = Array<'compose_later' | 'compose_now' | 'duplicate' | 'excluded' | 'open' | 'to_be_reviewed'>
 export interface QueryParams {
   limit: number,
   notes: boolean | undefined,
   index: number | undefined,
   ordering: Array<'-last_edited' | '-id' | 'last_edited' | 'id'> | undefined,
-  stateFilter: StateFilter | undefined,
+  stateFilter: ComposerSentenceListStateEnum[] | undefined,
   tagFilter: number[] | undefined,
   title: string | undefined
   exclude: string[] | undefined

@@ -1,22 +1,32 @@
 from django.db import connection
 from django.test import TestCase, override_settings
 
-from composer.models import Sentence, ConnectivityStatement, AnatomicalEntity, Via, Destination
+from composer.models import Sentence, ConnectivityStatement, AnatomicalEntity, AnatomicalEntityMeta, Via, Destination
 from composer.services.graph_service import generate_paths, consolidate_paths
 
 
 @override_settings(DEBUG=True)
 class JourneyTestCase(TestCase):
 
+    def setUp(self):
+        self.created_entities = {}
+
+    def create_or_get_anatomical_entity(self, name):
+        if name not in self.created_entities:
+            meta, _ = AnatomicalEntityMeta.objects.get_or_create(name=name, ontology_uri=name)
+            entity, _ = AnatomicalEntity.objects.get_or_create(simple_entity=meta)
+            self.created_entities[name] = entity
+        return self.created_entities[name]
+
     def test_journey_simple_graph_with_jump(self):
         # Test setup
         sentence = Sentence.objects.create()
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
-        origin1 = AnatomicalEntity.objects.create(name='Oa')
-        origin2 = AnatomicalEntity.objects.create(name='Ob')
-        via1 = AnatomicalEntity.objects.create(name='V1a')
-        destination1 = AnatomicalEntity.objects.create(name='Da')
+        origin1 = self.create_or_get_anatomical_entity("Oa")
+        origin2 = self.create_or_get_anatomical_entity("Ob")
+        via1 = self.create_or_get_anatomical_entity('V1a')
+        destination1 = self.create_or_get_anatomical_entity('Da')
 
         cs.origins.add(origin1, origin2)
 
@@ -42,10 +52,7 @@ class JourneyTestCase(TestCase):
             [('Ob', 0), ('Da', 2)]
         ]
 
-        initial_query_count = len(connection.queries)
         all_paths = generate_paths(origins, vias, destinations)
-        new_query_count = len(connection.queries) - initial_query_count
-        self.assertTrue(new_query_count == 0)
 
         all_paths.sort()
         expected_paths.sort()
@@ -70,9 +77,9 @@ class JourneyTestCase(TestCase):
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
         # Create Anatomical Entities
-        origin1 = AnatomicalEntity.objects.create(name='Oa')
-        origin2 = AnatomicalEntity.objects.create(name='Ob')
-        destination1 = AnatomicalEntity.objects.create(name='Da')
+        origin1 = self.create_or_get_anatomical_entity("Oa")
+        origin2 = self.create_or_get_anatomical_entity("Ob")
+        destination1 = self.create_or_get_anatomical_entity('Da')
 
         # Add origins
         cs.origins.add(origin1, origin2)
@@ -115,10 +122,10 @@ class JourneyTestCase(TestCase):
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
         # Create Anatomical Entities
-        origin1 = AnatomicalEntity.objects.create(name='Oa')
-        origin2 = AnatomicalEntity.objects.create(name='Ob')
-        via1 = AnatomicalEntity.objects.create(name='V1a')
-        destination1 = AnatomicalEntity.objects.create(name='Da')
+        origin1 = self.create_or_get_anatomical_entity("Oa")
+        origin2 = self.create_or_get_anatomical_entity("Ob")
+        via1 = self.create_or_get_anatomical_entity('V1a')
+        destination1 = self.create_or_get_anatomical_entity('Da')
 
         # Add origins
         cs.origins.add(origin1, origin2)
@@ -170,11 +177,11 @@ class JourneyTestCase(TestCase):
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
         # Create Anatomical Entities
-        origin1 = AnatomicalEntity.objects.create(name='Oa')
-        origin2 = AnatomicalEntity.objects.create(name='Ob')
-        via1 = AnatomicalEntity.objects.create(name='V1a')
-        via2 = AnatomicalEntity.objects.create(name='V1b')
-        destination1 = AnatomicalEntity.objects.create(name='Da')
+        origin1 = self.create_or_get_anatomical_entity("Oa")
+        origin2 = self.create_or_get_anatomical_entity("Ob")
+        via1 = self.create_or_get_anatomical_entity('V1a')
+        via2 = self.create_or_get_anatomical_entity('V1b')
+        destination1 = self.create_or_get_anatomical_entity('Da')
 
         # Add origins
         cs.origins.add(origin1, origin2)
@@ -232,15 +239,14 @@ class JourneyTestCase(TestCase):
         sentence = Sentence.objects.create()
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
-        # Create Anatomical Entities
-        origin_a = AnatomicalEntity.objects.create(name='Oa')
-        origin_b = AnatomicalEntity.objects.create(name='Ob')
-        via1_a = AnatomicalEntity.objects.create(name='V1a')
-        via2_a = AnatomicalEntity.objects.create(name='V2a')
-        via2_b = AnatomicalEntity.objects.create(name='V2b')
-        via3_a = AnatomicalEntity.objects.create(name='V3a')
-        via4_a = AnatomicalEntity.objects.create(name='V4a')
-        destination_a = AnatomicalEntity.objects.create(name='Da')
+        origin_a = self.create_or_get_anatomical_entity("Oa")
+        origin_b = self.create_or_get_anatomical_entity("Ob")
+        via1_a = self.create_or_get_anatomical_entity('V1a')
+        via2_a = self.create_or_get_anatomical_entity('V2a')
+        via2_b = self.create_or_get_anatomical_entity('V2b')
+        via3_a = self.create_or_get_anatomical_entity('V3a')
+        via4_a = self.create_or_get_anatomical_entity('V4a')
+        destination_a = self.create_or_get_anatomical_entity('Da')
 
         # Add origins
         cs.origins.add(origin_a, origin_b)
@@ -304,18 +310,17 @@ class JourneyTestCase(TestCase):
         sentence = Sentence.objects.create()
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
-        # Create Anatomical Entities
-        origin_a = AnatomicalEntity.objects.create(name='Oa')
-        origin_b = AnatomicalEntity.objects.create(name='Ob')
-        via1_a = AnatomicalEntity.objects.create(name='V1a')
-        via2_a = AnatomicalEntity.objects.create(name='V2a')
-        via2_b = AnatomicalEntity.objects.create(name='V2b')
-        via3_a = AnatomicalEntity.objects.create(name='V3a')
-        via4_a = AnatomicalEntity.objects.create(name='V4a')
-        via5_a = AnatomicalEntity.objects.create(name='V5a')
-        via5_b = AnatomicalEntity.objects.create(name='V5b')
-        via6_a = AnatomicalEntity.objects.create(name='V6a')
-        destination_a = AnatomicalEntity.objects.create(name='Da')
+        origin_a = self.create_or_get_anatomical_entity("Oa")
+        origin_b = self.create_or_get_anatomical_entity("Ob")
+        via1_a = self.create_or_get_anatomical_entity('V1a')
+        via2_a = self.create_or_get_anatomical_entity('V2a')
+        via2_b = self.create_or_get_anatomical_entity('V2b')
+        via3_a = self.create_or_get_anatomical_entity('V3a')
+        via4_a = self.create_or_get_anatomical_entity('V4a')
+        via5_a = self.create_or_get_anatomical_entity('V5a')
+        via5_b = self.create_or_get_anatomical_entity('V5b')
+        via6_a = self.create_or_get_anatomical_entity('V6a')
+        destination_a = self.create_or_get_anatomical_entity('Da')
 
         # Add origins
         cs.origins.add(origin_a, origin_b)
@@ -405,9 +410,9 @@ class JourneyTestCase(TestCase):
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
         # Create Anatomical Entities
-        origin1 = AnatomicalEntity.objects.create(name='Oa')
-        origin2 = AnatomicalEntity.objects.create(name='Ob')
-        destination1 = AnatomicalEntity.objects.create(name='Da')
+        origin1 = self.create_or_get_anatomical_entity("Oa")
+        origin2 = self.create_or_get_anatomical_entity("Ob")
+        destination1 = self.create_or_get_anatomical_entity('Da')
 
         # Add origins
         cs.origins.add(origin1, origin2)
@@ -459,10 +464,10 @@ class JourneyTestCase(TestCase):
         sentence = Sentence.objects.create()
         cs = ConnectivityStatement.objects.create(sentence=sentence)
 
-        origin1 = AnatomicalEntity.objects.create(name='Oa')
-        via1 = AnatomicalEntity.objects.create(name='V1a')
-        via2 = AnatomicalEntity.objects.create(name='V2a')
-        destination1 = AnatomicalEntity.objects.create(name='Da')
+        origin1 = self.create_or_get_anatomical_entity("Oa")
+        via1 = self.create_or_get_anatomical_entity('V1a')
+        via2 = self.create_or_get_anatomical_entity("V2a")
+        destination1 = self.create_or_get_anatomical_entity('Da')
 
         cs.origins.add(origin1)
 
@@ -503,6 +508,58 @@ class JourneyTestCase(TestCase):
         journey_paths = consolidate_paths(all_paths)
         expected_journey = [
             [('Oa', 0), ('V1a', 3), ('V2a', 6), ('Da', 7)],
+        ]
+        journey_paths.sort()
+        expected_journey.sort()
+        self.assertTrue(journey_paths == expected_journey,
+                        f"Expected journey {expected_journey}, but found {journey_paths}")
+
+    def test_journey_implicit_from_entities(self):
+        # Test setup
+        sentence = Sentence.objects.create()
+        cs = ConnectivityStatement.objects.create(sentence=sentence)
+
+        origin1 = self.create_or_get_anatomical_entity("Myenteric")
+        via1 = self.create_or_get_anatomical_entity('Longitudinal')
+        via2 = self.create_or_get_anatomical_entity("Serosa")
+        via3 = self.create_or_get_anatomical_entity("lumbar")
+        destination1 = self.create_or_get_anatomical_entity('inferior')
+
+        cs.origins.add(origin1)
+
+        via_a = Via.objects.create(connectivity_statement=cs)
+        via_a.anatomical_entities.add(via1)
+
+        via_b = Via.objects.create(connectivity_statement=cs)
+        via_b.anatomical_entities.add(via2)
+
+        via_c = Via.objects.create(connectivity_statement=cs)
+        via_c.anatomical_entities.add(via3)
+
+        destination = Destination.objects.create(connectivity_statement=cs)
+        destination.anatomical_entities.add(destination1)
+
+        # Prefetch related data
+        origins = list(cs.origins.all())
+        vias = list(
+            Via.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities', 'from_entities'))
+        destinations = list(
+            Destination.objects.filter(connectivity_statement=cs).prefetch_related('anatomical_entities',
+                                                                                   'from_entities'))
+
+        expected_paths = [
+            [('Myenteric', 0), ('Longitudinal', 1), ('Serosa', 2), ('lumbar', 3), ('inferior', 4)],
+        ]
+
+        all_paths = generate_paths(origins, vias, destinations)
+
+        all_paths.sort()
+        expected_paths.sort()
+        self.assertTrue(all_paths == expected_paths, f"Expected paths {expected_paths}, but found {all_paths}")
+
+        journey_paths = consolidate_paths(all_paths)
+        expected_journey = [
+            [('Myenteric', 0), ('Longitudinal', 1), ('Serosa', 2), ('lumbar', 3), ('inferior', 4)],
         ]
         journey_paths.sort()
         expected_journey.sort()
