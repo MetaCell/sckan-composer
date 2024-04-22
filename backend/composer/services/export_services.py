@@ -394,10 +394,11 @@ def get_rows(cs: ConnectivityStatement) -> List:
         except Exception:
             raise UnexportableConnectivityStatement("Error getting specie row")
 
-    try:
-        rows.append(get_sex_row(cs))
-    except Exception:
-        raise UnexportableConnectivityStatement("Error getting sex row")
+    if cs.sex is not None:
+        try:
+            rows.append(get_sex_row(cs))
+        except Exception:
+            raise UnexportableConnectivityStatement("Error getting sex row")
 
     try:
         rows.append(get_circuit_role_row(cs))
