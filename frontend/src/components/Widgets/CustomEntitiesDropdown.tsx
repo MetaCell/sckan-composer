@@ -366,14 +366,7 @@ export default function CustomEntitiesDropdown({
     if (!isDropdownOpened) return;
     setIsLoading(true);
     fetchData().then(() => setIsLoading(false));
-  }, [isDropdownOpened, id, onSearch, fetchData]);
-  
-  useEffect(() => {
-    if (inputValue !== undefined) {
-      setIsLoading(true);
-      fetchData().then(() => setIsLoading(false));
-    }
-  }, [inputValue, id, fetchData]);
+  }, [inputValue, isDropdownOpened, fetchData]);
   
   useEffect(() => {
     const preLevelItems = postProcessOptions && getPreLevelSelectedValues ? getPreLevelSelectedValues(id) : [];
