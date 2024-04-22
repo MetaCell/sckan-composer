@@ -174,8 +174,6 @@ class ConnectivityStatementStateService(StateServiceMixin):
                 connectivity_statement.origins.exists()
                 and connectivity_statement.destinations.exists()
                 and connectivity_statement.phenotype is not None
-                and connectivity_statement.sex is not None
-                and connectivity_statement.species.count() > 0
                 and connectivity_statement.provenance_set.count() > 0
         )
 

@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState, useMemo} from "react";
 import {
   Badge,
   CircularProgress,
@@ -29,6 +29,8 @@ import {Option} from "../../types";
 import Stack from "@mui/material/Stack";
 import {processFromEntitiesData} from "../../helpers/dropdownMappers";
 import CustomChipBoxComponent from "./CustomChipBoxComponent";
+import { debounce } from "@mui/material";
+import { SEARCH_DEBOUNCE } from "../../settings";
 
 const {
   buttonOutlinedBorderColor,
@@ -334,6 +336,10 @@ export default function CustomEntitiesDropdown({
     setHoveredOption(null);
     setInputValue(event.target.value);
   };
+
+  const debouncedResults = useMemo(() => {
+    return debounce(handleInputChange, SEARCH_DEBOUNCE);
+  }, []);
   
   const isOptionSelected = (option: Option) => {
     return selectedOptions?.some((selected) => selected?.id === option?.id);
@@ -366,14 +372,7 @@ export default function CustomEntitiesDropdown({
     if (!isDropdownOpened) return;
     setIsLoading(true);
     fetchData().then(() => setIsLoading(false));
-  }, [isDropdownOpened, id, onSearch, fetchData]);
-  
-  useEffect(() => {
-    if (inputValue !== undefined) {
-      setIsLoading(true);
-      fetchData().then(() => setIsLoading(false));
-    }
-  }, [inputValue, id, fetchData]);
+  }, [inputValue, isDropdownOpened, fetchData]);
   
   useEffect(() => {
     const preLevelItems = postProcessOptions && getPreLevelSelectedValues ? getPreLevelSelectedValues(id) : [];
@@ -395,7 +394,7 @@ export default function CustomEntitiesDropdown({
         }
       }
     };
-    
+
     document.addEventListener("mousedown", closePopperOnClickOutside);
     return () => {
       document.removeEventListener("mousedown", closePopperOnClickOutside);
@@ -589,8 +588,7 @@ export default function CustomEntitiesDropdown({
                     <TextField
                       fullWidth
                       type="text"
-                      value={inputValue}
-                      onChange={handleInputChange}
+                      onChange={debouncedResults}
                       placeholder={searchPlaceholder}
                       InputProps={{
                         startAdornment: (
