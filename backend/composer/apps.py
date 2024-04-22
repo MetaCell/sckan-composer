@@ -8,4 +8,5 @@ class ComposerConfig(AppConfig):
     def ready(self) -> None:
         # activate the signals
         from .signals import post_transition_callback
+        from .api import handlers  # noqa
         return super().ready()
