@@ -85,6 +85,10 @@ def get_sentence_number(cs: ConnectivityStatement, row: Row):
     return cs.sentence.id
 
 
+def get_statement_uri(cs: ConnectivityStatement, row: Row):
+    return cs.reference_uri
+
+
 def get_nlp_id(cs: ConnectivityStatement, row: Row):
     return cs.export_id
 
@@ -191,6 +195,7 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
         "Review notes": get_review_notes,
         "Proposed action": get_proposed_action,
         "Added to SCKAN (time stamp)": get_added_to_sckan_timestamp,
+        'URI': get_statement_uri,
     }
     exportable_tags = Tag.objects.filter(exportable=True)
     for tag in exportable_tags:
