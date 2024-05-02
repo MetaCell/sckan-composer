@@ -69,7 +69,8 @@ class Row:
             curation_notes: str = "",
             review_notes: str = "",
             layer: str = "",
-            connected_from: str = ""
+            connected_from_names: str = "",
+            connected_from_uris: str = ""
     ):
         self.structure = structure
         self.identifier = identifier
@@ -78,7 +79,8 @@ class Row:
         self.curation_notes = curation_notes
         self.review_notes = review_notes
         self.layer = layer
-        self.connected_from = connected_from
+        self.connected_from_names = connected_from_names
+        self.connected_from_uris = connected_from_uris
 
 
 def get_sentence_number(cs: ConnectivityStatement, row: Row):
@@ -117,8 +119,12 @@ def get_layer(cs: ConnectivityStatement, row: Row):
     return row.layer
 
 
-def get_connected_from(cs: ConnectivityStatement, row: Row):
-    return row.connected_from
+def get_connected_from_names(cs: ConnectivityStatement, row: Row):
+    return row.connected_from_names
+
+
+def get_connected_from_uri(cs: ConnectivityStatement, row: Row):
+    return row.connected_from_uris
 
 
 def get_predicate(cs: ConnectivityStatement, row: Row):
@@ -184,7 +190,8 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
         "Identifier": get_identifier,
         "Relationship": get_relationship,
         "Axonal course poset": get_layer,
-        "Connected From": get_connected_from,
+        "Connected From": get_connected_from_names,
+        "Connected From URIs": get_connected_from_uri,
         "Predicate": get_predicate,
         "Observed in species": get_observed_in_species,
         "Different from existing": get_different_from_existing,
@@ -222,8 +229,7 @@ def get_destination_row(destination: Destination, total_vias: int):
     else:
         connected_from_entities = get_complete_from_entities_for_destination(destination)
 
-    connected_from_names = [entity.name for entity in connected_from_entities] if connected_from_entities else []
-    connected_from = ', '.join(connected_from_names)
+    connected_from_names, connected_from_uris = _get_connected_from_info(connected_from_entities)
 
     layer_value = str(total_vias + 2)
     return [
@@ -235,7 +241,8 @@ def get_destination_row(destination: Destination, total_vias: int):
             "",
             "",
             layer=layer_value,
-            connected_from=connected_from
+            connected_from_names=connected_from_names,
+            connected_from_uris=connected_from_uris
         )
         for ae in destination.anatomical_entities.all()
     ]
@@ -247,8 +254,7 @@ def get_via_row(via: Via):
     else:
         connected_from_entities = get_complete_from_entities_for_via(via)
 
-    connected_from_names = [entity.name for entity in connected_from_entities] if connected_from_entities else []
-    connected_from = ', '.join(connected_from_names)
+    connected_from_names, connected_from_uris = _get_connected_from_info(connected_from_entities)
     layer_value = str(via.order + 2)
 
     return [
@@ -260,10 +266,18 @@ def get_via_row(via: Via):
             "",
             "",
             layer=layer_value,
-            connected_from=connected_from
+            connected_from_names=connected_from_names,
+            connected_from_uris=connected_from_uris
         )
         for ae in via.anatomical_entities.all()
     ]
+
+
+def _get_connected_from_info(entities):
+    connected_from_info = [(entity.name, entity.ontology_uri) for entity in entities] if entities else []
+    connected_from_names = '; '.join(name for name, _ in connected_from_info)
+    connected_from_uris = '; '.join(uri for _, uri in connected_from_info)
+    return connected_from_names, connected_from_uris
 
 
 def get_specie_row(specie: Specie):
