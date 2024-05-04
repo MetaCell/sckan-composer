@@ -371,7 +371,7 @@ def get_functional_circuit_row(cs: ConnectivityStatement):
 def get_forward_connection_row(forward_conn: ConnectivityStatement):
     return Row(
         forward_conn.sentence.pk,
-        forward_conn.pk,
+        forward_conn.reference_uri,
         ExportRelationships.hasForwardConnection.label,
         ExportRelationships.hasForwardConnection.value,
         "",
