@@ -706,6 +706,15 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
             "apinatomy_model",
             "phenotype_id",
             "phenotype",
-            "reference_uri"
+            "reference_uri",
+            "provenances",
+            "knowledge_statement",
+            "journey",
+            "laterality",
+            "projection",
+            "circuit_type",
+            "sex",
+            "apinatomy_model",
+            "statement_preview",
         )
         
