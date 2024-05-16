@@ -269,10 +269,10 @@ def validate_partial_order_and_axioms_aux(axiom_uris: Set[str], actual_uris: Set
 
     for uri in unexpected_uris:
         uri_str = f"{uri[0]}, {uri[1]}" if isinstance(uri, tuple) else uri
-        validation_errors.non_specified.append(f"Unexpected {category} URI not in axioms: {uri_str}")
+        validation_errors.non_specified.append(f"{category} URI present in partial order was not found in axioms: {uri_str}")
 
     for uri in missing_uris:
-        validation_errors.non_specified.append(f"Missing {category} URI not found in actual URIs: {uri}")
+        validation_errors.non_specified.append(f"{category} URI present in axioms was not found in partial order: {uri}")
 
     return validation_errors
 
