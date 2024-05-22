@@ -21,7 +21,8 @@ const StatementChart = (props: { statement: ConnectivityStatement }) => {
             {displayChart ? (
                 <Box sx={{height: '800px', width: '100%'}}>
                     <GraphDiagram origins={statement.origins} vias={statement.vias}
-                                  destinations={statement.destinations}/>
+                                  destinations={statement.destinations}
+                                  forward_connection={statement.forward_connection} />
                 </Box>
             ) : (
                 <Box p={3}>

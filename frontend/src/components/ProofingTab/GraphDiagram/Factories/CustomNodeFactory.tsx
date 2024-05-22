@@ -1,12 +1,13 @@
-import { AbstractReactFactory } from '@projectstorm/react-canvas-core';
-import {NodeTypes} from "../GraphDiagram";
+import {AbstractReactFactory, GenerateWidgetEvent} from '@projectstorm/react-canvas-core';
 import {CustomNodeModel} from "../Models/CustomNodeModel";
-import React from "react";
+import {Fragment} from "react";
 import {OriginNodeWidget} from "../Widgets/OriginNodeWidget";
 import {ViaNodeWidget} from "../Widgets/ViaNodeWidget";
 import {DestinationNodeWidget} from "../Widgets/DestinationNodeWidget";
+import {DiagramEngine, NodeModel, NodeModelGenerics} from "@projectstorm/react-diagrams";
+import {NodeTypes} from "../GraphDiagram";
 
-export class CustomNodeFactory extends AbstractReactFactory {
+export class CustomNodeFactory extends AbstractReactFactory<NodeModel<NodeModelGenerics>, DiagramEngine>  {
     constructor() {
         super('custom');
     }
@@ -15,8 +16,7 @@ export class CustomNodeFactory extends AbstractReactFactory {
         return new CustomNodeModel(NodeTypes.Origin, '');
     }
 
-    // @ts-ignore
-    generateReactWidget(event: any) {
+    generateReactWidget(event: GenerateWidgetEvent<CustomNodeModel>) {
         const { customType } = event.model;
 
         switch (customType) {
@@ -27,7 +27,7 @@ export class CustomNodeFactory extends AbstractReactFactory {
             case NodeTypes.Destination:
                 return <DestinationNodeWidget engine={this.engine} model={event.model} />;
             default:
-                return null;
+                return <Fragment></Fragment>;
         }
     }
 }

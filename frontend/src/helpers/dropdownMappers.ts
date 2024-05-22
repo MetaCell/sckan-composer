@@ -1,12 +1,12 @@
 import {
   AnatomicalEntity,
-  ConnectivityStatement,
+  BaseConnectivityStatement, ConnectivityStatement,
   ConnectivityStatementUpdate,
 } from "../apiclient/backend";
 import { Option, OptionDetail } from "../types";
+import { getName, getAnatomicalEntityDetails } from "./anatomicalEntityHelper";
 import { OriginsGroupLabel, ViasGroupLabel } from "./settings";
 
-export const DROPDOWN_MAPPER_ONTOLOGY_URL = "Ontology URI";
 export const DROPDOWN_MAPPER_STATE = "state";
 
 type tempOption = { sort: number } & Option;
@@ -20,23 +20,14 @@ export function mapAnatomicalEntitiesToOptions(
   }
   return entities.map((entity: any) => ({
     id: entity.id.toString(),
-    label: entity.name,
+    label: getName(entity),
     group: groupLabel,
-    content: [
-      {
-        title: "Name",
-        value: entity.name,
-      },
-      {
-        title: DROPDOWN_MAPPER_ONTOLOGY_URL,
-        value: entity.ontology_uri,
-      },
-    ],
+    content: getAnatomicalEntityDetails(entity),
   }));
 }
 
 export function mapConnectivityStatementsToOptions(
-  statements: ConnectivityStatement[],
+  statements: BaseConnectivityStatement[],
   group: string,
 ): Option[] {
   return statements?.reduce((options: Option[], statement) => {
@@ -50,9 +41,14 @@ export function mapConnectivityStatementsToOptions(
         title: "Knowledge Statement ID",
         value: statement.id.toString() || "N/A",
       },
-      { title: "Title", value: statement.knowledge_statement || "N/A" },
-      { title: "Statement", value: statement.statement_preview || "N/A" },
-      { title: DROPDOWN_MAPPER_STATE, value: statement.state || "N/A" },
+      {
+        title: "Title",
+        value: statement.knowledge_statement || "N/A"
+      },
+      {
+        title: DROPDOWN_MAPPER_STATE,
+        value: statement.state || "N/A"
+      },
     ];
 
     const option: Option = {
@@ -121,18 +117,19 @@ export const processFromEntitiesData = (allOptions: tempOption[]) => {
 export function getViasGroupLabel(currentIndex: number | null) {
   return currentIndex ? `${ViasGroupLabel}-${currentIndex}` : OriginsGroupLabel;
 }
+
 export function areArraysOfObjectsEqual(a: any[], b: any[]): boolean {
   if (a.length !== b.length) return false;
-  
+
   const setA = new Set(a.map(obj => obj.id));
   const setB = new Set(b.map(obj => obj.id));
-  
+
   if (setA.size !== setB.size) return false;
-  
+
   for (let id of setA) {
     if (!setB.has(id)) return false;
   }
-  
+
   return true;
 }
 
@@ -141,6 +138,9 @@ export function findMatchingEntities(
   statement: ConnectivityStatement,
   entities: Option[],
 ) {
+  if (entities === undefined) {
+    return [];
+  }
   const matchingOrigins: AnatomicalEntity[] = (statement.origins || []).filter(
     (origin: AnatomicalEntity) =>
       entities.some(
@@ -153,10 +153,10 @@ export function findMatchingEntities(
   ).reduce((result: any, via: any) => {
     const matchingAnatomicalEntitiesInVia: AnatomicalEntity &
       { order?: number }[] = via.anatomical_entities
-      .filter((fromEntity: Option) =>
-        entities.some((searchItem: Option) => fromEntity.id === searchItem.id),
-      )
-      .map((fromEntity: Option) => ({ ...fromEntity, order: via.order }));
+        .filter((fromEntity: Option) =>
+          entities.some((searchItem: Option) => fromEntity.id === searchItem.id),
+        )
+        .map((fromEntity: Option) => ({ ...fromEntity, order: via.order }));
 
     if (matchingAnatomicalEntitiesInVia.length > 0) {
       result.push(...matchingAnatomicalEntitiesInVia);

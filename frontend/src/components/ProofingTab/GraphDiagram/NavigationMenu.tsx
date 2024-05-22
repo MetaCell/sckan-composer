@@ -1,24 +1,28 @@
-import React from "react";
 import {Stack, Divider} from "@mui/material";
 import FitScreenOutlinedIcon from "@mui/icons-material/FitScreenOutlined";
 import ZoomInOutlinedIcon from "@mui/icons-material/ZoomInOutlined";
 import ZoomOutOutlinedIcon from "@mui/icons-material/ZoomOutOutlined";
 import IconButton from "@mui/material/IconButton";
+import {DiagramEngine} from "@projectstorm/react-diagrams-core";
 
 const ZOOM_CHANGE = 25
 
-const NavigationMenu = (props: any) => {
+interface NavigationMenuProps {
+    engine: DiagramEngine;
+}
+
+const NavigationMenu = (props: NavigationMenuProps) => {
     const {engine} = props
 
     const zoomOut = () => {
-        let zoomLevel = engine.model.getZoomLevel();
-        engine.model.setZoomLevel(zoomLevel - ZOOM_CHANGE);
+        const zoomLevel = engine.getModel().getZoomLevel();
+        engine.getModel().setZoomLevel(zoomLevel - ZOOM_CHANGE);
         engine.repaintCanvas();
     };
 
     const zoomIn = () => {
-        let zoomLevel = engine.model.getZoomLevel();
-        engine.model.setZoomLevel(zoomLevel + ZOOM_CHANGE);
+        const zoomLevel = engine.getModel().getZoomLevel();
+        engine.getModel().setZoomLevel(zoomLevel + ZOOM_CHANGE);
         engine.repaintCanvas();
 
     };

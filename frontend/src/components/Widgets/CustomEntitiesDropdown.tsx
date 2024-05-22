@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState, useMemo} from "react";
 import {
   Badge,
   CircularProgress,
@@ -29,6 +29,8 @@ import {Option} from "../../types";
 import Stack from "@mui/material/Stack";
 import {processFromEntitiesData} from "../../helpers/dropdownMappers";
 import CustomChipBoxComponent from "./CustomChipBoxComponent";
+import { debounce } from "@mui/material";
+import { SEARCH_DEBOUNCE } from "../../settings";
 
 const {
   buttonOutlinedBorderColor,
@@ -98,7 +100,6 @@ const styles = {
     height: "1.5rem",
     borderRadius: "0.375rem",
     fontSize: "0.875rem",
-    maxWidth: "8rem",
     fontWeight: 500,
     
     "&.MuiChip-filled": {
@@ -255,7 +256,12 @@ export default function CustomEntitiesDropdown({
     },
     {},
   );
-  
+
+  const isInOptions = (option: Option, inputValue: string) => {
+    return option.content.map((content) => content.value.toLowerCase())
+      .join(' ').includes(inputValue.toLowerCase());
+  }
+
   const handleSelectDeselectGroup = (group: string) => {
     const newSelectedOptions = [...selectedOptions];
     const groupOptions = autocompleteOptions.filter((option: Option) => option.group === group);
@@ -330,6 +336,10 @@ export default function CustomEntitiesDropdown({
     setHoveredOption(null);
     setInputValue(event.target.value);
   };
+
+  const debouncedResults = useMemo(() => {
+    return debounce(handleInputChange, SEARCH_DEBOUNCE);
+  }, []);
   
   const isOptionSelected = (option: Option) => {
     return selectedOptions?.some((selected) => selected?.id === option?.id);
@@ -349,19 +359,20 @@ export default function CustomEntitiesDropdown({
     }
   }, [inputValue, id, onSearch, postProcessOptions, selectedOptions]);
   
+  const getLabel = (option: Option) => {
+    if (option?.content.length > 3) {
+      const index = option?.label.lastIndexOf('(');
+      return <> {option?.label.slice(0, index)} <b>{option.label.slice(index)}</b> </>;
+    } else {
+      return option?.label;
+    }
+  }
   
   useEffect(() => {
     if (!isDropdownOpened) return;
     setIsLoading(true);
     fetchData().then(() => setIsLoading(false));
-  }, [isDropdownOpened, id, onSearch, fetchData]);
-  
-  useEffect(() => {
-    if (inputValue !== undefined) {
-      setIsLoading(true);
-      fetchData().then(() => setIsLoading(false));
-    }
-  }, [inputValue, id, fetchData]);
+  }, [inputValue, isDropdownOpened, fetchData]);
   
   useEffect(() => {
     const preLevelItems = postProcessOptions && getPreLevelSelectedValues ? getPreLevelSelectedValues(id) : [];
@@ -383,7 +394,7 @@ export default function CustomEntitiesDropdown({
         }
       }
     };
-    
+
     document.addEventListener("mousedown", closePopperOnClickOutside);
     return () => {
       document.removeEventListener("mousedown", closePopperOnClickOutside);
@@ -484,7 +495,6 @@ export default function CustomEntitiesDropdown({
                   gap={1}
                   sx={{
                     borderBottom: `0.0625rem solid ${popperBorderColor}`,
-                    height: autocompleteOptions.length > 0 ? "2.75rem" : "auto",
                     padding:
                       autocompleteOptions.length > 0 ? "0 0.875rem" : "0.875rem",
                   }}
@@ -578,8 +588,7 @@ export default function CustomEntitiesDropdown({
                     <TextField
                       fullWidth
                       type="text"
-                      value={inputValue}
-                      onChange={handleInputChange}
+                      onChange={debouncedResults}
                       placeholder={searchPlaceholder}
                       InputProps={{
                         startAdornment: (
@@ -707,16 +716,9 @@ export default function CustomEntitiesDropdown({
                               {getGroupButton(group)}
                             </ListSubheader>
                             <ul>
-                              {groupedOptions[group]
-                                .filter((option: Option) =>
-                                  option.label
-                                    .toLowerCase()
-                                    .includes(
-                                      inputValue !== undefined
-                                        ? inputValue.toLowerCase()
-                                        : "",
-                                    ),
-                                )
+                              {
+                                groupedOptions[group]
+                                  .filter((option: Option) => isInOptions(option, inputValue || ''))
                                 .map((option: Option) => (
                                   <li
                                     key={option.id}
@@ -751,7 +753,7 @@ export default function CustomEntitiesDropdown({
                                     >
                                       {option?.label?.length > 100
                                         ? option?.label.slice(0, 100) + "..."
-                                        : option?.label}
+                                        : getLabel(option)}
                                     </Typography>
                                     <Typography whiteSpace="nowrap" variant="body2">
                                       {option?.id}

@@ -5,6 +5,7 @@ from .views import (
     AnatomicalEntityViewSet,
     PhenotypeViewSet,
     ConnectivityStatementViewSet,
+	KnowledgeStatementViewSet,
     jsonschemas,
     NoteViewSet,
     ProfileViewSet,
@@ -42,4 +43,5 @@ app_name = "composer-api"
 urlpatterns = [
     path("", include(router.urls)),
     path("jsonschemas/", jsonschemas, name="jsonschemas"),
+	path("knowledge-statement/", KnowledgeStatementViewSet.as_view(), name="knowledge-statement"),
 ]

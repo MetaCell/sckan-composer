@@ -1,12 +1,13 @@
 from django.core.exceptions import ValidationError
 from django.dispatch import receiver
-from django.db.models.signals import post_save, m2m_changed
+from django.db.models.signals import post_save, m2m_changed, pre_save
 
 from django_fsm.signals import post_transition
 
 from .enums import CSState, NoteType
-from .models import ConnectivityStatement, ExportBatch, Note, Sentence
-from .services.export_services import compute_metrics, ConnectivityStatementService
+from .models import ConnectivityStatement, ExportBatch, Note, Sentence, Synonym, \
+    AnatomicalEntity, Layer, Region
+from .services.export_services import compute_metrics, ConnectivityStatementStateService
 
 
 @receiver(post_save, sender=ExportBatch)
@@ -41,8 +42,18 @@ def post_transition_callback(sender, instance, name, source, target, **kwargs):
 def post_transition_cs(sender, instance, name, source, target, **kwargs):
     if issubclass(sender, ConnectivityStatement):
         if target == CSState.COMPOSE_NOW and source in (
-            CSState.NPO_APPROVED,
-            CSState.EXPORTED,
+                CSState.NPO_APPROVED,
+                CSState.EXPORTED,
         ):
             # add important tag to CS when transition to COMPOSE_NOW from NPO Approved or Exported
-            instance = ConnectivityStatementService.add_important_tag(instance)
+            instance = ConnectivityStatementStateService.add_important_tag(instance)
+
+@receiver(post_save, sender=Layer)
+def create_layer_anatomical_entity(sender, instance=None, created=False, **kwargs):
+    if created and instance:
+        AnatomicalEntity.objects.create(simple_entity=instance) 
+
+@receiver(post_save, sender=Region)
+def create_region_anatomical_entity(sender, instance=None, created=False, **kwargs):
+    if created and instance:
+        AnatomicalEntity.objects.create(simple_entity=instance)

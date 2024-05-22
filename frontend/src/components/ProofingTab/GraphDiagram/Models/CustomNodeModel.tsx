@@ -1,11 +1,14 @@
 import { NodeModel, DefaultPortModel } from '@projectstorm/react-diagrams';
-import {NodeTypes} from "../GraphDiagram";
+import { NodeTypes } from "../GraphDiagram";
+import {CustomNodeOptions} from "../GraphDiagram";
 
 export class CustomNodeModel extends NodeModel {
     customType: NodeTypes;
     name: string;
     externalId: string;
-    constructor(customType: NodeTypes, name: string, externalId: string = '',  options: any = {}) {
+    constructor(customType: NodeTypes, name: string, externalId: string = '',  options: CustomNodeOptions = {
+        forward_connection: []
+    }) {
         super({
             ...options,
             type: 'custom',
@@ -24,5 +27,9 @@ export class CustomNodeModel extends NodeModel {
 
     getCustomType() {
         return this.customType;
+    }
+
+    getOptions(): CustomNodeOptions {
+        return super.getOptions() as CustomNodeOptions;
     }
 }

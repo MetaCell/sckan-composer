@@ -27,7 +27,7 @@ from composer.models import (
 from composer.services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
 from composer.services.filesystem_service import create_dir_if_not_exists
-from composer.services.state_services import ConnectivityStatementService
+from composer.services.state_services import ConnectivityStatementStateService
 
 HAS_NERVE_BRANCHES_TAG = "Has nerve branches"
 TEMP_CIRCUIT_MAP = {
@@ -69,7 +69,8 @@ class Row:
             curation_notes: str = "",
             review_notes: str = "",
             layer: str = "",
-            connected_from: str = ""
+            connected_from_names: str = "",
+            connected_from_uris: str = ""
     ):
         self.structure = structure
         self.identifier = identifier
@@ -78,11 +79,16 @@ class Row:
         self.curation_notes = curation_notes
         self.review_notes = review_notes
         self.layer = layer
-        self.connected_from = connected_from
+        self.connected_from_names = connected_from_names
+        self.connected_from_uris = connected_from_uris
 
 
 def get_sentence_number(cs: ConnectivityStatement, row: Row):
     return cs.sentence.id
+
+
+def get_statement_uri(cs: ConnectivityStatement, row: Row):
+    return cs.reference_uri
 
 
 def get_nlp_id(cs: ConnectivityStatement, row: Row):
@@ -113,8 +119,12 @@ def get_layer(cs: ConnectivityStatement, row: Row):
     return row.layer
 
 
-def get_connected_from(cs: ConnectivityStatement, row: Row):
-    return row.connected_from
+def get_connected_from_names(cs: ConnectivityStatement, row: Row):
+    return row.connected_from_names
+
+
+def get_connected_from_uri(cs: ConnectivityStatement, row: Row):
+    return row.connected_from_uris
 
 
 def get_predicate(cs: ConnectivityStatement, row: Row):
@@ -180,7 +190,8 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
         "Identifier": get_identifier,
         "Relationship": get_relationship,
         "Axonal course poset": get_layer,
-        "Connected From": get_connected_from,
+        "Connected From": get_connected_from_names,
+        "Connected From URIs": get_connected_from_uri,
         "Predicate": get_predicate,
         "Observed in species": get_observed_in_species,
         "Different from existing": get_different_from_existing,
@@ -191,6 +202,7 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
         "Review notes": get_review_notes,
         "Proposed action": get_proposed_action,
         "Added to SCKAN (time stamp)": get_added_to_sckan_timestamp,
+        'URI': get_statement_uri,
     }
     exportable_tags = Tag.objects.filter(exportable=True)
     for tag in exportable_tags:
@@ -217,8 +229,7 @@ def get_destination_row(destination: Destination, total_vias: int):
     else:
         connected_from_entities = get_complete_from_entities_for_destination(destination)
 
-    connected_from_names = [entity.name for entity in connected_from_entities] if connected_from_entities else []
-    connected_from = ', '.join(connected_from_names)
+    connected_from_names, connected_from_uris = _get_connected_from_info(connected_from_entities)
 
     layer_value = str(total_vias + 2)
     return [
@@ -230,7 +241,8 @@ def get_destination_row(destination: Destination, total_vias: int):
             "",
             "",
             layer=layer_value,
-            connected_from=connected_from
+            connected_from_names=connected_from_names,
+            connected_from_uris=connected_from_uris
         )
         for ae in destination.anatomical_entities.all()
     ]
@@ -242,8 +254,7 @@ def get_via_row(via: Via):
     else:
         connected_from_entities = get_complete_from_entities_for_via(via)
 
-    connected_from_names = [entity.name for entity in connected_from_entities] if connected_from_entities else []
-    connected_from = ', '.join(connected_from_names)
+    connected_from_names, connected_from_uris = _get_connected_from_info(connected_from_entities)
     layer_value = str(via.order + 2)
 
     return [
@@ -255,10 +266,18 @@ def get_via_row(via: Via):
             "",
             "",
             layer=layer_value,
-            connected_from=connected_from
+            connected_from_names=connected_from_names,
+            connected_from_uris=connected_from_uris
         )
         for ae in via.anatomical_entities.all()
     ]
+
+
+def _get_connected_from_info(entities):
+    connected_from_info = [(entity.name, entity.ontology_uri) for entity in entities] if entities else []
+    connected_from_names = '; '.join(name for name, _ in connected_from_info)
+    connected_from_uris = '; '.join(uri for _, uri in connected_from_info)
+    return connected_from_names, connected_from_uris
 
 
 def get_specie_row(specie: Specie):
@@ -352,7 +371,7 @@ def get_functional_circuit_row(cs: ConnectivityStatement):
 def get_forward_connection_row(forward_conn: ConnectivityStatement):
     return Row(
         forward_conn.sentence.pk,
-        forward_conn.pk,
+        forward_conn.reference_uri,
         ExportRelationships.hasForwardConnection.label,
         ExportRelationships.hasForwardConnection.value,
         "",
@@ -394,10 +413,11 @@ def get_rows(cs: ConnectivityStatement) -> List:
         except Exception:
             raise UnexportableConnectivityStatement("Error getting specie row")
 
-    try:
-        rows.append(get_sex_row(cs))
-    except Exception:
-        raise UnexportableConnectivityStatement("Error getting sex row")
+    if cs.sex is not None:
+        try:
+            rows.append(get_sex_row(cs))
+        except Exception:
+            raise UnexportableConnectivityStatement("Error getting sex row")
 
     try:
         rows.append(get_circuit_role_row(cs))
@@ -516,7 +536,7 @@ def do_transition_to_exported(export_batch: ExportBatch, user: User):
         ]
         if CSState.EXPORTED in available_transitions:
             # we need to update the state to exported when we are in the NP0 approved state and the system user has the permission to do so
-            cs = ConnectivityStatementService(connectivity_statement).do_transition(
+            cs = ConnectivityStatementStateService(connectivity_statement).do_transition(
                 CSState.EXPORTED, system_user, user
             )
             cs.save()
