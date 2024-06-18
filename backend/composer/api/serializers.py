@@ -597,6 +597,10 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
                 many=True,
                 context={**self.context, 'depth': depth + 1}
             ).data
+
+        if 'journey' in self.context:
+            del self.context['journey']
+
         return representation
 
     def update(self, instance, validated_data):
@@ -683,6 +687,7 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
 
 class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
     """Knowledge Statement"""
+
     def to_representation(self, instance):
         representation = super(ConnectivityStatementSerializer, self).to_representation(instance)
         depth = self.context.get('depth', 0)
@@ -693,8 +698,12 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
                 many=True,
                 context={**self.context, 'depth': depth + 1}
             ).data
+
+        if 'journey' in self.context:
+            del self.context['journey']
+
         return representation
-    
+
     class Meta(ConnectivityStatementSerializer.Meta):
         fields = (
             "id",
@@ -717,4 +726,3 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
             "apinatomy_model",
             "statement_preview",
         )
-        
