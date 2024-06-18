@@ -313,7 +313,6 @@ class ConnectivityStatementViewSet(
     filterset_class = ConnectivityStatementFilter
     service = ConnectivityStatementStateService
 
-
     def get_serializer_class(self):
         if self.action == 'list':
             return BaseConnectivityStatementSerializer
@@ -371,7 +370,6 @@ class KnowledgeStatementViewSet(
 
     def get_serializer_class(self):
         return KnowledgeStatementSerializer
-
 
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
