@@ -11,6 +11,7 @@ from ..enums import SentenceState, CSState
 from ..models import (
     AnatomicalEntity,
     Phenotype,
+    ProjectionPhenotype,
     Sex,
     ConnectivityStatement,
     Provenance,
@@ -176,6 +177,14 @@ class PhenotypeSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Phenotype
+        fields = ("id", "name")
+
+
+class ProjectionPhenotypeSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
+    """Phenotype"""
+
+    class Meta:
+        model = ProjectionPhenotype
         fields = ("id", "name")
 
 
@@ -368,6 +377,9 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
     phenotype_id = serializers.IntegerField(
         required=False, default=None, allow_null=True
     )
+    projection_phenotype_id = serializers.IntegerField(
+        required=False, default=None, allow_null=True
+    )
     provenances = ProvenanceSerializer(
         source="provenance_set", many=True, read_only=False
     )
@@ -375,6 +387,7 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
     species = SpecieSerializer(many=True, read_only=True)
     owner = UserSerializer(required=False, read_only=True)
     phenotype = PhenotypeSerializer(required=False, read_only=True)
+    projection_phenotype = ProjectionPhenotypeSerializer(required=False, read_only=True)
 
     class Meta:
         model = ConnectivityStatement
@@ -385,6 +398,8 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "provenances",
             "phenotype_id",
             "phenotype",
+            "projection_phenotype",
+            "projection_phenotype_id",
             "laterality",
             "projection",
             "circuit_type",
@@ -403,6 +418,8 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "provenances",
             "phenotype_id",
             "phenotype",
+            "projection_phenotype",
+            "projection_phenotype_id",
             "laterality",
             "projection",
             "circuit_type",
@@ -506,6 +523,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
 
     sentence_id = serializers.IntegerField(required=False)
     phenotype_id = serializers.IntegerField(required=False, allow_null=True)
+    projection_phenotype_id = serializers.IntegerField(required=False, allow_null=True)
     sex_id = serializers.IntegerField(required=False, allow_null=True)
     species = SpecieSerializer(many=True, read_only=False, required=False)
     provenances = ProvenanceSerializer(source="provenance_set", many=True, read_only=False, required=False)
@@ -513,6 +531,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     vias = ViaSerializerDetails(source="via_set", many=True, read_only=False, required=False)
     destinations = DestinationSerializerDetails(many=True, required=False)
     phenotype = PhenotypeSerializer(required=False, read_only=True)
+    projection_phenotype = ProjectionPhenotypeSerializer(required=False, read_only=True)
     sex = SexSerializer(required=False, read_only=True)
     sentence = SentenceSerializer(required=False, read_only=True)
     forward_connection = serializers.PrimaryKeyRelatedField(
@@ -553,7 +572,8 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             origins = ""
 
         circuit_type = instance.get_circuit_type_display() if instance.circuit_type else None
-        projection = instance.get_projection_display() if instance.projection else None
+        # projection = instance.get_projection_display() if instance.projection else None
+        projection_phenotype = str(instance.projection_phenotype) if instance.projection_phenotype else ''
 
         laterality_description = instance.get_laterality_description()
 
@@ -567,8 +587,8 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             statement = f"A {phenotype.lower()} connection goes {journey_sentence}.\n"
 
         statement += f"This "
-        if projection:
-            statement += f"{projection.lower()} "
+        if projection_phenotype:
+            statement += f"{projection_phenotype.lower()} "
         if circuit_type:
             statement += f"{circuit_type.lower()} "
 
@@ -628,6 +648,8 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             "destinations",
             "phenotype_id",
             "phenotype",
+            "projection_phenotype",
+            "projection_phenotype_id",
             "journey",
             "laterality",
             "projection",
@@ -668,6 +690,8 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
             "destinations",
             "phenotype_id",
             "phenotype",
+            "projection_phenotype",
+            "projection_phenotype_id",
             "journey",
             "laterality",
             "projection",
