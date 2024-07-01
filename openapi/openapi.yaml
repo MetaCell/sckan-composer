@@ -1135,6 +1135,62 @@ paths:
               schema:
                 $ref: '#/components/schemas/Profile'
           description: ''
+  /api/composer/projection/:
+    get:
+      operationId: composer_projection_list
+      description: Projection Phenotype
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProjectionPhenotypeList'
+          description: ''
+  /api/composer/projection/{id}/:
+    get:
+      operationId: composer_projection_retrieve
+      description: Projection Phenotype
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this projection phenotype.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectionPhenotype'
+          description: ''
   /api/composer/sentence/:
     get:
       operationId: composer_sentence_list
@@ -2006,6 +2062,13 @@ components:
           allOf:
           - $ref: '#/components/schemas/Phenotype'
           readOnly: true
+        projection_phenotype:
+          allOf:
+          - $ref: '#/components/schemas/ProjectionPhenotype'
+          readOnly: true
+        projection_phenotype_id:
+          type: integer
+          nullable: true
         journey:
           type: string
           readOnly: true
@@ -2072,6 +2135,7 @@ components:
       - modified_date
       - owner
       - phenotype
+      - projection_phenotype
       - sentence
       - sex
       - state
@@ -2136,6 +2200,13 @@ components:
           allOf:
           - $ref: '#/components/schemas/Phenotype'
           readOnly: true
+        projection_phenotype:
+          allOf:
+          - $ref: '#/components/schemas/ProjectionPhenotype'
+          readOnly: true
+        projection_phenotype_id:
+          type: integer
+          nullable: true
         journey:
           type: string
           readOnly: true
@@ -2203,6 +2274,7 @@ components:
       - origins
       - owner
       - phenotype
+      - projection_phenotype
       - sentence
       - sex
       - statement_preview
@@ -2300,9 +2372,46 @@ components:
           format: uri
           nullable: true
           maxLength: 200
+        provenances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Provenance'
+        knowledge_statement:
+          type: string
+        journey:
+          type: string
+          readOnly: true
+        laterality:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/LateralityEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        projection:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/ProjectionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        circuit_type:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/CircuitTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        sex:
+          allOf:
+          - $ref: '#/components/schemas/Sex'
+          readOnly: true
+        statement_preview:
+          type: string
+          readOnly: true
       required:
       - id
+      - journey
       - phenotype
+      - sex
+      - statement_preview
     LateralityEnum:
       enum:
       - RIGHT
@@ -2492,6 +2601,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Phenotype'
+    PaginatedProjectionPhenotypeList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectionPhenotype'
     PaginatedSentenceList:
       type: object
       properties:
@@ -2651,6 +2780,13 @@ components:
           allOf:
           - $ref: '#/components/schemas/Phenotype'
           readOnly: true
+        projection_phenotype:
+          allOf:
+          - $ref: '#/components/schemas/ProjectionPhenotype'
+          readOnly: true
+        projection_phenotype_id:
+          type: integer
+          nullable: true
         journey:
           type: string
           readOnly: true
@@ -2875,6 +3011,24 @@ components:
       - CONTRAT
       - BI
       type: string
+    ProjectionPhenotype:
+      type: object
+      description: Phenotype
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        ontology_uri:
+          type: string
+          format: uri
+          maxLength: 200
+      required:
+      - id
+      - name
+      - ontology_uri
     Provenance:
       type: object
       description: Provenance
@@ -3030,6 +3184,13 @@ components:
           allOf:
           - $ref: '#/components/schemas/Phenotype'
           readOnly: true
+        projection_phenotype:
+          allOf:
+          - $ref: '#/components/schemas/ProjectionPhenotype'
+          readOnly: true
+        projection_phenotype_id:
+          type: integer
+          nullable: true
         laterality:
           readOnly: true
           nullable: true
@@ -3085,6 +3246,7 @@ components:
       - owner
       - phenotype
       - projection
+      - projection_phenotype
       - provenances
       - sentence_id
       - sex

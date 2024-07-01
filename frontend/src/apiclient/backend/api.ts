@@ -308,6 +308,18 @@ export interface ConnectivityStatement {
     'phenotype': Phenotype;
     /**
      * 
+     * @type {ProjectionPhenotype}
+     * @memberof ConnectivityStatement
+     */
+    'projection_phenotype': ProjectionPhenotype;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatement
+     */
+    'projection_phenotype_id'?: number | null;
+    /**
+     * 
      * @type {string}
      * @memberof ConnectivityStatement
      */
@@ -505,6 +517,18 @@ export interface ConnectivityStatementUpdate {
      * @memberof ConnectivityStatementUpdate
      */
     'phenotype': Phenotype;
+    /**
+     * 
+     * @type {ProjectionPhenotype}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'projection_phenotype': ProjectionPhenotype;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'projection_phenotype_id'?: number | null;
     /**
      * 
      * @type {string}
@@ -740,6 +764,54 @@ export interface KnowledgeStatement {
      * @memberof KnowledgeStatement
      */
     'reference_uri'?: string | null;
+    /**
+     * 
+     * @type {Array<Provenance>}
+     * @memberof KnowledgeStatement
+     */
+    'provenances'?: Array<Provenance>;
+    /**
+     * 
+     * @type {string}
+     * @memberof KnowledgeStatement
+     */
+    'knowledge_statement'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof KnowledgeStatement
+     */
+    'journey': string;
+    /**
+     * 
+     * @type {ConnectivityStatementLaterality}
+     * @memberof KnowledgeStatement
+     */
+    'laterality'?: ConnectivityStatementLaterality | null;
+    /**
+     * 
+     * @type {ConnectivityStatementProjection}
+     * @memberof KnowledgeStatement
+     */
+    'projection'?: ConnectivityStatementProjection | null;
+    /**
+     * 
+     * @type {ConnectivityStatementCircuitType}
+     * @memberof KnowledgeStatement
+     */
+    'circuit_type'?: ConnectivityStatementCircuitType | null;
+    /**
+     * 
+     * @type {Sex}
+     * @memberof KnowledgeStatement
+     */
+    'sex': Sex;
+    /**
+     * 
+     * @type {string}
+     * @memberof KnowledgeStatement
+     */
+    'statement_preview': string;
 }
 /**
  * 
@@ -1069,6 +1141,37 @@ export interface PaginatedPhenotypeList {
 /**
  * 
  * @export
+ * @interface PaginatedProjectionPhenotypeList
+ */
+export interface PaginatedProjectionPhenotypeList {
+    /**
+     * 
+     * @type {number}
+     * @memberof PaginatedProjectionPhenotypeList
+     */
+    'count'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedProjectionPhenotypeList
+     */
+    'next'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedProjectionPhenotypeList
+     */
+    'previous'?: string | null;
+    /**
+     * 
+     * @type {Array<ProjectionPhenotype>}
+     * @memberof PaginatedProjectionPhenotypeList
+     */
+    'results'?: Array<ProjectionPhenotype>;
+}
+/**
+ * 
+ * @export
  * @interface PaginatedSentenceList
  */
 export interface PaginatedSentenceList {
@@ -1317,6 +1420,18 @@ export interface PatchedConnectivityStatementUpdate {
      * @memberof PatchedConnectivityStatementUpdate
      */
     'phenotype'?: Phenotype;
+    /**
+     * 
+     * @type {ProjectionPhenotype}
+     * @memberof PatchedConnectivityStatementUpdate
+     */
+    'projection_phenotype'?: ProjectionPhenotype;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatementUpdate
+     */
+    'projection_phenotype_id'?: number | null;
     /**
      * 
      * @type {string}
@@ -1716,6 +1831,31 @@ export type ProjectionEnum = typeof ProjectionEnum[keyof typeof ProjectionEnum];
 
 
 /**
+ * Phenotype
+ * @export
+ * @interface ProjectionPhenotype
+ */
+export interface ProjectionPhenotype {
+    /**
+     * 
+     * @type {number}
+     * @memberof ProjectionPhenotype
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProjectionPhenotype
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProjectionPhenotype
+     */
+    'ontology_uri': string;
+}
+/**
  * Provenance
  * @export
  * @interface Provenance
@@ -1953,6 +2093,18 @@ export interface SentenceConnectivityStatement {
      * @memberof SentenceConnectivityStatement
      */
     'phenotype': Phenotype;
+    /**
+     * 
+     * @type {ProjectionPhenotype}
+     * @memberof SentenceConnectivityStatement
+     */
+    'projection_phenotype': ProjectionPhenotype;
+    /**
+     * 
+     * @type {number}
+     * @memberof SentenceConnectivityStatement
+     */
+    'projection_phenotype_id'?: number | null;
     /**
      * 
      * @type {LateralityEnum}
@@ -3852,6 +4004,96 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Projection Phenotype
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerProjectionList: async (limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/projection/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Projection Phenotype
+         * @param {number} id A unique integer value identifying this projection phenotype.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerProjectionRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerProjectionRetrieve', 'id', id)
+            const localVarPath = `/api/composer/projection/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Sentence
          * @param {number} id A unique integer value identifying this sentence.
          * @param {number} tagId 
@@ -5187,6 +5429,27 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Projection Phenotype
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerProjectionList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedProjectionPhenotypeList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerProjectionList(limit, offset, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Projection Phenotype
+         * @param {number} id A unique integer value identifying this projection phenotype.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerProjectionRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProjectionPhenotype>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerProjectionRetrieve(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Sentence
          * @param {number} id A unique integer value identifying this sentence.
          * @param {number} tagId 
@@ -5755,6 +6018,25 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          */
         composerProfileMyRetrieve(options?: any): AxiosPromise<Profile> {
             return localVarFp.composerProfileMyRetrieve(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Projection Phenotype
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerProjectionList(limit?: number, offset?: number, options?: any): AxiosPromise<PaginatedProjectionPhenotypeList> {
+            return localVarFp.composerProjectionList(limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Projection Phenotype
+         * @param {number} id A unique integer value identifying this projection phenotype.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerProjectionRetrieve(id: number, options?: any): AxiosPromise<ProjectionPhenotype> {
+            return localVarFp.composerProjectionRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
          * Sentence
@@ -6372,6 +6654,29 @@ export class ComposerApi extends BaseAPI {
      */
     public composerProfileMyRetrieve(options?: AxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerProfileMyRetrieve(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Projection Phenotype
+     * @param {number} [limit] Number of results to return per page.
+     * @param {number} [offset] The initial index from which to return the results.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerProjectionList(limit?: number, offset?: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerProjectionList(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Projection Phenotype
+     * @param {number} id A unique integer value identifying this projection phenotype.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerProjectionRetrieve(id: number, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerProjectionRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

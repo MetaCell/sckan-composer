@@ -44,6 +44,7 @@ import {
 } from "../../apiclient/backend";
 import { CustomFooter } from "../Widgets/HoveredOptionContent";
 import { StatementStateChip } from "../Widgets/StateChip";
+import { projections } from "../../services/ProjectionService";
 
 const StatementForm = (props: any) => {
   const { uiFields, statement, refreshStatement, isDisabled } = props;
@@ -76,15 +77,22 @@ const StatementForm = (props: any) => {
     },
   };
 
-  copiedUISchema.projection = {
+
+  copiedUISchema.projection_phenotype_id = {
     "ui:widget": "CustomSingleSelect",
     "ui:options": {
       isDisabled,
       label: "Projection",
       classNames: "col-xs-12 col-md-6",
       placeholder: "Enter Projection",
+      data: projections.getProjections().map((row: any) => ({
+        label: row.name,
+        value: row.id,
+      })),
     },
+    value: statement?.projection_phenotype_id ?? "",
   };
+
 
   copiedUISchema.apinatomy_model = {
     "ui:widget": "CustomTextField",
@@ -121,6 +129,8 @@ const StatementForm = (props: any) => {
     },
     value: statement?.phenotype_id ?? "",
   };
+
+
 
   copiedUISchema.knowledge_statement = {
     "ui:widget": "CustomTextArea",
@@ -658,6 +668,7 @@ const StatementForm = (props: any) => {
     },
   };
 
+
   // Add null option to the fields which have null type in dropdown.
   Object.keys(copiedSchema.properties).forEach((key) => {
     if (copiedSchema.properties[key].type.includes("null") && copiedSchema.properties[key]?.enum && copiedSchema.properties[key]?.enumNames) {
@@ -701,7 +712,7 @@ const StatementForm = (props: any) => {
         "sex_id",
         "laterality",
         "circuit_type",
-        "projection",
+        "projection_phenotype_id",
       ]}
       {...props}
     />
