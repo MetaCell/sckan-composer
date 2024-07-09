@@ -6,7 +6,7 @@ from django_fsm.signals import post_transition
 
 from .enums import CSState, NoteType
 from .models import ConnectivityStatement, ExportBatch, Note, Sentence, Synonym, \
-    AnatomicalEntity, Layer, Region
+    AnatomicalEntity, Layer, Region, AnatomicalEntityMeta
 from .services.export_services import compute_metrics, ConnectivityStatementStateService
 
 
@@ -51,9 +51,10 @@ def post_transition_cs(sender, instance, name, source, target, **kwargs):
 @receiver(post_save, sender=Layer)
 def create_layer_anatomical_entity(sender, instance=None, created=False, **kwargs):
     if created and instance:
-        AnatomicalEntity.objects.create(simple_entity=instance) 
+        AnatomicalEntity.objects.create(simple_entity=instance.layer_ae_meta) 
 
 @receiver(post_save, sender=Region)
 def create_region_anatomical_entity(sender, instance=None, created=False, **kwargs):
     if created and instance:
-        AnatomicalEntity.objects.create(simple_entity=instance)
+        AnatomicalEntity.objects.create(simple_entity=instance.region_ae_meta)
+

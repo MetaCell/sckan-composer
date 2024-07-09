@@ -240,18 +240,37 @@ class AnatomicalEntityMeta(models.Model):
         verbose_name_plural = "Anatomical Entities"
 
 
-class Layer(AnatomicalEntityMeta):
-    ...
+class Layer(models.Model):
+    layer_id = models.BigAutoField(primary_key=True, auto_created=True)
+    layer_ae_meta = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='layer_meta', null=True)
+
+    def __str__(self):
+        return self.layer_ae_meta.name
+        
+    class Meta:
+        verbose_name = "Layer"
+        verbose_name_plural = "Layers"
 
 
-class Region(AnatomicalEntityMeta):
-    ...
-    layers = models.ManyToManyField(Layer, through='AnatomicalEntityIntersection')
+
+        
+
+
+class Region(models.Model):
+    region_id = models.BigAutoField(primary_key=True, auto_created=True)
+    region_ae_meta = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='region_meta', null=True)
+
+    def __str__(self):
+        return self.region_ae_meta.name
+    
+    class Meta:
+        verbose_name = "Region"
+        verbose_name_plural = "Regions"
 
 
 class AnatomicalEntityIntersection(models.Model):
-    layer = models.ForeignKey(Layer, on_delete=models.CASCADE)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE)
+    layer = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='layer_intersection')
+    region = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='region_intersection')
 
     class Meta:
         verbose_name = "Region/Layer Combination"
