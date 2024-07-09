@@ -4,6 +4,7 @@ from django.db.models import Q, CheckConstraint
 from django.db.models.expressions import F
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
+from django.core.exceptions import ValidationError
 
 from composer.services.state_services import (
     ConnectivityStatementStateService,
@@ -246,6 +247,21 @@ class Layer(models.Model):
 
     def __str__(self):
         return self.layer_ae_meta.name
+    
+    def clean(self):
+        if Layer.objects.filter(layer_ae_meta=self.layer_ae_meta).exists():
+            raise ValidationError('Layer with this ontology_uri already exists')
+        if Region.objects.filter(region_ae_meta=self.layer_ae_meta).exists():
+            raise ValidationError('Region with this ontology_uri already exists')
+
+
+    def save(self, *args, **kwargs):
+        if Layer.objects.filter(layer_ae_meta=self.layer_ae_meta).exists():
+            raise ValueError('Layer with this Anatomical Entity Meta already exists')
+        elif Region.objects.filter(region_ae_meta=self.layer_ae_meta).exists():
+            raise ValueError('Region with this Anatomical Entity Meta already exists')
+        else:
+            super().save(*args, **kwargs)
         
     class Meta:
         verbose_name = "Layer"
@@ -262,6 +278,20 @@ class Region(models.Model):
 
     def __str__(self):
         return self.region_ae_meta.name
+    
+    def clean(self):
+        if Layer.objects.filter(layer_ae_meta=self.region_ae_meta).exists():
+            raise ValidationError('Layer with this ontology_uri already exists')
+        if Region.objects.filter(region_ae_meta=self.region_ae_meta).exists():
+            raise ValidationError('Region with this ontology_uri already exists')
+
+    def save(self, *args, **kwargs):
+        if Layer.objects.filter(layer_ae_meta=self.region_ae_meta).exists():
+            raise ValidationError('Layer with this ontology_uri already exists')
+        elif Region.objects.filter(region_ae_meta=self.region_ae_meta).exists():
+            raise ValidationError('Region with this ontology_uri already exists')
+        else:
+            super().save(*args, **kwargs)
     
     class Meta:
         verbose_name = "Region"
