@@ -51,10 +51,10 @@ def post_transition_cs(sender, instance, name, source, target, **kwargs):
 @receiver(post_save, sender=Layer)
 def create_layer_anatomical_entity(sender, instance=None, created=False, **kwargs):
     if created and instance:
-        AnatomicalEntity.objects.create(simple_entity=instance.ae_meta) 
+        AnatomicalEntity.objects.get_or_create(simple_entity=instance.ae_meta)
 
 @receiver(post_save, sender=Region)
 def create_region_anatomical_entity(sender, instance=None, created=False, **kwargs):
     if created and instance:
-        AnatomicalEntity.objects.create(simple_entity=instance.ae_meta)
+        AnatomicalEntity.objects.get_or_create(simple_entity=instance.ae_meta)
 

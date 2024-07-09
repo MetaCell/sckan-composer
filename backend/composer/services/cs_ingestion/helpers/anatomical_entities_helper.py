@@ -117,17 +117,9 @@ def convert_anatomical_entity_to_specific_type(entity_meta, target_model):
     Attempts to delete the original instance and create the new specific instance atomically.
     """
     defaults = {'name': entity_meta.name, 'ontology_uri': entity_meta.ontology_uri}
-    try:
-        ae_instance = AnatomicalEntity.objects.get(simple_entity=entity_meta) 
-    except AnatomicalEntity.DoesNotExist:
-        ae_instance = None
 
     try:
         with transaction.atomic():
-            # Delete the anatomical entity instance if it exists
-            if ae_instance:
-                ae_instance.delete()
-            
             # Depending on the target_model, we need to create the specific entity - Layer/Region
             specific_entity, created = None, False
             if target_model == Layer:
