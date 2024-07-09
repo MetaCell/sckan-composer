@@ -69,12 +69,12 @@ def add_entity_to_instance(instance, entity_field, entity, update_anatomic_entit
 
 def get_or_create_complex_entity(region_uri, layer_uri, update_anatomical_entities=False):
     try:
-        layer = Layer.objects.get(layer_ae_meta__ontology_uri=layer_uri)
+        layer = Layer.objects.get(ae_meta__ontology_uri=layer_uri)
     except Layer.DoesNotExist:
         layer = None
 
     try:
-        region = Region.objects.get(region_ae_meta__ontology_uri=region_uri)
+        region = Region.objects.get(ae_meta__ontology_uri=region_uri)
     except Region.DoesNotExist:
         region = None
 
@@ -96,7 +96,7 @@ def get_or_create_complex_entity(region_uri, layer_uri, update_anatomical_entiti
         if not layer or not region:
             raise EntityNotFoundException("Required Layer or Region not found.")
 
-    intersection, _ = AnatomicalEntityIntersection.objects.get_or_create(layer=layer.layer_ae_meta, region=region.region_ae_meta)
+    intersection, _ = AnatomicalEntityIntersection.objects.get_or_create(layer=layer.ae_meta, region=region.ae_meta)
     anatomical_entity, created = AnatomicalEntity.objects.get_or_create(region_layer=intersection)
 
     return anatomical_entity, created
@@ -131,9 +131,9 @@ def convert_anatomical_entity_to_specific_type(entity_meta, target_model):
             # Depending on the target_model, we need to create the specific entity - Layer/Region
             specific_entity, created = None, False
             if target_model == Layer:
-                specific_entity, created = Layer.objects.get_or_create(layer_ae_meta=entity_meta)
+                specific_entity, created = Layer.objects.get_or_create(ae_meta=entity_meta)
             elif target_model == Region:
-                specific_entity, created = Region.objects.get_or_create(region_ae_meta=entity_meta)
+                specific_entity, created = Region.objects.get_or_create(ae_meta=entity_meta)
             return specific_entity, created
     except IntegrityError as e:
         raise IntegrityError(

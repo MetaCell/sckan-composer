@@ -139,7 +139,7 @@ class LayerAdminForm(forms.ModelForm):
         model = Layer
         fields = '__all__'
         labels = {
-            'layer_ae_meta': 'layer',
+            'ae_meta': 'layer',
         }
 
 
@@ -148,7 +148,7 @@ class RegionAdminForm(forms.ModelForm):
         model = Region
         fields = '__all__'
         labels = {
-            'region_ae_meta': 'region',
+            'ae_meta': 'region',
         }
 
 
@@ -156,16 +156,16 @@ class LayerAdmin(admin.ModelAdmin):
     form = LayerAdminForm
     list_display = ('layer_name', 'ontology_uri')
     list_display_links = ('layer_name', 'ontology_uri')
-    search_fields = ('layer_ae_meta__name', 'layer_ae_meta__ontology_uri')
-    autocomplete_fields = ('layer_ae_meta',)
+    search_fields = ('ae_meta__name', 'ae_meta__ontology_uri')
+    autocomplete_fields = ('ae_meta',)
 
     @admin.display(description="Layer Name")
     def layer_name(self, obj):
-        return obj.layer_ae_meta.name
+        return obj.ae_meta.name
     
     @admin.display(description="Ontology URI")
     def ontology_uri(self, obj):
-        return obj.layer_ae_meta.ontology_uri
+        return obj.ae_meta.ontology_uri
 
 
 
@@ -173,16 +173,16 @@ class RegionAdmin(admin.ModelAdmin):
     form = RegionAdminForm
     list_display = ('region_name', 'ontology_uri')
     list_display_links = ('region_name', 'ontology_uri')
-    search_fields = ('region_ae_meta__name', 'region_ae_meta__ontology_uri')
-    autocomplete_fields = ('region_ae_meta',)
+    search_fields = ('ae_meta__name', 'ae_meta__ontology_uri')
+    autocomplete_fields = ('ae_meta',)
    
     @admin.display(description="Region Name")
     def region_name(self, obj):
-        return obj.region_ae_meta.name
+        return obj.ae_meta.name
     
     @admin.display(description="Ontology URI")
     def ontology_uri(self, obj):
-        return obj.region_ae_meta.ontology_uri
+        return obj.ae_meta.ontology_uri
     
 
 
@@ -191,8 +191,8 @@ class AnatomicalEntityIntersectionAdmin(nested_admin.NestedModelAdmin, admin.Mod
     raw_id_fields = ('layer', 'region')
     list_filter = ('layer', 'region')
     search_fields = (
-        'layer__layer_ae_meta__name', 'region__region_ae_meta__name',
-        'layer__layer_ae_meta__ontology_uri', 'region__region_ae_meta__ontology_uri'
+        'layer__ae_meta__name', 'region__ae_meta__name',
+        'layer__ae_meta__ontology_uri', 'region__ae_meta__ontology_uri'
     )
 
     def get_model_perms(self, request):

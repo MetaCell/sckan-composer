@@ -243,22 +243,22 @@ class AnatomicalEntityMeta(models.Model):
 
 class Layer(models.Model):
     layer_id = models.BigAutoField(primary_key=True, auto_created=True)
-    layer_ae_meta = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='layer_meta', null=True)
+    ae_meta = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='layer_meta', null=True)
 
     def __str__(self):
-        return self.layer_ae_meta.name
+        return self.ae_meta.name
     
     def clean(self):
-        if Layer.objects.filter(layer_ae_meta=self.layer_ae_meta).exists():
+        if Layer.objects.filter(ae_meta=self.ae_meta).exists():
             raise ValidationError('Layer with this ontology_uri already exists')
-        if Region.objects.filter(region_ae_meta=self.layer_ae_meta).exists():
+        if Region.objects.filter(ae_meta=self.ae_meta).exists():
             raise ValidationError('Region with this ontology_uri already exists')
 
 
     def save(self, *args, **kwargs):
-        if Layer.objects.filter(layer_ae_meta=self.layer_ae_meta).exists():
+        if Layer.objects.filter(ae_meta=self.ae_meta).exists():
             raise ValueError('Layer with this Anatomical Entity Meta already exists')
-        elif Region.objects.filter(region_ae_meta=self.layer_ae_meta).exists():
+        elif Region.objects.filter(ae_meta=self.ae_meta).exists():
             raise ValueError('Region with this Anatomical Entity Meta already exists')
         else:
             super().save(*args, **kwargs)
@@ -274,21 +274,21 @@ class Layer(models.Model):
 
 class Region(models.Model):
     region_id = models.BigAutoField(primary_key=True, auto_created=True)
-    region_ae_meta = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='region_meta', null=True)
+    ae_meta = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='region_meta', null=True)
 
     def __str__(self):
-        return self.region_ae_meta.name
+        return self.ae_meta.name
     
     def clean(self):
-        if Layer.objects.filter(layer_ae_meta=self.region_ae_meta).exists():
+        if Layer.objects.filter(ae_meta=self.ae_meta).exists():
             raise ValidationError('Layer with this ontology_uri already exists')
-        if Region.objects.filter(region_ae_meta=self.region_ae_meta).exists():
+        if Region.objects.filter(ae_meta=self.ae_meta).exists():
             raise ValidationError('Region with this ontology_uri already exists')
 
     def save(self, *args, **kwargs):
-        if Layer.objects.filter(layer_ae_meta=self.region_ae_meta).exists():
+        if Layer.objects.filter(ae_meta=self.ae_meta).exists():
             raise ValidationError('Layer with this ontology_uri already exists')
-        elif Region.objects.filter(region_ae_meta=self.region_ae_meta).exists():
+        elif Region.objects.filter(ae_meta=self.ae_meta).exists():
             raise ValidationError('Region with this ontology_uri already exists')
         else:
             super().save(*args, **kwargs)
