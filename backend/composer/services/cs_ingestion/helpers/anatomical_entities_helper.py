@@ -69,19 +69,19 @@ def add_entity_to_instance(instance, entity_field, entity, update_anatomic_entit
 
 def get_or_create_complex_entity(region_uri, layer_uri, update_anatomical_entities=False):
     try:
-        layer = Layer.objects.get(ontology_uri=layer_uri)
+        layer = Layer.objects.get(layer_ae_meta__ontology_uri=layer_uri)
     except Layer.DoesNotExist:
         layer = None
 
     try:
-        region = Region.objects.get(ontology_uri=region_uri)
+        region = Region.objects.get(region_ae_meta__ontology_uri=region_uri)
     except Region.DoesNotExist:
         region = None
 
     if update_anatomical_entities:
         if not layer:
             try:
-                layer_meta = AnatomicalEntityMeta.objects.get(ontology_uri=layer_uri)
+                layer_meta = AnatomicalEntityMeta.objects.get(ontology_uri=layer_uri)                    
                 layer, _ = convert_anatomical_entity_to_specific_type(layer_meta, Layer)
             except AnatomicalEntityMeta.DoesNotExist:
                 raise EntityNotFoundException(f"Layer meta not found for URI: {layer_uri}")
@@ -96,7 +96,7 @@ def get_or_create_complex_entity(region_uri, layer_uri, update_anatomical_entiti
         if not layer or not region:
             raise EntityNotFoundException("Required Layer or Region not found.")
 
-    intersection, _ = AnatomicalEntityIntersection.objects.get_or_create(layer=layer, region=region)
+    intersection, _ = AnatomicalEntityIntersection.objects.get_or_create(layer=layer.layer_ae_meta, region=region.region_ae_meta)
     anatomical_entity, created = AnatomicalEntity.objects.get_or_create(region_layer=intersection)
 
     return anatomical_entity, created
@@ -117,16 +117,23 @@ def convert_anatomical_entity_to_specific_type(entity_meta, target_model):
     Attempts to delete the original instance and create the new specific instance atomically.
     """
     defaults = {'name': entity_meta.name, 'ontology_uri': entity_meta.ontology_uri}
+    try:
+        ae_instance = AnatomicalEntity.objects.get(simple_entity=entity_meta) 
+    except AnatomicalEntity.DoesNotExist:
+        ae_instance = None
 
     try:
         with transaction.atomic():
-            # Delete the anatomical entity meta in the incorrect type
-            entity_meta.delete()
-            # Create a new anatomical entity in the new specific type
-            specific_entity, created = target_model.objects.get_or_create(
-                ontology_uri=entity_meta.ontology_uri,
-                defaults=defaults
-            )
+            # Delete the anatomical entity instance if it exists
+            if ae_instance:
+                ae_instance.delete()
+            
+            # Depending on the target_model, we need to create the specific entity - Layer/Region
+            specific_entity, created = None, False
+            if target_model == Layer:
+                specific_entity, created = Layer.objects.get_or_create(layer_ae_meta=entity_meta)
+            elif target_model == Region:
+                specific_entity, created = Region.objects.get_or_create(region_ae_meta=entity_meta)
             return specific_entity, created
     except IntegrityError as e:
         raise IntegrityError(
