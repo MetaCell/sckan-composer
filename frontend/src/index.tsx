@@ -9,6 +9,7 @@ import { tags } from "./services/TagService";
 import { species } from "./services/SpecieService";
 import { sexes } from "./services/SexService";
 import { phenotypes } from "./services/PhenotypeService";
+import { projections } from "./services/ProjectionService";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 
@@ -22,11 +23,13 @@ doLogin().then(() => {
       species.setSpecieList().then(() => {
         sexes.setSexes().then(() => {
           phenotypes.setPhenotypes().then(() => {
-            root.render(
+            projections.setProjections().then(() => {
+              root.render(
                 <Provider store={store}>
                   <App />
                 </Provider>
-            );
+              );
+            });
           });
         });
       });
