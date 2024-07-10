@@ -4,6 +4,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     AnatomicalEntityViewSet,
     PhenotypeViewSet,
+	ProjectionPhenotypeViewSet,
     ConnectivityStatementViewSet,
 	KnowledgeStatementViewSet,
     jsonschemas,
@@ -22,6 +23,7 @@ router.register(
     r"anatomical-entity", AnatomicalEntityViewSet, basename="anatomical-entity"
 )
 router.register(r"phenotype", PhenotypeViewSet, basename="phenotype")
+router.register(r"projection", ProjectionPhenotypeViewSet, basename="projection-phenotype")
 router.register(r"sex", SexViewSet, basename="sex")
 router.register(
     r"connectivity-statement",

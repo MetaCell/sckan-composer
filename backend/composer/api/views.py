@@ -28,6 +28,7 @@ from .filtersets import (
 from .serializers import (
     AnatomicalEntitySerializer,
     PhenotypeSerializer,
+    ProjectionPhenotypeSerializer,
     ConnectivityStatementSerializer,
     KnowledgeStatementSerializer,
     NoteSerializer,
@@ -43,6 +44,7 @@ from .permissions import IsStaffUserIfExportedStateInConnectivityStatement
 from ..models import (
     AnatomicalEntity,
     Phenotype,
+    ProjectionPhenotype,
     ConnectivityStatement,
     Note,
     Profile,
@@ -261,6 +263,17 @@ class PhenotypeViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Phenotype.objects.all()
     serializer_class = PhenotypeSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+    ]
+
+
+class ProjectionPhenotypeViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Projection Phenotype
+    """
+    queryset = ProjectionPhenotype.objects.all()
+    serializer_class = ProjectionPhenotypeSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
