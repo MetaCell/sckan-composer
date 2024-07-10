@@ -81,23 +81,21 @@ class Migration(migrations.Migration):
             model_name="anatomicalentityintersection",
             name="layer_meta",
             field=models.ForeignKey(
-                default=1,
+                null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="layer_intersection",
                 to="composer.anatomicalentitymeta",
             ),
-            preserve_default=False,
         ),
         migrations.AddField(
             model_name="anatomicalentityintersection",
             name="region_meta",
             field=models.ForeignKey(
-                default=1,
+                null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="region_intersection",
                 to="composer.anatomicalentitymeta",
             ),
-            preserve_default=False,
         ),
 
         # ------------------------
