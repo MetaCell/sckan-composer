@@ -82,14 +82,14 @@ def get_or_create_complex_entity(region_uri, layer_uri, update_anatomical_entiti
         if not layer:
             try:
                 layer_meta = AnatomicalEntityMeta.objects.get(ontology_uri=layer_uri)                    
-                layer, _ = convert_anatomical_entity_to_specific_type(layer_meta, Layer)
+                layer, _ = create_region_layer_from_anatomical_entity(layer_meta, Layer)
             except AnatomicalEntityMeta.DoesNotExist:
                 raise EntityNotFoundException(f"Layer meta not found for URI: {layer_uri}")
 
         if not region:
             try:
                 region_meta = AnatomicalEntityMeta.objects.get(ontology_uri=region_uri)
-                region, _ = convert_anatomical_entity_to_specific_type(region_meta, Region)
+                region, _ = create_region_layer_from_anatomical_entity(region_meta, Region)
             except AnatomicalEntityMeta.DoesNotExist:
                 raise EntityNotFoundException(f"Region meta not found for URI: {layer_uri}")
     else:
@@ -111,10 +111,9 @@ def get_or_create_simple_entity(ontology_uri: str):
         raise EntityNotFoundException(f"Anatomical entity meta not found for URI: {ontology_uri}")
 
 
-def convert_anatomical_entity_to_specific_type(entity_meta, target_model):
+def create_region_layer_from_anatomical_entity(entity_meta, target_model):
     """
-    Convert an AnatomicalEntityMeta instance to a more specific subclass type (Layer or Region).
-    Attempts to delete the original instance and create the new specific instance atomically.
+    Create a new specific entity (Layer or Region) from an AnatomicalEntityMeta instance.
     """
     defaults = {'name': entity_meta.name, 'ontology_uri': entity_meta.ontology_uri}
 
