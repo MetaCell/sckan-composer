@@ -243,7 +243,7 @@ class AnatomicalEntityMeta(models.Model):
 
 class Layer(models.Model):
     layer_id = models.BigAutoField(primary_key=True, auto_created=True)
-    ae_meta = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='layer_meta', null=True)
+    ae_meta = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='layer_meta', null=False)
 
     def __str__(self):
         return self.ae_meta.name
@@ -268,7 +268,7 @@ class Layer(models.Model):
 
 class Region(models.Model):
     region_id = models.BigAutoField(primary_key=True, auto_created=True)
-    ae_meta = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='region_meta', null=True)
+    ae_meta = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='region_meta', null=False)
 
     def __str__(self):
         return self.ae_meta.name
