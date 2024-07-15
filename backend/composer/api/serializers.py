@@ -81,29 +81,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         dept = 2
 
 
-class LayerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Layer
-        fields = (
-            "id",
-            "name",
-            "ontology_uri",
-        )
-
-
-class RegionSerializer(serializers.ModelSerializer):
-    layers = LayerSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Region
-        fields = (
-            "id",
-            "name",
-            "ontology_uri",
-            "layers",
-        )
-
-
 class AnatomicalEntityMetaSerializer(serializers.ModelSerializer):
     class Meta:
         model = AnatomicalEntityMeta
@@ -115,8 +92,8 @@ class AnatomicalEntityMetaSerializer(serializers.ModelSerializer):
 
 
 class AnatomicalEntityIntersectionSerializer(serializers.ModelSerializer):
-    layer = LayerSerializer(read_only=True)
-    region = RegionSerializer(read_only=True)
+    layer = AnatomicalEntityMetaSerializer(read_only=True)
+    region = AnatomicalEntityMetaSerializer(read_only=True)
 
     class Meta:
         model = AnatomicalEntityIntersection
