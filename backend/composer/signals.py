@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.dispatch import receiver
-from django.db.models.signals import post_save, m2m_changed, pre_save
+from django.db.models.signals import post_save, m2m_changed, pre_save, post_delete
 
 from django_fsm.signals import post_transition
 
@@ -48,13 +48,25 @@ def post_transition_cs(sender, instance, name, source, target, **kwargs):
             # add important tag to CS when transition to COMPOSE_NOW from NPO Approved or Exported
             instance = ConnectivityStatementStateService.add_important_tag(instance)
 
+
 @receiver(post_save, sender=Layer)
 def create_layer_anatomical_entity(sender, instance=None, created=False, **kwargs):
     if created and instance:
         AnatomicalEntity.objects.get_or_create(simple_entity=instance.ae_meta)
+
 
 @receiver(post_save, sender=Region)
 def create_region_anatomical_entity(sender, instance=None, created=False, **kwargs):
     if created and instance:
         AnatomicalEntity.objects.get_or_create(simple_entity=instance.ae_meta)
 
+
+@receiver(post_delete, sender=AnatomicalEntity)
+def delete_associated_entities(sender, instance, **kwargs):
+    # Delete the associated simple_entity if it exists
+    if instance.simple_entity:
+        instance.simple_entity.delete()
+
+    # Delete the associated region_layer if it exists
+    if instance.region_layer:
+        instance.region_layer.delete()
