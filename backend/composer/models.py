@@ -98,7 +98,7 @@ class ConnectivityStatementManager(models.Manager):
 
     def excluding_draft(self):
         return self.get_queryset().exclude(state=CSState.DRAFT)
-        
+
     def exported(self):
         return self.get_queryset().filter(state=CSState.EXPORTED)
 
@@ -247,23 +247,16 @@ class Layer(models.Model):
 
     def __str__(self):
         return self.ae_meta.name
-    
-    def clean(self):
-        if Layer.objects.filter(ae_meta=self.ae_meta).exists():
-            raise ValidationError('Layer with this ontology_uri already exists')
-
 
     def save(self, *args, **kwargs):
-        self.clean()
         super().save(*args, **kwargs)
-        
+
     class Meta:
         verbose_name = "Layer"
         verbose_name_plural = "Layers"
-
-
-
-        
+        constraints = [
+            models.UniqueConstraint(fields=['ae_meta'], name='unique_layer_ae_meta')
+        ]
 
 
 class Region(models.Model):
@@ -272,27 +265,31 @@ class Region(models.Model):
 
     def __str__(self):
         return self.ae_meta.name
-    
-    def clean(self):
-        if Region.objects.filter(ae_meta=self.ae_meta).exists():
-            raise ValidationError('Region with this ontology_uri already exists')
 
     def save(self, *args, **kwargs):
-        self.clean()
         super().save(*args, **kwargs)
-    
+
     class Meta:
         verbose_name = "Region"
         verbose_name_plural = "Regions"
+        constraints = [
+            models.UniqueConstraint(fields=['ae_meta'], name='unique_region_ae_meta')
+        ]
 
 
 class AnatomicalEntityIntersection(models.Model):
     layer = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='layer_intersection')
     region = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='region_intersection')
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = "Region/Layer Combination"
         verbose_name_plural = "Region/Layer Combinations"
+        constraints = [
+            models.UniqueConstraint(fields=['layer', 'region'], name='unique_layer_region_combination')
+        ]
 
     def __str__(self):
         return f"{self.region.name} ({self.layer.name})"
@@ -309,7 +306,7 @@ class AnatomicalEntity(models.Model):
         if self.region_layer:
             return str(self.region_layer)
         return 'Unknown Anatomical Entity'
-        
+
     @property
     def ontology_uri(self):
         if self.simple_entity:
