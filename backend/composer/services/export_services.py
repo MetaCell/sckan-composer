@@ -32,7 +32,7 @@ from composer.services.state_services import ConnectivityStatementStateService
 HAS_NERVE_BRANCHES_TAG = "Has nerve branches"
 TEMP_CIRCUIT_MAP = {
     CircuitType.INTRINSIC: "http://uri.interlex.org/tgbugs/uris/readable/IntrinsicPhenotype",
-    CircuitType.PROJECTION: "http://uri.interlex.org/tgbugs/uris/readable/ProjectionPhenotype",
+    CircuitType.PROJECTION: "http://uri.interlex.org/tgbugs/uris/readable/HasProjection",
     CircuitType.MOTOR: "http://uri.interlex.org/tgbugs/uris/readable/MotorPhenotype",
     CircuitType.SENSORY: "http://uri.interlex.org/tgbugs/uris/readable/SensoryPhenotype",
 }

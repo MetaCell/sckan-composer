@@ -10,9 +10,9 @@ class Laterality(models.TextChoices):
 
 
 class Projection(models.TextChoices):
-    IPSI = "IPSI", "Ipsilateral"
-    CONTRAT = "CONTRAT", "Contralateral"
-    BI = "BI", "Bilateral"
+    IPSI = "IPSI", "ipsilateral"
+    CONTRAT = "CONTRAT", "contralateral"
+    BI = "BI", "bilateral"
 
 
 # todo: motor and sensory should move to phenotype options per csv
