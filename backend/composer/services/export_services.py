@@ -100,7 +100,8 @@ def get_neuron_population_label(cs: ConnectivityStatement, row: Row):
 
 
 def get_type(cs: ConnectivityStatement, row: Row):
-    return cs.phenotype.name
+    return cs.phenotype.name if cs.phenotype else ""
+
 
 
 def get_structure(cs: ConnectivityStatement, row: Row):
