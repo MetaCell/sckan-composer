@@ -100,7 +100,8 @@ def get_neuron_population_label(cs: ConnectivityStatement, row: Row):
 
 
 def get_type(cs: ConnectivityStatement, row: Row):
-    return cs.phenotype.name
+    return cs.phenotype.name if cs.phenotype else ""
+
 
 
 def get_structure(cs: ConnectivityStatement, row: Row):
@@ -336,9 +337,11 @@ def get_soma_phenotype_row(cs: ConnectivityStatement):
 
 
 def get_phenotype_row(cs: ConnectivityStatement):
+    phenotype_name = cs.phenotype.name if cs.phenotype else ""
+    phenotype_ontology_uri = cs.phenotype.ontology_uri if cs.phenotype else ""
     return Row(
-        cs.phenotype.name,
-        cs.phenotype.ontology_uri,
+        phenotype_name,
+        phenotype_ontology_uri,
         ExportRelationships.hasAnatomicalSystemPhenotype.label,
         ExportRelationships.hasAnatomicalSystemPhenotype.value,
         "",
@@ -347,9 +350,12 @@ def get_phenotype_row(cs: ConnectivityStatement):
 
 
 def get_projection_phenotype_row(cs: ConnectivityStatement):
+    projection_phenotype = cs.projection_phenotype if cs.projection_phenotype else ""
+    projection_phenotype_ontology_uri = cs.projection_phenotype.ontology_uri if cs.projection_phenotype else ""
+
     return Row(
-        cs.projection_phenotype,
-        cs.projection_phenotype.ontology_uri,
+        projection_phenotype,
+        projection_phenotype_ontology_uri,
         ExportRelationships.hasProjectionPhenotype.label,
         ExportRelationships.hasProjectionPhenotype.value,
         "",

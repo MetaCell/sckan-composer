@@ -4,6 +4,7 @@ from django.db.models import Q, CheckConstraint
 from django.db.models.expressions import F
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
+from django.core.exceptions import ValidationError
 
 from composer.services.state_services import (
     ConnectivityStatementStateService,
@@ -97,7 +98,7 @@ class ConnectivityStatementManager(models.Manager):
 
     def excluding_draft(self):
         return self.get_queryset().exclude(state=CSState.DRAFT)
-        
+
     def exported(self):
         return self.get_queryset().filter(state=CSState.EXPORTED)
 
@@ -240,22 +241,55 @@ class AnatomicalEntityMeta(models.Model):
         verbose_name_plural = "Anatomical Entities"
 
 
-class Layer(AnatomicalEntityMeta):
-    ...
+class Layer(models.Model):
+    layer_id = models.BigAutoField(primary_key=True, auto_created=True)
+    ae_meta = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='layer_meta', null=False)
+
+    def __str__(self):
+        return self.ae_meta.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Layer"
+        verbose_name_plural = "Layers"
+        constraints = [
+            models.UniqueConstraint(fields=['ae_meta'], name='unique_layer_ae_meta')
+        ]
 
 
-class Region(AnatomicalEntityMeta):
-    ...
-    layers = models.ManyToManyField(Layer, through='AnatomicalEntityIntersection')
+class Region(models.Model):
+    region_id = models.BigAutoField(primary_key=True, auto_created=True)
+    ae_meta = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='region_meta', null=False)
+
+    def __str__(self):
+        return self.ae_meta.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Region"
+        verbose_name_plural = "Regions"
+        constraints = [
+            models.UniqueConstraint(fields=['ae_meta'], name='unique_region_ae_meta')
+        ]
 
 
 class AnatomicalEntityIntersection(models.Model):
-    layer = models.ForeignKey(Layer, on_delete=models.CASCADE)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE)
+    layer = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='layer_intersection')
+    region = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='region_intersection')
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Region/Layer Combination"
         verbose_name_plural = "Region/Layer Combinations"
+        constraints = [
+            models.UniqueConstraint(fields=['layer', 'region'], name='unique_layer_region_combination')
+        ]
 
     def __str__(self):
         return f"{self.region.name} ({self.layer.name})"
@@ -272,7 +306,7 @@ class AnatomicalEntity(models.Model):
         if self.region_layer:
             return str(self.region_layer)
         return 'Unknown Anatomical Entity'
-        
+
     @property
     def ontology_uri(self):
         if self.simple_entity:

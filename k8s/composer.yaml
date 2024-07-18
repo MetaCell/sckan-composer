@@ -35,24 +35,24 @@ spec:
           value: "{{DEBUG}}"
         ports:
         - containerPort: 8000
-        livenessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /admin/login/
-            port: 8000
-            scheme: HTTP
-          initialDelaySeconds: 45
-          periodSeconds: 30
-          timeoutSeconds: 2
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /admin/login/
-            port: 8000
-            scheme: HTTP
-          initialDelaySeconds: 15
-          periodSeconds: 30
-          timeoutSeconds: 2
+        # livenessProbe:
+        #   failureThreshold: 3
+        #   httpGet:
+        #     path: /admin/login/
+        #     port: 8000
+        #     scheme: HTTP
+        #   initialDelaySeconds: 45
+        #   periodSeconds: 30
+        #   timeoutSeconds: 2
+        # readinessProbe:
+        #   failureThreshold: 3
+        #   httpGet:
+        #     path: /admin/login/
+        #     port: 8000
+        #     scheme: HTTP
+        #   initialDelaySeconds: 15
+        #   periodSeconds: 30
+        #   timeoutSeconds: 2
         resources:
           limits:
             cpu: 1500m
