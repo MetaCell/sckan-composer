@@ -78,13 +78,24 @@ const StatementForm = (props: any) => {
   };
 
 
+  copiedUISchema.projection = {
+    "ui:widget": "CustomSingleSelect",
+    "ui:options": {
+      isDisabled,
+      label: "Projection laterality",
+      classNames: "col-xs-12 col-md-6",
+      placeholder: "Enter Projection Laterality",
+    },
+  };
+
+
   copiedUISchema.projection_phenotype_id = {
     "ui:widget": "CustomSingleSelect",
     "ui:options": {
       isDisabled,
-      label: "Projection",
+      label: "Projection phenotype",
       classNames: "col-xs-12 col-md-6",
-      placeholder: "Enter Projection",
+      placeholder: "Enter Projection Phenotype",
       data: projections.getProjections().map((row: any) => ({
         label: row.name,
         value: row.id,
@@ -712,6 +723,7 @@ const StatementForm = (props: any) => {
         "sex_id",
         "laterality",
         "circuit_type",
+        "projection",
         "projection_phenotype_id",
       ]}
       {...props}

@@ -572,6 +572,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             origins = ""
 
         circuit_type = instance.get_circuit_type_display() if instance.circuit_type else None
+        projection = instance.get_projection_display() if instance.projection else None
         projection_phenotype = str(instance.projection_phenotype) if instance.projection_phenotype else ''
 
         laterality_description = instance.get_laterality_description()
@@ -586,6 +587,8 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             statement = f"A {phenotype.lower()} connection goes {journey_sentence}.\n"
 
         statement += f"This "
+        if projection:
+            statement += f"{projection.lower()} "
         if projection_phenotype:
             statement += f"{projection_phenotype.lower()} "
         if circuit_type:
