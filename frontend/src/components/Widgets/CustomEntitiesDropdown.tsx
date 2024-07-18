@@ -588,6 +588,7 @@ export default function CustomEntitiesDropdown({
                     <TextField
                       fullWidth
                       type="text"
+                      autoFocus={true}
                       onChange={debouncedResults}
                       placeholder={searchPlaceholder}
                       InputProps={{
