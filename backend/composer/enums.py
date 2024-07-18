@@ -78,7 +78,7 @@ class ExportRelationships(models.TextChoices):
     hasSomaPhenotype = "hasSomaPhenotype", "SomaPhenotype"
     hasAlert = "hasAlert", "Alert"
     hasSomaLocatedIn = "hasSomaLocatedIn", "Soma"
-    hasProjectionPhenotype = "hasProjectionPhenotype", "ProjectionPhenotype"
+    hasProjectionPhenotype = "hasProjection", "ProjectionPhenotype"
     hasAxonPresynapticElementIn = "hasAxonPresynapticElementIn", "Axon terminal"
     hasAxonSensorySubcellularElementIn = "hasAxonSensorySubcellularElementIn", "Afferent terminal",
     hasAxonLocatedIn = "hasAxonLocatedIn", "Axon"
