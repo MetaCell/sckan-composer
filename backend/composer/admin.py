@@ -242,7 +242,6 @@ class ConnectivityStatementAdmin(
         "sentence__pmcid",
         "knowledge_statement",
     )
-    exclude = ("projection",)
 
     fieldsets = ()
 

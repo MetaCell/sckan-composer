@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("composer", "0053_auto_20240709_0909"),
+        ("composer", "0054_auto_20240709_0909"),
     ]
 
     operations = [

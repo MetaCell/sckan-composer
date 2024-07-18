@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("composer", "0058_auto_20240717_1550"),
+        ("composer", "0059_auto_20240717_1550"),
     ]
 
     operations = [

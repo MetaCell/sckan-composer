@@ -67,6 +67,7 @@ const StatementDetailsAccordion = (props: any) => {
             "apinatomy_model",
             "circuit_type",
             "laterality",
+            "projection",
             "projection_phenotype_id",
             "phenotype_id",
             "additional_information"

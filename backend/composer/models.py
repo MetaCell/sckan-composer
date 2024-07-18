@@ -702,6 +702,10 @@ class ConnectivityStatement(models.Model):
                 check=Q(circuit_type__in=[c[0] for c in CircuitType.choices]),
                 name="circuit_type_valid",
             ),
+            models.CheckConstraint(
+                check=Q(projection__in=[p[0] for p in Projection.choices]),
+                name="projection_valid",
+            )
         ]
 
 

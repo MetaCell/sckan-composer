@@ -57,7 +57,7 @@ def remove_duplicate_intersections(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("composer", "0057_remove_connectivitystatement_projection_valid_and_more"),
+        ("composer", "0058_remove_connectivitystatement_projection_valid_and_more"),
     ]
 
     operations = [

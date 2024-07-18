@@ -10,7 +10,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("composer", "0052_alter_anatomicalentity_options_and_more"),
+        ("composer", "0053_alter_anatomicalentity_options_and_more"),
     ]
 
     # Steps taken in migration:

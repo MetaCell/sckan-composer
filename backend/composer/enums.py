@@ -10,9 +10,9 @@ class Laterality(models.TextChoices):
 
 
 class Projection(models.TextChoices):
-    IPSI = "IPSI", "Ipsilateral"
-    CONTRAT = "CONTRAT", "Contralateral"
-    BI = "BI", "Bilateral"
+    IPSI = "IPSI", "ipsilateral"
+    CONTRAT = "CONTRAT", "contralateral"
+    BI = "BI", "bilateral"
 
 
 # todo: motor and sensory should move to phenotype options per csv
@@ -78,7 +78,7 @@ class ExportRelationships(models.TextChoices):
     hasSomaPhenotype = "hasSomaPhenotype", "SomaPhenotype"
     hasAlert = "hasAlert", "Alert"
     hasSomaLocatedIn = "hasSomaLocatedIn", "Soma"
-    hasProjectionPhenotype = "hasProjectionPhenotype", "ProjectionPhenotype"
+    hasProjectionPhenotype = "hasProjection", "ProjectionPhenotype"
     hasAxonPresynapticElementIn = "hasAxonPresynapticElementIn", "Axon terminal"
     hasAxonSensorySubcellularElementIn = "hasAxonSensorySubcellularElementIn", "Afferent terminal",
     hasAxonLocatedIn = "hasAxonLocatedIn", "Axon"
