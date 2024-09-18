@@ -21,7 +21,7 @@ from .enums import (
     ViaType,
     Projection,
 )
-from .services.graph_service import compile_journey, compile_entities_name
+from .services.graph_service import compile_journey
 from .utils import doi_uri, pmcid_uri, pmid_uri, create_reference_uri
 
 
