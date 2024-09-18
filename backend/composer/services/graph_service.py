@@ -88,7 +88,7 @@ def consolidate_paths(paths):
 
         paths = consolidated + [paths[i] for i in range(len(paths)) if i not in used_indices]
 
-    return [[((node[0].replace(JOURNEY_DELIMITER, ' or '), node[1]) if (
+    return paths, [[((node[0].replace(JOURNEY_DELIMITER, ' or '), node[1]) if (
             node[1] == 0 or path.index(node) == len(path) - 1) else (
         node[0].replace(JOURNEY_DELIMITER, ', '), node[1])) for node in path] for path in paths]
 
@@ -132,7 +132,7 @@ def merge_paths(path1, path2):
     return merged_path
 
 
-def compile_journey(connectivity_statement) -> List[str]:
+def compile_journey(connectivity_statement) -> dict:
     """
    Generates a string of descriptions of journey paths for a given connectivity statement.
 
@@ -153,7 +153,16 @@ def compile_journey(connectivity_statement) -> List[str]:
 
     # Generate all paths and then consolidate them
     all_paths = generate_paths(origins, vias, destinations)
-    journey_paths = consolidate_paths(all_paths)
+    consolidated_paths, journey_paths = consolidate_paths(all_paths)
+
+    entities = []
+    for path in consolidated_paths:
+        entity = {
+            'origins': path[0][0].split(JOURNEY_DELIMITER),
+            'destinations': path[-1][0].split(JOURNEY_DELIMITER),
+            'vias': [node for node, layer in path if 0 < layer < len(vias) + 1]
+        }
+        entities.append(entity)
 
     # Create sentences for each journey path
     journey_descriptions = []
@@ -169,4 +178,7 @@ def compile_journey(connectivity_statement) -> List[str]:
 
         journey_descriptions.append(sentence)
 
-    return journey_descriptions
+    return {
+        'journey': journey_descriptions,
+        'entities': entities
+    }

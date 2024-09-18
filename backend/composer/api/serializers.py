@@ -516,6 +516,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     )
     available_transitions = serializers.SerializerMethodField()
     journey = serializers.SerializerMethodField()
+    entities_journey = serializers.SerializerMethodField()    
     statement_preview = serializers.SerializerMethodField()
     errors = serializers.SerializerMethodField()
 
@@ -528,6 +529,10 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         if 'journey' not in self.context:
             self.context['journey'] = instance.get_journey()
         return self.context['journey']
+    
+    def get_entities_journey(self, instance):
+        self.context['entities_journey'] = instance.get_entities_journey()
+        return self.context['entities_journey']
 
     def get_statement_preview(self, instance):
         if 'journey' not in self.context:
@@ -630,6 +635,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             "projection_phenotype",
             "projection_phenotype_id",
             "journey",
+            "entities_journey",
             "laterality",
             "projection",
             "circuit_type",
@@ -722,6 +728,7 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
             "provenances",
             "knowledge_statement",
             "journey",
+            "entities_journey",
             "laterality",
             "projection",
             "circuit_type",
