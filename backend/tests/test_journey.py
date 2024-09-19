@@ -58,7 +58,7 @@ class JourneyTestCase(TestCase):
         expected_paths.sort()
         self.assertTrue(all_paths == expected_paths)
 
-        journey_paths = consolidate_paths(all_paths)
+        consolidated_path, journey_paths = consolidate_paths(all_paths)
         expected_journey = [
             [('Oa', 0), ('V1a', 1), ('Da', 2)],
             [('Ob', 0), ('Da', 2)]
@@ -108,7 +108,7 @@ class JourneyTestCase(TestCase):
         expected_paths.sort()
         self.assertTrue(all_paths == expected_paths)
 
-        journey_paths = consolidate_paths(all_paths)
+        consolidated_path, journey_paths = consolidate_paths(all_paths)
         expected_journey = [[('Oa or Ob', 0), ('Da', 1)]]
         self.assertTrue(journey_paths == expected_journey)
 
@@ -162,7 +162,7 @@ class JourneyTestCase(TestCase):
         self.assertTrue(all_paths == expected_paths)
 
         expected_journey = [[('Oa or Ob', 0), ('V1a', 1), ('Da', 2)]]
-        journey_paths = consolidate_paths(all_paths)
+        consolidated_path, journey_paths = consolidate_paths(all_paths)
         self.assertTrue(journey_paths == expected_journey)
 
     def test_journey_multiple_vias_no_jumps(self):
@@ -222,7 +222,7 @@ class JourneyTestCase(TestCase):
         expected_journey = [
             [('Oa or Ob', 0), ('V1a, V1b', 1), ('Da', 2)]
         ]
-        journey_paths = consolidate_paths(all_paths)
+        consolidated_path, journey_paths = consolidate_paths(all_paths)
         self.assertTrue(journey_paths == expected_journey)
 
     def test_journey_complex_graph(self):
@@ -303,7 +303,7 @@ class JourneyTestCase(TestCase):
                             [('Oa or Ob', 0), ('V1a', 1), ('V2a', 2), ('V4a', 4), ('Da', 5)],
                             [('Oa or Ob', 0), ('V1a', 1), ('V2b', 2), ('Da', 5)],
                             [('Oa', 0), ('V3a', 3), ('Da', 5)]]
-        journey_paths = consolidate_paths(all_paths)
+        consolidated_path, journey_paths = consolidate_paths(all_paths)
         self.assertTrue(journey_paths == expected_journey)
 
     def test_journey_complex_graph_2(self):
@@ -395,7 +395,7 @@ class JourneyTestCase(TestCase):
             [('Oa or Ob', 0), ('V1a', 1), ('V3a', 3), ('V4a', 4), ('V5b', 5), ('Da', 7)]
         ]
 
-        journey_paths = consolidate_paths(all_paths)
+        consolidated_path, journey_paths = consolidate_paths(all_paths)
         journey_paths.sort()
         expected_journey.sort()
         self.assertTrue(journey_paths == expected_journey)
@@ -454,7 +454,7 @@ class JourneyTestCase(TestCase):
             [('Oa or Ob', 0), ('Da', 2)]
         ]
 
-        journey_paths = consolidate_paths(all_paths)
+        consolidated_path, journey_paths = consolidate_paths(all_paths)
         expected_journey.sort()
         journey_paths.sort()
         self.assertTrue(journey_paths == expected_journey)
@@ -505,7 +505,7 @@ class JourneyTestCase(TestCase):
         expected_paths.sort()
         self.assertTrue(all_paths == expected_paths, f"Expected paths {expected_paths}, but found {all_paths}")
 
-        journey_paths = consolidate_paths(all_paths)
+        consolidated_path, journey_paths = consolidate_paths(all_paths)
         expected_journey = [
             [('Oa', 0), ('V1a', 3), ('V2a', 6), ('Da', 7)],
         ]
@@ -557,7 +557,7 @@ class JourneyTestCase(TestCase):
         expected_paths.sort()
         self.assertTrue(all_paths == expected_paths, f"Expected paths {expected_paths}, but found {all_paths}")
 
-        journey_paths = consolidate_paths(all_paths)
+        consolidated_path, journey_paths = consolidate_paths(all_paths)
         expected_journey = [
             [('Myenteric', 0), ('Longitudinal', 1), ('Serosa', 2), ('lumbar', 3), ('inferior', 4)],
         ]
