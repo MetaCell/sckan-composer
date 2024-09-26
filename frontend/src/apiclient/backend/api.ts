@@ -68,16 +68,16 @@ export interface AnatomicalEntityIntersection {
     'id': number;
     /**
      * 
-     * @type {Layer}
+     * @type {AnatomicalEntityMeta}
      * @memberof AnatomicalEntityIntersection
      */
-    'layer': Layer;
+    'layer': AnatomicalEntityMeta;
     /**
      * 
-     * @type {Region}
+     * @type {AnatomicalEntityMeta}
      * @memberof AnatomicalEntityIntersection
      */
-    'region': Region;
+    'region': AnatomicalEntityMeta;
 }
 /**
  * 
@@ -324,6 +324,12 @@ export interface ConnectivityStatement {
      * @memberof ConnectivityStatement
      */
     'journey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatement
+     */
+    'entities_journey': string;
     /**
      * 
      * @type {ConnectivityStatementLaterality}
@@ -784,6 +790,12 @@ export interface KnowledgeStatement {
     'journey': string;
     /**
      * 
+     * @type {string}
+     * @memberof KnowledgeStatement
+     */
+    'entities_journey': string;
+    /**
+     * 
      * @type {ConnectivityStatementLaterality}
      * @memberof KnowledgeStatement
      */
@@ -827,31 +839,6 @@ export const LateralityEnum = {
 export type LateralityEnum = typeof LateralityEnum[keyof typeof LateralityEnum];
 
 
-/**
- * 
- * @export
- * @interface Layer
- */
-export interface Layer {
-    /**
-     * 
-     * @type {number}
-     * @memberof Layer
-     */
-    'id': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof Layer
-     */
-    'name': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Layer
-     */
-    'ontology_uri': string;
-}
 /**
  * 
  * @export
@@ -1848,12 +1835,6 @@ export interface ProjectionPhenotype {
      * @memberof ProjectionPhenotype
      */
     'name': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ProjectionPhenotype
-     */
-    'ontology_uri': string;
 }
 /**
  * Provenance
@@ -1879,37 +1860,6 @@ export interface Provenance {
      * @memberof Provenance
      */
     'connectivity_statement_id': number;
-}
-/**
- * 
- * @export
- * @interface Region
- */
-export interface Region {
-    /**
-     * 
-     * @type {number}
-     * @memberof Region
-     */
-    'id': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof Region
-     */
-    'name': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Region
-     */
-    'ontology_uri': string;
-    /**
-     * 
-     * @type {Array<Layer>}
-     * @memberof Region
-     */
-    'layers': Array<Layer>;
 }
 /**
  * Sentence

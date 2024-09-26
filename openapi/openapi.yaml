@@ -1914,11 +1914,11 @@ components:
           readOnly: true
         layer:
           allOf:
-          - $ref: '#/components/schemas/Layer'
+          - $ref: '#/components/schemas/AnatomicalEntityMeta'
           readOnly: true
         region:
           allOf:
-          - $ref: '#/components/schemas/Region'
+          - $ref: '#/components/schemas/AnatomicalEntityMeta'
           readOnly: true
       required:
       - id
@@ -2072,6 +2072,9 @@ components:
         journey:
           type: string
           readOnly: true
+        entities_journey:
+          type: string
+          readOnly: true
         laterality:
           nullable: true
           oneOf:
@@ -2128,6 +2131,7 @@ components:
           readOnly: true
       required:
       - available_transitions
+      - entities_journey
       - errors
       - has_notes
       - id
@@ -2381,6 +2385,9 @@ components:
         journey:
           type: string
           readOnly: true
+        entities_journey:
+          type: string
+          readOnly: true
         laterality:
           nullable: true
           oneOf:
@@ -2407,6 +2414,7 @@ components:
           type: string
           readOnly: true
       required:
+      - entities_journey
       - id
       - journey
       - phenotype
@@ -2417,23 +2425,6 @@ components:
       - RIGHT
       - LEFT
       type: string
-    Layer:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          maxLength: 200
-        ontology_uri:
-          type: string
-          format: uri
-          maxLength: 200
-      required:
-      - id
-      - name
-      - ontology_uri
     Login:
       type: object
       properties:
@@ -3021,14 +3012,9 @@ components:
         name:
           type: string
           maxLength: 200
-        ontology_uri:
-          type: string
-          format: uri
-          maxLength: 200
       required:
       - id
       - name
-      - ontology_uri
     Provenance:
       type: object
       description: Provenance
@@ -3044,29 +3030,6 @@ components:
       - connectivity_statement_id
       - id
       - uri
-    Region:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          maxLength: 200
-        ontology_uri:
-          type: string
-          format: uri
-          maxLength: 200
-        layers:
-          type: array
-          items:
-            $ref: '#/components/schemas/Layer'
-          readOnly: true
-      required:
-      - id
-      - layers
-      - name
-      - ontology_uri
     Sentence:
       type: object
       description: Sentence
