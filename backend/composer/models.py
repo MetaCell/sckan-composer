@@ -663,7 +663,11 @@ class ConnectivityStatement(models.Model):
             return set(self.via_set.get(order=via_order - 1).anatomical_entities.all())
 
     def get_journey(self):
-        return compile_journey(self)
+        return compile_journey(self)['journey']
+    
+    def get_entities_journey(self):
+        entities_journey = compile_journey(self)['entities']
+        return entities_journey
 
     def get_laterality_description(self):
         laterality_map = {
