@@ -664,7 +664,7 @@ class ConnectivityStatement(models.Model):
 
     def get_journey(self):
         return compile_journey(self)['journey']
-    
+
     def get_entities_journey(self):
         entities_journey = compile_journey(self)['entities']
         return entities_journey
@@ -711,6 +711,21 @@ class ConnectivityStatement(models.Model):
                 name="projection_valid",
             )
         ]
+
+
+# TODO: We likely need to reset this on the addition of new nodes to the connectivity statement
+class GraphState(models.Model):
+    connectivity_statement = models.OneToOneField(
+        ConnectivityStatement,
+        on_delete=models.CASCADE,
+        related_name='graph_state',
+    )
+    serialized_graph = models.JSONField()  # Stores the serialized diagram model
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    saved_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
 
 class AbstractConnectionLayer(models.Model):

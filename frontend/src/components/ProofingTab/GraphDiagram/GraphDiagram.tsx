@@ -16,6 +16,7 @@ import {
     TypeC11Enum,
     ViaSerializerDetails
 } from "../../../apiclient/backend";
+import {useParams} from "react-router-dom";
 
 
 export enum NodeTypes {
@@ -77,6 +78,7 @@ const createLink = (sourceNode: CustomNodeModel, targetNode: CustomNodeModel, so
     return null;
 };
 
+// TODO: Consider graph state information
 const processData = (
     origins: AnatomicalEntity[] | undefined,
     vias: ViaSerializerDetails[] | undefined,
@@ -207,6 +209,7 @@ const processData = (
 };
 
 const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations, forward_connection = []}) => {
+    const { statementId } = useParams();
     const [engine] = useState(() => createEngine());
     const [modelUpdated, setModelUpdated] = useState(false)
     const [modelFitted, setModelFitted] = useState(false)
@@ -263,7 +266,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations,
     return (
         modelUpdated ? (
                 <div ref={containerRef} className={"graphContainer"}>
-                    <NavigationMenu engine={engine}/>
+                    <NavigationMenu engine={engine} statementId={statementId || "-1"}/>
                     <InfoMenu engine={engine} forwardConnection={true} />
                     <CanvasWidget className={"graphContainer"} engine={engine}/>
                 </div>)

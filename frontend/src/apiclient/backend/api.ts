@@ -408,6 +408,12 @@ export interface ConnectivityStatement {
      * @memberof ConnectivityStatement
      */
     'errors': Array<any>;
+    /**
+     * 
+     * @type {{ [key: string]: any; }}
+     * @memberof ConnectivityStatement
+     */
+    'graph_state'?: { [key: string]: any; };
 }
 /**
  * @type ConnectivityStatementCircuitType
@@ -619,6 +625,12 @@ export interface ConnectivityStatementUpdate {
      * @memberof ConnectivityStatementUpdate
      */
     'errors': Array<any>;
+    /**
+     * 
+     * @type {{ [key: string]: any; }}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'graph_state'?: { [key: string]: any; };
 }
 /**
  * Destination
@@ -1503,6 +1515,12 @@ export interface PatchedConnectivityStatementUpdate {
      * @memberof PatchedConnectivityStatementUpdate
      */
     'errors'?: Array<any>;
+    /**
+     * 
+     * @type {{ [key: string]: any; }}
+     * @memberof PatchedConnectivityStatementUpdate
+     */
+    'graph_state'?: { [key: string]: any; };
 }
 /**
  * Destination

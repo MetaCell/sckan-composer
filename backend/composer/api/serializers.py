@@ -3,6 +3,7 @@ from typing import List
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django_fsm import FSMField
+from drf_spectacular.types import OpenApiTypes
 from drf_writable_nested.mixins import UniqueFieldsMixin
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
@@ -20,7 +21,7 @@ from ..models import (
     Sentence,
     Specie,
     Tag,
-    Via, Destination, AnatomicalEntityIntersection, Region, Layer, AnatomicalEntityMeta,
+    Via, Destination, AnatomicalEntityIntersection, Region, Layer, AnatomicalEntityMeta, GraphState,
 )
 from ..services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
@@ -495,6 +496,15 @@ class BaseConnectivityStatementSerializer(FixManyToManyMixin, FixedWritableNeste
         read_only_fields = ("state",)
 
 
+class GraphStateJSONField(serializers.JSONField):
+    class Meta:
+        swagger_schema_fields = {
+            "type": OpenApiTypes.OBJECT,  # This defines the type as an open object
+            "description": "Graph state containing the serialized react-diagrams model",
+            "additionalProperties": True,  # Allows for an open-ended structure
+        }
+
+
 class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     """Connectivity Statement"""
 
@@ -516,9 +526,10 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     )
     available_transitions = serializers.SerializerMethodField()
     journey = serializers.SerializerMethodField()
-    entities_journey = serializers.SerializerMethodField()    
+    entities_journey = serializers.SerializerMethodField()
     statement_preview = serializers.SerializerMethodField()
     errors = serializers.SerializerMethodField()
+    graph_state = GraphStateJSONField(required=False)
 
     def get_available_transitions(self, instance) -> list[CSState]:
         request = self.context.get("request", None)
@@ -529,7 +540,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         if 'journey' not in self.context:
             self.context['journey'] = instance.get_journey()
         return self.context['journey']
-    
+
     def get_entities_journey(self, instance):
         self.context['entities_journey'] = instance.get_entities_journey()
         return self.context['entities_journey']
@@ -612,6 +623,24 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         validated_data.pop('via_set', None)
         validated_data.pop('destinations', None)
 
+        # Extract the graph_state from the validated data
+        graph_state_data = validated_data.pop('graph_state', None)
+
+        # Handle updating the graph state if provided
+        if graph_state_data is not None:
+            if hasattr(instance, 'graph_state'):
+                # Update the existing graph state
+                instance.graph_state.serialized_graph = graph_state_data
+                instance.graph_state.saved_by = self.context['request'].user
+                instance.graph_state.save()
+            else:
+                # Create a new graph state if none exists
+                GraphState.objects.create(
+                    connectivity_statement=instance,
+                    serialized_graph=graph_state_data,
+                    saved_by=self.context['request'].user
+                )
+
         # Call the super class's update method with the modified validated_data
         return super(ConnectivityStatementSerializer, self).update(instance, validated_data)
 
@@ -648,7 +677,8 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             "modified_date",
             "has_notes",
             "statement_preview",
-            "errors"
+            "errors",
+            "graph_state"
         )
 
 
@@ -690,7 +720,8 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
             "modified_date",
             "has_notes",
             "statement_preview",
-            "errors"
+            "errors",
+            "graph_state"
         )
 
 

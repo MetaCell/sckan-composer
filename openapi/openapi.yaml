@@ -2129,6 +2129,9 @@ components:
           type: array
           items: {}
           readOnly: true
+        graph_state:
+          type: object
+          additionalProperties: {}
       required:
       - available_transitions
       - entities_journey
@@ -2268,6 +2271,9 @@ components:
           type: array
           items: {}
           readOnly: true
+        graph_state:
+          type: object
+          additionalProperties: {}
       required:
       - available_transitions
       - errors
@@ -2835,6 +2841,9 @@ components:
           type: array
           items: {}
           readOnly: true
+        graph_state:
+          type: object
+          additionalProperties: {}
     PatchedDestination:
       type: object
       description: Destination
