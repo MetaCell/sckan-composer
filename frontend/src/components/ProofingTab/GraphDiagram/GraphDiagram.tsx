@@ -223,7 +223,6 @@ function reroute(engine: DiagramEngine) {
 function autoDistribute(engine: DiagramEngine) {
     const model = engine.getModel();
     
-    // Ensure model and nodes exist before proceeding
     if (!model || model.getNodes().length === 0) {
         return;
     }
