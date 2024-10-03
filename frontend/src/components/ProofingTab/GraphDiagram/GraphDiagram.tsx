@@ -1,10 +1,10 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import InfoMenu from "./InfoMenu";
 import NavigationMenu from "./NavigationMenu";
 import createEngine, {
-    BasePositionModelOptions,
+    BasePositionModelOptions, DagreEngine,
     DefaultLinkModel,
-    DiagramModel,
+    DiagramModel, PathFindingLinkFactory,
 } from '@projectstorm/react-diagrams';
 import {CanvasWidget} from '@projectstorm/react-canvas-core';
 import {CustomNodeModel} from "./Models/CustomNodeModel";
@@ -16,8 +16,7 @@ import {
     TypeC11Enum,
     ViaSerializerDetails
 } from "../../../apiclient/backend";
-
-
+import {DiagramEngine} from "@projectstorm/react-diagrams-core";
 export enum NodeTypes {
     Origin = 'Origin',
     Via = 'Via',
@@ -78,42 +77,42 @@ const createLink = (sourceNode: CustomNodeModel, targetNode: CustomNodeModel, so
 };
 
 const processData = (
-    origins: AnatomicalEntity[] | undefined,
-    vias: ViaSerializerDetails[] | undefined,
-    destinations: DestinationSerializerDetails[] | undefined,
-    forward_connection: any[],
+  origins: AnatomicalEntity[] | undefined,
+  vias: ViaSerializerDetails[] | undefined,
+  destinations: DestinationSerializerDetails[] | undefined,
+  forward_connection: any[],
 ): { nodes: CustomNodeModel[], links: DefaultLinkModel[] } => {
     const nodes: CustomNodeModel[] = [];
     const links: DefaultLinkModel[] = [];
-
+    
     const nodeMap = new Map<string, CustomNodeModel>();
-
+    
     const yStart = 50
     const yIncrement = 250; // Vertical spacing
     const xIncrement = 250; // Horizontal spacing
     let xOrigin = 100
-
+    
     origins?.forEach(origin => {
         const id = getId(NodeTypes.Origin, origin)
         const name = origin.simple_entity !== null ? origin.simple_entity.name : origin.region_layer.region.name + '(' + origin.region_layer.layer.name + ')';
         const ontology_uri = origin.simple_entity !== null ? origin.simple_entity.ontology_uri : origin.region_layer.region.ontology_uri + ', ' + origin.region_layer.layer.ontology_uri;
         const fws: never[] = []
         const originNode = new CustomNodeModel(
-            NodeTypes.Origin,
-            name,
-            ontology_uri,
-            {
-                forward_connection: fws,
-                to: [],
-            }
+          NodeTypes.Origin,
+          name,
+          ontology_uri,
+          {
+              forward_connection: fws,
+              to: [],
+          }
         );
         originNode.setPosition(xOrigin, yStart);
         nodes.push(originNode);
         nodeMap.set(id, originNode);
         xOrigin += xIncrement;
     });
-
-
+    
+    
     vias?.forEach((via) => {
         const layerIndex = via.order + 1
         let xVia = 120
@@ -124,21 +123,21 @@ const processData = (
             const ontology_uri = entity.simple_entity !== null ? entity.simple_entity.ontology_uri : entity.region_layer.region.ontology_uri + ', ' + entity.region_layer.layer.ontology_uri;
             const fws: never[] = []
             const viaNode = new CustomNodeModel(
-                NodeTypes.Via,
-                name,
-                ontology_uri,
-                {
-                    forward_connection: fws,
-                    from: [],
-                    to: [],
-                    anatomicalType: via?.type ? ViaTypeMapping[via.type] : ''
-                }
+              NodeTypes.Via,
+              name,
+              ontology_uri,
+              {
+                  forward_connection: fws,
+                  from: [],
+                  to: [],
+                  anatomicalType: via?.type ? ViaTypeMapping[via.type] : ''
+              }
             );
             viaNode.setPosition(xVia, yVia);
             nodes.push(viaNode);
             nodeMap.set(id, viaNode);
             xVia += xIncrement
-
+            
             via.from_entities.forEach(fromEntity => {
                 const sourceNode = findNodeForEntity(fromEntity, nodeMap, layerIndex - 1);
                 if (sourceNode) {
@@ -155,12 +154,12 @@ const processData = (
         });
         yVia += yIncrement;
     });
-
-
+    
+    
     const yDestination = yIncrement * ((vias?.length || 1) + 1) + yStart
     let xDestination = 115
-
-
+    
+    
     // Process Destinations
     destinations?.forEach(destination => {
         destination.anatomical_entities.forEach(entity => {
@@ -174,14 +173,14 @@ const processData = (
                 return false;
             });
             const destinationNode = new CustomNodeModel(
-                NodeTypes.Destination,
-                name,
-                ontology_uri,
-                {
-                    forward_connection: fws,
-                    from: [],
-                    anatomicalType: destination?.type ? DestinationTypeMapping[destination.type] : '',
-                }
+              NodeTypes.Destination,
+              name,
+              ontology_uri,
+              {
+                  forward_connection: fws,
+                  from: [],
+                  anatomicalType: destination?.type ? DestinationTypeMapping[destination.type] : '',
+              }
             );
             destinationNode.setPosition(xDestination, yDestination);
             nodes.push(destinationNode);
@@ -202,72 +201,116 @@ const processData = (
             });
         });
     });
-
+    
     return {nodes, links};
 };
 
+
+function genDagreEngine() {
+    return new DagreEngine({
+        graph: {
+            rankdir: 'TB',
+            ranksep: 300,
+            nodesep: 250,
+            marginx: 50,
+            marginy: 50
+        },
+    });
+}
+function reroute(engine: DiagramEngine) {
+    engine.getLinkFactories().getFactory<PathFindingLinkFactory>(PathFindingLinkFactory.NAME).calculateRoutingMatrix();
+}
+function autoDistribute(engine: DiagramEngine) {
+    const model = engine.getModel();
+    
+    // Ensure model and nodes exist before proceeding
+    if (!model || model.getNodes().length === 0) {
+        return;
+    }
+    
+    const dagreEngine = genDagreEngine();
+    dagreEngine.redistribute(model);
+    
+    reroute(engine);
+    engine.repaintCanvas();
+}
 const GraphDiagram: React.FC<GraphDiagramProps> = ({origins, vias, destinations, forward_connection = []}) => {
     const [engine] = useState(() => createEngine());
     const [modelUpdated, setModelUpdated] = useState(false)
     const [modelFitted, setModelFitted] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null);
-
+    
     // This effect runs once to set up the engine
     useEffect(() => {
         engine.getNodeFactories().registerFactory(new CustomNodeFactory());
     }, [engine]);
-
-
+    
+    
     // This effect runs whenever origins, vias, or destinations change
     useEffect(() => {
         const {nodes, links} = processData(origins, vias, destinations, forward_connection);
-
+        
         const model = new DiagramModel();
         model.addAll(...nodes, ...links);
-
+        
         engine.setModel(model);
+        
         // engine.getModel().setLocked(true)
         setModelUpdated(true)
     }, [origins, vias, destinations, engine, forward_connection]);
-
+    
     // This effect prevents the default scroll and touchmove behavior
     useEffect(() => {
         const currentContainer = containerRef.current;
-
+        
         if (modelUpdated && currentContainer) {
             const disableScroll = (event: Event) => {
                 event.stopPropagation();
             };
-
+            
             currentContainer.addEventListener('wheel', disableScroll, {passive: false});
             currentContainer.addEventListener('touchmove', disableScroll, {passive: false});
-
+            
             return () => {
                 currentContainer?.removeEventListener('wheel', disableScroll);
                 currentContainer?.removeEventListener('touchmove', disableScroll);
             };
         }
+        
     }, [modelUpdated]);
-
+    
     useEffect(() => {
         if (modelUpdated && !modelFitted) {
             // TODO: for unknown reason at the moment if I call zoomToFit too early breaks the graph
             // To fix later in the next contract.
+            
             setTimeout(() => {
                 engine.zoomToFit();
             }, 1000);
             setModelFitted(true);
         }
     }, [modelUpdated, modelFitted, engine]);
-
+    
+    useLayoutEffect(() => {
+        autoDistribute(engine);
+    }, [engine, modelUpdated, destinations, vias, origins]);
+    
+    useEffect(() => {
+        const currentContainer = containerRef.current;
+        
+        if (modelUpdated && currentContainer) {
+            autoDistribute(engine);
+        }
+    }, [engine, modelUpdated, destinations, vias, origins]);
+    
     return (
-        modelUpdated ? (
-                <div ref={containerRef} className={"graphContainer"}>
-                    <NavigationMenu engine={engine}/>
-                    <InfoMenu engine={engine} forwardConnection={true} />
-                    <CanvasWidget className={"graphContainer"} engine={engine}/>
-                </div>)
-            : null
+      modelUpdated ? (
+          <div ref={containerRef} className={"graphContainer"}>
+              <NavigationMenu engine={engine}/>
+              <InfoMenu engine={engine} forwardConnection={true} />
+              <CanvasWidget className={"graphContainer"} engine={engine}/>
+          </div>)
+        : null
     );
 }
 
