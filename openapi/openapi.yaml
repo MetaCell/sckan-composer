@@ -2130,8 +2130,9 @@ components:
           items: {}
           readOnly: true
         graph_state:
-          type: object
-          additionalProperties: {}
+          allOf:
+          - $ref: '#/components/schemas/GraphState'
+          nullable: true
       required:
       - available_transitions
       - entities_journey
@@ -2272,8 +2273,9 @@ components:
           items: {}
           readOnly: true
         graph_state:
-          type: object
-          additionalProperties: {}
+          allOf:
+          - $ref: '#/components/schemas/GraphState'
+          nullable: true
       required:
       - available_transitions
       - errors
@@ -2340,6 +2342,14 @@ components:
       - connectivity_statement_id
       - from_entities
       - id
+    GraphState:
+      type: object
+      properties:
+        serialized_graph:
+          type: object
+          additionalProperties: {}
+      required:
+      - serialized_graph
     KnowledgeStatement:
       type: object
       description: Knowledge Statement
@@ -2842,8 +2852,9 @@ components:
           items: {}
           readOnly: true
         graph_state:
-          type: object
-          additionalProperties: {}
+          allOf:
+          - $ref: '#/components/schemas/GraphState'
+          nullable: true
     PatchedDestination:
       type: object
       description: Destination

@@ -496,13 +496,13 @@ class BaseConnectivityStatementSerializer(FixManyToManyMixin, FixedWritableNeste
         read_only_fields = ("state",)
 
 
-class GraphStateJSONField(serializers.JSONField):
+class GraphStateSerializer(serializers.ModelSerializer):
     class Meta:
-        swagger_schema_fields = {
-            "type": OpenApiTypes.OBJECT,  # This defines the type as an open object
-            "description": "Graph state containing the serialized react-diagrams model",
-            "additionalProperties": True,  # Allows for an open-ended structure
-        }
+        model = GraphState
+        fields = ['serialized_graph']
+
+    def to_representation(self, instance):
+        return instance.serialized_graph
 
 
 class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
@@ -529,7 +529,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     entities_journey = serializers.SerializerMethodField()
     statement_preview = serializers.SerializerMethodField()
     errors = serializers.SerializerMethodField()
-    graph_state = GraphStateJSONField(required=False)
+    graph_state = GraphStateSerializer(required=False, allow_null=True)
 
     def get_available_transitions(self, instance) -> list[CSState]:
         request = self.context.get("request", None)
@@ -626,18 +626,18 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         # Extract the graph_state from the validated data
         graph_state_data = validated_data.pop('graph_state', None)
 
-        # Handle updating the graph state if provided
         if graph_state_data is not None:
-            if hasattr(instance, 'graph_state'):
+            if hasattr(instance, 'graph_state') and instance.graph_state is not None:
                 # Update the existing graph state
-                instance.graph_state.serialized_graph = graph_state_data
+                instance.graph_state.serialized_graph = graph_state_data.get('serialized_graph',
+                                                                             instance.graph_state.serialized_graph)
                 instance.graph_state.saved_by = self.context['request'].user
                 instance.graph_state.save()
             else:
                 # Create a new graph state if none exists
                 GraphState.objects.create(
                     connectivity_statement=instance,
-                    serialized_graph=graph_state_data,
+                    serialized_graph=graph_state_data.get('serialized_graph', {}),
                     saved_by=self.context['request'].user
                 )
 

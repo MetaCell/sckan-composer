@@ -410,10 +410,10 @@ export interface ConnectivityStatement {
     'errors': Array<any>;
     /**
      * 
-     * @type {{ [key: string]: any; }}
+     * @type {GraphState}
      * @memberof ConnectivityStatement
      */
-    'graph_state'?: { [key: string]: any; };
+    'graph_state'?: GraphState | null;
 }
 /**
  * @type ConnectivityStatementCircuitType
@@ -627,10 +627,10 @@ export interface ConnectivityStatementUpdate {
     'errors': Array<any>;
     /**
      * 
-     * @type {{ [key: string]: any; }}
+     * @type {GraphState}
      * @memberof ConnectivityStatementUpdate
      */
-    'graph_state'?: { [key: string]: any; };
+    'graph_state'?: GraphState | null;
 }
 /**
  * Destination
@@ -716,6 +716,19 @@ export interface DestinationSerializerDetails {
 }
 
 
+/**
+ * 
+ * @export
+ * @interface GraphState
+ */
+export interface GraphState {
+    /**
+     * 
+     * @type {{ [key: string]: any; }}
+     * @memberof GraphState
+     */
+    'serialized_graph': { [key: string]: any; };
+}
 /**
  * Knowledge Statement
  * @export
@@ -1517,10 +1530,10 @@ export interface PatchedConnectivityStatementUpdate {
     'errors'?: Array<any>;
     /**
      * 
-     * @type {{ [key: string]: any; }}
+     * @type {GraphState}
      * @memberof PatchedConnectivityStatementUpdate
      */
-    'graph_state'?: { [key: string]: any; };
+    'graph_state'?: GraphState | null;
 }
 /**
  * Destination

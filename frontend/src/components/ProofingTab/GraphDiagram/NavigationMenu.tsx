@@ -1,11 +1,12 @@
-import {Stack, Divider} from "@mui/material";
+import {Stack, Divider, CircularProgress, Backdrop} from "@mui/material";
 import FitScreenOutlinedIcon from "@mui/icons-material/FitScreenOutlined";
 import ZoomInOutlinedIcon from "@mui/icons-material/ZoomInOutlined";
 import ZoomOutOutlinedIcon from "@mui/icons-material/ZoomOutOutlined";
+import RefreshIcon from '@mui/icons-material/Refresh';
 import SaveIcon from '@mui/icons-material/Save';
 import IconButton from "@mui/material/IconButton";
 import {DiagramEngine} from "@projectstorm/react-diagrams-core";
-import {useState} from "react";
+import React, {useState} from "react";
 import {PatchedConnectivityStatementUpdate} from "../../../apiclient/backend";
 import connectivityStatementService from "../../../services/StatementService";
 
@@ -19,6 +20,7 @@ interface NavigationMenuProps {
 const NavigationMenu = (props: NavigationMenuProps) => {
   const {engine, statementId} = props
   const [isSaving, setIsSaving] = useState<boolean>(false)
+  const [needsRefresh, setNeedsRefresh] = useState<boolean>(false);
 
 
   const zoomOut = () => {
@@ -42,7 +44,7 @@ const NavigationMenu = (props: NavigationMenuProps) => {
     const serializedGraph = model.serialize()
 
     const patchData: PatchedConnectivityStatementUpdate = {
-      graph_state: serializedGraph
+      graph_state: {serialized_graph: serializedGraph}
     }
 
     try {
@@ -55,7 +57,21 @@ const NavigationMenu = (props: NavigationMenuProps) => {
     }
   }
 
-  return engine ? (
+  const refreshDiagram = () => {
+    setIsSaving(true);
+    console.log("TODO: process differences")
+    console.log("TODO: position nodes")
+    console.log("TODO: save graph state")
+    setNeedsRefresh(false);
+
+
+  };
+
+  return isSaving ? (
+    <Backdrop open={isSaving}>
+      <CircularProgress color="inherit"/>
+    </Backdrop>
+  ) : (
     <Stack
       direction="row"
       spacing="1rem"
@@ -102,8 +118,15 @@ const NavigationMenu = (props: NavigationMenuProps) => {
       <IconButton onClick={() => saveGraph()}>
         <SaveIcon/>
       </IconButton>
+      <IconButton
+        onClick={refreshDiagram}
+        disabled={!needsRefresh}
+        color={needsRefresh ? "primary" : "default"}
+      >
+        <RefreshIcon/>
+      </IconButton>
     </Stack>
-  ) : null;
+  )
 };
 
 export default NavigationMenu;

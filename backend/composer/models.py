@@ -713,7 +713,6 @@ class ConnectivityStatement(models.Model):
         ]
 
 
-# TODO: We likely need to reset this on the addition of new nodes to the connectivity statement
 class GraphState(models.Model):
     connectivity_statement = models.OneToOneField(
         ConnectivityStatement,
