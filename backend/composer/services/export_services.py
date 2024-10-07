@@ -410,10 +410,6 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
     plain_notes = [
         note.note for note in cs.prefetched_notes if note.type == NoteType.PLAIN
     ]
-    different_notes = [
-        note.note for note in cs.prefetched_notes if note.type == NoteType.DIFFERENT
-    ]
-
     review_notes = "\n".join(plain_notes)
     curation_notes = "\n".join(
         note.note for note in cs.sentence.prefetched_sentence_notes
