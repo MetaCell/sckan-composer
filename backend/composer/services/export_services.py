@@ -549,7 +549,6 @@ def do_transition_to_exported(export_batch: ExportBatch, user: User):
 
 
 def dump_export_batch(export_batch, folder_path: typing.Optional[str] = None) -> str:
-    # returns the path of the exported file
     if folder_path is None:
         folder_path = tempfile.gettempdir()
 
@@ -560,26 +559,41 @@ def dump_export_batch(export_batch, folder_path: typing.Optional[str] = None) ->
 
     csv_attributes_mapping = generate_csv_attributes_mapping()
 
+    # Prefetch related data
+    connectivity_statements = export_batch.connectivity_statements.select_related(
+        'sentence', 'sex', 'functional_circuit_role', 'projection_phenotype'
+    ).prefetch_related(
+        'origins',
+        'notes',
+        'tags',
+        'species',
+        'forward_connection',
+        'provenance_set',
+        'sentence__notes',
+        'via_set__anatomical_entities',
+        'via_set__from_entities',
+        'destinations__anatomical_entities',
+        'destinations__from_entities',
+    )
+
     with open(filepath, "w", newline="") as csvfile:
         writer = csv.writer(csvfile)
-        # Write header row
         headers = csv_attributes_mapping.keys()
         writer.writerow(headers)
 
-        # Write data rows
-        for obj in export_batch.connectivity_statements.all():
+        for cs in connectivity_statements:
             try:
-                rows = get_rows(obj)
+                rows = get_rows(cs)
             except UnexportableConnectivityStatement as e:
-                logging.warning(
-                    f"Connectivity Statement with id {obj.id} skipped due to {e}"
-                )
+                logging.warning(f"Connectivity Statement with id {cs.id} skipped due to {e}")
                 continue
+
             for row in rows:
                 row_content = []
                 for key in csv_attributes_mapping:
-                    row_content.append(csv_attributes_mapping[key](obj, row))
+                    row_content.append(csv_attributes_mapping[key](cs, row))
                 writer.writerow(row_content)
+
     return filepath
 
 
