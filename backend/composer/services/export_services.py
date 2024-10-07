@@ -1,12 +1,6 @@
 import csv
 import logging
 import sys
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler(sys.stdout)]
-)
 import os
 import tempfile
 import typing
@@ -14,7 +8,7 @@ from typing import Dict, Callable, List
 
 from django.contrib.auth.models import User
 from django.db import transaction
-from django.db.models import Count, QuerySet, Prefetch, Q, F
+from django.db.models import Count, QuerySet, Prefetch
 from django.utils import timezone
 
 from composer.enums import (
