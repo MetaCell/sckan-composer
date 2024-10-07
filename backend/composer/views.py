@@ -41,7 +41,7 @@ def export(request):
     """
     Exporting all connectivity statements that have state NPO Approved
     """
-    time.sleep(30)
+    time.sleep(120)
     if request.user.is_staff:
         # only staff users can export connectivity statements
         qs = ConnectivityStatement.objects.filter(state=CSState.NPO_APPROVED)
