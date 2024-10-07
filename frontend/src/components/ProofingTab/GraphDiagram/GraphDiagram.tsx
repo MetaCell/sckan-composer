@@ -48,7 +48,8 @@ interface GraphDiagramProps {
   vias: ViaSerializerDetails[] | undefined;
   destinations: DestinationSerializerDetails[] | undefined;
   forwardConnection?: any[] | undefined;
-  graphState?: any | undefined
+  serializedGraph?: any | undefined
+  needsRefresh?: boolean | undefined
 }
 
 function getId(layerId: string, entity: AnatomicalEntity) {
@@ -216,7 +217,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
                                                      vias,
                                                      destinations,
                                                      forwardConnection = [],
-                                                     graphState
+                                                     serializedGraph,
+                                                     needsRefresh
                                                    }) => {
   const {statementId} = useParams();
   const [engine] = useState(() => createEngine());
@@ -233,10 +235,10 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   // This effect runs whenever origins, vias, or destinations change
   useEffect(() => {
     const model = new DiagramModel();
-    if (graphState) {
+    if (serializedGraph) {
       // If graphState is provided, deserialize it and set it as the model
       try {
-        model.deserializeModel(graphState, engine);
+        model.deserializeModel(serializedGraph, engine);
         setModelUpdated(true);
       } catch (error) {
         // Fallback to processing data if deserialization fails
@@ -254,7 +256,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     engine.setModel(model);
     // engine.getModel().setLocked(true)
     setModelUpdated(true)
-  }, [origins, vias, destinations, engine, forwardConnection, graphState]);
+  }, [engine, serializedGraph]);
 
   // This effect prevents the default scroll and touchmove behavior
   useEffect(() => {
@@ -289,7 +291,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   return (
     modelUpdated ? (
         <div ref={containerRef} className={"graphContainer"}>
-          <NavigationMenu engine={engine} statementId={statementId || "-1"}/>
+          <NavigationMenu engine={engine} statementId={statementId || "-1"} needsRefresh={needsRefresh}/>
           <InfoMenu engine={engine} forwardConnection={true}/>
           <CanvasWidget className={"graphContainer"} engine={engine}/>
         </div>)

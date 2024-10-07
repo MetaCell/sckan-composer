@@ -22,3 +22,13 @@ def join_entities(entities):
     elif entities_list:
         return entities_list[0]
     return ''
+
+
+def mark_graph_rendering_state_as_outdated(connectivity_statement):
+    try:
+        graph_rendering_state = connectivity_statement.graph_rendering_state
+        if graph_rendering_state and not graph_rendering_state.is_outdated:
+            graph_rendering_state.is_outdated = True
+            graph_rendering_state.save()
+    except:
+        pass

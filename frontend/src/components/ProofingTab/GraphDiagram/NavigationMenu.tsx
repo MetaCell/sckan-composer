@@ -15,12 +15,12 @@ const ZOOM_CHANGE = 25
 interface NavigationMenuProps {
   engine: DiagramEngine;
   statementId: string;
+  needsRefresh: boolean | undefined;
 }
 
 const NavigationMenu = (props: NavigationMenuProps) => {
-  const {engine, statementId} = props
+  const {engine, statementId, needsRefresh} = props
   const [isSaving, setIsSaving] = useState<boolean>(false)
-  const [needsRefresh, setNeedsRefresh] = useState<boolean>(false);
 
 
   const zoomOut = () => {
@@ -44,7 +44,7 @@ const NavigationMenu = (props: NavigationMenuProps) => {
     const serializedGraph = model.serialize()
 
     const patchData: PatchedConnectivityStatementUpdate = {
-      graph_state: {serialized_graph: serializedGraph}
+      graph_rendering_state: {serialized_graph: serializedGraph}
     }
 
     try {
@@ -58,13 +58,8 @@ const NavigationMenu = (props: NavigationMenuProps) => {
   }
 
   const refreshDiagram = () => {
-    setIsSaving(true);
-    console.log("TODO: process differences")
-    console.log("TODO: position nodes")
-    console.log("TODO: save graph state")
-    setNeedsRefresh(false);
-
-
+    console.log("Update graph")
+    console.log("Save graph")
   };
 
   return isSaving ? (
@@ -122,6 +117,11 @@ const NavigationMenu = (props: NavigationMenuProps) => {
         onClick={refreshDiagram}
         disabled={!needsRefresh}
         color={needsRefresh ? "primary" : "default"}
+        sx={{
+          opacity: !needsRefresh ? 0.5 : 1,
+          cursor: !needsRefresh ? "not-allowed" : "pointer",
+          color: !needsRefresh ? "rgba(0, 0, 0, 0.26)" : "inherit",
+        }}
       >
         <RefreshIcon/>
       </IconButton>

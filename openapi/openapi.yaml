@@ -2129,7 +2129,7 @@ components:
           type: array
           items: {}
           readOnly: true
-        graph_state:
+        graph_rendering_state:
           allOf:
           - $ref: '#/components/schemas/GraphState'
           nullable: true
@@ -2272,7 +2272,7 @@ components:
           type: array
           items: {}
           readOnly: true
-        graph_state:
+        graph_rendering_state:
           allOf:
           - $ref: '#/components/schemas/GraphState'
           nullable: true
@@ -2348,6 +2348,8 @@ components:
         serialized_graph:
           type: object
           additionalProperties: {}
+        is_outdated:
+          type: boolean
       required:
       - serialized_graph
     KnowledgeStatement:
@@ -2851,7 +2853,7 @@ components:
           type: array
           items: {}
           readOnly: true
-        graph_state:
+        graph_rendering_state:
           allOf:
           - $ref: '#/components/schemas/GraphState'
           nullable: true

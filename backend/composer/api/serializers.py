@@ -21,7 +21,7 @@ from ..models import (
     Sentence,
     Specie,
     Tag,
-    Via, Destination, AnatomicalEntityIntersection, Region, Layer, AnatomicalEntityMeta, GraphState,
+    Via, Destination, AnatomicalEntityIntersection, Region, Layer, AnatomicalEntityMeta, GraphRenderingState,
 )
 from ..services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
@@ -498,12 +498,15 @@ class BaseConnectivityStatementSerializer(FixManyToManyMixin, FixedWritableNeste
 
 class GraphStateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = GraphState
-        fields = ['serialized_graph']
+        model = GraphRenderingState
+        fields = ['serialized_graph', 'is_outdated']
 
     def to_representation(self, instance):
-        return instance.serialized_graph
-
+        representation = super().to_representation(instance)
+        return {
+            'serialized_graph': representation['serialized_graph'],
+            'is_outdated': representation['is_outdated'],
+        }
 
 class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     """Connectivity Statement"""
@@ -529,7 +532,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     entities_journey = serializers.SerializerMethodField()
     statement_preview = serializers.SerializerMethodField()
     errors = serializers.SerializerMethodField()
-    graph_state = GraphStateSerializer(required=False, allow_null=True)
+    graph_rendering_state = GraphStateSerializer(required=False, allow_null=True)
 
     def get_available_transitions(self, instance) -> list[CSState]:
         request = self.context.get("request", None)
@@ -623,21 +626,21 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         validated_data.pop('via_set', None)
         validated_data.pop('destinations', None)
 
-        # Extract the graph_state from the validated data
-        graph_state_data = validated_data.pop('graph_state', None)
+        # Extract the graph_rendering_state from the validated data
+        graph_rendering_state_data = validated_data.pop('graph_rendering_state', None)
 
-        if graph_state_data is not None:
-            if hasattr(instance, 'graph_state') and instance.graph_state is not None:
+        if graph_rendering_state_data is not None:
+            if hasattr(instance, 'graph_rendering_state') and instance.graph_rendering_state is not None:
                 # Update the existing graph state
-                instance.graph_state.serialized_graph = graph_state_data.get('serialized_graph',
-                                                                             instance.graph_state.serialized_graph)
-                instance.graph_state.saved_by = self.context['request'].user
-                instance.graph_state.save()
+                instance.graph_rendering_state.serialized_graph = graph_rendering_state_data.get('serialized_graph',
+                                                                             instance.graph_rendering_state.serialized_graph)
+                instance.graph_rendering_state.saved_by = self.context['request'].user
+                instance.graph_rendering_state.save()
             else:
                 # Create a new graph state if none exists
-                GraphState.objects.create(
+                GraphRenderingState.objects.create(
                     connectivity_statement=instance,
-                    serialized_graph=graph_state_data.get('serialized_graph', {}),
+                    serialized_graph=graph_rendering_state_data.get('serialized_graph', {}),
                     saved_by=self.context['request'].user
                 )
 
@@ -678,7 +681,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             "has_notes",
             "statement_preview",
             "errors",
-            "graph_state"
+            "graph_rendering_state"
         )
 
 
@@ -721,7 +724,7 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
             "has_notes",
             "statement_preview",
             "errors",
-            "graph_state"
+            "graph_rendering_state"
         )
 
 

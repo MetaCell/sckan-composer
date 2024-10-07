@@ -4,7 +4,6 @@ from django.db.models import Q, CheckConstraint
 from django.db.models.expressions import F
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
-from django.core.exceptions import ValidationError
 
 from composer.services.state_services import (
     ConnectivityStatementStateService,
@@ -22,7 +21,7 @@ from .enums import (
     Projection,
 )
 from .services.graph_service import compile_journey
-from .utils import doi_uri, pmcid_uri, pmid_uri, create_reference_uri
+from .utils import doi_uri, pmcid_uri, pmid_uri, create_reference_uri, mark_graph_rendering_state_as_outdated
 
 
 # from django_fsm_log.decorators import fsm_log_by
@@ -713,11 +712,11 @@ class ConnectivityStatement(models.Model):
         ]
 
 
-class GraphState(models.Model):
+class GraphRenderingState(models.Model):
     connectivity_statement = models.OneToOneField(
         ConnectivityStatement,
         on_delete=models.CASCADE,
-        related_name='graph_state',
+        related_name='graph_rendering_state',
     )
     serialized_graph = models.JSONField()  # Stores the serialized diagram model
     created_at = models.DateTimeField(auto_now_add=True)
@@ -725,6 +724,7 @@ class GraphState(models.Model):
     saved_by = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True
     )
+    is_outdated = models.BooleanField(default=False)
 
 
 class AbstractConnectionLayer(models.Model):
@@ -753,6 +753,16 @@ class Destination(AbstractConnectionLayer):
     )
 
     objects = DestinationManager()
+
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            mark_graph_rendering_state_as_outdated(self.connectivity_statement)
+            super(Destination, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        with transaction.atomic():
+            super().delete(*args, **kwargs)
+            mark_graph_rendering_state_as_outdated(self.connectivity_statement)
 
     class Meta:
         constraints = [
@@ -788,6 +798,8 @@ class Via(AbstractConnectionLayer):
                 if old_via.order != self.order:
                     self._update_order_for_other_vias(old_via.order)
                     self.from_entities.clear()
+
+            mark_graph_rendering_state_as_outdated(self.connectivity_statement)
             super(Via, self).save(*args, **kwargs)
 
     def _update_order_for_other_vias(self, old_order):
@@ -826,6 +838,7 @@ class Via(AbstractConnectionLayer):
     def delete(self, *args, **kwargs):
         with transaction.atomic():
             super().delete(*args, **kwargs)
+            mark_graph_rendering_state_as_outdated(self.connectivity_statement)
             vias_to_update = Via.objects.filter(
                 connectivity_statement=self.connectivity_statement,
                 order__gt=self.order
