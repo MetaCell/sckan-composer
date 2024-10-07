@@ -1,6 +1,5 @@
 import csv
 import logging
-import sys
 import os
 import tempfile
 import typing
