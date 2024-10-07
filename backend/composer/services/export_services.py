@@ -34,10 +34,6 @@ from composer.models import (
     AnatomicalEntity,
     Destination,
     Note,
-    Phenotype,
-    Sex,
-    FunctionalCircuitRole,
-    ProjectionPhenotype,
 )
 from composer.services.connections_service import (
     get_complete_from_entities_for_destination,
@@ -333,7 +329,7 @@ def get_circuit_role_row(cs: ConnectivityStatement):
     )
 
 
-def get_laterality_row(cs: ConnectivityStatement):
+def get_projection_row(cs: ConnectivityStatement):
     return Row(
         cs.get_projection_display(),
         TEMP_PROJECTION_MAP.get(cs.projection, ""),
@@ -443,16 +439,20 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
         rows.append(get_sex_row(cs))
 
     # Circuit Role
-    rows.append(get_circuit_role_row(cs))
+    if cs.circuit_type is not None:
+        rows.append(get_circuit_role_row(cs))
 
-    # Laterality
-    rows.append(get_laterality_row(cs))
+    # Projection
+    if cs.projection is not None:
+        rows.append(get_projection_row(cs))
 
     # Soma Phenotype
-    rows.append(get_soma_phenotype_row(cs))
+    if cs.laterality is not None:
+        rows.append(get_soma_phenotype_row(cs))
 
     # Phenotype
-    rows.append(get_phenotype_row(cs))
+    if cs.phenotype is not None:
+        rows.append(get_phenotype_row(cs))
 
     # Projection Phenotype
     if cs.projection_phenotype:
