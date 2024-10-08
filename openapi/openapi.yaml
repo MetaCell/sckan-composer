@@ -2348,8 +2348,6 @@ components:
         serialized_graph:
           type: object
           additionalProperties: {}
-        is_outdated:
-          type: boolean
       required:
       - serialized_graph
     KnowledgeStatement:

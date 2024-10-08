@@ -728,12 +728,6 @@ export interface GraphState {
      * @memberof GraphState
      */
     'serialized_graph': { [key: string]: any; };
-    /**
-     * 
-     * @type {boolean}
-     * @memberof GraphState
-     */
-    'is_outdated'?: boolean;
 }
 /**
  * Knowledge Statement

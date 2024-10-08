@@ -499,13 +499,12 @@ class BaseConnectivityStatementSerializer(FixManyToManyMixin, FixedWritableNeste
 class GraphStateSerializer(serializers.ModelSerializer):
     class Meta:
         model = GraphRenderingState
-        fields = ['serialized_graph', 'is_outdated']
+        fields = ['serialized_graph']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         return {
             'serialized_graph': representation['serialized_graph'],
-            'is_outdated': representation['is_outdated'],
         }
 
 class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):

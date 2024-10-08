@@ -5,10 +5,9 @@ from django.db.models.signals import post_save, m2m_changed, pre_save, post_dele
 from django_fsm.signals import post_transition
 
 from .enums import CSState, NoteType
-from .models import ConnectivityStatement, ExportBatch, Note, Sentence, Synonym, \
-    AnatomicalEntity, Layer, Region, AnatomicalEntityMeta
+from .models import ConnectivityStatement, ExportBatch, Note, Sentence, \
+    AnatomicalEntity, Layer, Region
 from .services.export_services import compute_metrics, ConnectivityStatementStateService
-from .utils import mark_graph_rendering_state_as_outdated
 
 
 @receiver(post_save, sender=ExportBatch)
@@ -71,17 +70,3 @@ def delete_associated_entities(sender, instance, **kwargs):
     # Delete the associated region_layer if it exists
     if instance.region_layer:
         instance.region_layer.delete()
-
-
-# Signal for changes in the 'origins' many-to-many field
-@receiver(m2m_changed, sender=ConnectivityStatement.origins.through)
-def mark_graph_rendering_as_outdated_on_origins_change(sender, instance, action, **kwargs):
-    if action in ["post_add", "post_remove", "post_clear"]:
-        mark_graph_rendering_state_as_outdated(instance)
-
-
-# Signal for changes in the 'forward_connection' many-to-many field
-@receiver(m2m_changed, sender=ConnectivityStatement.forward_connection.through)
-def mark_graph_rendering_as_outdated_on_forward_connection_change(sender, instance, action, **kwargs):
-    if action in ["post_add", "post_remove", "post_clear"]:
-        mark_graph_rendering_state_as_outdated(instance)

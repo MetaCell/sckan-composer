@@ -24,7 +24,6 @@ const StatementChart = (props: { statement: ConnectivityStatement }) => {
                                   destinations={statement.destinations}
                                   forwardConnection={statement.forward_connection}
                                   serializedGraph={statement.graph_rendering_state?.serialized_graph}
-                                  needsRefresh={statement.graph_rendering_state?.is_outdated}
                     />
                 </Box>
             ) : (

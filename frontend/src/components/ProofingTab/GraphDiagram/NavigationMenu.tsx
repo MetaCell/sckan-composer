@@ -2,7 +2,6 @@ import {Stack, Divider, CircularProgress, Backdrop} from "@mui/material";
 import FitScreenOutlinedIcon from "@mui/icons-material/FitScreenOutlined";
 import ZoomInOutlinedIcon from "@mui/icons-material/ZoomInOutlined";
 import ZoomOutOutlinedIcon from "@mui/icons-material/ZoomOutOutlined";
-import RefreshIcon from '@mui/icons-material/Refresh';
 import SaveIcon from '@mui/icons-material/Save';
 import IconButton from "@mui/material/IconButton";
 import {DiagramEngine} from "@projectstorm/react-diagrams-core";
@@ -15,11 +14,10 @@ const ZOOM_CHANGE = 25
 interface NavigationMenuProps {
   engine: DiagramEngine;
   statementId: string;
-  needsRefresh: boolean | undefined;
 }
 
 const NavigationMenu = (props: NavigationMenuProps) => {
-  const {engine, statementId, needsRefresh} = props
+  const {engine, statementId} = props
   const [isSaving, setIsSaving] = useState<boolean>(false)
 
 
@@ -56,11 +54,6 @@ const NavigationMenu = (props: NavigationMenuProps) => {
       setIsSaving(false)
     }
   }
-
-  const refreshDiagram = () => {
-    console.log("Update graph")
-    console.log("Save graph")
-  };
 
   return isSaving ? (
     <Backdrop open={isSaving}>
@@ -112,18 +105,6 @@ const NavigationMenu = (props: NavigationMenuProps) => {
       </IconButton>
       <IconButton onClick={() => saveGraph()}>
         <SaveIcon/>
-      </IconButton>
-      <IconButton
-        onClick={refreshDiagram}
-        disabled={!needsRefresh}
-        color={needsRefresh ? "primary" : "default"}
-        sx={{
-          opacity: !needsRefresh ? 0.5 : 1,
-          cursor: !needsRefresh ? "not-allowed" : "pointer",
-          color: !needsRefresh ? "rgba(0, 0, 0, 0.26)" : "inherit",
-        }}
-      >
-        <RefreshIcon/>
       </IconButton>
     </Stack>
   )

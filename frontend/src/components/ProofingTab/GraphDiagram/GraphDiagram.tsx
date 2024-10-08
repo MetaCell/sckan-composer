@@ -49,7 +49,6 @@ interface GraphDiagramProps {
   destinations: DestinationSerializerDetails[] | undefined;
   forwardConnection?: any[] | undefined;
   serializedGraph?: any | undefined
-  needsRefresh?: boolean | undefined
 }
 
 function getId(layerId: string, entity: AnatomicalEntity) {
@@ -218,7 +217,6 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
                                                      destinations,
                                                      forwardConnection = [],
                                                      serializedGraph,
-                                                     needsRefresh
                                                    }) => {
   const {statementId} = useParams();
   const [engine] = useState(() => createEngine());
@@ -291,7 +289,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   return (
     modelUpdated ? (
         <div ref={containerRef} className={"graphContainer"}>
-          <NavigationMenu engine={engine} statementId={statementId || "-1"} needsRefresh={needsRefresh}/>
+          <NavigationMenu engine={engine} statementId={statementId || "-1"}/>
           <InfoMenu engine={engine} forwardConnection={true}/>
           <CanvasWidget className={"graphContainer"} engine={engine}/>
         </div>)
