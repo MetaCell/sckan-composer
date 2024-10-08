@@ -507,6 +507,7 @@ class GraphStateSerializer(serializers.ModelSerializer):
             'serialized_graph': representation['serialized_graph'],
         }
 
+
 class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     """Connectivity Statement"""
 
@@ -621,30 +622,10 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         return representation
 
     def update(self, instance, validated_data):
-        # Remove 'vias' and 'destinations' from validated_data if they exist
+        # Remove 'via_set' and 'destinations' from validated_data if they exist
         validated_data.pop('via_set', None)
         validated_data.pop('destinations', None)
-
-        # Extract the graph_rendering_state from the validated data
-        graph_rendering_state_data = validated_data.pop('graph_rendering_state', None)
-
-        if graph_rendering_state_data is not None:
-            if hasattr(instance, 'graph_rendering_state') and instance.graph_rendering_state is not None:
-                # Update the existing graph state
-                instance.graph_rendering_state.serialized_graph = graph_rendering_state_data.get('serialized_graph',
-                                                                             instance.graph_rendering_state.serialized_graph)
-                instance.graph_rendering_state.saved_by = self.context['request'].user
-                instance.graph_rendering_state.save()
-            else:
-                # Create a new graph state if none exists
-                GraphRenderingState.objects.create(
-                    connectivity_statement=instance,
-                    serialized_graph=graph_rendering_state_data.get('serialized_graph', {}),
-                    saved_by=self.context['request'].user
-                )
-
-        # Call the super class's update method with the modified validated_data
-        return super(ConnectivityStatementSerializer, self).update(instance, validated_data)
+        return instance
 
     class Meta(BaseConnectivityStatementSerializer.Meta):
         fields = (
