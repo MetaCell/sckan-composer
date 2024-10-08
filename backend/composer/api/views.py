@@ -365,11 +365,7 @@ class ConnectivityStatementViewSet(
 
         if response.status_code == status.HTTP_200_OK:
             instance = self.get_object()
-
-            # Handle graph rendering state outside the serializer
             self.handle_graph_rendering_state(instance, graph_rendering_state_data, request.user)
-
-            # Handle origin_ids logic
             if origin_ids:
                 instance.set_origins(origin_ids)
 
@@ -387,11 +383,10 @@ class ConnectivityStatementViewSet(
 
         if response.status_code == status.HTTP_200_OK:
             instance = self.get_object()
-
-            # Handle graph rendering state outside the serializer
             self.handle_graph_rendering_state(instance, graph_rendering_state_data, request.user)
 
         return response
+
 
 @extend_schema(tags=["public"])
 class KnowledgeStatementViewSet(
