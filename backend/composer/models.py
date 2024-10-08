@@ -725,6 +725,7 @@ class GraphRenderingState(models.Model):
         User, on_delete=models.SET_NULL, null=True, blank=True
     )
 
+
 class AbstractConnectionLayer(models.Model):
     connectivity_statement = models.ForeignKey(ConnectivityStatement, on_delete=models.CASCADE)
     anatomical_entities = models.ManyToManyField(AnatomicalEntity, blank=True)
@@ -751,14 +752,6 @@ class Destination(AbstractConnectionLayer):
     )
 
     objects = DestinationManager()
-
-    def save(self, *args, **kwargs):
-        with transaction.atomic():
-            super(Destination, self).save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        with transaction.atomic():
-            super().delete(*args, **kwargs)
 
     class Meta:
         constraints = [
