@@ -3,17 +3,13 @@ import InfoMenu from "./InfoMenu";
 import NavigationMenu from "./NavigationMenu";
 import createEngine, {
   BasePositionModelOptions,
-  DefaultLinkModel,
   DiagramModel,
 } from '@projectstorm/react-diagrams';
 import {CanvasWidget} from '@projectstorm/react-canvas-core';
-import {CustomNodeModel} from "./Models/CustomNodeModel";
 import {CustomNodeFactory} from "./Factories/CustomNodeFactory";
 import {
   AnatomicalEntity,
   DestinationSerializerDetails,
-  TypeB60Enum,
-  TypeC11Enum,
   ViaSerializerDetails
 } from "../../../apiclient/backend";
 import {useParams} from "react-router-dom";

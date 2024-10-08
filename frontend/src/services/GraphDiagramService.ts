@@ -27,12 +27,6 @@ const POSITION_CONSTANTS = {
   xStart: 100
 };
 
-interface SerializedNodePosition {
-  id: string;
-  x: number;
-  y: number;
-}
-
 interface ProcessDataParams {
   origins: AnatomicalEntity[] | undefined;
   vias: ViaSerializerDetails[] | undefined;
@@ -42,12 +36,12 @@ interface ProcessDataParams {
 }
 
 export const processData = ({
-  origins,
-  vias,
-  destinations,
-  forwardConnection,
-  serializedGraph
-}: ProcessDataParams): { nodes: CustomNodeModel[]; links: DefaultLinkModel[] } => {
+                              origins,
+                              vias,
+                              destinations,
+                              forwardConnection,
+                              serializedGraph
+                            }: ProcessDataParams): { nodes: CustomNodeModel[]; links: DefaultLinkModel[] } => {
   const nodes: CustomNodeModel[] = [];
   const links: DefaultLinkModel[] = [];
   const nodeMap = new Map<string, CustomNodeModel>();
@@ -68,12 +62,15 @@ export const processData = ({
     vias?.length || 0
   );
 
-  return { nodes, links };
+  return {nodes, links};
 };
 
 // Helper functions
 
-function extractNodePositionsFromSerializedGraph(serializedGraph: any): Map<string, Map<string, { x: number; y: number }>> {
+function extractNodePositionsFromSerializedGraph(serializedGraph: any): Map<string, Map<string, {
+  x: number;
+  y: number
+}>> {
   const positions = new Map<string, Map<string, { x: number; y: number }>>();
   if (!serializedGraph) return positions;
 
@@ -85,12 +82,12 @@ function extractNodePositionsFromSerializedGraph(serializedGraph: any): Map<stri
   Object.values(models).forEach((model: any) => {
     const externalId = model.externalId;
     const customType = model.customType; // NodeTypes: 'Origin', 'Via', 'Destination'
-    const position = model.position || { x: model.x, y: model.y };
+    const position = model.position || {x: model.x, y: model.y};
     if (externalId && position && customType) {
       if (!positions.has(customType)) {
         positions.set(customType, new Map());
       }
-      positions.get(customType)!.set(externalId, { x: position.x, y: position.y });
+      positions.get(customType)!.set(externalId, {x: position.x, y: position.y});
     }
   });
   return positions;
@@ -102,17 +99,17 @@ function processOrigins(
   nodes: CustomNodeModel[],
   existingPositions: Map<string, { x: number; y: number }>
 ) {
-  const { yStart, xIncrement, xStart } = POSITION_CONSTANTS;
+  const {yStart, xIncrement, xStart} = POSITION_CONSTANTS;
   let xOrigin = xStart;
 
   origins?.forEach(origin => {
     const id = getId(NodeTypes.Origin, origin);
-    const { name, ontology_uri } = getEntityNameAndUri(origin);
+    const {name} = getEntityNameAndUri(origin);
     const fws: never[] = [];
     const originNode = new CustomNodeModel(
       NodeTypes.Origin,
       name,
-      origin.id.toString(), // Use externalId
+      origin.id.toString(),
       {
         forward_connection: fws,
         to: []
@@ -133,7 +130,7 @@ function processVias(
   links: DefaultLinkModel[],
   existingPositions: Map<string, { x: number; y: number }>
 ) {
-  const { yStart, yIncrement, xIncrement } = POSITION_CONSTANTS;
+  const {yStart, yIncrement, xIncrement} = POSITION_CONSTANTS;
 
   vias?.forEach(via => {
     const layerIndex = via.order + 1;
@@ -142,11 +139,11 @@ function processVias(
 
     via.anatomical_entities.forEach(entity => {
       const id = getId(NodeTypes.Via + layerIndex, entity);
-      const { name, ontology_uri } = getEntityNameAndUri(entity);
+      const {name} = getEntityNameAndUri(entity);
       const viaNode = new CustomNodeModel(
         NodeTypes.Via,
         name,
-        entity.id.toString(), // Use externalId
+        entity.id.toString(),
         {
           forward_connection: [],
           from: [],
@@ -183,18 +180,18 @@ function processDestinations(
   existingPositions: Map<string, { x: number; y: number }>,
   viasLength: number
 ) {
-  const { yStart, yIncrement, xIncrement } = POSITION_CONSTANTS;
+  const {yStart, yIncrement, xIncrement} = POSITION_CONSTANTS;
   const yDestination = yIncrement * (viasLength + 1) + yStart;
   let xDestination = 115;
 
   destinations?.forEach(destination => {
     destination.anatomical_entities.forEach(entity => {
-      const { name, ontology_uri } = getEntityNameAndUri(entity);
+      const {name} = getEntityNameAndUri(entity);
       const fws = filterForwardConnections(forwardConnection, entity);
       const destinationNode = new CustomNodeModel(
         NodeTypes.Destination,
         name,
-        entity.id.toString(), // Use externalId
+        entity.id.toString(),
         {
           forward_connection: fws,
           from: [],
@@ -233,7 +230,7 @@ function getEntityNameAndUri(entity: AnatomicalEntity): { name: string; ontology
   const ontology_uri = entity.simple_entity
     ? entity.simple_entity.ontology_uri
     : `${entity.region_layer.region.ontology_uri}, ${entity.region_layer.layer.ontology_uri}`;
-  return { name, ontology_uri };
+  return {name, ontology_uri};
 }
 
 function setPosition(
@@ -248,7 +245,7 @@ function setPosition(
     const position = existingPositions.get(externalId)!;
     node.setPosition(position.x, position.y);
   } else {
-    const { x, y } = findNonOverlappingPosition(defaultX, defaultY, nodes);
+    const {x, y} = findNonOverlappingPosition(defaultX, defaultY, nodes);
     node.setPosition(x, y);
   }
 }
@@ -262,15 +259,20 @@ function findNonOverlappingPosition(
   let newY = y;
   let collision = false;
   do {
+    let currentX = newX;
+    let currentY = newY;
+
     collision = nodes.some(node => {
-      return Math.abs(node.getX() - newX) < 50 && Math.abs(node.getY() - newY) < 50;
+      return Math.abs(node.getX() - currentX) < 50 && Math.abs(node.getY() - currentY) < 50;
     });
+
     if (collision) {
-      newX += 50; // Adjust the offset as needed
+      newX += 50;
       newY += 50;
     }
   } while (collision);
-  return { x: newX, y: newY };
+
+  return {x: newX, y: newY};
 }
 
 function findNodeForEntity(
@@ -313,8 +315,8 @@ function updateNodeOptions(
 ) {
   const sourceOptions = sourceNode.getOptions() as CustomNodeOptions;
   const targetOptions = targetNode.getOptions() as CustomNodeOptions;
-  sourceOptions.to?.push({ name: targetNode.name, type: targetType });
-  targetOptions.from?.push({ name: sourceNode.name, type: sourceNode.getCustomType() });
+  sourceOptions.to?.push({name: targetNode.name, type: targetType});
+  targetOptions.from?.push({name: sourceNode.name, type: sourceNode.getCustomType()});
 }
 
 function filterForwardConnections(forwardConnection: any[], entity: AnatomicalEntity): any[] {
