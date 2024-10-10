@@ -14,8 +14,8 @@ from .neurondm_script import main as get_statements_from_neurondm
 logger_service = LoggerService()
 
 
-def ingest_statements(update_upstream=False, update_anatomical_entities=False):
-    statements_list = get_statements_from_neurondm(logger_service_param=logger_service)
+def ingest_statements(update_upstream=False, update_anatomical_entities=False, should_overwrite=True, full_imports=[], label_imports=[]):
+    statements_list = get_statements_from_neurondm(full_imports=full_imports, label_imports=label_imports, logger_service_param=logger_service)
     overridable_statements = get_overwritable_statements(statements_list)
     statements = validate_statements(overridable_statements, update_anatomical_entities)
 
