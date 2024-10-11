@@ -10,25 +10,35 @@ from composer.services.cs_ingestion.models import LoggableAnomaly
 logger_service = LoggerService()
 
 
-def get_overwritable_statements(statements_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    overwritable_statements = [
+def get_overwritable_and_new_statements(statements_list: List[Dict[str, Any]], disable_overwrite: bool=False) -> List[Dict[str, Any]]:
+    overwritable_and_new_statements = [
         statement for statement in statements_list
-        if not has_invalid_sentence(statement) and not has_invalid_statement(statement)
+        if not has_invalid_sentence(statement, disable_overwrite) and not has_invalid_statement(statement, disable_overwrite)
     ]
-    return overwritable_statements
+    return overwritable_and_new_statements
 
 
-def has_invalid_sentence(statement: Dict) -> bool:
+def has_invalid_sentence(statement: Dict, disable_overwrite: bool) -> bool:
+    """
+    If disable_overwrite is True, then the sentence is considered invalid for overwriting - if it already exists in the database.
+    """
     try:
         sentence = Sentence.objects.get(doi__iexact=statement[ID])
+        if disable_overwrite:
+            return True
     except Sentence.DoesNotExist:
         return False
     return not can_sentence_be_overwritten(sentence, statement)
 
 
-def has_invalid_statement(statement: Dict) -> bool:
+def has_invalid_statement(statement: Dict, disable_overwrite: bool) -> bool:
+    """
+    If disable_overwrite is True, then the statement is considered invalid for overwriting - if it already exists in the database.
+    """
     try:
         connectivity_statement = ConnectivityStatement.objects.get(reference_uri=statement[ID])
+        if disable_overwrite:
+            return True
     except ConnectivityStatement.DoesNotExist:
         return False
     return not can_statement_be_overwritten(connectivity_statement, statement)

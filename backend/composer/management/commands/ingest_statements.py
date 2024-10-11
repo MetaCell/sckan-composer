@@ -19,6 +19,12 @@ class Command(BaseCommand):
             help='Set this flag to try move anatomical entities to specific layer, region.',
         )
         parser.add_argument(
+            '--disable_overwrite',
+            action='store_true',
+            help='Set this flag to overwrite existing statements.',
+        )
+
+        parser.add_argument(
             '--full_imports',
             nargs='*',
             help='List of full imports to include in the ingestion.',
@@ -32,13 +38,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         update_upstream = options['update_upstream']
         update_anatomical_entities = options['update_anatomical_entities']
-        should_overwrite = options['overwrite']
+        disable_overwrite = options['disable_overwrite']
         full_imports = options['full_imports']
         label_imports = options['label_imports']
 
         start_time = time.time()
 
-        ingest_statements(update_upstream, update_anatomical_entities, should_overwrite, full_imports, label_imports)
+        ingest_statements(update_upstream, update_anatomical_entities, disable_overwrite, full_imports, label_imports)
 
         end_time = time.time()
 
