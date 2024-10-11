@@ -3,6 +3,7 @@ from typing import List
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django_fsm import FSMField
+from drf_spectacular.types import OpenApiTypes
 from drf_writable_nested.mixins import UniqueFieldsMixin
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
@@ -20,7 +21,7 @@ from ..models import (
     Sentence,
     Specie,
     Tag,
-    Via, Destination, AnatomicalEntityIntersection, Region, Layer, AnatomicalEntityMeta,
+    Via, Destination, AnatomicalEntityIntersection, Region, Layer, AnatomicalEntityMeta, GraphRenderingState,
 )
 from ..services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
@@ -495,6 +496,18 @@ class BaseConnectivityStatementSerializer(FixManyToManyMixin, FixedWritableNeste
         read_only_fields = ("state",)
 
 
+class GraphStateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GraphRenderingState
+        fields = ['serialized_graph']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return {
+            'serialized_graph': representation['serialized_graph'],
+        }
+
+
 class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     """Connectivity Statement"""
 
@@ -516,9 +529,10 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     )
     available_transitions = serializers.SerializerMethodField()
     journey = serializers.SerializerMethodField()
-    entities_journey = serializers.SerializerMethodField()    
+    entities_journey = serializers.SerializerMethodField()
     statement_preview = serializers.SerializerMethodField()
     errors = serializers.SerializerMethodField()
+    graph_rendering_state = GraphStateSerializer(required=False, allow_null=True)
 
     def get_available_transitions(self, instance) -> list[CSState]:
         request = self.context.get("request", None)
@@ -529,7 +543,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         if 'journey' not in self.context:
             self.context['journey'] = instance.get_journey()
         return self.context['journey']
-    
+
     def get_entities_journey(self, instance):
         self.context['entities_journey'] = instance.get_entities_journey()
         return self.context['entities_journey']
@@ -608,12 +622,10 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         return representation
 
     def update(self, instance, validated_data):
-        # Remove 'vias' and 'destinations' from validated_data if they exist
+        # Remove 'via_set' and 'destinations' from validated_data if they exist
         validated_data.pop('via_set', None)
         validated_data.pop('destinations', None)
-
-        # Call the super class's update method with the modified validated_data
-        return super(ConnectivityStatementSerializer, self).update(instance, validated_data)
+        return instance
 
     class Meta(BaseConnectivityStatementSerializer.Meta):
         fields = (
@@ -648,7 +660,8 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             "modified_date",
             "has_notes",
             "statement_preview",
-            "errors"
+            "errors",
+            "graph_rendering_state"
         )
 
 
@@ -690,7 +703,8 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
             "modified_date",
             "has_notes",
             "statement_preview",
-            "errors"
+            "errors",
+            "graph_rendering_state"
         )
 
 

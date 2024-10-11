@@ -5,8 +5,8 @@ from django.db.models.signals import post_save, m2m_changed, pre_save, post_dele
 from django_fsm.signals import post_transition
 
 from .enums import CSState, NoteType
-from .models import ConnectivityStatement, ExportBatch, Note, Sentence, Synonym, \
-    AnatomicalEntity, Layer, Region, AnatomicalEntityMeta
+from .models import ConnectivityStatement, ExportBatch, Note, Sentence, \
+    AnatomicalEntity, Layer, Region
 from .services.export_services import compute_metrics, ConnectivityStatementStateService
 
 

@@ -4,7 +4,6 @@ from django.db.models import Q, CheckConstraint
 from django.db.models.expressions import F
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
-from django.core.exceptions import ValidationError
 
 from composer.services.state_services import (
     ConnectivityStatementStateService,
@@ -664,7 +663,7 @@ class ConnectivityStatement(models.Model):
 
     def get_journey(self):
         return compile_journey(self)['journey']
-    
+
     def get_entities_journey(self):
         entities_journey = compile_journey(self)['entities']
         return entities_journey
@@ -711,6 +710,20 @@ class ConnectivityStatement(models.Model):
                 name="projection_valid",
             )
         ]
+
+
+class GraphRenderingState(models.Model):
+    connectivity_statement = models.OneToOneField(
+        ConnectivityStatement,
+        on_delete=models.CASCADE,
+        related_name='graph_rendering_state',
+    )
+    serialized_graph = models.JSONField()  # Stores the serialized diagram model
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    saved_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
 
 class AbstractConnectionLayer(models.Model):
@@ -774,6 +787,7 @@ class Via(AbstractConnectionLayer):
                 if old_via.order != self.order:
                     self._update_order_for_other_vias(old_via.order)
                     self.from_entities.clear()
+
             super(Via, self).save(*args, **kwargs)
 
     def _update_order_for_other_vias(self, old_order):

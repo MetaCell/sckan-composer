@@ -408,6 +408,12 @@ export interface ConnectivityStatement {
      * @memberof ConnectivityStatement
      */
     'errors': Array<any>;
+    /**
+     * 
+     * @type {GraphState}
+     * @memberof ConnectivityStatement
+     */
+    'graph_rendering_state'?: GraphState | null;
 }
 /**
  * @type ConnectivityStatementCircuitType
@@ -619,6 +625,12 @@ export interface ConnectivityStatementUpdate {
      * @memberof ConnectivityStatementUpdate
      */
     'errors': Array<any>;
+    /**
+     * 
+     * @type {GraphState}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'graph_rendering_state'?: GraphState | null;
 }
 /**
  * Destination
@@ -704,6 +716,19 @@ export interface DestinationSerializerDetails {
 }
 
 
+/**
+ * 
+ * @export
+ * @interface GraphState
+ */
+export interface GraphState {
+    /**
+     * 
+     * @type {{ [key: string]: any; }}
+     * @memberof GraphState
+     */
+    'serialized_graph': { [key: string]: any; };
+}
 /**
  * Knowledge Statement
  * @export
@@ -1503,6 +1528,12 @@ export interface PatchedConnectivityStatementUpdate {
      * @memberof PatchedConnectivityStatementUpdate
      */
     'errors'?: Array<any>;
+    /**
+     * 
+     * @type {GraphState}
+     * @memberof PatchedConnectivityStatementUpdate
+     */
+    'graph_rendering_state'?: GraphState | null;
 }
 /**
  * Destination

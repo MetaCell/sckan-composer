@@ -22,7 +22,9 @@ const StatementChart = (props: { statement: ConnectivityStatement }) => {
                 <Box sx={{height: '800px', width: '100%'}}>
                     <GraphDiagram origins={statement.origins} vias={statement.vias}
                                   destinations={statement.destinations}
-                                  forward_connection={statement.forward_connection} />
+                                  forwardConnection={statement.forward_connection}
+                                  serializedGraph={statement.graph_rendering_state?.serialized_graph}
+                    />
                 </Box>
             ) : (
                 <Box p={3}>
