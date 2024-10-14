@@ -32,13 +32,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         update_upstream = options['update_upstream']
         update_anatomical_entities = options['update_anatomical_entities']
-        should_overwrite = options['overwrite']
         full_imports = options['full_imports']
         label_imports = options['label_imports']
 
         start_time = time.time()
 
-        ingest_statements(update_upstream, update_anatomical_entities, should_overwrite, full_imports, label_imports)
+        ingest_statements(update_upstream, update_anatomical_entities, full_imports, label_imports)
 
         end_time = time.time()
 
