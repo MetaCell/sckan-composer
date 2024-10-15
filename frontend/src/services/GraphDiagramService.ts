@@ -299,7 +299,7 @@ function createLink(
   const sourcePort = sourceNode.getPort(sourcePortName);
   const targetPort = targetNode.getPort(targetPortName);
   if (sourcePort && targetPort) {
-    const link = new DefaultLinkModel();
+    const link = new DefaultLinkModel({locked: true});
     link.setSourcePort(sourcePort);
     link.setTargetPort(targetPort);
     link.getOptions().curvyness = 0;
