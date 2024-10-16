@@ -45,9 +45,11 @@ import {
 import {CustomFooter} from "../Widgets/HoveredOptionContent";
 import {StatementStateChip} from "../Widgets/StateChip";
 import {projections} from "../../services/ProjectionService";
+import {userProfile} from "../../services/UserService";
+
 
 const StatementForm = (props: any) => {
-  const {uiFields, statement, refreshStatement, isDisabled} = props;
+  const {uiFields, statement, isDisabled, action: refreshStatement} = props;
   const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
@@ -182,7 +184,6 @@ const StatementForm = (props: any) => {
       onUpdate: async (selectedOptions: any) => {
         await updateOrigins(selectedOptions, statement.id);
       },
-      refreshStatement: () => refreshStatement(),
       errors: "",
       mapValueToOption: () =>
         mapAnatomicalEntitiesToOptions(statement?.origins, OriginsGroupLabel),
@@ -216,7 +217,6 @@ const StatementForm = (props: any) => {
         {...props}
         onElementDelete={async (element: any) => {
           await api.composerViaDestroy(element.children.props.formData.id);
-          refreshStatement();
         }}
         onElementAdd={async () => {
           await api.composerViaCreate({
@@ -226,7 +226,6 @@ const StatementForm = (props: any) => {
             anatomical_entities: [],
             from_entities: [],
           });
-          refreshStatement();
         }}
         onElementReorder={async (
           sourceIndex: number,
@@ -235,7 +234,6 @@ const StatementForm = (props: any) => {
           await api.composerViaPartialUpdate(statement.vias[sourceIndex].id, {
             order: destinationIndex,
           });
-          refreshStatement();
         }}
         hideDeleteBtn={statement?.vias?.length <= 1 || isDisabled}
         showReOrderingIcon={true}
@@ -265,7 +263,6 @@ const StatementForm = (props: any) => {
                 .composerViaPartialUpdate(viaIndex, {
                   type: typeOption,
                 })
-                .then(() => refreshStatement());
             }
           },
         },
@@ -304,7 +301,6 @@ const StatementForm = (props: any) => {
               propertyToUpdate: "anatomical_entities",
             });
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) =>
             mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
@@ -372,7 +368,6 @@ const StatementForm = (props: any) => {
               return entity
             }
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) => {
             const entities: Option[] = [];
@@ -404,7 +399,6 @@ const StatementForm = (props: any) => {
           await api.composerDestinationDestroy(
             element.children.props.formData.id,
           );
-          refreshStatement();
         }}
         onElementAdd={async () => {
           await api.composerDestinationCreate({
@@ -414,7 +408,6 @@ const StatementForm = (props: any) => {
             anatomical_entities: [],
             from_entities: [],
           });
-          refreshStatement();
         }}
         hideDeleteBtn={statement?.destinations?.length <= 1 || isDisabled}
         showReOrderingIcon={false}
@@ -444,7 +437,6 @@ const StatementForm = (props: any) => {
                 .composerDestinationPartialUpdate(viaIndex, {
                   type: typeOption,
                 })
-                .then(() => refreshStatement());
             }
           },
         },
@@ -482,7 +474,6 @@ const StatementForm = (props: any) => {
               propertyToUpdate: "anatomical_entities",
             });
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) =>
             mapAnatomicalEntitiesToOptions(
@@ -554,7 +545,6 @@ const StatementForm = (props: any) => {
             }
 
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) => {
             const entities: Option[] = [];
@@ -613,9 +603,7 @@ const StatementForm = (props: any) => {
       },
       onUpdate: async (selectedOptions: Option[]) => {
         await updateForwardConnections(selectedOptions, statement);
-        refreshStatement()
       },
-      refreshStatement: () => refreshStatement(),
       statement: statement,
       errors: statement?.errors?.includes("Invalid forward connection")
         ? "Forward connection(s) not found"
@@ -707,6 +695,48 @@ const StatementForm = (props: any) => {
     SelectWidget: CustomSingleSelect,
   };
 
+  const handleErrorAction = (error: any, newStatementData: ConnectivityStatement) => {
+    // Check if the newStatementData has an owner and it's not the current user
+    if (statement.owner && statement.owner?.id !== userProfile.getUser().id) {
+      // Show a confirmation alert to the user
+      const userConfirmed = window.confirm(
+        `This statement is assigned to ${statement.owner.first_name}, assign to yourself? To view the record without assigning ownership, select Cancel.`
+      );
+
+      if (userConfirmed) {
+        // User confirmed to assign ownership
+        const statementIdNumber = statement.id ?? -1; // Ensure newStatementData.id is a valid number
+        const userId = userProfile.getUser().id
+        // Reassign ownership
+        statementService
+          .assignOwner(statementIdNumber, {
+            ...statement,
+            owner_id: userId,
+          })
+          .then((_: ConnectivityStatement) => {
+            // Save and refresh the updated statement
+            return statementService.save({
+              ...newStatementData,
+              owner_id: userId
+            }).then(() => {
+              refreshStatement(); // Refresh after saving
+            });
+          })
+          .catch((error) => {
+            console.error("Failed to reassign ownership", error);
+            refreshStatement(); // Still refresh the statement even if there's an error
+          });
+      } else {
+        // User canceled, just refresh the statement
+        refreshStatement();
+      }
+    } else {
+      // Handle other errors if necessary
+      console.error("An error occurred: ", error);
+    }
+  };
+
+
   return (
     <FormBase
       data={statement}
@@ -731,6 +761,7 @@ const StatementForm = (props: any) => {
         "projection",
         "projection_phenotype_id",
       ]}
+      onErrorAction={(error: any, formData: any) => handleErrorAction(error, formData)}
       {...props}
     />
   );

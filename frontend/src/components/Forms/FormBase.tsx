@@ -1,9 +1,9 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, {useRef, useState, useEffect} from "react";
 import validator from "@rjsf/validator-ajv8";
-import { IChangeEvent, withTheme } from "@rjsf/core";
-import { Backdrop, Box, CircularProgress } from "@mui/material";
-import { Theme } from "@rjsf/mui";
-import { EDIT_DEBOUNCE } from "../../settings";
+import {IChangeEvent, withTheme} from "@rjsf/core";
+import {Backdrop, Box, CircularProgress} from "@mui/material";
+import {Theme} from "@rjsf/mui";
+import {EDIT_DEBOUNCE} from "../../settings";
 import Button from "@mui/material/Button";
 
 const Form = withTheme(Theme);
@@ -32,6 +32,7 @@ export const FormBase = (props: any) => {
     showErrorList,
     submitOnChangeFields = [],
     submitOnBlurFields = [],
+    onErrorAction,
   } = props;
   const [localData, setLocalData] = useState<any>(data);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -44,7 +45,7 @@ export const FormBase = (props: any) => {
 
   const submitButtonRef = useRef<any>(null);
   const removeProp = (obj: any, prop: string) => {
-    const { [prop]: removedProp, ...newObj } = obj;
+    const {[prop]: removedProp, ...newObj} = obj;
     return newObj;
   };
 
@@ -102,7 +103,7 @@ export const FormBase = (props: any) => {
   };
 
   const handleSubmit = async (event: IChangeEvent) => {
-    const formData = { ...event.formData, ...extraData };
+    const formData = {...event.formData, ...extraData};
     setIsSaving(true);
     service
       .save(formData)
@@ -116,8 +117,11 @@ export const FormBase = (props: any) => {
         setLocalData(formData);
       })
       .catch((error: any) => {
-        // todo: handle errors here
-        log("Something went wrong");
+        if (onErrorAction) {
+          onErrorAction(error, formData); // Custom error handling
+        } else {
+          log(`Something went wrong ${error}`); // Default error handling
+        }
       })
       .finally(() => {
         setIsSaving(false);
@@ -128,7 +132,7 @@ export const FormBase = (props: any) => {
   };
 
   const handleUpdate = async (event: IChangeEvent, id: any) => {
-    const formData = { ...event.formData, ...extraData };
+    const formData = {...event.formData, ...extraData};
     if (submitOnBlurFields.some((field: string) => id && id.includes(field))) {
       resetTimer();
     }
@@ -162,7 +166,7 @@ export const FormBase = (props: any) => {
     <>
       {(!data || isSaving) && (
         <Backdrop open={isSaving}>
-          <CircularProgress color="inherit" />
+          <CircularProgress color="inherit"/>
         </Backdrop>
       )}
       <Box>
