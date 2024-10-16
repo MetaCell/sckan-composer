@@ -13,7 +13,6 @@ import {
   ComposerConnectivityStatementListStateEnum as statementStates,
   ConnectivityStatement
 } from "../apiclient/backend";
-import {userProfile} from "../services/UserService";
 import ProofingTab from "../components/ProofingTab/ProofingTab";
 import {SentenceStateChip} from "../components/Widgets/StateChip";
 import {formatDate, formatTime, StatementsLabels} from "../helpers/helpers";
