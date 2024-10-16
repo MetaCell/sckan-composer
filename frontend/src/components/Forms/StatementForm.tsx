@@ -47,7 +47,7 @@ import {StatementStateChip} from "../Widgets/StateChip";
 import {projections} from "../../services/ProjectionService";
 
 const StatementForm = (props: any) => {
-  const {uiFields, statement, refreshStatement, isDisabled} = props;
+  const {uiFields, statement, setStatement, isDisabled, action: refreshStatement} = props;
   const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
@@ -180,9 +180,8 @@ const StatementForm = (props: any) => {
         );
       },
       onUpdate: async (selectedOptions: any) => {
-        await updateOrigins(selectedOptions, statement.id);
+        await updateOrigins(selectedOptions, statement.id, setStatement);
       },
-      refreshStatement: () => refreshStatement(),
       errors: "",
       mapValueToOption: () =>
         mapAnatomicalEntitiesToOptions(statement?.origins, OriginsGroupLabel),
@@ -216,7 +215,6 @@ const StatementForm = (props: any) => {
         {...props}
         onElementDelete={async (element: any) => {
           await api.composerViaDestroy(element.children.props.formData.id);
-          refreshStatement();
         }}
         onElementAdd={async () => {
           await api.composerViaCreate({
@@ -226,7 +224,6 @@ const StatementForm = (props: any) => {
             anatomical_entities: [],
             from_entities: [],
           });
-          refreshStatement();
         }}
         onElementReorder={async (
           sourceIndex: number,
@@ -235,7 +232,6 @@ const StatementForm = (props: any) => {
           await api.composerViaPartialUpdate(statement.vias[sourceIndex].id, {
             order: destinationIndex,
           });
-          refreshStatement();
         }}
         hideDeleteBtn={statement?.vias?.length <= 1 || isDisabled}
         showReOrderingIcon={true}
@@ -265,7 +261,6 @@ const StatementForm = (props: any) => {
                 .composerViaPartialUpdate(viaIndex, {
                   type: typeOption,
                 })
-                .then(() => refreshStatement());
             }
           },
         },
@@ -298,13 +293,13 @@ const StatementForm = (props: any) => {
           },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
             await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
               propertyToUpdate: "anatomical_entities",
             });
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) =>
             mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
@@ -340,6 +335,7 @@ const StatementForm = (props: any) => {
           },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
             await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
@@ -372,7 +368,6 @@ const StatementForm = (props: any) => {
               return entity
             }
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) => {
             const entities: Option[] = [];
@@ -404,7 +399,6 @@ const StatementForm = (props: any) => {
           await api.composerDestinationDestroy(
             element.children.props.formData.id,
           );
-          refreshStatement();
         }}
         onElementAdd={async () => {
           await api.composerDestinationCreate({
@@ -414,7 +408,6 @@ const StatementForm = (props: any) => {
             anatomical_entities: [],
             from_entities: [],
           });
-          refreshStatement();
         }}
         hideDeleteBtn={statement?.destinations?.length <= 1 || isDisabled}
         showReOrderingIcon={false}
@@ -444,7 +437,6 @@ const StatementForm = (props: any) => {
                 .composerDestinationPartialUpdate(viaIndex, {
                   type: typeOption,
                 })
-                .then(() => refreshStatement());
             }
           },
         },
@@ -476,13 +468,13 @@ const StatementForm = (props: any) => {
           },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
             await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
               propertyToUpdate: "anatomical_entities",
             });
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) =>
             mapAnatomicalEntitiesToOptions(
@@ -521,6 +513,7 @@ const StatementForm = (props: any) => {
           },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
             await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
@@ -554,7 +547,6 @@ const StatementForm = (props: any) => {
             }
 
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) => {
             const entities: Option[] = [];
@@ -613,9 +605,7 @@ const StatementForm = (props: any) => {
       },
       onUpdate: async (selectedOptions: Option[]) => {
         await updateForwardConnections(selectedOptions, statement);
-        refreshStatement()
       },
-      refreshStatement: () => refreshStatement(),
       statement: statement,
       errors: statement?.errors?.includes("Invalid forward connection")
         ? "Forward connection(s) not found"
@@ -707,10 +697,12 @@ const StatementForm = (props: any) => {
     SelectWidget: CustomSingleSelect,
   };
 
+
   return (
     <FormBase
       data={statement}
       service={statementService}
+      onSaveCancel={refreshStatement}
       schema={copiedSchema}
       uiSchema={copiedUISchema}
       uiFields={uiFields}

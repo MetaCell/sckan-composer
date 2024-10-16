@@ -51,7 +51,7 @@ const PathsBuilder = (props: any) => {
                 {...props}
                 statement={statement}
                 format="noLabel"
-                refreshStatement={refreshStatement}
+                action={refreshStatement}
                 extraData={{ sentence_id: statement.sentence.id }}
                 uiFields={["origins"]}
                 enableAutoSave={false}
@@ -70,7 +70,7 @@ const PathsBuilder = (props: any) => {
               {...props}
               statement={statement}
               format="noLabel"
-              refreshStatement={refreshStatement}
+              action={refreshStatement}
               extraData={{ sentence_id: statement.sentence.id }}
               uiFields={["vias"]}
               enableAutoSave={false}
@@ -94,7 +94,7 @@ const PathsBuilder = (props: any) => {
               {...props}
               statement={statement}
               format="noLabel"
-              refreshStatement={refreshStatement}
+              action={refreshStatement}
               extraData={{ sentence_id: statement.sentence.id }}
               uiFields={["destinations"]}
               enableAutoSave={false}
@@ -119,7 +119,7 @@ const PathsBuilder = (props: any) => {
                 {...props}
                 statement={statement}
                 format="small"
-                refreshStatement={refreshStatement}
+                action={refreshStatement}
                 extraData={{ sentence_id: statement.sentence.id }}
                 uiFields={["forward_connection"]}
                 enableAutoSave={true}

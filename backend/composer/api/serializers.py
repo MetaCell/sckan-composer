@@ -3,7 +3,6 @@ from typing import List
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django_fsm import FSMField
-from drf_spectacular.types import OpenApiTypes
 from drf_writable_nested.mixins import UniqueFieldsMixin
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
@@ -21,7 +20,7 @@ from ..models import (
     Sentence,
     Specie,
     Tag,
-    Via, Destination, AnatomicalEntityIntersection, Region, Layer, AnatomicalEntityMeta, GraphRenderingState,
+    Via, Destination, AnatomicalEntityIntersection, AnatomicalEntityMeta, GraphRenderingState,
 )
 from ..services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
@@ -625,7 +624,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         # Remove 'via_set' and 'destinations' from validated_data if they exist
         validated_data.pop('via_set', None)
         validated_data.pop('destinations', None)
-        return instance
+        return super().update(instance, validated_data)
 
     class Meta(BaseConnectivityStatementSerializer.Meta):
         fields = (

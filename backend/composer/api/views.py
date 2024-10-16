@@ -40,7 +40,8 @@ from .serializers import (
     ProvenanceSerializer,
     SexSerializer, ConnectivityStatementUpdateSerializer, DestinationSerializer, BaseConnectivityStatementSerializer,
 )
-from .permissions import IsStaffUserIfExportedStateInConnectivityStatement
+from .permissions import IsStaffUserIfExportedStateInConnectivityStatement, IsOwnerOrAssignOwnerOrReadOnly, \
+    IsOwnerOfConnectivityStatementOrReadOnly
 from ..models import (
     AnatomicalEntity,
     Phenotype,
@@ -321,7 +322,7 @@ class ConnectivityStatementViewSet(
     serializer_class = ConnectivityStatementSerializer
     permission_classes = [
         IsStaffUserIfExportedStateInConnectivityStatement,
-        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrAssignOwnerOrReadOnly,
     ]
     filterset_class = ConnectivityStatementFilter
     service = ConnectivityStatementStateService
@@ -366,7 +367,7 @@ class ConnectivityStatementViewSet(
         if response.status_code == status.HTTP_200_OK:
             instance = self.get_object()
             self.handle_graph_rendering_state(instance, graph_rendering_state_data, request.user)
-            if origin_ids:
+            if origin_ids is not None:
                 instance.set_origins(origin_ids)
 
         return response
@@ -386,6 +387,13 @@ class ConnectivityStatementViewSet(
             self.handle_graph_rendering_state(instance, graph_rendering_state_data, request.user)
 
         return response
+
+    @action(detail=True, methods=['patch'], permission_classes=[permissions.IsAuthenticated])
+    def assign_owner(self, request, pk=None):
+        instance = self.get_object()
+        instance.owner = request.user
+        instance.save()
+        return Response(self.get_serializer(instance).data)
 
 
 @extend_schema(tags=["public"])
@@ -481,6 +489,10 @@ class ProfileViewSet(viewsets.GenericViewSet):
         return Response(self.get_serializer(profile).data)
 
 
+class IsOwnerOfConnectivityStatement:
+    pass
+
+
 class ViaViewSet(viewsets.ModelViewSet):
     """
     Via
@@ -489,7 +501,7 @@ class ViaViewSet(viewsets.ModelViewSet):
     queryset = Via.objects.all()
     serializer_class = ViaSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOfConnectivityStatementOrReadOnly,
     ]
     filterset_class = ViaFilter
 
@@ -502,7 +514,7 @@ class DestinationViewSet(viewsets.ModelViewSet):
     queryset = Destination.objects.all()
     serializer_class = DestinationSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOfConnectivityStatementOrReadOnly
     ]
     filterset_class = DestinationFilter
 
