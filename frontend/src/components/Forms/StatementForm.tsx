@@ -45,9 +45,6 @@ import {
 import {CustomFooter} from "../Widgets/HoveredOptionContent";
 import {StatementStateChip} from "../Widgets/StateChip";
 import {projections} from "../../services/ProjectionService";
-import {checkOwnership} from "../../helpers/ownershipAlert";
-import {getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
-
 
 const StatementForm = (props: any) => {
   const {uiFields, statement, setStatement, isDisabled, action: refreshStatement} = props;

@@ -15,7 +15,7 @@ import {
   DestinationSerializerDetails,
   PatchedConnectivityStatementUpdate,
   PatchedDestination,
-  PatchedVia, User,
+  PatchedVia,
   ViaSerializerDetails,
 } from "../apiclient/backend";
 import {searchAnatomicalEntities} from "../helpers/helpers";
