@@ -625,7 +625,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         # Remove 'via_set' and 'destinations' from validated_data if they exist
         validated_data.pop('via_set', None)
         validated_data.pop('destinations', None)
-        return instance
+        return super().update(instance, validated_data)
 
     class Meta(BaseConnectivityStatementSerializer.Meta):
         fields = (
