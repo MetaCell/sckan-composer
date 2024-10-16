@@ -40,7 +40,8 @@ from .serializers import (
     ProvenanceSerializer,
     SexSerializer, ConnectivityStatementUpdateSerializer, DestinationSerializer, BaseConnectivityStatementSerializer,
 )
-from .permissions import IsStaffUserIfExportedStateInConnectivityStatement
+from .permissions import IsStaffUserIfExportedStateInConnectivityStatement, IsOwnerOrAssignOwnerOrReadOnly, \
+    IsOwnerOfConnectivityStatementOrReadOnly
 from ..models import (
     AnatomicalEntity,
     Phenotype,
@@ -321,7 +322,7 @@ class ConnectivityStatementViewSet(
     serializer_class = ConnectivityStatementSerializer
     permission_classes = [
         IsStaffUserIfExportedStateInConnectivityStatement,
-        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrAssignOwnerOrReadOnly,
     ]
     filterset_class = ConnectivityStatementFilter
     service = ConnectivityStatementStateService
@@ -387,6 +388,12 @@ class ConnectivityStatementViewSet(
 
         return response
 
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def assign_owner(self, request, pk=None):
+        instance = self.get_object()
+        instance.owner = request.user
+        instance.save()
+        return Response(self.get_serializer(instance).data)
 
 @extend_schema(tags=["public"])
 class KnowledgeStatementViewSet(
@@ -481,6 +488,10 @@ class ProfileViewSet(viewsets.GenericViewSet):
         return Response(self.get_serializer(profile).data)
 
 
+class IsOwnerOfConnectivityStatement:
+    pass
+
+
 class ViaViewSet(viewsets.ModelViewSet):
     """
     Via
@@ -489,7 +500,7 @@ class ViaViewSet(viewsets.ModelViewSet):
     queryset = Via.objects.all()
     serializer_class = ViaSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOfConnectivityStatementOrReadOnly,
     ]
     filterset_class = ViaFilter
 
@@ -502,7 +513,7 @@ class DestinationViewSet(viewsets.ModelViewSet):
     queryset = Destination.objects.all()
     serializer_class = DestinationSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOfConnectivityStatementOrReadOnly
     ]
     filterset_class = DestinationFilter
 
