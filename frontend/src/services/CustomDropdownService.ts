@@ -21,6 +21,7 @@ import {
 import { searchAnatomicalEntities } from "../helpers/helpers";
 import connectivityStatementService from "./StatementService";
 import statementService from "./StatementService";
+import {checkOwnership} from "../helpers/ownershipAlert";
 
 export async function getAnatomicalEntities(
   searchValue: string,
@@ -42,18 +43,24 @@ export async function getAnatomicalEntities(
   }
 }
 
-export async function updateOrigins(selected: Option[], statementId: number) {
+export async function updateOrigins(selected: Option[], statementId: number,
+                                    setStatement: (statement: any) => void) {
   const originIds = selected.map((option) => parseInt(option.id));
   const patchedStatement: PatchedConnectivityStatementUpdate = {
     origins: originIds,
   };
   try {
-    await api.composerConnectivityStatementPartialUpdate(
+    await statementService.partialUpdate(
       statementId,
       patchedStatement,
     );
   } catch (error) {
-    console.error("Error updating origins", error);
+        checkOwnership(
+          statementId,
+          () => statementService.partialUpdate(statementId, patchedStatement),
+      (fetchedStatement) => setStatement(fetchedStatement),
+      (owner) => `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+    );
   }
 }
 

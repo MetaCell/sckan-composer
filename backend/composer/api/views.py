@@ -367,7 +367,7 @@ class ConnectivityStatementViewSet(
         if response.status_code == status.HTTP_200_OK:
             instance = self.get_object()
             self.handle_graph_rendering_state(instance, graph_rendering_state_data, request.user)
-            if origin_ids:
+            if origin_ids is not None:
                 instance.set_origins(origin_ids)
 
         return response

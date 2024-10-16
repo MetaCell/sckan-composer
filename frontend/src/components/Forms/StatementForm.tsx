@@ -45,11 +45,11 @@ import {
 import {CustomFooter} from "../Widgets/HoveredOptionContent";
 import {StatementStateChip} from "../Widgets/StateChip";
 import {projections} from "../../services/ProjectionService";
-import {userProfile} from "../../services/UserService";
+import {checkOwnership} from "../../helpers/ownershipAlert";
 
 
 const StatementForm = (props: any) => {
-  const {uiFields, statement, isDisabled, action: refreshStatement} = props;
+  const {uiFields, statement, setStatement, isDisabled, action: refreshStatement} = props;
   const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
@@ -182,7 +182,7 @@ const StatementForm = (props: any) => {
         );
       },
       onUpdate: async (selectedOptions: any) => {
-        await updateOrigins(selectedOptions, statement.id);
+        await updateOrigins(selectedOptions, statement.id, setStatement);
       },
       errors: "",
       mapValueToOption: () =>
@@ -696,53 +696,13 @@ const StatementForm = (props: any) => {
   };
 
   const handleErrorAction = (error: any, newStatementData: ConnectivityStatement) => {
-    const statementIdNumber = newStatementData.id ?? -1; // Ensure statement ID is a valid number
-
-    // Fetch the latest statement to check for ownership
-    statementService.getObject(statementIdNumber.toString()).then((fetchedStatement: ConnectivityStatement) => {
-      // Check if the fetched statement has an owner and it's not the current user
-      if (fetchedStatement.owner && fetchedStatement.owner?.id !== userProfile.getUser().id) {
-        // Show a confirmation alert to the user
-        const userConfirmed = window.confirm(
-          `This statement is currently assigned to ${fetchedStatement.owner.first_name}. You are in read-only mode, and any changes you attempt will not be saved. 
-Would you like to assign this statement to yourself and gain edit access? Select 'OK' to assign ownership, or 'Cancel' to continue viewing in read-only mode.`
-        );
-
-        if (userConfirmed) {
-          // User confirmed to assign ownership
-          const userId = userProfile.getUser().id;
-
-          // Reassign ownership
-          statementService
-            .assignOwner(statementIdNumber, {
-              ...fetchedStatement,
-              owner_id: userId, // Assign ownership to the current user
-            })
-            .then((_: ConnectivityStatement) => {
-              // Save and refresh the updated statement
-              return statementService.save({
-                ...newStatementData,
-                owner_id: userId,
-              }).then(() => {
-                refreshStatement(); // Refresh after saving
-              });
-            })
-            .catch((error) => {
-              console.error("Failed to reassign ownership", error);
-              refreshStatement(); // Still refresh the statement even if there's an error
-            });
-        } else {
-          // User canceled, just refresh the statement
-          refreshStatement();
-        }
-      } else {
-        // No need to assign ownership, just refresh the statement
-        refreshStatement();
-      }
-    }).catch((fetchError) => {
-      console.error("Failed to fetch the statement data", fetchError);
-      refreshStatement(); // Refresh the statement in case of fetch failure
-    });
+    checkOwnership(
+      statement.id,
+      (fetchedData, userId) => statementService.save({...newStatementData, owner_id: userId})
+        .then(() => refreshStatement()),
+      () => refreshStatement(),
+      (owner) => `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+    );
   };
 
 
