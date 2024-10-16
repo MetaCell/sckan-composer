@@ -1339,6 +1339,211 @@ export interface PaginatedViaList {
 /**
  * Connectivity Statement
  * @export
+ * @interface PatchedConnectivityStatement
+ */
+export interface PatchedConnectivityStatement {
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatement
+     */
+    'id'?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatement
+     */
+    'sentence_id'?: number;
+    /**
+     * 
+     * @type {Sentence}
+     * @memberof PatchedConnectivityStatement
+     */
+    'sentence'?: Sentence;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'knowledge_statement'?: string;
+    /**
+     * 
+     * @type {Array<Tag>}
+     * @memberof PatchedConnectivityStatement
+     */
+    'tags'?: Array<Tag>;
+    /**
+     * 
+     * @type {Array<Provenance>}
+     * @memberof PatchedConnectivityStatement
+     */
+    'provenances'?: Array<Provenance>;
+    /**
+     * 
+     * @type {User}
+     * @memberof PatchedConnectivityStatement
+     */
+    'owner'?: User;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatement
+     */
+    'owner_id'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'state'?: string;
+    /**
+     * 
+     * @type {Array<AvailableTransitions24dEnum>}
+     * @memberof PatchedConnectivityStatement
+     */
+    'available_transitions'?: Array<AvailableTransitions24dEnum>;
+    /**
+     * 
+     * @type {Array<AnatomicalEntity>}
+     * @memberof PatchedConnectivityStatement
+     */
+    'origins'?: Array<AnatomicalEntity>;
+    /**
+     * 
+     * @type {Array<ViaSerializerDetails>}
+     * @memberof PatchedConnectivityStatement
+     */
+    'vias'?: Array<ViaSerializerDetails>;
+    /**
+     * 
+     * @type {Array<DestinationSerializerDetails>}
+     * @memberof PatchedConnectivityStatement
+     */
+    'destinations'?: Array<DestinationSerializerDetails>;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatement
+     */
+    'phenotype_id'?: number | null;
+    /**
+     * 
+     * @type {Phenotype}
+     * @memberof PatchedConnectivityStatement
+     */
+    'phenotype'?: Phenotype;
+    /**
+     * 
+     * @type {ProjectionPhenotype}
+     * @memberof PatchedConnectivityStatement
+     */
+    'projection_phenotype'?: ProjectionPhenotype;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatement
+     */
+    'projection_phenotype_id'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'journey'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'entities_journey'?: string;
+    /**
+     * 
+     * @type {ConnectivityStatementLaterality}
+     * @memberof PatchedConnectivityStatement
+     */
+    'laterality'?: ConnectivityStatementLaterality | null;
+    /**
+     * 
+     * @type {ConnectivityStatementProjection}
+     * @memberof PatchedConnectivityStatement
+     */
+    'projection'?: ConnectivityStatementProjection | null;
+    /**
+     * 
+     * @type {ConnectivityStatementCircuitType}
+     * @memberof PatchedConnectivityStatement
+     */
+    'circuit_type'?: ConnectivityStatementCircuitType | null;
+    /**
+     * 
+     * @type {Array<Specie>}
+     * @memberof PatchedConnectivityStatement
+     */
+    'species'?: Array<Specie>;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatement
+     */
+    'sex_id'?: number | null;
+    /**
+     * 
+     * @type {Sex}
+     * @memberof PatchedConnectivityStatement
+     */
+    'sex'?: Sex;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof PatchedConnectivityStatement
+     */
+    'forward_connection'?: Array<number>;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'apinatomy_model'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'additional_information'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'modified_date'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PatchedConnectivityStatement
+     */
+    'has_notes'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'statement_preview'?: string;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof PatchedConnectivityStatement
+     */
+    'errors'?: Array<any>;
+    /**
+     * 
+     * @type {GraphState}
+     * @memberof PatchedConnectivityStatement
+     */
+    'graph_rendering_state'?: GraphState | null;
+}
+/**
+ * Connectivity Statement
+ * @export
  * @interface PatchedConnectivityStatementUpdate
  */
 export interface PatchedConnectivityStatementUpdate {
@@ -2628,13 +2833,13 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {ConnectivityStatement} [connectivityStatement] 
+         * @param {PatchedConnectivityStatement} [patchedConnectivityStatement] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAssignOwnerCreate: async (id: number, connectivityStatement?: ConnectivityStatement, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementAssignOwnerPartialUpdate: async (id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
-            assertParamExists('composerConnectivityStatementAssignOwnerCreate', 'id', id)
+            assertParamExists('composerConnectivityStatementAssignOwnerPartialUpdate', 'id', id)
             const localVarPath = `/api/composer/connectivity-statement/{id}/assign_owner/`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -2644,7 +2849,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -2664,7 +2869,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(connectivityStatement, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(patchedConnectivityStatement, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -5141,12 +5346,12 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {ConnectivityStatement} [connectivityStatement] 
+         * @param {PatchedConnectivityStatement} [patchedConnectivityStatement] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementAssignOwnerCreate(id: number, connectivityStatement?: ConnectivityStatement, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAssignOwnerCreate(id, connectivityStatement, options);
+        async composerConnectivityStatementAssignOwnerPartialUpdate(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAssignOwnerPartialUpdate(id, patchedConnectivityStatement, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -5772,12 +5977,12 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {ConnectivityStatement} [connectivityStatement] 
+         * @param {PatchedConnectivityStatement} [patchedConnectivityStatement] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAssignOwnerCreate(id: number, connectivityStatement?: ConnectivityStatement, options?: any): AxiosPromise<ConnectivityStatement> {
-            return localVarFp.composerConnectivityStatementAssignOwnerCreate(id, connectivityStatement, options).then((request) => request(axios, basePath));
+        composerConnectivityStatementAssignOwnerPartialUpdate(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options?: any): AxiosPromise<ConnectivityStatement> {
+            return localVarFp.composerConnectivityStatementAssignOwnerPartialUpdate(id, patchedConnectivityStatement, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -6361,13 +6566,13 @@ export class ComposerApi extends BaseAPI {
     /**
      * ConnectivityStatement
      * @param {number} id A unique integer value identifying this connectivity statement.
-     * @param {ConnectivityStatement} [connectivityStatement] 
+     * @param {PatchedConnectivityStatement} [patchedConnectivityStatement] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementAssignOwnerCreate(id: number, connectivityStatement?: ConnectivityStatement, options?: AxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementAssignOwnerCreate(id, connectivityStatement, options).then((request) => request(this.axios, this.basePath));
+    public composerConnectivityStatementAssignOwnerPartialUpdate(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options?: AxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementAssignOwnerPartialUpdate(id, patchedConnectivityStatement, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

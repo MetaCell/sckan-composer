@@ -700,21 +700,12 @@ const StatementForm = (props: any) => {
     SelectWidget: CustomSingleSelect,
   };
 
-  const handleErrorAction = (error: any, newStatementData: ConnectivityStatement) => {
-    checkOwnership(
-      statement.id,
-      (fetchedData, userId) => statementService.save({...newStatementData, owner_id: userId})
-        .then(() => refreshStatement()),
-      () => refreshStatement(),
-      (owner) => getOwnershipAlertMessage(owner)
-    );
-  };
-
 
   return (
     <FormBase
       data={statement}
       service={statementService}
+      onSaveCancel={refreshStatement}
       schema={copiedSchema}
       uiSchema={copiedUISchema}
       uiFields={uiFields}
@@ -735,7 +726,6 @@ const StatementForm = (props: any) => {
         "projection",
         "projection_phenotype_id",
       ]}
-      onErrorAction={(error: any, formData: any) => handleErrorAction(error, formData)}
       {...props}
     />
   );

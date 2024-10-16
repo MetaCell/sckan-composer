@@ -412,8 +412,8 @@ paths:
                 $ref: '#/components/schemas/ConnectivityStatement'
           description: ''
   /api/composer/connectivity-statement/{id}/assign_owner/:
-    post:
-      operationId: composer_connectivity_statement_assign_owner_create
+    patch:
+      operationId: composer_connectivity_statement_assign_owner_partial_update
       description: ConnectivityStatement
       parameters:
       - in: path
@@ -428,13 +428,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ConnectivityStatement'
+              $ref: '#/components/schemas/PatchedConnectivityStatement'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/ConnectivityStatement'
+              $ref: '#/components/schemas/PatchedConnectivityStatement'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/ConnectivityStatement'
+              $ref: '#/components/schemas/PatchedConnectivityStatement'
       security:
       - tokenAuth: []
       - basicAuth: []
@@ -2756,6 +2756,136 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Via'
+    PatchedConnectivityStatement:
+      type: object
+      description: Connectivity Statement
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          nullable: true
+        sentence_id:
+          type: integer
+        sentence:
+          allOf:
+          - $ref: '#/components/schemas/Sentence'
+          readOnly: true
+        knowledge_statement:
+          type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+          readOnly: true
+        provenances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Provenance'
+        owner:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        owner_id:
+          type: integer
+          nullable: true
+        state:
+          type: string
+          readOnly: true
+        available_transitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AvailableTransitions24dEnum'
+          readOnly: true
+        origins:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnatomicalEntity'
+        vias:
+          type: array
+          items:
+            $ref: '#/components/schemas/ViaSerializerDetails'
+        destinations:
+          type: array
+          items:
+            $ref: '#/components/schemas/DestinationSerializerDetails'
+        phenotype_id:
+          type: integer
+          nullable: true
+        phenotype:
+          allOf:
+          - $ref: '#/components/schemas/Phenotype'
+          readOnly: true
+        projection_phenotype:
+          allOf:
+          - $ref: '#/components/schemas/ProjectionPhenotype'
+          readOnly: true
+        projection_phenotype_id:
+          type: integer
+          nullable: true
+        journey:
+          type: string
+          readOnly: true
+        entities_journey:
+          type: string
+          readOnly: true
+        laterality:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/LateralityEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        projection:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/ProjectionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        circuit_type:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/CircuitTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        species:
+          type: array
+          items:
+            $ref: '#/components/schemas/Specie'
+        sex_id:
+          type: integer
+          nullable: true
+        sex:
+          allOf:
+          - $ref: '#/components/schemas/Sex'
+          readOnly: true
+        forward_connection:
+          type: array
+          items:
+            type: integer
+        apinatomy_model:
+          type: string
+          nullable: true
+          maxLength: 200
+        additional_information:
+          type: string
+          nullable: true
+        modified_date:
+          type: string
+          format: date-time
+          readOnly: true
+        has_notes:
+          type: boolean
+          readOnly: true
+        statement_preview:
+          type: string
+          readOnly: true
+        errors:
+          type: array
+          items: {}
+          readOnly: true
+        graph_rendering_state:
+          allOf:
+          - $ref: '#/components/schemas/GraphState'
+          nullable: true
     PatchedConnectivityStatementUpdate:
       type: object
       description: Connectivity Statement

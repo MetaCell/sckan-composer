@@ -43,24 +43,22 @@ export async function getAnatomicalEntities(
   }
 }
 
-export async function updateOrigins(selected: Option[], statementId: number,
-                                    setStatement: (statement: any) => void) {
+export async function updateOrigins(
+  selected: Option[],
+  statementId: number,
+  setStatement: (statement: any) => void
+) {
   const originIds = selected.map((option) => parseInt(option.id));
   const patchedStatement: PatchedConnectivityStatementUpdate = {
     origins: originIds,
   };
+
   try {
-    await statementService.partialUpdate(
-      statementId,
-      patchedStatement,
-    );
+    await statementService.partialUpdate(statementId, patchedStatement, () => {
+      console.log("User canceled ownership reassignment.");
+    });
   } catch (error) {
-        checkOwnership(
-          statementId,
-          () => statementService.partialUpdate(statementId, patchedStatement),
-      (fetchedStatement) => setStatement(fetchedStatement),
-      (owner: User) => getOwnershipAlertMessage(owner)
-    );
+    console.error("Error updating origins:", error);
   }
 }
 

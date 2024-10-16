@@ -32,7 +32,7 @@ export const FormBase = (props: any) => {
     showErrorList,
     submitOnChangeFields = [],
     submitOnBlurFields = [],
-    onErrorAction,
+    onUnauthorizedSave: onSaveCancel,
   } = props;
   const [localData, setLocalData] = useState<any>(data);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -104,9 +104,10 @@ export const FormBase = (props: any) => {
 
   const handleSubmit = async (event: IChangeEvent) => {
     const formData = {...event.formData, ...extraData};
+    const saveOptions = onSaveCancel ? { onCancel: onSaveCancel } : {};
     setIsSaving(true);
     service
-      .save(formData)
+      .save(formData, saveOptions)
       .then((newData: any) => {
         setter && setter(newData);
         // todo: improve UI feedback
@@ -117,11 +118,7 @@ export const FormBase = (props: any) => {
         setLocalData(formData);
       })
       .catch((error: any) => {
-        if (onErrorAction) {
-          onErrorAction(error, formData); // Custom error handling
-        } else {
-          log(`Something went wrong ${error}`); // Default error handling
-        }
+        log(`Something went wrong ${error}`); // Default error handling
       })
       .finally(() => {
         setIsSaving(false);

@@ -388,12 +388,13 @@ class ConnectivityStatementViewSet(
 
         return response
 
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    @action(detail=True, methods=['patch'], permission_classes=[permissions.IsAuthenticated])
     def assign_owner(self, request, pk=None):
         instance = self.get_object()
         instance.owner = request.user
         instance.save()
         return Response(self.get_serializer(instance).data)
+
 
 @extend_schema(tags=["public"])
 class KnowledgeStatementViewSet(
