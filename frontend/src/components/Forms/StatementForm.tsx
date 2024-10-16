@@ -295,6 +295,7 @@ const StatementForm = (props: any) => {
           },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
             await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
@@ -336,6 +337,7 @@ const StatementForm = (props: any) => {
           },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
             await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
@@ -468,6 +470,7 @@ const StatementForm = (props: any) => {
           },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
             await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
@@ -512,6 +515,7 @@ const StatementForm = (props: any) => {
           },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
             await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",

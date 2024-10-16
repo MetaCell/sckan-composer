@@ -65,6 +65,7 @@ export async function updateOrigins(selected: Option[], statementId: number,
 }
 
 export type UpdateEntityParams = {
+  statementId: number
   selected: Option[];
   entityId: number | null;
   entityType: "via" | "destination";
@@ -79,6 +80,7 @@ const apiFunctionMap = {
 };
 
 export async function updateEntity({
+  statementId,
   selected,
   entityId,
   entityType,
@@ -93,9 +95,22 @@ export async function updateEntity({
   const patchObject = { [propertyToUpdate]: entityIds };
 
   try {
+    // Get the API function from the map
     const updateFunction = apiFunctionMap[entityType];
     if (updateFunction) {
-      await updateFunction(entityId, patchObject);
+      // Attempt to update, using checkOwnership in case of ownership error
+      try {
+        await updateFunction(entityId, patchObject);
+      } catch (error) {
+        // Ownership error occurred, trigger ownership check
+        checkOwnership(
+          statementId,
+          () => updateFunction(entityId, patchObject), // Re-attempt the update if ownership is reassigned
+          (fetchedEntity) => console.log(`Ownership assigned, updated entity:`, fetchedEntity), // Optional: handle post-assignment logic
+          (owner) =>
+            `This entity is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this entity to yourself and gain edit access?`
+        );
+      }
     } else {
       console.error(`No update function found for entity type: ${entityType}`);
     }
