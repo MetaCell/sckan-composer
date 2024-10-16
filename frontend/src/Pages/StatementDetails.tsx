@@ -91,26 +91,26 @@ const StatementDetails = () => {
         .getObject(statementId)
         .then((statement: ConnectivityStatement) => {
           setStatement(statement);
-          if (
-            statement.owner &&
-            statement.owner?.id !== userProfile.getUser().id
-          ) {
-            if (
-              window.confirm(
-                `This statement is assigned to ${statement.owner.first_name}, assign to yourself? To view the record without assigning ownership, select Cancel.`,
-              )
-            ) {
-              const statementIdNumber = statement.id ?? -1; // Ensure statement.id is a number, use -1 as a fallback
-
-              statementService
-                .assignOwner(statementIdNumber, {
-                  ...statement,
-                  owner_id: userProfile.getUser().id
-                }).then((statement: ConnectivityStatement) => {
-                setStatement(statement);
-              });
-            }
-          }
+          //   if (
+          //     statement.owner &&
+          //     statement.owner?.id !== userProfile.getUser().id
+          //   ) {
+          //     if (
+          //       window.confirm(
+          //         `This statement is assigned to ${statement.owner.first_name}, assign to yourself? To view the record without assigning ownership, select Cancel.`,
+          //       )
+          //     ) {
+          //       const statementIdNumber = statement.id ?? -1; // Ensure statement.id is a number, use -1 as a fallback
+          //
+          //       statementService
+          //         .assignOwner(statementIdNumber, {
+          //           ...statement,
+          //           owner_id: userProfile.getUser().id
+          //         }).then((statement: ConnectivityStatement) => {
+          //         setStatement(statement);
+          //       });
+          //     }
+          //   }
         })
         .finally(() => {
           setLoading(false);

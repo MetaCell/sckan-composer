@@ -696,44 +696,53 @@ const StatementForm = (props: any) => {
   };
 
   const handleErrorAction = (error: any, newStatementData: ConnectivityStatement) => {
-    // Check if the newStatementData has an owner and it's not the current user
-    if (statement.owner && statement.owner?.id !== userProfile.getUser().id) {
-      // Show a confirmation alert to the user
-      const userConfirmed = window.confirm(
-        `This statement is assigned to ${statement.owner.first_name}, assign to yourself? To view the record without assigning ownership, select Cancel.`
-      );
+    const statementIdNumber = newStatementData.id ?? -1; // Ensure statement ID is a valid number
 
-      if (userConfirmed) {
-        // User confirmed to assign ownership
-        const statementIdNumber = statement.id ?? -1; // Ensure newStatementData.id is a valid number
-        const userId = userProfile.getUser().id
-        // Reassign ownership
-        statementService
-          .assignOwner(statementIdNumber, {
-            ...statement,
-            owner_id: userId,
-          })
-          .then((_: ConnectivityStatement) => {
-            // Save and refresh the updated statement
-            return statementService.save({
-              ...newStatementData,
-              owner_id: userId
-            }).then(() => {
-              refreshStatement(); // Refresh after saving
+    // Fetch the latest statement to check for ownership
+    statementService.getObject(statementIdNumber.toString()).then((fetchedStatement: ConnectivityStatement) => {
+      // Check if the fetched statement has an owner and it's not the current user
+      if (fetchedStatement.owner && fetchedStatement.owner?.id !== userProfile.getUser().id) {
+        // Show a confirmation alert to the user
+        const userConfirmed = window.confirm(
+          `This statement is currently assigned to ${fetchedStatement.owner.first_name}. You are in read-only mode, and any changes you attempt will not be saved. 
+Would you like to assign this statement to yourself and gain edit access? Select 'OK' to assign ownership, or 'Cancel' to continue viewing in read-only mode.`
+        );
+
+        if (userConfirmed) {
+          // User confirmed to assign ownership
+          const userId = userProfile.getUser().id;
+
+          // Reassign ownership
+          statementService
+            .assignOwner(statementIdNumber, {
+              ...fetchedStatement,
+              owner_id: userId, // Assign ownership to the current user
+            })
+            .then((_: ConnectivityStatement) => {
+              // Save and refresh the updated statement
+              return statementService.save({
+                ...newStatementData,
+                owner_id: userId,
+              }).then(() => {
+                refreshStatement(); // Refresh after saving
+              });
+            })
+            .catch((error) => {
+              console.error("Failed to reassign ownership", error);
+              refreshStatement(); // Still refresh the statement even if there's an error
             });
-          })
-          .catch((error) => {
-            console.error("Failed to reassign ownership", error);
-            refreshStatement(); // Still refresh the statement even if there's an error
-          });
+        } else {
+          // User canceled, just refresh the statement
+          refreshStatement();
+        }
       } else {
-        // User canceled, just refresh the statement
+        // No need to assign ownership, just refresh the statement
         refreshStatement();
       }
-    } else {
-      // Handle other errors if necessary
-      console.error("An error occurred: ", error);
-    }
+    }).catch((fetchError) => {
+      console.error("Failed to fetch the statement data", fetchError);
+      refreshStatement(); // Refresh the statement in case of fetch failure
+    });
   };
 
 
