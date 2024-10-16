@@ -15,13 +15,13 @@ import {
   DestinationSerializerDetails,
   PatchedConnectivityStatementUpdate,
   PatchedDestination,
-  PatchedVia,
+  PatchedVia, User,
   ViaSerializerDetails,
 } from "../apiclient/backend";
-import { searchAnatomicalEntities } from "../helpers/helpers";
+import {searchAnatomicalEntities} from "../helpers/helpers";
 import connectivityStatementService from "./StatementService";
 import statementService from "./StatementService";
-import {checkOwnership} from "../helpers/ownershipAlert";
+import {checkOwnership, getOwnershipAlertMessage} from "../helpers/ownershipAlert";
 
 export async function getAnatomicalEntities(
   searchValue: string,
@@ -59,7 +59,7 @@ export async function updateOrigins(selected: Option[], statementId: number,
           statementId,
           () => statementService.partialUpdate(statementId, patchedStatement),
       (fetchedStatement) => setStatement(fetchedStatement),
-      (owner) => `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+      (owner: User) => getOwnershipAlertMessage(owner)
     );
   }
 }
@@ -107,8 +107,7 @@ export async function updateEntity({
           statementId,
           () => updateFunction(entityId, patchObject), // Re-attempt the update if ownership is reassigned
           (fetchedEntity) => console.log(`Ownership assigned, updated entity:`, fetchedEntity), // Optional: handle post-assignment logic
-          (owner) =>
-            `This entity is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this entity to yourself and gain edit access?`
+          (owner) => getOwnershipAlertMessage(owner)
         );
       }
     } else {

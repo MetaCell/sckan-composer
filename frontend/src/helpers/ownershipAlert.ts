@@ -1,5 +1,6 @@
 import statementService from "../services/StatementService";
 import {userProfile} from "../services/UserService";
+import {User} from "../apiclient/backend";
 
 export const checkOwnership = (
   id: number,
@@ -40,3 +41,7 @@ export const checkOwnership = (
       onCancel(null, userId);
     });
 };
+
+export const getOwnershipAlertMessage = (owner: User) => {
+  return `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+}

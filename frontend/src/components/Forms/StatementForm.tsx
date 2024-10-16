@@ -46,6 +46,7 @@ import {CustomFooter} from "../Widgets/HoveredOptionContent";
 import {StatementStateChip} from "../Widgets/StateChip";
 import {projections} from "../../services/ProjectionService";
 import {checkOwnership} from "../../helpers/ownershipAlert";
+import {getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
 
 
 const StatementForm = (props: any) => {
@@ -705,7 +706,7 @@ const StatementForm = (props: any) => {
       (fetchedData, userId) => statementService.save({...newStatementData, owner_id: userId})
         .then(() => refreshStatement()),
       () => refreshStatement(),
-      (owner) => `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+      (owner) => getOwnershipAlertMessage(owner)
     );
   };
 

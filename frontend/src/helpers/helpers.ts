@@ -1,6 +1,6 @@
 import {
   AnatomicalEntity,
-  SentenceAvailableTransitionsEnum as sentenceStates,
+  SentenceAvailableTransitionsEnum as sentenceStates, User,
 } from "../apiclient/backend/api";
 import { ComposerConnectivityStatementListStateEnum as statementStates } from "../apiclient/backend/api";
 import { getName } from "./anatomicalEntityHelper";
