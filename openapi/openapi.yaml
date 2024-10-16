@@ -178,7 +178,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -230,7 +229,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -413,6 +411,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConnectivityStatement'
           description: ''
+  /api/composer/connectivity-statement/{id}/assign_owner/:
+    post:
+      operationId: composer_connectivity_statement_assign_owner_create
+      description: ConnectivityStatement
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectivityStatement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConnectivityStatement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConnectivityStatement'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatement'
+          description: ''
   /api/composer/connectivity-statement/{id}/clone_statement/:
     get:
       operationId: composer_connectivity_statement_clone_statement_retrieve
@@ -430,7 +463,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -589,7 +621,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -642,7 +673,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1699,7 +1729,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1752,7 +1781,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:

@@ -67,6 +67,10 @@ class ConnectivityStatementService extends AbstractService {
   async getSexList() {
     return composerApi.composerSexList(undefined).then((res: any) => res.data)
   }
+
+  async assignOwner(id: number, connectivityStatement?: ConnectivityStatement): Promise<ConnectivityStatement> {
+    return composerApi.composerConnectivityStatementAssignOwnerCreate(id, connectivityStatement).then((response: any) => response.data);
+  }
 }
 
 const connectivityStatementService = new ConnectivityStatementService()

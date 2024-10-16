@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, {useEffect, useState, useRef} from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
@@ -6,23 +6,23 @@ import Grid from "@mui/material/Grid";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import TabPanel from "../components/Widgets/TabPanel";
-import { useParams } from "react-router-dom";
+import {useParams} from "react-router-dom";
 import statementService from "../services/StatementService";
 import TagForm from "../components/Forms/TagForm";
 import {
   ComposerConnectivityStatementListStateEnum as statementStates,
   ConnectivityStatement
 } from "../apiclient/backend";
-import { userProfile } from "../services/UserService";
+import {userProfile} from "../services/UserService";
 import ProofingTab from "../components/ProofingTab/ProofingTab";
-import { SentenceStateChip } from "../components/Widgets/StateChip";
-import { formatDate, formatTime, StatementsLabels } from "../helpers/helpers";
+import {SentenceStateChip} from "../components/Widgets/StateChip";
+import {formatDate, formatTime, StatementsLabels} from "../helpers/helpers";
 import GroupedButtons from "../components/Widgets/CustomGroupedButtons";
 import Divider from "@mui/material/Divider";
 import NoteDetails from "../components/Widgets/NotesFomList";
 import DistillationTab from "../components/DistillationTab";
-import { useSectionStyle } from "../styles/styles";
-import { useTheme } from "@mui/system";
+import {useSectionStyle} from "../styles/styles";
+import {useTheme} from "@mui/system";
 import IconButton from "@mui/material/IconButton";
 import {
   EditOutlined,
@@ -32,10 +32,11 @@ import {
   InputOutlined,
 } from "@mui/icons-material";
 import Stack from "@mui/material/Stack";
-import { ViaIcon, DestinationIcon, OriginIcon } from "../components/icons";
-import { CircularProgress } from "@mui/material";
+import {ViaIcon, DestinationIcon, OriginIcon} from "../components/icons";
+import {CircularProgress} from "@mui/material";
+
 const StatementDetails = () => {
-  const { statementId } = useParams();
+  const {statementId} = useParams();
   const [statement, setStatement] = useState({} as ConnectivityStatement);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
@@ -55,7 +56,7 @@ const StatementDetails = () => {
   const scrollToElement = (index: number) => {
     const element = refs[index].current;
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+      element.scrollIntoView({behavior: "smooth"});
     }
   };
 
@@ -99,11 +100,15 @@ const StatementDetails = () => {
                 `This statement is assigned to ${statement.owner.first_name}, assign to yourself? To view the record without assigning ownership, select Cancel.`,
               )
             ) {
+              const statementIdNumber = statement.id ?? -1; // Ensure statement.id is a number, use -1 as a fallback
+
               statementService
-                .save({ ...statement, owner_id: userProfile.getUser().id })
-                .then((statement: ConnectivityStatement) => {
-                  setStatement(statement);
-                });
+                .assignOwner(statementIdNumber, {
+                  ...statement,
+                  owner_id: userProfile.getUser().id
+                }).then((statement: ConnectivityStatement) => {
+                setStatement(statement);
+              });
             }
           }
         })
@@ -134,7 +139,7 @@ const StatementDetails = () => {
             justifyContent: "center",
           }}
         >
-          <CircularProgress />
+          <CircularProgress/>
         </div>
       )}
       {(statement.knowledge_statement !== undefined && statement.knowledge_statement !== null) && (
@@ -165,41 +170,41 @@ const StatementDetails = () => {
               }}
             >
               <IconButton onClick={() => scrollToElement(0)}>
-                <BiotechOutlined />
+                <BiotechOutlined/>
               </IconButton>
-              <Divider />
+              <Divider/>
               {activeTab === 0 && (
                 <>
                   <IconButton onClick={() => scrollToElement(2)}>
-                    <FindInPageOutlined />
+                    <FindInPageOutlined/>
                   </IconButton>
                   <IconButton onClick={() => scrollToElement(1)}>
-                    <InputOutlined />
+                    <InputOutlined/>
                   </IconButton>
                 </>
               )}
               {activeTab === 1 && (
                 <>
                   <IconButton onClick={() => scrollToElement(3)}>
-                    <OriginIcon />
+                    <OriginIcon/>
                   </IconButton>
                   <IconButton onClick={() => scrollToElement(4)}>
-                    <ViaIcon />
+                    <ViaIcon/>
                   </IconButton>
                   <IconButton onClick={() => scrollToElement(5)}>
-                    <DestinationIcon />
+                    <DestinationIcon/>
                   </IconButton>
-                  <Divider />
+                  <Divider/>
 
                   <IconButton onClick={() => scrollToElement(6)}>
-                    <BubbleChartOutlined />
+                    <BubbleChartOutlined/>
                   </IconButton>
                 </>
               )}
-              <Divider />
+              <Divider/>
 
               <IconButton onClick={() => scrollToElement(7)}>
-                <EditOutlined />
+                <EditOutlined/>
               </IconButton>
             </Stack>
           </Grid>
@@ -238,7 +243,7 @@ const StatementDetails = () => {
                         selectedOption={
                           StatementsLabels[
                             statement?.available_transitions[selectedIndex]
-                          ]
+                            ]
                         }
                         options={statement?.available_transitions}
                         selectedIndex={selectedIndex}
@@ -266,8 +271,8 @@ const StatementDetails = () => {
                       borderBottom: "1px solid #EAECF0",
                     }}
                   >
-                    <Tab label="Distillation" />
-                    <Tab label="Proofing" />
+                    <Tab label="Distillation"/>
+                    <Tab label="Proofing"/>
                   </Tabs>
                 </Box>
               </Grid>
@@ -300,7 +305,7 @@ const StatementDetails = () => {
                       <Paper
                         sx={{
                           ...sectionStyle,
-                          "& .MuiBox-root": { padding: 0 },
+                          "& .MuiBox-root": {padding: 0},
                         }}
                       >
                         <Typography variant="h5" mb={1}>
@@ -315,7 +320,7 @@ const StatementDetails = () => {
                           setter={refreshStatement}
                           isDisabled={isDisabled}
                         />
-                        <Divider sx={{ margin: "36px 0" }} />
+                        <Divider sx={{margin: "36px 0"}}/>
                         <NoteDetails
                           extraData={{
                             connectivity_statement_id: statement.id,
