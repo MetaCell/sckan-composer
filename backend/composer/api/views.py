@@ -53,7 +53,7 @@ from ..models import (
     Tag,
     Via,
     Provenance,
-    Sex, Destination,
+    Sex, Destination, GraphRenderingState,
 )
 
 
@@ -336,6 +336,22 @@ class ConnectivityStatementViewSet(
             return ConnectivityStatement.objects.excluding_draft()
         return super().get_queryset()
 
+    def handle_graph_rendering_state(self, instance, graph_rendering_state_data, user):
+        if graph_rendering_state_data:
+            if hasattr(instance, 'graph_rendering_state') and instance.graph_rendering_state is not None:
+                # Update the existing graph state
+                instance.graph_rendering_state.serialized_graph = graph_rendering_state_data.get(
+                    'serialized_graph', instance.graph_rendering_state.serialized_graph)
+                instance.graph_rendering_state.saved_by = user
+                instance.graph_rendering_state.save()
+            else:
+                # Create a new graph state if none exists
+                GraphRenderingState.objects.create(
+                    connectivity_statement=instance,
+                    serialized_graph=graph_rendering_state_data.get('serialized_graph', {}),
+                    saved_by=user
+                )
+
     @extend_schema(
         methods=['PUT'],
         request=ConnectivityStatementUpdateSerializer,
@@ -343,12 +359,15 @@ class ConnectivityStatementViewSet(
     )
     def update(self, request, *args, **kwargs):
         origin_ids = request.data.pop('origins', None)
+        graph_rendering_state_data = request.data.pop('graph_rendering_state', None)
 
         response = super().update(request, *args, **kwargs)
 
-        if origin_ids and response.status_code == status.HTTP_200_OK:
+        if response.status_code == status.HTTP_200_OK:
             instance = self.get_object()
-            instance.set_origins(origin_ids)
+            self.handle_graph_rendering_state(instance, graph_rendering_state_data, request.user)
+            if origin_ids:
+                instance.set_origins(origin_ids)
 
         return response
 
@@ -358,7 +377,15 @@ class ConnectivityStatementViewSet(
         responses={200: ConnectivityStatementSerializer}
     )
     def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
+        graph_rendering_state_data = request.data.pop('graph_rendering_state', None)
+
+        response = super().partial_update(request, *args, **kwargs)
+
+        if response.status_code == status.HTTP_200_OK:
+            instance = self.get_object()
+            self.handle_graph_rendering_state(instance, graph_rendering_state_data, request.user)
+
+        return response
 
 
 @extend_schema(tags=["public"])

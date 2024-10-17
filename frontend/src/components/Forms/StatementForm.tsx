@@ -1,15 +1,15 @@
 import React from "react";
-import { FormBase } from "./FormBase";
-import { jsonSchemas } from "../../services/JsonSchema";
+import {FormBase} from "./FormBase";
+import {jsonSchemas} from "../../services/JsonSchema";
 import statementService from "../../services/StatementService";
 import CustomTextField from "../Widgets/CustomTextField";
 import CustomSingleSelect from "../Widgets/CustomSingleSelect";
 import CustomTextArea from "../Widgets/CustomTextArea";
 import ArrayFieldTemplate from "../Widgets/ArrayFieldTemplate";
 import AnatomicalEntitiesField from "../AnatomicalEntitiesField";
-import { sexes } from "../../services/SexService";
-import { phenotypes } from "../../services/PhenotypeService";
-import { Box, Chip } from "@mui/material";
+import {sexes} from "../../services/SexService";
+import {phenotypes} from "../../services/PhenotypeService";
+import {Box, Chip} from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
@@ -29,26 +29,26 @@ import {
   getViasGroupLabel,
   findMatchingEntities,
 } from "../../helpers/dropdownMappers";
-import { DestinationIcon, ViaIcon } from "../icons";
+import {DestinationIcon, ViaIcon} from "../icons";
 import {
   DestinationsGroupLabel,
   OriginsGroupLabel,
   ViasGroupLabel,
 } from "../../helpers/settings";
-import { Option, OptionDetail } from "../../types";
-import { composerApi as api } from "../../services/apis";
+import {Option, OptionDetail} from "../../types";
+import {composerApi as api} from "../../services/apis";
 import {
   ConnectivityStatement,
   TypeB60Enum,
   TypeC11Enum,
 } from "../../apiclient/backend";
-import { CustomFooter } from "../Widgets/HoveredOptionContent";
-import { StatementStateChip } from "../Widgets/StateChip";
-import { projections } from "../../services/ProjectionService";
+import {CustomFooter} from "../Widgets/HoveredOptionContent";
+import {StatementStateChip} from "../Widgets/StateChip";
+import {projections} from "../../services/ProjectionService";
 
 const StatementForm = (props: any) => {
-  const { uiFields, statement, refreshStatement, isDisabled } = props;
-  const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
+  const {uiFields, statement, refreshStatement, isDisabled} = props;
+  const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
   // TODO: set up the widgets for the schema
@@ -123,7 +123,7 @@ const StatementForm = (props: any) => {
       placeholder: "Enter Sex",
       data: sexes
         .getSexes()
-        .map((row: any) => ({ label: row.name, value: row.id })),
+        .map((row: any) => ({label: row.name, value: row.id})),
     },
     value: statement?.sex_id ?? "",
   };
@@ -136,11 +136,10 @@ const StatementForm = (props: any) => {
       placeholder: "Select Phenotype",
       data: phenotypes
         .getPhenotypes()
-        .map((row: any) => ({ label: row.name, value: row.id })),
+        .map((row: any) => ({label: row.name, value: row.id})),
     },
     value: statement?.phenotype_id ?? "",
   };
-
 
 
   copiedUISchema.knowledge_statement = {
@@ -357,7 +356,7 @@ const StatementForm = (props: any) => {
             const id = getFirstNumberFromString(formId)
             let entity: any = []
             if (id !== null) {
-              const preLevelItems = id === 0 ? statement['origins'] :  statement['vias'][id-1]['anatomical_entities']
+              const preLevelItems = id === 0 ? statement['origins'] : statement['vias'][id - 1]['anatomical_entities']
               const selected = findMatchingEntities(
                 statement,
                 preLevelItems,
@@ -538,7 +537,7 @@ const StatementForm = (props: any) => {
             const id = getFirstNumberFromString(formId)
             let entity: any = []
             if (id !== null) {
-              const preLevelItems = id === 0 && statement['vias'].length === 0 ? statement['origins'] :  statement['vias'][statement?.vias?.length - 1]?.anatomical_entities
+              const preLevelItems = id === 0 && statement['vias'].length === 0 ? statement['origins'] : statement['vias'][statement?.vias?.length - 1]?.anatomical_entities
               const selected = findMatchingEntities(
                 statement,
                 preLevelItems,
@@ -638,23 +637,23 @@ const StatementForm = (props: any) => {
             ),
           ),
       },
-      CustomInputChip: ({ entity, sx = {} }: any) => (
+      CustomInputChip: ({entity, sx = {}}: any) => (
         <Chip
           key={entity?.id}
           variant={"filled"}
           onClick={(e) => {
             e.stopPropagation();
           }}
-          deleteIcon={<OpenInNewIcon sx={{ fill: "#548CE5" }} />}
+          deleteIcon={<OpenInNewIcon sx={{fill: "#548CE5"}}/>}
           onDelete={(e) => {
             window.open(window.location.origin + "/statement/" + entity?.id, '_blank')
             e.stopPropagation();
           }}
           label={entity?.label}
-          sx={{ ...sx }}
+          sx={{...sx}}
         />
       ),
-      CustomHeader: ({ entity }: any) => {
+      CustomHeader: ({entity}: any) => {
         const stateDetail = entity.content.find(
           (detail: OptionDetail) => detail.title === DROPDOWN_MAPPER_STATE,
         );
@@ -672,7 +671,7 @@ const StatementForm = (props: any) => {
               pb: "1.5rem",
             }}
           >
-            <StatementStateChip value={stateValue} />
+            <StatementStateChip value={stateValue}/>
           </Box>
         );
       },
@@ -682,15 +681,21 @@ const StatementForm = (props: any) => {
 
   // Add null option to the fields which have null type in dropdown.
   Object.keys(copiedSchema.properties).forEach((key) => {
-    if (copiedSchema.properties[key].type.includes("null") && copiedSchema.properties[key]?.enum && copiedSchema.properties[key]?.enumNames) {
-      copiedSchema.properties[key].enum.push(null);
-      copiedSchema.properties[key].enumNames.push("---------");
+    const property = copiedSchema.properties[key];
+
+    // Check if the 'type' exists and is an array or string that includes 'null'
+    if (property.type && Array.isArray(property.type) && property.type.includes("null")) {
+      // Check if 'enum' and 'enumNames' exist
+      if (property.enum && property.enumNames) {
+        property.enum.push(null);
+        property.enumNames.push("---------");
+      }
     }
   });
 
   Object.keys(copiedUISchema).forEach((key) => {
     if (copiedUISchema[key]["ui:options"] && copiedUISchema[key]["ui:options"].data) {
-      copiedUISchema[key]["ui:options"].data.push({ label: "---------", value: null })
+      copiedUISchema[key]["ui:options"].data.push({label: "---------", value: null})
     }
   });
 

@@ -30,12 +30,16 @@
                         <h5 class="m-0">Export statistics</h5>
                     </div>
                     <div class="card-body">
-                        <a id="exportData" class="float-right btn btn-xs {{ jazzmin_ui.button_classes.success }} addlink">Create new export</a>
-
+                        <a id="exportData" class="float-right btn btn-xs {{ jazzmin_ui.button_classes.success }} addlink">
+                            Create new export
+                            <span id="spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                        </a>
                         <script src="/static/admin/js/vendor/jquery/jquery.js"></script>
                         <script type="text/javascript">
                             jQuery('#exportData').on('click', function () {
-                                jQuery.ajax({
+                              jQuery('#spinner').show();
+                              jQuery('#exportData').prop('disabled', true);
+                              jQuery.ajax({
                                     url: '/composer/export',
                                     method: 'GET',
                                     success: function (data, textStatus, request) {
@@ -57,6 +61,10 @@
                                     },
                                     error: function (e) {
                                         console.log(e);
+                                    },
+                                    complete: function(e) {
+                                      jQuery('#spinner').hide();
+                                      jQuery('#exportData').prop('disabled', false);
                                     }
                                 });
                             });

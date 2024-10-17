@@ -3,7 +3,8 @@ import {
   AnatomicalEntity,
   ConnectivityStatement,
   ConnectivityStatementUpdate,
-  PaginatedBaseConnectivityStatementList
+  PaginatedBaseConnectivityStatementList,
+  PatchedConnectivityStatementUpdate
 } from '../apiclient/backend'
 import { AbstractService } from "./AbstractService"
 import { QueryParams } from "../redux/statementSlice"
@@ -26,6 +27,10 @@ class ConnectivityStatementService extends AbstractService {
   async update(connectivityStatement: ConnectivityStatementUpdate) {
     const id = connectivityStatement.id || -1
     return composerApi.composerConnectivityStatementUpdate(id, connectivityStatement).then((response: any) => response.data)
+  }
+
+  async partialUpdate(id: number, patchedConnectivityStatementUpdate: PatchedConnectivityStatementUpdate) {
+    return composerApi.composerConnectivityStatementPartialUpdate(id, patchedConnectivityStatementUpdate).then((response: any) => response.data)
   }
   async remove(id: number) {
     return composerApi.composerConnectivityStatementDestroy(id).then((response: any) => response.data)
