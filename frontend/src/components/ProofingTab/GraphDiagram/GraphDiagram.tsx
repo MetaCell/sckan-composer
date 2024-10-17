@@ -143,7 +143,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
         if (modelUpdated && currentContainer) {
             autoDistribute(engine);
         }
-    }, [destinations, vias, origins]);
+    }, [engine, destinations, vias, origins]);
     
     return (
     modelUpdated ? (
