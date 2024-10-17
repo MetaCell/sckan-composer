@@ -2,9 +2,8 @@ import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import InfoMenu from "./InfoMenu";
 import NavigationMenu from "./NavigationMenu";
 import createEngine, {
-  BasePositionModelOptions, DagreEngine,
-  DiagramModel, PathFindingLinkFactory, DiagramEngine
-} from '@projectstorm/react-diagrams';
+    BasePositionModelOptions, DagreEngine,
+    DiagramModel, PathFindingLinkFactory, DiagramEngine } from '@projectstorm/react-diagrams';
 import {CanvasWidget} from '@projectstorm/react-canvas-core';
 import {CustomNodeFactory} from "./Factories/CustomNodeFactory";
 import {
@@ -14,6 +13,7 @@ import {
 } from "../../../apiclient/backend";
 import {useParams} from "react-router-dom";
 import { processData } from "../../../services/GraphDiagramService";
+
 
 export enum NodeTypes {
   Origin = 'Origin',
@@ -37,32 +37,33 @@ interface GraphDiagramProps {
   serializedGraph?: any | undefined
 }
 
+
 function genDagreEngine() {
-  return new DagreEngine({
-    graph: {
-      rankdir: 'TB',
-      ranksep: 300,
-      nodesep: 250,
-      marginx: 50,
-      marginy: 50
-    },
-  });
+    return new DagreEngine({
+        graph: {
+            rankdir: 'TB',
+            ranksep: 300,
+            nodesep: 250,
+            marginx: 50,
+            marginy: 50
+        },
+    });
 }
 function reroute(engine: DiagramEngine) {
-  engine.getLinkFactories().getFactory<PathFindingLinkFactory>(PathFindingLinkFactory.NAME).calculateRoutingMatrix();
+    engine.getLinkFactories().getFactory<PathFindingLinkFactory>(PathFindingLinkFactory.NAME).calculateRoutingMatrix();
 }
 function autoDistribute(engine: DiagramEngine) {
-  const model = engine.getModel();
-  
-  if (!model || model.getNodes().length === 0) {
-    return;
-  }
-  
-  const dagreEngine = genDagreEngine();
-  dagreEngine.redistribute(model);
-  
-  reroute(engine);
-  engine.repaintCanvas();
+    const model = engine.getModel();
+    
+    if (!model || model.getNodes().length === 0) {
+        return;
+    }
+    
+    const dagreEngine = genDagreEngine();
+    dagreEngine.redistribute(model);
+    
+    reroute(engine);
+    engine.repaintCanvas();
 }
 
 const GraphDiagram: React.FC<GraphDiagramProps> = ({
@@ -131,21 +132,20 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
       setModelFitted(true);
     }
   }, [modelUpdated, modelFitted, engine]);
-  
-  useLayoutEffect(() => {
-    autoDistribute(engine);
-  }, [engine, modelUpdated]);
-  
-  useEffect(() => {
-    const currentContainer = containerRef.current;
     
-    if (modelUpdated && currentContainer) {
-      autoDistribute(engine);
-    }
-  }, [engine, modelUpdated, destinations, vias, origins]);
-  
-  
-  return (
+    useLayoutEffect(() => {
+        autoDistribute(engine);
+    }, [engine, modelUpdated]);
+    
+    useEffect(() => {
+        const currentContainer = containerRef.current;
+        
+        if (modelUpdated && currentContainer) {
+            autoDistribute(engine);
+        }
+    }, [engine, modelUpdated, destinations, vias, origins]);
+    
+    return (
     modelUpdated ? (
         <div ref={containerRef} className={"graphContainer"}>
           <NavigationMenu engine={engine} statementId={statementId || "-1"}/>
