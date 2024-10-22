@@ -240,10 +240,17 @@ export default function CustomEntitiesDropdown({
     }
   };
   const handleSelectedOptionsChange = async (newSelectedOptions: Option[]) => {
-    setSelectedOptions(newSelectedOptions);
-    setHasValueChanged(true);
-    onUpdate(newSelectedOptions, id);
+    try {
+      const result = await onUpdate(newSelectedOptions, id);
+      if (result.success) {
+        setSelectedOptions(newSelectedOptions);
+        setHasValueChanged(true);
+      }
+    } catch (error) {
+      console.error("Error updating selected options:", error);
+    }
   };
+  
   const groupedOptions = autocompleteOptions.reduce(
     (grouped: any, option: Option) => {
       const group = option.group;

@@ -15,7 +15,8 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
   createOptionsFromStatements,
   getAnatomicalEntities,
-  getConnectionId, getFirstNumberFromString,
+  getConnectionId,
+  getFirstNumberFromString,
   searchForwardConnection,
   searchFromEntitiesDestination,
   searchFromEntitiesVia,
@@ -24,24 +25,16 @@ import {
   updateOrigins,
 } from "../../services/CustomDropdownService";
 import {
-  mapAnatomicalEntitiesToOptions,
   DROPDOWN_MAPPER_STATE,
-  getViasGroupLabel,
   findMatchingEntities,
+  getViasGroupLabel,
+  mapAnatomicalEntitiesToOptions,
 } from "../../helpers/dropdownMappers";
 import {DestinationIcon, ViaIcon} from "../icons";
-import {
-  DestinationsGroupLabel,
-  OriginsGroupLabel,
-  ViasGroupLabel,
-} from "../../helpers/settings";
+import {DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel,} from "../../helpers/settings";
 import {Option, OptionDetail} from "../../types";
 import {composerApi as api} from "../../services/apis";
-import {
-  ConnectivityStatement,
-  TypeB60Enum,
-  TypeC11Enum,
-} from "../../apiclient/backend";
+import {ConnectivityStatement, TypeB60Enum, TypeC11Enum,} from "../../apiclient/backend";
 import {CustomFooter} from "../Widgets/HoveredOptionContent";
 import {StatementStateChip} from "../Widgets/StateChip";
 import {projections} from "../../services/ProjectionService";
@@ -180,7 +173,11 @@ const StatementForm = (props: any) => {
         );
       },
       onUpdate: async (selectedOptions: any) => {
-        await updateOrigins(selectedOptions, statement.id, setStatement);
+        try {
+          return await updateOrigins(selectedOptions, statement.id, setStatement);
+        } catch (error) {
+          return { success: false };
+        }
       },
       errors: "",
       mapValueToOption: () =>
@@ -292,13 +289,17 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
-            await updateEntity({
-              statementId: statement.id,
-              selected: selectedOptions,
-              entityId: getConnectionId(formId, statement.vias),
-              entityType: "via",
-              propertyToUpdate: "anatomical_entities",
-            });
+            try {
+              return await updateEntity({
+                statementId: statement.id,
+                selected: selectedOptions,
+                entityId: getConnectionId(formId, statement.vias),
+                entityType: "via",
+                propertyToUpdate: "anatomical_entities",
+              });
+            } catch (error) {
+              return { success: false };
+            }
           },
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) =>
@@ -334,13 +335,17 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
-            await updateEntity({
-              statementId: statement.id,
-              selected: selectedOptions,
-              entityId: getConnectionId(formId, statement.vias),
-              entityType: "via",
-              propertyToUpdate: "from_entities",
-            });
+            try {
+             return await updateEntity({
+                statementId: statement.id,
+                selected: selectedOptions,
+                entityId: getConnectionId(formId, statement.vias),
+                entityType: "via",
+                propertyToUpdate: "from_entities",
+              });
+            } catch (error) {
+              return { success: false };
+            }
           },
           areConnectionsExplicit: (formId: any) => {
             const id = getFirstNumberFromString(formId)
@@ -467,13 +472,17 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
-            await updateEntity({
-              statementId: statement.id,
-              selected: selectedOptions,
-              entityId: getConnectionId(formId, statement?.destinations),
-              entityType: "destination",
-              propertyToUpdate: "anatomical_entities",
-            });
+            try {
+              return await updateEntity({
+                statementId: statement.id,
+                selected: selectedOptions,
+                entityId: getConnectionId(formId, statement?.destinations),
+                entityType: "destination",
+                propertyToUpdate: "anatomical_entities",
+              });
+            } catch (error) {
+              return { success: false };
+            }
           },
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) =>
@@ -512,13 +521,17 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
-            await updateEntity({
-              statementId: statement.id,
-              selected: selectedOptions,
-              entityId: getConnectionId(formId, statement?.destinations),
-              entityType: "destination",
-              propertyToUpdate: "from_entities",
-            });
+            try {
+              return await updateEntity({
+                statementId: statement.id,
+                selected: selectedOptions,
+                entityId: getConnectionId(formId, statement?.destinations),
+                entityType: "destination",
+                propertyToUpdate: "from_entities",
+              });
+            } catch (error) {
+              return { success: false };
+            }
           },
           areConnectionsExplicit: (formId: any) => {
             const id = getFirstNumberFromString(formId)
@@ -604,7 +617,12 @@ const StatementForm = (props: any) => {
         return searchForwardConnection(searchValue, statement, excludedIds);
       },
       onUpdate: async (selectedOptions: Option[]) => {
-        await updateForwardConnections(selectedOptions, statement);
+        try {
+          return await updateForwardConnections(selectedOptions, statement);
+        } catch (error) {
+          return { success: false };
+        }
+        
       },
       statement: statement,
       errors: statement?.errors?.includes("Invalid forward connection")

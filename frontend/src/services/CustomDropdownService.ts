@@ -57,8 +57,14 @@ export async function updateOrigins(
     await statementService.partialUpdate(statementId, patchedStatement, () => {
       console.log("User canceled ownership reassignment.");
     });
+    return {
+      success: true,
+    }
   } catch (error) {
     console.error("Error updating origins:", error);
+    return {
+      success: false,
+    }
   }
 }
 
@@ -86,7 +92,7 @@ export async function updateEntity({
 }: UpdateEntityParams) {
   if (entityId == null) {
     console.error(`Error updating ${entityType}`);
-    return;
+    return { success: false };
   }
 
   const entityIds = selected.map((option) => parseInt(option.id));
@@ -99,6 +105,7 @@ export async function updateEntity({
       // Attempt to update, using checkOwnership in case of ownership error
       try {
         await updateFunction(entityId, patchObject);
+        return { success: true };
       } catch (error) {
         // Ownership error occurred, trigger ownership check
         checkOwnership(
@@ -113,6 +120,7 @@ export async function updateEntity({
     }
   } catch (error) {
     console.error(`Error updating ${entityType}`, error);
+    return { success: false };
   }
 }
 
@@ -297,9 +305,10 @@ export async function updateForwardConnections(
   // Call the update method of statementService
   try {
     await statementService.update(updateData);
+    return {success: true}
   } catch (error) {
     console.error("Error updating statement:", error);
-    throw error;
+    return {success: false}
   }
 }
 
