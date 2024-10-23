@@ -31,7 +31,7 @@ import {
   mapAnatomicalEntitiesToOptions,
 } from "../../helpers/dropdownMappers";
 import {DestinationIcon, ViaIcon} from "../icons";
-import {DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel,} from "../../helpers/settings";
+import {ChangeRequestStatus, DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel,} from "../../helpers/settings";
 import {Option, OptionDetail} from "../../types";
 import {composerApi as api} from "../../services/apis";
 import {ConnectivityStatement, TypeB60Enum, TypeC11Enum,} from "../../apiclient/backend";
@@ -257,7 +257,7 @@ const StatementForm = (props: any) => {
                 await api.composerViaPartialUpdate(viaIndex, {
                   type: typeOption,
                 });
-                return 'Saved';
+                return ChangeRequestStatus.SAVED;
               } catch (error) {
                 return checkOwnership(
                   statement.id,
@@ -265,17 +265,16 @@ const StatementForm = (props: any) => {
                     await api.composerViaPartialUpdate(viaIndex, {
                       type: typeOption,
                     });
-                    return 'Saved';
+                    return ChangeRequestStatus.SAVED;
                   },
                   () => {
-                    console.log("Ownership reassignment was canceled.");
-                    return 'canceled';
+                    return ChangeRequestStatus.CANCELLED;
                   },
                   (owner) => getOwnershipAlertMessage(owner)
                 );
               }
             }
-            return 'canceled';
+            return ChangeRequestStatus.CANCELLED;
           },
         },
       },

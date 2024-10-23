@@ -6,6 +6,7 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
 import { vars } from "../../theme/variables";
+import {ChangeRequestStatus} from "../../helpers/settings";
 
 const CustomSingleSelect = ({
   onChange,
@@ -107,7 +108,7 @@ const CustomSingleSelect = ({
               if (onUpdate) {
                 try {
                   const result = await onUpdate(event.target.value, id);
-                  if (result !== 'canceled') {
+                  if (result !== ChangeRequestStatus.CANCELLED) {
                     onChange(event.target.value);
                   }
                 } catch (e) {

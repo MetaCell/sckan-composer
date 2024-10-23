@@ -1,13 +1,14 @@
 import statementService from "../services/StatementService";
 import {userProfile} from "../services/UserService";
 import {User} from "../apiclient/backend";
+import {ChangeRequestStatus} from "./settings";
 
 export const checkOwnership = (
   id: number,
   onSave: (fetchedData: any, userId: number) => Promise<any>,
   onCancel: (fetchedData: any, userId: number) => void,
   alertMessage: (owner: any) => string
-): Promise<'saved' | 'canceled'> => {
+): Promise<string> => {
   const userId = userProfile.getUser().id;
   return new Promise((resolve, reject) => {
     // Fetch the latest data to check for ownership
@@ -21,7 +22,7 @@ export const checkOwnership = (
             statementService.assignOwner(fetchedData.id, {})
               .then(() => {
                 return onSave(fetchedData, userId)
-                  .then((result) => resolve('saved'))
+                  .then((result) => resolve(ChangeRequestStatus.SAVED))
                   .catch((error) => reject(error));
               })
               .catch((error) => {
@@ -31,11 +32,11 @@ export const checkOwnership = (
               });
           } else {
             onCancel(fetchedData, userId);
-            resolve('canceled');
+            resolve(ChangeRequestStatus.CANCELLED);
           }
         } else {
           onSave(fetchedData, userId)
-            .then(() => resolve('saved'))
+            .then(() => resolve(ChangeRequestStatus.SAVED))
             .catch((error) => reject(error));
         }
       })

@@ -9,6 +9,7 @@ import {
 import {AbstractService} from "./AbstractService"
 import {QueryParams} from "../redux/statementSlice"
 import {checkOwnership} from "../helpers/ownershipAlert";
+import {ChangeRequestStatus} from "../helpers/settings";
 
 class ConnectivityStatementService extends AbstractService {
   async save(
@@ -43,7 +44,7 @@ class ConnectivityStatementService extends AbstractService {
 
     try {
        await composerApi.composerConnectivityStatementUpdate(id, connectivityStatement).then((response: any) => response.data);
-       return 'saved'
+       return ChangeRequestStatus.SAVED;
     } catch (error) {
       return await checkOwnership(
         id,
@@ -54,11 +55,11 @@ class ConnectivityStatementService extends AbstractService {
             owner_id: userId,
           };
           await composerApi.composerConnectivityStatementUpdate(id, updatedStatement).then((response: any) => response.data);
-          return 'saved';
+          return ChangeRequestStatus.SAVED;
         },
         () => {
           onCancel();
-          return 'canceled';
+          return ChangeRequestStatus.CANCELLED;
         },
         (owner) =>
           `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`,
@@ -87,7 +88,7 @@ class ConnectivityStatementService extends AbstractService {
         },
         () => {
           onCancel();
-          return 'canceled'; // Return 'canceled' when onCancel is triggered
+          return ChangeRequestStatus.CANCELLED; // Return 'canceled' when onCancel is triggered
         },
         (owner) =>
           `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`,
