@@ -240,14 +240,10 @@ export default function CustomEntitiesDropdown({
     }
   };
   const handleSelectedOptionsChange = async (newSelectedOptions: Option[]) => {
-    try {
-      const result = await onUpdate(newSelectedOptions, id);
-      if (result.success) {
-        setSelectedOptions(newSelectedOptions);
-        setHasValueChanged(true);
-      }
-    } catch (error) {
-      console.error("Error updating selected options:", error);
+    const result = await onUpdate(newSelectedOptions, id);
+    if (result !== 'canceled') {
+      setSelectedOptions(newSelectedOptions);
+      setHasValueChanged(true);
     }
   };
   

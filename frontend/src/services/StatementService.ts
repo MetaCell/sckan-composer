@@ -42,7 +42,8 @@ class ConnectivityStatementService extends AbstractService {
     const id = connectivityStatement.id || -1;
 
     try {
-      return await composerApi.composerConnectivityStatementUpdate(id, connectivityStatement).then((response: any) => response.data);
+       await composerApi.composerConnectivityStatementUpdate(id, connectivityStatement).then((response: any) => response.data);
+       return 'saved'
     } catch (error) {
       return await checkOwnership(
         id,
@@ -52,9 +53,13 @@ class ConnectivityStatementService extends AbstractService {
             ...connectivityStatement,
             owner_id: userId,
           };
-          return composerApi.composerConnectivityStatementUpdate(id, updatedStatement).then((response: any) => response.data);
+          await composerApi.composerConnectivityStatementUpdate(id, updatedStatement).then((response: any) => response.data);
+          return 'saved';
         },
-        onCancel,
+        () => {
+          onCancel();
+          return 'canceled';
+        },
         (owner) =>
           `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`,
       );
@@ -80,7 +85,10 @@ class ConnectivityStatementService extends AbstractService {
           };
           return composerApi.composerConnectivityStatementPartialUpdate(id, updatedPatchedStatement).then((response: any) => response.data);
         },
-        onCancel,
+        () => {
+          onCancel();
+          return 'canceled'; // Return 'canceled' when onCancel is triggered
+        },
         (owner) =>
           `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`,
       );
