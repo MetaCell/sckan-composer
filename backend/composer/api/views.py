@@ -81,8 +81,6 @@ class AssignOwnerMixin(viewsets.GenericViewSet):
 
 
 class TagMixin(viewsets.GenericViewSet):
-    permission_classes = [IsOwnerOrAssignOwnerOrCreateOrReadOnly]
-
     @extend_schema(
         parameters=[
             OpenApiParameter(

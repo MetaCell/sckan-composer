@@ -20,8 +20,18 @@ class IsOwnerOrAssignOwnerOrCreateOrReadOnly(permissions.BasePermission):
     replacing the existing owner.
     """
 
+    def has_permission(self, request, view):
+        # Allow safe methods (GET, HEAD, OPTIONS) for all users
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # For unsafe methods (POST, PATCH, PUT, DELETE), allow only authenticated users
+        # Object-level permissions (e.g., ownership) are handled by has_object_permission
+        return request.user.is_authenticated
+
     def has_object_permission(self, request, view, obj):
-        # Read permissions are allowed to any request
+
+        # Allow read permissions (GET, HEAD, OPTIONS) to any user
         if request.method in permissions.SAFE_METHODS:
             return True
 
@@ -29,16 +39,8 @@ class IsOwnerOrAssignOwnerOrCreateOrReadOnly(permissions.BasePermission):
         if view.action == 'assign_owner':
             return request.user.is_authenticated
 
-        # Write permissions are only allowed to the owner
+        # Write and delete permissions (PATCH, PUT, DELETE) are only allowed to the owner
         return obj.owner == request.user
-
-    def has_permission(self, request, view):
-        # Allow authenticated users to create new objects (POST requests)
-        if request.method == 'POST':
-            return request.user.is_authenticated
-
-        # Allow access for non-object-specific safe methods (e.g., listing objects via GET)
-        return request.method in permissions.SAFE_METHODS
 
 class IsOwnerOfConnectivityStatementOrReadOnly(permissions.BasePermission):
     """
@@ -70,18 +72,6 @@ class IsSentenceOrStatementOwnerOrSystemUserOrReadOnly(permissions.BasePermissio
             return True
 
         # For POST (create), PUT, PATCH (update), or DELETE, check ownership
-        return self.check_ownership(request)
-
-    def has_object_permission(self, request, view, obj):
-        # Allow system user to bypass all checks
-        if request.user.username == 'system' and request.user.is_staff:
-            return True
-
-        # Allow read-only access (GET, HEAD, OPTIONS)
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        # Check ownership for unsafe methods (PUT, PATCH, DELETE)
         return self.check_ownership(request)
 
 
