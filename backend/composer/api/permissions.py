@@ -25,7 +25,11 @@ class IsOwnerOrAssignOwnerOrCreateOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        # For unsafe methods (POST, PATCH, PUT, DELETE), allow only authenticated users
+        # Checks if creator is the owner of the related sentence
+        if request.method == 'POST':
+                return check_related_entity_ownership(request)
+
+        # For unsafe methods (PATCH, PUT, DELETE), allow only authenticated users
         # Object-level permissions (e.g., ownership) are handled by has_object_permission
         return request.user.is_authenticated
 
@@ -72,32 +76,33 @@ class IsSentenceOrStatementOwnerOrSystemUserOrReadOnly(permissions.BasePermissio
             return True
 
         # For POST (create), PUT, PATCH (update), or DELETE, check ownership
-        return self.check_ownership(request)
+        return check_related_entity_ownership(request)
 
 
-    def check_ownership(self, request):
-        """
-        Helper method to check ownership of sentence or connectivity statement.
-        Raises PermissionDenied if the user is not the owner.
-        """
-        sentence_id = request.data.get('sentence_id')
-        connectivity_statement_id = request.data.get('connectivity_statement_id')
+def check_related_entity_ownership(request):
+    """
+    Helper method to check ownership of sentence or connectivity statement.
+    Raises PermissionDenied if the user is not the owner.
+    """
+    sentence_id = request.data.get('sentence_id')
+    connectivity_statement_id = request.data.get('connectivity_statement_id')
 
-        # Check ownership for sentence_id
-        if sentence_id:
-            try:
-                sentence = Sentence.objects.get(id=sentence_id)
-            except Sentence.DoesNotExist:
-                raise PermissionDenied("Invalid sentence_id.")
-            if sentence.owner != request.user:
-                raise PermissionDenied("You are not the owner of this sentence.")
+    # Check ownership for sentence_id
+    if sentence_id:
+        try:
+            sentence = Sentence.objects.get(id=sentence_id)
+        except Sentence.DoesNotExist:
+            raise PermissionDenied("Invalid sentence_id.")
+        if sentence.owner != request.user:
+            raise PermissionDenied("You are not the owner of this sentence.")
 
-        # Check ownership for connectivity_statement_id
-        if connectivity_statement_id:
-            try:
-                connectivity_statement = ConnectivityStatement.objects.get(id=connectivity_statement_id)
-            except ConnectivityStatement.DoesNotExist:
-                raise PermissionDenied("Invalid connectivity_statement_id.")
-            if connectivity_statement.owner != request.user:
-                raise PermissionDenied("You are not the owner of this connectivity statement.")
-        return True
+    # Check ownership for connectivity_statement_id
+    if connectivity_statement_id:
+        try:
+            connectivity_statement = ConnectivityStatement.objects.get(id=connectivity_statement_id)
+        except ConnectivityStatement.DoesNotExist:
+            raise PermissionDenied("Invalid connectivity_statement_id.")
+        if connectivity_statement.owner != request.user:
+            raise PermissionDenied("You are not the owner of this connectivity statement.")
+    
+    return True
