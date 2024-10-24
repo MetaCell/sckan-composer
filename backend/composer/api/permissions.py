@@ -10,7 +10,7 @@ class IsStaffUserIfExportedStateInConnectivityStatement(permissions.BasePermissi
         return True
 
 
-class IsOwnerOrAssignOwnerOrReadOnly(permissions.BasePermission):
+class IsOwnerOrAssignOwnerOrCreateOrReadOnly(permissions.BasePermission):
     """
     Custom permission to allow only the owner to edit an object,
     but allow any authenticated user to assign themselves as owner,
@@ -29,6 +29,13 @@ class IsOwnerOrAssignOwnerOrReadOnly(permissions.BasePermission):
         # Write permissions are only allowed to the owner
         return obj.owner == request.user
 
+    def has_permission(self, request, view):
+        # Allow authenticated users to create new objects (POST requests)
+        if request.method == 'POST':
+            return request.user.is_authenticated
+
+        # Allow access for non-object-specific safe methods (e.g., listing objects via GET)
+        return request.method in permissions.SAFE_METHODS
 
 class IsOwnerOfConnectivityStatementOrReadOnly(permissions.BasePermission):
     """

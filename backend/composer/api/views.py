@@ -40,7 +40,7 @@ from .serializers import (
     ProvenanceSerializer,
     SexSerializer, ConnectivityStatementUpdateSerializer, DestinationSerializer, BaseConnectivityStatementSerializer,
 )
-from .permissions import IsStaffUserIfExportedStateInConnectivityStatement, IsOwnerOrAssignOwnerOrReadOnly, \
+from .permissions import IsStaffUserIfExportedStateInConnectivityStatement, IsOwnerOrAssignOwnerOrCreateOrReadOnly, \
     IsOwnerOfConnectivityStatementOrReadOnly
 from ..models import (
     AnatomicalEntity,
@@ -324,7 +324,7 @@ class ConnectivityStatementViewSet(
     serializer_class = ConnectivityStatementSerializer
     permission_classes = [
         IsStaffUserIfExportedStateInConnectivityStatement,
-        IsOwnerOrAssignOwnerOrReadOnly,
+        IsOwnerOrAssignOwnerOrCreateOrReadOnly,
     ]
     filterset_class = ConnectivityStatementFilter
     service = ConnectivityStatementStateService
@@ -440,7 +440,7 @@ class SentenceViewSet(
     queryset = Sentence.objects.all()
     serializer_class = SentenceSerializer
     permission_classes = [
-        IsOwnerOrAssignOwnerOrReadOnly,
+        IsOwnerOrAssignOwnerOrCreateOrReadOnly,
     ]
     filterset_class = SentenceFilter
     service = SentenceStateService
