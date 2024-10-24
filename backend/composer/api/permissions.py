@@ -25,9 +25,9 @@ class IsOwnerOrAssignOwnerOrCreateOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        # Checks if creator is the owner of the related sentence
+        # Checks if creator is the owner of the related entity (if related entity exists)
         if request.method == 'POST':
-                return check_related_entity_ownership(request)
+            return check_related_entity_ownership(request)
 
         # For unsafe methods (PATCH, PUT, DELETE), allow only authenticated users
         # Object-level permissions (e.g., ownership) are handled by has_object_permission
