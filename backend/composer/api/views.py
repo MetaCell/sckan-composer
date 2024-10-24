@@ -23,7 +23,8 @@ from .filtersets import (
     AnatomicalEntityFilter,
     NoteFilter,
     ViaFilter,
-    SpecieFilter, DestinationFilter,
+    SpecieFilter,
+    DestinationFilter,
 )
 from .serializers import (
     AnatomicalEntitySerializer,
@@ -38,9 +39,17 @@ from .serializers import (
     TagSerializer,
     ViaSerializer,
     ProvenanceSerializer,
-    SexSerializer, ConnectivityStatementUpdateSerializer, DestinationSerializer, BaseConnectivityStatementSerializer,
+    SexSerializer,
+    ConnectivityStatementUpdateSerializer,
+    DestinationSerializer,
+    BaseConnectivityStatementSerializer,
 )
-from .permissions import IsStaffUserIfExportedStateInConnectivityStatement
+from .permissions import (
+    IsSentenceOrStatementOwnerOrSystemUserOrReadOnly,
+    IsStaffUserIfExportedStateInConnectivityStatement,
+    IsOwnerOrAssignOwnerOrCreateOrReadOnly,
+    IsOwnerOfConnectivityStatementOrReadOnly,
+)
 from ..models import (
     AnatomicalEntity,
     Phenotype,
@@ -53,20 +62,25 @@ from ..models import (
     Tag,
     Via,
     Provenance,
-    Sex, Destination, GraphRenderingState,
+    Sex,
+    Destination,
+    GraphRenderingState,
 )
 
 
 # Mixins
 class AssignOwnerMixin(viewsets.GenericViewSet):
-    def retrieve(self, request, *args, **kwargs):
-        self.get_object().assign_owner(request)
-        return super().retrieve(request, *args, **kwargs)
+    @action(
+        detail=True, methods=["patch"], permission_classes=[permissions.IsAuthenticated]
+    )
+    def assign_owner(self, request, pk=None):
+        instance = self.get_object()
+        instance.assign_owner(request)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 
-class TagMixin(
-    viewsets.GenericViewSet,
-):
+class TagMixin(viewsets.GenericViewSet):
     @extend_schema(
         parameters=[
             OpenApiParameter(
@@ -139,7 +153,11 @@ class ProvenanceMixin(
         ],
         request=None,
     )
-    @action(detail=True, methods=["delete"], url_path="del_provenance/(?P<provenance_id>\d+)")
+    @action(
+        detail=True,
+        methods=["delete"],
+        url_path="del_provenance/(?P<provenance_id>\d+)",
+    )
     def del_provenance(self, request, pk=None, provenance_id=None):
         count, deleted = Provenance.objects.filter(
             id=provenance_id, connectivity_statement_id=pk
@@ -208,8 +226,10 @@ class CSCloningMixin(viewsets.GenericViewSet):
         instance.origins = None
         instance.save()
         instance.species.add(*self.get_object().species.all())
-        provenances = (Provenance(connectivity_statement=instance, uri=provenance.uri) for provenance in
-                       self.get_object().provenance_set.all())
+        provenances = (
+            Provenance(connectivity_statement=instance, uri=provenance.uri)
+            for provenance in self.get_object().provenance_set.all()
+        )
         Provenance.objects.bulk_create(provenances)
         return Response(self.get_serializer(instance).data)
 
@@ -224,23 +244,20 @@ class ModelRetrieveViewSet(
     # mixins.DestroyModelMixin,
     # mixins.ListModelMixin,
     viewsets.GenericViewSet,
-):
-    ...
+): ...
 
 
 class ModelCreateRetrieveViewSet(
     ModelRetrieveViewSet,
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
-):
-    ...
+): ...
 
 
 class ModelNoDeleteViewSet(
     ModelCreateRetrieveViewSet,
     mixins.UpdateModelMixin,
-):
-    ...
+): ...
 
 
 class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
@@ -272,6 +289,7 @@ class ProjectionPhenotypeViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Projection Phenotype
     """
+
     queryset = ProjectionPhenotype.objects.all()
     serializer_class = ProjectionPhenotypeSerializer
     permission_classes = [
@@ -299,7 +317,7 @@ class NoteViewSet(viewsets.ModelViewSet):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
+        IsSentenceOrStatementOwnerOrSystemUserOrReadOnly
     ]
     filterset_class = NoteFilter
 
@@ -321,13 +339,13 @@ class ConnectivityStatementViewSet(
     serializer_class = ConnectivityStatementSerializer
     permission_classes = [
         IsStaffUserIfExportedStateInConnectivityStatement,
-        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrAssignOwnerOrCreateOrReadOnly,
     ]
     filterset_class = ConnectivityStatementFilter
     service = ConnectivityStatementStateService
 
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action == "list":
             return BaseConnectivityStatementSerializer
         return ConnectivityStatementSerializer
 
@@ -338,52 +356,65 @@ class ConnectivityStatementViewSet(
 
     def handle_graph_rendering_state(self, instance, graph_rendering_state_data, user):
         if graph_rendering_state_data:
-            if hasattr(instance, 'graph_rendering_state') and instance.graph_rendering_state is not None:
+            if (
+                hasattr(instance, "graph_rendering_state")
+                and instance.graph_rendering_state is not None
+            ):
                 # Update the existing graph state
-                instance.graph_rendering_state.serialized_graph = graph_rendering_state_data.get(
-                    'serialized_graph', instance.graph_rendering_state.serialized_graph)
+                instance.graph_rendering_state.serialized_graph = (
+                    graph_rendering_state_data.get(
+                        "serialized_graph",
+                        instance.graph_rendering_state.serialized_graph,
+                    )
+                )
                 instance.graph_rendering_state.saved_by = user
                 instance.graph_rendering_state.save()
             else:
                 # Create a new graph state if none exists
                 GraphRenderingState.objects.create(
                     connectivity_statement=instance,
-                    serialized_graph=graph_rendering_state_data.get('serialized_graph', {}),
-                    saved_by=user
+                    serialized_graph=graph_rendering_state_data.get(
+                        "serialized_graph", {}
+                    ),
+                    saved_by=user,
                 )
 
     @extend_schema(
-        methods=['PUT'],
+        methods=["PUT"],
         request=ConnectivityStatementUpdateSerializer,
-        responses={200: ConnectivityStatementSerializer}
+        responses={200: ConnectivityStatementSerializer},
     )
     def update(self, request, *args, **kwargs):
-        origin_ids = request.data.pop('origins', None)
-        graph_rendering_state_data = request.data.pop('graph_rendering_state', None)
+        origin_ids = request.data.pop("origins", None)
+        graph_rendering_state_data = request.data.pop("graph_rendering_state", None)
 
         response = super().update(request, *args, **kwargs)
 
         if response.status_code == status.HTTP_200_OK:
             instance = self.get_object()
-            self.handle_graph_rendering_state(instance, graph_rendering_state_data, request.user)
-            if origin_ids:
+            self.handle_graph_rendering_state(
+                instance, graph_rendering_state_data, request.user
+            )
+            if origin_ids is not None:
                 instance.set_origins(origin_ids)
 
         return response
 
     @extend_schema(
-        methods=['PATCH'],
+        methods=["PATCH"],
         request=ConnectivityStatementUpdateSerializer,
-        responses={200: ConnectivityStatementSerializer}
+        responses={200: ConnectivityStatementSerializer},
     )
     def partial_update(self, request, *args, **kwargs):
-        graph_rendering_state_data = request.data.pop('graph_rendering_state', None)
+        graph_rendering_state_data = request.data.pop("graph_rendering_state", None)
 
         response = super().partial_update(request, *args, **kwargs)
 
         if response.status_code == status.HTTP_200_OK:
             instance = self.get_object()
-            self.handle_graph_rendering_state(instance, graph_rendering_state_data, request.user)
+            self.handle_graph_rendering_state(
+                instance, graph_rendering_state_data, request.user
+            )
 
         return response
 
@@ -395,6 +426,7 @@ class KnowledgeStatementViewSet(
     """
     KnowledgeStatement that only allows GET to get the list of ConnectivityStatements
     """
+
     model = ConnectivityStatement
     queryset = ConnectivityStatement.objects.exported()
     serializer_class = KnowledgeStatementSerializer
@@ -406,7 +438,7 @@ class KnowledgeStatementViewSet(
 
     @property
     def allowed_methods(self):
-        return ['GET']
+        return ["GET"]
 
     def get_serializer_class(self):
         return KnowledgeStatementSerializer
@@ -437,7 +469,7 @@ class SentenceViewSet(
     queryset = Sentence.objects.all()
     serializer_class = SentenceSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrAssignOwnerOrCreateOrReadOnly,
     ]
     filterset_class = SentenceFilter
     service = SentenceStateService
@@ -481,6 +513,10 @@ class ProfileViewSet(viewsets.GenericViewSet):
         return Response(self.get_serializer(profile).data)
 
 
+class IsOwnerOfConnectivityStatement:
+    pass
+
+
 class ViaViewSet(viewsets.ModelViewSet):
     """
     Via
@@ -489,7 +525,7 @@ class ViaViewSet(viewsets.ModelViewSet):
     queryset = Via.objects.all()
     serializer_class = ViaSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOfConnectivityStatementOrReadOnly,
     ]
     filterset_class = ViaFilter
 
@@ -501,9 +537,7 @@ class DestinationViewSet(viewsets.ModelViewSet):
 
     queryset = Destination.objects.all()
     serializer_class = DestinationSerializer
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-    ]
+    permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
     filterset_class = DestinationFilter
 
 

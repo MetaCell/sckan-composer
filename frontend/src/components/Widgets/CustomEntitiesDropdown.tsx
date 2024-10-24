@@ -208,7 +208,6 @@ export default function CustomEntitiesDropdown({
        label,
        chipsNumber = 2,
        postProcessOptions = false,
-       refreshStatement,
        getPreLevelSelectedValues,
        areConnectionsExplicit,
        minWidth = '',
@@ -241,10 +240,17 @@ export default function CustomEntitiesDropdown({
     }
   };
   const handleSelectedOptionsChange = async (newSelectedOptions: Option[]) => {
-    setSelectedOptions(newSelectedOptions);
-    setHasValueChanged(true);
-    onUpdate(newSelectedOptions, id);
+    try {
+      const result = await onUpdate(newSelectedOptions, id);
+      if (result.success) {
+        setSelectedOptions(newSelectedOptions);
+        setHasValueChanged(true);
+      }
+    } catch (error) {
+      console.error("Error updating selected options:", error);
+    }
   };
+  
   const groupedOptions = autocompleteOptions.reduce(
     (grouped: any, option: Option) => {
       const group = option.group;
@@ -329,7 +335,7 @@ export default function CustomEntitiesDropdown({
   
   const handleChipRemove = (chip: Option) => {
     const updatedChips = selectedOptions.filter((c: Option) => c !== chip);
-    handleSelectedOptionsChange(updatedChips).then(() => refreshStatement());
+    handleSelectedOptionsChange(updatedChips);
   };
   
   const handleInputChange = (event: any) => {
@@ -385,8 +391,7 @@ export default function CustomEntitiesDropdown({
         setAnchorEl(null);
         setInputValue("");
         setAllOptions([]);
-        if (refreshStatement && hasValueChanged) {
-          refreshStatement();
+        if (hasValueChanged) {
           setHasValueChanged(false);
         }
         if (postProcessOptions && selectedOptions.length === 0) {
@@ -399,7 +404,7 @@ export default function CustomEntitiesDropdown({
     return () => {
       document.removeEventListener("mousedown", closePopperOnClickOutside);
     };
-  }, [hasValueChanged, postProcessOptions, getPreLevelSelectedValues, refreshStatement, selectedOptions.length, id]);
+  }, [hasValueChanged, postProcessOptions, getPreLevelSelectedValues, selectedOptions.length, id]);
 
   return isDisabled ? (
     disabledReason ? (

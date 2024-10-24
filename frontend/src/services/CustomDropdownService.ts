@@ -18,9 +18,10 @@ import {
   PatchedVia,
   ViaSerializerDetails,
 } from "../apiclient/backend";
-import { searchAnatomicalEntities } from "../helpers/helpers";
+import {searchAnatomicalEntities} from "../helpers/helpers";
 import connectivityStatementService from "./StatementService";
 import statementService from "./StatementService";
+import {checkOwnership, getOwnershipAlertMessage} from "../helpers/ownershipAlert";
 
 export async function getAnatomicalEntities(
   searchValue: string,
@@ -42,22 +43,33 @@ export async function getAnatomicalEntities(
   }
 }
 
-export async function updateOrigins(selected: Option[], statementId: number) {
+export async function updateOrigins(
+  selected: Option[],
+  statementId: number,
+  setStatement: (statement: any) => void
+) {
   const originIds = selected.map((option) => parseInt(option.id));
   const patchedStatement: PatchedConnectivityStatementUpdate = {
     origins: originIds,
   };
+
   try {
-    await api.composerConnectivityStatementPartialUpdate(
-      statementId,
-      patchedStatement,
-    );
+    await statementService.partialUpdate(statementId, patchedStatement, () => {
+      console.log("User canceled ownership reassignment.");
+    });
+    return {
+      success: true,
+    }
   } catch (error) {
-    console.error("Error updating origins", error);
+    console.error("Error updating origins:", error);
+    return {
+      success: false,
+    }
   }
 }
 
 export type UpdateEntityParams = {
+  statementId: number
   selected: Option[];
   entityId: number | null;
   entityType: "via" | "destination";
@@ -72,6 +84,7 @@ const apiFunctionMap = {
 };
 
 export async function updateEntity({
+  statementId,
   selected,
   entityId,
   entityType,
@@ -79,21 +92,35 @@ export async function updateEntity({
 }: UpdateEntityParams) {
   if (entityId == null) {
     console.error(`Error updating ${entityType}`);
-    return;
+    return { success: false };
   }
 
   const entityIds = selected.map((option) => parseInt(option.id));
   const patchObject = { [propertyToUpdate]: entityIds };
 
   try {
+    // Get the API function from the map
     const updateFunction = apiFunctionMap[entityType];
     if (updateFunction) {
-      await updateFunction(entityId, patchObject);
+      // Attempt to update, using checkOwnership in case of ownership error
+      try {
+        await updateFunction(entityId, patchObject);
+        return { success: true };
+      } catch (error) {
+        // Ownership error occurred, trigger ownership check
+        checkOwnership(
+          statementId,
+          () => updateFunction(entityId, patchObject), // Re-attempt the update if ownership is reassigned
+          (fetchedEntity) => console.log(`Ownership assigned, updated entity:`, fetchedEntity), // Optional: handle post-assignment logic
+          (owner) => getOwnershipAlertMessage(owner)
+        );
+      }
     } else {
       console.error(`No update function found for entity type: ${entityType}`);
     }
   } catch (error) {
     console.error(`Error updating ${entityType}`, error);
+    return { success: false };
   }
 }
 
@@ -278,9 +305,10 @@ export async function updateForwardConnections(
   // Call the update method of statementService
   try {
     await statementService.update(updateData);
+    return {success: true}
   } catch (error) {
     console.error("Error updating statement:", error);
-    throw error;
+    return {success: false}
   }
 }
 
