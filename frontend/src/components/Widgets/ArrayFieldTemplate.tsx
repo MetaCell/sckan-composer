@@ -23,6 +23,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { SortableItem } from "../ProofingTab/SortableItem";
+import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
 
 function ArrayFieldTemplate(props: any) {
   const [isDragging, setIsDragging] = useState(false);
@@ -73,35 +74,72 @@ function ArrayFieldTemplate(props: any) {
     setShowConfirmation(false);
   }
 
-  function handleDragEnd(event: any) {
-    const { active, over } = event;
-    if (active.id !== over.id && isDragging) {
-      openConfirmationDialog(
-        sortableItems.map((e: any) => e.id).indexOf(over.id),
+ async function handleDragEnd(event: any) {
+   try {
+     await checkOwnership(
+       props.id,
+       async () => {
+         const { active, over } = event;
+         if (active.id !== over.id && isDragging) {
+           openConfirmationDialog(
+             sortableItems.map((e: any) => e.id).indexOf(over.id),
+           );
+         }
+       },
+       () => {
+         console.log("Ownership reassignment was canceled.");
+       },
+       (owner) => getOwnershipAlertMessage(owner) // Prompt message
+     );
+   } catch (error) {
+     console.error("Error during add action:", error);
+   }
+  }
+
+  async function handleDelete(element: any) {
+    try {
+      await checkOwnership(
+        props.id,
+        async () => {
+          // Call the original onDropIndexClick function
+          element.onDropIndexClick(element.index)();
+          
+          // Additionally call onElementDelete if it's provided
+          if (props.onElementDelete) {
+            props.onElementDelete(element);
+          }
+        },
+        () => {
+          console.log("Ownership reassignment was canceled.");
+        },
+        (owner) => getOwnershipAlertMessage(owner) // Prompt message
       );
+    } catch (error) {
+      console.error("Error during add action:", error);
     }
   }
-
-  function handleDelete(element: any) {
-    // Call the original onDropIndexClick function
-    element.onDropIndexClick(element.index)();
-
-    // Additionally call onElementDelete if it's provided
-    if (props.onElementDelete) {
-      props.onElementDelete(element);
+  
+  async function handleAdd(event: any) {
+    try {
+      await checkOwnership(
+        props.id,
+        async () => {
+          props.onAddClick(event);
+          if (props.onElementAdd) {
+            props.onElementAdd();
+          }
+        },
+        () => {
+          console.log("Ownership reassignment was canceled.");
+        },
+        (owner) => getOwnershipAlertMessage(owner) // Prompt message
+      );
+    } catch (error) {
+      console.error("Error during add action:", error);
     }
   }
-
-  function handleAdd(event: any) {
-    // Call the default onAddClick function
-    props.onAddClick(event);
-
-    // Additionally call onElementAdd if it's provided
-    if (props.onElementAdd) {
-      props.onElementAdd();
-    }
-  }
-
+  
+  
   return (
     <DndContext
       sensors={sensors}

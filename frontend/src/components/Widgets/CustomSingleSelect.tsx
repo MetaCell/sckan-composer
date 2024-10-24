@@ -103,9 +103,19 @@ const CustomSingleSelect = ({
               },
             }}
             value={value !== null ? value : ""}
-            onChange={(event) => {
-              onChange(event.target.value);
-              onUpdate && onUpdate(event.target.value, id);
+            onChange={async (event)  => {
+              if (onUpdate) {
+                try {
+                  const result = await onUpdate(event.target.value, id);
+                  if (result !== 'canceled') {
+                    onChange(event.target.value);
+                  }
+                } catch (e) {
+                  console.log(e)
+                }
+              } else {
+                onChange(event.target.value);
+              }
             }}
             disabled={isDisabled}
             id="custom-select"

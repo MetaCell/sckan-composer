@@ -7,7 +7,7 @@ export const checkOwnership = (
   onSave: (fetchedData: any, userId: number) => Promise<any>,
   onCancel: (fetchedData: any, userId: number) => void,
   alertMessage: (owner: any) => string
-): Promise<void> => {
+): Promise<'saved' | 'canceled'> => {
   const userId = userProfile.getUser().id;
   return new Promise((resolve, reject) => {
     // Fetch the latest data to check for ownership
@@ -16,14 +16,12 @@ export const checkOwnership = (
         // Check if the fetched data has an owner and if the current user is not the owner
         if (fetchedData.owner && fetchedData.owner.id !== userId) {
           const userConfirmed = window.confirm(alertMessage(fetchedData.owner));
-
+          
           if (userConfirmed) {
-            // Reassign ownership and save the data
             statementService.assignOwner(fetchedData.id, {})
               .then(() => {
-                // Call the merged save action
                 return onSave(fetchedData, userId)
-                  .then((result) => resolve(result))
+                  .then((result) => resolve('saved'))
                   .catch((error) => reject(error));
               })
               .catch((error) => {
@@ -33,8 +31,12 @@ export const checkOwnership = (
               });
           } else {
             onCancel(fetchedData, userId);
-            resolve(); // Resolve since user canceled, but operation is complete
+            resolve('canceled');
           }
+        } else {
+          onSave(fetchedData, userId)
+            .then(() => resolve('saved'))
+            .catch((error) => reject(error));
         }
       })
       .catch((fetchError) => {

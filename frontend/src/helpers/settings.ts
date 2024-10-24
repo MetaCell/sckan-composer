@@ -28,3 +28,8 @@ export const sentenceStateToColor: SentenceStateToColor = {
 export const OriginsGroupLabel = "Origins";
 export const ViasGroupLabel = "Vias";
 export const DestinationsGroupLabel = "Destinations";
+
+export const ChangeRequestStatus = {
+  CANCELLED: "canceled",
+  SAVED: "saved",
+}

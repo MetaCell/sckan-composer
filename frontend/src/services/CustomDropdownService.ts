@@ -54,17 +54,11 @@ export async function updateOrigins(
   };
 
   try {
-    await statementService.partialUpdate(statementId, patchedStatement, () => {
+   return await statementService.partialUpdate(statementId, patchedStatement, () => {
       console.log("User canceled ownership reassignment.");
     });
-    return {
-      success: true,
-    }
   } catch (error) {
     console.error("Error updating origins:", error);
-    return {
-      success: false,
-    }
   }
 }
 
@@ -92,7 +86,6 @@ export async function updateEntity({
 }: UpdateEntityParams) {
   if (entityId == null) {
     console.error(`Error updating ${entityType}`);
-    return { success: false };
   }
 
   const entityIds = selected.map((option) => parseInt(option.id));
@@ -104,13 +97,14 @@ export async function updateEntity({
     if (updateFunction) {
       // Attempt to update, using checkOwnership in case of ownership error
       try {
-        await updateFunction(entityId, patchObject);
-        return { success: true };
+        if (entityId != null) {
+          await updateFunction(entityId, patchObject);
+        }
       } catch (error) {
         // Ownership error occurred, trigger ownership check
-        checkOwnership(
+        return checkOwnership(
           statementId,
-          () => updateFunction(entityId, patchObject), // Re-attempt the update if ownership is reassigned
+          () => updateFunction(<number>entityId, patchObject), // Re-attempt the update if ownership is reassigned
           (fetchedEntity) => console.log(`Ownership assigned, updated entity:`, fetchedEntity), // Optional: handle post-assignment logic
           (owner) => getOwnershipAlertMessage(owner)
         );
@@ -120,7 +114,6 @@ export async function updateEntity({
     }
   } catch (error) {
     console.error(`Error updating ${entityType}`, error);
-    return { success: false };
   }
 }
 
@@ -304,11 +297,9 @@ export async function updateForwardConnections(
 
   // Call the update method of statementService
   try {
-    await statementService.update(updateData);
-    return {success: true}
+    return await statementService.update(updateData);
   } catch (error) {
     console.error("Error updating statement:", error);
-    return {success: false}
   }
 }
 
