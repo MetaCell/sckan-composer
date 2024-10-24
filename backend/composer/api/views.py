@@ -60,10 +60,12 @@ from ..models import (
 
 # Mixins
 class AssignOwnerMixin(viewsets.GenericViewSet):
-    def retrieve(self, request, *args, **kwargs):
-        self.get_object().assign_owner(request)
-        return super().retrieve(request, *args, **kwargs)
-
+    @action(detail=True, methods=['patch'], permission_classes=[permissions.IsAuthenticated])
+    def assign_owner(self, request, pk=None):
+        instance = self.get_object()
+        instance.assign_owner(request)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 class TagMixin(
     viewsets.GenericViewSet,
@@ -388,13 +390,6 @@ class ConnectivityStatementViewSet(
 
         return response
 
-    @action(detail=True, methods=['patch'], permission_classes=[permissions.IsAuthenticated])
-    def assign_owner(self, request, pk=None):
-        instance = self.get_object()
-        instance.owner = request.user
-        instance.save()
-        return Response(self.get_serializer(instance).data)
-
 
 @extend_schema(tags=["public"])
 class KnowledgeStatementViewSet(
@@ -445,7 +440,7 @@ class SentenceViewSet(
     queryset = Sentence.objects.all()
     serializer_class = SentenceSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrAssignOwnerOrReadOnly,
     ]
     filterset_class = SentenceFilter
     service = SentenceStateService
