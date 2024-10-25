@@ -443,10 +443,22 @@ class Sentence(models.Model):
             self.owner = request.user
             self.save(update_fields=["owner"])
 
+            # Update the owner of related draft ConnectivityStatements
+            ConnectivityStatement.objects.filter(
+                sentence=self,
+                state=CSState.DRAFT
+            ).update(owner=request.user)
+
     def auto_assign_owner(self, request):
         if SentenceStateService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
+
+            # Update the owner of related draft ConnectivityStatements
+            ConnectivityStatement.objects.filter(
+                sentence=self,
+                state=CSState.DRAFT
+            ).update(owner=request.user)
 
     @property
     def pmid_uri(self) -> str:
@@ -691,10 +703,15 @@ class ConnectivityStatement(models.Model):
             self.save(update_fields=["owner"])
 
     def save(self, *args, **kwargs):
+        if not self.pk and self.sentence and not self.owner:
+            self.owner = self.sentence.owner
+
         super().save(*args, **kwargs)
+
         if self.reference_uri is None:
             self.reference_uri = create_reference_uri(self.pk)
             self.save(update_fields=["reference_uri"])
+
 
     def set_origins(self, origin_ids):
         self.origins.set(origin_ids, clear=True)
