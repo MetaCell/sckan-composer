@@ -78,6 +78,11 @@ class AssignOwnerMixin(viewsets.GenericViewSet):
         instance.assign_owner(request)
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+    
+    def retrieve(self, request, *args, **kwargs):
+        self.get_object().auto_assign_owner(request)
+        return super().retrieve(request, *args, **kwargs)
+
 
 
 class TagMixin(viewsets.GenericViewSet):

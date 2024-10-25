@@ -16,10 +16,14 @@ class OwnerServiceMixin(BaseServiceMixin):
     def is_owner(self, owner):
         return self.obj.owner == owner
 
-    def should_set_owner(self, request):
+    def can_assign_owner(self, request):
         return bool(request.user)
 
-
+    def should_set_owner(self, request):
+        if self.obj.owner:
+            return False
+        if request.user:
+            return True
 
 class StateServiceMixin(OwnerServiceMixin):
     def _is_transition_available(self, transition, user=None):

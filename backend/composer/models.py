@@ -439,6 +439,11 @@ class Sentence(models.Model):
         ...
 
     def assign_owner(self, request):
+        if SentenceStateService(self).can_assign_owner(request):
+            self.owner = request.user
+            self.save(update_fields=["owner"])
+
+    def auto_assign_owner(self, request):
         if SentenceStateService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
@@ -676,6 +681,11 @@ class ConnectivityStatement(models.Model):
         return laterality_map.get(self.laterality, None)
 
     def assign_owner(self, request):
+        if ConnectivityStatementStateService(self).can_assign_owner(request):
+            self.owner = request.user
+            self.save(update_fields=["owner"])
+
+    def auto_assign_owner(self, request):
         if ConnectivityStatementStateService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
