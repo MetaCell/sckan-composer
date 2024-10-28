@@ -186,7 +186,7 @@ const SentencesDetails = () => {
               )
             ) {
               sentenceService
-                .save({ ...sentence, owner_id: userProfile.getUser().id })
+                .assignOwner(sentence.id, {})
                 .then((sentence: Sentence) => {
                   setSentence(sentence);
                 });

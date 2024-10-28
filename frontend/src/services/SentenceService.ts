@@ -1,5 +1,5 @@
 import { composerApi } from "./apis";
-import { PaginatedSentenceList, Sentence } from '../apiclient/backend';
+import { PaginatedSentenceList, PatchedSentence, Sentence } from '../apiclient/backend';
 import { AbstractService } from "./AbstractService";
 import { QueryParams } from "../redux/sentenceSlice";
 
@@ -28,6 +28,9 @@ class SentenceService extends AbstractService {
   async getList(queryOptions: QueryParams): Promise<PaginatedSentenceList> {
     const { exclude, limit, ordering, index, title, stateFilter, tagFilter } = queryOptions
     return composerApi.composerSentenceList(exclude, limit, undefined, index, ordering, stateFilter, tagFilter, title).then((res: any) => res.data)
+  }
+  async assignOwner(id: number, patchedSentence?: PatchedSentence): Promise<Sentence> {
+    return composerApi.composerSentenceAssignOwnerPartialUpdate(id, patchedSentence).then((response: any) => response.data);
   }
 }
 

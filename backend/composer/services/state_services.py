@@ -76,7 +76,8 @@ class SentenceStateService(StateServiceMixin):
         for cs in sentence.connectivitystatement_set.all():
             if cs.state == CSState.DRAFT:
                 cs.compose_now(*args, **kwargs)
-                cs.save()
+                cs.owner = None
+                cs.save(update_fields=["state", "owner"])
 
     @staticmethod
     def can_be_reviewed(sentence):
