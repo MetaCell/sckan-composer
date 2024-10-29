@@ -96,12 +96,32 @@ class ConnectivityStatementService extends AbstractService {
     }
   }
 
-  async remove(id: number) {
-    return composerApi.composerConnectivityStatementDestroy(id).then((response: any) => response.data);
+  async remove(id: number, onCancel: () => void = () => {
+  }) {
+    try {
+      return await composerApi.composerConnectivityStatementDestroy(id).then((response: any) => response.data);
+    } catch (e) {
+      return checkOwnership(
+        id,
+        async () => {
+          return composerApi.composerConnectivityStatementDestroy(id).then((response: any) => response.data);
+        },
+        () => {
+          onCancel();
+          return ChangeRequestStatus.CANCELLED; // Return 'canceled' when onCancel is triggered
+        },
+        (owner) =>
+          `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`,
+      );
+    }
   }
 
   async clone(id: number) {
-    return composerApi.composerConnectivityStatementCloneStatementRetrieve(id).then((response: any) => response.data);
+    try {
+      return await composerApi.composerConnectivityStatementCloneStatementRetrieve(id).then((response: any) => response.data);
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   async getObject(id: string): Promise<ConnectivityStatement> {
@@ -112,21 +132,80 @@ class ConnectivityStatementService extends AbstractService {
     const id = connectivityStatement.id || -1;
     return composerApi.composerConnectivityStatementDoTransitionCreate(id, transition, connectivityStatement).then((response: any) => response.data);
   }
-
-  async addTag(id: number, tagId: number): Promise<ConnectivityStatement> {
-    return composerApi.composerConnectivityStatementAddTagCreate(id, tagId).then((response: any) => response.data);
+  
+  async addTag(id: number, tagId: number, onCancel: () => void = () => {}): Promise<ConnectivityStatement | string> {
+    try {
+      return await composerApi.composerConnectivityStatementAddTagCreate(id, tagId).then((response: any) => response.data as ConnectivityStatement);
+    } catch (error) {
+      return await checkOwnership(
+        id,
+        async () => {
+          return await composerApi.composerConnectivityStatementAddTagCreate(id, tagId).then((response: any) => response.data as ConnectivityStatement);
+        },
+        () => {
+          onCancel();
+          return ChangeRequestStatus.CANCELLED;
+        },
+        (owner) =>
+          `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+      );
+    }
+  }
+  async addSpecie(id: number, specieId: number, onCancel: () => void = () => {}): Promise<string> {
+   try {
+     return await composerApi.composerConnectivityStatementAddSpecieCreate(id, specieId).then((response: any) => response.data);
+   } catch (error) {
+     return await checkOwnership(
+       id,
+       async () => {
+         return await composerApi.composerConnectivityStatementDelTagCreate(id, specieId).then((response: any) => response.data as ConnectivityStatement);
+       },
+       () => {
+         onCancel();
+         return ChangeRequestStatus.CANCELLED;
+       },
+       (owner) =>
+         `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+     );
+   }
   }
 
-  async addSpecie(id: number, specieId: number): Promise<ConnectivityStatement> {
-    return composerApi.composerConnectivityStatementAddSpecieCreate(id, specieId).then((response: any) => response.data);
+  async removeTag(id: number, tagId: number, onCancel: () => void = () => {}): Promise<string> {
+    try {
+      return await composerApi.composerConnectivityStatementDelTagCreate(id, tagId).then((response: any) => response.data);
+    } catch (err) {
+      return await checkOwnership(
+        id,
+        async () => {
+          return await composerApi.composerConnectivityStatementDelTagCreate(id, tagId).then((response: any) => response.data as ConnectivityStatement);
+        },
+        () => {
+          onCancel();
+          return ChangeRequestStatus.CANCELLED;
+        },
+        (owner) =>
+          `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+      );
+    }
   }
 
-  async removeTag(id: number, tagId: number): Promise<ConnectivityStatement> {
-    return composerApi.composerConnectivityStatementDelTagCreate(id, tagId).then((response: any) => response.data);
-  }
-
-  async removeSpecie(id: number, specieId: number): Promise<ConnectivityStatement> {
-    return composerApi.composerConnectivityStatementDelSpecieCreate(id, specieId).then((response: any) => response.data);
+  async removeSpecie(id: number, specieId: number, onCancel: () => void = () => {}): Promise<string> {
+    try {
+      return await composerApi.composerConnectivityStatementDelSpecieCreate(id, specieId).then((response: any) => response.data);
+    } catch (err) {
+      return await checkOwnership(
+        id,
+        async () => {
+          return await composerApi.composerConnectivityStatementDelSpecieCreate(id, specieId).then((response: any) => response.data as ConnectivityStatement);
+        },
+        () => {
+          onCancel();
+          return ChangeRequestStatus.CANCELLED;
+        },
+        (owner) =>
+          `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+      );
+    }
   }
 
   async getList(queryOptions: QueryParams): Promise<PaginatedBaseConnectivityStatementList> {

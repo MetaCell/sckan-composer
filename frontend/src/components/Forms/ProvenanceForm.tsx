@@ -4,7 +4,7 @@ import { jsonSchemas } from '../../services/JsonSchema'
 import provenanceService from '../../services/ProvenanceService'
 import {Provenance} from "../../apiclient/backend";
 import TextfieldWithChips from "../Widgets/TextfieldWithChips";
-
+import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
 
 const ProvenancesForm = (props: any) => {
   const { provenancesData, setter, extraData, isDisabled } = props
@@ -22,9 +22,18 @@ const ProvenancesForm = (props: any) => {
 
   const handleAutocompleteChange = (e:any, value:any)=>{
     const newValue = value.pop()
-    provenanceService.save({statementId: extraData.connectivity_statement_id, uri: newValue}).then((newData:any)=>{
-      setter()
-    })
+    return checkOwnership(
+      extraData.connectivity_statement_id,
+      async () => {
+        provenanceService.save({statementId: extraData.connectivity_statement_id, uri: newValue}).then(()=>{
+          setter()
+        })
+      },
+      () => {
+        console.log("Adding a provenance canceled due to ownership issues.");
+      },
+      getOwnershipAlertMessage // message to show when ownership needs to be reassigned
+    );
   }
 
   const isValidUrl = (uri: string) =>{
@@ -45,8 +54,18 @@ const ProvenancesForm = (props: any) => {
       data: provenancesData?.map((row: Provenance) => ({id: row.id, label: row.uri, enableClick: isValidUrl(row.uri) })) || [],
       placeholder: isDisabled ? null : 'Enter Provenances (Press Enter to add a Provenance)',
       removeChip: function(provenanceId: any) {
-        provenanceService.delete(provenanceId, extraData.connectivity_statement_id)
-        refresh()
+        return checkOwnership(
+          extraData.connectivity_statement_id,
+          async () => {
+           await provenanceService.delete(provenanceId, extraData.connectivity_statement_id)
+            refresh()
+          },
+          () => {
+            console.log("Deleting a provenance canceled due to ownership issues.");
+          },
+          getOwnershipAlertMessage // message to show when ownership needs to be reassigned
+        );
+       
       },
       onAutocompleteChange: handleAutocompleteChange,
     }

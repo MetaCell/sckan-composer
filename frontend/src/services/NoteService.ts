@@ -1,11 +1,41 @@
 import { composerApi } from "./apis"
 import { Note } from "../apiclient/backend"
 import { AbstractService } from "./AbstractService"
-
-
+import {checkOwnership, checkSentenceOwnership} from "../helpers/ownershipAlert";
 class NoteService extends AbstractService {
-  async save(note: Note) {
-    return composerApi.composerNoteCreate(note).then((response: any) => response.data)
+  async save(note: Note, onCancel: () => void = () => {}) {
+    try {
+      return await composerApi.composerNoteCreate(note).then((response: any) => response.data);
+    } catch (err) {
+      const defaultOnCancel = typeof onCancel === 'function' ? onCancel : () => {};
+      
+      if (note.sentence_id !== undefined && note.sentence_id !== null) {
+        const id = note.sentence_id;
+        return await checkSentenceOwnership(
+          id,
+          async () => {
+            return await composerApi.composerNoteCreate(note).then((response: any) => response.data);
+          },
+          defaultOnCancel,
+          (owner) =>
+            `This sentence is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this sentence to yourself and gain edit access?`
+        );
+      } else if (note.connectivity_statement_id !== undefined && note.connectivity_statement_id !== null) {
+        const id = note.connectivity_statement_id;
+        return await checkOwnership(
+          id,
+          async () => {
+            return await composerApi.composerNoteCreate(note).then((response: any) => response.data);
+          },
+          defaultOnCancel,
+          (owner) =>
+            `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+        );
+      } else {
+        console.error("Note does not have a valid ID for ownership check.");
+        return Promise.reject("Invalid note type: missing both sentence_id and connectivity_statement_id.");
+      }
+    }
   }
   async getNotesList(connectivityStatementId?: number, limit?: number, offset?: number, sentenceId?: number) {
     return composerApi.composerNoteList(connectivityStatementId, limit, offset, sentenceId).then((res: any) => res.data)

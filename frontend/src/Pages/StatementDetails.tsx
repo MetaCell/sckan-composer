@@ -33,6 +33,7 @@ import {
 import Stack from "@mui/material/Stack";
 import {ViaIcon, DestinationIcon, OriginIcon} from "../components/icons";
 import {CircularProgress} from "@mui/material";
+import {checkOwnership, getOwnershipAlertMessage} from "../helpers/ownershipAlert";
 
 const StatementDetails = () => {
   const {statementId} = useParams();
@@ -61,17 +62,29 @@ const StatementDetails = () => {
 
   const theme = useTheme();
   const sectionStyle = useSectionStyle(theme);
-
+  
   const doTransition = () => {
     const transition = statement?.available_transitions[selectedIndex];
-    statementService
-      .doTransition(statement, transition)
-      .then((statement: ConnectivityStatement) => {
-        setStatement(statement);
-        setSelectedIndex(0);
-      });
+    if (statement.id) {
+      return checkOwnership(
+        statement.id,
+        async (fetchedData, userId) => {
+          // Update the statement with the new ownership if reassigned
+          const updatedStatement = { ...statement, owner_id: userId };
+          
+          // Proceed with the transition once ownership is confirmed
+          const result = await statementService.doTransition(updatedStatement, transition);
+          setStatement(result);
+          setSelectedIndex(0);
+          return result;
+        },
+        () => {
+          console.log("Transition canceled due to ownership issues.");
+        },
+        getOwnershipAlertMessage // message to show when ownership needs to be reassigned
+      );
+    }
   };
-
   const handleMenuItemClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
     index: number,
@@ -315,6 +328,7 @@ const StatementDetails = () => {
                           extraData={{
                             parentId: statement.id,
                             service: statementService,
+                            statement
                           }}
                           setter={refreshStatement}
                           isDisabled={isDisabled}
@@ -323,6 +337,7 @@ const StatementDetails = () => {
                         <NoteDetails
                           extraData={{
                             connectivity_statement_id: statement.id,
+                            type: 'statement'
                           }}
                         />
                       </Paper>
