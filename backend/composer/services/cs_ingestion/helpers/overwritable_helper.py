@@ -13,7 +13,7 @@ logger_service = LoggerService()
 def get_overwritable_and_new_statements(statements_list: List[Dict[str, Any]], disable_overwrite: bool=False) -> List[Dict[str, Any]]:
     overwritable_and_new_statements = [
         statement for statement in statements_list
-        if is_new_or_overwritable_sentence(statement, disable_overwrite) and is_new_or_overwritable_statement(statement, disable_overwrite)
+        if is_new_or_overwritable_statement(statement, disable_overwrite)
     ]
     return overwritable_and_new_statements
 
