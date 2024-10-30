@@ -1,4 +1,4 @@
-import {composerApi} from "./apis"
+import { composerApi } from "./apis"
 import {
   AnatomicalEntity,
   ConnectivityStatement,
@@ -6,10 +6,10 @@ import {
   PaginatedBaseConnectivityStatementList, PatchedConnectivityStatement,
   PatchedConnectivityStatementUpdate
 } from '../apiclient/backend'
-import {AbstractService} from "./AbstractService"
-import {QueryParams} from "../redux/statementSlice"
-import {checkOwnership} from "../helpers/ownershipAlert";
-import {ChangeRequestStatus} from "../helpers/settings";
+import { AbstractService } from "./AbstractService"
+import { QueryParams } from "../redux/statementSlice"
+import { checkOwnership } from "../helpers/ownershipAlert";
+import { ChangeRequestStatus } from "../helpers/settings";
 
 class ConnectivityStatementService extends AbstractService {
   async save(
@@ -43,8 +43,8 @@ class ConnectivityStatementService extends AbstractService {
     const id = connectivityStatement.id || -1;
 
     try {
-       await composerApi.composerConnectivityStatementUpdate(id, connectivityStatement).then((response: any) => response.data);
-       return ChangeRequestStatus.SAVED;
+      await composerApi.composerConnectivityStatementUpdate(id, connectivityStatement).then((response: any) => response.data);
+      return ChangeRequestStatus.SAVED;
     } catch (error) {
       return await checkOwnership(
         id,
@@ -132,8 +132,8 @@ class ConnectivityStatementService extends AbstractService {
     const id = connectivityStatement.id || -1;
     return composerApi.composerConnectivityStatementDoTransitionCreate(id, transition, connectivityStatement).then((response: any) => response.data);
   }
-  
-  async addTag(id: number, tagId: number, onCancel: () => void = () => {}): Promise<ConnectivityStatement | string> {
+
+  async addTag(id: number, tagId: number, onCancel: () => void = () => { }): Promise<ConnectivityStatement | string> {
     try {
       return await composerApi.composerConnectivityStatementAddTagCreate(id, tagId).then((response: any) => response.data as ConnectivityStatement);
     } catch (error) {
@@ -151,26 +151,26 @@ class ConnectivityStatementService extends AbstractService {
       );
     }
   }
-  async addSpecie(id: number, specieId: number, onCancel: () => void = () => {}): Promise<string> {
-   try {
-     return await composerApi.composerConnectivityStatementAddSpecieCreate(id, specieId).then((response: any) => response.data);
-   } catch (error) {
-     return await checkOwnership(
-       id,
-       async () => {
-         return await composerApi.composerConnectivityStatementDelTagCreate(id, specieId).then((response: any) => response.data as ConnectivityStatement);
-       },
-       () => {
-         onCancel();
-         return ChangeRequestStatus.CANCELLED;
-       },
-       (owner) =>
-         `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
-     );
-   }
+  async addSpecie(id: number, specieId: number, onCancel: () => void = () => { }): Promise<string> {
+    try {
+      return await composerApi.composerConnectivityStatementAddSpecieCreate(id, specieId).then((response: any) => response.data);
+    } catch (error) {
+      return await checkOwnership(
+        id,
+        async () => {
+          return await composerApi.composerConnectivityStatementAddSpecieCreate(id, specieId).then((response: any) => response.data as ConnectivityStatement);
+        },
+        () => {
+          onCancel();
+          return ChangeRequestStatus.CANCELLED;
+        },
+        (owner) =>
+          `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+      );
+    }
   }
 
-  async removeTag(id: number, tagId: number, onCancel: () => void = () => {}): Promise<string> {
+  async removeTag(id: number, tagId: number, onCancel: () => void = () => { }): Promise<string> {
     try {
       return await composerApi.composerConnectivityStatementDelTagCreate(id, tagId).then((response: any) => response.data);
     } catch (err) {
@@ -189,7 +189,7 @@ class ConnectivityStatementService extends AbstractService {
     }
   }
 
-  async removeSpecie(id: number, specieId: number, onCancel: () => void = () => {}): Promise<string> {
+  async removeSpecie(id: number, specieId: number, onCancel: () => void = () => { }): Promise<string> {
     try {
       return await composerApi.composerConnectivityStatementDelSpecieCreate(id, specieId).then((response: any) => response.data);
     } catch (err) {
