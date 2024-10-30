@@ -8,7 +8,7 @@ import {CanvasWidget} from '@projectstorm/react-canvas-core';
 import {CustomNodeFactory} from "./Factories/CustomNodeFactory";
 import {
   AnatomicalEntity,
-  DestinationSerializerDetails,
+  DestinationSerializerDetails, TypeC11Enum,
   ViaSerializerDetails
 } from "../../../apiclient/backend";
 import {useParams} from "react-router-dom";
@@ -38,10 +38,10 @@ interface GraphDiagramProps {
 }
 
 
-function genDagreEngine() {
+function genDagreEngine(containsAfferentT: boolean) {
     return new DagreEngine({
         graph: {
-            rankdir: 'TB',
+            rankdir: containsAfferentT ? 'BT' : 'TB',
             ranksep: 300,
             nodesep: 250,
             marginx: 50,
@@ -52,14 +52,14 @@ function genDagreEngine() {
 function reroute(engine: DiagramEngine) {
     engine.getLinkFactories().getFactory<PathFindingLinkFactory>(PathFindingLinkFactory.NAME).calculateRoutingMatrix();
 }
-function autoDistribute(engine: DiagramEngine) {
+function autoDistribute(engine: DiagramEngine, containsAfferentT: boolean) {
     const model = engine.getModel();
-    
+
     if (!model || model.getNodes().length === 0) {
         return;
     }
     
-    const dagreEngine = genDagreEngine();
+    const dagreEngine = genDagreEngine(containsAfferentT);
     dagreEngine.redistribute(model);
     
     reroute(engine);
@@ -78,7 +78,12 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   const [modelUpdated, setModelUpdated] = useState(false)
   const [modelFitted, setModelFitted] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null);
-
+  
+  const containsAfferentT = destinations?.some(destination =>
+    destination.type === TypeC11Enum.AfferentT
+  ) || false;
+  
+  
   // This effect runs once to set up the engine
   useEffect(() => {
     engine.getNodeFactories().registerFactory(new CustomNodeFactory());
@@ -134,16 +139,16 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   }, [modelUpdated, modelFitted, engine]);
     
     useLayoutEffect(() => {
-        autoDistribute(engine);
-    }, [engine, modelUpdated]);
+        autoDistribute(engine, containsAfferentT);
+    }, [engine, modelUpdated, containsAfferentT]);
     
     useEffect(() => {
         const currentContainer = containerRef.current;
         
         if (modelUpdated && currentContainer) {
-            autoDistribute(engine);
+            autoDistribute(engine, containsAfferentT);
         }
-    }, [engine, modelUpdated, destinations, vias, origins]);
+    }, [engine, modelUpdated, destinations, vias, origins, containsAfferentT]);
     
     return (
     modelUpdated ? (
