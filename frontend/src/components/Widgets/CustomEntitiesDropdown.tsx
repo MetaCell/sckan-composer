@@ -31,6 +31,7 @@ import {processFromEntitiesData} from "../../helpers/dropdownMappers";
 import CustomChipBoxComponent from "./CustomChipBoxComponent";
 import { debounce } from "@mui/material";
 import { SEARCH_DEBOUNCE } from "../../settings";
+import {ChangeRequestStatus} from "../../helpers/settings";
 
 const {
   buttonOutlinedBorderColor,
@@ -240,14 +241,10 @@ export default function CustomEntitiesDropdown({
     }
   };
   const handleSelectedOptionsChange = async (newSelectedOptions: Option[]) => {
-    try {
-      const result = await onUpdate(newSelectedOptions, id);
-      if (result.success) {
-        setSelectedOptions(newSelectedOptions);
-        setHasValueChanged(true);
-      }
-    } catch (error) {
-      console.error("Error updating selected options:", error);
+    const result = await onUpdate(newSelectedOptions, id);
+    if (result !== ChangeRequestStatus.CANCELLED) {
+      setSelectedOptions(newSelectedOptions);
+      setHasValueChanged(true);
     }
   };
   

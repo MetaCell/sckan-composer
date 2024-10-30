@@ -31,13 +31,14 @@ import {
   mapAnatomicalEntitiesToOptions,
 } from "../../helpers/dropdownMappers";
 import {DestinationIcon, ViaIcon} from "../icons";
-import {DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel,} from "../../helpers/settings";
+import {ChangeRequestStatus, DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel,} from "../../helpers/settings";
 import {Option, OptionDetail} from "../../types";
 import {composerApi as api} from "../../services/apis";
 import {ConnectivityStatement, TypeB60Enum, TypeC11Enum,} from "../../apiclient/backend";
 import {CustomFooter} from "../Widgets/HoveredOptionContent";
 import {StatementStateChip} from "../Widgets/StateChip";
 import {projections} from "../../services/ProjectionService";
+import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
 
 const StatementForm = (props: any) => {
   const {uiFields, statement, setStatement, isDisabled, action: refreshStatement} = props;
@@ -173,11 +174,7 @@ const StatementForm = (props: any) => {
         );
       },
       onUpdate: async (selectedOptions: any) => {
-        try {
-          return await updateOrigins(selectedOptions, statement.id, setStatement);
-        } catch (error) {
-          return { success: false };
-        }
+        return await updateOrigins(selectedOptions, statement.id, setStatement);
       },
       errors: "",
       mapValueToOption: () =>
@@ -210,6 +207,7 @@ const StatementForm = (props: any) => {
     "ui:ArrayFieldTemplate": (props: any) => (
       <ArrayFieldTemplate
         {...props}
+        id={statement.id}
         onElementDelete={async (element: any) => {
           await api.composerViaDestroy(element.children.props.formData.id);
         }}
@@ -253,12 +251,30 @@ const StatementForm = (props: any) => {
           onUpdate: async (selectedOption: string, formId: string) => {
             const viaIndex = getConnectionId(formId, statement.vias);
             const typeOption = selectedOption as TypeB60Enum;
+            
             if (viaIndex) {
-              api
-                .composerViaPartialUpdate(viaIndex, {
+              try {
+                await api.composerViaPartialUpdate(viaIndex, {
                   type: typeOption,
-                })
+                });
+                return ChangeRequestStatus.SAVED;
+              } catch (error) {
+                return checkOwnership(
+                  statement.id,
+                  async () => {
+                    await api.composerViaPartialUpdate(viaIndex, {
+                      type: typeOption,
+                    });
+                    return ChangeRequestStatus.SAVED;
+                  },
+                  () => {
+                    return ChangeRequestStatus.CANCELLED;
+                  },
+                  (owner) => getOwnershipAlertMessage(owner)
+                );
+              }
             }
+            return ChangeRequestStatus.CANCELLED;
           },
         },
       },
@@ -289,17 +305,13 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
-            try {
-              return await updateEntity({
-                statementId: statement.id,
-                selected: selectedOptions,
-                entityId: getConnectionId(formId, statement.vias),
-                entityType: "via",
-                propertyToUpdate: "anatomical_entities",
-              });
-            } catch (error) {
-              return { success: false };
-            }
+           return await updateEntity({
+              statementId: statement.id,
+              selected: selectedOptions,
+              entityId: getConnectionId(formId, statement.vias),
+              entityType: "via",
+              propertyToUpdate: "anatomical_entities",
+            });
           },
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) =>
@@ -335,17 +347,13 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
-            try {
-             return await updateEntity({
-                statementId: statement.id,
-                selected: selectedOptions,
-                entityId: getConnectionId(formId, statement.vias),
-                entityType: "via",
-                propertyToUpdate: "from_entities",
-              });
-            } catch (error) {
-              return { success: false };
-            }
+            return await updateEntity({
+              statementId: statement.id,
+              selected: selectedOptions,
+              entityId: getConnectionId(formId, statement.vias),
+              entityType: "via",
+              propertyToUpdate: "from_entities",
+            });
           },
           areConnectionsExplicit: (formId: any) => {
             const id = getFirstNumberFromString(formId)
@@ -400,6 +408,7 @@ const StatementForm = (props: any) => {
     "ui:ArrayFieldTemplate": (props: any) => (
       <ArrayFieldTemplate
         {...props}
+        id={statement.id}
         onElementDelete={async (element: any) => {
           await api.composerDestinationDestroy(
             element.children.props.formData.id,
@@ -472,17 +481,13 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
-            try {
-              return await updateEntity({
-                statementId: statement.id,
-                selected: selectedOptions,
-                entityId: getConnectionId(formId, statement?.destinations),
-                entityType: "destination",
-                propertyToUpdate: "anatomical_entities",
-              });
-            } catch (error) {
-              return { success: false };
-            }
+            return await updateEntity({
+              statementId: statement.id,
+              selected: selectedOptions,
+              entityId: getConnectionId(formId, statement?.destinations),
+              entityType: "destination",
+              propertyToUpdate: "anatomical_entities",
+            });
           },
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) =>
@@ -521,17 +526,13 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
-            try {
-              return await updateEntity({
-                statementId: statement.id,
-                selected: selectedOptions,
-                entityId: getConnectionId(formId, statement?.destinations),
-                entityType: "destination",
-                propertyToUpdate: "from_entities",
-              });
-            } catch (error) {
-              return { success: false };
-            }
+            return await updateEntity({
+              statementId: statement.id,
+              selected: selectedOptions,
+              entityId: getConnectionId(formId, statement?.destinations),
+              entityType: "destination",
+              propertyToUpdate: "from_entities",
+            });
           },
           areConnectionsExplicit: (formId: any) => {
             const id = getFirstNumberFromString(formId)
@@ -617,12 +618,7 @@ const StatementForm = (props: any) => {
         return searchForwardConnection(searchValue, statement, excludedIds);
       },
       onUpdate: async (selectedOptions: Option[]) => {
-        try {
-          return await updateForwardConnections(selectedOptions, statement);
-        } catch (error) {
-          return { success: false };
-        }
-        
+        return await updateForwardConnections(selectedOptions, statement);
       },
       statement: statement,
       errors: statement?.errors?.includes("Invalid forward connection")
