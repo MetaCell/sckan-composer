@@ -104,7 +104,7 @@ export async function updateEntity({
         // Ownership error occurred, trigger ownership check
         return checkOwnership(
           statementId,
-          () => updateFunction(<number>entityId, patchObject), // Re-attempt the update if ownership is reassigned
+          () => updateFunction(entityId as number, patchObject), // Re-attempt the update if ownership is reassigned
           (fetchedEntity) => console.log(`Ownership assigned, updated entity:`, fetchedEntity), // Optional: handle post-assignment logic
           (owner) => getOwnershipAlertMessage(owner)
         );
