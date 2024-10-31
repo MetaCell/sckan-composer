@@ -92,17 +92,17 @@ def check_related_entity_ownership(request):
         try:
             sentence = Sentence.objects.get(id=sentence_id)
         except Sentence.DoesNotExist:
-            raise PermissionDenied("Invalid sentence_id.")
+            raise PermissionDenied()
         if sentence.owner != request.user:
-            raise PermissionDenied("You are not the owner of this sentence.")
+            raise PermissionDenied()
 
     # Check ownership for connectivity_statement_id
     if connectivity_statement_id:
         try:
             connectivity_statement = ConnectivityStatement.objects.get(id=connectivity_statement_id)
         except ConnectivityStatement.DoesNotExist:
-            raise PermissionDenied("Invalid connectivity_statement_id.")
+            raise PermissionDenied()
         if connectivity_statement.owner != request.user:
-            raise PermissionDenied("You are not the owner of this connectivity statement.")
+            raise PermissionDenied()
     
     return True
