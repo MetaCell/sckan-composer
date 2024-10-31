@@ -36,10 +36,12 @@ import {
   EditOutlined,
   InputOutlined,
 } from "@mui/icons-material";
+import { checkSentenceOwnership, getOwnershipAlertMessage} from "../helpers/ownershipAlert";
+import {ChangeRequestStatus} from "../helpers/settings";
 
 const { bodyBgColor, darkBlue } = vars;
 
-const StyledAddStatementBtn = styled(Button)(({ theme }) => ({
+const StyledAddStatementBtn = styled(Button)(() => ({
   height: "60px",
   background: bodyBgColor,
   borderRadius: "16px",
@@ -120,7 +122,6 @@ const SentencesDetails = () => {
           navigate("/");
         }
       } catch (error) {
-        console.error("Error fetching the next sentence:", error);
         setIsLoading(false);
       }
     };
@@ -131,22 +132,29 @@ const SentencesDetails = () => {
       .doTransition(sentence, transition)
       .then((sentence: Sentence) => fetchNextSentence(sentence));
   };
-
+  
   const onAddNewStatement = () => {
-    setConnectivityStatements([
-      // @ts-ignore
-      ...connectivityStatements,
-      {
-        sentence_id: sentence.id,
-        knowledge_statement: "",
-        sex: null,
-        phenotype: null,
-        species: [],
-        dois: [],
+    return checkSentenceOwnership(
+      sentence.id,
+      async () => {
+        setConnectivityStatements((prev: any = []) => [
+          ...prev,
+          {
+            sentence: sentence.id,
+            knowledge_statement: "",
+            sex: null,
+            phenotype: null,
+            species: [],
+          },
+        ]);
       },
-    ]);
+      () => {
+        return ChangeRequestStatus.CANCELLED;
+      },
+      getOwnershipAlertMessage
+    );
   };
-
+  
   const handleMenuItemClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
     index: number,
@@ -176,22 +184,6 @@ const SentencesDetails = () => {
           setConnectivityStatements(
             sentence.connectivity_statements.sort((a, b) => a.id - b.id),
           );
-          if (
-            sentence.owner &&
-            sentence.owner?.id !== userProfile.getUser().id
-          ) {
-            if (
-              window.confirm(
-                `This sentence is assigned to ${sentence.owner.first_name}, assign to yourself? To view the record without assigning ownership, select Cancel.`,
-              )
-            ) {
-              sentenceService
-                .save({ ...sentence, owner_id: userProfile.getUser().id })
-                .then((sentence: Sentence) => {
-                  setSentence(sentence);
-                });
-            }
-          }
         })
         .finally(() => {
           setRefetch(false);
@@ -373,7 +365,7 @@ const SentencesDetails = () => {
                       setter={refreshSentence}
                     />
                     <Divider sx={{ margin: "36px 0" }} />
-                    <NoteDetails extraData={{ sentence_id: sentence.id }} />
+                    <NoteDetails extraData={{ sentence_id: sentence.id, type: 'sentence' }} />
                   </Paper>
                 </Box>
               </Grid>

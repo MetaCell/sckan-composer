@@ -1,6 +1,6 @@
 import { Option } from "../types";
 import { composerApi as api } from "./apis";
-import { autocompleteRows } from "../helpers/settings";
+import {autocompleteRows, ChangeRequestStatus} from "../helpers/settings";
 import {
   convertToConnectivityStatementUpdate,
   getViasGroupLabel,
@@ -18,9 +18,10 @@ import {
   PatchedVia,
   ViaSerializerDetails,
 } from "../apiclient/backend";
-import { searchAnatomicalEntities } from "../helpers/helpers";
+import {searchAnatomicalEntities} from "../helpers/helpers";
 import connectivityStatementService from "./StatementService";
 import statementService from "./StatementService";
+import {checkOwnership, getOwnershipAlertMessage} from "../helpers/ownershipAlert";
 
 export async function getAnatomicalEntities(
   searchValue: string,
@@ -37,27 +38,29 @@ export async function getAnatomicalEntities(
     const anatomicalEntities = response.data.results || [];
     return mapAnatomicalEntitiesToOptions(anatomicalEntities, groupLabel);
   } catch (error) {
-    console.error("Error fetching anatomical entities:", error);
     return [];
   }
 }
 
-export async function updateOrigins(selected: Option[], statementId: number) {
+export async function updateOrigins(
+  selected: Option[],
+  statementId: number,
+  setStatement: (statement: any) => void
+) {
   const originIds = selected.map((option) => parseInt(option.id));
   const patchedStatement: PatchedConnectivityStatementUpdate = {
     origins: originIds,
   };
+
   try {
-    await api.composerConnectivityStatementPartialUpdate(
-      statementId,
-      patchedStatement,
-    );
+   return await statementService.partialUpdate(statementId, patchedStatement);
   } catch (error) {
-    console.error("Error updating origins", error);
+    alert(`Error updating origins: ${error}`);
   }
 }
 
 export type UpdateEntityParams = {
+  statementId: number
   selected: Option[];
   entityId: number | null;
   entityType: "via" | "destination";
@@ -72,28 +75,44 @@ const apiFunctionMap = {
 };
 
 export async function updateEntity({
+  statementId,
   selected,
   entityId,
   entityType,
   propertyToUpdate,
 }: UpdateEntityParams) {
   if (entityId == null) {
-    console.error(`Error updating ${entityType}`);
-    return;
+    alert(`Error updating ${entityType}`);
   }
 
   const entityIds = selected.map((option) => parseInt(option.id));
   const patchObject = { [propertyToUpdate]: entityIds };
 
   try {
+    // Get the API function from the map
     const updateFunction = apiFunctionMap[entityType];
     if (updateFunction) {
-      await updateFunction(entityId, patchObject);
+      // Attempt to update, using checkOwnership in case of ownership error
+      try {
+        if (entityId != null) {
+          await updateFunction(entityId, patchObject);
+        }
+      } catch (error) {
+        // Ownership error occurred, trigger ownership check
+        return checkOwnership(
+          statementId,
+          () => updateFunction(entityId as number, patchObject), // Re-attempt the update if ownership is reassigned
+          () => {
+            return ChangeRequestStatus.CANCELLED;
+          }, // Optional: handle post-assignment logic
+          (owner) => getOwnershipAlertMessage(owner)
+        );
+      }
     } else {
-      console.error(`No update function found for entity type: ${entityType}`);
+      alert(`No update function found for entity type: ${entityType}`);
     }
   } catch (error) {
-    console.error(`Error updating ${entityType}`, error);
+    alert(`Error updating ${entityType}`);
   }
 }
 
@@ -257,7 +276,6 @@ export async function searchForwardConnection(
 
     return [...sameSentenceOptions, ...differentSentenceOptions];
   } catch (error) {
-    console.error("Error fetching data:", error);
     throw error;
   }
 }
@@ -277,10 +295,9 @@ export async function updateForwardConnections(
 
   // Call the update method of statementService
   try {
-    await statementService.update(updateData);
+    return await statementService.update(updateData);
   } catch (error) {
-    console.error("Error updating statement:", error);
-    throw error;
+    alert(`Error updating statement: ${error}`);
   }
 }
 
