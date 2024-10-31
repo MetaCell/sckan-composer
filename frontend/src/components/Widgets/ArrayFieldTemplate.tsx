@@ -24,6 +24,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableItem } from "../ProofingTab/SortableItem";
 import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
+import {ChangeRequestStatus} from "../../helpers/settings";
 
 function ArrayFieldTemplate(props: any) {
   const [isDragging, setIsDragging] = useState(false);
@@ -87,12 +88,12 @@ function ArrayFieldTemplate(props: any) {
          }
        },
        () => {
-         console.log("Ownership reassignment was canceled.");
-       },
-       (owner) => getOwnershipAlertMessage(owner) // Prompt message
+         return ChangeRequestStatus.CANCELLED;
+         },
+       (owner) => getOwnershipAlertMessage(owner)
      );
    } catch (error) {
-     console.error("Error during add action:", error);
+     alert(`Error during add action: ${error}`);
    }
   }
 
@@ -110,12 +111,12 @@ function ArrayFieldTemplate(props: any) {
           }
         },
         () => {
-          console.log("Ownership reassignment was canceled.");
+          return ChangeRequestStatus.CANCELLED;
         },
         (owner) => getOwnershipAlertMessage(owner) // Prompt message
       );
     } catch (error) {
-      console.error("Error during add action:", error);
+      alert(`Error during add action: ${error}`);
     }
   }
   
@@ -130,12 +131,12 @@ function ArrayFieldTemplate(props: any) {
           }
         },
         () => {
-          console.log("Ownership reassignment was canceled.");
+          return ChangeRequestStatus.CANCELLED;
         },
         (owner) => getOwnershipAlertMessage(owner) // Prompt message
       );
     } catch (error) {
-      console.error("Error during add action:", error);
+      alert(`Error during add action: ${error}`);
     }
   }
   

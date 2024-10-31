@@ -5,6 +5,7 @@ import provenanceService from '../../services/ProvenanceService'
 import {Provenance} from "../../apiclient/backend";
 import TextfieldWithChips from "../Widgets/TextfieldWithChips";
 import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
+import {ChangeRequestStatus} from "../../helpers/settings";
 
 const ProvenancesForm = (props: any) => {
   const { provenancesData, setter, extraData, isDisabled } = props
@@ -30,8 +31,8 @@ const ProvenancesForm = (props: any) => {
         })
       },
       () => {
-        console.log("Adding a provenance canceled due to ownership issues.");
-      },
+        return ChangeRequestStatus.CANCELLED;
+        },
       getOwnershipAlertMessage // message to show when ownership needs to be reassigned
     );
   }
@@ -61,8 +62,8 @@ const ProvenancesForm = (props: any) => {
             refresh()
           },
           () => {
-            console.log("Deleting a provenance canceled due to ownership issues.");
-          },
+            return ChangeRequestStatus.CANCELLED;
+            },
           getOwnershipAlertMessage // message to show when ownership needs to be reassigned
         );
        

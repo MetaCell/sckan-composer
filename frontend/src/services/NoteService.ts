@@ -2,12 +2,15 @@ import { composerApi } from "./apis"
 import { Note } from "../apiclient/backend"
 import { AbstractService } from "./AbstractService"
 import {checkOwnership, checkSentenceOwnership} from "../helpers/ownershipAlert";
+import {ChangeRequestStatus} from "../helpers/settings";
 class NoteService extends AbstractService {
   async save(note: Note, onCancel: () => void = () => {}) {
     try {
       return await composerApi.composerNoteCreate(note).then((response: any) => response.data);
     } catch (err) {
-      const defaultOnCancel = typeof onCancel === 'function' ? onCancel : () => {};
+      const defaultOnCancel = typeof onCancel === 'function' ? onCancel : () => {
+        return ChangeRequestStatus.CANCELLED;
+      };
       
       if (note.sentence_id !== undefined && note.sentence_id !== null) {
         const id = note.sentence_id;
@@ -32,7 +35,6 @@ class NoteService extends AbstractService {
             `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
         );
       } else {
-        console.error("Note does not have a valid ID for ownership check.");
         return Promise.reject("Invalid note type: missing both sentence_id and connectivity_statement_id.");
       }
     }
