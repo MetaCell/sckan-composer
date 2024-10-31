@@ -49,10 +49,10 @@ class ConnectivityStatementService extends AbstractService {
       return await checkOwnership(
         id,
         // Retry the update after ownership is reassigned, including new owner ID
-        async (userId: number) => {
+        async (userId) => {
           const updatedStatement = {
             ...connectivityStatement,
-            owner_id: userId,
+            owner_id: userId.id,
           };
           await composerApi.composerConnectivityStatementUpdate(id, updatedStatement).then((response: any) => response.data);
           return ChangeRequestStatus.SAVED;
