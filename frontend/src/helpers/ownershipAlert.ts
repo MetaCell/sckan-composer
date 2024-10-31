@@ -23,11 +23,10 @@ export const checkOwnership = (
             statementService.assignOwner(fetchedData.id, {})
               .then(() => {
                 return onSave(fetchedData, userId)
-                  .then((result) => resolve(ChangeRequestStatus.SAVED))
+                  .then(() => resolve(ChangeRequestStatus.SAVED))
                   .catch((error) => reject(error));
               })
               .catch((error) => {
-                console.error("Failed to reassign ownership", error);
                 onCancel(fetchedData, userId);
                 reject(error);
               });
@@ -42,7 +41,6 @@ export const checkOwnership = (
         }
       })
       .catch((fetchError) => {
-        console.error("Failed to fetch the data", fetchError);
         onCancel(null, userId);
         reject(fetchError);
       });
@@ -68,11 +66,10 @@ export const checkSentenceOwnership = (
             sentenceService.assignOwner(fetchedData.id, {})
               .then(() => {
                 return onSave(fetchedData, userId)
-                  .then((result) => resolve(ChangeRequestStatus.SAVED))
+                  .then(() => resolve(ChangeRequestStatus.SAVED))
                   .catch((error) => reject(error));
               })
               .catch((error) => {
-                console.error("Failed to reassign ownership", error);
                 onCancel(fetchedData, userId);
                 reject(error);
               });
@@ -87,7 +84,6 @@ export const checkSentenceOwnership = (
         }
       })
       .catch((fetchError) => {
-        console.error("Failed to fetch the data", fetchError);
         onCancel(null, userId);
         reject(fetchError);
       });

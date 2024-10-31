@@ -34,6 +34,7 @@ import Stack from "@mui/material/Stack";
 import {ViaIcon, DestinationIcon, OriginIcon} from "../components/icons";
 import {CircularProgress} from "@mui/material";
 import {checkOwnership, getOwnershipAlertMessage} from "../helpers/ownershipAlert";
+import {ChangeRequestStatus} from "../helpers/settings";
 
 const StatementDetails = () => {
   const {statementId} = useParams();
@@ -79,8 +80,8 @@ const StatementDetails = () => {
           return result;
         },
         () => {
-          console.log("Transition canceled due to ownership issues.");
-        },
+          return ChangeRequestStatus.CANCELLED;
+          },
         getOwnershipAlertMessage // message to show when ownership needs to be reassigned
       );
     }

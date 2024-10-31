@@ -37,6 +37,7 @@ import {
   InputOutlined,
 } from "@mui/icons-material";
 import { checkSentenceOwnership, getOwnershipAlertMessage} from "../helpers/ownershipAlert";
+import {ChangeRequestStatus} from "../helpers/settings";
 
 const { bodyBgColor, darkBlue } = vars;
 
@@ -121,7 +122,6 @@ const SentencesDetails = () => {
           navigate("/");
         }
       } catch (error) {
-        console.error("Error fetching the next sentence:", error);
         setIsLoading(false);
       }
     };
@@ -132,31 +132,29 @@ const SentencesDetails = () => {
       .doTransition(sentence, transition)
       .then((sentence: Sentence) => fetchNextSentence(sentence));
   };
-
+  
   const onAddNewStatement = () => {
     return checkSentenceOwnership(
       sentence.id,
       async () => {
-        setConnectivityStatements([
-          // @ts-ignore
-          ...connectivityStatements,
+        setConnectivityStatements((prev: any = []) => [
+          ...prev,
           {
-            sentence_id: sentence.id,
+            sentence: sentence.id,
             knowledge_statement: "",
             sex: null,
             phenotype: null,
             species: [],
-            dois: [],
           },
         ]);
       },
       () => {
-        console.log("Adding a new statement canceled due to ownership issues.");
+        return ChangeRequestStatus.CANCELLED;
       },
-      getOwnershipAlertMessage // message to show when ownership needs to be reassigned
+      getOwnershipAlertMessage
     );
   };
-
+  
   const handleMenuItemClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
     index: number,

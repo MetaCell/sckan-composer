@@ -1,6 +1,6 @@
 import { Option } from "../types";
 import { composerApi as api } from "./apis";
-import { autocompleteRows } from "../helpers/settings";
+import {autocompleteRows, ChangeRequestStatus} from "../helpers/settings";
 import {
   convertToConnectivityStatementUpdate,
   getViasGroupLabel,
@@ -38,7 +38,6 @@ export async function getAnatomicalEntities(
     const anatomicalEntities = response.data.results || [];
     return mapAnatomicalEntitiesToOptions(anatomicalEntities, groupLabel);
   } catch (error) {
-    console.error("Error fetching anatomical entities:", error);
     return [];
   }
 }
@@ -54,11 +53,9 @@ export async function updateOrigins(
   };
 
   try {
-   return await statementService.partialUpdate(statementId, patchedStatement, () => {
-      console.log("User canceled ownership reassignment.");
-    });
+   return await statementService.partialUpdate(statementId, patchedStatement);
   } catch (error) {
-    console.error("Error updating origins:", error);
+    alert(`Error updating origins: ${error}`);
   }
 }
 
@@ -85,7 +82,7 @@ export async function updateEntity({
   propertyToUpdate,
 }: UpdateEntityParams) {
   if (entityId == null) {
-    console.error(`Error updating ${entityType}`);
+    alert(`Error updating ${entityType}`);
   }
 
   const entityIds = selected.map((option) => parseInt(option.id));
@@ -105,15 +102,17 @@ export async function updateEntity({
         return checkOwnership(
           statementId,
           () => updateFunction(entityId as number, patchObject), // Re-attempt the update if ownership is reassigned
-          (fetchedEntity) => console.log(`Ownership assigned, updated entity:`, fetchedEntity), // Optional: handle post-assignment logic
+          () => {
+            return ChangeRequestStatus.CANCELLED;
+          }, // Optional: handle post-assignment logic
           (owner) => getOwnershipAlertMessage(owner)
         );
       }
     } else {
-      console.error(`No update function found for entity type: ${entityType}`);
+      alert(`No update function found for entity type: ${entityType}`);
     }
   } catch (error) {
-    console.error(`Error updating ${entityType}`, error);
+    alert(`Error updating ${entityType}`);
   }
 }
 
@@ -277,7 +276,6 @@ export async function searchForwardConnection(
 
     return [...sameSentenceOptions, ...differentSentenceOptions];
   } catch (error) {
-    console.error("Error fetching data:", error);
     throw error;
   }
 }
@@ -299,7 +297,7 @@ export async function updateForwardConnections(
   try {
     return await statementService.update(updateData);
   } catch (error) {
-    console.error("Error updating statement:", error);
+    alert(`Error updating statement: ${error}`);
   }
 }
 
