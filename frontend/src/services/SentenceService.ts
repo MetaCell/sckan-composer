@@ -3,7 +3,6 @@ import { PaginatedSentenceList, PatchedSentence, Sentence} from '../apiclient/ba
 import { AbstractService } from "./AbstractService";
 import { QueryParams } from "../redux/sentenceSlice";
 import { checkSentenceOwnership} from "../helpers/ownershipAlert";
-import {ChangeRequestStatus} from "../helpers/settings";
 
 
 class SentenceService extends AbstractService {
@@ -12,7 +11,21 @@ class SentenceService extends AbstractService {
       return composerApi.composerSentenceCreate(sentence).then((response: any) => response.data)
     }
     else {
-      return composerApi.composerSentenceUpdate(sentence.id, sentence).then((response: any) => response.data)
+      try {
+        return await composerApi.composerSentenceUpdate(sentence.id, sentence).then((response: any) => response.data)
+      } catch (err) {
+        return await checkSentenceOwnership(
+          sentence.id,
+          async () => {
+            return await composerApi.composerSentenceUpdate(sentence.id, sentence).then((response: any) => response.data)
+          },
+          (fetchedData, userId) => {
+            return fetchedData;
+          },
+          (owner) =>
+            `This sentence is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+        );
+      }
     }
   }
   async getObject(id: string): Promise<Sentence> {
@@ -31,9 +44,9 @@ class SentenceService extends AbstractService {
         async () => {
           return await composerApi.composerSentenceAddTagCreate(id, tagId).then((response: any) => response.data)
         },
-        () => {
+        (fetchedData) => {
           onCancel();
-          return ChangeRequestStatus.CANCELLED;
+          return fetchedData;
         },
         (owner) =>
           `This sentence is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
@@ -49,9 +62,9 @@ class SentenceService extends AbstractService {
         async () => {
           return await composerApi.composerSentenceDelTagCreate(id, tagId).then((response: any) => response.data)
         },
-        () => {
+        (fetchedData) => {
           onCancel();
-          return ChangeRequestStatus.CANCELLED;
+          return fetchedData;
         },
         (owner) =>
           `This sentence is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
