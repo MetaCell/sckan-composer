@@ -49,7 +49,7 @@ class ConnectivityStatementService extends AbstractService {
       return await checkOwnership(
         id,
         // Retry the update after ownership is reassigned, including new owner ID
-        async (userId) => {
+        async () => {
           const updatedStatement = {
             ...connectivityStatement,
           };
