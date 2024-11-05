@@ -66,7 +66,7 @@ export const checkSentenceOwnership = (
             sentenceService.assignOwner(fetchedData.id, {})
               .then(() => {
                 return onSave(fetchedData, userId)
-                  .then(() => resolve(ChangeRequestStatus.SAVED))
+                  .then(() => resolve(fetchedData))
                   .catch((error) => reject(error));
               })
               .catch((error) => {
@@ -75,11 +75,11 @@ export const checkSentenceOwnership = (
               });
           } else {
             onCancel(fetchedData, userId);
-            resolve(ChangeRequestStatus.CANCELLED);
+            resolve(fetchedData);
           }
         } else {
           onSave(fetchedData, userId)
-            .then(() => resolve(ChangeRequestStatus.SAVED))
+            .then(() => resolve(fetchedData))
             .catch((error) => reject(error));
         }
       })

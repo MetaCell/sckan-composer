@@ -10,9 +10,10 @@ import TagForm from "../components/Forms/TagForm";
 import {
   Sentence,
   SentenceConnectivityStatement,
-  SentenceAvailableTransitionsEnum, ComposerSentenceListStateEnum,
+  SentenceAvailableTransitionsEnum,
+  ComposerSentenceListStateEnum,
+  SentenceAvailableTransitionsEnum as SentenceStates,
 } from "../apiclient/backend/api";
-import { userProfile } from "../services/UserService";
 import CheckDuplicates from "../components/CheckForDuplicates/CheckDuplicatesDialog";
 import { SentenceStateChip } from "../components/Widgets/StateChip";
 import { SentenceLabels, formatDate, formatTime } from "../helpers/helpers";
@@ -203,7 +204,7 @@ const SentencesDetails = () => {
     );
   }
 
-  const isDisabled = sentence.owner?.id !== userProfile.getUser().id;
+  const isDisabled = sentence?.state === SentenceStates.ComposeNow;
 
   return (
     <Grid p={6} container>
@@ -278,7 +279,7 @@ const SentencesDetails = () => {
                     handleClick={handleClick}
                     selectedOption={
                       SentenceLabels[
-                        sentence?.available_transitions[selectedIndex]
+                        sentence?.available_transitions?.[selectedIndex]
                       ]
                     }
                     options={sentence?.available_transitions}
