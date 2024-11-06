@@ -45,7 +45,6 @@ from .serializers import (
     BaseConnectivityStatementSerializer,
 )
 from .permissions import (
-    IsSentenceOrStatementOwnerOrSystemUserOrReadOnly,
     IsStaffUserIfExportedStateInConnectivityStatement,
     IsOwnerOrAssignOwnerOrCreateOrReadOnly,
     IsOwnerOfConnectivityStatementOrReadOnly,

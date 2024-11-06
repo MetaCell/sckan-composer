@@ -25,8 +25,8 @@ class IsOwnerOrAssignOwnerOrCreateOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        # Checks if creator is the owner of the related entity (if related entity exists)
-        if request.method == 'POST':
+        # If creating a new instance, ensure related entity ownership
+        if request.method == 'POST' and view.action == 'create':
             return check_related_entity_ownership(request)
 
         # For unsafe methods (PATCH, PUT, DELETE), allow only authenticated users
@@ -58,25 +58,6 @@ class IsOwnerOfConnectivityStatementOrReadOnly(permissions.BasePermission):
         # Write permissions are only allowed to the owner of the related ConnectivityStatement
         return obj.connectivity_statement.owner == request.user
     
-
-class IsSentenceOrStatementOwnerOrSystemUserOrReadOnly(permissions.BasePermission):
-    """
-    Custom permission to allow:
-    - System user to bypass all checks.
-    - Only the owner of a sentence or connectivity statement can create a note.
-    """
-
-    def has_permission(self, request, view):
-        # Allow system user to bypass all checks
-        if request.user.username == 'system' and request.user.is_staff:
-            return True
-
-        # Allow read-only access (GET, HEAD, OPTIONS)
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        # For POST (create), PUT, PATCH (update), or DELETE, check ownership
-        return check_related_entity_ownership(request)
 
 
 def check_related_entity_ownership(request):
