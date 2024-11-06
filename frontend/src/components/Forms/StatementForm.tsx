@@ -219,6 +219,7 @@ const StatementForm = (props: any) => {
             anatomical_entities: [],
             from_entities: [],
           });
+          refreshStatement();
         }}
         onElementReorder={async (
           sourceIndex: number,
@@ -422,6 +423,7 @@ const StatementForm = (props: any) => {
             anatomical_entities: [],
             from_entities: [],
           });
+          refreshStatement();
         }}
         hideDeleteBtn={statement?.destinations?.length <= 1 || isDisabled}
         showReOrderingIcon={false}
