@@ -45,7 +45,6 @@ from .serializers import (
     BaseConnectivityStatementSerializer,
 )
 from .permissions import (
-    IsSentenceOrStatementOwnerOrSystemUserOrReadOnly,
     IsStaffUserIfExportedStateInConnectivityStatement,
     IsOwnerOrAssignOwnerOrCreateOrReadOnly,
     IsOwnerOfConnectivityStatementOrReadOnly,
@@ -321,7 +320,9 @@ class NoteViewSet(viewsets.ModelViewSet):
 
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
-    permission_classes = []
+    permission_classes = [
+                permissions.IsAuthenticatedOrReadOnly,
+    ]
     filterset_class = NoteFilter
 
 
