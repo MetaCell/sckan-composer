@@ -35,11 +35,11 @@ def create_or_update_connectivity_statement(statement: Dict, sentence: Sentence,
         reference_uri=reference_uri,
         defaults=defaults
     )
-    if not created:
+    if not created:        
         if has_changes(connectivity_statement, statement, defaults):
-            ConnectivityStatement.objects.filter(reference_uri=reference_uri).update(**defaults)
-            fields_to_refresh = [field for field in defaults.keys() if field != 'state']
-            connectivity_statement.refresh_from_db(fields=fields_to_refresh)
+            defaults_without_state = {field: value for field, value in defaults.items() if field != 'state'}
+            ConnectivityStatement.objects.filter(reference_uri=reference_uri).update(**defaults_without_state)
+            connectivity_statement = ConnectivityStatement.objects.filter(reference_uri=reference_uri).first()
             add_ingestion_system_note(connectivity_statement)
 
     validation_errors = statement.get(VALIDATION_ERRORS, ValidationErrors())
