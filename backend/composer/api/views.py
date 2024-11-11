@@ -391,7 +391,6 @@ class ConnectivityStatementViewSet(
         origin_ids = request.data.pop("origins", None)
         graph_rendering_state_data = request.data.pop("graph_rendering_state", None)
 
-        # Call the UpdateModelMixin's update
         response = super().update(request, *args, **kwargs)
 
         if response.status_code == status.HTTP_200_OK:
@@ -418,7 +417,6 @@ class ConnectivityStatementViewSet(
     def partial_update(self, request, *args, **kwargs):
         graph_rendering_state_data = request.data.pop("graph_rendering_state", None)
 
-        # Call the UpdateModelMixin's partial_update
         response = super().partial_update(request, *args, **kwargs)
 
         if response.status_code == status.HTTP_200_OK:

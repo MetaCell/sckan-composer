@@ -106,12 +106,16 @@ export async function updateEntity({
         // Ownership error occurred, trigger ownership check
         return checkOwnership(
           statementId,
-          () => updateFunction(entityId as number, patchObject), // Re-attempt the update if ownership is reassigned
+          async () => {
+            await updateFunction(entityId as number, patchObject); // Re-attempt the update if ownership is reassigned
+            refreshStatement();
+          },
           () => {
             return ChangeRequestStatus.CANCELLED;
           }, // Optional: handle post-assignment logic
           (owner) => getOwnershipAlertMessage(owner)
         );
+        
       }
     } else {
       alert(`No update function found for entity type: ${entityType}`);

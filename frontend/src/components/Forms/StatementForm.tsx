@@ -252,12 +252,13 @@ const StatementForm = (props: any) => {
           onUpdate: async (selectedOption: string, formId: string) => {
             const viaIndex = getConnectionId(formId, statement.vias);
             const typeOption = selectedOption as TypeB60Enum;
-            
+
             if (viaIndex) {
               try {
                 await api.composerViaPartialUpdate(viaIndex, {
                   type: typeOption,
                 });
+                refreshStatement()
                 return ChangeRequestStatus.SAVED;
               } catch (error) {
                 return checkOwnership(
@@ -266,6 +267,7 @@ const StatementForm = (props: any) => {
                     await api.composerViaPartialUpdate(viaIndex, {
                       type: typeOption,
                     });
+                    refreshStatement()
                     return ChangeRequestStatus.SAVED;
                   },
                   () => {
@@ -306,7 +308,7 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
-           return await updateEntity({
+            return await updateEntity({
               statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement.vias),
@@ -448,13 +450,13 @@ const StatementForm = (props: any) => {
           isPathBuilderComponent: true,
           InputIcon: DestinationIcon,
           onUpdate: async (selectedOption: string, formId: string) => {
-            const viaIndex = getConnectionId(formId, statement?.destinations);
+            const destinationIndex = getConnectionId(formId, statement?.destinations);
             const typeOption = selectedOption as TypeC11Enum;
-            if (viaIndex) {
-              api
-                .composerDestinationPartialUpdate(viaIndex, {
-                  type: typeOption,
-                })
+            if (destinationIndex) {
+              await api.composerDestinationPartialUpdate(destinationIndex, {
+                type: typeOption,
+              })
+              refreshStatement()
             }
           },
         },
