@@ -77,11 +77,10 @@ class AssignOwnerMixin(viewsets.GenericViewSet):
         instance.assign_owner(request)
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
-    
+
     def retrieve(self, request, *args, **kwargs):
         self.get_object().auto_assign_owner(request)
         return super().retrieve(request, *args, **kwargs)
-
 
 
 class TagMixin(viewsets.GenericViewSet):
@@ -321,7 +320,7 @@ class NoteViewSet(viewsets.ModelViewSet):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
     permission_classes = [
-                permissions.IsAuthenticatedOrReadOnly,
+        permissions.IsAuthenticatedOrReadOnly,
     ]
     filterset_class = NoteFilter
 
@@ -392,15 +391,22 @@ class ConnectivityStatementViewSet(
         origin_ids = request.data.pop("origins", None)
         graph_rendering_state_data = request.data.pop("graph_rendering_state", None)
 
+        # Call the UpdateModelMixin's update
         response = super().update(request, *args, **kwargs)
 
         if response.status_code == status.HTTP_200_OK:
             instance = self.get_object()
+
+            # Handle custom updates
             self.handle_graph_rendering_state(
                 instance, graph_rendering_state_data, request.user
             )
             if origin_ids is not None:
                 instance.set_origins(origin_ids)
+
+            # Re-serialize the instance with all modifications
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
         return response
 
@@ -412,13 +418,20 @@ class ConnectivityStatementViewSet(
     def partial_update(self, request, *args, **kwargs):
         graph_rendering_state_data = request.data.pop("graph_rendering_state", None)
 
+        # Call the UpdateModelMixin's partial_update
         response = super().partial_update(request, *args, **kwargs)
 
         if response.status_code == status.HTTP_200_OK:
             instance = self.get_object()
+
+            # Handle custom updates
             self.handle_graph_rendering_state(
                 instance, graph_rendering_state_data, request.user
             )
+
+            # Re-serialize the instance with all modifications
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
         return response
 

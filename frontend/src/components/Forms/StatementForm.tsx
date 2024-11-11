@@ -312,6 +312,7 @@ const StatementForm = (props: any) => {
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
               propertyToUpdate: "anatomical_entities",
+              refreshStatement
             });
           },
           errors: "",
@@ -354,6 +355,7 @@ const StatementForm = (props: any) => {
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
               propertyToUpdate: "from_entities",
+              refreshStatement
             });
           },
           areConnectionsExplicit: (formId: any) => {
@@ -489,6 +491,7 @@ const StatementForm = (props: any) => {
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
               propertyToUpdate: "anatomical_entities",
+              refreshStatement
             });
           },
           errors: "",
@@ -534,6 +537,7 @@ const StatementForm = (props: any) => {
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
               propertyToUpdate: "from_entities",
+              refreshStatement
             });
           },
           areConnectionsExplicit: (formId: any) => {

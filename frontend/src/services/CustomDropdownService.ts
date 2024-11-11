@@ -1,6 +1,6 @@
 import { Option } from "../types";
 import { composerApi as api } from "./apis";
-import {autocompleteRows, ChangeRequestStatus} from "../helpers/settings";
+import { autocompleteRows, ChangeRequestStatus } from "../helpers/settings";
 import {
   convertToConnectivityStatementUpdate,
   getViasGroupLabel,
@@ -18,10 +18,10 @@ import {
   PatchedVia,
   ViaSerializerDetails,
 } from "../apiclient/backend";
-import {searchAnatomicalEntities} from "../helpers/helpers";
+import { searchAnatomicalEntities } from "../helpers/helpers";
 import connectivityStatementService from "./StatementService";
 import statementService from "./StatementService";
-import {checkOwnership, getOwnershipAlertMessage} from "../helpers/ownershipAlert";
+import { checkOwnership, getOwnershipAlertMessage } from "../helpers/ownershipAlert";
 
 export async function getAnatomicalEntities(
   searchValue: string,
@@ -53,7 +53,9 @@ export async function updateOrigins(
   };
 
   try {
-   return await statementService.partialUpdate(statementId, patchedStatement);
+    const response = await statementService.partialUpdate(statementId, patchedStatement);
+    setStatement(response);
+    return response;
   } catch (error) {
     alert(`Error updating origins: ${error}`);
   }
@@ -65,6 +67,7 @@ export type UpdateEntityParams = {
   entityId: number | null;
   entityType: "via" | "destination";
   propertyToUpdate: "anatomical_entities" | "from_entities";
+  refreshStatement:  () => void;
 };
 
 const apiFunctionMap = {
@@ -80,6 +83,7 @@ export async function updateEntity({
   entityId,
   entityType,
   propertyToUpdate,
+  refreshStatement,
 }: UpdateEntityParams) {
   if (entityId == null) {
     alert(`Error updating ${entityType}`);
@@ -96,6 +100,7 @@ export async function updateEntity({
       try {
         if (entityId != null) {
           await updateFunction(entityId, patchObject);
+          refreshStatement()
         }
       } catch (error) {
         // Ownership error occurred, trigger ownership check
@@ -231,9 +236,9 @@ export async function searchForwardConnection(
 
   try {
     const forwardConnectionOrigins = statement.destinations?.flatMap(
-        (destination) =>
-            destination.anatomical_entities?.map((entity) => entity.id) ?? [],
-        ) ?? [];
+      (destination) =>
+        destination.anatomical_entities?.map((entity) => entity.id) ?? [],
+    ) ?? [];
     if (forwardConnectionOrigins.length === 0) {
       return []
     }
@@ -262,16 +267,16 @@ export async function searchForwardConnection(
 
     const sameSentenceOptions = sameRes.results
       ? mapConnectivityStatementsToOptions(
-          sameRes.results.filter((res) => res.id !== statement.id),
-          forwardConnectionGroups.sameSentence,
-        )
+        sameRes.results.filter((res) => res.id !== statement.id),
+        forwardConnectionGroups.sameSentence,
+      )
       : [];
 
     const differentSentenceOptions = diffRes.results
       ? mapConnectivityStatementsToOptions(
-          diffRes.results,
-          forwardConnectionGroups.otherSentence,
-        )
+        diffRes.results,
+        forwardConnectionGroups.otherSentence,
+      )
       : [];
 
     return [...sameSentenceOptions, ...differentSentenceOptions];
