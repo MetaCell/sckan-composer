@@ -456,11 +456,30 @@ const StatementForm = (props: any) => {
             const destinationIndex = getConnectionId(formId, statement?.destinations);
             const typeOption = selectedOption as TypeC11Enum;
             if (destinationIndex) {
-              await api.composerDestinationPartialUpdate(destinationIndex, {
-                type: typeOption,
-              })
-              refreshStatement()
+              try {
+                await api.composerDestinationPartialUpdate(destinationIndex, {
+                  type: typeOption,
+                })
+                refreshStatement()
+                return ChangeRequestStatus.SAVED;
+              } catch (error) {
+                return checkOwnership(
+                  statement.id,
+                  async () => {
+                    await api.composerDestinationPartialUpdate(destinationIndex, {
+                      type: typeOption,
+                    })
+                    refreshStatement()
+                    return ChangeRequestStatus.SAVED;
+                  },
+                  () => {
+                    return ChangeRequestStatus.CANCELLED;
+                  },
+                  (owner) => getOwnershipAlertMessage(owner)
+                );
+              }
             }
+            return ChangeRequestStatus.CANCELLED;
           },
         },
       },
