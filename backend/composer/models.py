@@ -634,7 +634,10 @@ class ConnectivityStatement(models.Model):
 
     @transition(
         field=state,
-        source=CSState.NPO_APPROVED,
+        source=[
+            CSState.NPO_APPROVED,
+            CSState.INVALID
+        ],
         target=CSState.EXPORTED,
         conditions=[ConnectivityStatementStateService.is_valid],
         permission=ConnectivityStatementStateService.has_permission_to_transition_to_exported,
