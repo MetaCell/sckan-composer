@@ -12,7 +12,7 @@ from composer.services.cs_ingestion.helpers.common_helpers import LABEL, VALIDAT
 from composer.services.cs_ingestion.helpers.getters import get_sex, get_circuit_type, get_functional_circuit_role, \
     get_phenotype, get_projection_phenotype
 from composer.services.cs_ingestion.helpers.notes_helper import do_transition_to_invalid_with_note, create_invalid_note, \
-    add_ingestion_system_note
+    add_ingestion_system_note, do_transition_to_exported
 from composer.services.cs_ingestion.models import ValidationErrors
 
 
@@ -50,6 +50,9 @@ def create_or_update_connectivity_statement(statement: Dict, sentence: Sentence,
             do_transition_to_invalid_with_note(connectivity_statement, error_message)
         else:
             create_invalid_note(connectivity_statement, error_message)
+    else:
+        if connectivity_statement.state != CSState.EXPORTED:
+            do_transition_to_exported(connectivity_statement)
 
     update_many_to_many_fields(connectivity_statement, statement, update_anatomical_entities)
     statement[STATE] = connectivity_statement.state
