@@ -112,6 +112,21 @@ cd backend
 python3 manage.py ingest_anatomical_entities ./composer/resources/anatomical_entities.csv
 ```
 
+### Ingest Statements
+You can get the detailed shell script at - backend/run_ingest.sh
+```
+python manage.py ingest_statements --update_upstream
+```
+
+You can add custom full imports and label imports to the above command by using the flags `--full_imports` and `--label_imports` respectively. Example below:
+```
+python manage.py ingest_statements --update_upstream --full_imports apinat-partial-orders apinat-pops-more sparc-nlp --label_imports apinatomy-neuron-populations ../../npo
+```
+here - `apinat-partial-orders` and `apinat-pops-more sparc-nlp` are the full imports and `apinatomy-neuron-populations` and `../../npo` are the label imports.
+
+NOTE: full imports are done from `https://raw.githubusercontent.com/SciCrunch/NIF-Ontology/neurons/ttl/generated/neurons/*.ttl` and label imports are done from `https://raw.githubusercontent.com/SciCrunch/NIF-Ontology/neurons/ttl/generated/neurons/*.ttl`, and if you want a different path, you can use it relatively like - `../../npo`
+
+
 ### Open the admin page
 there will be a superuser created with username/password: `admin/admin`
 
