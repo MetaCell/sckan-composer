@@ -210,6 +210,7 @@ const StatementForm = (props: any) => {
         id={statement.id}
         onElementDelete={async (element: any) => {
           await api.composerViaDestroy(element.children.props.formData.id);
+          refreshStatement();
         }}
         onElementAdd={async () => {
           await api.composerViaCreate({
@@ -228,8 +229,9 @@ const StatementForm = (props: any) => {
           await api.composerViaPartialUpdate(statement.vias[sourceIndex].id, {
             order: destinationIndex,
           });
+          refreshStatement();
         }}
-        hideDeleteBtn={statement?.vias?.length <= 1 || isDisabled}
+        hideDeleteBtn={statement?.vias?.length < 1 || isDisabled}
         showReOrderingIcon={true}
         addButtonPlaceholder={"Via"}
         canAdd={!isDisabled}
@@ -418,6 +420,7 @@ const StatementForm = (props: any) => {
           await api.composerDestinationDestroy(
             element.children.props.formData.id,
           );
+          refreshStatement();
         }}
         onElementAdd={async () => {
           await api.composerDestinationCreate({
@@ -429,7 +432,7 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
-        hideDeleteBtn={statement?.destinations?.length <= 1 || isDisabled}
+        hideDeleteBtn={statement?.destinations?.length < 1 || isDisabled}
         showReOrderingIcon={false}
         addButtonPlaceholder={"Destination"}
         canAdd={!isDisabled}
