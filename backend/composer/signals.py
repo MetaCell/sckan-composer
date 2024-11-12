@@ -5,8 +5,18 @@ from django.db.models.signals import post_save, m2m_changed, pre_save, post_dele
 from django_fsm.signals import post_transition
 
 from .enums import CSState, NoteType
-from .models import ConnectivityStatement, ExportBatch, Note, Sentence, \
-    AnatomicalEntity, Layer, Region
+from .models import (
+    ConnectivityStatement,
+    Destination,
+    ExportBatch,
+    GraphRenderingState,
+    Note,
+    Sentence,
+    AnatomicalEntity,
+    Layer,
+    Region,
+    Via,
+)
 from .services.export_services import compute_metrics, ConnectivityStatementStateService
 
 
@@ -42,8 +52,8 @@ def post_transition_callback(sender, instance, name, source, target, **kwargs):
 def post_transition_cs(sender, instance, name, source, target, **kwargs):
     if issubclass(sender, ConnectivityStatement):
         if target == CSState.COMPOSE_NOW and source in (
-                CSState.NPO_APPROVED,
-                CSState.EXPORTED,
+            CSState.NPO_APPROVED,
+            CSState.EXPORTED,
         ):
             # add important tag to CS when transition to COMPOSE_NOW from NPO Approved or Exported
             instance = ConnectivityStatementStateService.add_important_tag(instance)
@@ -70,3 +80,87 @@ def delete_associated_entities(sender, instance, **kwargs):
     # Delete the associated region_layer if it exists
     if instance.region_layer:
         instance.region_layer.delete()
+
+
+# Signals for ConnectivityStatement origins
+@receiver(m2m_changed, sender=ConnectivityStatement.origins.through)
+def connectivity_statement_origins_changed(sender, instance, action, **kwargs):
+    if action in ["post_add", "post_remove", "post_clear"]:
+        try:
+            instance.graph_rendering_state.delete()
+        except GraphRenderingState.DoesNotExist:
+            pass
+        except ValueError:
+            pass
+
+
+# Signals for Via anatomical_entities
+@receiver(m2m_changed, sender=Via.anatomical_entities.through)
+def via_anatomical_entities_changed(sender, instance, action, **kwargs):
+    if action in ["post_add", "post_remove", "post_clear"]:
+        try:
+            instance.connectivity_statement.graph_rendering_state.delete()
+        except GraphRenderingState.DoesNotExist:
+            pass
+        except ValueError:
+            pass
+
+
+# Signals for Via from_entities
+@receiver(m2m_changed, sender=Via.from_entities.through)
+def via_from_entities_changed(sender, instance, action, **kwargs):
+    if action in ["post_add", "post_remove", "post_clear"]:
+        try:
+            instance.connectivity_statement.graph_rendering_state.delete()
+        except GraphRenderingState.DoesNotExist:
+            pass
+        except ValueError:
+            pass
+
+
+# Signals for Destination anatomical_entities
+@receiver(m2m_changed, sender=Destination.anatomical_entities.through)
+def destination_anatomical_entities_changed(sender, instance, action, **kwargs):
+    if action in ["post_add", "post_remove", "post_clear"]:
+        try:
+            instance.connectivity_statement.graph_rendering_state.delete()
+        except GraphRenderingState.DoesNotExist:
+            pass
+        except ValueError:
+            pass
+
+
+# Signals for Destination from_entities
+@receiver(m2m_changed, sender=Destination.from_entities.through)
+def destination_from_entities_changed(sender, instance, action, **kwargs):
+    if action in ["post_add", "post_remove", "post_clear"]:
+        try:
+            instance.connectivity_statement.graph_rendering_state.delete()
+        except GraphRenderingState.DoesNotExist:
+            pass
+        except ValueError:
+            pass
+
+
+# Signals for Via model changes
+@receiver(post_save, sender=Via)
+@receiver(post_delete, sender=Via)
+def via_changed(sender, instance, **kwargs):
+    try:
+        instance.connectivity_statement.graph_rendering_state.delete()
+    except GraphRenderingState.DoesNotExist:
+        pass
+    except ValueError:
+        pass
+
+
+# Signals for Destination model changes
+@receiver(post_save, sender=Destination)
+@receiver(post_delete, sender=Destination)
+def destination_changed(sender, instance, **kwargs):
+    try:
+        instance.connectivity_statement.graph_rendering_state.delete()
+    except GraphRenderingState.DoesNotExist:
+        pass
+    except ValueError:
+        pass

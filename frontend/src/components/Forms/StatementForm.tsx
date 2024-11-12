@@ -210,6 +210,7 @@ const StatementForm = (props: any) => {
         id={statement.id}
         onElementDelete={async (element: any) => {
           await api.composerViaDestroy(element.children.props.formData.id);
+          refreshStatement();
         }}
         onElementAdd={async () => {
           await api.composerViaCreate({
@@ -228,8 +229,9 @@ const StatementForm = (props: any) => {
           await api.composerViaPartialUpdate(statement.vias[sourceIndex].id, {
             order: destinationIndex,
           });
+          refreshStatement();
         }}
-        hideDeleteBtn={statement?.vias?.length <= 1 || isDisabled}
+        hideDeleteBtn={statement?.vias?.length < 1 || isDisabled}
         showReOrderingIcon={true}
         addButtonPlaceholder={"Via"}
         canAdd={!isDisabled}
@@ -252,12 +254,13 @@ const StatementForm = (props: any) => {
           onUpdate: async (selectedOption: string, formId: string) => {
             const viaIndex = getConnectionId(formId, statement.vias);
             const typeOption = selectedOption as TypeB60Enum;
-            
+
             if (viaIndex) {
               try {
                 await api.composerViaPartialUpdate(viaIndex, {
                   type: typeOption,
                 });
+                refreshStatement()
                 return ChangeRequestStatus.SAVED;
               } catch (error) {
                 return checkOwnership(
@@ -266,6 +269,7 @@ const StatementForm = (props: any) => {
                     await api.composerViaPartialUpdate(viaIndex, {
                       type: typeOption,
                     });
+                    refreshStatement()
                     return ChangeRequestStatus.SAVED;
                   },
                   () => {
@@ -306,12 +310,13 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
-           return await updateEntity({
+            return await updateEntity({
               statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
               propertyToUpdate: "anatomical_entities",
+              refreshStatement
             });
           },
           errors: "",
@@ -354,6 +359,7 @@ const StatementForm = (props: any) => {
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
               propertyToUpdate: "from_entities",
+              refreshStatement
             });
           },
           areConnectionsExplicit: (formId: any) => {
@@ -414,6 +420,7 @@ const StatementForm = (props: any) => {
           await api.composerDestinationDestroy(
             element.children.props.formData.id,
           );
+          refreshStatement();
         }}
         onElementAdd={async () => {
           await api.composerDestinationCreate({
@@ -425,7 +432,7 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
-        hideDeleteBtn={statement?.destinations?.length <= 1 || isDisabled}
+        hideDeleteBtn={statement?.destinations?.length < 1 || isDisabled}
         showReOrderingIcon={false}
         addButtonPlaceholder={"Destination"}
         canAdd={!isDisabled}
@@ -446,14 +453,33 @@ const StatementForm = (props: any) => {
           isPathBuilderComponent: true,
           InputIcon: DestinationIcon,
           onUpdate: async (selectedOption: string, formId: string) => {
-            const viaIndex = getConnectionId(formId, statement?.destinations);
+            const destinationIndex = getConnectionId(formId, statement?.destinations);
             const typeOption = selectedOption as TypeC11Enum;
-            if (viaIndex) {
-              api
-                .composerDestinationPartialUpdate(viaIndex, {
+            if (destinationIndex) {
+              try {
+                await api.composerDestinationPartialUpdate(destinationIndex, {
                   type: typeOption,
                 })
+                refreshStatement()
+                return ChangeRequestStatus.SAVED;
+              } catch (error) {
+                return checkOwnership(
+                  statement.id,
+                  async () => {
+                    await api.composerDestinationPartialUpdate(destinationIndex, {
+                      type: typeOption,
+                    })
+                    refreshStatement()
+                    return ChangeRequestStatus.SAVED;
+                  },
+                  () => {
+                    return ChangeRequestStatus.CANCELLED;
+                  },
+                  (owner) => getOwnershipAlertMessage(owner)
+                );
+              }
             }
+            return ChangeRequestStatus.CANCELLED;
           },
         },
       },
@@ -489,6 +515,7 @@ const StatementForm = (props: any) => {
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
               propertyToUpdate: "anatomical_entities",
+              refreshStatement
             });
           },
           errors: "",
@@ -534,6 +561,7 @@ const StatementForm = (props: any) => {
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
               propertyToUpdate: "from_entities",
+              refreshStatement
             });
           },
           areConnectionsExplicit: (formId: any) => {
