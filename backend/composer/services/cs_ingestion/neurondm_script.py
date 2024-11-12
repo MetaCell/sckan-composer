@@ -7,6 +7,8 @@ from neurondm.core import Config, graphBase
 from neurondm.core import OntTerm, OntId, RDFL
 from pyontutils.core import OntGraph, OntResIri, OntResPath
 from pyontutils.namespaces import rdfs, ilxtr
+from django.core.management.base import BaseCommand, CommandError
+import logging
 
 from composer.services.cs_ingestion.exceptions import NeuronDMInconsistency
 from composer.services.cs_ingestion.helpers.common_helpers import VALIDATION_ERRORS, DESTINATIONS, VIAS, ORIGINS
@@ -15,6 +17,13 @@ from composer.services.cs_ingestion.models import NeuronDMVia, NeuronDMOrigin, N
     AxiomType, ValidationErrors, Severity
 
 logger_service: Optional[LoggerService] = None
+logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+RED_COLOR = "\033[91m"
+RESET_COLOR = "\033[0m"
+
+def log_error(message):
+    logger.error(f"{RED_COLOR}{message}{RESET_COLOR}")
 
 
 def makelpesrdf():
@@ -410,7 +419,7 @@ def update_from_entities(origins: NeuronDMOrigin, vias: List[NeuronDMVia], desti
 
 ## Based on:
 ## https://github.com/tgbugs/pyontutils/blob/30c415207b11644808f70c8caecc0c75bd6acb0a/neurondm/docs/composer.py#L668-L698
-def main(local=False, logger_service_param=Optional[LoggerService]):
+def main(local=False, full_imports=[], label_imports=[], logger_service_param=Optional[LoggerService]):
     global logger_service
     logger_service = logger_service_param
 
@@ -438,27 +447,48 @@ def main(local=False, logger_service_param=Optional[LoggerService]):
         orr = 'https://raw.githubusercontent.com/SciCrunch/NIF-Ontology/neurons/'
         remote_base = orr + gen_neurons_path
 
-    # full imports
-    for f in ('apinat-partial-orders',
-              'apinat-pops-more',
-              'apinat-simple-sheet',
-              'sparc-nlp'):
+    # full imports - if not provided manually, use default
+    default_full_imports = ['apinat-partial-orders',
+                            'apinat-pops-more',
+                            'apinat-simple-sheet',
+                            'sparc-nlp']
+    full_imports_paths = full_imports if full_imports else default_full_imports
+    failed_full_imports_paths = []
+    for f in full_imports_paths:
         if local:
             ori = OntResPath(local_base / (f + suffix))
         else:
             ori = OntResIri(remote_base + f + suffix)
-        [g.add(t) for t in ori.graph]
 
-    # label only imports
-    for f in ('apinatomy-neuron-populations',
-              '../../npo'):
+        try:
+            [g.add(t) for t in ori.graph]
+        except ValueError:
+            failed_full_imports_paths.append(f)
+            log_error(f"Error in loading {ori}")
+    
+    if failed_full_imports_paths:
+        log_error(f"Failed to load the following full imports: {', '.join(failed_full_imports_paths)}")
+
+    # label imports - if not provided manually, use default
+    default_label_imports = ['apinatomy-neuron-populations',
+                             '../../npo']
+    label_imports_paths = label_imports if label_imports else default_label_imports
+    failed_label_imports_paths = []
+    for f in label_imports_paths:
         p = os.path.normpath(gen_neurons_path + f)
         if local:
             ori = OntResPath(olr / (p + suffix))
         else:
             ori = OntResIri(orr + p + suffix)
 
-        [g.add((s, rdfs.label, o)) for s, o in ori.graph[:rdfs.label:]]
+        try:
+            [g.add((s, rdfs.label, o)) for s, o in ori.graph[:rdfs.label:]]
+        except ValueError:
+            failed_label_imports_paths.append(f)
+            log_error(f"Error in loading {ori}")
+
+    if failed_label_imports_paths:
+        log_error(f"Failed to load the following label imports: {', '.join(failed_label_imports_paths)}")
 
     config.load_existing(g)
     neurons = config.neurons()

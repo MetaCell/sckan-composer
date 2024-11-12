@@ -48,7 +48,7 @@ const DistillationTab = ({
                 <StatementForm
                   statement={statement}
                   format="small"
-                  setter={refreshStatement}
+                  action={refreshStatement}
                   extraData={{ sentence_id: statement.sentence.id }}
                   uiFields={["knowledge_statement"]}
                   className="ks"

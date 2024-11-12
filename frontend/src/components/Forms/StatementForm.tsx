@@ -15,7 +15,8 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
   createOptionsFromStatements,
   getAnatomicalEntities,
-  getConnectionId, getFirstNumberFromString,
+  getConnectionId,
+  getFirstNumberFromString,
   searchForwardConnection,
   searchFromEntitiesDestination,
   searchFromEntitiesVia,
@@ -24,30 +25,23 @@ import {
   updateOrigins,
 } from "../../services/CustomDropdownService";
 import {
-  mapAnatomicalEntitiesToOptions,
   DROPDOWN_MAPPER_STATE,
-  getViasGroupLabel,
   findMatchingEntities,
+  getViasGroupLabel,
+  mapAnatomicalEntitiesToOptions,
 } from "../../helpers/dropdownMappers";
 import {DestinationIcon, ViaIcon} from "../icons";
-import {
-  DestinationsGroupLabel,
-  OriginsGroupLabel,
-  ViasGroupLabel,
-} from "../../helpers/settings";
+import {ChangeRequestStatus, DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel,} from "../../helpers/settings";
 import {Option, OptionDetail} from "../../types";
 import {composerApi as api} from "../../services/apis";
-import {
-  ConnectivityStatement,
-  TypeB60Enum,
-  TypeC11Enum,
-} from "../../apiclient/backend";
+import {ConnectivityStatement, TypeB60Enum, TypeC11Enum,} from "../../apiclient/backend";
 import {CustomFooter} from "../Widgets/HoveredOptionContent";
 import {StatementStateChip} from "../Widgets/StateChip";
 import {projections} from "../../services/ProjectionService";
+import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
 
 const StatementForm = (props: any) => {
-  const {uiFields, statement, refreshStatement, isDisabled} = props;
+  const {uiFields, statement, setStatement, isDisabled, action: refreshStatement} = props;
   const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
@@ -180,9 +174,8 @@ const StatementForm = (props: any) => {
         );
       },
       onUpdate: async (selectedOptions: any) => {
-        await updateOrigins(selectedOptions, statement.id);
+        return await updateOrigins(selectedOptions, statement.id, setStatement);
       },
-      refreshStatement: () => refreshStatement(),
       errors: "",
       mapValueToOption: () =>
         mapAnatomicalEntitiesToOptions(statement?.origins, OriginsGroupLabel),
@@ -214,6 +207,7 @@ const StatementForm = (props: any) => {
     "ui:ArrayFieldTemplate": (props: any) => (
       <ArrayFieldTemplate
         {...props}
+        id={statement.id}
         onElementDelete={async (element: any) => {
           await api.composerViaDestroy(element.children.props.formData.id);
           refreshStatement();
@@ -237,7 +231,7 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
-        hideDeleteBtn={statement?.vias?.length <= 1 || isDisabled}
+        hideDeleteBtn={statement?.vias?.length < 1 || isDisabled}
         showReOrderingIcon={true}
         addButtonPlaceholder={"Via"}
         canAdd={!isDisabled}
@@ -260,13 +254,32 @@ const StatementForm = (props: any) => {
           onUpdate: async (selectedOption: string, formId: string) => {
             const viaIndex = getConnectionId(formId, statement.vias);
             const typeOption = selectedOption as TypeB60Enum;
+
             if (viaIndex) {
-              api
-                .composerViaPartialUpdate(viaIndex, {
+              try {
+                await api.composerViaPartialUpdate(viaIndex, {
                   type: typeOption,
-                })
-                .then(() => refreshStatement());
+                });
+                refreshStatement()
+                return ChangeRequestStatus.SAVED;
+              } catch (error) {
+                return checkOwnership(
+                  statement.id,
+                  async () => {
+                    await api.composerViaPartialUpdate(viaIndex, {
+                      type: typeOption,
+                    });
+                    refreshStatement()
+                    return ChangeRequestStatus.SAVED;
+                  },
+                  () => {
+                    return ChangeRequestStatus.CANCELLED;
+                  },
+                  (owner) => getOwnershipAlertMessage(owner)
+                );
+              }
             }
+            return ChangeRequestStatus.CANCELLED;
           },
         },
       },
@@ -297,14 +310,15 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
-            await updateEntity({
+            return await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
               propertyToUpdate: "anatomical_entities",
+              refreshStatement
             });
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) =>
             mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
@@ -339,11 +353,13 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
-            await updateEntity({
+            return await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
               propertyToUpdate: "from_entities",
+              refreshStatement
             });
           },
           areConnectionsExplicit: (formId: any) => {
@@ -372,7 +388,6 @@ const StatementForm = (props: any) => {
               return entity
             }
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) => {
             const entities: Option[] = [];
@@ -400,6 +415,7 @@ const StatementForm = (props: any) => {
     "ui:ArrayFieldTemplate": (props: any) => (
       <ArrayFieldTemplate
         {...props}
+        id={statement.id}
         onElementDelete={async (element: any) => {
           await api.composerDestinationDestroy(
             element.children.props.formData.id,
@@ -416,7 +432,7 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
-        hideDeleteBtn={statement?.destinations?.length <= 1 || isDisabled}
+        hideDeleteBtn={statement?.destinations?.length < 1 || isDisabled}
         showReOrderingIcon={false}
         addButtonPlaceholder={"Destination"}
         canAdd={!isDisabled}
@@ -437,15 +453,33 @@ const StatementForm = (props: any) => {
           isPathBuilderComponent: true,
           InputIcon: DestinationIcon,
           onUpdate: async (selectedOption: string, formId: string) => {
-            const viaIndex = getConnectionId(formId, statement?.destinations);
+            const destinationIndex = getConnectionId(formId, statement?.destinations);
             const typeOption = selectedOption as TypeC11Enum;
-            if (viaIndex) {
-              api
-                .composerDestinationPartialUpdate(viaIndex, {
+            if (destinationIndex) {
+              try {
+                await api.composerDestinationPartialUpdate(destinationIndex, {
                   type: typeOption,
                 })
-                .then(() => refreshStatement());
+                refreshStatement()
+                return ChangeRequestStatus.SAVED;
+              } catch (error) {
+                return checkOwnership(
+                  statement.id,
+                  async () => {
+                    await api.composerDestinationPartialUpdate(destinationIndex, {
+                      type: typeOption,
+                    })
+                    refreshStatement()
+                    return ChangeRequestStatus.SAVED;
+                  },
+                  () => {
+                    return ChangeRequestStatus.CANCELLED;
+                  },
+                  (owner) => getOwnershipAlertMessage(owner)
+                );
+              }
             }
+            return ChangeRequestStatus.CANCELLED;
           },
         },
       },
@@ -475,14 +509,15 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
-            await updateEntity({
+            return await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
               propertyToUpdate: "anatomical_entities",
+              refreshStatement
             });
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) =>
             mapAnatomicalEntitiesToOptions(
@@ -520,11 +555,13 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
-            await updateEntity({
+            return await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
               propertyToUpdate: "from_entities",
+              refreshStatement
             });
           },
           areConnectionsExplicit: (formId: any) => {
@@ -554,7 +591,6 @@ const StatementForm = (props: any) => {
             }
 
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) => {
             const entities: Option[] = [];
@@ -612,10 +648,8 @@ const StatementForm = (props: any) => {
         return searchForwardConnection(searchValue, statement, excludedIds);
       },
       onUpdate: async (selectedOptions: Option[]) => {
-        await updateForwardConnections(selectedOptions, statement);
-        refreshStatement()
+        return await updateForwardConnections(selectedOptions, statement);
       },
-      refreshStatement: () => refreshStatement(),
       statement: statement,
       errors: statement?.errors?.includes("Invalid forward connection")
         ? "Forward connection(s) not found"
@@ -707,10 +741,12 @@ const StatementForm = (props: any) => {
     SelectWidget: CustomSingleSelect,
   };
 
+
   return (
     <FormBase
       data={statement}
       service={statementService}
+      onSaveCancel={refreshStatement}
       schema={copiedSchema}
       uiSchema={copiedUISchema}
       uiFields={uiFields}
