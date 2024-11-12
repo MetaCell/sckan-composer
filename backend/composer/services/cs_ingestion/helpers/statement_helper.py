@@ -39,7 +39,7 @@ def create_or_update_connectivity_statement(statement: Dict, sentence: Sentence,
         if has_changes(connectivity_statement, statement, defaults):
             defaults_without_state = {field: value for field, value in defaults.items() if field != 'state'}
             ConnectivityStatement.objects.filter(reference_uri=reference_uri).update(**defaults_without_state)
-            connectivity_statement = ConnectivityStatement.objects.filter(reference_uri=reference_uri).first()
+            connectivity_statement = ConnectivityStatement.objects.get(reference_uri=reference_uri)
             add_ingestion_system_note(connectivity_statement)
 
     validation_errors = statement.get(VALIDATION_ERRORS, ValidationErrors())
