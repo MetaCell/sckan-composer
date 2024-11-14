@@ -1,6 +1,4 @@
 import os
-# TO REMOVE
-import time
 
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import loader
@@ -41,7 +39,6 @@ def export(request):
     """
     Exporting all connectivity statements that have state NPO Approved
     """
-    time.sleep(120)
     if request.user.is_staff:
         # only staff users can export connectivity statements
         qs = ConnectivityStatement.objects.filter(state=CSState.NPO_APPROVED)
