@@ -20,9 +20,11 @@ export const OriginNodeWidget: React.FC<OriginNodeProps> = ({
     const [isActive, setIsActive] = useState(false);
     const [zIndex, setZIndex] = useState(0);
 
-    const toggleColor = () => {
-        setIsActive(!isActive);
-        setZIndex((prevZIndex) => prevZIndex + 1);
+    const toggleColor = (event: any) => {
+        if (event.shiftKey) {
+            setIsActive(!isActive);
+            setZIndex((prevZIndex) => prevZIndex + 1);
+        }
     };
 
     const outPort = model.getPort("out");

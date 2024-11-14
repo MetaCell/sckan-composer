@@ -27,9 +27,11 @@ export const ViaNodeWidget: React.FC<ViaNodeProps> = ({model, engine}) => {
     const [isActive, setIsActive] = useState(false);
     const [zIndex, setZIndex] = useState(0);
     // Function to toggle the state
-    const toggleColor = () => {
-        setIsActive(!isActive);
-        setZIndex((prevZIndex) => prevZIndex + 1);
+    const toggleColor = (event: any) => {
+        if (event.shiftKey) {
+          setIsActive(!isActive);
+          setZIndex((prevZIndex) => prevZIndex + 1);
+        }
     };
 
     const outPort = model.getPort("out");

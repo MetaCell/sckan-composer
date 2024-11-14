@@ -42,10 +42,11 @@ function genDagreEngine(containsAfferentT: boolean) {
     return new DagreEngine({
         graph: {
             rankdir: containsAfferentT ? 'BT' : 'TB',
-            ranksep: 300,
-            nodesep: 250,
-            marginx: 50,
-            marginy: 50
+            ranksep: 350,
+            nodesep: 150,
+            marginx: 800,
+            marginy: 100,
+            edgesep: 10,
         },
     });
 }

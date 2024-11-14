@@ -20,6 +20,8 @@ code {
     position: relative;
 }
 
+/* Vertical graph */
+
 .outPort {
   position: absolute;
   top: 100%;
@@ -37,3 +39,22 @@ code {
   top: 0%;
   left: 0%;
 }
+
+/* Horizontal graph */
+/* .outPort {
+  position: absolute;
+  top: 50%;
+  right: 0%;
+}
+
+.inPort {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+}
+
+.inPortDestination {
+  position: absolute;
+  top: 100%;
+  left: 0%;
+} */

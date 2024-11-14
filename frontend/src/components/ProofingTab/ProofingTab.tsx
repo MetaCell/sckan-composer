@@ -19,7 +19,7 @@ const ProofingTab = (props: any) => {
   return (
     <Grid container mb={2} spacing={2}>
       <Grid item xs={12}>
-        <Box ref={refs[0]}>
+        <Box>
           <Paper sx={sectionStyle}>
             <Stack
               direction="row"

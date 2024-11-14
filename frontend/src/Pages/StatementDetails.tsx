@@ -226,7 +226,7 @@ const StatementDetails = () => {
               <Grid item xs={12} mb={4}>
                 <Grid container>
                   <Grid item xs={12} md={6}>
-                    <Box>
+                    <Box ref={refs[0]}>
                       <Typography variant="h3" mb={1}>
                         Statement Details #{statementId}{" "}
                         <span>

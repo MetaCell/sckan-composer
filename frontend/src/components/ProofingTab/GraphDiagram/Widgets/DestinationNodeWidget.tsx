@@ -22,9 +22,11 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
     const [zIndex, setZIndex] = useState(0);
 
     // Function to toggle the state
-    const toggleColor = () => {
-        setIsActive(!isActive);
-        setZIndex((prevZIndex) => prevZIndex + 1);
+    const toggleColor = (event: any) => {
+        if (event.shiftKey) {
+            setIsActive(!isActive);
+            setZIndex((prevZIndex) => prevZIndex + 1);
+        }
     };
 
 
