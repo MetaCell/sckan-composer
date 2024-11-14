@@ -706,7 +706,7 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
             "errors",
             "graph_rendering_state",
         )
-        read_only_fields = ("owner", "owner_id")
+        read_only_fields = ("state","owner", "owner_id")
 
     def update(self, instance, validated_data):
         validated_data.pop("owner", None)
@@ -730,7 +730,6 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
         if origins is not None:
             instance.origins.set(origins)
 
-        # Proceed with the standard update
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
