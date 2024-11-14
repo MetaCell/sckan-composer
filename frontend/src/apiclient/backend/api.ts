@@ -26,6 +26,31 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @interface AlertType
+ */
+export interface AlertType {
+    /**
+     * 
+     * @type {number}
+     * @memberof AlertType
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AlertType
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AlertType
+     */
+    'uri': string;
+}
+/**
+ * 
+ * @export
  * @interface AnatomicalEntity
  */
 export interface AnatomicalEntity {
@@ -414,6 +439,12 @@ export interface ConnectivityStatement {
      * @memberof ConnectivityStatement
      */
     'graph_rendering_state'?: GraphState | null;
+    /**
+     * 
+     * @type {Array<StatementAlert>}
+     * @memberof ConnectivityStatement
+     */
+    'statement_alerts'?: Array<StatementAlert>;
 }
 /**
  * @type ConnectivityStatementCircuitType
@@ -492,7 +523,7 @@ export interface ConnectivityStatementUpdate {
      * @type {string}
      * @memberof ConnectivityStatementUpdate
      */
-    'state'?: string;
+    'state': string;
     /**
      * 
      * @type {Array<AvailableTransitions24dEnum>}
@@ -631,6 +662,12 @@ export interface ConnectivityStatementUpdate {
      * @memberof ConnectivityStatementUpdate
      */
     'graph_rendering_state'?: GraphState | null;
+    /**
+     * 
+     * @type {Array<StatementAlert>}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'statement_alerts'?: Array<StatementAlert>;
 }
 /**
  * Destination
@@ -963,6 +1000,37 @@ export const NullEnum = {
 export type NullEnum = typeof NullEnum[keyof typeof NullEnum];
 
 
+/**
+ * 
+ * @export
+ * @interface PaginatedAlertTypeList
+ */
+export interface PaginatedAlertTypeList {
+    /**
+     * 
+     * @type {number}
+     * @memberof PaginatedAlertTypeList
+     */
+    'count'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedAlertTypeList
+     */
+    'next'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedAlertTypeList
+     */
+    'previous'?: string | null;
+    /**
+     * 
+     * @type {Array<AlertType>}
+     * @memberof PaginatedAlertTypeList
+     */
+    'results'?: Array<AlertType>;
+}
 /**
  * 
  * @export
@@ -1539,6 +1607,12 @@ export interface PatchedConnectivityStatement {
      * @memberof PatchedConnectivityStatement
      */
     'graph_rendering_state'?: GraphState | null;
+    /**
+     * 
+     * @type {Array<StatementAlert>}
+     * @memberof PatchedConnectivityStatement
+     */
+    'statement_alerts'?: Array<StatementAlert>;
 }
 /**
  * Connectivity Statement
@@ -1738,6 +1812,12 @@ export interface PatchedConnectivityStatementUpdate {
      * @memberof PatchedConnectivityStatementUpdate
      */
     'graph_rendering_state'?: GraphState | null;
+    /**
+     * 
+     * @type {Array<StatementAlert>}
+     * @memberof PatchedConnectivityStatementUpdate
+     */
+    'statement_alerts'?: Array<StatementAlert>;
 }
 /**
  * Destination
@@ -2404,6 +2484,49 @@ export interface Specie {
     'ontology_uri'?: string | null;
 }
 /**
+ * 
+ * @export
+ * @interface StatementAlert
+ */
+export interface StatementAlert {
+    /**
+     * 
+     * @type {number}
+     * @memberof StatementAlert
+     */
+    'id'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof StatementAlert
+     */
+    'alert_type': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof StatementAlert
+     */
+    'text': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof StatementAlert
+     */
+    'saved_by': number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof StatementAlert
+     */
+    'created_at': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StatementAlert
+     */
+    'updated_at': string;
+}
+/**
  * Note Tag
  * @export
  * @interface Tag
@@ -2591,6 +2714,96 @@ export interface ViaSerializerDetails {
  */
 export const ComposerApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * A viewset for viewing the list of alert types.
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerAlertList: async (limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/alert/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * A viewset for viewing the list of alert types.
+         * @param {number} id A unique integer value identifying this alert type.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerAlertRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerAlertRetrieve', 'id', id)
+            const localVarPath = `/api/composer/alert/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * AnatomicalEntity
          * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
@@ -5333,6 +5546,31 @@ export const ComposerApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ComposerApiAxiosParamCreator(configuration)
     return {
         /**
+         * A viewset for viewing the list of alert types.
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerAlertList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedAlertTypeList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerAlertList(limit, offset, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerAlertList']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * A viewset for viewing the list of alert types.
+         * @param {number} id A unique integer value identifying this alert type.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerAlertRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AlertType>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerAlertRetrieve(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerAlertRetrieve']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * AnatomicalEntity
          * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
@@ -6096,6 +6334,25 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
     const localVarFp = ComposerApiFp(configuration)
     return {
         /**
+         * A viewset for viewing the list of alert types.
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerAlertList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedAlertTypeList> {
+            return localVarFp.composerAlertList(limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * A viewset for viewing the list of alert types.
+         * @param {number} id A unique integer value identifying this alert type.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerAlertRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<AlertType> {
+            return localVarFp.composerAlertRetrieve(id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * AnatomicalEntity
          * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
@@ -6684,6 +6941,29 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
  * @extends {BaseAPI}
  */
 export class ComposerApi extends BaseAPI {
+    /**
+     * A viewset for viewing the list of alert types.
+     * @param {number} [limit] Number of results to return per page.
+     * @param {number} [offset] The initial index from which to return the results.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerAlertList(limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerAlertList(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * A viewset for viewing the list of alert types.
+     * @param {number} id A unique integer value identifying this alert type.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerAlertRetrieve(id: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerAlertRetrieve(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * AnatomicalEntity
      * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.

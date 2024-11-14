@@ -10,6 +10,7 @@ from rest_framework import serializers
 
 from ..enums import SentenceState, CSState
 from ..models import (
+    AlertType,
     AnatomicalEntity,
     Phenotype,
     ProjectionPhenotype,
@@ -20,6 +21,7 @@ from ..models import (
     Profile,
     Sentence,
     Specie,
+    StatementAlert,
     Tag,
     Via, Destination, AnatomicalEntityIntersection, AnatomicalEntityMeta, GraphRenderingState,
 )
@@ -506,7 +508,31 @@ class GraphStateSerializer(serializers.ModelSerializer):
         return {
             'serialized_graph': representation['serialized_graph'],
         }
+    
+class AlertTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlertType
+        fields = ('id', 'name', 'uri')
 
+class StatementAlertSerializer(serializers.ModelSerializer):
+    alert_type = serializers.PrimaryKeyRelatedField(queryset=AlertType.objects.all(), required=True)
+    id = serializers.IntegerField(required=False)
+    class Meta:
+        model = StatementAlert
+        fields = ('id', 'alert_type', 'text', 'saved_by', 'created_at', 'updated_at')
+        read_only_fields = ('created_at', 'updated_at', 'saved_by', 'alert_type')
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        user = request.user if request else None
+        validated_data['saved_by'] = user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        user = request.user if request else None
+        validated_data['saved_by'] = user
+        return super().update(instance, validated_data)
 
 class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     """Connectivity Statement"""
@@ -533,6 +559,8 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     statement_preview = serializers.SerializerMethodField()
     errors = serializers.SerializerMethodField()
     graph_rendering_state = GraphStateSerializer(required=False, allow_null=True)
+    statement_alerts = StatementAlertSerializer(many=True, read_only=False, required=False)
+
 
     def get_available_transitions(self, instance) -> list[CSState]:
         request = self.context.get("request", None)
@@ -661,7 +689,8 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             "has_notes",
             "statement_preview",
             "errors",
-            "graph_rendering_state"
+            "graph_rendering_state",
+            "statement_alerts"
         )
 
 
@@ -705,6 +734,7 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
             "statement_preview",
             "errors",
             "graph_rendering_state",
+            "statement_alerts",
         )
         read_only_fields = ("state","owner", "owner_id")
 
@@ -712,6 +742,7 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
         validated_data.pop("owner", None)
         validated_data.pop("owner_id", None)
 
+        # Handle graph_rendering_state
         graph_rendering_state_data = validated_data.pop("graph_rendering_state", None)
         if graph_rendering_state_data is not None:
             graph_state, _ = GraphRenderingState.objects.get_or_create(
@@ -729,6 +760,24 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
         origins = validated_data.pop("origins", None)
         if origins is not None:
             instance.origins.set(origins)
+
+        # Handle statement alerts
+        alerts_data = validated_data.pop('statement_alerts', [])
+        for alert_data in alerts_data:
+            alert_id = alert_data.get('id')
+            if alert_id:
+                # Update existing alert
+                alert_instance = StatementAlert.objects.get(id=alert_id)
+                alert_instance.text = alert_data.get('text', alert_instance.text)
+                alert_instance.save()
+            else:
+                # Create new alert if id is not provided
+                StatementAlert.objects.create(
+                    connectivity_statement=instance,
+                    alert_type=alert_data['alert_type'],
+                    text=alert_data.get('text', '')
+                )
+
 
         return super().update(instance, validated_data)
 

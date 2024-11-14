@@ -27,6 +27,7 @@ from .filtersets import (
     DestinationFilter,
 )
 from .serializers import (
+    AlertTypeSerializer,
     AnatomicalEntitySerializer,
     PhenotypeSerializer,
     ProjectionPhenotypeSerializer,
@@ -50,6 +51,7 @@ from .permissions import (
     IsOwnerOfConnectivityStatementOrReadOnly,
 )
 from ..models import (
+    AlertType,
     AnatomicalEntity,
     Phenotype,
     ProjectionPhenotype,
@@ -325,6 +327,14 @@ class NoteViewSet(viewsets.ModelViewSet):
     filterset_class = NoteFilter
 
 
+class AlertTypeViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A viewset for viewing the list of alert types.
+    """
+
+    queryset = AlertType.objects.all()
+    serializer_class = AlertTypeSerializer
+
 class ConnectivityStatementViewSet(
     ProvenanceMixin,
     SpecieMixin,
@@ -348,7 +358,7 @@ class ConnectivityStatementViewSet(
     service = ConnectivityStatementStateService
 
     def get_serializer_class(self):
-        if self.action in ['update', 'partial_update']:
+        if self.action in ["update", "partial_update"]:
             return ConnectivityStatementUpdateSerializer
         if self.action == "list":
             return BaseConnectivityStatementSerializer

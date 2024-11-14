@@ -4,6 +4,62 @@ info:
   version: 1.0.0
   description: SCKAN Composer API
 paths:
+  /api/composer/alert/:
+    get:
+      operationId: composer_alert_list
+      description: A viewset for viewing the list of alert types.
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAlertTypeList'
+          description: ''
+  /api/composer/alert/{id}/:
+    get:
+      operationId: composer_alert_retrieve
+      description: A viewset for viewing the list of alert types.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this alert type.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertType'
+          description: ''
   /api/composer/anatomical-entity/:
     get:
       operationId: composer_anatomical_entity_list
@@ -1945,6 +2001,23 @@ paths:
           description: ''
 components:
   schemas:
+    AlertType:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        uri:
+          type: string
+          format: uri
+          maxLength: 200
+      required:
+      - id
+      - name
+      - uri
     AnatomicalEntity:
       type: object
       properties:
@@ -2194,6 +2267,10 @@ components:
           allOf:
           - $ref: '#/components/schemas/GraphState'
           nullable: true
+        statement_alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatementAlert'
       required:
       - available_transitions
       - entities_journey
@@ -2244,7 +2321,7 @@ components:
           nullable: true
         state:
           type: string
-          maxLength: 50
+          readOnly: true
         available_transitions:
           type: array
           items:
@@ -2337,6 +2414,10 @@ components:
           allOf:
           - $ref: '#/components/schemas/GraphState'
           nullable: true
+        statement_alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatementAlert'
       required:
       - available_transitions
       - errors
@@ -2350,6 +2431,7 @@ components:
       - projection_phenotype
       - sentence
       - sex
+      - state
       - statement_preview
       - tags
     Destination:
@@ -2549,6 +2631,26 @@ components:
     NullEnum:
       enum:
       - null
+    PaginatedAlertTypeList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlertType'
     PaginatedAnatomicalEntityList:
       type: object
       properties:
@@ -2919,6 +3021,10 @@ components:
           allOf:
           - $ref: '#/components/schemas/GraphState'
           nullable: true
+        statement_alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatementAlert'
     PatchedConnectivityStatementUpdate:
       type: object
       description: Connectivity Statement
@@ -2953,7 +3059,7 @@ components:
           nullable: true
         state:
           type: string
-          maxLength: 50
+          readOnly: true
         available_transitions:
           type: array
           items:
@@ -3046,6 +3152,10 @@ components:
           allOf:
           - $ref: '#/components/schemas/GraphState'
           nullable: true
+        statement_alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatementAlert'
     PatchedDestination:
       type: object
       description: Destination
@@ -3459,6 +3569,33 @@ components:
       required:
       - id
       - name
+    StatementAlert:
+      type: object
+      properties:
+        id:
+          type: integer
+        alert_type:
+          type: integer
+        text:
+          type: string
+        saved_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - alert_type
+      - created_at
+      - saved_by
+      - text
+      - updated_at
     Tag:
       type: object
       description: Note Tag
