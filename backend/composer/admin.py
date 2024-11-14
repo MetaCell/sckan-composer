@@ -10,6 +10,7 @@ from fsm_admin.mixins import FSMTransitionMixin
 from django import forms
 
 from composer.models import (
+    AlertType,
     Phenotype,
     Sex,
     ConnectivityStatement,
@@ -19,6 +20,7 @@ from composer.models import (
     Profile,
     Sentence,
     Specie,
+    StatementAlert,
     Tag,
     Via,
     FunctionalCircuitRole,
@@ -67,6 +69,17 @@ class NoteConnectivityStatementInline(admin.StackedInline):
     extra = 0
     sortable_options = "disabled"
 
+
+class AlertTypeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'uri')
+    search_fields = ('name', 'uri')
+
+class StatementAlertInline(admin.StackedInline):
+    model = StatementAlert
+    extra = 1
+    autocomplete_fields = ('alert_type', )
+    fields = ('alert_type', 'text', 'saved_by', 'created_at', 'updated_at')
+    readonly_fields = ('created_at', 'updated_at')
 
 class ConnectivityStatementInline(nested_admin.NestedStackedInline):
     model = ConnectivityStatement
@@ -245,7 +258,7 @@ class ConnectivityStatementAdmin(
 
     fieldsets = ()
 
-    inlines = (ProvenanceInline, NoteConnectivityStatementInline, ViaInline, DestinationInline)
+    inlines = (ProvenanceInline, NoteConnectivityStatementInline, ViaInline, DestinationInline, StatementAlertInline)
 
     @admin.display(description="Knowledge Statement")
     def short_ks(self, obj):
@@ -296,6 +309,7 @@ class ExportBatchAdmin(admin.ModelAdmin):
         return super().get_form(request, obj=obj, change=change, **kwargs)
 
 
+
 # Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
@@ -315,6 +329,7 @@ admin.site.register(Specie)
 admin.site.register(Tag)
 admin.site.register(FunctionalCircuitRole)
 admin.site.register(ProjectionPhenotype)
+admin.site.register(AlertType, AlertTypeAdmin)
 # admin.site.register(ExportMetrics)
 
 
