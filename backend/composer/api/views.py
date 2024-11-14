@@ -348,6 +348,8 @@ class ConnectivityStatementViewSet(
     service = ConnectivityStatementStateService
 
     def get_serializer_class(self):
+        if self.action in ['update', 'partial_update']:
+            return ConnectivityStatementUpdateSerializer
         if self.action == "list":
             return BaseConnectivityStatementSerializer
         return ConnectivityStatementSerializer
@@ -357,30 +359,10 @@ class ConnectivityStatementViewSet(
             return ConnectivityStatement.objects.excluding_draft()
         return super().get_queryset()
 
-    def handle_graph_rendering_state(self, instance, graph_rendering_state_data, user):
-        if graph_rendering_state_data:
-            if (
-                hasattr(instance, "graph_rendering_state")
-                and instance.graph_rendering_state is not None
-            ):
-                # Update the existing graph state
-                instance.graph_rendering_state.serialized_graph = (
-                    graph_rendering_state_data.get(
-                        "serialized_graph",
-                        instance.graph_rendering_state.serialized_graph,
-                    )
-                )
-                instance.graph_rendering_state.saved_by = user
-                instance.graph_rendering_state.save()
-            else:
-                # Create a new graph state if none exists
-                GraphRenderingState.objects.create(
-                    connectivity_statement=instance,
-                    serialized_graph=graph_rendering_state_data.get(
-                        "serialized_graph", {}
-                    ),
-                    saved_by=user,
-                )
+    """
+    Override the update method to apply the extend_schema decorator.
+    The actual update logic is handled by the serializer.
+    """
 
     @extend_schema(
         methods=["PUT"],
@@ -388,26 +370,12 @@ class ConnectivityStatementViewSet(
         responses={200: ConnectivityStatementSerializer},
     )
     def update(self, request, *args, **kwargs):
-        origin_ids = request.data.pop("origins", None)
-        graph_rendering_state_data = request.data.pop("graph_rendering_state", None)
+        return super().update(request, *args, **kwargs)
 
-        response = super().update(request, *args, **kwargs)
-
-        if response.status_code == status.HTTP_200_OK:
-            instance = self.get_object()
-
-            # Handle custom updates
-            self.handle_graph_rendering_state(
-                instance, graph_rendering_state_data, request.user
-            )
-            if origin_ids is not None:
-                instance.set_origins(origin_ids)
-
-            # Re-serialize the instance with all modifications
-            serializer = self.get_serializer(instance)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        return response
+    """
+    Override the partial_update method to apply the extend_schema decorator.
+    The actual update logic is handled by the serializer.
+    """
 
     @extend_schema(
         methods=["PATCH"],
@@ -415,23 +383,7 @@ class ConnectivityStatementViewSet(
         responses={200: ConnectivityStatementSerializer},
     )
     def partial_update(self, request, *args, **kwargs):
-        graph_rendering_state_data = request.data.pop("graph_rendering_state", None)
-
-        response = super().partial_update(request, *args, **kwargs)
-
-        if response.status_code == status.HTTP_200_OK:
-            instance = self.get_object()
-
-            # Handle custom updates
-            self.handle_graph_rendering_state(
-                instance, graph_rendering_state_data, request.user
-            )
-
-            # Re-serialize the instance with all modifications
-            serializer = self.get_serializer(instance)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        return response
+        return super().partial_update(request, *args, **kwargs)
 
 
 @extend_schema(tags=["public"])

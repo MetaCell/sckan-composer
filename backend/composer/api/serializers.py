@@ -2,6 +2,7 @@ from typing import List
 
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.forms import ValidationError
 from django_fsm import FSMField
 from drf_writable_nested.mixins import UniqueFieldsMixin
 from drf_writable_nested.serializers import WritableNestedModelSerializer
@@ -703,8 +704,40 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
             "has_notes",
             "statement_preview",
             "errors",
-            "graph_rendering_state"
+            "graph_rendering_state",
         )
+        read_only_fields = ("state","owner", "owner_id")
+
+    def update(self, instance, validated_data):
+        validated_data.pop("owner", None)
+        validated_data.pop("owner_id", None)
+
+        graph_rendering_state_data = validated_data.pop("graph_rendering_state", None)
+        if graph_rendering_state_data is not None:
+            graph_state, _ = GraphRenderingState.objects.get_or_create(
+                connectivity_statement=instance, defaults={"serialized_graph": {}}
+            )
+
+            # Update the serialized_graph with incoming data
+            graph_state.serialized_graph = graph_rendering_state_data.get(
+                "serialized_graph", graph_state.serialized_graph
+            )
+            graph_state.saved_by = self.context["request"].user
+            graph_state.save()
+
+        # Handle origins
+        origins = validated_data.pop("origins", None)
+        if origins is not None:
+            instance.origins.set(origins)
+
+        return super().update(instance, validated_data)
+
+    def to_representation(self, instance):
+        """
+        After updating, use the main serializer to represent the instance,
+        ensuring that 'origins' are serialized as full objects.
+        """
+        return ConnectivityStatementSerializer(instance, context=self.context).data
 
 
 class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
