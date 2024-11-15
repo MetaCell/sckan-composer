@@ -9,7 +9,7 @@ import {CanvasWidget} from '@projectstorm/react-canvas-core';
 import {CustomNodeFactory} from "./Factories/CustomNodeFactory";
 import {
   AnatomicalEntity,
-  DestinationSerializerDetails,
+  DestinationSerializerDetails, TypeC11Enum,
   ViaSerializerDetails
 } from "../../../apiclient/backend";
 import {useParams} from "react-router-dom";
@@ -81,7 +81,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     const minOriginY = Math.min(...originNodes.map(node => g.node(node.getID()).y || 0));
 
     const afferentTNodes = nodes.filter(
-      node => node.getOptions().anatomicalType === DestinationTypeMapping["AFFERENT-T"]
+      node => node.getOptions().anatomicalType === DestinationTypeMapping[TypeC11Enum.AfferentT]
     );
 
     afferentTNodes.forEach(afferentNode => {

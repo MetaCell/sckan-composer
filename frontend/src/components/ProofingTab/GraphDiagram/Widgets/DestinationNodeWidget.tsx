@@ -35,7 +35,7 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
     const inPort = model.getPort("in");
     const hasForwardConnections = model.getOptions()?.forward_connection?.length > 0;
     
-    const isAfferentT = model.getOptions().anatomicalType === DestinationTypeMapping["AFFERENT-T"]
+    const isAfferentT = model.getOptions().anatomicalType === DestinationTypeMapping[TypeC11Enum.AfferentT]
   
     const edgeClassName = isAfferentT ? "inPortAfferentTDestination" : "inPortDestination"
 
