@@ -52,12 +52,12 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   const [modelUpdated, setModelUpdated] = useState(false)
   const [modelFitted, setModelFitted] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null);
-
+  const [rankdir, setRankdir] = useState<"TB" | "LR">("TB");
   const layoutNodes = (nodes: CustomNodeModel[], links: DefaultLinkModel[]) => {
     const g = new dagre.graphlib.Graph();
     
     g.setGraph({
-      rankdir: 'TB', // Top-to-bottom layout
+      rankdir: rankdir,
       ranksep: 350,
       marginx: 150,
       marginy: 100,
@@ -98,6 +98,34 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     });
   };
   
+  const toggleRankdir = () => {
+    setRankdir((prev) => (prev === "TB" ? "LR" : "TB"));
+  };
+  
+  const initializeGraph = () => {
+    const model = new DiagramModel();
+    
+    // Process data to revert to the initial layout
+    const { nodes, links } = processData({
+      origins,
+      vias,
+      destinations,
+      forwardConnection,
+      serializedGraph,
+    });
+    
+    layoutNodes(nodes, links);
+    
+    model.addAll(...nodes, ...links);
+    engine.setModel(model);
+    setModelUpdated(true);
+    setModelFitted(false);
+  };
+  
+  const resetGraph = () => {
+    initializeGraph()
+    setRankdir('TB')
+  };
   
   // This effect runs once to set up the engine
   useEffect(() => {
@@ -107,23 +135,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
 
   // This effect runs whenever origins, vias, or destinations change
   useEffect(() => {
-    const model = new DiagramModel();
-
-    // Process data using the refactored function
-    const { nodes, links } = processData({
-      origins,
-      vias,
-      destinations,
-      forwardConnection,
-      serializedGraph
-    });
-    
-    layoutNodes(nodes, links);
-
-    model.addAll(...nodes, ...links);
-    engine.setModel(model);
-    setModelUpdated(true);
-  }, [engine, serializedGraph, origins, vias, destinations, forwardConnection]);
+    initializeGraph()
+  }, [engine, serializedGraph, origins, vias, destinations, forwardConnection, rankdir]);
 
   // This effect prevents the default scroll and touchmove behavior
   useEffect(() => {
@@ -159,7 +172,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     return (
     modelUpdated ? (
         <div ref={containerRef} className={"graphContainer"}>
-          <NavigationMenu engine={engine} statementId={statementId || "-1"}/>
+          <NavigationMenu engine={engine} statementId={statementId || "-1"} rankdir={rankdir} toggleRankdir={toggleRankdir} resetGraph={resetGraph} />
           <InfoMenu engine={engine} forwardConnection={true}/>
           <CanvasWidget className={"graphContainer"} engine={engine}/>
         </div>)

@@ -8,16 +8,21 @@ import {DiagramEngine} from "@projectstorm/react-diagrams-core";
 import React, {useState} from "react";
 import {PatchedConnectivityStatementUpdate} from "../../../apiclient/backend";
 import connectivityStatementService from "../../../services/StatementService";
-
+import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
+import SwapVertOutlinedIcon from '@mui/icons-material/SwapVertOutlined';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 const ZOOM_CHANGE = 25
 
 interface NavigationMenuProps {
   engine: DiagramEngine;
   statementId: string;
+  rankdir: string;
+  toggleRankdir: () => void;
+  resetGraph: () => void;
 }
 
 const NavigationMenu = (props: NavigationMenuProps) => {
-  const {engine, statementId} = props
+  const {engine, statementId, toggleRankdir, rankdir, resetGraph} = props
   const [isSaving, setIsSaving] = useState<boolean>(false)
 
 
@@ -105,6 +110,14 @@ const NavigationMenu = (props: NavigationMenuProps) => {
       </IconButton>
       <IconButton onClick={() => saveGraph()}>
         <SaveIcon/>
+      </IconButton>
+      <IconButton onClick={toggleRankdir}>
+        {
+          rankdir === 'LR' ? <SwapVertOutlinedIcon/> : <SwapHorizOutlinedIcon/>
+        }
+      </IconButton>
+      <IconButton onClick={resetGraph}>
+        <HomeOutlinedIcon />
       </IconButton>
     </Stack>
   )
