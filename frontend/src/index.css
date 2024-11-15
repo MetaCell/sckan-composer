@@ -40,6 +40,11 @@ code {
   left: 0%;
 }
 
+.inPortAfferentTDestination {
+  position: absolute;
+  top: 100%;
+  left: 100%;
+}
 /* Horizontal graph */
 /* .outPort {
   position: absolute;

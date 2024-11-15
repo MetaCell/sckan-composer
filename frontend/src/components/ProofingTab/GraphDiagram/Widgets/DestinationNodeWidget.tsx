@@ -7,6 +7,8 @@ import {CustomNodeModel} from "../Models/CustomNodeModel";
 import {DiagramEngine} from "@projectstorm/react-diagrams-core";
 import {NodeTypes} from "../GraphDiagram";
 import {ArrowDownwardIcon, ArrowOutward, DestinationIcon, OriginIcon, ViaIcon} from "./icons";
+import {TypeC11Enum} from "../../../../apiclient/backend";
+import {DestinationTypeMapping} from "../../../../services/GraphDiagramService";
 
 interface DestinationNodeProps {
     model: CustomNodeModel;
@@ -32,6 +34,10 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
 
     const inPort = model.getPort("in");
     const hasForwardConnections = model.getOptions()?.forward_connection?.length > 0;
+    
+    const isAfferentT = model.getOptions().anatomicalType === DestinationTypeMapping["AFFERENT-T"]
+  
+    const edgeClassName = isAfferentT ? "inPortAfferentTDestination" : "inPortDestination"
 
     return (
         <Box
@@ -69,8 +75,8 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
                 </Typography>
                 {hasForwardConnections && <ArrowDownwardIcon style={{ position: 'absolute', bottom: '-0.5rem', left: '50%', transform: 'translateX(-50%)' }} />}
             </Box>
-            {inPort && <PortWidget className="inPortDestination" engine={engine} port={inPort}>
-              <div className="inPortDestination"/>
+            {inPort && <PortWidget className={edgeClassName} engine={engine} port={inPort}>
+              <div className={edgeClassName}/>
             </PortWidget>}
 
             {isActive && (

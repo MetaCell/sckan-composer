@@ -14,7 +14,7 @@ const ViaTypeMapping: Record<TypeB60Enum, string> = {
   [TypeB60Enum.Dendrite]: 'Dendrite'
 };
 
-const DestinationTypeMapping: Record<TypeC11Enum, string> = {
+export const DestinationTypeMapping: Record<TypeC11Enum, string> = {
   [TypeC11Enum.AxonT]: 'Axon terminal',
   [TypeC11Enum.AfferentT]: 'Afferent terminal',
   [TypeC11Enum.Unknown]: 'Not specified'

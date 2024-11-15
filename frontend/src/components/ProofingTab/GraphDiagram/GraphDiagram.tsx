@@ -1,19 +1,22 @@
-import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import InfoMenu from "./InfoMenu";
 import NavigationMenu from "./NavigationMenu";
 import createEngine, {
-    BasePositionModelOptions, DagreEngine,
-    DiagramModel, PathFindingLinkFactory, DiagramEngine } from '@projectstorm/react-diagrams';
+  BasePositionModelOptions,
+  DiagramModel, DefaultLinkModel
+} from '@projectstorm/react-diagrams';
 import {CanvasWidget} from '@projectstorm/react-canvas-core';
 import {CustomNodeFactory} from "./Factories/CustomNodeFactory";
 import {
   AnatomicalEntity,
-  DestinationSerializerDetails, TypeC11Enum,
+  DestinationSerializerDetails,
   ViaSerializerDetails
 } from "../../../apiclient/backend";
 import {useParams} from "react-router-dom";
-import { processData } from "../../../services/GraphDiagramService";
+import {DestinationTypeMapping, processData} from "../../../services/GraphDiagramService";
 
+import dagre from 'dagre';
+import {CustomNodeModel} from "./Models/CustomNodeModel";
 
 export enum NodeTypes {
   Origin = 'Origin',
@@ -37,36 +40,6 @@ interface GraphDiagramProps {
   serializedGraph?: any | undefined
 }
 
-
-function genDagreEngine(containsAfferentT: boolean) {
-    return new DagreEngine({
-        graph: {
-            rankdir: containsAfferentT ? 'BT' : 'TB',
-            ranksep: 350,
-            nodesep: 150,
-            marginx: 800,
-            marginy: 100,
-            edgesep: 10,
-        },
-    });
-}
-function reroute(engine: DiagramEngine) {
-    engine.getLinkFactories().getFactory<PathFindingLinkFactory>(PathFindingLinkFactory.NAME).calculateRoutingMatrix();
-}
-function autoDistribute(engine: DiagramEngine, containsAfferentT: boolean) {
-    const model = engine.getModel();
-
-    if (!model || model.getNodes().length === 0) {
-        return;
-    }
-    
-    const dagreEngine = genDagreEngine(containsAfferentT);
-    dagreEngine.redistribute(model);
-    
-    reroute(engine);
-    engine.repaintCanvas();
-}
-
 const GraphDiagram: React.FC<GraphDiagramProps> = ({
                                                      origins,
                                                      vias,
@@ -79,10 +52,51 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   const [modelUpdated, setModelUpdated] = useState(false)
   const [modelFitted, setModelFitted] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null);
-  
-  const containsAfferentT = destinations?.some(destination =>
-    destination.type === TypeC11Enum.AfferentT
-  ) || false;
+
+  const layoutNodes = (nodes: CustomNodeModel[], links: DefaultLinkModel[]) => {
+    const g = new dagre.graphlib.Graph();
+    
+    g.setGraph({
+      rankdir: 'TB', // Top-to-bottom layout
+      ranksep: 350,
+      marginx: 150,
+      marginy: 100,
+      edgesep: 10,
+    });
+    
+    g.setDefaultEdgeLabel(() => ({}));
+    
+    nodes.forEach(node => {
+      g.setNode(node.getID(), { width: 100, height: 50 });
+    });
+    
+    links.forEach(link => {
+      g.setEdge(link.getSourcePort().getNode().getID(), link.getTargetPort().getNode().getID());
+    });
+    
+    dagre.layout(g);
+    
+    const originNodes = nodes.filter(node => node.getCustomType() === NodeTypes.Origin);
+    const maxOriginX = Math.max(...originNodes.map(node => g.node(node.getID()).x || 0));
+    const minOriginY = Math.min(...originNodes.map(node => g.node(node.getID()).y || 0));
+
+    const afferentTNodes = nodes.filter(
+      node => node.getOptions().anatomicalType === DestinationTypeMapping["AFFERENT-T"]
+    );
+
+    afferentTNodes.forEach(afferentNode => {
+      const { x } = g.node(afferentNode.getID());
+      afferentNode.setPosition(maxOriginX + x, minOriginY);
+    });
+    
+    g.nodes().forEach((nodeId: string) => {
+      const node = nodes.find(n => n.getID() === nodeId);
+      if (node && !afferentTNodes.includes(node)) {
+        const { x, y } = g.node(nodeId);
+        node.setPosition(x, y);
+      }
+    });
+  };
   
   
   // This effect runs once to set up the engine
@@ -103,6 +117,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
       forwardConnection,
       serializedGraph
     });
+    
+    layoutNodes(nodes, links);
 
     model.addAll(...nodes, ...links);
     engine.setModel(model);
@@ -138,19 +154,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
       setModelFitted(true);
     }
   }, [modelUpdated, modelFitted, engine]);
-    
-    useLayoutEffect(() => {
-        autoDistribute(engine, containsAfferentT);
-    }, [engine, modelUpdated, containsAfferentT]);
-    
-    useEffect(() => {
-        const currentContainer = containerRef.current;
-        
-        if (modelUpdated && currentContainer) {
-            autoDistribute(engine, containsAfferentT);
-        }
-    }, [engine, modelUpdated, destinations, vias, origins, containsAfferentT]);
-    
+
+  
     return (
     modelUpdated ? (
         <div ref={containerRef} className={"graphContainer"}>
