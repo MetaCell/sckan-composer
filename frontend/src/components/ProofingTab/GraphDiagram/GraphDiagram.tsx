@@ -53,7 +53,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   const [modelFitted, setModelFitted] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null);
   const [rankdir, setRankdir] = useState<"TB" | "LR">("TB");
-  const layoutNodes = (nodes: CustomNodeModel[], links: DefaultLinkModel[]) => {
+  const layoutNodes = useCallback((nodes: CustomNodeModel[], links: DefaultLinkModel[]) => {
     const g = new dagre.graphlib.Graph();
     
     g.setGraph({
@@ -96,7 +96,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
         node.setPosition(x, y);
       }
     });
-  };
+  }, [rankdir]);
   
   const toggleRankdir = () => {
     setRankdir((prev) => (prev === "TB" ? "LR" : "TB"));
@@ -120,7 +120,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     engine.setModel(model);
     setModelUpdated(true);
     setModelFitted(false);
-  }, [engine, serializedGraph, origins, vias, destinations, forwardConnection, rankdir]);
+  }, [engine, serializedGraph, origins, vias, destinations, forwardConnection, layoutNodes]);
   
   const resetGraph = () => {
     initializeGraph()
