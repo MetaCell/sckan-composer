@@ -39,6 +39,7 @@ import {CustomFooter} from "../Widgets/HoveredOptionContent";
 import {StatementStateChip} from "../Widgets/StateChip";
 import {projections} from "../../services/ProjectionService";
 import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
+import Typography from "@mui/material/Typography";
 
 const StatementForm = (props: any) => {
   const {uiFields, statement, setStatement, isDisabled, action: refreshStatement} = props;
@@ -48,9 +49,52 @@ const StatementForm = (props: any) => {
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
+  copiedSchema.properties.statement_alerts.items.properties.alert_type.type = "number";
 
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["destination_type", "*"];
+  copiedSchema.properties.statement_alerts.title = " ";
+  
+  copiedUISchema.statement_alerts ={
+    "ui:ArrayFieldTemplate": (props: any) => {
+      return (
+        <div>
+          {props.items &&
+            props.items.map((element: any) => (
+              <div key={element.index} style={{ marginBottom: "1rem" }}>
+                <Typography variant="subtitle1">
+                  {props.formData[element.index]?.alert_type || "New Alert"}
+                </Typography>
+                {element.children}
+              </div>
+            ))}
+        </div>
+      );
+    },
+    "ui:options": {
+      orderable: false,
+      addable: false,
+      removable: false,
+      label: false,
+    },
+    items: {
+      "ui:label": false,
+      
+      id: {
+        "ui:widget": "hidden",
+      },
+      alert_type: {
+        "ui:widget": "hidden",
+      },
+      text: {
+        "ui:widget": "CustomTextArea",
+        "ui:options": {
+          placeholder: "Enter alert text here...",
+          rows: 3,
+        },
+      },
+    },
+  }
   copiedUISchema.circuit_type = {
     "ui:widget": "CustomSingleSelect",
     "ui:options": {
@@ -758,6 +802,7 @@ const StatementForm = (props: any) => {
         "knowledge_statement",
         "additional_information",
         "apinatomy_model",
+        "statement_alerts"
       ]}
       submitOnChangeFields={[
         "phenotype_id",
