@@ -13,6 +13,7 @@ from composer.models import (
     Via,
     Specie, Destination,
 )
+from django.contrib.auth.models import User
 from django_filters import rest_framework
 from django_filters import CharFilter, BaseInFilter
 
@@ -203,10 +204,25 @@ class NoteFilter(django_filters.FilterSet):
         field_name="connectivity_statement_id",
         queryset=ConnectivityStatement.objects.all(),
     )
+    include_system_notes = django_filters.BooleanFilter(
+        field_name="include_system_notes", method="get_notes", label="Include System Notes"
+    )
 
     class Meta:
         model = Note
         fields = []
+
+    @staticmethod
+    def get_notes(queryset, name, value):
+        if value:
+            return queryset
+        system_user = User.objects.get(username="system")
+        combined_queryset = queryset.filter(
+            Q(user=system_user, note__icontains="invalid") |
+            Q(user=system_user, note__icontains="exported") |
+            ~Q(user=system_user)
+        )
+        return combined_queryset.distinct()
 
 
 class ViaFilter(django_filters.FilterSet):
