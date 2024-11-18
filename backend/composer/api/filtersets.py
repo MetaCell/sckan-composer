@@ -76,7 +76,7 @@ class SentenceFilter(django_filters.FilterSet):
             ).order_by('owner_null', f'{reverse__order_direction}is_current_user', f'{order_direction}owner_full_name', *value)
         if 'last_edited' in value or '-last_edited' in value:
             order_direction = '-' if '-last_edited' in value else ''
-            return queryset.order_by(f'{order_direction}modified_date')
+            return queryset.order_by(f'{order_direction}modified_date', *value)
 
         return queryset.order_by(*value)
 
