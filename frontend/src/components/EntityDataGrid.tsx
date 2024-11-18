@@ -42,7 +42,7 @@ interface DataGridProps {
 }
 
 type criteria =
-  | ("id" | "-id" | "last_edited" | "-last_edited")[]
+  | ("id" | "-id" | "last_edited" | "-last_edited" | "owner" | "-owner")[]
   | undefined;
 
 const EntityDataGrid = (props: DataGridProps) => {
@@ -102,7 +102,7 @@ const EntityDataGrid = (props: DataGridProps) => {
       flex: 1,
       renderCell: renderDate,
     },
-    { field: "owner", headerName: "Owner", sortable: false, flex: 1 },
+    { field: "owner", headerName: "Owner", flex: 1 },
     {
       field: "tags",
       headerName: "Tags",
@@ -154,6 +154,10 @@ const EntityDataGrid = (props: DataGridProps) => {
         ordering = ["last_edited"];
       } else if (sortingCriteria === "last_edited desc") {
         ordering = ["-last_edited"];
+      } else if (sortingCriteria === "owner asc") {
+        ordering = ["owner"];
+      } else if (sortingCriteria === "owner desc") {
+        ordering = ["-owner"];
       } else {
         ordering = undefined;
       }
