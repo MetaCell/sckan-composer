@@ -57,13 +57,14 @@ const StatementForm = (props: any) => {
   
   copiedUISchema.statement_alerts ={
     "ui:ArrayFieldTemplate": (props: any) => {
+      console.log(props)
       return (
         <div>
           {props.items &&
             props.items.map((element: any) => (
               <div key={element.index} style={{ marginBottom: "1rem" }}>
                 <Typography variant="subtitle1">
-                  {props.formData[element.index]?.alert_type || "New Alert"}
+                  {props.formData[element.index]?.name || "New Alert"}
                 </Typography>
                 {element.children}
               </div>

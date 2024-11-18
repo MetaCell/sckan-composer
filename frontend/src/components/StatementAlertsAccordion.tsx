@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import {
   Accordion,
   AccordionDetails,
@@ -9,19 +9,14 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import StatementForm from "../components/Forms/StatementForm";
+import connectivityStatementService from "../services/StatementService";
 
 const StatementAlertsAccordion = (props: any) => {
   const { statement, refreshStatement, isDisabled, setStatement } = props;
   
   const [expanded, setExpanded] = useState<boolean>(false);
   const [activeTypes, setActiveTypes] = useState<number[]>([]);
-  
-  const alertTypes = [
-    { id: 1, label: "Alert Type 1" },
-    { id: 2, label: "Alert Type 2" },
-    { id: 3, label: "Alert Type 3" },
-  ];
-  
+  const [alerts, setAlerts] = useState<any[]>([]);
   const handleChange = (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded);
   };
@@ -39,6 +34,16 @@ const StatementAlertsAccordion = (props: any) => {
       setStatement(updatedStatement);
     }
   };
+  
+  useEffect(() => {
+    connectivityStatementService.getAlertsList().then((res) => {
+      setAlerts(res.results)
+    });
+  }, []);
+  
+  useEffect(() => {
+    setActiveTypes(statement.statement_alerts.map((row: any) => row.alert_type))
+  }, [statement]);
   
   return (
     <Box px={2} py={0.5}>
@@ -64,10 +69,10 @@ const StatementAlertsAccordion = (props: any) => {
         </AccordionSummary>
         <AccordionDetails sx={{ px: 4, pt: 0, pb: 2 }}>
           <Box>
-            {alertTypes.map((type) => (
+            {alerts.map((type) => (
               <Chip
                 key={type.id}
-                label={activeTypes.includes(type.id) ? type.label : `+ ${type.label}`}
+                label={activeTypes.includes(type.id) ? type.name : `+ ${type.name}`}
                 clickable
                 color={activeTypes.includes(type.id) ? "primary" : "default"}
                 onClick={() => handleChipClick(type.id)}

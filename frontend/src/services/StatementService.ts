@@ -231,6 +231,10 @@ class ConnectivityStatementService extends AbstractService {
     return composerApi.composerSexList(undefined).then((res: any) => res.data);
   }
 
+  async getAlertsList() {
+    return composerApi.composerAlertList(undefined).then((res: any) => res.data);
+  }
+
   async assignOwner(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement): Promise<ConnectivityStatement> {
     return composerApi.composerConnectivityStatementAssignOwnerPartialUpdate(id, patchedConnectivityStatement).then((response: any) => response.data);
   }
