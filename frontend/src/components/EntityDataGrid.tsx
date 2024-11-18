@@ -36,6 +36,7 @@ import Stack from "@mui/material/Stack";
 interface DataGridProps {
   entityType: "sentence" | "statement";
   entityList: (Sentence | BaseConnectivityStatement)[] | undefined;
+  allowSortByOwner?: boolean;
   queryOptions: SentenceQueryParams | StatementQueryParams;
   loading: boolean;
   totalResults: number;
@@ -46,7 +47,7 @@ type criteria =
   | undefined;
 
 const EntityDataGrid = (props: DataGridProps) => {
-  const { entityList, entityType, queryOptions, loading, totalResults } = props;
+  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false } = props;
 
   const currentPage = (queryOptions.index || 0) / queryOptions.limit;
 
@@ -102,7 +103,7 @@ const EntityDataGrid = (props: DataGridProps) => {
       flex: 1,
       renderCell: renderDate,
     },
-    { field: "owner", headerName: "Owner", flex: 1 },
+    { field: "owner", headerName: "Owner", flex: 1, sortable: allowSortByOwner },
     {
       field: "tags",
       headerName: "Tags",
