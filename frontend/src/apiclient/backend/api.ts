@@ -492,7 +492,7 @@ export interface ConnectivityStatementUpdate {
      * @type {string}
      * @memberof ConnectivityStatementUpdate
      */
-    'state'?: string;
+    'state': string;
     /**
      * 
      * @type {Array<AvailableTransitions24dEnum>}

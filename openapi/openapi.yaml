@@ -2244,7 +2244,7 @@ components:
           nullable: true
         state:
           type: string
-          maxLength: 50
+          readOnly: true
         available_transitions:
           type: array
           items:
@@ -2350,6 +2350,7 @@ components:
       - projection_phenotype
       - sentence
       - sex
+      - state
       - statement_preview
       - tags
     Destination:
@@ -2953,7 +2954,7 @@ components:
           nullable: true
         state:
           type: string
-          maxLength: 50
+          readOnly: true
         available_transitions:
           type: array
           items:
