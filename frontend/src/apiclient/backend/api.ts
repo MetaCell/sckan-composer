@@ -7411,8 +7411,10 @@ export type ComposerConnectivityStatementListStateEnum = typeof ComposerConnecti
 export const ComposerSentenceListOrderingEnum = {
     Id: '-id',
     LastEdited: '-last_edited',
+    Owner: '-owner',
     Id2: 'id',
-    LastEdited2: 'last_edited'
+    LastEdited2: 'last_edited',
+    Owner2: 'owner'
 } as const;
 export type ComposerSentenceListOrderingEnum = typeof ComposerSentenceListOrderingEnum[keyof typeof ComposerSentenceListOrderingEnum];
 /**

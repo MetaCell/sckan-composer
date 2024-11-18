@@ -1261,8 +1261,10 @@ paths:
             enum:
             - -id
             - -last_edited
+            - -owner
             - id
             - last_edited
+            - owner
         description: Ordering
         explode: false
         style: form
