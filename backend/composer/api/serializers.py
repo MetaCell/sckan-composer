@@ -539,19 +539,22 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         user = request.user if request else None
         return [t.name for t in instance.get_available_user_state_transitions(user)]
 
+    def _get_cached_journey(self, instance):
+        if not hasattr(self, '_cached_journey'):
+            self._cached_journey = {}
+        if instance.id not in self._cached_journey:
+            self._cached_journey[instance.id] = instance.get_journey()
+        return self._cached_journey[instance.id]
+
     def get_journey(self, instance):
-        if 'journey' not in self.context:
-            self.context['journey'] = instance.get_journey()
-        return self.context['journey']
+        return self._get_cached_journey(instance)['paths']
 
     def get_entities_journey(self, instance):
-        self.context['entities_journey'] = instance.get_entities_journey()
-        return self.context['entities_journey']
+        return self._get_cached_journey(instance)['detailed_paths']
 
     def get_statement_preview(self, instance):
-        if 'journey' not in self.context:
-            self.context['journey'] = instance.get_journey()
-        return self.create_statement_preview(instance, self.context['journey'])
+        journey = self.get_journey(instance)
+        return self.create_statement_preview(instance, journey)
 
     def create_statement_preview(self, instance, journey):
         sex = instance.sex.sex_str if instance.sex else None
@@ -615,9 +618,6 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
                 many=True,
                 context={**self.context, 'depth': depth + 1}
             ).data
-
-        if 'journey' in self.context:
-            del self.context['journey']
 
         return representation
 
@@ -744,6 +744,7 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
     """Knowledge Statement"""
 
     def to_representation(self, instance):
+        # We are skipping the to_representation of ConnectivityStatementSerializer so that forward_connection gets serialized by the KnowledgeStatementSerializer
         representation = super(ConnectivityStatementSerializer, self).to_representation(instance)
         depth = self.context.get('depth', 0)
 
@@ -753,9 +754,6 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
                 many=True,
                 context={**self.context, 'depth': depth + 1}
             ).data
-
-        if 'journey' in self.context:
-            del self.context['journey']
 
         return representation
 

@@ -1,4 +1,5 @@
 import json
+from pyinstrument import Profiler
 
 from django.http import HttpResponse, Http404
 from drf_react_template.schema_form_encoder import SchemaProcessor, UiSchemaProcessor
@@ -395,7 +396,17 @@ class KnowledgeStatementViewSet(
     """
 
     model = ConnectivityStatement
-    queryset = ConnectivityStatement.objects.exported()
+    queryset = ConnectivityStatement.objects.exported().select_related(
+        'sentence', 'owner', 'phenotype', 'sex', 'functional_circuit_role', 'projection_phenotype'
+    ).prefetch_related(
+        'origins',
+        'species',
+        'tags',
+        'forward_connection',
+        'destinations',
+        'via_set',
+        'provenance_set',
+    )
     serializer_class = KnowledgeStatementSerializer
     permission_classes = [
         permissions.AllowAny,
@@ -411,7 +422,12 @@ class KnowledgeStatementViewSet(
         return KnowledgeStatementSerializer
 
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        profiler = Profiler()
+        profiler.start()
+        response =  super().list(request, *args, **kwargs)
+        profiler.stop()
+        print(profiler.output_text(unicode=True, color=True))
+        return response
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):

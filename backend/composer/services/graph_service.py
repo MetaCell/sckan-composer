@@ -197,6 +197,6 @@ def compile_journey(connectivity_statement) -> dict:
         journey_descriptions.append(sentence)
 
     return {
-        'journey': journey_descriptions,
-        'entities': entities
+        'paths': journey_descriptions,
+        'detailed_paths': entities
     }
