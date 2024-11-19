@@ -60,7 +60,7 @@ class SentenceFilter(django_filters.FilterSet):
         if 'owner' in value or '-owner' in value:
             order_direction = '-' if '-owner' in value else ''
             reverse__order_direction = '' if '-owner' in value else '-'
-            return queryset.annotate(
+            queryset = queryset.annotate(
                 owner_full_name=Coalesce(
                     'owner__first_name', Value(' '), 'owner__last_name'),
                 owner_null=Case(
@@ -73,12 +73,15 @@ class SentenceFilter(django_filters.FilterSet):
                     default=Value(0),
                     output_field=IntegerField()
                 )
-            ).order_by('owner_null', f'{reverse__order_direction}is_current_user', f'{order_direction}owner_full_name', *value)
+            ).order_by('owner_null', f'{reverse__order_direction}is_current_user', f'{order_direction}owner_full_name')
         if 'last_edited' in value or '-last_edited' in value:
             order_direction = '-' if '-last_edited' in value else ''
-            return queryset.order_by(f'{order_direction}modified_date', *value)
 
-        return queryset.order_by(*value)
+            queryset = queryset.order_by(f'{order_direction}modified_date')
+
+        other_ordering = [v for v in value if v not in [
+            'owner', '-owner', 'last_edited', '-last_edited']]
+        return queryset if not other_ordering else queryset.order_by(*other_ordering)
 
     class Meta:
         model = Sentence
