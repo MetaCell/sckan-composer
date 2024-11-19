@@ -1,6 +1,5 @@
-import json
 from pyinstrument import Profiler
-
+import json
 from django.http import HttpResponse, Http404
 from drf_react_template.schema_form_encoder import SchemaProcessor, UiSchemaProcessor
 from drf_spectacular.types import OpenApiTypes
@@ -349,7 +348,7 @@ class ConnectivityStatementViewSet(
     service = ConnectivityStatementStateService
 
     def get_serializer_class(self):
-        if self.action in ['update', 'partial_update']:
+        if self.action in ["update", "partial_update"]:
             return ConnectivityStatementUpdateSerializer
         if self.action == "list":
             return BaseConnectivityStatementSerializer
@@ -387,30 +386,18 @@ class ConnectivityStatementViewSet(
         return super().partial_update(request, *args, **kwargs)
 
 
+
 @extend_schema(tags=["public"])
-class KnowledgeStatementViewSet(
-    generics.ListAPIView,
-):
+class KnowledgeStatementViewSet(generics.ListAPIView):
     """
     KnowledgeStatement that only allows GET to get the list of ConnectivityStatements
     """
 
     model = ConnectivityStatement
-    queryset = ConnectivityStatement.objects.exported().select_related(
-        'sentence', 'owner', 'phenotype', 'sex', 'functional_circuit_role', 'projection_phenotype'
-    ).prefetch_related(
-        'origins',
-        'species',
-        'tags',
-        'forward_connection',
-        'destinations',
-        'via_set',
-        'provenance_set',
-    )
+    queryset = ConnectivityStatement.objects.exported()
+
     serializer_class = KnowledgeStatementSerializer
-    permission_classes = [
-        permissions.AllowAny,
-    ]
+    permission_classes = [permissions.AllowAny]
     filter_backends = [DjangoFilterBackend]
     filterset_class = KnowledgeStatementFilterSet
 
@@ -424,11 +411,14 @@ class KnowledgeStatementViewSet(
     def list(self, request, *args, **kwargs):
         profiler = Profiler()
         profiler.start()
-        response =  super().list(request, *args, **kwargs)
+        try:
+            response = super().list(request, *args, **kwargs)
+        except Exception as e:
+            print(e)
+            return
         profiler.stop()
         print(profiler.output_text(unicode=True, color=True))
         return response
-
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """

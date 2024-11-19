@@ -87,12 +87,15 @@ class ConnectivityStatementManager(models.Manager):
             super()
             .get_queryset()
             .select_related(
+                
+                "sentence",
                 "owner",
                 "phenotype",
-                "sentence",
                 "sex",
+                "functional_circuit_role",
+                "projection_phenotype",
             )
-            .prefetch_related("notes", "tags", "provenance_set", "species", "origins", "destinations")
+            .prefetch_related("notes", "tags", "provenance_set", "species", "origins", "destinations", "via_set")
         )
 
     def excluding_draft(self):
@@ -300,17 +303,17 @@ class AnatomicalEntity(models.Model):
 
     @property
     def name(self):
-        if self.simple_entity:
+        if self.simple_entity_id:
             return str(self.simple_entity)
-        if self.region_layer:
+        elif self.region_layer_id:
             return str(self.region_layer)
         return 'Unknown Anatomical Entity'
 
     @property
     def ontology_uri(self):
-        if self.simple_entity:
+        if self.simple_entity_id:
             return self.simple_entity.ontology_uri
-        elif self.region_layer:
+        elif self.region_layer_id:
             return f'{self.region_layer.region.ontology_uri},{self.region_layer.layer.ontology_uri}'
         return 'Unknown URI'
 
