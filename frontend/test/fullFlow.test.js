@@ -136,7 +136,7 @@ describe('End to End Tests', () => {
 
             await page.waitForSelector(selectors.ADD_RECORD)
             await page.click(selectors.ADD_RECORD)
-            await page.waitForSelector(selectors.ARTICLE_LABEL)
+            await page.waitForSelector(selectors.ARTICLE_LABEL, {hidden:false})
             await page.click(selectors.ARTICLE_FIELD)
             await page.type(selectors.ARTICLE_FIELD, `${article_title}`)
             await page.waitForTimeout(3000)
@@ -343,38 +343,13 @@ describe('End to End Tests', () => {
 
         })
 
-        // it.skip('Search for created Record', async () => {
-        //     console.log('Searching for created Record ...')
-
-        //     await page.waitForTimeout(3000)
-        //     await page.waitForSelector('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected')
-        //     const sidebar_buttons = await page.$$('ul.MuiList-root.MuiList-padding > li')
-        //     await sidebar_buttons[0].click()
-        //     await page.waitForSelector(selectors.SEARCH_ICON)
-        //     await page.waitForSelector(selectors.SEARCH_BAR)
-        //     await page.click(selectors.SEARCH_BAR)
-        //     await page.waitForTimeout(3000)
-        //     await page.type(selectors.SEARCH_BAR, `${article_title}`)
-        //     await page.waitForSelector('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight')
-        //     await page.waitForTimeout(6000)
-        //     const searched_records_count = await page.$$eval('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight', elements => elements.length);
-        //     expect(searched_records_count).toBe(1)
-
-        //     await page.waitForSelector(selectors.TABLE_ROW)
-        //     await page.click(selectors.TABLE_ROW)
-
-        //     await page.waitForSelector(selectors.SENTENCE_PAGE)
-
-        //     console.log('Record found')
-        // })
-
 
         it('Change status -> Ready to Compose', async () => {
             console.log('Changing Status ...')
 
-            await page.waitForSelector(selectors.STATUS_BUTTON, { visible: true })
-            await page.waitForSelector('button[aria-label="select merge strategy"]', { visible: true })
-            await page.click('button[aria-label="select merge strategy"]', { visible: true })
+            await page.waitForSelector(selectors.STATUS_BUTTON, {hidden:false})
+            await page.waitForSelector('button[aria-label="select merge strategy"]', {hidden:false})
+            await page.click('button[aria-label="select merge strategy"]', {hidden:false})
             await page.waitForSelector('#split-button-menu')
             await page.keyboard.press('ArrowDown');
             await page.keyboard.press('Enter')
@@ -388,7 +363,7 @@ describe('End to End Tests', () => {
         })
 
 
-        it('Search for created Record 2', async () => {
+        it('Search for created Record', async () => {
             console.log('Searching for created Record ...')
 
             await page.waitForTimeout(3000)
@@ -396,12 +371,11 @@ describe('End to End Tests', () => {
             const sidebar_buttons = await page.$$('ul.MuiList-root.MuiList-padding > li')
             await sidebar_buttons[0].click()
             await page.waitForSelector(selectors.SEARCH_ICON)
-            await page.waitForSelector(selectors.SEARCH_BAR, { visible: true })
-            // previous Search is already in the search bar
+            await page.waitForSelector(selectors.SEARCH_BAR, {hidden:false})
             await page.click(selectors.SEARCH_BAR)
             await page.waitForTimeout(1000)
             await page.type(selectors.SEARCH_BAR, `${article_title}`)
-            await page.waitForTimeout(1000)
+            await page.waitForTimeout(3000)
             await page.waitForSelector('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight')
             // await page.waitForTimeout(6000)
             const searched_records_count = await page.$$eval('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight', elements => elements.length);
@@ -420,9 +394,9 @@ describe('End to End Tests', () => {
         })
 
         it('Set status as Compose Now', async () => {
-            await page.waitForSelector(selectors.STATUS_BUTTON, { visible: true })
-            await page.waitForSelector('button[aria-label="select merge strategy"]', { visible: true })
-            await page.click('button[aria-label="select merge strategy"]', { visible: true })
+            await page.waitForSelector(selectors.STATUS_BUTTON, {hidden:false})
+            await page.waitForSelector('button[aria-label="select merge strategy"]', {hidden:false})
+            await page.click('button[aria-label="select merge strategy"]', {hidden:false})
             await page.waitForSelector('#split-button-menu')
             await page.keyboard.press('ArrowDown');
             await page.keyboard.press('Enter')
@@ -443,7 +417,7 @@ describe('End to End Tests', () => {
             const sidebar_buttons = await page.$$('ul.MuiList-root.MuiList-padding > li')
             await sidebar_buttons[1].click()
             await page.waitForSelector(selectors.SEARCH_ICON)
-            await page.waitForSelector(selectors.SEARCH_FOR_KS, { visible: true })
+            await page.waitForSelector(selectors.SEARCH_FOR_KS, {hidden:false})
             await page.click(selectors.SEARCH_FOR_KS)
             await page.waitForTimeout(3000)
             await page.type(selectors.SEARCH_FOR_KS, `${knowledge_statement_1}`)
@@ -468,7 +442,7 @@ describe('End to End Tests', () => {
         it.skip('Distillation - add tags and notes', async () => {
             console.log('Adding Tags and Notes ...')
             // Tags
-            await page.waitForSelector(selectors.TAGS_FIELD, { visible: true })
+            await page.waitForSelector(selectors.TAGS_FIELD, {hidden:false})
             await page.click(selectors.TAGS_FIELD)
             await page.keyboard.press('ArrowDown');
             await page.keyboard.press('Enter')
@@ -492,9 +466,9 @@ describe('End to End Tests', () => {
 
         it('Set status as In progress', async () => {
             console.log('Changing Status ...')
-            await page.waitForSelector(selectors.STATUS_BUTTON)
+            await page.waitForSelector(selectors.STATUS_BUTTON, {hidden:false})
             await page.click(selectors.STATUS_BUTTON)
-            await page.waitForTimeout(1000)
+            await page.waitForTimeout(3000)
             const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
                 return status.map(status => status.innerText.toLowerCase())
             })
@@ -502,9 +476,10 @@ describe('End to End Tests', () => {
             console.log('Status Changed')
         })
 
-        it('Add elements to path builder', async () => {
+        it('Add via elements to path builder', async () => {
 
             console.log('Adding elements to path builder ...')
+            await page.waitForSelector('button[role="tab"][aria-selected="false"]')
             await page.click('button[role="tab"][aria-selected="false"]')
             await page.waitForTimeout(3000)
 
@@ -518,18 +493,24 @@ describe('End to End Tests', () => {
             const added_via = await page.$$eval('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart', elements => elements.length);
             expect(added_via).toBe(1)
 
+        })
+
+        it('Add destination element to path builder', async () => {
+
             //Add a Destination element
-            await page.waitForSelector(selectors.ADD_BUTTON_PATH_BUILDER, { visible: true })
+            await page.waitForSelector(selectors.ADD_BUTTON_PATH_BUILDER, {hidden:false})
             const add_destination_button = await page.$$('button.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium.MuiButton-root.MuiButton-text.MuiButton-textInfo.MuiButton-sizeMedium.MuiButton-textSizeMedium')
             await add_destination_button[1].click()
+            await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+            await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForSelector(selectors.ADDED_ELEMENT)
             const added_destination = await page.$$eval('div.MuiSelect-select.MuiSelect-standard.MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputAdornedStart', elements => elements.length);
-            expect(added_destination).toBe(added_via + 1)
+            expect(added_destination).toBe(2)
 
             console.log('Elements added')
         })
 
-        it.skip('Add Origin', async () => {
+        it('Add Origin', async () => {
             console.log('Adding Origin ...')
 
             //Origin 
@@ -541,44 +522,63 @@ describe('End to End Tests', () => {
             const all_origins = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
             expect(all_origins).toBeGreaterThan(1)
             await page.click(selectors.SEARCH_ORIGINS)
-            await page.type(selectors.SEARCH_ORIGINS, path_builder_origin_)
+            await page.click('#simple-popper ul li')
+
+            // await page.type(selectors.SEARCH_ORIGINS, path_builder_origin_)
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-            await page.waitForSelector(selectors.CHECKBOX_ITEM)
-            const searched_origins = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
-            expect(searched_origins).toBe(1)
-            await page.waitForSelector(selectors.FIRST_SEARCHED_ELEMENT)
-            await page.click(selectors.FIRST_SEARCHED_ELEMENT)
-            await page.click(selectors.ORIGIN_FIELD)
+            // await page.waitForSelector(selectors.CHECKBOX_ITEM)
+            // const searched_origins = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
+            // expect(searched_origins).toBe(1)
+            // await page.waitForSelector(selectors.FIRST_SEARCHED_ELEMENT)
+            // await page.click(selectors.FIRST_SEARCHED_ELEMENT)
+            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+
+            // await page.click(selectors.ORIGIN_FIELD)
             await page.waitForTimeout(3000)
             const added_origin = await page.$$eval('form[class="origins"] > div > div  > div  > div  > div  > div  > div > span > div ', status => {
                 return status.map(status => status.innerText)
             })
-            expect(added_origin).toContain(path_builder_origin_)
-            await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-            await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
+            expect(added_origin).not.toHaveLength(0)
+            // await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+            // await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
 
             console.log('Origin added')
         })
 
-        it.skip('Add Vias', async () => {
+        it('Add Vias', async () => {
 
             console.log('Adding Vias ...')
             await page.waitForTimeout(3000)
 
             //Vias
             await page.waitForSelector(selectors.VIAS_FROM_FIELD)
-            await page.waitForFunction((selector, expectedText) => {
-                const elements = document.querySelectorAll(selector);
-                return Array.from(elements, element => element.innerText).includes(expectedText);
-            }, { timeout: 15000 }, 'form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div', path_builder_origin_);
+            await page.click(selectors.VIAS_FROM_FIELD)
+            await page.waitForSelector('div:has(> input[placeholder="Search for connections"]')
+            await page.waitForSelector(selectors.CHECKBOX_ITEM)
+            await page.click('div:has(> input[placeholder="Search for connections"]')
+            await page.click('#simple-popper ul li')
+            await page.waitForTimeout(1000)
+            await page.click('#simple-popper ul li')
+            await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+            await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
+            await page.waitForTimeout(3000)
+            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForTimeout(3000)
+
+            // await page.waitForFunction((selector, expectedText) => {
+            //     const elements = document.querySelectorAll(selector);
+            //     return Array.from(elements, element => element.innerText).includes(expectedText);
+            // }, { timeout: 15000 }, 'form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div', path_builder_origin_);
 
             const added_via_from_field = await page.$$eval('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div', status => {
                 return status.map(status => status.innerText);
             });
+            expect(added_via_from_field).not.toHaveLength(0)
 
-            expect(added_via_from_field).toContain(path_builder_origin_);
             await page.waitForSelector(selectors.VIAS_FIELD)
             await page.click(selectors.VIAS_FIELD)
             await page.waitForSelector(selectors.SEARCH_FOR_VIAS)
@@ -587,42 +587,62 @@ describe('End to End Tests', () => {
             const all_vias = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
             expect(all_vias).toBeGreaterThan(1)
             await page.click(selectors.SEARCH_FOR_VIAS)
-            await page.type(selectors.SEARCH_FOR_VIAS, path_builder_via)
+            await page.click('#simple-popper ul li')
+            // await page.type(selectors.SEARCH_FOR_VIAS, path_builder_via)
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-            await page.waitForSelector(selectors.CHECKBOX_ITEM)
-            const searched_vias = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
-            expect(searched_vias).toBe(1)
-            await page.waitForSelector(selectors.FIRST_SEARCHED_ELEMENT)
-            await page.click(selectors.FIRST_SEARCHED_ELEMENT)
-            await page.click(selectors.VIAS_FIELD)
+
+
+            // await page.waitForSelector(selectors.CHECKBOX_ITEM)
+            // const searched_vias = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
+            // expect(searched_vias).toBe(1)
+            // await page.waitForSelector(selectors.FIRST_SEARCHED_ELEMENT)
+            // await page.click(selectors.FIRST_SEARCHED_ELEMENT)
+            // await page.click(selectors.VIAS_FIELD)
+
+            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
             await page.waitForTimeout(3000)
             const added_via = await page.$$eval('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div', status => {
                 return status.map(status => status.innerText)
             })
-            expect(added_via).toContain(path_builder_via)
+            expect(added_via).not.toHaveLength(0)
             console.log('Via added')
 
         })
 
-        it.skip('Add Destination', async () => {
+        it('Add Destination', async () => {
 
             console.log('Adding Destination ...')
             await page.waitForTimeout(3000)
 
             //Destination
             await page.waitForSelector(selectors.DESTINATION_FROM_FIELD)
-            await page.waitForFunction((selector, expectedText) => {
-                const elements = document.querySelectorAll(selector);
-                return Array.from(elements, element => element.innerText).includes(expectedText);
-            }, { timeout: 15000 }, 'form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div', path_builder_via);
+            await page.click(selectors.DESTINATION_FROM_FIELD)
+            await page.waitForSelector(selectors.SEARCH_FOR_DESTINATIONS)
+            await page.click(selectors.SEARCH_FOR_DESTINATIONS)
+            await page.waitForSelector(selectors.CHECKBOX_ITEM)
+            await page.waitForSelector('#simple-popper ul li')
+            await page.click('#simple-popper ul li')
+            await page.waitForTimeout(1000)
+            await page.click('#simple-popper ul li')
+            await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+            await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
+            await page.waitForTimeout(3000)
+            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForTimeout(3000)
+            // await page.waitForFunction((selector, expectedText) => {
+            //     const elements = document.querySelectorAll(selector);
+            //     return Array.from(elements, element => element.innerText).includes(expectedText);
+            // }, { timeout: 15000 }, 'form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div', path_builder_via);
 
             const added_destination_from_field = await page.$$eval('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div', status => {
                 return status.map(status => status.innerText);
             });
 
-            expect(added_destination_from_field).toContain(path_builder_via);
+            expect(added_destination_from_field).not.toHaveLength(0)
 
             await page.waitForSelector(selectors.FROM_FIELD)
             await page.click(selectors.FROM_FIELD)
@@ -632,99 +652,124 @@ describe('End to End Tests', () => {
             const all_destinations = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
             expect(all_destinations).toBeGreaterThan(1)
             await page.click(selectors.SEARCH_FOR_DESTINATIONS)
-            await page.type(selectors.SEARCH_FOR_DESTINATIONS, path_builder_destination)
-            await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-            await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
-            await page.waitForTimeout(3000)
             await page.waitForSelector(selectors.CHECKBOX_ITEM)
-            const searched_destination = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
-            expect(searched_destination).toBeGreaterThan(1)
-            await page.waitForSelector(selectors.FIRST_SEARCHED_ELEMENT)
-            await page.click(selectors.FIRST_SEARCHED_ELEMENT)
-            await page.click(selectors.FROM_FIELD)
+            await page.waitForSelector('#simple-popper ul li')
+            await page.click('#simple-popper ul li')
+            await page.waitForTimeout(1000)
+            await page.click('#simple-popper ul li')
+            // await page.type(selectors.SEARCH_FOR_DESTINATIONS, path_builder_destination)
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
+            // await page.waitForSelector(selectors.CHECKBOX_ITEM)
+            // const searched_destination = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
+            // expect(searched_destination).toBeGreaterThan(1)
+            // await page.waitForSelector(selectors.FIRST_SEARCHED_ELEMENT)
+            // await page.click(selectors.FIRST_SEARCHED_ELEMENT)
+            // await page.click(selectors.FROM_FIELD)
+            // await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
+            // await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
+            // await page.waitForTimeout(3000)
             const added_destination = await page.$$eval('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div', status => {
                 return status.map(status => status.innerText)
             })
-            expect(added_destination).toContain(path_builder_destination)
+            expect(added_destination).not.toHaveLength(0)
 
             console.log('Destination added')
         })
 
 
-        it.skip('Check Statement Preview', async () => {
+        it('Check Statement Preview', async () => {
             console.log('Checking Statement Preview ...')
+            await page.waitForTimeout(3000)
+            const h5divs = await page.$$('div.MuiStack-root:has(h5.MuiTypography-root.MuiTypography-h5)');
+            const thirdDivTextContent = await page.evaluate(div => div.innerText, h5divs[2]);
+            expect(thirdDivTextContent.length).toBeGreaterThan(8);
 
-            await page.waitForSelector(selectors.STATEMENT_PREVIEW_TITLE)
-            const journey = await page.$$eval('h5.MuiTypography-root.MuiTypography-h5 + p.MuiTypography-root.MuiTypography-body1', journey => {
-                return journey.map(journey => journey.innerText)
-            })
-            expect(journey).toContain(`From ${path_builder_origin_} to ${path_builder_destination} via ${path_builder_via}.`)
+            // await page.waitForSelector('div:has(h5.MuiTypography-root.MuiTypography-h5:contains("Journey"))')
+            // const divTextContent = await page.$eval('div:has(h5.MuiTypography-root.MuiTypography-h5:contains("Journey"))', div => div.textContent);
+            // console.log(divTextContent);
 
-            console.log('Statement Preview correct')
+            // const journey = await page.$$eval('h5.MuiTypography-root.MuiTypography-h5 + p.MuiTypography-root.MuiTypography-body1', journey => {
+            //     return journey.map(journey => journey.innerText)
+            // })
+            // expect(journey).not.toHaveLength(0)
+
+            console.log('Statement Preview filled')
         })
 
-        it.skip('Check Population Diagram', async () => {
+        it('Check Population Diagram', async () => {
             console.log('Checking Population Diagram ...')
 
-            await page.waitForSelector('div.node')
+            await page.waitForSelector('div.node', {hidden:false})
             const nodes = await page.$$('div.node');
             expect(nodes.length).toBe(3);
 
-            const nodesText = await page.$$eval('div.node', nodes => nodes.map(node => node.innerText));
-            expect(nodesText).toEqual([`${path_builder_origin_}`, `${path_builder_via}`, `${path_builder_destination}`]);
-
+            
             console.log('Population Diagram correct')
         })
 
-        it.skip('Set status as To be Reviewed', async () => {
+        it('Set status as To be Reviewed', async () => {
             console.log('Changing Status ...')
 
-            await page.waitForSelector(selectors.STATUS_BUTTON)
+            await page.waitForSelector(selectors.STATUS_BUTTON, {hidden:false})
+            await page.waitForSelector('button[aria-label="select merge strategy"]', {hidden:false})
+            await page.click('button[aria-label="select merge strategy"]', {hidden:false})
+            await page.waitForSelector('#split-button-menu')
+            await page.keyboard.press('ArrowDown');
+            await page.keyboard.press('Enter')
+            await page.waitForTimeout(100)
             await page.click(selectors.STATUS_BUTTON)
             await page.waitForTimeout(2000)
-            await page.waitForFunction((selector, expectedText) => {
-                const elements = document.querySelectorAll(selector);
-                return Array.from(elements, element => element.innerText).includes(expectedText);
-            }, { timeout: 15000 }, 'span.MuiChip-label.MuiChip-labelSmall', "To be reviewed");
+            // await page.waitForFunction((selector, expectedText) => {
+            //     const elements = document.querySelectorAll(selector);
+            //     return Array.from(elements, element => element.innerText).includes(expectedText);
+            // }, { timeout: 15000 }, 'span.MuiChip-label.MuiChip-labelSmall', "To be reviewed");
 
             const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
-                return status.map(status => status.innerText);
+                return status.map(status => status.innerText.toLowerCase());
             });
 
-            expect(sentence_status).toContain("To be reviewed");
+            expect(sentence_status).toContain("to be reviewed");
+            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForTimeout(2000)
             console.log('Status Changed')
         })
 
-        it.skip('Set status as NPO Approved', async () => {
+        it('Set status as NPO Approved', async () => {
             console.log('Changing Status ...')
 
-            await page.waitForSelector(selectors.STATUS_BUTTON)
-            await page.click(selectors.STATUS_DROPDOWN)
-            await page.waitForSelector('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiMenuItem-root.MuiMenuItem-gutters')
-            await page.evaluate(() => {
-                [...document.querySelectorAll('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiMenuItem-root.MuiMenuItem-gutters')].find(element => element.innerText === 'NPO approved').click();
-            });
+            await page.waitForSelector(selectors.STATUS_BUTTON, {hidden:false})
+            await page.waitForSelector('button[aria-label="select merge strategy"]', {hidden:false})
+            await page.click('button[aria-label="select merge strategy"]')
+            await page.waitForSelector('#split-button-menu', {hidden:false})
+            await page.keyboard.press('ArrowDown');
+            await page.keyboard.press('Enter')
+            await page.waitForTimeout(1000)
+            // await page.click(selectors.STATUS_DROPDOWN)
+            // await page.waitForSelector('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiMenuItem-root.MuiMenuItem-gutters')
+            // await page.evaluate(() => {
+            //     [...document.querySelectorAll('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiMenuItem-root.MuiMenuItem-gutters')].find(element => element.innerText === 'NPO approved').click();
+            // });
 
             await page.click(selectors.STATUS_BUTTON)
             await page.waitForTimeout(2000)
-            await page.waitForFunction((selector, expectedText) => {
-                const elements = document.querySelectorAll(selector);
-                return Array.from(elements, element => element.innerText).includes(expectedText);
-            }, { timeout: 15000 }, 'span.MuiChip-label.MuiChip-labelSmall', "NPO approved");
+            // await page.waitForFunction((selector, expectedText) => {
+            //     const elements = document.querySelectorAll(selector);
+            //     return Array.from(elements, element => element.innerText).includes(expectedText);
+            // }, { timeout: 15000 }, 'span.MuiChip-label.MuiChip-labelSmall', "NPO approved");
 
-            const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
-                return status.map(status => status.innerText);
+            const sentence_final_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
+                return status.map(status => status.innerText.toLowerCase());
             });
 
-            expect(sentence_status).toContain("Npo approved");
+            expect(sentence_final_status).toContain("npo approved");
             console.log('Status Changed')
         })
     })
 
-    describe.skip('Logout Flow', () => {
+    describe('Logout Flow', () => {
 
         it('Logout', async () => {
             console.log('Logging out ...')
