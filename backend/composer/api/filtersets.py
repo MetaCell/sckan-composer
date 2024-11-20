@@ -217,7 +217,6 @@ class NoteFilter(django_filters.FilterSet):
         if value:
             return queryset
         system_user = User.objects.get(username="system")
-        # BELOW LOGIC: if include_system_notes is False, show - system notes associated with "invalid" or "exported" + non_system_notes
         combined_queryset = queryset.filter(
             Q(user=system_user, note__icontains="invalid") |
             Q(user=system_user, note__icontains="exported") |
