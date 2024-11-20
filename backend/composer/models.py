@@ -144,6 +144,10 @@ class DestinationManager(models.Manager):
         )
 
 
+class AnatomicalEntityManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("synonyms")
+
 # Create your models here.
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -300,6 +304,9 @@ class AnatomicalEntityIntersection(models.Model):
 class AnatomicalEntity(models.Model):
     simple_entity = models.OneToOneField(AnatomicalEntityMeta, on_delete=models.CASCADE, null=True, blank=True)
     region_layer = models.OneToOneField(AnatomicalEntityIntersection, on_delete=models.CASCADE, null=True, blank=True)
+
+    objects = AnatomicalEntityManager()
+
 
     @property
     def name(self):

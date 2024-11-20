@@ -112,8 +112,7 @@ class AnatomicalEntitySerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_synonyms(obj):
-        return ", ".join(obj.synonyms.values_list("name", flat=True))
-
+        return ", ".join([synonym.name for synonym in obj.synonyms.all()])
     class Meta:
         model = AnatomicalEntity
         fields = (
@@ -225,16 +224,17 @@ class ViaSerializerDetails(serializers.ModelSerializer):
         """
         Determine if 'from_entities' are explicitly set for the Via instance.
         """
-        return instance.from_entities.exists()
+        return len(instance.from_entities.all()) > 0
 
     def to_representation(self, instance):
         """
         Custom representation for Via.
         """
         representation = super().to_representation(instance)
+        from_entities = instance.from_entities.all()
 
         # Check if from_entities is empty
-        if not instance.from_entities.exists():
+        if not from_entities:
             appropriate_entities = get_complete_from_entities_for_via(instance)
             representation['from_entities'] = AnatomicalEntitySerializer(appropriate_entities, many=True).data
 
@@ -319,16 +319,17 @@ class DestinationSerializerDetails(serializers.ModelSerializer):
         """
         Determine if 'from_entities' are explicitly set for the Via instance.
         """
-        return instance.from_entities.exists()
+        return len(instance.from_entities.all()) > 0
 
     def to_representation(self, instance):
         """
         Custom representation for Destination.
         """
         representation = super().to_representation(instance)
+        from_entities = instance.from_entities.all()
 
         # Check if from_entities is empty
-        if not instance.from_entities.exists():
+        if not from_entities:
             appropriate_entities = get_complete_from_entities_for_destination(instance)
             representation['from_entities'] = AnatomicalEntitySerializer(appropriate_entities, many=True).data
 
