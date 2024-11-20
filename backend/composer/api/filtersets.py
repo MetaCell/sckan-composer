@@ -61,8 +61,6 @@ class SentenceFilter(django_filters.FilterSet):
             order_direction = '-' if '-owner' in value else ''
             reverse__order_direction = '' if '-owner' in value else '-'
             queryset = queryset.annotate(
-                owner_full_name=Coalesce(
-                    'owner__first_name', Value(' '), 'owner__last_name'),
                 owner_null=Case(
                     When(owner=None, then=Value(1)),
                     default=Value(0),
@@ -73,7 +71,7 @@ class SentenceFilter(django_filters.FilterSet):
                     default=Value(0),
                     output_field=IntegerField()
                 )
-            ).order_by('owner_null', f'{reverse__order_direction}is_current_user', f'{order_direction}owner_full_name')
+            ).order_by('owner_null', f'{reverse__order_direction}is_current_user', f'{order_direction}owner__first_name', f'{order_direction}owner__last_name')
         if 'last_edited' in value or '-last_edited' in value:
             order_direction = '-' if '-last_edited' in value else ''
 
