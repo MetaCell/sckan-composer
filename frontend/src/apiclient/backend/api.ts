@@ -14,7 +14,7 @@
 
 
 import type { Configuration } from './configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
@@ -2600,7 +2600,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerAnatomicalEntityList: async (excludeIds?: Array<number>, limit?: number, name?: string, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerAnatomicalEntityList: async (excludeIds?: Array<number>, limit?: number, name?: string, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/anatomical-entity/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2655,7 +2655,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerAnatomicalEntityRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerAnatomicalEntityRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerAnatomicalEntityRetrieve', 'id', id)
             const localVarPath = `/api/composer/anatomical-entity/{id}/`
@@ -2698,7 +2698,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAddProvenanceCreate: async (id: number, uri: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementAddProvenanceCreate: async (id: number, uri: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementAddProvenanceCreate', 'id', id)
             // verify required parameter 'uri' is not null or undefined
@@ -2744,7 +2744,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAddSpecieCreate: async (id: number, specieId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementAddSpecieCreate: async (id: number, specieId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementAddSpecieCreate', 'id', id)
             // verify required parameter 'specieId' is not null or undefined
@@ -2790,7 +2790,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAddTagCreate: async (id: number, tagId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementAddTagCreate: async (id: number, tagId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementAddTagCreate', 'id', id)
             // verify required parameter 'tagId' is not null or undefined
@@ -2836,7 +2836,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAssignOwnerPartialUpdate: async (id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementAssignOwnerPartialUpdate: async (id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementAssignOwnerPartialUpdate', 'id', id)
             const localVarPath = `/api/composer/connectivity-statement/{id}/assign_owner/`
@@ -2881,7 +2881,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementCloneStatementRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementCloneStatementRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementCloneStatementRetrieve', 'id', id)
             const localVarPath = `/api/composer/connectivity-statement/{id}/clone_statement/`
@@ -2923,7 +2923,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementCreate: async (connectivityStatement?: ConnectivityStatement, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementCreate: async (connectivityStatement?: ConnectivityStatement, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/connectivity-statement/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2966,7 +2966,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDelProvenanceDestroy: async (id: number, provenanceId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementDelProvenanceDestroy: async (id: number, provenanceId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementDelProvenanceDestroy', 'id', id)
             // verify required parameter 'provenanceId' is not null or undefined
@@ -3012,7 +3012,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDelSpecieCreate: async (id: number, specieId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementDelSpecieCreate: async (id: number, specieId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementDelSpecieCreate', 'id', id)
             // verify required parameter 'specieId' is not null or undefined
@@ -3058,7 +3058,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDelTagCreate: async (id: number, tagId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementDelTagCreate: async (id: number, tagId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementDelTagCreate', 'id', id)
             // verify required parameter 'tagId' is not null or undefined
@@ -3103,7 +3103,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDestroy: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementDestroy: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementDestroy', 'id', id)
             const localVarPath = `/api/composer/connectivity-statement/{id}/`
@@ -3147,7 +3147,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDoTransitionCreate: async (id: number, transition: string, connectivityStatement?: ConnectivityStatement, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementDoTransitionCreate: async (id: number, transition: string, connectivityStatement?: ConnectivityStatement, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementDoTransitionCreate', 'id', id)
             // verify required parameter 'transition' is not null or undefined
@@ -3206,7 +3206,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList: async (destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementList: async (destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/connectivity-statement/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3294,7 +3294,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementPartialUpdate: async (id: number, patchedConnectivityStatementUpdate?: PatchedConnectivityStatementUpdate, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementPartialUpdate: async (id: number, patchedConnectivityStatementUpdate?: PatchedConnectivityStatementUpdate, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementPartialUpdate', 'id', id)
             const localVarPath = `/api/composer/connectivity-statement/{id}/`
@@ -3339,7 +3339,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementRetrieve', 'id', id)
             const localVarPath = `/api/composer/connectivity-statement/{id}/`
@@ -3382,7 +3382,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementUpdate: async (id: number, connectivityStatementUpdate: ConnectivityStatementUpdate, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementUpdate: async (id: number, connectivityStatementUpdate: ConnectivityStatementUpdate, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementUpdate', 'id', id)
             // verify required parameter 'connectivityStatementUpdate' is not null or undefined
@@ -3429,7 +3429,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationCreate: async (destination: Destination, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerDestinationCreate: async (destination: Destination, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'destination' is not null or undefined
             assertParamExists('composerDestinationCreate', 'destination', destination)
             const localVarPath = `/api/composer/destination/`;
@@ -3473,7 +3473,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationDestroy: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerDestinationDestroy: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerDestinationDestroy', 'id', id)
             const localVarPath = `/api/composer/destination/{id}/`
@@ -3517,7 +3517,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationList: async (connectivityStatementId?: number, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerDestinationList: async (connectivityStatementId?: number, limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/destination/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3569,7 +3569,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationPartialUpdate: async (id: number, patchedDestination?: PatchedDestination, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerDestinationPartialUpdate: async (id: number, patchedDestination?: PatchedDestination, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerDestinationPartialUpdate', 'id', id)
             const localVarPath = `/api/composer/destination/{id}/`
@@ -3614,7 +3614,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerDestinationRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerDestinationRetrieve', 'id', id)
             const localVarPath = `/api/composer/destination/{id}/`
@@ -3657,7 +3657,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationUpdate: async (id: number, destination: Destination, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerDestinationUpdate: async (id: number, destination: Destination, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerDestinationUpdate', 'id', id)
             // verify required parameter 'destination' is not null or undefined
@@ -3703,7 +3703,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerJsonschemasRetrieve: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerJsonschemasRetrieve: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/jsonschemas/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3742,7 +3742,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteCreate: async (note: Note, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerNoteCreate: async (note: Note, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'note' is not null or undefined
             assertParamExists('composerNoteCreate', 'note', note)
             const localVarPath = `/api/composer/note/`;
@@ -3786,7 +3786,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteDestroy: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerNoteDestroy: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerNoteDestroy', 'id', id)
             const localVarPath = `/api/composer/note/{id}/`
@@ -3832,7 +3832,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteList: async (connectivityStatementId?: number | null, includeSystemNotes?: boolean, limit?: number, offset?: number, sentenceId?: number | null, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerNoteList: async (connectivityStatementId?: number | null, includeSystemNotes?: boolean, limit?: number, offset?: number, sentenceId?: number | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/note/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3892,7 +3892,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNotePartialUpdate: async (id: number, patchedNote?: PatchedNote, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerNotePartialUpdate: async (id: number, patchedNote?: PatchedNote, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerNotePartialUpdate', 'id', id)
             const localVarPath = `/api/composer/note/{id}/`
@@ -3937,7 +3937,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerNoteRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerNoteRetrieve', 'id', id)
             const localVarPath = `/api/composer/note/{id}/`
@@ -3980,7 +3980,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteTagList: async (limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerNoteTagList: async (limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/note-tag/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4027,7 +4027,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteTagRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerNoteTagRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerNoteTagRetrieve', 'id', id)
             const localVarPath = `/api/composer/note-tag/{id}/`
@@ -4070,7 +4070,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteUpdate: async (id: number, note: Note, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerNoteUpdate: async (id: number, note: Note, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerNoteUpdate', 'id', id)
             // verify required parameter 'note' is not null or undefined
@@ -4118,7 +4118,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerPhenotypeList: async (limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerPhenotypeList: async (limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/phenotype/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4165,7 +4165,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerPhenotypeRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerPhenotypeRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerPhenotypeRetrieve', 'id', id)
             const localVarPath = `/api/composer/phenotype/{id}/`
@@ -4206,7 +4206,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerProfileMyRetrieve: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerProfileMyRetrieve: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/profile/my/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4246,7 +4246,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerProjectionList: async (limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerProjectionList: async (limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/projection/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4293,7 +4293,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerProjectionRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerProjectionRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerProjectionRetrieve', 'id', id)
             const localVarPath = `/api/composer/projection/{id}/`
@@ -4336,7 +4336,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceAddTagCreate: async (id: number, tagId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceAddTagCreate: async (id: number, tagId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerSentenceAddTagCreate', 'id', id)
             // verify required parameter 'tagId' is not null or undefined
@@ -4382,7 +4382,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceAssignOwnerPartialUpdate: async (id: number, patchedSentence?: PatchedSentence, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceAssignOwnerPartialUpdate: async (id: number, patchedSentence?: PatchedSentence, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerSentenceAssignOwnerPartialUpdate', 'id', id)
             const localVarPath = `/api/composer/sentence/{id}/assign_owner/`
@@ -4427,7 +4427,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceCreate: async (sentence: Sentence, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceCreate: async (sentence: Sentence, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'sentence' is not null or undefined
             assertParamExists('composerSentenceCreate', 'sentence', sentence)
             const localVarPath = `/api/composer/sentence/`;
@@ -4472,7 +4472,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceDelTagCreate: async (id: number, tagId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceDelTagCreate: async (id: number, tagId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerSentenceDelTagCreate', 'id', id)
             // verify required parameter 'tagId' is not null or undefined
@@ -4519,7 +4519,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceDoTransitionCreate: async (id: number, transition: string, sentence: Sentence, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceDoTransitionCreate: async (id: number, transition: string, sentence: Sentence, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerSentenceDoTransitionCreate', 'id', id)
             // verify required parameter 'transition' is not null or undefined
@@ -4576,7 +4576,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceList: async (exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceList: async (exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/sentence/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4648,7 +4648,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentencePartialUpdate: async (id: number, patchedSentence?: PatchedSentence, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentencePartialUpdate: async (id: number, patchedSentence?: PatchedSentence, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerSentencePartialUpdate', 'id', id)
             const localVarPath = `/api/composer/sentence/{id}/`
@@ -4693,7 +4693,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerSentenceRetrieve', 'id', id)
             const localVarPath = `/api/composer/sentence/{id}/`
@@ -4736,7 +4736,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceUpdate: async (id: number, sentence: Sentence, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceUpdate: async (id: number, sentence: Sentence, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerSentenceUpdate', 'id', id)
             // verify required parameter 'sentence' is not null or undefined
@@ -4784,7 +4784,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSexList: async (limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSexList: async (limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/sex/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4831,7 +4831,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSexRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSexRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerSexRetrieve', 'id', id)
             const localVarPath = `/api/composer/sex/{id}/`
@@ -4875,7 +4875,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSpecieList: async (limit?: number, name?: string, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSpecieList: async (limit?: number, name?: string, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/specie/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4926,7 +4926,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSpecieRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSpecieRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerSpecieRetrieve', 'id', id)
             const localVarPath = `/api/composer/specie/{id}/`
@@ -4969,7 +4969,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerTagList: async (limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerTagList: async (limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/tag/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5016,7 +5016,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerTagRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerTagRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerTagRetrieve', 'id', id)
             const localVarPath = `/api/composer/tag/{id}/`
@@ -5058,7 +5058,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerViaCreate: async (via: Via, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerViaCreate: async (via: Via, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'via' is not null or undefined
             assertParamExists('composerViaCreate', 'via', via)
             const localVarPath = `/api/composer/via/`;
@@ -5102,7 +5102,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerViaDestroy: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerViaDestroy: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerViaDestroy', 'id', id)
             const localVarPath = `/api/composer/via/{id}/`
@@ -5146,7 +5146,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerViaList: async (connectivityStatementId?: number, limit?: number, offset?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerViaList: async (connectivityStatementId?: number, limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/via/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5198,7 +5198,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerViaPartialUpdate: async (id: number, patchedVia?: PatchedVia, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerViaPartialUpdate: async (id: number, patchedVia?: PatchedVia, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerViaPartialUpdate', 'id', id)
             const localVarPath = `/api/composer/via/{id}/`
@@ -5243,7 +5243,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerViaRetrieve: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerViaRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerViaRetrieve', 'id', id)
             const localVarPath = `/api/composer/via/{id}/`
@@ -5286,7 +5286,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerViaUpdate: async (id: number, via: Via, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerViaUpdate: async (id: number, via: Via, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerViaUpdate', 'id', id)
             // verify required parameter 'via' is not null or undefined
@@ -5346,7 +5346,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerAnatomicalEntityList(excludeIds?: Array<number>, limit?: number, name?: string, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedAnatomicalEntityList>> {
+        async composerAnatomicalEntityList(excludeIds?: Array<number>, limit?: number, name?: string, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedAnatomicalEntityList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerAnatomicalEntityList(excludeIds, limit, name, offset, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerAnatomicalEntityList']?.[localVarOperationServerIndex]?.url;
@@ -5358,7 +5358,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerAnatomicalEntityRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AnatomicalEntity>> {
+        async composerAnatomicalEntityRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AnatomicalEntity>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerAnatomicalEntityRetrieve(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerAnatomicalEntityRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -5371,7 +5371,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementAddProvenanceCreate(id: number, uri: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementAddProvenanceCreate(id: number, uri: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAddProvenanceCreate(id, uri, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAddProvenanceCreate']?.[localVarOperationServerIndex]?.url;
@@ -5384,7 +5384,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementAddSpecieCreate(id: number, specieId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementAddSpecieCreate(id: number, specieId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAddSpecieCreate(id, specieId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAddSpecieCreate']?.[localVarOperationServerIndex]?.url;
@@ -5397,7 +5397,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementAddTagCreate(id: number, tagId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementAddTagCreate(id: number, tagId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAddTagCreate(id, tagId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAddTagCreate']?.[localVarOperationServerIndex]?.url;
@@ -5410,7 +5410,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementAssignOwnerPartialUpdate(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementAssignOwnerPartialUpdate(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAssignOwnerPartialUpdate(id, patchedConnectivityStatement, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAssignOwnerPartialUpdate']?.[localVarOperationServerIndex]?.url;
@@ -5422,7 +5422,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementCloneStatementRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementCloneStatementRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementCloneStatementRetrieve(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementCloneStatementRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -5434,7 +5434,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementCreate(connectivityStatement?: ConnectivityStatement, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementCreate(connectivityStatement?: ConnectivityStatement, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementCreate(connectivityStatement, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementCreate']?.[localVarOperationServerIndex]?.url;
@@ -5447,7 +5447,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementDelProvenanceDestroy(id: number, provenanceId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async composerConnectivityStatementDelProvenanceDestroy(id: number, provenanceId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementDelProvenanceDestroy(id, provenanceId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementDelProvenanceDestroy']?.[localVarOperationServerIndex]?.url;
@@ -5460,7 +5460,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementDelSpecieCreate(id: number, specieId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementDelSpecieCreate(id: number, specieId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementDelSpecieCreate(id, specieId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementDelSpecieCreate']?.[localVarOperationServerIndex]?.url;
@@ -5473,7 +5473,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementDelTagCreate(id: number, tagId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementDelTagCreate(id: number, tagId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementDelTagCreate(id, tagId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementDelTagCreate']?.[localVarOperationServerIndex]?.url;
@@ -5485,7 +5485,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementDestroy(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async composerConnectivityStatementDestroy(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementDestroy(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementDestroy']?.[localVarOperationServerIndex]?.url;
@@ -5499,7 +5499,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementDoTransitionCreate(id: number, transition: string, connectivityStatement?: ConnectivityStatement, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementDoTransitionCreate(id: number, transition: string, connectivityStatement?: ConnectivityStatement, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementDoTransitionCreate(id, transition, connectivityStatement, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementDoTransitionCreate']?.[localVarOperationServerIndex]?.url;
@@ -5522,7 +5522,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedBaseConnectivityStatementList>> {
+        async composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedBaseConnectivityStatementList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementList']?.[localVarOperationServerIndex]?.url;
@@ -5535,7 +5535,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementPartialUpdate(id: number, patchedConnectivityStatementUpdate?: PatchedConnectivityStatementUpdate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementPartialUpdate(id: number, patchedConnectivityStatementUpdate?: PatchedConnectivityStatementUpdate, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementPartialUpdate(id, patchedConnectivityStatementUpdate, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementPartialUpdate']?.[localVarOperationServerIndex]?.url;
@@ -5547,7 +5547,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementRetrieve(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -5560,7 +5560,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementUpdate(id: number, connectivityStatementUpdate: ConnectivityStatementUpdate, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementUpdate(id: number, connectivityStatementUpdate: ConnectivityStatementUpdate, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementUpdate(id, connectivityStatementUpdate, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementUpdate']?.[localVarOperationServerIndex]?.url;
@@ -5572,7 +5572,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerDestinationCreate(destination: Destination, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Destination>> {
+        async composerDestinationCreate(destination: Destination, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Destination>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerDestinationCreate(destination, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerDestinationCreate']?.[localVarOperationServerIndex]?.url;
@@ -5584,7 +5584,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerDestinationDestroy(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async composerDestinationDestroy(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerDestinationDestroy(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerDestinationDestroy']?.[localVarOperationServerIndex]?.url;
@@ -5598,7 +5598,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerDestinationList(connectivityStatementId?: number, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedDestinationList>> {
+        async composerDestinationList(connectivityStatementId?: number, limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedDestinationList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerDestinationList(connectivityStatementId, limit, offset, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerDestinationList']?.[localVarOperationServerIndex]?.url;
@@ -5611,7 +5611,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerDestinationPartialUpdate(id: number, patchedDestination?: PatchedDestination, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Destination>> {
+        async composerDestinationPartialUpdate(id: number, patchedDestination?: PatchedDestination, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Destination>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerDestinationPartialUpdate(id, patchedDestination, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerDestinationPartialUpdate']?.[localVarOperationServerIndex]?.url;
@@ -5623,7 +5623,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerDestinationRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Destination>> {
+        async composerDestinationRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Destination>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerDestinationRetrieve(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerDestinationRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -5636,7 +5636,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerDestinationUpdate(id: number, destination: Destination, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Destination>> {
+        async composerDestinationUpdate(id: number, destination: Destination, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Destination>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerDestinationUpdate(id, destination, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerDestinationUpdate']?.[localVarOperationServerIndex]?.url;
@@ -5647,7 +5647,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerJsonschemasRetrieve(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
+        async composerJsonschemasRetrieve(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerJsonschemasRetrieve(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerJsonschemasRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -5659,7 +5659,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerNoteCreate(note: Note, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Note>> {
+        async composerNoteCreate(note: Note, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Note>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerNoteCreate(note, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerNoteCreate']?.[localVarOperationServerIndex]?.url;
@@ -5671,7 +5671,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerNoteDestroy(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async composerNoteDestroy(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerNoteDestroy(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerNoteDestroy']?.[localVarOperationServerIndex]?.url;
@@ -5687,7 +5687,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerNoteList(connectivityStatementId?: number | null, includeSystemNotes?: boolean, limit?: number, offset?: number, sentenceId?: number | null, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedNoteList>> {
+        async composerNoteList(connectivityStatementId?: number | null, includeSystemNotes?: boolean, limit?: number, offset?: number, sentenceId?: number | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedNoteList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerNoteList(connectivityStatementId, includeSystemNotes, limit, offset, sentenceId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerNoteList']?.[localVarOperationServerIndex]?.url;
@@ -5700,7 +5700,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerNotePartialUpdate(id: number, patchedNote?: PatchedNote, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Note>> {
+        async composerNotePartialUpdate(id: number, patchedNote?: PatchedNote, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Note>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerNotePartialUpdate(id, patchedNote, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerNotePartialUpdate']?.[localVarOperationServerIndex]?.url;
@@ -5712,7 +5712,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerNoteRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Note>> {
+        async composerNoteRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Note>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerNoteRetrieve(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerNoteRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -5725,7 +5725,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerNoteTagList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedTagList>> {
+        async composerNoteTagList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedTagList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerNoteTagList(limit, offset, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerNoteTagList']?.[localVarOperationServerIndex]?.url;
@@ -5737,7 +5737,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerNoteTagRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Tag>> {
+        async composerNoteTagRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Tag>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerNoteTagRetrieve(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerNoteTagRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -5750,7 +5750,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerNoteUpdate(id: number, note: Note, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Note>> {
+        async composerNoteUpdate(id: number, note: Note, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Note>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerNoteUpdate(id, note, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerNoteUpdate']?.[localVarOperationServerIndex]?.url;
@@ -5763,7 +5763,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerPhenotypeList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedPhenotypeList>> {
+        async composerPhenotypeList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedPhenotypeList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerPhenotypeList(limit, offset, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerPhenotypeList']?.[localVarOperationServerIndex]?.url;
@@ -5775,7 +5775,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerPhenotypeRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Phenotype>> {
+        async composerPhenotypeRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Phenotype>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerPhenotypeRetrieve(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerPhenotypeRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -5786,7 +5786,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerProfileMyRetrieve(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Profile>> {
+        async composerProfileMyRetrieve(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Profile>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerProfileMyRetrieve(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerProfileMyRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -5799,7 +5799,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerProjectionList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedProjectionPhenotypeList>> {
+        async composerProjectionList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedProjectionPhenotypeList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerProjectionList(limit, offset, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerProjectionList']?.[localVarOperationServerIndex]?.url;
@@ -5811,7 +5811,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerProjectionRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProjectionPhenotype>> {
+        async composerProjectionRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProjectionPhenotype>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerProjectionRetrieve(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerProjectionRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -5824,7 +5824,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceAddTagCreate(id: number, tagId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
+        async composerSentenceAddTagCreate(id: number, tagId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceAddTagCreate(id, tagId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceAddTagCreate']?.[localVarOperationServerIndex]?.url;
@@ -5837,7 +5837,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceAssignOwnerPartialUpdate(id: number, patchedSentence?: PatchedSentence, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
+        async composerSentenceAssignOwnerPartialUpdate(id: number, patchedSentence?: PatchedSentence, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceAssignOwnerPartialUpdate(id, patchedSentence, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceAssignOwnerPartialUpdate']?.[localVarOperationServerIndex]?.url;
@@ -5849,7 +5849,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceCreate(sentence: Sentence, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
+        async composerSentenceCreate(sentence: Sentence, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceCreate(sentence, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceCreate']?.[localVarOperationServerIndex]?.url;
@@ -5862,7 +5862,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceDelTagCreate(id: number, tagId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
+        async composerSentenceDelTagCreate(id: number, tagId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceDelTagCreate(id, tagId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceDelTagCreate']?.[localVarOperationServerIndex]?.url;
@@ -5876,7 +5876,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceDoTransitionCreate(id: number, transition: string, sentence: Sentence, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
+        async composerSentenceDoTransitionCreate(id: number, transition: string, sentence: Sentence, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceDoTransitionCreate(id, transition, sentence, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceDoTransitionCreate']?.[localVarOperationServerIndex]?.url;
@@ -5895,7 +5895,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceList(exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
+        async composerSentenceList(exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceList(exclude, limit, notes, offset, ordering, state, tags, title, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceList']?.[localVarOperationServerIndex]?.url;
@@ -5908,7 +5908,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentencePartialUpdate(id: number, patchedSentence?: PatchedSentence, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
+        async composerSentencePartialUpdate(id: number, patchedSentence?: PatchedSentence, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentencePartialUpdate(id, patchedSentence, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentencePartialUpdate']?.[localVarOperationServerIndex]?.url;
@@ -5920,7 +5920,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
+        async composerSentenceRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceRetrieve(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -5933,7 +5933,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceUpdate(id: number, sentence: Sentence, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
+        async composerSentenceUpdate(id: number, sentence: Sentence, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceUpdate(id, sentence, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceUpdate']?.[localVarOperationServerIndex]?.url;
@@ -5946,7 +5946,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSexList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSexList>> {
+        async composerSexList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSexList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSexList(limit, offset, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSexList']?.[localVarOperationServerIndex]?.url;
@@ -5958,7 +5958,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSexRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sex>> {
+        async composerSexRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sex>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSexRetrieve(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSexRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -5972,7 +5972,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSpecieList(limit?: number, name?: string, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSpecieList>> {
+        async composerSpecieList(limit?: number, name?: string, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSpecieList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSpecieList(limit, name, offset, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSpecieList']?.[localVarOperationServerIndex]?.url;
@@ -5984,7 +5984,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSpecieRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Specie>> {
+        async composerSpecieRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Specie>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSpecieRetrieve(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSpecieRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -5997,7 +5997,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerTagList(limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedTagList>> {
+        async composerTagList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedTagList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerTagList(limit, offset, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerTagList']?.[localVarOperationServerIndex]?.url;
@@ -6009,7 +6009,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerTagRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Tag>> {
+        async composerTagRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Tag>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerTagRetrieve(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerTagRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -6021,7 +6021,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerViaCreate(via: Via, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Via>> {
+        async composerViaCreate(via: Via, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Via>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerViaCreate(via, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerViaCreate']?.[localVarOperationServerIndex]?.url;
@@ -6033,7 +6033,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerViaDestroy(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async composerViaDestroy(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerViaDestroy(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerViaDestroy']?.[localVarOperationServerIndex]?.url;
@@ -6047,7 +6047,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerViaList(connectivityStatementId?: number, limit?: number, offset?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedViaList>> {
+        async composerViaList(connectivityStatementId?: number, limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedViaList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerViaList(connectivityStatementId, limit, offset, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerViaList']?.[localVarOperationServerIndex]?.url;
@@ -6060,7 +6060,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerViaPartialUpdate(id: number, patchedVia?: PatchedVia, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Via>> {
+        async composerViaPartialUpdate(id: number, patchedVia?: PatchedVia, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Via>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerViaPartialUpdate(id, patchedVia, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerViaPartialUpdate']?.[localVarOperationServerIndex]?.url;
@@ -6072,7 +6072,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerViaRetrieve(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Via>> {
+        async composerViaRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Via>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerViaRetrieve(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerViaRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -6085,7 +6085,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerViaUpdate(id: number, via: Via, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Via>> {
+        async composerViaUpdate(id: number, via: Via, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Via>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerViaUpdate(id, via, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerViaUpdate']?.[localVarOperationServerIndex]?.url;
@@ -6110,7 +6110,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerAnatomicalEntityList(excludeIds?: Array<number>, limit?: number, name?: string, offset?: number, options?: AxiosRequestConfig): AxiosPromise<PaginatedAnatomicalEntityList> {
+        composerAnatomicalEntityList(excludeIds?: Array<number>, limit?: number, name?: string, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedAnatomicalEntityList> {
             return localVarFp.composerAnatomicalEntityList(excludeIds, limit, name, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6119,7 +6119,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerAnatomicalEntityRetrieve(id: number, options?: AxiosRequestConfig): AxiosPromise<AnatomicalEntity> {
+        composerAnatomicalEntityRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<AnatomicalEntity> {
             return localVarFp.composerAnatomicalEntityRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6129,7 +6129,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAddProvenanceCreate(id: number, uri: string, options?: AxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementAddProvenanceCreate(id: number, uri: string, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementAddProvenanceCreate(id, uri, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6139,7 +6139,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAddSpecieCreate(id: number, specieId: number, options?: AxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementAddSpecieCreate(id: number, specieId: number, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementAddSpecieCreate(id, specieId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6149,7 +6149,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAddTagCreate(id: number, tagId: number, options?: AxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementAddTagCreate(id: number, tagId: number, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementAddTagCreate(id, tagId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6159,7 +6159,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAssignOwnerPartialUpdate(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options?: AxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementAssignOwnerPartialUpdate(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementAssignOwnerPartialUpdate(id, patchedConnectivityStatement, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6168,7 +6168,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementCloneStatementRetrieve(id: number, options?: AxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementCloneStatementRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementCloneStatementRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6177,7 +6177,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementCreate(connectivityStatement?: ConnectivityStatement, options?: AxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementCreate(connectivityStatement?: ConnectivityStatement, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementCreate(connectivityStatement, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6187,7 +6187,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDelProvenanceDestroy(id: number, provenanceId: number, options?: AxiosRequestConfig): AxiosPromise<void> {
+        composerConnectivityStatementDelProvenanceDestroy(id: number, provenanceId: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.composerConnectivityStatementDelProvenanceDestroy(id, provenanceId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6197,7 +6197,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDelSpecieCreate(id: number, specieId: number, options?: AxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementDelSpecieCreate(id: number, specieId: number, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementDelSpecieCreate(id, specieId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6207,7 +6207,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDelTagCreate(id: number, tagId: number, options?: AxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementDelTagCreate(id: number, tagId: number, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementDelTagCreate(id, tagId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6216,7 +6216,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDestroy(id: number, options?: AxiosRequestConfig): AxiosPromise<void> {
+        composerConnectivityStatementDestroy(id: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.composerConnectivityStatementDestroy(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6227,7 +6227,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementDoTransitionCreate(id: number, transition: string, connectivityStatement?: ConnectivityStatement, options?: AxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementDoTransitionCreate(id: number, transition: string, connectivityStatement?: ConnectivityStatement, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementDoTransitionCreate(id, transition, connectivityStatement, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6247,7 +6247,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig): AxiosPromise<PaginatedBaseConnectivityStatementList> {
+        composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedBaseConnectivityStatementList> {
             return localVarFp.composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6257,7 +6257,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementPartialUpdate(id: number, patchedConnectivityStatementUpdate?: PatchedConnectivityStatementUpdate, options?: AxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementPartialUpdate(id: number, patchedConnectivityStatementUpdate?: PatchedConnectivityStatementUpdate, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementPartialUpdate(id, patchedConnectivityStatementUpdate, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6266,7 +6266,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementRetrieve(id: number, options?: AxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6276,7 +6276,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementUpdate(id: number, connectivityStatementUpdate: ConnectivityStatementUpdate, options?: AxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementUpdate(id: number, connectivityStatementUpdate: ConnectivityStatementUpdate, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementUpdate(id, connectivityStatementUpdate, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6285,7 +6285,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationCreate(destination: Destination, options?: AxiosRequestConfig): AxiosPromise<Destination> {
+        composerDestinationCreate(destination: Destination, options?: RawAxiosRequestConfig): AxiosPromise<Destination> {
             return localVarFp.composerDestinationCreate(destination, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6294,7 +6294,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationDestroy(id: number, options?: AxiosRequestConfig): AxiosPromise<void> {
+        composerDestinationDestroy(id: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.composerDestinationDestroy(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6305,7 +6305,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationList(connectivityStatementId?: number, limit?: number, offset?: number, options?: AxiosRequestConfig): AxiosPromise<PaginatedDestinationList> {
+        composerDestinationList(connectivityStatementId?: number, limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedDestinationList> {
             return localVarFp.composerDestinationList(connectivityStatementId, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6315,7 +6315,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationPartialUpdate(id: number, patchedDestination?: PatchedDestination, options?: AxiosRequestConfig): AxiosPromise<Destination> {
+        composerDestinationPartialUpdate(id: number, patchedDestination?: PatchedDestination, options?: RawAxiosRequestConfig): AxiosPromise<Destination> {
             return localVarFp.composerDestinationPartialUpdate(id, patchedDestination, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6324,7 +6324,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationRetrieve(id: number, options?: AxiosRequestConfig): AxiosPromise<Destination> {
+        composerDestinationRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Destination> {
             return localVarFp.composerDestinationRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6334,7 +6334,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerDestinationUpdate(id: number, destination: Destination, options?: AxiosRequestConfig): AxiosPromise<Destination> {
+        composerDestinationUpdate(id: number, destination: Destination, options?: RawAxiosRequestConfig): AxiosPromise<Destination> {
             return localVarFp.composerDestinationUpdate(id, destination, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6342,7 +6342,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerJsonschemasRetrieve(options?: AxiosRequestConfig): AxiosPromise<{ [key: string]: any; }> {
+        composerJsonschemasRetrieve(options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: any; }> {
             return localVarFp.composerJsonschemasRetrieve(options).then((request) => request(axios, basePath));
         },
         /**
@@ -6351,7 +6351,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteCreate(note: Note, options?: AxiosRequestConfig): AxiosPromise<Note> {
+        composerNoteCreate(note: Note, options?: RawAxiosRequestConfig): AxiosPromise<Note> {
             return localVarFp.composerNoteCreate(note, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6360,7 +6360,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteDestroy(id: number, options?: AxiosRequestConfig): AxiosPromise<void> {
+        composerNoteDestroy(id: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.composerNoteDestroy(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6373,7 +6373,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteList(connectivityStatementId?: number | null, includeSystemNotes?: boolean, limit?: number, offset?: number, sentenceId?: number | null, options?: AxiosRequestConfig): AxiosPromise<PaginatedNoteList> {
+        composerNoteList(connectivityStatementId?: number | null, includeSystemNotes?: boolean, limit?: number, offset?: number, sentenceId?: number | null, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedNoteList> {
             return localVarFp.composerNoteList(connectivityStatementId, includeSystemNotes, limit, offset, sentenceId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6383,7 +6383,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNotePartialUpdate(id: number, patchedNote?: PatchedNote, options?: AxiosRequestConfig): AxiosPromise<Note> {
+        composerNotePartialUpdate(id: number, patchedNote?: PatchedNote, options?: RawAxiosRequestConfig): AxiosPromise<Note> {
             return localVarFp.composerNotePartialUpdate(id, patchedNote, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6392,7 +6392,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteRetrieve(id: number, options?: AxiosRequestConfig): AxiosPromise<Note> {
+        composerNoteRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Note> {
             return localVarFp.composerNoteRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6402,7 +6402,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteTagList(limit?: number, offset?: number, options?: AxiosRequestConfig): AxiosPromise<PaginatedTagList> {
+        composerNoteTagList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedTagList> {
             return localVarFp.composerNoteTagList(limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6411,7 +6411,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteTagRetrieve(id: number, options?: AxiosRequestConfig): AxiosPromise<Tag> {
+        composerNoteTagRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Tag> {
             return localVarFp.composerNoteTagRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6421,7 +6421,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteUpdate(id: number, note: Note, options?: AxiosRequestConfig): AxiosPromise<Note> {
+        composerNoteUpdate(id: number, note: Note, options?: RawAxiosRequestConfig): AxiosPromise<Note> {
             return localVarFp.composerNoteUpdate(id, note, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6431,7 +6431,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerPhenotypeList(limit?: number, offset?: number, options?: AxiosRequestConfig): AxiosPromise<PaginatedPhenotypeList> {
+        composerPhenotypeList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedPhenotypeList> {
             return localVarFp.composerPhenotypeList(limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6440,7 +6440,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerPhenotypeRetrieve(id: number, options?: AxiosRequestConfig): AxiosPromise<Phenotype> {
+        composerPhenotypeRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Phenotype> {
             return localVarFp.composerPhenotypeRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6448,7 +6448,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerProfileMyRetrieve(options?: AxiosRequestConfig): AxiosPromise<Profile> {
+        composerProfileMyRetrieve(options?: RawAxiosRequestConfig): AxiosPromise<Profile> {
             return localVarFp.composerProfileMyRetrieve(options).then((request) => request(axios, basePath));
         },
         /**
@@ -6458,7 +6458,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerProjectionList(limit?: number, offset?: number, options?: AxiosRequestConfig): AxiosPromise<PaginatedProjectionPhenotypeList> {
+        composerProjectionList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedProjectionPhenotypeList> {
             return localVarFp.composerProjectionList(limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6467,7 +6467,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerProjectionRetrieve(id: number, options?: AxiosRequestConfig): AxiosPromise<ProjectionPhenotype> {
+        composerProjectionRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ProjectionPhenotype> {
             return localVarFp.composerProjectionRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6477,7 +6477,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceAddTagCreate(id: number, tagId: number, options?: AxiosRequestConfig): AxiosPromise<Sentence> {
+        composerSentenceAddTagCreate(id: number, tagId: number, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
             return localVarFp.composerSentenceAddTagCreate(id, tagId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6487,7 +6487,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceAssignOwnerPartialUpdate(id: number, patchedSentence?: PatchedSentence, options?: AxiosRequestConfig): AxiosPromise<Sentence> {
+        composerSentenceAssignOwnerPartialUpdate(id: number, patchedSentence?: PatchedSentence, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
             return localVarFp.composerSentenceAssignOwnerPartialUpdate(id, patchedSentence, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6496,7 +6496,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceCreate(sentence: Sentence, options?: AxiosRequestConfig): AxiosPromise<Sentence> {
+        composerSentenceCreate(sentence: Sentence, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
             return localVarFp.composerSentenceCreate(sentence, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6506,7 +6506,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceDelTagCreate(id: number, tagId: number, options?: AxiosRequestConfig): AxiosPromise<Sentence> {
+        composerSentenceDelTagCreate(id: number, tagId: number, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
             return localVarFp.composerSentenceDelTagCreate(id, tagId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6517,7 +6517,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceDoTransitionCreate(id: number, transition: string, sentence: Sentence, options?: AxiosRequestConfig): AxiosPromise<Sentence> {
+        composerSentenceDoTransitionCreate(id: number, transition: string, sentence: Sentence, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
             return localVarFp.composerSentenceDoTransitionCreate(id, transition, sentence, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6533,7 +6533,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceList(exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: AxiosRequestConfig): AxiosPromise<PaginatedSentenceList> {
+        composerSentenceList(exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedSentenceList> {
             return localVarFp.composerSentenceList(exclude, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6543,7 +6543,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentencePartialUpdate(id: number, patchedSentence?: PatchedSentence, options?: AxiosRequestConfig): AxiosPromise<Sentence> {
+        composerSentencePartialUpdate(id: number, patchedSentence?: PatchedSentence, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
             return localVarFp.composerSentencePartialUpdate(id, patchedSentence, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6552,7 +6552,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceRetrieve(id: number, options?: AxiosRequestConfig): AxiosPromise<Sentence> {
+        composerSentenceRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
             return localVarFp.composerSentenceRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6562,7 +6562,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceUpdate(id: number, sentence: Sentence, options?: AxiosRequestConfig): AxiosPromise<Sentence> {
+        composerSentenceUpdate(id: number, sentence: Sentence, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
             return localVarFp.composerSentenceUpdate(id, sentence, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6572,7 +6572,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSexList(limit?: number, offset?: number, options?: AxiosRequestConfig): AxiosPromise<PaginatedSexList> {
+        composerSexList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedSexList> {
             return localVarFp.composerSexList(limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6581,7 +6581,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSexRetrieve(id: number, options?: AxiosRequestConfig): AxiosPromise<Sex> {
+        composerSexRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Sex> {
             return localVarFp.composerSexRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6592,7 +6592,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSpecieList(limit?: number, name?: string, offset?: number, options?: AxiosRequestConfig): AxiosPromise<PaginatedSpecieList> {
+        composerSpecieList(limit?: number, name?: string, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedSpecieList> {
             return localVarFp.composerSpecieList(limit, name, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6601,7 +6601,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSpecieRetrieve(id: number, options?: AxiosRequestConfig): AxiosPromise<Specie> {
+        composerSpecieRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Specie> {
             return localVarFp.composerSpecieRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6611,7 +6611,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerTagList(limit?: number, offset?: number, options?: AxiosRequestConfig): AxiosPromise<PaginatedTagList> {
+        composerTagList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedTagList> {
             return localVarFp.composerTagList(limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6620,7 +6620,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerTagRetrieve(id: number, options?: AxiosRequestConfig): AxiosPromise<Tag> {
+        composerTagRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Tag> {
             return localVarFp.composerTagRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6629,7 +6629,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerViaCreate(via: Via, options?: AxiosRequestConfig): AxiosPromise<Via> {
+        composerViaCreate(via: Via, options?: RawAxiosRequestConfig): AxiosPromise<Via> {
             return localVarFp.composerViaCreate(via, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6638,7 +6638,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerViaDestroy(id: number, options?: AxiosRequestConfig): AxiosPromise<void> {
+        composerViaDestroy(id: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.composerViaDestroy(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6649,7 +6649,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerViaList(connectivityStatementId?: number, limit?: number, offset?: number, options?: AxiosRequestConfig): AxiosPromise<PaginatedViaList> {
+        composerViaList(connectivityStatementId?: number, limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedViaList> {
             return localVarFp.composerViaList(connectivityStatementId, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6659,7 +6659,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerViaPartialUpdate(id: number, patchedVia?: PatchedVia, options?: AxiosRequestConfig): AxiosPromise<Via> {
+        composerViaPartialUpdate(id: number, patchedVia?: PatchedVia, options?: RawAxiosRequestConfig): AxiosPromise<Via> {
             return localVarFp.composerViaPartialUpdate(id, patchedVia, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6668,7 +6668,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerViaRetrieve(id: number, options?: AxiosRequestConfig): AxiosPromise<Via> {
+        composerViaRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Via> {
             return localVarFp.composerViaRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6678,7 +6678,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerViaUpdate(id: number, via: Via, options?: AxiosRequestConfig): AxiosPromise<Via> {
+        composerViaUpdate(id: number, via: Via, options?: RawAxiosRequestConfig): AxiosPromise<Via> {
             return localVarFp.composerViaUpdate(id, via, options).then((request) => request(axios, basePath));
         },
     };
@@ -6701,7 +6701,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerAnatomicalEntityList(excludeIds?: Array<number>, limit?: number, name?: string, offset?: number, options?: AxiosRequestConfig) {
+    public composerAnatomicalEntityList(excludeIds?: Array<number>, limit?: number, name?: string, offset?: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerAnatomicalEntityList(excludeIds, limit, name, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6712,7 +6712,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerAnatomicalEntityRetrieve(id: number, options?: AxiosRequestConfig) {
+    public composerAnatomicalEntityRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerAnatomicalEntityRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6724,7 +6724,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementAddProvenanceCreate(id: number, uri: string, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementAddProvenanceCreate(id: number, uri: string, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementAddProvenanceCreate(id, uri, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6736,7 +6736,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementAddSpecieCreate(id: number, specieId: number, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementAddSpecieCreate(id: number, specieId: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementAddSpecieCreate(id, specieId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6748,7 +6748,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementAddTagCreate(id: number, tagId: number, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementAddTagCreate(id: number, tagId: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementAddTagCreate(id, tagId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6760,7 +6760,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementAssignOwnerPartialUpdate(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementAssignOwnerPartialUpdate(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementAssignOwnerPartialUpdate(id, patchedConnectivityStatement, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6771,7 +6771,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementCloneStatementRetrieve(id: number, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementCloneStatementRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementCloneStatementRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6782,7 +6782,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementCreate(connectivityStatement?: ConnectivityStatement, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementCreate(connectivityStatement?: ConnectivityStatement, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementCreate(connectivityStatement, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6794,7 +6794,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementDelProvenanceDestroy(id: number, provenanceId: number, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementDelProvenanceDestroy(id: number, provenanceId: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementDelProvenanceDestroy(id, provenanceId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6806,7 +6806,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementDelSpecieCreate(id: number, specieId: number, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementDelSpecieCreate(id: number, specieId: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementDelSpecieCreate(id, specieId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6818,7 +6818,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementDelTagCreate(id: number, tagId: number, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementDelTagCreate(id: number, tagId: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementDelTagCreate(id, tagId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6829,7 +6829,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementDestroy(id: number, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementDestroy(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementDestroy(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6842,7 +6842,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementDoTransitionCreate(id: number, transition: string, connectivityStatement?: ConnectivityStatement, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementDoTransitionCreate(id: number, transition: string, connectivityStatement?: ConnectivityStatement, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementDoTransitionCreate(id, transition, connectivityStatement, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6864,7 +6864,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6876,7 +6876,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementPartialUpdate(id: number, patchedConnectivityStatementUpdate?: PatchedConnectivityStatementUpdate, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementPartialUpdate(id: number, patchedConnectivityStatementUpdate?: PatchedConnectivityStatementUpdate, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementPartialUpdate(id, patchedConnectivityStatementUpdate, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6887,7 +6887,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementRetrieve(id: number, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6899,7 +6899,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementUpdate(id: number, connectivityStatementUpdate: ConnectivityStatementUpdate, options?: AxiosRequestConfig) {
+    public composerConnectivityStatementUpdate(id: number, connectivityStatementUpdate: ConnectivityStatementUpdate, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementUpdate(id, connectivityStatementUpdate, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6910,7 +6910,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerDestinationCreate(destination: Destination, options?: AxiosRequestConfig) {
+    public composerDestinationCreate(destination: Destination, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerDestinationCreate(destination, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6921,7 +6921,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerDestinationDestroy(id: number, options?: AxiosRequestConfig) {
+    public composerDestinationDestroy(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerDestinationDestroy(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6934,7 +6934,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerDestinationList(connectivityStatementId?: number, limit?: number, offset?: number, options?: AxiosRequestConfig) {
+    public composerDestinationList(connectivityStatementId?: number, limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerDestinationList(connectivityStatementId, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6946,7 +6946,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerDestinationPartialUpdate(id: number, patchedDestination?: PatchedDestination, options?: AxiosRequestConfig) {
+    public composerDestinationPartialUpdate(id: number, patchedDestination?: PatchedDestination, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerDestinationPartialUpdate(id, patchedDestination, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6957,7 +6957,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerDestinationRetrieve(id: number, options?: AxiosRequestConfig) {
+    public composerDestinationRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerDestinationRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6969,7 +6969,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerDestinationUpdate(id: number, destination: Destination, options?: AxiosRequestConfig) {
+    public composerDestinationUpdate(id: number, destination: Destination, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerDestinationUpdate(id, destination, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6979,7 +6979,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerJsonschemasRetrieve(options?: AxiosRequestConfig) {
+    public composerJsonschemasRetrieve(options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerJsonschemasRetrieve(options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6990,7 +6990,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerNoteCreate(note: Note, options?: AxiosRequestConfig) {
+    public composerNoteCreate(note: Note, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerNoteCreate(note, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7001,7 +7001,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerNoteDestroy(id: number, options?: AxiosRequestConfig) {
+    public composerNoteDestroy(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerNoteDestroy(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7016,7 +7016,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerNoteList(connectivityStatementId?: number | null, includeSystemNotes?: boolean, limit?: number, offset?: number, sentenceId?: number | null, options?: AxiosRequestConfig) {
+    public composerNoteList(connectivityStatementId?: number | null, includeSystemNotes?: boolean, limit?: number, offset?: number, sentenceId?: number | null, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerNoteList(connectivityStatementId, includeSystemNotes, limit, offset, sentenceId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7028,7 +7028,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerNotePartialUpdate(id: number, patchedNote?: PatchedNote, options?: AxiosRequestConfig) {
+    public composerNotePartialUpdate(id: number, patchedNote?: PatchedNote, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerNotePartialUpdate(id, patchedNote, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7039,7 +7039,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerNoteRetrieve(id: number, options?: AxiosRequestConfig) {
+    public composerNoteRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerNoteRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7051,7 +7051,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerNoteTagList(limit?: number, offset?: number, options?: AxiosRequestConfig) {
+    public composerNoteTagList(limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerNoteTagList(limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7062,7 +7062,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerNoteTagRetrieve(id: number, options?: AxiosRequestConfig) {
+    public composerNoteTagRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerNoteTagRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7074,7 +7074,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerNoteUpdate(id: number, note: Note, options?: AxiosRequestConfig) {
+    public composerNoteUpdate(id: number, note: Note, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerNoteUpdate(id, note, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7086,7 +7086,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerPhenotypeList(limit?: number, offset?: number, options?: AxiosRequestConfig) {
+    public composerPhenotypeList(limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerPhenotypeList(limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7097,7 +7097,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerPhenotypeRetrieve(id: number, options?: AxiosRequestConfig) {
+    public composerPhenotypeRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerPhenotypeRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7107,7 +7107,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerProfileMyRetrieve(options?: AxiosRequestConfig) {
+    public composerProfileMyRetrieve(options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerProfileMyRetrieve(options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7119,7 +7119,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerProjectionList(limit?: number, offset?: number, options?: AxiosRequestConfig) {
+    public composerProjectionList(limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerProjectionList(limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7130,7 +7130,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerProjectionRetrieve(id: number, options?: AxiosRequestConfig) {
+    public composerProjectionRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerProjectionRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7142,7 +7142,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceAddTagCreate(id: number, tagId: number, options?: AxiosRequestConfig) {
+    public composerSentenceAddTagCreate(id: number, tagId: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentenceAddTagCreate(id, tagId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7154,7 +7154,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceAssignOwnerPartialUpdate(id: number, patchedSentence?: PatchedSentence, options?: AxiosRequestConfig) {
+    public composerSentenceAssignOwnerPartialUpdate(id: number, patchedSentence?: PatchedSentence, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentenceAssignOwnerPartialUpdate(id, patchedSentence, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7165,7 +7165,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceCreate(sentence: Sentence, options?: AxiosRequestConfig) {
+    public composerSentenceCreate(sentence: Sentence, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentenceCreate(sentence, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7177,7 +7177,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceDelTagCreate(id: number, tagId: number, options?: AxiosRequestConfig) {
+    public composerSentenceDelTagCreate(id: number, tagId: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentenceDelTagCreate(id, tagId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7190,7 +7190,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceDoTransitionCreate(id: number, transition: string, sentence: Sentence, options?: AxiosRequestConfig) {
+    public composerSentenceDoTransitionCreate(id: number, transition: string, sentence: Sentence, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentenceDoTransitionCreate(id, transition, sentence, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7208,7 +7208,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceList(exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: AxiosRequestConfig) {
+    public composerSentenceList(exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentenceList(exclude, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7220,7 +7220,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentencePartialUpdate(id: number, patchedSentence?: PatchedSentence, options?: AxiosRequestConfig) {
+    public composerSentencePartialUpdate(id: number, patchedSentence?: PatchedSentence, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentencePartialUpdate(id, patchedSentence, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7231,7 +7231,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceRetrieve(id: number, options?: AxiosRequestConfig) {
+    public composerSentenceRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentenceRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7243,7 +7243,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceUpdate(id: number, sentence: Sentence, options?: AxiosRequestConfig) {
+    public composerSentenceUpdate(id: number, sentence: Sentence, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentenceUpdate(id, sentence, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7255,7 +7255,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSexList(limit?: number, offset?: number, options?: AxiosRequestConfig) {
+    public composerSexList(limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSexList(limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7266,7 +7266,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSexRetrieve(id: number, options?: AxiosRequestConfig) {
+    public composerSexRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSexRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7279,7 +7279,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSpecieList(limit?: number, name?: string, offset?: number, options?: AxiosRequestConfig) {
+    public composerSpecieList(limit?: number, name?: string, offset?: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSpecieList(limit, name, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7290,7 +7290,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSpecieRetrieve(id: number, options?: AxiosRequestConfig) {
+    public composerSpecieRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSpecieRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7302,7 +7302,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerTagList(limit?: number, offset?: number, options?: AxiosRequestConfig) {
+    public composerTagList(limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerTagList(limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7313,7 +7313,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerTagRetrieve(id: number, options?: AxiosRequestConfig) {
+    public composerTagRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerTagRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7324,7 +7324,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerViaCreate(via: Via, options?: AxiosRequestConfig) {
+    public composerViaCreate(via: Via, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerViaCreate(via, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7335,7 +7335,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerViaDestroy(id: number, options?: AxiosRequestConfig) {
+    public composerViaDestroy(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerViaDestroy(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7348,7 +7348,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerViaList(connectivityStatementId?: number, limit?: number, offset?: number, options?: AxiosRequestConfig) {
+    public composerViaList(connectivityStatementId?: number, limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerViaList(connectivityStatementId, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7360,7 +7360,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerViaPartialUpdate(id: number, patchedVia?: PatchedVia, options?: AxiosRequestConfig) {
+    public composerViaPartialUpdate(id: number, patchedVia?: PatchedVia, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerViaPartialUpdate(id, patchedVia, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7371,7 +7371,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerViaRetrieve(id: number, options?: AxiosRequestConfig) {
+    public composerViaRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerViaRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7383,7 +7383,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerViaUpdate(id: number, via: Via, options?: AxiosRequestConfig) {
+    public composerViaUpdate(id: number, via: Via, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerViaUpdate(id, via, options).then((request) => request(this.axios, this.basePath));
     }
 }
@@ -7449,7 +7449,7 @@ export const MetacellAuthApiAxiosParamCreator = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        metacellAuthLoginRetrieve: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        metacellAuthLoginRetrieve: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/metacell_auth/login/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7487,7 +7487,7 @@ export const MetacellAuthApiAxiosParamCreator = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        metacellAuthLogoutRetrieve: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        metacellAuthLogoutRetrieve: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/metacell_auth/logout/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7535,7 +7535,7 @@ export const MetacellAuthApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async metacellAuthLoginRetrieve(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Login>> {
+        async metacellAuthLoginRetrieve(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Login>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.metacellAuthLoginRetrieve(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['MetacellAuthApi.metacellAuthLoginRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -7546,7 +7546,7 @@ export const MetacellAuthApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async metacellAuthLogoutRetrieve(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Logout>> {
+        async metacellAuthLogoutRetrieve(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Logout>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.metacellAuthLogoutRetrieve(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['MetacellAuthApi.metacellAuthLogoutRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -7567,7 +7567,7 @@ export const MetacellAuthApiFactory = function (configuration?: Configuration, b
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        metacellAuthLoginRetrieve(options?: AxiosRequestConfig): AxiosPromise<Login> {
+        metacellAuthLoginRetrieve(options?: RawAxiosRequestConfig): AxiosPromise<Login> {
             return localVarFp.metacellAuthLoginRetrieve(options).then((request) => request(axios, basePath));
         },
         /**
@@ -7575,7 +7575,7 @@ export const MetacellAuthApiFactory = function (configuration?: Configuration, b
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        metacellAuthLogoutRetrieve(options?: AxiosRequestConfig): AxiosPromise<Logout> {
+        metacellAuthLogoutRetrieve(options?: RawAxiosRequestConfig): AxiosPromise<Logout> {
             return localVarFp.metacellAuthLogoutRetrieve(options).then((request) => request(axios, basePath));
         },
     };
@@ -7594,7 +7594,7 @@ export class MetacellAuthApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MetacellAuthApi
      */
-    public metacellAuthLoginRetrieve(options?: AxiosRequestConfig) {
+    public metacellAuthLoginRetrieve(options?: RawAxiosRequestConfig) {
         return MetacellAuthApiFp(this.configuration).metacellAuthLoginRetrieve(options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -7604,7 +7604,7 @@ export class MetacellAuthApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MetacellAuthApi
      */
-    public metacellAuthLogoutRetrieve(options?: AxiosRequestConfig) {
+    public metacellAuthLogoutRetrieve(options?: RawAxiosRequestConfig) {
         return MetacellAuthApiFp(this.configuration).metacellAuthLogoutRetrieve(options).then((request) => request(this.axios, this.basePath));
     }
 }
@@ -7628,7 +7628,7 @@ export const PublicApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerKnowledgeStatementList: async (destinationUris?: Array<string>, limit?: number, offset?: number, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerKnowledgeStatementList: async (destinationUris?: Array<string>, limit?: number, offset?: number, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/knowledge-statement/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7706,7 +7706,7 @@ export const PublicApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerKnowledgeStatementList(destinationUris?: Array<string>, limit?: number, offset?: number, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedKnowledgeStatementList>> {
+        async composerKnowledgeStatementList(destinationUris?: Array<string>, limit?: number, offset?: number, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedKnowledgeStatementList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerKnowledgeStatementList(destinationUris, limit, offset, originUris, populationUris, viaUris, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PublicApi.composerKnowledgeStatementList']?.[localVarOperationServerIndex]?.url;
@@ -7733,7 +7733,7 @@ export const PublicApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerKnowledgeStatementList(destinationUris?: Array<string>, limit?: number, offset?: number, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options?: AxiosRequestConfig): AxiosPromise<PaginatedKnowledgeStatementList> {
+        composerKnowledgeStatementList(destinationUris?: Array<string>, limit?: number, offset?: number, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedKnowledgeStatementList> {
             return localVarFp.composerKnowledgeStatementList(destinationUris, limit, offset, originUris, populationUris, viaUris, options).then((request) => request(axios, basePath));
         },
     };
@@ -7758,7 +7758,7 @@ export class PublicApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof PublicApi
      */
-    public composerKnowledgeStatementList(destinationUris?: Array<string>, limit?: number, offset?: number, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options?: AxiosRequestConfig) {
+    public composerKnowledgeStatementList(destinationUris?: Array<string>, limit?: number, offset?: number, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options?: RawAxiosRequestConfig) {
         return PublicApiFp(this.configuration).composerKnowledgeStatementList(destinationUris, limit, offset, originUris, populationUris, viaUris, options).then((request) => request(this.axios, this.basePath));
     }
 }
