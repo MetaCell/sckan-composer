@@ -3,7 +3,7 @@ from django.db.models import Q
 import django_filters
 from django_filters import BaseInFilter, NumberFilter
 
-from composer.enums import SentenceState, CSState
+from composer.enums import SentenceState, CSState, NoteType
 from composer.models import (
     Sentence,
     ConnectivityStatement,
@@ -218,9 +218,10 @@ class NoteFilter(django_filters.FilterSet):
             return queryset
         system_user = User.objects.get(username="system")
         combined_queryset = queryset.filter(
-            Q(user=system_user, note__icontains="invalid") |
+            (Q(user=system_user, note__icontains="invalid") |
             Q(user=system_user, note__icontains="exported") |
-            ~Q(user=system_user)
+             ~Q(user=system_user)) &
+            ~Q(type__in=[NoteType.TRANSITION])
         )
         return combined_queryset.distinct()
 
