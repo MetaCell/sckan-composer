@@ -20,7 +20,7 @@ export const ArrowDown = () => (
 export const ArrowRight = () => (
   <SvgIcon viewBox="0 0 16 16">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6 12L10 8L6 4" stroke="#C7CBD1" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 12L10 8L6 4" stroke="#C7CBD1" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   </SvgIcon>
 );
@@ -140,7 +140,7 @@ export const OriginInfoIcon = () => (
 
     <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="0.626667" y="1.59737" width="22.7467" height="22.7467" rx="11.3733" fill="#F6F7F9"/>
-      <rect x="0.626667" y="1.59737" width="22.7467" height="22.7467" rx="11.3733" stroke="#6C707A" stroke-width="1.25333"/>
+      <rect x="0.626667" y="1.59737" width="22.7467" height="22.7467" rx="11.3733" stroke="#6C707A" strokeWidth="1.25333"/>
     </svg>
 );
 export const ViaInfoIcon = () => (
@@ -228,7 +228,7 @@ export const ViaInfoIcon = () => (
     // </SvgIcon>
     <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.12667" y="1.59737" width="22.7467" height="22.7467" rx="1.37333" fill="#F6F7F9"/>
-      <rect x="1.12667" y="1.59737" width="22.7467" height="22.7467" rx="1.37333" stroke="#6C707A" stroke-width="1.25333"/>
+      <rect x="1.12667" y="1.59737" width="22.7467" height="22.7467" rx="1.37333" stroke="#6C707A" strokeWidth="1.25333"/>
     </svg>
 );
 export const DestinationInfoIcon = () => (
@@ -316,17 +316,17 @@ export const DestinationInfoIcon = () => (
     // </SvgIcon>
     <svg width="34" height="35" viewBox="0 0 34 35" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="0.886241" y="17.0659" width="22.7467" height="22.7467" rx="1.37333" transform="rotate(-45 0.886241 17.0659)" fill="#F6F7F9"/>
-      <rect x="0.886241" y="17.0659" width="22.7467" height="22.7467" rx="1.37333" transform="rotate(-45 0.886241 17.0659)" stroke="#6C707A" stroke-width="1.25333"/>
+      <rect x="0.886241" y="17.0659" width="22.7467" height="22.7467" rx="1.37333" transform="rotate(-45 0.886241 17.0659)" stroke="#6C707A" strokeWidth="1.25333"/>
     </svg>
 );
 
 export const ForwardConnectionIcon = () => (
   <svg width="35" height="34" viewBox="0 0 35 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g clip-path="url(#clip0_3303_11348)">
+    <g clipPath="url(#clip0_3303_11348)">
       <rect x="0.441162" y="16.9688" width="24" height="24" rx="2" transform="rotate(-45 0.441162 16.9688)" fill="#F6F7F9"/>
       <path d="M25.4117 16.9688L24.0017 15.5588L18.4117 21.1388V8.96875H16.4117V21.1388L10.8317 15.5488L9.41174 16.9688L17.4117 24.9688L25.4117 16.9688Z" fill="#6C707A"/>
     </g>
-    <rect x="1.3274" y="16.9688" width="22.7467" height="22.7467" rx="1.37333" transform="rotate(-45 1.3274 16.9688)" stroke="#6C707A" stroke-width="1.25333"/>
+    <rect x="1.3274" y="16.9688" width="22.7467" height="22.7467" rx="1.37333" transform="rotate(-45 1.3274 16.9688)" stroke="#6C707A" strokeWidth="1.25333"/>
     <defs>
       <clipPath id="clip0_3303_11348">
         <rect x="0.441162" y="16.9688" width="24" height="24" rx="2" transform="rotate(-45 0.441162 16.9688)" fill="white"/>
@@ -344,10 +344,10 @@ export const ViaIcon = (props: SvgIconProps) => (
             height: props.height ? props.height : 24,
         }}
     >
-        <g clip-path="url(#clip0_2956_213155)">
+        <g clipPath="url(#clip0_2956_213155)">
             <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
+                fillRule="evenodd"
+                clipRule="evenodd"
                 d="M17.149 19.7649C17.4753 20.1473 18.0499 20.1927 18.4323 19.8664L21.6056 16.6193C21.988 16.293 22.0335 15.7184 21.7071 15.336C21.3808 14.9536 20.8062 14.9081 20.4238 15.2345L18.6426 17.2934C18.4845 17.085 18.2382 16.9459 17.9563 16.9337C17.7129 16.9232 17.4877 17.0093 17.3177 17.158L15.3358 15.2379C15.0095 14.8555 14.4349 14.81 14.0525 15.1364C13.6701 15.4627 13.6246 16.0373 13.951 16.4197L17.149 19.7649ZM17.9738 16.0863C18.4765 16.0847 18.8828 15.6759 18.8812 15.1731C18.8785 14.3243 18.8559 13.3981 18.7989 12.455C18.7686 11.9532 18.3372 11.5709 17.8354 11.6012C17.3336 11.6316 16.9514 12.0629 16.9817 12.5648C17.0361 13.4663 17.058 14.3571 17.0606 15.1789C17.0622 15.6817 17.4711 16.0879 17.9738 16.0863ZM17.7574 10.7566C18.2546 10.6824 18.5976 10.2192 18.5234 9.72196C18.3786 8.75184 18.1769 7.80622 17.8949 6.96589C17.735 6.48926 17.219 6.23251 16.7424 6.39242C16.2658 6.55233 16.009 7.06835 16.1689 7.54498C16.4061 8.25191 16.5877 9.08585 16.7227 9.99069C16.7969 10.4879 17.2602 10.8309 17.7574 10.7566ZM12.4025 5.5875C12.7154 5.98096 13.2881 6.04623 13.6816 5.73329C13.9241 5.54041 14.1606 5.45746 14.4262 5.46184C14.6769 5.46598 14.8935 5.54675 15.1044 5.7143C15.498 6.02704 16.0707 5.96148 16.3834 5.56785C16.6961 5.17423 16.6306 4.6016 16.237 4.28886C15.7387 3.89296 15.1406 3.65281 14.4563 3.64151C13.7196 3.62934 13.0803 3.88526 12.5483 4.30843C12.1548 4.62138 12.0896 5.19403 12.4025 5.5875Z"
                 fill={props.fill ? props.fill : "#344054"}
             />
@@ -399,9 +399,9 @@ export const DestinationIcon = (props: SvgIconProps) => (
         <path
             d="M22.5605 12H19.0605"
             stroke={props.fill ? props.fill : "#0C2751"}
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
         />
         <rect
             x="-1"
@@ -411,7 +411,7 @@ export const DestinationIcon = (props: SvgIconProps) => (
             rx="4"
             transform="matrix(-1 0 0 1 17.5605 7)"
             stroke={props.fill ? props.fill : "#0C2751"}
-            stroke-width="2"
+            strokeWidth="2"
             fill="#fff"
         />
     </SvgIcon>
@@ -419,7 +419,7 @@ export const DestinationIcon = (props: SvgIconProps) => (
 
 export const ArrowRightIcon = () => (
     <svg width="44" height="36" viewBox="0 0 44 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M15.3335 18H28.6668M28.6668 18L23.6668 13M28.6668 18L23.6668 23" stroke="#4A4C4F" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M15.3335 18H28.6668M28.6668 18L23.6668 13M28.6668 18L23.6668 23" stroke="#4A4C4F" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
@@ -491,7 +491,7 @@ export const OriginIcon = (props: SvgIconProps) => (
           cy="11"
           r="3"
           stroke={props.fill ? props.fill : "#344054"}
-          stroke-width="2"
+          strokeWidth="2"
           fill="#fff"
       />
   </SvgIcon>
