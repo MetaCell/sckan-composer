@@ -72,8 +72,8 @@ describe('End to End Tests', () => {
             args: [
                 "--no-sandbox",
             ],
-            // headless: 'new',
-            headless: false,
+            headless: 'new',
+            // headless: false,
             defaultViewport: {
                 width: 1600,
                 height: 1000,
@@ -223,7 +223,7 @@ describe('End to End Tests', () => {
             await page.keyboard.press('Enter')
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
-            await page.waitForTimeout(1000)
+            await page.waitForTimeout(3000)
             await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
             await page.click('svg[data-testid="BiotechOutlinedIcon"]')
         })
@@ -242,7 +242,7 @@ describe('End to End Tests', () => {
             await page.keyboard.press('Enter')
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
-            await page.waitForTimeout(1000)
+            await page.waitForTimeout(3000)
             await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
             await page.click('svg[data-testid="BiotechOutlinedIcon"]')
         })
@@ -255,7 +255,7 @@ describe('End to End Tests', () => {
             await page.keyboard.press('Enter')
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
-            await page.waitForTimeout(1000)
+            await page.waitForTimeout(3000)
             await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
             await page.click('svg[data-testid="BiotechOutlinedIcon"]')
         })
@@ -273,7 +273,7 @@ describe('End to End Tests', () => {
             await page.keyboard.press('Enter')
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
-            await page.waitForTimeout(1000)
+            await page.waitForTimeout(3000)
             await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
             await page.click('svg[data-testid="BiotechOutlinedIcon"]')
         })
@@ -291,7 +291,7 @@ describe('End to End Tests', () => {
             await page.keyboard.press('Enter')
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
-            await page.waitForTimeout(1000)
+            await page.waitForTimeout(3000)
             await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
             await page.click('svg[data-testid="BiotechOutlinedIcon"]')
         })
@@ -308,7 +308,7 @@ describe('End to End Tests', () => {
             await page.keyboard.press('Enter')
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
-            await page.waitForTimeout(1000)
+            await page.waitForTimeout(3000)
             await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
             await page.click('svg[data-testid="BiotechOutlinedIcon"]')
         })
@@ -623,16 +623,17 @@ describe('End to End Tests', () => {
             await page.waitForSelector(selectors.SEARCH_FOR_DESTINATIONS)
             await page.click(selectors.SEARCH_FOR_DESTINATIONS)
             await page.waitForSelector(selectors.CHECKBOX_ITEM)
-            await page.waitForSelector('#simple-popper ul li')
+            await page.waitForSelector('#simple-popper ul li', {hidden:false})
             await page.click('#simple-popper ul li')
             await page.waitForTimeout(1000)
+            await page.waitForSelector('#simple-popper ul li', {hidden:false})
             await page.click('#simple-popper ul li')
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.waitForTimeout(3000)
+            // await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
+            // await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            // await page.waitForTimeout(3000)
             // await page.waitForFunction((selector, expectedText) => {
             //     const elements = document.querySelectorAll(selector);
             //     return Array.from(elements, element => element.innerText).includes(expectedText);
@@ -653,10 +654,11 @@ describe('End to End Tests', () => {
             expect(all_destinations).toBeGreaterThan(1)
             await page.click(selectors.SEARCH_FOR_DESTINATIONS)
             await page.waitForSelector(selectors.CHECKBOX_ITEM)
-            await page.waitForSelector('#simple-popper ul li')
+            await page.waitForSelector('#simple-popper ul li', {hidden:false})
             await page.click('#simple-popper ul li')
             await page.waitForTimeout(1000)
-            await page.click('#simple-popper ul li')
+            // await page.waitForSelector('#simple-popper ul li', {hidden:false})
+            // await page.click('#simple-popper ul li')
             // await page.type(selectors.SEARCH_FOR_DESTINATIONS, path_builder_destination)
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
