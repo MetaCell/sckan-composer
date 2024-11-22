@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import InfoMenu from "./InfoMenu";
 import NavigationMenu from "./NavigationMenu";
 import createEngine, {
@@ -53,7 +53,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   const [modelFitted, setModelFitted] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null);
   const [rankdir, setRankdir] = useState<"TB" | "LR">("TB");
-  const layoutNodes = (nodes: CustomNodeModel[], links: DefaultLinkModel[]) => {
+  const layoutNodes = useCallback((nodes: CustomNodeModel[], links: DefaultLinkModel[]) => {
     const g = new dagre.graphlib.Graph();
     
     g.setGraph({
@@ -96,13 +96,13 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
         node.setPosition(x, y);
       }
     });
-  };
+  }, [rankdir]);
   
   const toggleRankdir = () => {
     setRankdir((prev) => (prev === "TB" ? "LR" : "TB"));
   };
   
-  const initializeGraph = () => {
+  const initializeGraph = useCallback(() => {
     const model = new DiagramModel();
     
     // Process data to revert to the initial layout
@@ -123,7 +123,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     engine.setModel(model);
     setModelUpdated(true);
     setModelFitted(false);
-  };
+  }, [engine, serializedGraph, origins, vias, destinations, forwardConnection, layoutNodes]);
   
   const resetGraph = () => {
     initializeGraph()
@@ -138,9 +138,9 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
 
   // This effect runs whenever origins, vias, or destinations change
   useEffect(() => {
-    initializeGraph()
-  }, [engine, serializedGraph, origins, vias, destinations, forwardConnection, rankdir]);
-
+    initializeGraph();
+  }, [initializeGraph]);
+  
   // This effect prevents the default scroll and touchmove behavior
   useEffect(() => {
     const currentContainer = containerRef.current;
