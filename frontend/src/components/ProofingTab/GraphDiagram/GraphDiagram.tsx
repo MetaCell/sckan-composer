@@ -114,7 +114,10 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
       serializedGraph,
     });
     
-    layoutNodes(nodes, links);
+    // If the backend does NOT provides us a serialised graph then we use the smart routing.
+    if (serializedGraph === undefined) {
+      layoutNodes(nodes, links);
+    }
     
     model.addAll(...nodes, ...links);
     engine.setModel(model);
