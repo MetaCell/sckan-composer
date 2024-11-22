@@ -54,3 +54,4 @@ export const SEARCH_FOR_VIAS = 'div:has(> input[placeholder="Search for vias"]';
 export const DESTINATION_FROM_FIELD = 'form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div';
 export const FROM_FIELD = 'form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div';
 export const SEARCH_FOR_DESTINATIONS = 'div:has(> input[placeholder="Search for Destinations"]';
+export const BIOTECH_ICON_SELECTOR = 'svg[data-testid="BiotechOutlinedIcon"]'

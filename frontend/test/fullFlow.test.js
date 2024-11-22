@@ -119,9 +119,9 @@ describe('End to End Tests', () => {
             await page.waitForSelector(selectors.USERNAME, { timeout: 60000 })
             await page.type(selectors.USERNAME, USERNAME)
             await page.type(selectors.PASSWORD, PASSWORD)
-            await page.waitForSelector(selectors.SIGN_IN_BUTTON)
+            await page.waitForSelector(selectors.SIGN_IN_BUTTON, {hidden:false})
             await page.click(selectors.SIGN_IN_BUTTON)
-            await page.waitForSelector(selectors.SEARCH_ICON)
+            await page.waitForSelector(selectors.SEARCH_ICON, {hidden:false})
 
 
             console.log('Logged In')
@@ -134,7 +134,7 @@ describe('End to End Tests', () => {
         it('Add Record', async () => {
             console.log('Adding record ...')
 
-            await page.waitForSelector(selectors.ADD_RECORD)
+            await page.waitForSelector(selectors.ADD_RECORD, {hidden:false})
             await page.click(selectors.ADD_RECORD)
             await page.waitForSelector(selectors.ARTICLE_LABEL, {hidden:false})
             await page.click(selectors.ARTICLE_FIELD)
@@ -152,10 +152,10 @@ describe('End to End Tests', () => {
             await page.click(selectors.SENTENCE_FIELD)
             await page.type(selectors.SENTENCE_FIELD, `${sentence}`)
             await page.waitForTimeout(3000)
-            await page.waitForSelector(selectors.CREATE_SENTENCE)
+            await page.waitForSelector(selectors.CREATE_SENTENCE, {hidden:false})
             await page.click(selectors.CREATE_SENTENCE)
 
-            await page.waitForSelector(selectors.SENTENCE_DETAILS_TITLE)
+            await page.waitForSelector(selectors.SENTENCE_DETAILS_TITLE, {hidden:false})
 
             const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
                 return status.map(status => status.innerText)
@@ -171,33 +171,33 @@ describe('End to End Tests', () => {
             console.log('Creating Knowledge Statement ...')
 
             await page.waitForTimeout(3000)
-            await page.waitForSelector(selectors.ADD_KNOWLEDGE_STATEMENT)
+            await page.waitForSelector(selectors.ADD_KNOWLEDGE_STATEMENT, {hidden:false})
             await page.click(selectors.ADD_KNOWLEDGE_STATEMENT)
-            await page.waitForSelector(selectors.KS_FIELD, { timeout: 6000 })
 
             // Knowledge Statement
+            await page.waitForSelector(selectors.KS_FIELD, { timeout: 6000 })
             await page.click(selectors.KS_FIELD)
             await page.type(selectors.KS_FIELD, knowledge_statement_1)
 
             await page.waitForTimeout(3000)
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR, {hidden:false})
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
 
             //Provenance
-            await page.waitForSelector(selectors.PROVENANCE_FIELD)
+            await page.waitForSelector(selectors.PROVENANCE_FIELD, {hidden:false})
             await page.click(selectors.PROVENANCE_FIELD)
             await page.type(selectors.PROVENANCE_FIELD, provenances_1)
             await page.keyboard.press('Enter')
             await page.waitForTimeout(3000)
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR, {hidden:false})
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
 
         })
 
         it('Add Species to KS', async () => {
 
             //Species
-            await page.waitForSelector(selectors.SPECIES_FIELD)
+            await page.waitForSelector(selectors.SPECIES_FIELD, {hidden:false})
             await page.click(selectors.SPECIES_FIELD)
             // await page.type(selectors.SPECIES_FIELD, species_1)
             await page.keyboard.press('ArrowDown');
@@ -205,8 +205,8 @@ describe('End to End Tests', () => {
             // await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             // await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR, {hidden:false})
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
         })
 
         it('Add Phenotype to KS', async () => {
@@ -224,8 +224,8 @@ describe('End to End Tests', () => {
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR, {hidden:false})
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
         })
 
         it('Add Projection phenotype to KS', async () => {
@@ -243,8 +243,8 @@ describe('End to End Tests', () => {
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR, {hidden:false})
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
         })
 
         it('Add Laterality to KS', async () => {
@@ -256,8 +256,8 @@ describe('End to End Tests', () => {
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR, {hidden:false})
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
         })
 
         it('Add Projection Laterality to KS', async () => {
@@ -274,8 +274,8 @@ describe('End to End Tests', () => {
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR, {hidden:false})
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
         })
 
         it('Add Circuit Type to KS', async () => {
@@ -292,8 +292,8 @@ describe('End to End Tests', () => {
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR, {hidden:false})
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
         })
 
 
@@ -309,18 +309,18 @@ describe('End to End Tests', () => {
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR, {hidden:false})
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
         })
 
         it('Add Apinatomy model to KS', async () => {
 
             // Apinatomy Model Name
-            await page.waitForSelector(selectors.APINATOMY_MODEL)
+            await page.waitForSelector(selectors.APINATOMY_MODEL, {hidden:false})
             await page.click(selectors.APINATOMY_MODEL)
             await page.type(selectors.APINATOMY_MODEL, apinatomy_model_name_1)
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR, {hidden:false})
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
@@ -331,8 +331,8 @@ describe('End to End Tests', () => {
             // Additional Information
             await page.click(selectors.ADDITIONAL_INFORMATION)
             await page.type(selectors.ADDITIONAL_INFORMATION, additional_info_1)
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR, {hidden:false})
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
@@ -349,8 +349,8 @@ describe('End to End Tests', () => {
 
             await page.waitForSelector(selectors.STATUS_BUTTON, {hidden:false})
             await page.waitForSelector('button[aria-label="select merge strategy"]', {hidden:false})
-            await page.click('button[aria-label="select merge strategy"]', {hidden:false})
-            await page.waitForSelector('#split-button-menu')
+            await page.click('button[aria-label="select merge strategy"]')
+            await page.waitForSelector('#split-button-menu', {hidden:false})
             await page.keyboard.press('ArrowDown');
             await page.keyboard.press('Enter')
             await page.waitForTimeout(100)
@@ -533,8 +533,8 @@ describe('End to End Tests', () => {
             // expect(searched_origins).toBe(1)
             // await page.waitForSelector(selectors.FIRST_SEARCHED_ELEMENT)
             // await page.click(selectors.FIRST_SEARCHED_ELEMENT)
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR)
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
 
             // await page.click(selectors.ORIGIN_FIELD)
             await page.waitForTimeout(3000)
@@ -565,8 +565,8 @@ describe('End to End Tests', () => {
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR)
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
             await page.waitForTimeout(3000)
 
             // await page.waitForFunction((selector, expectedText) => {
@@ -601,8 +601,8 @@ describe('End to End Tests', () => {
             // await page.click(selectors.FIRST_SEARCHED_ELEMENT)
             // await page.click(selectors.VIAS_FIELD)
 
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR)
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
             await page.waitForTimeout(3000)
             const added_via = await page.$$eval('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(3) > div > div > div > span > div', status => {
                 return status.map(status => status.innerText)
@@ -631,8 +631,8 @@ describe('End to End Tests', () => {
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-            // await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            // await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            // await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR)
+            // await page.click(selectors.BIOTECH_ICON_SELECTOR)
             // await page.waitForTimeout(3000)
             // await page.waitForFunction((selector, expectedText) => {
             //     const elements = document.querySelectorAll(selector);
@@ -688,15 +688,6 @@ describe('End to End Tests', () => {
             const thirdDivTextContent = await page.evaluate(div => div.innerText, h5divs[2]);
             expect(thirdDivTextContent.length).toBeGreaterThan(8);
 
-            // await page.waitForSelector('div:has(h5.MuiTypography-root.MuiTypography-h5:contains("Journey"))')
-            // const divTextContent = await page.$eval('div:has(h5.MuiTypography-root.MuiTypography-h5:contains("Journey"))', div => div.textContent);
-            // console.log(divTextContent);
-
-            // const journey = await page.$$eval('h5.MuiTypography-root.MuiTypography-h5 + p.MuiTypography-root.MuiTypography-body1', journey => {
-            //     return journey.map(journey => journey.innerText)
-            // })
-            // expect(journey).not.toHaveLength(0)
-
             console.log('Statement Preview filled')
         })
 
@@ -720,7 +711,7 @@ describe('End to End Tests', () => {
             await page.waitForSelector('#split-button-menu')
             await page.keyboard.press('ArrowDown');
             await page.keyboard.press('Enter')
-            await page.waitForTimeout(100)
+            await page.waitForTimeout(300)
             await page.click(selectors.STATUS_BUTTON)
             await page.waitForTimeout(2000)
             // await page.waitForFunction((selector, expectedText) => {
@@ -733,8 +724,8 @@ describe('End to End Tests', () => {
             });
 
             expect(sentence_status).toContain("to be reviewed");
-            await page.waitForSelector('svg[data-testid="BiotechOutlinedIcon"]')
-            await page.click('svg[data-testid="BiotechOutlinedIcon"]')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR)
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
             await page.waitForTimeout(2000)
             console.log('Status Changed')
         })
