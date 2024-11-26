@@ -340,6 +340,7 @@ const StatementDetails = () => {
                             connectivity_statement_id: statement.id,
                             type: 'statement'
                           }}
+                          setter={refreshStatement}
                         />
                       </Paper>
                     </Box>

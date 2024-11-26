@@ -29,7 +29,7 @@ const TimeLineIcon = () => {
   </Box>
 }
 const NoteDetails = (props: any) => {
-  const { extraData } = props
+  const { extraData, setter } = props
   const [noteList, setNoteList] = useState<Note[]>([])
   const [refresh, setRefresh] = useState(false)
 
@@ -45,6 +45,13 @@ const NoteDetails = (props: any) => {
       })
     }
   }, [extraData?.connectivity_statement_id, extraData?.sentence_id, refresh, extraData])
+
+  // Note: This useEffect is used to refresh the sentence/cs after the a new note has been added
+  useEffect(() => {
+    if (refresh) {
+      setter()
+    }
+  }, [refresh, setter])
 
   return (
     <Box display='flex' flexDirection='column' >
