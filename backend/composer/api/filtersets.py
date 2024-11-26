@@ -218,10 +218,9 @@ class NoteFilter(django_filters.FilterSet):
             return queryset
         system_user = User.objects.get(username="system")
         combined_queryset = queryset.filter(
-            (Q(user=system_user, note__icontains="invalid") |
+            Q(user=system_user, note__icontains="invalid") |
             Q(user=system_user, note__icontains="exported") |
-             ~Q(user=system_user)) &
-            ~Q(type__in=[NoteType.TRANSITION])
+            ~Q(user=system_user)
         )
         return combined_queryset.distinct()
 
