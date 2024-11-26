@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 def pmid_uri(pmid):
     return f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/" if pmid else "."
 
@@ -22,3 +24,7 @@ def join_entities(entities):
     elif entities_list:
         return entities_list[0]
     return ''
+
+def update_modified_date(instance):
+    instance.modified_date = timezone.now()
+    instance.save(update_fields=["modified_date"])

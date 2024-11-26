@@ -1,5 +1,6 @@
 from typing import List
-from django.db.models import Q
+from django.db.models import Q, Case, When, Value, IntegerField
+from django.db.models.functions import Coalesce
 import django_filters
 from django_filters import BaseInFilter, NumberFilter
 
@@ -49,9 +50,37 @@ class SentenceFilter(django_filters.FilterSet):
         fields=(
             ("id", "id"),
             ("modified_date", "last_edited"),
+            ("owner", "owner"),
         ),
+        method='order_by_current_user'
     )
     exclude = django_filters.BaseInFilter(method=exclude_ids)
+
+    def order_by_current_user(self, queryset, name, value):
+        current_user = self.request.user
+        if 'owner' in value or '-owner' in value:
+            order_direction = '-' if '-owner' in value else ''
+            reverse__order_direction = '' if '-owner' in value else '-'
+            queryset = queryset.annotate(
+                owner_null=Case(
+                    When(owner=None, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField()
+                ),
+                is_current_user=Case(
+                    When(owner=current_user, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField()
+                )
+            ).order_by('owner_null', f'{reverse__order_direction}is_current_user', f'{order_direction}owner__first_name', f'{order_direction}owner__last_name')
+        if 'last_edited' in value or '-last_edited' in value:
+            order_direction = '-' if '-last_edited' in value else ''
+
+            queryset = queryset.order_by(f'{order_direction}modified_date')
+
+        other_ordering = [v for v in value if v not in [
+            'owner', '-owner', 'last_edited', '-last_edited']]
+        return queryset if not other_ordering else queryset.order_by(*other_ordering)
 
     class Meta:
         model = Sentence

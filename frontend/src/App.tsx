@@ -14,7 +14,9 @@ import StatementList from "./Pages/StatementList";
 import SentenceList from "./Pages/SentenceList";
 import { userProfile } from "./services/UserService";
 import { useAppDispatch } from "./redux/hooks";
-import { setFilters } from "./redux/statementSlice";
+import { setFilters as setStatementFilters } from "./redux/statementSlice";
+import { setFilters as setSentenceFilters } from "./redux/sentenceSlice";
+import { ComposerSentenceListStateEnum } from "./apiclient/backend";
 
 const PageSelect = () => {
   const user = userProfile.getProfile();
@@ -34,18 +36,24 @@ function App() {
   if (userProfile.isSignedIn()) {
     const user = userProfile.getProfile();
 
-    const defaultStateFilter = []
+    const defaultStatementStateFilter = []
+    const defaultSentenceStateFilter = [
+      ComposerSentenceListStateEnum.ComposeLater, ComposerSentenceListStateEnum.ComposeNow,
+      ComposerSentenceListStateEnum.NeedsFurtherReview, ComposerSentenceListStateEnum.Open,
+      ComposerSentenceListStateEnum.ReadyToCompose
+    ]
     if (user.is_curator) {
-      defaultStateFilter.push("compose_now")
+      defaultStatementStateFilter.push("compose_now")
     }
 
     if (user.is_reviewer) {
-      defaultStateFilter.push("to_be_reviewed")
+      defaultStatementStateFilter.push("to_be_reviewed")
     }
 
-    if (defaultStateFilter.length > 0) {
-      dispatch(setFilters({ stateFilter: defaultStateFilter }));
+    if (defaultStatementStateFilter.length > 0) {
+      dispatch(setStatementFilters({ stateFilter: defaultStatementStateFilter }));
     }
+    dispatch(setSentenceFilters({ stateFilter: defaultSentenceStateFilter }));
 
     return (
       <BrowserRouter>

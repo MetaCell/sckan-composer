@@ -366,7 +366,10 @@ const SentencesDetails = () => {
                       setter={refreshSentence}
                     />
                     <Divider sx={{ margin: "36px 0" }} />
-                    <NoteDetails extraData={{ sentence_id: sentence.id, type: 'sentence' }} />
+                    <NoteDetails
+                      extraData={{ sentence_id: sentence.id, type: 'sentence' }}
+                      setter={refreshSentence}
+                    />
                   </Paper>
                 </Box>
               </Grid>

@@ -2,9 +2,8 @@ from django.core.exceptions import ValidationError
 from django.dispatch import receiver
 from django.db.models.signals import post_save, m2m_changed, pre_save, post_delete
 from django.contrib.auth import get_user_model
-
 from django_fsm.signals import post_transition
-
+from .utils import update_modified_date
 from .enums import CSState, NoteType
 from .models import (
     ConnectivityStatement,
@@ -167,3 +166,19 @@ def destination_changed(sender, instance, **kwargs):
         pass
     except ValueError:
         pass
+
+# TAG: If a sentence/CS tag is changed, update the modified_date
+@receiver(m2m_changed, sender=Sentence.tags.through, dispatch_uid="sentence_tags_changed")
+@receiver(m2m_changed, sender=ConnectivityStatement.tags.through, dispatch_uid="cs_tags_changed")
+def sentence_and_cs_tags_changed(sender, instance, action, **kwargs):
+    if action in ["post_add", "post_remove", "post_clear"]:
+        update_modified_date(instance)
+
+# NOTE: If a note is added, updated, or deleted, update the modified_date of the sentence/CS
+@receiver(post_save, sender=Note, dispatch_uid="note_post_save")
+@receiver(post_delete, sender=Note, dispatch_uid="note_post_delete")
+def note_post_save_and_delete(sender, instance, **kwargs):
+    if instance.sentence:
+        update_modified_date(instance.sentence)
+    if instance.connectivity_statement:
+        update_modified_date(instance.connectivity_statement)
