@@ -33,5 +33,6 @@ export const vars = {
     dropdownHeadingColor: '#373A3E',
     dropdownTextColor: '#A9ACB2',
     gray200: '#EAECF0',
-    warning600: '#DC6803'
+    warning600: '#DC6803',
+    gray600: '#475467'
 };

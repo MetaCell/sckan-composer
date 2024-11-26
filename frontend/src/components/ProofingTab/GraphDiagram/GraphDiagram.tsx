@@ -56,7 +56,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   const [modelFitted, setModelFitted] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null);
   const [rankdir, setRankdir] = useState<"TB" | "LR">("TB");
-  const [lockedGraph, setLockedGraph] = React.useState(false);
+  const [isGraphLocked, setIsGraphLocked] = React.useState(false);
   
   const layoutNodes = useCallback((nodes: CustomNodeModel[], links: DefaultLinkModel[]) => {
     const g = new dagre.graphlib.Graph();
@@ -73,7 +73,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     
     nodes.forEach(node => {
       g.setNode(node.getID(), { width: 100, height: 50 });
-      node.setLocked(lockedGraph);
+      node.setLocked(isGraphLocked);
     });
     
     links.forEach(link => {
@@ -102,7 +102,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
         node.setPosition(x, y);
       }
     });
-  }, [rankdir, lockedGraph]);
+  }, [rankdir, isGraphLocked]);
   
   const toggleRankdir = () => {
     setRankdir((prev) => (prev === "TB" ? "LR" : "TB"));
@@ -185,8 +185,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
           rankdir={rankdir}
           toggleRankdir={toggleRankdir}
           resetGraph={resetGraph}
-          lockedGraph={lockedGraph}
-          setLockedGraph={setLockedGraph}
+          isGraphLocked={isGraphLocked}
+          setIsGraphLocked={setIsGraphLocked}
         />
         <Box
           display="flex"
