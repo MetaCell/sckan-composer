@@ -39,7 +39,8 @@ function App() {
     const defaultStatementStateFilter = []
     const defaultSentenceStateFilter = [
       ComposerSentenceListStateEnum.ComposeLater, ComposerSentenceListStateEnum.ComposeNow,
-      ComposerSentenceListStateEnum.NeedsFurtherReview, ComposerSentenceListStateEnum.ReadyToCompose
+      ComposerSentenceListStateEnum.NeedsFurtherReview, ComposerSentenceListStateEnum.Open,
+      ComposerSentenceListStateEnum.ReadyToCompose
     ]
     if (user.is_curator) {
       defaultStatementStateFilter.push("compose_now")
