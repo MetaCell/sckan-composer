@@ -492,7 +492,7 @@ export interface ConnectivityStatementUpdate {
      * @type {string}
      * @memberof ConnectivityStatementUpdate
      */
-    'state'?: string;
+    'state': string;
     /**
      * 
      * @type {Array<AvailableTransitions24dEnum>}
@@ -3825,13 +3825,14 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * Note
          * @param {number | null} [connectivityStatementId] 
+         * @param {boolean} [includeSystemNotes] Include System Notes
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
          * @param {number | null} [sentenceId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteList: async (connectivityStatementId?: number | null, limit?: number, offset?: number, sentenceId?: number | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerNoteList: async (connectivityStatementId?: number | null, includeSystemNotes?: boolean, limit?: number, offset?: number, sentenceId?: number | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/note/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3855,6 +3856,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
 
             if (connectivityStatementId !== undefined) {
                 localVarQueryParameter['connectivity_statement_id'] = connectivityStatementId;
+            }
+
+            if (includeSystemNotes !== undefined) {
+                localVarQueryParameter['include_system_notes'] = includeSystemNotes;
             }
 
             if (limit !== undefined) {
@@ -5675,14 +5680,15 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         /**
          * Note
          * @param {number | null} [connectivityStatementId] 
+         * @param {boolean} [includeSystemNotes] Include System Notes
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
          * @param {number | null} [sentenceId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerNoteList(connectivityStatementId?: number | null, limit?: number, offset?: number, sentenceId?: number | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedNoteList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerNoteList(connectivityStatementId, limit, offset, sentenceId, options);
+        async composerNoteList(connectivityStatementId?: number | null, includeSystemNotes?: boolean, limit?: number, offset?: number, sentenceId?: number | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedNoteList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerNoteList(connectivityStatementId, includeSystemNotes, limit, offset, sentenceId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerNoteList']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -6360,14 +6366,15 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         /**
          * Note
          * @param {number | null} [connectivityStatementId] 
+         * @param {boolean} [includeSystemNotes] Include System Notes
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
          * @param {number | null} [sentenceId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerNoteList(connectivityStatementId?: number | null, limit?: number, offset?: number, sentenceId?: number | null, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedNoteList> {
-            return localVarFp.composerNoteList(connectivityStatementId, limit, offset, sentenceId, options).then((request) => request(axios, basePath));
+        composerNoteList(connectivityStatementId?: number | null, includeSystemNotes?: boolean, limit?: number, offset?: number, sentenceId?: number | null, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedNoteList> {
+            return localVarFp.composerNoteList(connectivityStatementId, includeSystemNotes, limit, offset, sentenceId, options).then((request) => request(axios, basePath));
         },
         /**
          * Note
@@ -7001,6 +7008,7 @@ export class ComposerApi extends BaseAPI {
     /**
      * Note
      * @param {number | null} [connectivityStatementId] 
+     * @param {boolean} [includeSystemNotes] Include System Notes
      * @param {number} [limit] Number of results to return per page.
      * @param {number} [offset] The initial index from which to return the results.
      * @param {number | null} [sentenceId] 
@@ -7008,8 +7016,8 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerNoteList(connectivityStatementId?: number | null, limit?: number, offset?: number, sentenceId?: number | null, options?: RawAxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerNoteList(connectivityStatementId, limit, offset, sentenceId, options).then((request) => request(this.axios, this.basePath));
+    public composerNoteList(connectivityStatementId?: number | null, includeSystemNotes?: boolean, limit?: number, offset?: number, sentenceId?: number | null, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerNoteList(connectivityStatementId, includeSystemNotes, limit, offset, sentenceId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
