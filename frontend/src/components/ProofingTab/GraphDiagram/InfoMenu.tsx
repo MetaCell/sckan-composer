@@ -21,14 +21,8 @@ const InfoMenu = (props: InfoMenuProps) => {
             alignItems='center'
             sx={{
                 borderRadius: "1.75rem",
-                border: "0.0394rem solid #EDEFF2",
-                background: "rgba(255, 255, 255, 0.5)",
                 width: "fit-content",
-                boxShadow:
-                    "0rem 0.1567rem 0.235rem -0.0783rem rgba(16, 24, 40, 0.03), 0rem 0.47rem 0.6267rem -0.1567rem rgba(16, 24, 40, 0.08)",
-                padding: "0 1.25rem",
-                height: '3.625rem',
-                zIndex: 10,
+                padding: "1.25rem 0 .5rem 0",
 
                 "& .MuiDivider-root": {
                     width: '0.0313rem',
