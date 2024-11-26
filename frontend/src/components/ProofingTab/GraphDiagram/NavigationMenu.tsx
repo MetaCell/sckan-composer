@@ -19,13 +19,14 @@ interface NavigationMenuProps {
   rankdir: string;
   toggleRankdir: () => void;
   resetGraph: () => void;
+  lockedGraph: boolean;
+  setLockedGraph: (locked: boolean) => void;
 }
 
 const NavigationMenu = (props: NavigationMenuProps) => {
-  const {engine, statementId, toggleRankdir, resetGraph} = props
+  const {engine, statementId, toggleRankdir, resetGraph, lockedGraph, setLockedGraph} = props
   const [isSaving, setIsSaving] = useState<boolean>(false)
   const [viewWarningAlert, setViewWarningAlert] = useState<boolean>(false)
-  const [lockedGraph, setLockedGraph] = React.useState(false);
   const zoomOut = () => {
     const zoomLevel = engine.getModel().getZoomLevel();
     engine.getModel().setZoomLevel(zoomLevel - ZOOM_CHANGE);
