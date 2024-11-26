@@ -1,16 +1,16 @@
-import {Stack, Divider, CircularProgress, Backdrop} from "@mui/material";
+import {Stack, Divider, CircularProgress, Backdrop, Tooltip, Alert} from "@mui/material";
 import FitScreenOutlinedIcon from "@mui/icons-material/FitScreenOutlined";
 import ZoomInOutlinedIcon from "@mui/icons-material/ZoomInOutlined";
 import ZoomOutOutlinedIcon from "@mui/icons-material/ZoomOutOutlined";
-import SaveIcon from '@mui/icons-material/Save';
 import IconButton from "@mui/material/IconButton";
 import {DiagramEngine} from "@projectstorm/react-diagrams-core";
 import React, {useState} from "react";
 import {PatchedConnectivityStatementUpdate} from "../../../apiclient/backend";
 import connectivityStatementService from "../../../services/StatementService";
-import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
-import SwapVertOutlinedIcon from '@mui/icons-material/SwapVertOutlined';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
+import CameraswitchOutlinedIcon from '@mui/icons-material/CameraswitchOutlined';
+import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
+import CustomSwitch from "../../CustomSwitch";
 const ZOOM_CHANGE = 25
 
 interface NavigationMenuProps {
@@ -22,10 +22,10 @@ interface NavigationMenuProps {
 }
 
 const NavigationMenu = (props: NavigationMenuProps) => {
-  const {engine, statementId, toggleRankdir, rankdir, resetGraph} = props
+  const {engine, statementId, toggleRankdir, resetGraph} = props
   const [isSaving, setIsSaving] = useState<boolean>(false)
-
-
+  const [viewWarningAlert, setViewWarningAlert] = useState<boolean>(false)
+  const [lockedGraph, setLockedGraph] = React.useState(false);
   const zoomOut = () => {
     const zoomLevel = engine.getModel().getZoomLevel();
     engine.getModel().setZoomLevel(zoomLevel - ZOOM_CHANGE);
@@ -68,57 +68,89 @@ const NavigationMenu = (props: NavigationMenuProps) => {
     <Stack
       direction="row"
       spacing="1rem"
+      alignItems='center'
+      justifyContent="space-between"
       sx={{
-        borderRadius: "1.75rem",
-        border: "1px solid #F2F4F7",
-        background: "#FFF",
-        width: "fit-content",
-        boxShadow:
-          "0px 4px 6px -2px rgba(16, 24, 40, 0.03), 0px 12px 16px -4px rgba(16, 24, 40, 0.08)",
-        padding: "0.75rem 1.25rem",
-        position: "absolute",
-        top: 8,
-        right: 8,
-        zIndex: 10,
-
+        p: '1.5rem .5rem',
         "& .MuiSvgIcon-root": {
-          color: "#475467",
+          color: "#6C707A",
         },
 
         "& .MuiDivider-root": {
           borderColor: "#EAECF0",
           borderWidth: 0.5,
+          height: '1.5rem'
         },
         "& .MuiButtonBase-root": {
           padding: 0,
-
-          "&:hover": {
-            backgroundColor: "transparent",
-          },
+          
+          '&.Mui-disabled': {
+            "& .MuiSvgIcon-root": {
+              color: '#caced1',
+            },
+          }
         },
       }}
     >
-      <IconButton onClick={() => engine.zoomToFit()}>
-        <FitScreenOutlinedIcon/>
-      </IconButton>
-      <Divider/>
-      <IconButton onClick={() => zoomIn()}>
-        <ZoomInOutlinedIcon/>
-      </IconButton>
-      <IconButton>
-        <ZoomOutOutlinedIcon onClick={() => zoomOut()}/>
-      </IconButton>
-      <IconButton onClick={() => saveGraph()}>
-        <SaveIcon/>
-      </IconButton>
-      <IconButton onClick={toggleRankdir}>
+      <Stack direction="row" alignItems='center' spacing="1rem" sx={{
+        "& .MuiButtonBase-root": {
+          borderRadius: '4px',
+          padding: '0 !important',
+          "&:hover": {
+            backgroundColor: "#EDEFF2",
+            borderRadius: '4px',
+            padding: '2px',
+            "& .MuiSvgIcon-root": {
+              color: "#2F3032",
+            },
+          },
+        },
+      }}>
+        <Tooltip arrow title='Zoom in'>
+          <IconButton onClick={() => zoomIn()}>
+            <ZoomInOutlinedIcon/>
+          </IconButton>
+        </Tooltip>
+        <Tooltip arrow title='Zoom Out'>
+          <IconButton>
+            <ZoomOutOutlinedIcon onClick={() => zoomOut()}/>
+          </IconButton>
+        </Tooltip>
+        <Tooltip arrow title='Autoscale'>
+          <IconButton onClick={() => engine.zoomToFit()}>
+            <FitScreenOutlinedIcon/>
+          </IconButton>
+        </Tooltip>
+        <Tooltip arrow title='Switch orientation'>
+          <IconButton onClick={toggleRankdir} disabled={lockedGraph}>
+            <CameraswitchOutlinedIcon />
+          </IconButton>
+        </Tooltip>
+        <Divider />
+        {/*<IconButton onClick={() => saveGraph()}>*/}
+        {/*  <SaveIcon/>*/}
+        {/*</IconButton>*/}
+        <Tooltip arrow title='Reset to default visualisation'>
+          <IconButton onClick={resetGraph} disabled={lockedGraph}>
+            <RestartAltOutlinedIcon />
+          </IconButton>
+        </Tooltip>
+      </Stack>
+      <Stack direction="row" spacing="1rem" alignItems='center'>
         {
-          rankdir === 'LR' ? <SwapVertOutlinedIcon/> : <SwapHorizOutlinedIcon/>
+          viewWarningAlert ?
+            <Tooltip arrow title='This diagram does not match the Path Builder. It will be updated with default routing if you leave this page.'>
+              <Alert severity="warning">The diagram is outdated, please use the reset button on the left to update the diagram</Alert>
+            </Tooltip> :
+            <Tooltip arrow title='The diagram is saved for all users'>
+                <CheckCircleOutlineRoundedIcon sx={{
+                  color: "#039855 !important",
+                }} />
+            </Tooltip>
         }
-      </IconButton>
-      <IconButton onClick={resetGraph}>
-        <HomeOutlinedIcon />
-      </IconButton>
+        <Divider />
+         <CustomSwitch locked={lockedGraph} setLocked={setLockedGraph} />
+      </Stack>
     </Stack>
   )
 };

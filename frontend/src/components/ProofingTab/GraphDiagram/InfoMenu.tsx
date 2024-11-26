@@ -28,9 +28,6 @@ const InfoMenu = (props: InfoMenuProps) => {
                     "0rem 0.1567rem 0.235rem -0.0783rem rgba(16, 24, 40, 0.03), 0rem 0.47rem 0.6267rem -0.1567rem rgba(16, 24, 40, 0.08)",
                 padding: "0 1.25rem",
                 height: '3.625rem',
-                position: "absolute",
-                left: '1.25rem',
-                bottom: '1.25rem',
                 zIndex: 10,
 
                 "& .MuiDivider-root": {

@@ -454,6 +454,50 @@ const theme = createTheme({
         }),
       },
     },
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          padding: 0,
+          cursor: 'default',
+          
+          '& .MuiAlert-message, & .MuiAlert-icon': {
+            padding: 0
+          },
+          
+          '& .MuiAlert-icon': {
+            marginRight: '4px'
+          },
+          
+          '&.MuiAlert-standardWarning': {
+            '& .MuiAlert-message': {
+              color: vars.warning600,
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              lineHeight: '1.125rem',
+            },
+            '& .MuiAlert-icon': {
+              '& .MuiSvgIcon-root': {
+                color: vars.warning600,
+                fontSize: '1rem',
+              }
+            }
+          }
+        }
+      },
+    },
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          backgroundColor: '#232325',
+          padding: '0.5rem 0.75rem',
+          fontWeight: 600,
+          fontSize: '0.75rem'
+        },
+        arrow: {
+          color: '#232325'
+        }
+      },
+    },
   },
 });
 

@@ -17,6 +17,8 @@ import {DestinationTypeMapping, processData} from "../../../services/GraphDiagra
 
 import dagre from 'dagre';
 import {CustomNodeModel} from "./Models/CustomNodeModel";
+import Box from "@mui/material/Box";
+import {useTheme} from "@mui/system";
 
 export enum NodeTypes {
   Origin = 'Origin',
@@ -47,6 +49,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
                                                      forwardConnection = [],
                                                      serializedGraph,
                                                    }) => {
+  const theme = useTheme();
   const {statementId} = useParams();
   const [engine] = useState(() => createEngine());
   const [modelUpdated, setModelUpdated] = useState(false)
@@ -55,7 +58,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   const [rankdir, setRankdir] = useState<"TB" | "LR">("TB");
   const layoutNodes = useCallback((nodes: CustomNodeModel[], links: DefaultLinkModel[]) => {
     const g = new dagre.graphlib.Graph();
-    
+
     g.setGraph({
       rankdir: rankdir,
       ranksep: 350,
@@ -173,13 +176,25 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
 
   
     return (
-    modelUpdated ? (
-        <div ref={containerRef} className={"graphContainer"}>
-          <NavigationMenu engine={engine} statementId={statementId || "-1"} rankdir={rankdir} toggleRankdir={toggleRankdir} resetGraph={resetGraph} />
-          <InfoMenu engine={engine} forwardConnection={true}/>
-          <CanvasWidget className={"graphContainer"} engine={engine}/>
-        </div>)
-      : null
+      <Box>
+        <NavigationMenu engine={engine} statementId={statementId || "-1"} rankdir={rankdir} toggleRankdir={toggleRankdir} resetGraph={resetGraph} />
+        <Box
+          display="flex"
+          justifyContent="center"
+          sx={{background: theme.palette.grey[100], borderRadius: 1}}
+        >
+          <Box sx={{height: '800px', width: '100%'}}>
+            {
+              modelUpdated ? (
+                  <div ref={containerRef} className={"graphContainer"}>
+                    <CanvasWidget className={"graphContainer"} engine={engine}/>
+                  </div>)
+                : null
+            }
+          </Box>
+        </Box>
+        <InfoMenu engine={engine} forwardConnection={true}/>
+      </Box>
   );
 }
 
