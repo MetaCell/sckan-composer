@@ -178,7 +178,7 @@ const StatementForm = (props: any) => {
         );
       },
       onUpdate: async (selectedOptions: any) => {
-        return await updateOrigins(selectedOptions, statement.id, setStatement, dispatch);
+        return await updateOrigins(selectedOptions, statement.id, refreshStatement, dispatch);
       },
       errors: "",
       mapValueToOption: () =>

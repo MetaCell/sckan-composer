@@ -47,7 +47,7 @@ export async function getAnatomicalEntities(
 export async function updateOrigins(
   selected: Option[],
   statementId: number,
-  setStatement: (statement: any) => void,
+  refreshStatement: () => void,
   dispatch: AppDispatch,
 ) {
   const originIds = selected.map((option) => parseInt(option.id));
@@ -57,8 +57,10 @@ export async function updateOrigins(
 
   try {
     const response = await statementService.partialUpdate(statementId, patchedStatement);
-    setStatement(response);
-    dispatch(setWasChangeDetected(true));
+    if (response === ChangeRequestStatus.SAVED) {
+      refreshStatement();
+      dispatch(setWasChangeDetected(true));
+    }
     return response;
   } catch (error) {
     alert(`Error updating origins: ${error}`);
