@@ -195,21 +195,27 @@ const NavigationMenu = (props: NavigationMenuProps) => {
                 </Tooltip>
             }
             <Divider />
-            <CustomSwitch disabled={wasChangeDetected} locked={isGraphLocked} setLocked={() => openDialog({
-              title: isGraphLocked
-                ? CONFIRMATION_DIALOG_CONFIG.Locked.title
-                : CONFIRMATION_DIALOG_CONFIG.Unlocked.title,
-              confirmationText: isGraphLocked
-                ? CONFIRMATION_DIALOG_CONFIG.Locked.confirmationText
-                : CONFIRMATION_DIALOG_CONFIG.Unlocked.confirmationText,
-              Icon: isGraphLocked
-                ? <CONFIRMATION_DIALOG_CONFIG.Locked.Icon/>
-                : <CONFIRMATION_DIALOG_CONFIG.Unlocked.Icon/>,
-              onConfirm: () => {
-                switchLockedGraph(!isGraphLocked);
-                closeDialog();
-              },
-            })}
+            <CustomSwitch disabled={wasChangeDetected} locked={isGraphLocked} setLocked={(lock: boolean) => {
+              console.log(lock)
+              return openDialog({
+                title: !lock
+                  ? CONFIRMATION_DIALOG_CONFIG.Locked.title
+                  : CONFIRMATION_DIALOG_CONFIG.Unlocked.title,
+                confirmationText: !lock
+                  ? CONFIRMATION_DIALOG_CONFIG.Locked.confirmationText
+                  : CONFIRMATION_DIALOG_CONFIG.Unlocked.confirmationText,
+                Icon: !lock
+                  ? <CONFIRMATION_DIALOG_CONFIG.Locked.Icon/>
+                  : <CONFIRMATION_DIALOG_CONFIG.Unlocked.Icon/>,
+                onConfirm: async () => {
+                  if (lock) {
+                    await saveGraph()
+                  }
+                  switchLockedGraph(!isGraphLocked);
+                  closeDialog();
+                },
+              })
+            }}
             />
           </Stack>
         </Stack>
