@@ -1016,6 +1016,7 @@ class ExportMetrics(models.Model):
 
 class AlertType(models.Model):
     name = models.CharField(max_length=200, unique=True)
+    predicate = models.CharField(max_length=200)
     uri = models.URLField()
 
     def __str__(self):
