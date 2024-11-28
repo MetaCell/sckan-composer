@@ -219,7 +219,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   return (
       <Box>
         <NavigationMenu
-          engine={engine} statementId={statementId || "-1"}
+          engine={engine}
+          statementId={statementId || "-1"}
           rankdir={rankdir}
           toggleRankdir={toggleRankdir}
           resetGraph={resetGraph}

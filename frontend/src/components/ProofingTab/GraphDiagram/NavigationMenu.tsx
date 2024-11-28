@@ -15,6 +15,7 @@ import ConfirmationDialog from "../../ConfirmationDialog";
 import {CONFIRMATION_DIALOG_CONFIG} from "../../../settings";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../redux/store";
+import {checkOwnership, getOwnershipAlertMessage} from "../../../helpers/ownershipAlert";
 const ZOOM_CHANGE = 25
 
 interface NavigationMenuProps {
@@ -92,8 +93,62 @@ const NavigationMenu = (props: NavigationMenuProps) => {
       setIsSaving(false)
     }
   }
-
-  return <>
+  
+  const switchOrientation = () => {
+    return openDialog({
+      title: CONFIRMATION_DIALOG_CONFIG.Redraw.title,
+      confirmationText: CONFIRMATION_DIALOG_CONFIG.Redraw.confirmationText,
+      Icon: <CONFIRMATION_DIALOG_CONFIG.Redraw.Icon />,
+      onConfirm: () => {
+        toggleRankdir();
+        closeDialog();
+      },
+    });
+  };
+  
+  const redrawGraph = async () => {
+    return openDialog({
+      title: CONFIRMATION_DIALOG_CONFIG.Redraw.title,
+      confirmationText: CONFIRMATION_DIALOG_CONFIG.Redraw.confirmationText,
+      Icon: <CONFIRMATION_DIALOG_CONFIG.Redraw.Icon />,
+      onConfirm: async () => {
+        await resetGraph();
+        await saveGraph()
+        closeDialog();
+      },
+    })
+  }
+  
+  const toggleGraphLock = (lock: boolean) => {
+   return checkOwnership(
+      Number(statementId),
+      async () => {
+        // If ownership is valid, proceed with dialog confirmation
+        openDialog({
+          title: !lock
+            ? CONFIRMATION_DIALOG_CONFIG.Locked.title
+            : CONFIRMATION_DIALOG_CONFIG.Unlocked.title,
+          confirmationText: !lock
+            ? CONFIRMATION_DIALOG_CONFIG.Locked.confirmationText
+            : CONFIRMATION_DIALOG_CONFIG.Unlocked.confirmationText,
+          Icon: !lock
+            ? <CONFIRMATION_DIALOG_CONFIG.Locked.Icon/>
+            : <CONFIRMATION_DIALOG_CONFIG.Unlocked.Icon/>,
+          onConfirm: async () => {
+            if (lock) {
+              await saveGraph();
+            }
+            switchLockedGraph(!isGraphLocked);
+            closeDialog();
+          },
+        });
+      },
+      () => {},
+      getOwnershipAlertMessage
+    );
+  };
+    
+    return <>
     {
       isSaving ? (
         <Backdrop open={isSaving}>
@@ -157,33 +212,13 @@ const NavigationMenu = (props: NavigationMenuProps) => {
               </IconButton>
             </Tooltip>
             <Tooltip arrow title='Switch orientation'>
-              <IconButton onClick={() =>
-                openDialog({
-                  title: CONFIRMATION_DIALOG_CONFIG.Redraw.title,
-                  confirmationText: CONFIRMATION_DIALOG_CONFIG.Redraw.confirmationText,
-                  Icon: <CONFIRMATION_DIALOG_CONFIG.Redraw.Icon />,
-                  onConfirm: () => {
-                    toggleRankdir();
-                    closeDialog();
-                  },
-                })
-              } disabled={isGraphLocked}>
+              <IconButton onClick={switchOrientation} disabled={isGraphLocked}>
                 <CameraswitchOutlinedIcon />
               </IconButton>
             </Tooltip>
             <Divider />
             <Tooltip arrow title='Reset to default visualisation'>
-              <IconButton onClick={() =>
-                openDialog({
-                  title: CONFIRMATION_DIALOG_CONFIG.Redraw.title,
-                  confirmationText: CONFIRMATION_DIALOG_CONFIG.Redraw.confirmationText,
-                  Icon: <CONFIRMATION_DIALOG_CONFIG.Redraw.Icon />,
-                  onConfirm: () => {
-                    resetGraph();
-                    closeDialog();
-                  },
-                })
-              } disabled={isGraphLocked}>
+              <IconButton onClick={redrawGraph} disabled={isGraphLocked}>
                 <RestartAltOutlinedIcon />
               </IconButton>
             </Tooltip>
@@ -201,27 +236,10 @@ const NavigationMenu = (props: NavigationMenuProps) => {
                 </Tooltip>
             }
             <Divider />
-            <CustomSwitch disabled={wasChangeDetected} locked={isGraphLocked} setLocked={(lock: boolean) => {
-              console.log(lock)
-              return openDialog({
-                title: !lock
-                  ? CONFIRMATION_DIALOG_CONFIG.Locked.title
-                  : CONFIRMATION_DIALOG_CONFIG.Unlocked.title,
-                confirmationText: !lock
-                  ? CONFIRMATION_DIALOG_CONFIG.Locked.confirmationText
-                  : CONFIRMATION_DIALOG_CONFIG.Unlocked.confirmationText,
-                Icon: !lock
-                  ? <CONFIRMATION_DIALOG_CONFIG.Locked.Icon/>
-                  : <CONFIRMATION_DIALOG_CONFIG.Unlocked.Icon/>,
-                onConfirm: async () => {
-                  if (lock) {
-                    await saveGraph()
-                  }
-                  switchLockedGraph(!isGraphLocked);
-                  closeDialog();
-                },
-              })
-            }}
+            <CustomSwitch
+              disabled={wasChangeDetected}
+              locked={isGraphLocked}
+              setLocked={(lock: boolean) => toggleGraphLock(lock)}
             />
           </Stack>
         </Stack>

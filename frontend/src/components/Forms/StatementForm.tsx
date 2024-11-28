@@ -234,6 +234,7 @@ const StatementForm = (props: any) => {
           await api.composerViaPartialUpdate(statement.vias[sourceIndex].id, {
             order: destinationIndex,
           });
+          dispatch(setWasChangeDetected(true));
           refreshStatement();
         }}
         hideDeleteBtn={statement?.vias?.length < 1 || isDisabled}
