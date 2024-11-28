@@ -11,6 +11,12 @@ const MaterialUISwitch = styled(Switch)(() => ({
   margin: '0 !important',
   '& .MuiSwitch-switchBase': {
     margin: 2.7,
+    '&.Mui-disabled': {
+      '& + .MuiSwitch-track': {
+        opacity: .8,
+        cursor: 'default'
+      }
+    },
     '&.Mui-checked': {
       '& .MuiSwitch-thumb:before': {
         backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="14" width="14" viewBox="0 0 14 14"><path fill="${encodeURIComponent(
@@ -67,12 +73,12 @@ const MaterialUISwitch = styled(Switch)(() => ({
   },
 }));
 
-const CustomizedSwitches = ({locked, setLocked}: {locked: boolean, setLocked: (locked: boolean) => void})=> {
+const CustomizedSwitches = ({locked, setLocked, disabled}: {locked: boolean, setLocked: (locked: boolean) => void, disabled: boolean})=> {
   return (
       <FormControlLabel
         control={
           <Tooltip arrow title={locked ? 'The diagram is locked and saved. You cannot change the positions of the entities' : 'The diagram is unlocked. You can move the population entities freely. Lock to persist.'}>
-             <MaterialUISwitch sx={{ m: 1 }} checked={locked} onClick={() => setLocked(!locked)} />
+             <MaterialUISwitch disabled={disabled} sx={{ m: 1 }} checked={locked} onClick={() => setLocked(!locked)} />
           </Tooltip>
          }
         label=""

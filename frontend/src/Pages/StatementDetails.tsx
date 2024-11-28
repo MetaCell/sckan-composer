@@ -35,6 +35,11 @@ import {ViaIcon, DestinationIcon, OriginIcon} from "../components/icons";
 import {CircularProgress} from "@mui/material";
 import {checkOwnership, getOwnershipAlertMessage} from "../helpers/ownershipAlert";
 import {ChangeRequestStatus} from "../helpers/settings";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../redux/store";
+import ConfirmationDialog from "../components/ConfirmationDialog";
+import {CONFIRMATION_DIALOG_CONFIG} from "../settings";
+import {setWasChangeDetected} from "../redux/statementSlice";
 
 const StatementDetails = () => {
   const {statementId} = useParams();
@@ -43,6 +48,9 @@ const StatementDetails = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [refetch, setRefetch] = useState(false);
+  const [isNavigateDialogOpen, setIsNavigateDialogOpen] = useState(false);
+  const dispatch = useDispatch();
+  
   const refs = [
     useRef<HTMLElement | null>(null),
     useRef<HTMLElement | null>(null),
@@ -53,7 +61,25 @@ const StatementDetails = () => {
     useRef<HTMLElement | null>(null),
     useRef<HTMLElement | null>(null),
   ];
-
+  const wasChangeDetected = useSelector((state: RootState) => state.statement.wasChangeDetected);
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    if (wasChangeDetected) {
+      setIsNavigateDialogOpen(true);
+    } else {
+      setActiveTab(newValue);
+    }
+  };
+  
+  const handleNavigateConfirm = () => {
+    setIsNavigateDialogOpen(false);
+    setActiveTab(0)
+    dispatch(setWasChangeDetected(false));
+  };
+  
+  const handleNavigateCancel = () => {
+    setIsNavigateDialogOpen(false);
+  };
+  
   const scrollToElement = (index: number) => {
     const element = refs[index].current;
     if (element) {
@@ -279,7 +305,7 @@ const StatementDetails = () => {
                   <Tabs
                     value={activeTab}
                     variant="standard"
-                    onChange={(e, i: number) => setActiveTab(i)}
+                    onChange={handleTabChange}
                     sx={{
                       borderBottom: "1px solid #EAECF0",
                     }}
@@ -350,6 +376,14 @@ const StatementDetails = () => {
           </Grid>
         </>
       )}
+      <ConfirmationDialog
+        open={isNavigateDialogOpen}
+        onConfirm={handleNavigateConfirm}
+        onCancel={handleNavigateCancel}
+        title={CONFIRMATION_DIALOG_CONFIG.Navigate.title}
+        confirmationText={CONFIRMATION_DIALOG_CONFIG.Navigate.confirmationText}
+        Icon={<CONFIRMATION_DIALOG_CONFIG.Navigate.Icon />}
+      />
     </Grid>
   );
 };

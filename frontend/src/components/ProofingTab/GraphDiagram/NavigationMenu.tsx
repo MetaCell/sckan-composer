@@ -13,6 +13,8 @@ import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlin
 import CustomSwitch from "../../CustomSwitch";
 import ConfirmationDialog from "../../ConfirmationDialog";
 import {CONFIRMATION_DIALOG_CONFIG} from "../../../settings";
+import {useSelector} from "react-redux";
+import {RootState} from "../../../redux/store";
 const ZOOM_CHANGE = 25
 
 interface NavigationMenuProps {
@@ -22,27 +24,35 @@ interface NavigationMenuProps {
   toggleRankdir: () => void;
   resetGraph: () => void;
   isGraphLocked: boolean;
-  setIsGraphLocked: (locked: boolean) => void;
+  switchLockedGraph: (locked: boolean) => void;
 }
 
 const NavigationMenu = (props: NavigationMenuProps) => {
-  const {engine, statementId, toggleRankdir, resetGraph, isGraphLocked, setIsGraphLocked} = props
+  const {engine, statementId, toggleRankdir, resetGraph, isGraphLocked, switchLockedGraph} = props
   const [isSaving, setIsSaving] = useState<boolean>(false)
-  const [viewWarningAlert, setViewWarningAlert] = useState<boolean>(false)
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const handleSwitchChange = () => {
-    setIsModalOpen(true);
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({
+    title: "",
+    confirmationText: "",
+    Icon: <></> as React.ReactNode,
+    onConfirm: () => {},
+  });
+  
+  const wasChangeDetected = useSelector((state: RootState) => state.statement.wasChangeDetected);
+  
+  const openDialog = (config: {
+    title: string;
+    confirmationText: string;
+    Icon: React.ReactNode;
+    onConfirm: () => void;
+  }) => {
+    setDialogConfig(config);
+    setIsConfirmationDialogOpen(true);
   };
   
-  const handleConfirmChange = () => {
-    setIsModalOpen(false);
-    setIsGraphLocked(!isGraphLocked);
+  const closeDialog = () => {
+    setIsConfirmationDialogOpen(false);
   };
-  
-  const handleCancelChange = () => {
-    setIsModalOpen(false);
-  };
-  
   const zoomOut = () => {
     const zoomLevel = engine.getModel().getZoomLevel();
     engine.getModel().setZoomLevel(zoomLevel - ZOOM_CHANGE);
@@ -141,23 +151,40 @@ const NavigationMenu = (props: NavigationMenuProps) => {
               </IconButton>
             </Tooltip>
             <Tooltip arrow title='Switch orientation'>
-              <IconButton onClick={toggleRankdir} disabled={isGraphLocked}>
+              <IconButton onClick={() =>
+                openDialog({
+                  title: CONFIRMATION_DIALOG_CONFIG.Redraw.title,
+                  confirmationText: CONFIRMATION_DIALOG_CONFIG.Redraw.confirmationText,
+                  Icon: <CONFIRMATION_DIALOG_CONFIG.Redraw.Icon />,
+                  onConfirm: () => {
+                    toggleRankdir();
+                    closeDialog();
+                  },
+                })
+              } disabled={isGraphLocked}>
                 <CameraswitchOutlinedIcon />
               </IconButton>
             </Tooltip>
             <Divider />
-            {/*<IconButton onClick={() => saveGraph()}>*/}
-            {/*  <SaveIcon/>*/}
-            {/*</IconButton>*/}
             <Tooltip arrow title='Reset to default visualisation'>
-              <IconButton onClick={resetGraph} disabled={isGraphLocked}>
+              <IconButton onClick={() =>
+                openDialog({
+                  title: CONFIRMATION_DIALOG_CONFIG.Redraw.title,
+                  confirmationText: CONFIRMATION_DIALOG_CONFIG.Redraw.confirmationText,
+                  Icon: <CONFIRMATION_DIALOG_CONFIG.Redraw.Icon />,
+                  onConfirm: () => {
+                    resetGraph();
+                    closeDialog();
+                  },
+                })
+              } disabled={isGraphLocked}>
                 <RestartAltOutlinedIcon />
               </IconButton>
             </Tooltip>
           </Stack>
           <Stack direction="row" spacing="1rem" alignItems='center'>
             {
-              viewWarningAlert ?
+              wasChangeDetected ?
                 <Tooltip arrow title='This diagram does not match the Path Builder. It will be updated with default routing if you leave this page.'>
                   <Alert severity="warning">The diagram is outdated, please use the reset button on the left to update the diagram</Alert>
                 </Tooltip> :
@@ -168,18 +195,33 @@ const NavigationMenu = (props: NavigationMenuProps) => {
                 </Tooltip>
             }
             <Divider />
-            <CustomSwitch locked={isGraphLocked} setLocked={handleSwitchChange} />
+            <CustomSwitch disabled={wasChangeDetected} locked={isGraphLocked} setLocked={() => openDialog({
+              title: isGraphLocked
+                ? CONFIRMATION_DIALOG_CONFIG.Locked.title
+                : CONFIRMATION_DIALOG_CONFIG.Unlocked.title,
+              confirmationText: isGraphLocked
+                ? CONFIRMATION_DIALOG_CONFIG.Locked.confirmationText
+                : CONFIRMATION_DIALOG_CONFIG.Unlocked.confirmationText,
+              Icon: isGraphLocked
+                ? <CONFIRMATION_DIALOG_CONFIG.Locked.Icon/>
+                : <CONFIRMATION_DIALOG_CONFIG.Unlocked.Icon/>,
+              onConfirm: () => {
+                switchLockedGraph(!isGraphLocked);
+                closeDialog();
+              },
+            })}
+            />
           </Stack>
         </Stack>
       )
     }
     <ConfirmationDialog
-      open={isModalOpen}
-      onConfirm={handleConfirmChange}
-      onCancel={handleCancelChange}
-      title={isGraphLocked ? CONFIRMATION_DIALOG_CONFIG['Locked']['title'] : CONFIRMATION_DIALOG_CONFIG['Unlocked']['title']}
-      confirmationText={isGraphLocked ? CONFIRMATION_DIALOG_CONFIG['Locked']['confirmationText'] : CONFIRMATION_DIALOG_CONFIG['Unlocked']['confirmationText']}
-      Icon={isGraphLocked ? <CONFIRMATION_DIALOG_CONFIG.Unlocked.Icon /> : <CONFIRMATION_DIALOG_CONFIG.Locked.Icon />}
+      open={isConfirmationDialogOpen}
+      onConfirm={dialogConfig.onConfirm}
+      onCancel={closeDialog}
+      title={dialogConfig.title}
+      confirmationText={dialogConfig.confirmationText}
+      Icon={dialogConfig.Icon}
     />
   </>
 };

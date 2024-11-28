@@ -22,6 +22,8 @@ import { searchAnatomicalEntities } from "../helpers/helpers";
 import connectivityStatementService from "./StatementService";
 import statementService from "./StatementService";
 import { checkOwnership, getOwnershipAlertMessage } from "../helpers/ownershipAlert";
+import {setWasChangeDetected} from "../redux/statementSlice";
+import {AppDispatch} from "../redux/store";
 
 export async function getAnatomicalEntities(
   searchValue: string,
@@ -45,7 +47,8 @@ export async function getAnatomicalEntities(
 export async function updateOrigins(
   selected: Option[],
   statementId: number,
-  setStatement: (statement: any) => void
+  setStatement: (statement: any) => void,
+  dispatch: AppDispatch,
 ) {
   const originIds = selected.map((option) => parseInt(option.id));
   const patchedStatement: PatchedConnectivityStatementUpdate = {
@@ -55,6 +58,7 @@ export async function updateOrigins(
   try {
     const response = await statementService.partialUpdate(statementId, patchedStatement);
     setStatement(response);
+    dispatch(setWasChangeDetected(true));
     return response;
   } catch (error) {
     alert(`Error updating origins: ${error}`);
@@ -68,6 +72,7 @@ export type UpdateEntityParams = {
   entityType: "via" | "destination";
   propertyToUpdate: "anatomical_entities" | "from_entities";
   refreshStatement:  () => void;
+  dispatch:  AppDispatch;
 };
 
 const apiFunctionMap = {
@@ -84,6 +89,7 @@ export async function updateEntity({
   entityType,
   propertyToUpdate,
   refreshStatement,
+  dispatch
 }: UpdateEntityParams) {
   if (entityId == null) {
     alert(`Error updating ${entityType}`);
@@ -100,6 +106,7 @@ export async function updateEntity({
       try {
         if (entityId != null) {
           await updateFunction(entityId, patchObject);
+          dispatch(setWasChangeDetected(true));
           refreshStatement()
         }
       } catch (error) {
@@ -109,6 +116,7 @@ export async function updateEntity({
           async () => {
             await updateFunction(entityId as number, patchObject); // Re-attempt the update if ownership is reassigned
             refreshStatement();
+            dispatch(setWasChangeDetected(true));
           },
           () => {
             return ChangeRequestStatus.CANCELLED;
@@ -292,6 +300,7 @@ export async function searchForwardConnection(
 export async function updateForwardConnections(
   selectedOptions: Option[],
   currentStatement: ConnectivityStatement,
+  dispatch: AppDispatch,
 ) {
   const forwardConnectionIds = selectedOptions.map((option) =>
     parseInt(option.id),
@@ -304,6 +313,7 @@ export async function updateForwardConnections(
 
   // Call the update method of statementService
   try {
+    dispatch(setWasChangeDetected(true));
     return await statementService.update(updateData);
   } catch (error) {
     alert(`Error updating statement: ${error}`);

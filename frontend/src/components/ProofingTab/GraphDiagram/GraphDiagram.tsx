@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState} from "react";
 import InfoMenu from "./InfoMenu";
 import NavigationMenu from "./NavigationMenu";
 import createEngine, {
@@ -19,6 +19,9 @@ import dagre from 'dagre';
 import {CustomNodeModel} from "./Models/CustomNodeModel";
 import Box from "@mui/material/Box";
 import {useTheme} from "@mui/system";
+import {useDispatch, useSelector} from "react-redux";
+import {setWasChangeDetected} from "../../../redux/statementSlice";
+import {RootState} from "../../../redux/store";
 
 export enum NodeTypes {
   Origin = 'Origin',
@@ -51,6 +54,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
                                                    }) => {
   const theme = useTheme();
   const {statementId} = useParams();
+  const dispatch = useDispatch();
+  
   const [engine] = useState(() => createEngine());
   const [modelUpdated, setModelUpdated] = useState(false)
   const [modelFitted, setModelFitted] = useState(false)
@@ -58,7 +63,9 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   const [rankdir, setRankdir] = useState<"TB" | "LR">("TB");
   const [isGraphLocked, setIsGraphLocked] = React.useState(false);
   
-  const layoutNodes = useCallback((nodes: CustomNodeModel[], links: DefaultLinkModel[]) => {
+  const wasChangeDetected = useSelector((state: RootState) => state.statement.wasChangeDetected);
+  
+  const layoutNodes = (nodes: CustomNodeModel[], links: DefaultLinkModel[]) => {
     const g = new dagre.graphlib.Graph();
 
     g.setGraph({
@@ -102,13 +109,21 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
         node.setPosition(x, y);
       }
     });
-  }, [rankdir, isGraphLocked]);
+  }
   
   const toggleRankdir = () => {
     setRankdir((prev) => (prev === "TB" ? "LR" : "TB"));
   };
   
-  const initializeGraph = useCallback(() => {
+  const switchLockedGraph = (lock: boolean) => {
+    const model = engine.getModel();
+    model.getNodes().forEach((node) => {
+      node.setLocked(lock);
+    });
+    setIsGraphLocked(lock);
+  };
+
+  const initializeGraph = () => {
     const model = new DiagramModel();
     
     // Process data to revert to the initial layout
@@ -129,12 +144,23 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     engine.setModel(model);
     setModelUpdated(true);
     setModelFitted(false);
-  }, [engine, serializedGraph, origins, vias, destinations, forwardConnection, layoutNodes]);
+  }
   
   const resetGraph = () => {
     initializeGraph()
     setRankdir('TB')
+    setIsGraphLocked(true)
+    dispatch(setWasChangeDetected(false));
   };
+  
+  useEffect(() => {
+    if (wasChangeDetected) {
+      setIsGraphLocked(false);
+    } else {
+      setIsGraphLocked(true);
+    }
+
+  }, [wasChangeDetected]);
   
   // This effect runs once to set up the engine
   useEffect(() => {
@@ -145,7 +171,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   // This effect runs whenever origins, vias, or destinations change
   useEffect(() => {
     initializeGraph();
-  }, [initializeGraph]);
+  }, [rankdir]);
   
   // This effect prevents the default scroll and touchmove behavior
   useEffect(() => {
@@ -178,7 +204,15 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   }, [modelUpdated, modelFitted, engine]);
 
   
-    return (
+  useEffect(() => {
+    const model = engine.getModel();
+    if (!model) return
+    model.getNodes().forEach((node) => {
+      node.setLocked(isGraphLocked);
+    });
+  }, [isGraphLocked]);
+  
+  return (
       <Box>
         <NavigationMenu
           engine={engine} statementId={statementId || "-1"}
@@ -186,7 +220,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
           toggleRankdir={toggleRankdir}
           resetGraph={resetGraph}
           isGraphLocked={isGraphLocked}
-          setIsGraphLocked={setIsGraphLocked}
+          switchLockedGraph={switchLockedGraph}
         />
         <Box
           display="flex"
