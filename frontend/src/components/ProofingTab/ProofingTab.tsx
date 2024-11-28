@@ -82,7 +82,7 @@ const ProofingTab = (props: any) => {
                 }}>Download graph</Button>
               </Box>
               
-              <StatementChart statement={statement} />
+              <StatementChart statement={statement} setStatement={setStatement} />
             </Stack>
             {hasJourney && (
               <>

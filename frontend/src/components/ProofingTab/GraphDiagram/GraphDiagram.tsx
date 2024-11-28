@@ -8,7 +8,7 @@ import createEngine, {
 import {CanvasWidget} from '@projectstorm/react-canvas-core';
 import {CustomNodeFactory} from "./Factories/CustomNodeFactory";
 import {
-  AnatomicalEntity,
+  AnatomicalEntity, ConnectivityStatement,
   DestinationSerializerDetails, TypeC11Enum,
   ViaSerializerDetails
 } from "../../../apiclient/backend";
@@ -43,6 +43,8 @@ interface GraphDiagramProps {
   destinations: DestinationSerializerDetails[] | undefined;
   forwardConnection?: any[] | undefined;
   serializedGraph?: any | undefined
+  statement: ConnectivityStatement;
+  setStatement: (statement: any) => void,
 }
 
 const GraphDiagram: React.FC<GraphDiagramProps> = ({
@@ -51,6 +53,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
                                                      destinations,
                                                      forwardConnection = [],
                                                      serializedGraph,
+                                                     statement,
+                                                     setStatement
                                                    }) => {
   const theme = useTheme();
   const {statementId} = useParams();
@@ -221,6 +225,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
           resetGraph={resetGraph}
           isGraphLocked={isGraphLocked}
           switchLockedGraph={switchLockedGraph}
+          statement={statement}
+          setStatement={setStatement}
         />
         <Box
           display="flex"

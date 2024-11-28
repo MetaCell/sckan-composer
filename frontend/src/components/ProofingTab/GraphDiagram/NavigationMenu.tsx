@@ -5,7 +5,7 @@ import ZoomOutOutlinedIcon from "@mui/icons-material/ZoomOutOutlined";
 import IconButton from "@mui/material/IconButton";
 import {DiagramEngine} from "@projectstorm/react-diagrams-core";
 import React, {useState} from "react";
-import {PatchedConnectivityStatementUpdate} from "../../../apiclient/backend";
+import {ConnectivityStatement, PatchedConnectivityStatementUpdate} from "../../../apiclient/backend";
 import connectivityStatementService from "../../../services/StatementService";
 import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
 import CameraswitchOutlinedIcon from '@mui/icons-material/CameraswitchOutlined';
@@ -25,10 +25,12 @@ interface NavigationMenuProps {
   resetGraph: () => void;
   isGraphLocked: boolean;
   switchLockedGraph: (locked: boolean) => void;
+  statement: ConnectivityStatement;
+  setStatement: (statement: any) => void
 }
 
 const NavigationMenu = (props: NavigationMenuProps) => {
-  const {engine, statementId, toggleRankdir, resetGraph, isGraphLocked, switchLockedGraph} = props
+  const {engine, statementId, toggleRankdir, resetGraph, isGraphLocked, switchLockedGraph, statement, setStatement} = props
   const [isSaving, setIsSaving] = useState<boolean>(false)
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
   const [dialogConfig, setDialogConfig] = useState({
@@ -78,7 +80,11 @@ const NavigationMenu = (props: NavigationMenuProps) => {
     }
 
     try {
-      await connectivityStatementService.partialUpdate(parseInt(statementId, 10), patchData)
+     const updatedStatement =  await connectivityStatementService.partialUpdate(parseInt(statementId, 10), patchData)
+      setStatement({
+        ...statement,
+        graph_rendering_state: updatedStatement.graph_rendering_state
+      })
     } catch (error) {
       // TODO: Provide proper feedback
       console.error("Error saving graph:", error)
