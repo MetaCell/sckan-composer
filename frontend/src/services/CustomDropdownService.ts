@@ -57,7 +57,7 @@ export async function updateOrigins(
 
   try {
     const response = await statementService.partialUpdate(statementId, patchedStatement);
-    if (response === ChangeRequestStatus.SAVED) {
+    if (response !== ChangeRequestStatus.CANCELLED) {
       refreshStatement();
       dispatch(setWasChangeDetected(true));
     }

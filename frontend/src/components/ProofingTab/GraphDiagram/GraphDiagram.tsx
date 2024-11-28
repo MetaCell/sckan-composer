@@ -144,6 +144,13 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
       layoutNodes(nodes, links);
     }
     
+    nodes.forEach((node) => {
+      node.registerListener({
+        positionChanged: () => {
+          dispatch(setWasChangeDetected(true));
+        },
+      });
+    });
     model.addAll(...nodes, ...links);
     engine.setModel(model);
     setModelUpdated(true);
@@ -152,7 +159,6 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   
   const resetGraph = () => {
     initializeGraph()
-    setRankdir('TB')
     setIsGraphLocked(true)
     dispatch(setWasChangeDetected(false));
   };

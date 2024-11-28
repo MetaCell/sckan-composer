@@ -13,9 +13,11 @@ import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlin
 import CustomSwitch from "../../CustomSwitch";
 import ConfirmationDialog from "../../ConfirmationDialog";
 import {CONFIRMATION_DIALOG_CONFIG} from "../../../settings";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../redux/store";
 import {checkOwnership, getOwnershipAlertMessage} from "../../../helpers/ownershipAlert";
+import {setWasChangeDetected} from "../../../redux/statementSlice";
+
 const ZOOM_CHANGE = 25
 
 interface NavigationMenuProps {
@@ -27,7 +29,7 @@ interface NavigationMenuProps {
   isGraphLocked: boolean;
   switchLockedGraph: (locked: boolean) => void;
   statement: ConnectivityStatement;
-  setStatement: (statement: any) => void
+  setStatement: (statement: any) => void;
 }
 
 const NavigationMenu = (props: NavigationMenuProps) => {
@@ -40,6 +42,7 @@ const NavigationMenu = (props: NavigationMenuProps) => {
     Icon: <></> as React.ReactNode,
     onConfirm: () => {},
   });
+  const dispatch = useDispatch();
   
   const wasChangeDetected = useSelector((state: RootState) => state.statement.wasChangeDetected);
   
@@ -86,6 +89,7 @@ const NavigationMenu = (props: NavigationMenuProps) => {
         ...statement,
         graph_rendering_state: updatedStatement.graph_rendering_state
       })
+      dispatch(setWasChangeDetected(false));
     } catch (error) {
       // TODO: Provide proper feedback
       console.error("Error saving graph:", error)
