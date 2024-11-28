@@ -20,7 +20,7 @@ import {CustomNodeModel} from "./Models/CustomNodeModel";
 import Box from "@mui/material/Box";
 import {useTheme} from "@mui/system";
 import {useDispatch, useSelector} from "react-redux";
-import {setWasChangeDetected} from "../../../redux/statementSlice";
+import {setPositionChangeOnly, setWasChangeDetected} from "../../../redux/statementSlice";
 import {RootState} from "../../../redux/store";
 
 export enum NodeTypes {
@@ -147,7 +147,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     nodes.forEach((node) => {
       node.registerListener({
         positionChanged: () => {
-          dispatch(setWasChangeDetected(true));
+          dispatch(setPositionChangeOnly(true));
         },
       });
     });

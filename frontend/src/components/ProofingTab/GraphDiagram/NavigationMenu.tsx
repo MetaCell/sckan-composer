@@ -44,7 +44,7 @@ const NavigationMenu = (props: NavigationMenuProps) => {
   });
   const dispatch = useDispatch();
   
-  const wasChangeDetected = useSelector((state: RootState) => state.statement.wasChangeDetected);
+  const { wasChangeDetected, positionChangeOnly } = useSelector((state: RootState) => state.statement);
   
   const openDialog = (config: {
     title: string;
@@ -241,7 +241,7 @@ const NavigationMenu = (props: NavigationMenuProps) => {
             }
             <Divider />
             <CustomSwitch
-              disabled={wasChangeDetected}
+              disabled={wasChangeDetected && !positionChangeOnly}
               locked={isGraphLocked}
               setLocked={(lock: boolean) => toggleGraphLock(lock)}
             />
