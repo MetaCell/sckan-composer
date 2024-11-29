@@ -10,6 +10,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import StatementForm from "../components/Forms/StatementForm";
 import connectivityStatementService from "../services/StatementService";
+import Stack from "@mui/material/Stack";
 
 const StatementAlertsAccordion = (props: any) => {
   const { statement, refreshStatement, isDisabled, setStatement } = props;
@@ -79,20 +80,44 @@ const StatementAlertsAccordion = (props: any) => {
                 disabled={isDisabled}
               />
             ))}
-            {statement.statement_alerts?.map((alert: any, index: number) => {
-              return (
-                <Box key={index} sx={{ marginBottom: 2 }}>
-                  <StatementForm
-                    statement={{ ...statement, statement_alerts: [alert] }}
-                    uiFields={["statement_alerts"]}
-                    format="small"
-                    action={refreshStatement}
-                    enableAutoSave={true}
-                    isDisabled={isDisabled}
-                  />
-                </Box>
-              );
-            })}
+            <Stack spacing='2rem'>
+              {statement.statement_alerts?.map((alert: any, index: number) => {
+                return (
+                  <Box
+                    sx={{
+                      borderRadius: '12px',
+                      border: '1px solid #EAECF0',
+                      textAlign: 'left',
+                      backgroundColor: '#F2F4F7',
+                      width: '100%',
+                      padding: '.5rem',
+                      
+                      '& .MuiInputBase-root': {
+                        p: '0 .75rem',
+                        mt: '-1rem',
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          boxShadow: 'none !important',
+                          border: 'none !important',
+                        },
+                      }
+                    }}
+                  >
+                    <Typography variant="subtitle1" mb={'.5rem'}>
+                      {alerts[index]?.name}
+                    </Typography>
+                    <StatementForm
+                      statement={{ ...statement, statement_alerts: [alert] }}
+                      uiFields={["statement_alerts"]}
+                      format="small"
+                      action={refreshStatement}
+                      enableAutoSave={true}
+                      isDisabled={isDisabled}
+                      className='ks alert-form'
+                    />
+                  </Box>
+                );
+              })}
+            </Stack>
           </Box>
         </AccordionDetails>
       </Accordion>
