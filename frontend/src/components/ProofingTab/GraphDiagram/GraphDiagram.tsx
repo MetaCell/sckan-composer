@@ -66,6 +66,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [rankdir, setRankdir] = useState<"TB" | "LR">("TB");
   const [isGraphLocked, setIsGraphLocked] = React.useState(false);
+  const [ignoreSerializedGraph, setIgnoreSerializedGraph] = useState(false);
   
   const wasChangeDetected = useSelector((state: RootState) => state.statement.wasChangeDetected);
   
@@ -117,6 +118,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   
   const toggleRankdir = () => {
     setRankdir((prev) => (prev === "TB" ? "LR" : "TB"));
+    setIgnoreSerializedGraph(true);
   };
   
   const switchLockedGraph = (lock: boolean) => {
@@ -140,7 +142,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     });
     
     // If the backend does NOT provides us a serialised graph then we use the smart routing.
-    if (serializedGraph === undefined) {
+    if (ignoreSerializedGraph || serializedGraph === undefined) {
       layoutNodes(nodes, links);
     }
     
@@ -221,6 +223,11 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
       node.setLocked(isGraphLocked);
     });
   }, [isGraphLocked]);
+  
+  
+  useEffect(() => {
+    return () => setIgnoreSerializedGraph(false); // Reset the flag on unmount
+  }, []);
   
   return (
       <Box>
