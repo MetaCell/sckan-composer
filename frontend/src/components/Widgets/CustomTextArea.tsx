@@ -26,6 +26,7 @@ export default function TextArea({ id, value, placeholder, required, onChange, o
   return (
     <FormControl variant="standard">
       <StyledInput
+        id={id}
       value={value?value:''}
       multiline
       rows={rows}

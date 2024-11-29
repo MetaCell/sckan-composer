@@ -39,7 +39,6 @@ import {CustomFooter} from "../Widgets/HoveredOptionContent";
 import {StatementStateChip} from "../Widgets/StateChip";
 import {projections} from "../../services/ProjectionService";
 import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
-import Typography from "@mui/material/Typography";
 
 const StatementForm = (props: any) => {
   const {uiFields, statement, setStatement, isDisabled, action: refreshStatement} = props;
@@ -56,17 +55,6 @@ const StatementForm = (props: any) => {
   copiedSchema.properties.statement_alerts.title = " ";
   
   copiedUISchema.statement_alerts ={
-    "ui:ArrayFieldTemplate": (props: any) => {
-      return (
-        <Box sx={{
-          backgroundColor: '#fff !important',
-          borderRadius: '0.5rem',
-        }}>
-          {props.items &&
-            props.items.map((element: any) => element.children)}
-        </Box>
-      );
-    },
     "ui:options": {
       orderable: false,
       addable: false,

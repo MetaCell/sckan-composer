@@ -196,6 +196,18 @@ const theme = createTheme({
         flex: 2
       }
       
+      .MuiBox-root:has(.alerts-form) {
+        flex: 1;
+      }
+      
+      .alerts-form .MuiBox-root {
+      padding: 0;
+      margin: 0
+      }
+      
+      .alerts-form .MuiPaper-root {
+        box-shadow: none;
+      }
       `,
     },
     MuiButton: {
