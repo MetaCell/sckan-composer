@@ -18,6 +18,8 @@ const StatementAlertsAccordion = (props: any) => {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [activeTypes, setActiveTypes] = useState<number[]>([]);
   const [alerts, setAlerts] = useState<any[]>([]);
+  const [openFormIndex, setOpenFormIndex] = useState<number | null>(null);
+  
   const handleChange = (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded);
   };
@@ -45,6 +47,11 @@ const StatementAlertsAccordion = (props: any) => {
   useEffect(() => {
     setActiveTypes(statement.statement_alerts.map((row: any) => row.alert_type))
   }, [statement]);
+  
+  const toggleFormVisibility = (index: number) => {
+    setOpenFormIndex(openFormIndex === index ? null : index);
+  };
+  
   
   return (
     <Box px={2} py={0.5}>
@@ -80,43 +87,79 @@ const StatementAlertsAccordion = (props: any) => {
                 disabled={isDisabled}
               />
             ))}
-            <Stack spacing='2rem'>
-              {statement.statement_alerts?.map((alert: any, index: number) => {
-                return (
-                  <Box
+            <Stack spacing="2rem">
+              {statement.statement_alerts?.map((alert: any, index: number) => (
+                <Box
+                  key={index}
+                  sx={{
+                    borderRadius: "12px",
+                    border: "1px solid #EAECF0",
+                    backgroundColor: "#F2F4F7",
+                    textAlign: "left",
+                    width: "100%",
+                    padding: "0.5rem",
+                  }}
+                >
+                  <Accordion
+                    expanded={openFormIndex === index}
+                    onChange={() => toggleFormVisibility(index)}
+                    elevation={0}
                     sx={{
-                      borderRadius: '12px',
-                      border: '1px solid #EAECF0',
-                      textAlign: 'left',
-                      backgroundColor: '#F2F4F7',
-                      width: '100%',
-                      padding: '.5rem',
-                      
-                      '& .MuiInputBase-root': {
-                        p: '0 .75rem',
-                        mt: '-1rem',
-                        '& .MuiOutlinedInput-notchedOutline': {
-                          boxShadow: 'none !important',
-                          border: 'none !important',
-                        },
-                      }
+                      '&.MuiPaper-root': {
+                        backgroundColor: 'transparent',
+                      },
+                      "&:before": {
+                        display: "none",
+                      },
                     }}
                   >
-                    <Typography variant="subtitle1" mb={'.5rem'}>
-                      {alerts[index]?.name}
-                    </Typography>
-                    <StatementForm
-                      statement={{ ...statement, statement_alerts: [alert] }}
-                      uiFields={["statement_alerts"]}
-                      format="small"
-                      action={refreshStatement}
-                      enableAutoSave={true}
-                      isDisabled={isDisabled}
-                      className='ks alert-form'
-                    />
-                  </Box>
-                );
-              })}
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="panel1bh-content"
+                      className="panel1bh-header"
+                      sx={{ p: 0, display: "flex", flexDirection: "row-reverse", m: 0 }}
+                    >
+                      <Typography variant="subtitle1" ml={1}>
+                        {alerts[index]?.name}
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails sx={{
+                      p: 0
+                    }}>
+                      <StatementForm
+                        statement={{
+                          ...statement,
+                          statement_alerts: [alert],
+                        }}
+                        uiFields={["statement_alerts"]}
+                        format="small"
+                        action={refreshStatement}
+                        enableAutoSave={true}
+                        isDisabled={isDisabled}
+                        className="ks alert-form"
+                      />
+                    </AccordionDetails>
+                  </Accordion>
+                  {openFormIndex !== index && (
+                    <Box sx={{
+                      borderRadius: ".5rem",
+                      border: "1px solid #EAECF0",
+                      backgroundColor: "#fff",
+                      textAlign: "left",
+                      width: "100%",
+                      padding: '.75rem',
+                      boxShadow: '0px 1px 2px 0px rgba(16, 24, 40, 0.05)'
+                    }}>
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                      >
+                        {alert.text || "No details provided."}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              ))}
             </Stack>
           </Box>
         </AccordionDetails>
