@@ -1033,7 +1033,7 @@ class StatementAlert(models.Model):
         on_delete=models.CASCADE,
         related_name='statement_alerts'
     )
-    text = models.TextField()
+    text = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     saved_by = models.ForeignKey(

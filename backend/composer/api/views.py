@@ -37,6 +37,7 @@ from .serializers import (
     ProfileSerializer,
     SentenceSerializer,
     SpecieSerializer,
+    StatementAlertSerializer,
     TagSerializer,
     ViaSerializer,
     ProvenanceSerializer,
@@ -60,6 +61,7 @@ from ..models import (
     Profile,
     Sentence,
     Specie,
+    StatementAlert,
     Tag,
     Via,
     Provenance,
@@ -517,6 +519,20 @@ class DestinationViewSet(viewsets.ModelViewSet):
     permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
     filterset_class = DestinationFilter
 
+class StatementAlertViewSet(viewsets.ModelViewSet):
+    """
+    StatementAlert
+    """
+    queryset = StatementAlert.objects.all()
+    serializer_class = StatementAlertSerializer
+    permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except Exception as e:
+            raise
+
 
 @extend_schema(
     responses=OpenApiTypes.OBJECT,
@@ -532,6 +548,7 @@ def jsonschemas(request):
         ProvenanceSerializer,
         SpecieSerializer,
         NoteSerializer,
+        StatementAlertViewSet
     ]
 
     schema = {}

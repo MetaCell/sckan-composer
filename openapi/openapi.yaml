@@ -1735,6 +1735,176 @@ paths:
               schema:
                 $ref: '#/components/schemas/Specie'
           description: ''
+  /api/composer/statementAlert/:
+    get:
+      operationId: composer_statementAlert_list
+      description: StatementAlert
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStatementAlertList'
+          description: ''
+    post:
+      operationId: composer_statementAlert_create
+      description: StatementAlert
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatementAlert'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StatementAlert'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StatementAlert'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementAlert'
+          description: ''
+  /api/composer/statementAlert/{id}/:
+    get:
+      operationId: composer_statementAlert_retrieve
+      description: StatementAlert
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this statement alert.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementAlert'
+          description: ''
+    put:
+      operationId: composer_statementAlert_update
+      description: StatementAlert
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this statement alert.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatementAlert'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StatementAlert'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StatementAlert'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementAlert'
+          description: ''
+    patch:
+      operationId: composer_statementAlert_partial_update
+      description: StatementAlert
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this statement alert.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStatementAlert'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStatementAlert'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStatementAlert'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementAlert'
+          description: ''
+    delete:
+      operationId: composer_statementAlert_destroy
+      description: StatementAlert
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this statement alert.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/composer/tag/:
     get:
       operationId: composer_tag_list
@@ -2851,6 +3021,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Specie'
+    PaginatedStatementAlertList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatementAlert'
     PaginatedTagList:
       type: object
       properties:
@@ -3263,6 +3453,29 @@ components:
         doi_uri:
           type: string
           readOnly: true
+    PatchedStatementAlert:
+      type: object
+      properties:
+        id:
+          type: integer
+        alert_type:
+          type: integer
+        text:
+          type: string
+        saved_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        connectivity_statement:
+          type: integer
     PatchedVia:
       type: object
       description: Via
@@ -3590,11 +3803,13 @@ components:
           type: string
           format: date-time
           readOnly: true
+        connectivity_statement:
+          type: integer
       required:
       - alert_type
+      - connectivity_statement
       - created_at
       - saved_by
-      - text
       - updated_at
     Tag:
       type: object
@@ -3644,6 +3859,10 @@ components:
           format: email
           title: Email address
           maxLength: 254
+        is_staff:
+          type: boolean
+          title: Staff status
+          description: Designates whether the user can log into this admin site.
       required:
       - id
       - username
