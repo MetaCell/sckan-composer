@@ -2,16 +2,16 @@ import React from "react";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import SentenceForm from "../components/Forms/SentenceForm";
-import StatementForm from "../components/Forms/StatementForm";
+import SentenceForm from "../Forms/SentenceForm";
+import StatementForm from "../Forms/StatementForm";
 import Paper from "@mui/material/Paper";
-import SentenceStatementWithDois from "./SentenceStatementWithDois";
+import SentenceStatementWithDois from "../SentenceStatementWithDois";
 import StatementAlertsAccordion from "./StatementAlertsAccordion";
-import { useSectionStyle, useGreyBgContainer } from "../styles/styles";
+import { useSectionStyle, useGreyBgContainer } from "../../styles/styles";
 import { useTheme } from "@mui/system";
-import StatementDetailsAccordion from "./TriageStatementSection/StatementDetailsAccordion";
-import ProvenancesForm from "./Forms/ProvenanceForm";
-import StatementPreviewForm from "./Forms/StatementPreviewForm";
+import StatementDetailsAccordion from "../TriageStatementSection/StatementDetailsAccordion";
+import ProvenancesForm from "../Forms/ProvenanceForm";
+import StatementPreviewForm from "../Forms/StatementPreviewForm";
 
 const DistillationTab = ({
                            statement,

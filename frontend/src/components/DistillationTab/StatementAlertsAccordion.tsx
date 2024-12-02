@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
   Accordion,
   AccordionDetails,
@@ -7,15 +7,16 @@ import {
   Box,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import StatementForm from "../components/Forms/StatementForm";
-import connectivityStatementService from "../services/StatementService";
+import StatementForm from "../Forms/StatementForm";
+import connectivityStatementService from "../../services/StatementService";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
-import {DeleteOutlined} from "@mui/icons-material";
-import statementService from "../services/StatementService";
-import MenuItem from "@mui/material/MenuItem";
+import { DeleteOutlined} from "@mui/icons-material";
+import statementService from "../../services/StatementService";
 import Select from "@mui/material/Select";
-import Button from "@mui/material/Button";
+import AlertMenuItem from "./AlertMenuItem";
+import {vars} from "../../theme/variables";
+import ConfirmationDialog from "./ConfiramtionDialog";
 const StatementAlertsAccordion = (props: any) => {
   const { statement, refreshStatement, isDisabled, setStatement } = props;
   
@@ -23,7 +24,8 @@ const StatementAlertsAccordion = (props: any) => {
   const [activeTypes, setActiveTypes] = useState<number[]>([]);
   const [alerts, setAlerts] = useState<any[]>([]);
   const [openFormIndex, setOpenFormIndex] = useState<number | null>(null);
-  const textInputRefs = useRef<Array<HTMLInputElement | null>>([]);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [alertToDelete, setAlertToDelete] = useState<number | null>(null);
   const handleChange = (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded);
   };
@@ -40,6 +42,7 @@ const StatementAlertsAccordion = (props: any) => {
       setActiveTypes([...activeTypes, typeId]);
       setStatement(updatedStatement);
       
+      // connectivityStatementService.partialUpdate(parseInt(statement.id), {statement_alerts: updatedAlerts})
       const newIndex = updatedAlerts.length - 1;
       setOpenFormIndex(newIndex);
       
@@ -52,9 +55,12 @@ const StatementAlertsAccordion = (props: any) => {
     }
   };
   
-  const handleDelete = async (index: number) => {
+  
+  const confirmDelete = async () => {
+    if (alertToDelete === null) return;
+    
     const updatedAlerts = statement.statement_alerts.filter(
-      (_: any, alertIndex: number) => alertIndex !== index
+      (_: any, alertIndex: number) => alertIndex !== alertToDelete
     );
     
     const patchedStatement = {
@@ -70,6 +76,13 @@ const StatementAlertsAccordion = (props: any) => {
     } catch (error) {
       alert(`Error deleting alert: ${error}`);
     }
+    
+    setOpenDialog(false);
+    setAlertToDelete(null);
+  };
+  const handleDelete = async (index: number) => {
+    setAlertToDelete(index);
+    setOpenDialog(true);
   };
   
   useEffect(() => {
@@ -85,8 +98,8 @@ const StatementAlertsAccordion = (props: any) => {
   const toggleFormVisibility = (index: number) => {
     setOpenFormIndex(openFormIndex === index ? null : index);
   };
-  
-  
+  console.log(alerts)
+  console.log(statement.statement_alerts)
   return (
     <Box px={2} py={0.5}>
       <Accordion
@@ -110,46 +123,93 @@ const StatementAlertsAccordion = (props: any) => {
           </Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ px: 4, pt: 0, pb: 2 }}>
-          <Box>
+          <Box sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: '0.75rem'
+          }}>
             <Select
+              sx={{
+                alignSelf: 'flex-end',
+                fontWeight: 600,
+                borderRadius: '6.25rem',
+                border: `1px solid ${vars.buttonOutlinedBorderColor}`,
+                boxShadow: '0px 1px 2px 0px rgba(16, 24, 40, 0.05)',
+                minWidth: '10rem',
+                padding: '0.625rem 1rem',
+                
+                  '& .MuiSelect-select': {
+                    padding: 0
+                  }
+              }}
               value=""
               displayEmpty
-              fullWidth
-              sx={{ mb: 2 }}
-              renderValue={() => "Select an Alert"}
+              renderValue={() => "Display alerts"}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    width: '19.25rem',
+                    padding: 0,
+                    boxShadow: '0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)'
+                  },
+                },
+              }}
             >
-              {alerts.map((type: any) => (
-                <MenuItem
-                  key={type.id}
-                  value={type.id}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography>{type.name}</Typography>
-                  {!activeTypes.includes(type.id) && (
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() => addAlert(type.id)}
-                      disabled={isDisabled}
-                    >
-                      Add
-                    </Button>
-                  )}
-                </MenuItem>
-              ))}
+              <Box>
+                <Typography sx={{
+                  padding: "0.875rem 0.875rem 0.5rem 0.875rem",
+                  color: vars.inputPlaceholderColor,
+                  fontWeight: 700,
+                  fontSize: '0.75rem'
+                }}>
+                  AVAILABLE
+                </Typography>
+                {alerts
+                  .filter((type: any) => !activeTypes.includes(type.id))
+                  .map((type: any) => (
+                    <AlertMenuItem
+                      key={type.id}
+                      type={type}
+                      isSelected={false}
+                      isDisabled={isDisabled}
+                      onAdd={addAlert}
+                      alertStatus={'available'}
+                    />
+                  ))}
+              </Box>
+              
+              {/* DISPLAYED Alerts */}
+              <Box>
+                <Typography sx={{
+                  padding: "0.875rem 0.875rem 0.5rem 0.875rem",
+                  color: vars.inputPlaceholderColor,
+                  fontWeight: 700,
+                  fontSize: '0.75rem'
+                }}>
+                  DISPLAYED
+                </Typography>
+                {alerts
+                  .filter((type: any) => activeTypes.includes(type.id))
+                  .map((type: any) => (
+                    <AlertMenuItem
+                      key={type.id}
+                      type={type}
+                      isSelected={true}
+                      isDisabled={isDisabled}
+                      onAdd={addAlert}
+                      alertStatus={'displayed'}
+                    />
+                  ))}
+              </Box>
             </Select>
-            <Stack spacing="2rem">
+            <Stack spacing="2rem" pt='.75rem' pb='.75rem'>
               {statement.statement_alerts?.map((alert: any, index: number) => (
                 <Box
                   key={alert.alert_type}
                   sx={{
                     borderRadius: "12px",
-                    border: "1px solid #EAECF0",
-                    backgroundColor: "#F2F4F7",
+                    border: `1px solid ${vars.dropdownChipColor}`,
+                    backgroundColor: vars.bodyBgColor,
                     textAlign: "left",
                     width: "100%",
                     padding: "0.5rem",
@@ -175,7 +235,7 @@ const StatementAlertsAccordion = (props: any) => {
                       sx={{ p: 0, display: "flex", flexDirection: "row-reverse", m: 0 }}
                     >
                       <Typography variant="subtitle1" ml={1}>
-                        {alerts[index]?.name}
+                        {alerts.find((type: any) => type.id === alert.alert_type)?.name || "Unknown"}
                       </Typography>
                     </AccordionSummary>
                     <AccordionDetails sx={{
@@ -184,11 +244,18 @@ const StatementAlertsAccordion = (props: any) => {
                       gap: ".5rem",
                       alignItems: 'center',
                       '& .MuiInputBase-root': {
-                        backgroundColor: "#fff",
+                        backgroundColor: vars.whiteColor,
+                        
+                        '&.Mui-focused': {
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            border: '0 !important',
+                            boxShadow: 'none',
+                          }
+                        }
                       },
                       '& .MuiGrid-root': {
                         marginTop: '0 !important',
-                        
+
                         '& .MuiGrid-root': {
                           marginBottom: '0 !important',
                           paddingTop: '0 !important',
@@ -206,9 +273,10 @@ const StatementAlertsAccordion = (props: any) => {
                         enableAutoSave={true}
                         isDisabled={isDisabled}
                         className="alerts-form"
-                        textInputRefs={textInputRefs}
                       />
-                      <IconButton onClick={() => handleDelete(index)}>
+                      <IconButton onClick={() => handleDelete(index)}
+                                  disabled={alert?.text?.trim() !== ''}
+                      >
                         <DeleteOutlined />
                       </IconButton>
                     </AccordionDetails>
@@ -217,8 +285,8 @@ const StatementAlertsAccordion = (props: any) => {
                     <Box display='flex' alignItems='center' gap='.5rem'>
                       <Box sx={{
                         borderRadius: ".5rem",
-                        border: "1px solid #EAECF0",
-                        backgroundColor: "#fff",
+                        border: `1px solid ${vars.dropdownChipColor}`,
+                        backgroundColor: vars.whiteColor,
                         textAlign: "left",
                         width: "100%",
                         padding: '.75rem',
@@ -231,7 +299,10 @@ const StatementAlertsAccordion = (props: any) => {
                           {alert.text}
                         </Typography>
                       </Box>
-                      <IconButton disabled>
+                      <IconButton
+                        onClick={() => handleDelete(index)}
+                        disabled={alert?.text?.trim() !== ''}
+                      >
                         <DeleteOutlined />
                       </IconButton>
                     </Box>
@@ -242,6 +313,11 @@ const StatementAlertsAccordion = (props: any) => {
           </Box>
         </AccordionDetails>
       </Accordion>
+      <ConfirmationDialog
+        open={openDialog}
+        onConfirm={confirmDelete}
+        onCancel={() => setOpenDialog(false)}
+      />
     </Box>
   );
 };

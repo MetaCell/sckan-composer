@@ -53,6 +53,7 @@ const StatementForm = (props: any) => {
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["destination_type", "*"];
   copiedSchema.properties.statement_alerts.title = " ";
+  copiedSchema.properties.statement_alerts.items.required = ["alert_type"]
   
   copiedUISchema.statement_alerts ={
     "ui:options": {
