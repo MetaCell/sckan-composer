@@ -548,7 +548,7 @@ def jsonschemas(request):
         ProvenanceSerializer,
         SpecieSerializer,
         NoteSerializer,
-        StatementAlertViewSet
+        StatementAlertSerializer
     ]
 
     schema = {}
