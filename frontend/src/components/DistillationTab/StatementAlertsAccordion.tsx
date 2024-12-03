@@ -17,6 +17,31 @@ import Select from "@mui/material/Select";
 import AlertMenuItem from "./AlertMenuItem";
 import {vars} from "../../theme/variables";
 import ConfirmationDialog from "./ConfiramtionDialog";
+
+const parseTextWithLinks = (text: string, vars: any): JSX.Element[] => {
+  const urlRegex = /(https?:\/\/\S+|www\.\S+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi;
+  
+  return text.split(urlRegex).map((part, index) => {
+    const isURL = urlRegex.test(part);
+    if (isURL) {
+      const href = part.startsWith("http") ? part : `http://${part}`;
+      return (
+        <React.Fragment key={index}>
+          <a
+            key={index}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: vars.primary800, textDecoration: "underline" }}
+          >
+            {part}
+          </a>
+        </React.Fragment>
+      );
+    }
+    return <React.Fragment key={index}>{part}</React.Fragment>;
+  });
+};
 const StatementAlertsAccordion = (props: any) => {
   const { statement, refreshStatement, isDisabled, setStatement } = props;
   
@@ -180,7 +205,8 @@ const StatementAlertsAccordion = (props: any) => {
               </Box>
               
               {/* DISPLAYED Alerts */}
-              <Box>
+              {alerts.filter((type: any) => activeTypes.includes(type.id)).length > 0 && (
+                <Box>
                 <Typography sx={{
                   padding: "0.875rem 0.875rem 0.5rem 0.875rem",
                   color: vars.inputPlaceholderColor,
@@ -202,6 +228,8 @@ const StatementAlertsAccordion = (props: any) => {
                     />
                   ))}
               </Box>
+              )}
+            
             </Select>
             <Stack spacing="2rem" pt='.75rem' pb='.75rem'>
               {statement.statement_alerts?.map((alert: any, index: number) => (
@@ -294,11 +322,8 @@ const StatementAlertsAccordion = (props: any) => {
                         padding: '.75rem',
                         boxShadow: '0px 1px 2px 0px rgba(16, 24, 40, 0.05)'
                       }}>
-                        <Typography
-                          variant="body2"
-                          color="textSecondary"
-                        >
-                          {alert.text}
+                        <Typography component='p' variant='body2' color={vars.darkTextColor}>
+                          {parseTextWithLinks(alert.text, vars)}
                         </Typography>
                       </Box>
                       <IconButton
