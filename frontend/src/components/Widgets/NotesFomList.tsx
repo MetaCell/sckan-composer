@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import { Box } from '@mui/material'
+import { Box, Checkbox } from '@mui/material'
 import noteService from '../../services/NoteService'
 import Timeline from '@mui/lab/Timeline';
 import TimelineItem from '@mui/lab/TimelineItem';
@@ -29,8 +29,9 @@ const TimeLineIcon = () => {
   </Box>
 }
 const NoteDetails = (props: any) => {
-  const { extraData } = props
+  const { extraData, setter } = props
   const [noteList, setNoteList] = useState<Note[]>([])
+  const [showSystemNotes, setShowSystemNotes] = useState(false)
   const [refresh, setRefresh] = useState(false)
 
   const theme = useTheme()
@@ -39,12 +40,19 @@ const NoteDetails = (props: any) => {
   useEffect(() => {
     const { connectivity_statement_id, sentence_id } = extraData
     if (connectivity_statement_id || sentence_id) {
-      noteService.getNotesList(connectivity_statement_id, undefined,undefined, sentence_id).then(result => {
+      noteService.getNotesList(connectivity_statement_id, showSystemNotes, undefined, undefined, sentence_id).then(result => {
         setNoteList(result?.results)
         setRefresh(false)
       })
     }
-  }, [extraData?.connectivity_statement_id, extraData?.sentence_id, refresh, extraData])
+  }, [extraData?.connectivity_statement_id, extraData?.sentence_id, refresh, extraData, showSystemNotes])
+
+  // Note: This useEffect is used to refresh the sentence/cs after the a new note has been added
+  useEffect(() => {
+    if (refresh) {
+      setter()
+    }
+  }, [refresh, setter])
 
   return (
     <Box display='flex' flexDirection='column' >
@@ -62,6 +70,21 @@ const NoteDetails = (props: any) => {
         }
       }}>
         <NoteForm setRefresh={setRefresh} extraData={extraData} />
+      </Box>
+      <Box display='flex' justifyContent='space-between' alignItems='center' sx={{
+        margin: '0 16px',
+        marginTop: 6,
+      }}>
+        <Typography variant="h5" sx={{
+          fontSize: 16,
+        }}>Note's History</Typography>
+        <Box display='flex' alignItems='center'>
+          <Checkbox
+            checked={showSystemNotes}
+            onChange={() => setShowSystemNotes(!showSystemNotes)}
+          />
+          <Typography variant="h6">Show System Notes</Typography>
+        </Box>
       </Box>
       <Timeline sx={{
         "& .MuiTimelineItem-root": {

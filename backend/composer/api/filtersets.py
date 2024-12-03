@@ -1,9 +1,10 @@
 from typing import List
-from django.db.models import Q
+from django.db.models import Q, Case, When, Value, IntegerField
+from django.db.models.functions import Coalesce
 import django_filters
 from django_filters import BaseInFilter, NumberFilter
 
-from composer.enums import SentenceState, CSState
+from composer.enums import SentenceState, CSState, NoteType
 from composer.models import (
     Sentence,
     ConnectivityStatement,
@@ -13,6 +14,7 @@ from composer.models import (
     Via,
     Specie, Destination,
 )
+from django.contrib.auth.models import User
 from django_filters import rest_framework
 from django_filters import CharFilter, BaseInFilter
 
@@ -48,9 +50,37 @@ class SentenceFilter(django_filters.FilterSet):
         fields=(
             ("id", "id"),
             ("modified_date", "last_edited"),
+            ("owner", "owner"),
         ),
+        method='order_by_current_user'
     )
     exclude = django_filters.BaseInFilter(method=exclude_ids)
+
+    def order_by_current_user(self, queryset, name, value):
+        current_user = self.request.user
+        if 'owner' in value or '-owner' in value:
+            order_direction = '-' if '-owner' in value else ''
+            reverse__order_direction = '' if '-owner' in value else '-'
+            queryset = queryset.annotate(
+                owner_null=Case(
+                    When(owner=None, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField()
+                ),
+                is_current_user=Case(
+                    When(owner=current_user, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField()
+                )
+            ).order_by('owner_null', f'{reverse__order_direction}is_current_user', f'{order_direction}owner__first_name', f'{order_direction}owner__last_name')
+        if 'last_edited' in value or '-last_edited' in value:
+            order_direction = '-' if '-last_edited' in value else ''
+
+            queryset = queryset.order_by(f'{order_direction}modified_date')
+
+        other_ordering = [v for v in value if v not in [
+            'owner', '-owner', 'last_edited', '-last_edited']]
+        return queryset if not other_ordering else queryset.order_by(*other_ordering)
 
     class Meta:
         model = Sentence
@@ -203,10 +233,25 @@ class NoteFilter(django_filters.FilterSet):
         field_name="connectivity_statement_id",
         queryset=ConnectivityStatement.objects.all(),
     )
+    include_system_notes = django_filters.BooleanFilter(
+        field_name="include_system_notes", method="get_notes", label="Include System Notes"
+    )
 
     class Meta:
         model = Note
         fields = []
+
+    @staticmethod
+    def get_notes(queryset, name, value):
+        if value:
+            return queryset
+        system_user = User.objects.get(username="system")
+        combined_queryset = queryset.filter(
+            Q(user=system_user, note__icontains="invalid") |
+            Q(user=system_user, note__icontains="exported") |
+            ~Q(user=system_user)
+        )
+        return combined_queryset.distinct()
 
 
 class ViaFilter(django_filters.FilterSet):

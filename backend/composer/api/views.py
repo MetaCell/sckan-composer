@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Case, When, Value, IntegerField
 
 from composer.services.state_services import (
     ConnectivityStatementStateService,
@@ -440,6 +441,17 @@ class SentenceViewSet(
     ]
     filterset_class = SentenceFilter
     service = SentenceStateService
+
+    def get_queryset(self):
+        if "ordering" not in self.request.query_params:
+            return super().get_queryset().annotate(
+                is_current_user=Case(
+                    When(owner=self.request.user, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                )
+            ).order_by("-is_current_user", "-modified_date")
+        return super().get_queryset()
 
 
 class SpecieViewSet(viewsets.ReadOnlyModelViewSet):
