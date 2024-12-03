@@ -107,8 +107,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     
     // Process data to revert to the initial layout
     const { nodes, links } = processData({
-      origins,
-      vias,
+      origins: origins ? origins : [],
+      vias: vias ? vias : [],
       destinations,
       forwardConnection,
       serializedGraph,

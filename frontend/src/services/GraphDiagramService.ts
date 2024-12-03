@@ -20,6 +20,15 @@ export const DestinationTypeMapping: Record<TypeC11Enum, string> = {
   [TypeC11Enum.Unknown]: 'Not specified'
 };
 
+type EntityType = NodeTypes.Origin | NodeTypes.Via | NodeTypes.Destination;
+
+interface EntityInfo {
+  entity: AnatomicalEntity;
+  type: EntityType;
+  viaType?: TypeB60Enum;
+  destinationType?: TypeC11Enum;
+}
+
 const POSITION_CONSTANTS = {
   yStart: 50,
   yIncrement: 250, // Vertical spacing
@@ -48,6 +57,9 @@ export const processData = ({
 
   // Extract positions per node type
   const existingPositions = extractNodePositionsFromSerializedGraph(serializedGraph);
+
+  // Collect entity information
+  const entityMap = collectEntityMap(origins, vias, destinations);
 
   // Process nodes with type-specific positions
   processOrigins(origins, nodeMap, nodes, existingPositions.get(NodeTypes.Origin) || new Map());
@@ -92,6 +104,50 @@ function extractNodePositionsFromSerializedGraph(serializedGraph: any): Map<stri
   });
   return positions;
 }
+
+
+function collectEntityMap(
+  origins: AnatomicalEntity[] | undefined,
+  vias: ViaSerializerDetails[] | undefined,
+  destinations: DestinationSerializerDetails[] | undefined
+): Map<string, EntityInfo> {
+  const entityMap = new Map<string, EntityInfo>();
+
+  origins?.forEach(origin => {
+    const entityId = origin.id.toString();
+    if (entityMap.has(entityId)) {
+      console.warn(`Entity with ID ${entityId} already exists as an origin. Overwriting.`);
+    }
+    entityMap.set(entityId, { entity: origin, type: NodeTypes.Origin });
+  });
+
+  vias?.forEach(via => {
+    via.anatomical_entities.forEach(entity => {
+      const entityId = entity.id.toString();
+      if (entityMap.has(entityId)) {
+        console.warn(`Entity with ID ${entityId} already exists as a via. Overwriting.`);
+      }
+      entityMap.set(entityId, { entity, type: NodeTypes.Via, viaType: via.type });
+    });
+  });
+
+  destinations?.forEach(destination => {
+    destination.anatomical_entities.forEach(entity => {
+      const entityId = entity.id.toString();
+      if (entityMap.has(entityId)) {
+        console.warn(`Entity with ID ${entityId} already exists as a destination. Overwriting.`);
+      }
+      entityMap.set(entityId, {
+        entity,
+        type: NodeTypes.Destination,
+        destinationType: destination.type,
+      });
+    });
+  });
+
+  return entityMap;
+}
+
 
 function processOrigins(
   origins: AnatomicalEntity[] | undefined,

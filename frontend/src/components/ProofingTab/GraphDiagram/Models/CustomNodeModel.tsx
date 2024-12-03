@@ -1,6 +1,8 @@
 import { NodeModel, DefaultPortModel } from '@projectstorm/react-diagrams';
 import { NodeTypes } from "../GraphDiagram";
 import {CustomNodeOptions} from "../GraphDiagram";
+import { DestinationTypeMapping } from '../../../../services/GraphDiagramService';
+import { TypeC11Enum } from '../../../../apiclient/backend/api';
 
 export class CustomNodeModel extends NodeModel {
     customType: NodeTypes;
@@ -17,11 +19,29 @@ export class CustomNodeModel extends NodeModel {
         this.name = name;
         this.externalId = externalId;
 
-        if (customType === NodeTypes.Origin || customType === NodeTypes.Via) {
+        this.configurePorts(customType, options);
+    }
+
+    configurePorts(customType: NodeTypes, options: CustomNodeOptions): void {
+        // Origin nodes have both in and out ports
+        if (customType === NodeTypes.Origin) {
+            this.addPort(new DefaultPortModel(true, 'in', 'In'));
             this.addPort(new DefaultPortModel(false, 'out', 'Out'));
         }
-        if (customType === NodeTypes.Via || customType === NodeTypes.Destination) {
+        // Via nodes have both in and out ports
+        if (customType === NodeTypes.Via) {
             this.addPort(new DefaultPortModel(true, 'in', 'In'));
+            this.addPort(new DefaultPortModel(false, 'out', 'Out'));
+        }
+        // Destination nodes: ports depend on the type of destination
+        if (customType === NodeTypes.Destination) {
+            if (options.anatomicalType === DestinationTypeMapping[TypeC11Enum.AfferentT]) {
+                // Afferent terminals have only an out port
+                this.addPort(new DefaultPortModel(false, 'out', 'Out'));
+            } else {
+                // Other destinations have only an in port
+                this.addPort(new DefaultPortModel(true, 'in', 'In'));
+            }
         }
     }
 
