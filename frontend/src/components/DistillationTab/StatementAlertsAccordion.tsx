@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
   Accordion,
   AccordionDetails,
@@ -26,6 +26,8 @@ const StatementAlertsAccordion = (props: any) => {
   const [openFormIndex, setOpenFormIndex] = useState<number | null>(null);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [alertToDelete, setAlertToDelete] = useState<number | null>(null);
+  
+  const currentAlertRef = useRef<any>(null);
   const handleChange = (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded);
   };
@@ -34,8 +36,9 @@ const StatementAlertsAccordion = (props: any) => {
     if (!activeTypes.includes(typeId)) {
       const newAlert = { connectivity_statement: parseInt(statement.id), alert_type: typeId, text: "" }
       
-      
       connectivityStatementService.createAlert(newAlert).then((res: any) => {
+        currentAlertRef.current = res;
+        
         const updatedAlerts = [
           ...(statement.statement_alerts || []),
           res,
@@ -45,7 +48,6 @@ const StatementAlertsAccordion = (props: any) => {
         setStatement(updatedStatement);
         const newIndex = updatedAlerts.length - 1;
         setOpenFormIndex(newIndex);
-        
         setTimeout(() => {
           const textArea = document.querySelectorAll(`#root_statement_alerts_0_text`);
           if (textArea) {
@@ -68,6 +70,7 @@ const StatementAlertsAccordion = (props: any) => {
       alert(`Error deleting alert: ${error}`);
     }
     
+    setOpenFormIndex(null);
     setOpenDialog(false);
     setAlertToDelete(null);
   };
@@ -87,8 +90,17 @@ const StatementAlertsAccordion = (props: any) => {
   }, [statement]);
   
   const toggleFormVisibility = (index: number) => {
+    const alert = statement.statement_alerts[index] || null;
     setOpenFormIndex(openFormIndex === index ? null : index);
+    currentAlertRef.current = alert;
   };
+  
+  const onInputBlur = async (value: string) => {
+    const alert = currentAlertRef.current;
+    const updatedAlert = { ...alert, text: value };
+   await connectivityStatementService.updateAlert(alert.id, updatedAlert).then(() => refreshStatement())
+  }
+
   return (
     <Box px={2} py={0.5}>
       <Accordion
@@ -262,6 +274,7 @@ const StatementAlertsAccordion = (props: any) => {
                         enableAutoSave={true}
                         isDisabled={isDisabled}
                         className="alerts-form"
+                        onInputBlur={onInputBlur}
                       />
                       <IconButton onClick={() => handleDelete(alert.id)}
                                   disabled={alert?.text?.trim() !== ''}
