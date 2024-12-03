@@ -56,6 +56,7 @@ const SentenceList = () => {
         entityType="sentence"
         loading={loading}
         totalResults={totalResults}
+        allowSortByOwner={true}
         queryOptions={queryOptions}
       />
     </Box>

@@ -863,6 +863,11 @@ paths:
         schema:
           type: integer
           nullable: true
+      - in: query
+        name: include_system_notes
+        schema:
+          type: boolean
+        description: Include System Notes
       - name: limit
         required: false
         in: query
@@ -1261,8 +1266,10 @@ paths:
             enum:
             - -id
             - -last_edited
+            - -owner
             - id
             - last_edited
+            - owner
         description: Ordering
         explode: false
         style: form
@@ -2244,7 +2251,7 @@ components:
           nullable: true
         state:
           type: string
-          maxLength: 50
+          readOnly: true
         available_transitions:
           type: array
           items:
@@ -2350,6 +2357,7 @@ components:
       - projection_phenotype
       - sentence
       - sex
+      - state
       - statement_preview
       - tags
     Destination:
@@ -2953,7 +2961,7 @@ components:
           nullable: true
         state:
           type: string
-          maxLength: 50
+          readOnly: true
         available_transitions:
           type: array
           items:
