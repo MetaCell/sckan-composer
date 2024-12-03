@@ -242,6 +242,9 @@ class ConnectivityStatementService extends AbstractService {
   async destroyAlert(id: number) {
     return composerApi.composerStatementAlertDestroy(id).then((response: any) => response.data);
   }
+  async updateAlert(id: number, statementAlert: any) {
+    return composerApi.composerStatementAlertUpdate(id, statementAlert).then((response: any) => response.data);
+  }
   
   async assignOwner(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement): Promise<ConnectivityStatement> {
     return composerApi.composerConnectivityStatementAssignOwnerPartialUpdate(id, patchedConnectivityStatement).then((response: any) => response.data);

@@ -41,10 +41,11 @@ import {projections} from "../../services/ProjectionService";
 import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
 
 const StatementForm = (props: any) => {
-  const {uiFields, statement, setStatement, isDisabled, action: refreshStatement} = props;
+  const {uiFields, statement, setStatement, isDisabled, action: refreshStatement, onInputBlur} = props;
   const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
+
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
@@ -77,9 +78,7 @@ const StatementForm = (props: any) => {
         "ui:options": {
           placeholder: "Enter alert text here...",
           rows: 3,
-          onBlur: (value: string, id: string) => {
-            console.log(`Blurred field with ID: ${id}, value: ${value}`);
-          },
+          onBlur: (value: string) => onInputBlur(value),
         },
       },
       connectivity_statement: {

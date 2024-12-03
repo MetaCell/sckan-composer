@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
   Accordion,
   AccordionDetails,
@@ -17,6 +17,31 @@ import Select from "@mui/material/Select";
 import AlertMenuItem from "./AlertMenuItem";
 import {vars} from "../../theme/variables";
 import ConfirmationDialog from "./ConfiramtionDialog";
+
+const parseTextWithLinks = (text: string, vars: any): JSX.Element[] => {
+  const urlRegex = /(https?:\/\/\S+|www\.\S+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi;
+  
+  return text.split(urlRegex).map((part, index) => {
+    const isURL = urlRegex.test(part);
+    if (isURL) {
+      const href = part.startsWith("http") ? part : `http://${part}`;
+      return (
+        <React.Fragment key={index}>
+          <a
+            key={index}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: vars.primary800, textDecoration: "underline" }}
+          >
+            {part}
+          </a>
+        </React.Fragment>
+      );
+    }
+    return <React.Fragment key={index}>{part}</React.Fragment>;
+  });
+};
 const StatementAlertsAccordion = (props: any) => {
   const { statement, refreshStatement, isDisabled, setStatement } = props;
   
@@ -26,6 +51,8 @@ const StatementAlertsAccordion = (props: any) => {
   const [openFormIndex, setOpenFormIndex] = useState<number | null>(null);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [alertToDelete, setAlertToDelete] = useState<number | null>(null);
+  
+  const currentAlertRef = useRef<any>(null);
   const handleChange = (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded);
   };
@@ -34,8 +61,9 @@ const StatementAlertsAccordion = (props: any) => {
     if (!activeTypes.includes(typeId)) {
       const newAlert = { connectivity_statement: parseInt(statement.id), alert_type: typeId, text: "" }
       
-      
       connectivityStatementService.createAlert(newAlert).then((res: any) => {
+        currentAlertRef.current = res;
+        
         const updatedAlerts = [
           ...(statement.statement_alerts || []),
           res,
@@ -45,7 +73,6 @@ const StatementAlertsAccordion = (props: any) => {
         setStatement(updatedStatement);
         const newIndex = updatedAlerts.length - 1;
         setOpenFormIndex(newIndex);
-        
         setTimeout(() => {
           const textArea = document.querySelectorAll(`#root_statement_alerts_0_text`);
           if (textArea) {
@@ -68,6 +95,7 @@ const StatementAlertsAccordion = (props: any) => {
       alert(`Error deleting alert: ${error}`);
     }
     
+    setOpenFormIndex(null);
     setOpenDialog(false);
     setAlertToDelete(null);
   };
@@ -87,8 +115,17 @@ const StatementAlertsAccordion = (props: any) => {
   }, [statement]);
   
   const toggleFormVisibility = (index: number) => {
+    const alert = statement.statement_alerts[index] || null;
     setOpenFormIndex(openFormIndex === index ? null : index);
+    currentAlertRef.current = alert;
   };
+  
+  const onInputBlur = async (value: string) => {
+    const alert = currentAlertRef.current;
+    const updatedAlert = { ...alert, text: value };
+   await connectivityStatementService.updateAlert(alert.id, updatedAlert).then(() => refreshStatement())
+  }
+
   return (
     <Box px={2} py={0.5}>
       <Accordion
@@ -168,7 +205,8 @@ const StatementAlertsAccordion = (props: any) => {
               </Box>
               
               {/* DISPLAYED Alerts */}
-              <Box>
+              {alerts.filter((type: any) => activeTypes.includes(type.id)).length > 0 && (
+                <Box>
                 <Typography sx={{
                   padding: "0.875rem 0.875rem 0.5rem 0.875rem",
                   color: vars.inputPlaceholderColor,
@@ -190,6 +228,8 @@ const StatementAlertsAccordion = (props: any) => {
                     />
                   ))}
               </Box>
+              )}
+            
             </Select>
             <Stack spacing="2rem" pt='.75rem' pb='.75rem'>
               {statement.statement_alerts?.map((alert: any, index: number) => (
@@ -262,6 +302,7 @@ const StatementAlertsAccordion = (props: any) => {
                         enableAutoSave={true}
                         isDisabled={isDisabled}
                         className="alerts-form"
+                        onInputBlur={onInputBlur}
                       />
                       <IconButton onClick={() => handleDelete(alert.id)}
                                   disabled={alert?.text?.trim() !== ''}
@@ -281,11 +322,8 @@ const StatementAlertsAccordion = (props: any) => {
                         padding: '.75rem',
                         boxShadow: '0px 1px 2px 0px rgba(16, 24, 40, 0.05)'
                       }}>
-                        <Typography
-                          variant="body2"
-                          color="textSecondary"
-                        >
-                          {alert.text}
+                        <Typography component='p' variant='body2' color={vars.darkTextColor}>
+                          {parseTextWithLinks(alert.text, vars)}
                         </Typography>
                       </Box>
                       <IconButton
