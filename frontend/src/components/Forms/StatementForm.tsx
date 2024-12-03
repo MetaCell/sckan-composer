@@ -49,6 +49,7 @@ const StatementForm = (props: any) => {
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
   copiedSchema.properties.statement_alerts.items.properties.alert_type.type = "number";
+  copiedSchema.properties.statement_alerts.items.properties.connectivity_statement.type = "number";
 
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["destination_type", "*"];
@@ -76,8 +77,14 @@ const StatementForm = (props: any) => {
         "ui:options": {
           placeholder: "Enter alert text here...",
           rows: 3,
+          onBlur: (value: string, id: string) => {
+            console.log(`Blurred field with ID: ${id}, value: ${value}`);
+          },
         },
       },
+      connectivity_statement: {
+        "ui:widget": "hidden",
+      }
     },
   }
   copiedUISchema.circuit_type = {
@@ -787,7 +794,6 @@ const StatementForm = (props: any) => {
         "knowledge_statement",
         "additional_information",
         "apinatomy_model",
-        "statement_alerts"
       ]}
       submitOnChangeFields={[
         "phenotype_id",

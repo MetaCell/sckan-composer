@@ -30,49 +30,40 @@ const StatementAlertsAccordion = (props: any) => {
     setExpanded(isExpanded);
   };
   
-  
   const addAlert = (typeId: number) => {
     if (!activeTypes.includes(typeId)) {
-      const updatedAlerts = [
-        ...(statement.statement_alerts || []),
-        { alert_type: typeId, text: "" },
-      ];
+      const newAlert = { connectivity_statement: parseInt(statement.id), alert_type: typeId, text: "" }
       
-      const updatedStatement = { ...statement, statement_alerts: updatedAlerts };
-      setActiveTypes([...activeTypes, typeId]);
-      setStatement(updatedStatement);
       
-      // connectivityStatementService.partialUpdate(parseInt(statement.id), {statement_alerts: updatedAlerts})
-      const newIndex = updatedAlerts.length - 1;
-      setOpenFormIndex(newIndex);
-      
-      setTimeout(() => {
-        const textArea = document.querySelectorAll(`#root_statement_alerts_0_text`);
-        if (textArea) {
-          (textArea[newIndex] as HTMLTextAreaElement).focus();
-        }
-      }, 0);
+      connectivityStatementService.createAlert(newAlert).then((res: any) => {
+        const updatedAlerts = [
+          ...(statement.statement_alerts || []),
+          res,
+        ];
+        const updatedStatement = { ...statement, statement_alerts: updatedAlerts };
+        setActiveTypes([...activeTypes, typeId]);
+        setStatement(updatedStatement);
+        const newIndex = updatedAlerts.length - 1;
+        setOpenFormIndex(newIndex);
+        
+        setTimeout(() => {
+          const textArea = document.querySelectorAll(`#root_statement_alerts_0_text`);
+          if (textArea) {
+            (textArea[newIndex] as HTMLTextAreaElement).focus();
+          }
+        }, 500);
+      })
     }
   };
   
   
   const confirmDelete = async () => {
     if (alertToDelete === null) return;
-    
-    const updatedAlerts = statement.statement_alerts.filter(
-      (_: any, alertIndex: number) => alertIndex !== alertToDelete
-    );
-    
-    const patchedStatement = {
-      statement_alerts: updatedAlerts,
-    };
-    
+ 
     try {
-      const response = await statementService.partialUpdate(
-        statement.id,
-        patchedStatement
-      );
-      setStatement(response);
+     await statementService.destroyAlert(alertToDelete).then(() => {
+       refreshStatement();
+     })
     } catch (error) {
       alert(`Error deleting alert: ${error}`);
     }
@@ -98,8 +89,6 @@ const StatementAlertsAccordion = (props: any) => {
   const toggleFormVisibility = (index: number) => {
     setOpenFormIndex(openFormIndex === index ? null : index);
   };
-  console.log(alerts)
-  console.log(statement.statement_alerts)
   return (
     <Box px={2} py={0.5}>
       <Accordion
@@ -274,7 +263,7 @@ const StatementAlertsAccordion = (props: any) => {
                         isDisabled={isDisabled}
                         className="alerts-form"
                       />
-                      <IconButton onClick={() => handleDelete(index)}
+                      <IconButton onClick={() => handleDelete(alert.id)}
                                   disabled={alert?.text?.trim() !== ''}
                       >
                         <DeleteOutlined />
@@ -300,7 +289,7 @@ const StatementAlertsAccordion = (props: any) => {
                         </Typography>
                       </Box>
                       <IconButton
-                        onClick={() => handleDelete(index)}
+                        onClick={() => handleDelete(alert.id)}
                         disabled={alert?.text?.trim() !== ''}
                       >
                         <DeleteOutlined />
