@@ -515,12 +515,16 @@ class AlertTypeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'uri')
 
 class StatementAlertSerializer(serializers.ModelSerializer):
+    connectivity_statement = serializers.PrimaryKeyRelatedField(
+        queryset=ConnectivityStatement.objects.all(),
+        required=True
+    )
     alert_type = serializers.PrimaryKeyRelatedField(queryset=AlertType.objects.all(), required=True)
     id = serializers.IntegerField(required=False)
     class Meta:
         model = StatementAlert
-        fields = ('id', 'alert_type', 'text', 'saved_by', 'created_at', 'updated_at')
-        read_only_fields = ('created_at', 'updated_at', 'saved_by', 'alert_type')
+        fields = ('id', 'alert_type', 'text', 'saved_by', 'created_at', 'updated_at', 'connectivity_statement')
+        read_only_fields = ('created_at', 'updated_at', 'saved_by', 'alert_type', 'connectivity_statement')
 
     def create(self, validated_data):
         request = self.context.get('request')

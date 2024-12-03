@@ -1344,6 +1344,37 @@ export interface PaginatedSpecieList {
 /**
  * 
  * @export
+ * @interface PaginatedStatementAlertList
+ */
+export interface PaginatedStatementAlertList {
+    /**
+     * 
+     * @type {number}
+     * @memberof PaginatedStatementAlertList
+     */
+    'count'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedStatementAlertList
+     */
+    'next'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedStatementAlertList
+     */
+    'previous'?: string | null;
+    /**
+     * 
+     * @type {Array<StatementAlert>}
+     * @memberof PaginatedStatementAlertList
+     */
+    'results'?: Array<StatementAlert>;
+}
+/**
+ * 
+ * @export
  * @interface PaginatedTagList
  */
 export interface PaginatedTagList {
@@ -2017,6 +2048,55 @@ export interface PatchedSentence {
     'doi_uri'?: string;
 }
 /**
+ * 
+ * @export
+ * @interface PatchedStatementAlert
+ */
+export interface PatchedStatementAlert {
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedStatementAlert
+     */
+    'id'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedStatementAlert
+     */
+    'alert_type'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedStatementAlert
+     */
+    'text'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedStatementAlert
+     */
+    'saved_by'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedStatementAlert
+     */
+    'created_at'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedStatementAlert
+     */
+    'updated_at'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedStatementAlert
+     */
+    'connectivity_statement'?: number;
+}
+/**
  * Via
  * @export
  * @interface PatchedVia
@@ -2506,7 +2586,7 @@ export interface StatementAlert {
      * @type {string}
      * @memberof StatementAlert
      */
-    'text': string;
+    'text'?: string;
     /**
      * 
      * @type {number}
@@ -2525,6 +2605,12 @@ export interface StatementAlert {
      * @memberof StatementAlert
      */
     'updated_at': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof StatementAlert
+     */
+    'connectivity_statement': number;
 }
 /**
  * Note Tag
@@ -2610,6 +2696,12 @@ export interface User {
      * @memberof User
      */
     'email'?: string;
+    /**
+     * Designates whether the user can log into this admin site.
+     * @type {boolean}
+     * @memberof User
+     */
+    'is_staff'?: boolean;
 }
 /**
  * Via
@@ -5171,6 +5263,276 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * StatementAlert
+         * @param {StatementAlert} statementAlert 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerStatementAlertCreate: async (statementAlert: StatementAlert, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'statementAlert' is not null or undefined
+            assertParamExists('composerStatementAlertCreate', 'statementAlert', statementAlert)
+            const localVarPath = `/api/composer/statementAlert/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(statementAlert, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * StatementAlert
+         * @param {number} id A unique integer value identifying this statement alert.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerStatementAlertDestroy: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerStatementAlertDestroy', 'id', id)
+            const localVarPath = `/api/composer/statementAlert/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * StatementAlert
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerStatementAlertList: async (limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/statementAlert/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * StatementAlert
+         * @param {number} id A unique integer value identifying this statement alert.
+         * @param {PatchedStatementAlert} [patchedStatementAlert] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerStatementAlertPartialUpdate: async (id: number, patchedStatementAlert?: PatchedStatementAlert, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerStatementAlertPartialUpdate', 'id', id)
+            const localVarPath = `/api/composer/statementAlert/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(patchedStatementAlert, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * StatementAlert
+         * @param {number} id A unique integer value identifying this statement alert.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerStatementAlertRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerStatementAlertRetrieve', 'id', id)
+            const localVarPath = `/api/composer/statementAlert/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * StatementAlert
+         * @param {number} id A unique integer value identifying this statement alert.
+         * @param {StatementAlert} statementAlert 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerStatementAlertUpdate: async (id: number, statementAlert: StatementAlert, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerStatementAlertUpdate', 'id', id)
+            // verify required parameter 'statementAlert' is not null or undefined
+            assertParamExists('composerStatementAlertUpdate', 'statementAlert', statementAlert)
+            const localVarPath = `/api/composer/statementAlert/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(statementAlert, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Tag
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
@@ -6223,6 +6585,81 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * StatementAlert
+         * @param {StatementAlert} statementAlert 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerStatementAlertCreate(statementAlert: StatementAlert, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StatementAlert>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerStatementAlertCreate(statementAlert, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerStatementAlertCreate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * StatementAlert
+         * @param {number} id A unique integer value identifying this statement alert.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerStatementAlertDestroy(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerStatementAlertDestroy(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerStatementAlertDestroy']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * StatementAlert
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerStatementAlertList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedStatementAlertList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerStatementAlertList(limit, offset, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerStatementAlertList']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * StatementAlert
+         * @param {number} id A unique integer value identifying this statement alert.
+         * @param {PatchedStatementAlert} [patchedStatementAlert] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerStatementAlertPartialUpdate(id: number, patchedStatementAlert?: PatchedStatementAlert, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StatementAlert>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerStatementAlertPartialUpdate(id, patchedStatementAlert, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerStatementAlertPartialUpdate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * StatementAlert
+         * @param {number} id A unique integer value identifying this statement alert.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerStatementAlertRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StatementAlert>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerStatementAlertRetrieve(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerStatementAlertRetrieve']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * StatementAlert
+         * @param {number} id A unique integer value identifying this statement alert.
+         * @param {StatementAlert} statementAlert 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerStatementAlertUpdate(id: number, statementAlert: StatementAlert, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StatementAlert>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerStatementAlertUpdate(id, statementAlert, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerStatementAlertUpdate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Tag
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
@@ -6853,6 +7290,63 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          */
         composerSpecieRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Specie> {
             return localVarFp.composerSpecieRetrieve(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * StatementAlert
+         * @param {StatementAlert} statementAlert 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerStatementAlertCreate(statementAlert: StatementAlert, options?: RawAxiosRequestConfig): AxiosPromise<StatementAlert> {
+            return localVarFp.composerStatementAlertCreate(statementAlert, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * StatementAlert
+         * @param {number} id A unique integer value identifying this statement alert.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerStatementAlertDestroy(id: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.composerStatementAlertDestroy(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * StatementAlert
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerStatementAlertList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedStatementAlertList> {
+            return localVarFp.composerStatementAlertList(limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * StatementAlert
+         * @param {number} id A unique integer value identifying this statement alert.
+         * @param {PatchedStatementAlert} [patchedStatementAlert] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerStatementAlertPartialUpdate(id: number, patchedStatementAlert?: PatchedStatementAlert, options?: RawAxiosRequestConfig): AxiosPromise<StatementAlert> {
+            return localVarFp.composerStatementAlertPartialUpdate(id, patchedStatementAlert, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * StatementAlert
+         * @param {number} id A unique integer value identifying this statement alert.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerStatementAlertRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<StatementAlert> {
+            return localVarFp.composerStatementAlertRetrieve(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * StatementAlert
+         * @param {number} id A unique integer value identifying this statement alert.
+         * @param {StatementAlert} statementAlert 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerStatementAlertUpdate(id: number, statementAlert: StatementAlert, options?: RawAxiosRequestConfig): AxiosPromise<StatementAlert> {
+            return localVarFp.composerStatementAlertUpdate(id, statementAlert, options).then((request) => request(axios, basePath));
         },
         /**
          * Tag
@@ -7564,6 +8058,75 @@ export class ComposerApi extends BaseAPI {
      */
     public composerSpecieRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSpecieRetrieve(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * StatementAlert
+     * @param {StatementAlert} statementAlert 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerStatementAlertCreate(statementAlert: StatementAlert, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerStatementAlertCreate(statementAlert, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * StatementAlert
+     * @param {number} id A unique integer value identifying this statement alert.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerStatementAlertDestroy(id: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerStatementAlertDestroy(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * StatementAlert
+     * @param {number} [limit] Number of results to return per page.
+     * @param {number} [offset] The initial index from which to return the results.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerStatementAlertList(limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerStatementAlertList(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * StatementAlert
+     * @param {number} id A unique integer value identifying this statement alert.
+     * @param {PatchedStatementAlert} [patchedStatementAlert] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerStatementAlertPartialUpdate(id: number, patchedStatementAlert?: PatchedStatementAlert, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerStatementAlertPartialUpdate(id, patchedStatementAlert, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * StatementAlert
+     * @param {number} id A unique integer value identifying this statement alert.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerStatementAlertRetrieve(id: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerStatementAlertRetrieve(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * StatementAlert
+     * @param {number} id A unique integer value identifying this statement alert.
+     * @param {StatementAlert} statementAlert 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerStatementAlertUpdate(id: number, statementAlert: StatementAlert, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerStatementAlertUpdate(id, statementAlert, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
