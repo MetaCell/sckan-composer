@@ -84,6 +84,7 @@ class Row:
         layer: str = "",
         connected_from_names: str = "",
         connected_from_uris: str = "",
+        object_text__from_alert_notes: str = "",
     ):
         self.structure = structure
         self.identifier = identifier
@@ -94,6 +95,7 @@ class Row:
         self.layer = layer
         self.connected_from_names = connected_from_names
         self.connected_from_uris = connected_from_uris
+        self.object_text__from_alert_notes = object_text__from_alert_notes
 
 
 def get_sentence_number(cs: ConnectivityStatement, row: Row):
@@ -103,6 +105,9 @@ def get_sentence_number(cs: ConnectivityStatement, row: Row):
 def get_statement_uri(cs: ConnectivityStatement, row: Row):
     return cs.reference_uri
 
+
+def get_alert_text(cs: ConnectivityStatement, row: Row):
+    return row.object_text__from_alert_notes
 
 def get_nlp_id(cs: ConnectivityStatement, row: Row):
     return cs.export_id
@@ -217,6 +222,7 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
         "Proposed action": get_proposed_action,
         "Added to SCKAN (time stamp)": get_added_to_sckan_timestamp,
         "URI": get_statement_uri,
+        "Object Text": get_alert_text,
     }
     exportable_tags = Tag.objects.filter(exportable=True)
     for tag in exportable_tags:
@@ -465,6 +471,15 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
     # Forward Connections
     for forward_conn in cs.forward_connection.all():
         rows.append(get_forward_connection_row(forward_conn))
+
+    for statement_alert in cs.statement_alerts.all():
+        rows.append(Row(
+            identifier=statement_alert.alert_type.uri,
+            structure="",
+            relationship=statement_alert.alert_type.name,
+            predicate=statement_alert.alert_type.predicate,
+            object_text__from_alert_notes=statement_alert.text,
+        ))
 
     return rows
 
