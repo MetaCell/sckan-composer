@@ -128,7 +128,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     });
     setIsGraphLocked(lock);
   };
-
+  
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const initializeGraph = () => {
     const model = new DiagramModel();
     
@@ -183,7 +184,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   // This effect runs whenever origins, vias, or destinations change
   useEffect(() => {
     initializeGraph();
-  }, [rankdir]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rankdir, initializeGraph]);
   
   // This effect prevents the default scroll and touchmove behavior
   useEffect(() => {
@@ -222,7 +224,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     model.getNodes().forEach((node) => {
       node.setLocked(isGraphLocked);
     });
-  }, [isGraphLocked]);
+  }, [isGraphLocked, engine]);
   
   
   useEffect(() => {
