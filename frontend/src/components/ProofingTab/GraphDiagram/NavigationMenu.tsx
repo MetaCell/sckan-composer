@@ -1,16 +1,23 @@
-import {Stack, Divider, CircularProgress, Backdrop} from "@mui/material";
+import {Stack, Divider, CircularProgress, Backdrop, Tooltip, Alert} from "@mui/material";
 import FitScreenOutlinedIcon from "@mui/icons-material/FitScreenOutlined";
 import ZoomInOutlinedIcon from "@mui/icons-material/ZoomInOutlined";
 import ZoomOutOutlinedIcon from "@mui/icons-material/ZoomOutOutlined";
-import SaveIcon from '@mui/icons-material/Save';
 import IconButton from "@mui/material/IconButton";
 import {DiagramEngine} from "@projectstorm/react-diagrams-core";
 import React, {useState} from "react";
-import {PatchedConnectivityStatementUpdate} from "../../../apiclient/backend";
+import {ConnectivityStatement, PatchedConnectivityStatementUpdate} from "../../../apiclient/backend";
 import connectivityStatementService from "../../../services/StatementService";
-import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
-import SwapVertOutlinedIcon from '@mui/icons-material/SwapVertOutlined';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
+import CameraswitchOutlinedIcon from '@mui/icons-material/CameraswitchOutlined';
+import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
+import CustomSwitch from "../../CustomSwitch";
+import ConfirmationDialog from "../../ConfirmationDialog";
+import {CONFIRMATION_DIALOG_CONFIG} from "../../../settings";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../../../redux/store";
+import {checkOwnership, getOwnershipAlertMessage} from "../../../helpers/ownershipAlert";
+import {setWasChangeDetected} from "../../../redux/statementSlice";
+
 const ZOOM_CHANGE = 25
 
 interface NavigationMenuProps {
@@ -19,13 +26,39 @@ interface NavigationMenuProps {
   rankdir: string;
   toggleRankdir: () => void;
   resetGraph: () => void;
+  isGraphLocked: boolean;
+  switchLockedGraph: (locked: boolean) => void;
+  statement: ConnectivityStatement;
+  setStatement: (statement: any) => void;
 }
 
 const NavigationMenu = (props: NavigationMenuProps) => {
-  const {engine, statementId, toggleRankdir, rankdir, resetGraph} = props
+  const {engine, statementId, toggleRankdir, resetGraph, isGraphLocked, switchLockedGraph, statement, setStatement} = props
   const [isSaving, setIsSaving] = useState<boolean>(false)
-
-
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({
+    title: "",
+    confirmationText: "",
+    Icon: <></> as React.ReactNode,
+    onConfirm: () => {},
+  });
+  const dispatch = useDispatch();
+  
+  const { wasChangeDetected, positionChangeOnly } = useSelector((state: RootState) => state.statement);
+  
+  const openDialog = (config: {
+    title: string;
+    confirmationText: string;
+    Icon: React.ReactNode;
+    onConfirm: () => void;
+  }) => {
+    setDialogConfig(config);
+    setIsConfirmationDialogOpen(true);
+  };
+  
+  const closeDialog = () => {
+    setIsConfirmationDialogOpen(false);
+  };
   const zoomOut = () => {
     const zoomLevel = engine.getModel().getZoomLevel();
     engine.getModel().setZoomLevel(zoomLevel - ZOOM_CHANGE);
@@ -51,7 +84,12 @@ const NavigationMenu = (props: NavigationMenuProps) => {
     }
 
     try {
-      await connectivityStatementService.partialUpdate(parseInt(statementId, 10), patchData)
+     const updatedStatement =  await connectivityStatementService.partialUpdate(parseInt(statementId, 10), patchData)
+      setStatement({
+        ...statement,
+        graph_rendering_state: updatedStatement.graph_rendering_state
+      })
+      dispatch(setWasChangeDetected(false));
     } catch (error) {
       // TODO: Provide proper feedback
       console.error("Error saving graph:", error)
@@ -59,68 +97,167 @@ const NavigationMenu = (props: NavigationMenuProps) => {
       setIsSaving(false)
     }
   }
-
-  return isSaving ? (
-    <Backdrop open={isSaving}>
-      <CircularProgress color="inherit"/>
-    </Backdrop>
-  ) : (
-    <Stack
-      direction="row"
-      spacing="1rem"
-      sx={{
-        borderRadius: "1.75rem",
-        border: "1px solid #F2F4F7",
-        background: "#FFF",
-        width: "fit-content",
-        boxShadow:
-          "0px 4px 6px -2px rgba(16, 24, 40, 0.03), 0px 12px 16px -4px rgba(16, 24, 40, 0.08)",
-        padding: "0.75rem 1.25rem",
-        position: "absolute",
-        top: 8,
-        right: 8,
-        zIndex: 10,
-
-        "& .MuiSvgIcon-root": {
-          color: "#475467",
-        },
-
-        "& .MuiDivider-root": {
-          borderColor: "#EAECF0",
-          borderWidth: 0.5,
-        },
-        "& .MuiButtonBase-root": {
-          padding: 0,
-
-          "&:hover": {
-            backgroundColor: "transparent",
+  
+  const switchOrientation = () => {
+    return openDialog({
+      title: CONFIRMATION_DIALOG_CONFIG.Redraw.title,
+      confirmationText: CONFIRMATION_DIALOG_CONFIG.Redraw.confirmationText,
+      Icon: <CONFIRMATION_DIALOG_CONFIG.Redraw.Icon />,
+      onConfirm: () => {
+        toggleRankdir();
+        closeDialog();
+      },
+    });
+  };
+  
+  const redrawGraph = async () => {
+    return openDialog({
+      title: CONFIRMATION_DIALOG_CONFIG.Redraw.title,
+      confirmationText: CONFIRMATION_DIALOG_CONFIG.Redraw.confirmationText,
+      Icon: <CONFIRMATION_DIALOG_CONFIG.Redraw.Icon />,
+      onConfirm: async () => {
+        await resetGraph();
+        await saveGraph()
+        closeDialog();
+      },
+    })
+  }
+  
+  const toggleGraphLock = (lock: boolean) => {
+   return checkOwnership(
+      Number(statementId),
+      async () => {
+        // If ownership is valid, proceed with dialog confirmation
+        openDialog({
+          title: !lock
+            ? CONFIRMATION_DIALOG_CONFIG.Locked.title
+            : CONFIRMATION_DIALOG_CONFIG.Unlocked.title,
+          confirmationText: !lock
+            ? CONFIRMATION_DIALOG_CONFIG.Locked.confirmationText
+            : CONFIRMATION_DIALOG_CONFIG.Unlocked.confirmationText,
+          Icon: !lock
+            ? <CONFIRMATION_DIALOG_CONFIG.Locked.Icon/>
+            : <CONFIRMATION_DIALOG_CONFIG.Unlocked.Icon/>,
+          onConfirm: async () => {
+            if (lock) {
+              await saveGraph();
+            }
+            switchLockedGraph(!isGraphLocked);
+            closeDialog();
           },
-        },
-      }}
-    >
-      <IconButton onClick={() => engine.zoomToFit()}>
-        <FitScreenOutlinedIcon/>
-      </IconButton>
-      <Divider/>
-      <IconButton onClick={() => zoomIn()}>
-        <ZoomInOutlinedIcon/>
-      </IconButton>
-      <IconButton>
-        <ZoomOutOutlinedIcon onClick={() => zoomOut()}/>
-      </IconButton>
-      <IconButton onClick={() => saveGraph()}>
-        <SaveIcon/>
-      </IconButton>
-      <IconButton onClick={toggleRankdir}>
-        {
-          rankdir === 'LR' ? <SwapVertOutlinedIcon/> : <SwapHorizOutlinedIcon/>
-        }
-      </IconButton>
-      <IconButton onClick={resetGraph}>
-        <HomeOutlinedIcon />
-      </IconButton>
-    </Stack>
-  )
+        });
+      },
+      () => {},
+      getOwnershipAlertMessage
+    );
+  };
+    
+    return <>
+    {
+      isSaving ? (
+        <Backdrop open={isSaving}>
+          <CircularProgress color="inherit"/>
+        </Backdrop>
+      ) : (
+        <Stack
+          direction="row"
+          spacing="1rem"
+          alignItems='center'
+          justifyContent="space-between"
+          sx={{
+            p: '1.5rem .5rem',
+            "& .MuiSvgIcon-root": {
+              color: "#6C707A",
+            },
+            
+            "& .MuiDivider-root": {
+              borderColor: "#EAECF0",
+              borderWidth: 0.5,
+              height: '1.5rem'
+            },
+            "& .MuiButtonBase-root": {
+              padding: 0,
+              
+              '&.Mui-disabled': {
+                "& .MuiSvgIcon-root": {
+                  color: '#caced1',
+                },
+              }
+            },
+          }}
+        >
+          <Stack direction="row" alignItems='center' spacing="1rem" sx={{
+            "& .MuiButtonBase-root": {
+              borderRadius: '4px',
+              padding: '0 !important',
+              "&:hover": {
+                backgroundColor: "#EDEFF2",
+                borderRadius: '4px',
+                padding: '2px',
+                "& .MuiSvgIcon-root": {
+                  color: "#2F3032",
+                },
+              },
+            },
+          }}>
+            <Tooltip arrow title='Zoom in'>
+              <IconButton onClick={() => zoomIn()}>
+                <ZoomInOutlinedIcon/>
+              </IconButton>
+            </Tooltip>
+            <Tooltip arrow title='Zoom Out'>
+              <IconButton>
+                <ZoomOutOutlinedIcon onClick={() => zoomOut()}/>
+              </IconButton>
+            </Tooltip>
+            <Tooltip arrow title='Autoscale'>
+              <IconButton onClick={() => engine.zoomToFit()}>
+                <FitScreenOutlinedIcon/>
+              </IconButton>
+            </Tooltip>
+            <Tooltip arrow title='Switch orientation'>
+              <IconButton onClick={switchOrientation} disabled={isGraphLocked}>
+                <CameraswitchOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+            <Divider />
+            <Tooltip arrow title='Reset to default visualisation'>
+              <IconButton onClick={redrawGraph} disabled={isGraphLocked}>
+                <RestartAltOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+          <Stack direction="row" spacing="1rem" alignItems='center'>
+            {
+              wasChangeDetected ?
+                <Tooltip arrow title='This diagram does not match the Path Builder. It will be updated with default routing if you leave this page.'>
+                  <Alert severity="warning">The diagram is outdated, please use the reset button on the left to update the diagram</Alert>
+                </Tooltip> :
+                <Tooltip arrow title='The diagram is saved for all users'>
+                  <CheckCircleOutlineRoundedIcon sx={{
+                    color: "#039855 !important",
+                  }} />
+                </Tooltip>
+            }
+            <Divider />
+            <CustomSwitch
+              disabled={wasChangeDetected && !positionChangeOnly}
+              locked={isGraphLocked}
+              setLocked={(lock: boolean) => toggleGraphLock(lock)}
+            />
+          </Stack>
+        </Stack>
+      )
+    }
+    <ConfirmationDialog
+      open={isConfirmationDialogOpen}
+      onConfirm={dialogConfig.onConfirm}
+      onCancel={closeDialog}
+      title={dialogConfig.title}
+      confirmationText={dialogConfig.confirmationText}
+      Icon={dialogConfig.Icon}
+    />
+  </>
 };
 
 export default NavigationMenu;

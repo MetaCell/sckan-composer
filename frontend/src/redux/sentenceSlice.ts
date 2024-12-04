@@ -6,7 +6,7 @@ export interface QueryParams {
   limit: number,
   notes: boolean | undefined,
   index: number | undefined,
-  ordering: Array<'-last_edited' | '-id' | 'last_edited' | 'id'> | undefined,
+  ordering: Array<'-last_edited' | '-id' | 'last_edited' | 'id' | 'owner' | '-owner'> | undefined,
   stateFilter: ComposerSentenceListStateEnum[] | undefined,
   tagFilter: number[] | undefined,
   title: string | undefined
