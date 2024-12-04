@@ -129,7 +129,6 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     setIsGraphLocked(lock);
   };
   
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const initializeGraph = () => {
     const model = new DiagramModel();
     
