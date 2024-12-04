@@ -18,6 +18,8 @@ export interface QueryParams {
 
 export interface StatementState {
   queryOptions: QueryParams;
+  wasChangeDetected: boolean;
+  positionChangeOnly: boolean;
 }
 
 export const initialState: StatementState = {
@@ -34,6 +36,8 @@ export const initialState: StatementState = {
     excludeIds: undefined,
     origins: undefined,
   },
+  wasChangeDetected: false,
+  positionChangeOnly: false,
 };
 
 export const statementSlice = createSlice({
@@ -56,10 +60,19 @@ export const statementSlice = createSlice({
     setIndex: (state, action) => {
       state.queryOptions.index = action.payload;
     },
+    setPositionChangeOnly(state, action) {
+      state.positionChangeOnly = action.payload;
+    },
+    setWasChangeDetected(state, action) {
+      state.wasChangeDetected = action.payload;
+      if (action.payload) {
+        state.positionChangeOnly = false; // Reset when other changes occur
+      }
+    },
   },
 });
 
-export const { setFilters, setSorting, setKnowledgeStatementQuery, setIndex } =
+export const { setFilters, setSorting, setKnowledgeStatementQuery, setIndex, setWasChangeDetected, setPositionChangeOnly } =
   statementSlice.actions;
 
 export default statementSlice.reducer;
