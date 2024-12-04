@@ -43,7 +43,7 @@ import {useDispatch} from "react-redux";
 import {setWasChangeDetected} from "../../redux/statementSlice";
 
 const StatementForm = (props: any) => {
-  const {uiFields, statement, setStatement, isDisabled, action: refreshStatement} = props;
+  const {uiFields, statement, isDisabled, action: refreshStatement} = props;
   const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
