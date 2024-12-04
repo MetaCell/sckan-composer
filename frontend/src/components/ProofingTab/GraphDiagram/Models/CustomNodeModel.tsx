@@ -35,7 +35,7 @@ export class CustomNodeModel extends NodeModel {
         }
         // Destination nodes: ports depend on the type of destination
         if (customType === NodeTypes.Destination) {
-            if (options.anatomicalType === DestinationTypeMapping[TypeC11Enum.AfferentT]) {
+            if (options.anatomicalType === TypeC11Enum.AfferentT) {
                 // Afferent terminals have only an out port
                 this.addPort(new DefaultPortModel(false, 'out', 'Out'));
             } else {
