@@ -185,7 +185,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   useEffect(() => {
     initializeGraph();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rankdir, initializeGraph]);
+  }, [rankdir]);
   
   // This effect prevents the default scroll and touchmove behavior
   useEffect(() => {
