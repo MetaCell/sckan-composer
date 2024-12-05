@@ -6,6 +6,8 @@ const puppeteer = require("puppeteer");
 const USERNAME = process.env.USERNAME || 'simao@metacell.us'
 const PASSWORD = process.env.PASSWORD || 'Pokemon9897!'
 const baseURL = process.env.TEST_URL || 'https://composer.sckan.dev.metacell.us/'
+const shouldSkipLoginTest = !!process.env.TEST_URL;
+
 
 
 //FUNCTIONS AND CONSTANTS
@@ -90,6 +92,9 @@ describe('End to End Tests', () => {
         await console.log('Starting tests ...')
 
         await page.goto(baseURL, { waitUntil: 'domcontentloaded' })
+        const pageTitle = await page.title();
+        console.log(pageTitle);
+        expect(pageTitle).toBe('SCKAN Composer')
     });
 
     afterAll(async () => {
@@ -99,34 +104,29 @@ describe('End to End Tests', () => {
 
     describe('Login Flow', () => {
 
-        it('HomePage', async () => {
+        (shouldSkipLoginTest ? it.skip : it)('HomePage', async () => {
 
-            const pageTitle = await page.title();
-            console.log(pageTitle);
-            expect(pageTitle).toBe('SCKAN Composer')
+            
             await page.waitForSelector(selectors.LOGIN_PAGE, { timeout: 60000 })
             await page.waitForSelector(selectors.COOKIE_MODAL, { timeout: 60000 })
             await page.waitForSelector(selectors.ACCEPT_COOKIES, { timeout: 60000 })
             await page.click(selectors.ACCEPT_COOKIES)
             await page.waitForSelector(selectors.ACCEPT_COOKIES, { hidden: true });
 
-        })
+        });
 
-        it('Login', async () => {
-
-            console.log('Logging in ...')
-
-            await page.waitForSelector(selectors.USERNAME, { timeout: 60000 })
-            await page.type(selectors.USERNAME, USERNAME)
-            await page.type(selectors.PASSWORD, PASSWORD)
-            await page.waitForSelector(selectors.SIGN_IN_BUTTON, {hidden:false})
-            await page.click(selectors.SIGN_IN_BUTTON)
-            await page.waitForSelector(selectors.SEARCH_ICON, {hidden:false})
-
-
-            console.log('Logged In')
-
-        })
+        (shouldSkipLoginTest ? it.skip : it)('Login', async () => {
+            console.log('Logging in ...');
+    
+            await page.waitForSelector(selectors.USERNAME, { timeout: 60000 });
+            await page.type(selectors.USERNAME, USERNAME);
+            await page.type(selectors.PASSWORD, PASSWORD);
+            await page.waitForSelector(selectors.SIGN_IN_BUTTON, { hidden: false });
+            await page.click(selectors.SIGN_IN_BUTTON);
+            await page.waitForSelector(selectors.SEARCH_ICON, { hidden: false });
+    
+            console.log('Logged In');
+        });
     })
 
     describe('Sentence List', () => {
