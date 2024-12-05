@@ -19,9 +19,8 @@ import dagre from 'dagre';
 import {CustomNodeModel} from "./Models/CustomNodeModel";
 import Box from "@mui/material/Box";
 import {useTheme} from "@mui/system";
-import {useDispatch, useSelector} from "react-redux";
-import {setPositionChangeOnly} from "../../../redux/statementSlice";
-import {RootState} from "../../../redux/store";
+import {useDispatch} from "react-redux";
+import {setPositionChangeOnly, setWasChangeDetected} from "../../../redux/statementSlice";
 
 export enum NodeTypes {
   Origin = 'Origin',
@@ -65,10 +64,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   const [modelFitted, setModelFitted] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null);
   const [rankdir, setRankdir] = useState<"TB" | "LR">("TB");
-  const [isGraphLocked, setIsGraphLocked] = React.useState(false);
+  const [isGraphLocked, setIsGraphLocked] = React.useState(true);
   const [ignoreSerializedGraph, setIgnoreSerializedGraph] = useState(false);
-  
-  const wasChangeDetected = useSelector((state: RootState) => state.statement.wasChangeDetected);
   
   const layoutNodes = (nodes: CustomNodeModel[], links: DefaultLinkModel[]) => {
     const g = new dagre.graphlib.Graph();
@@ -161,17 +158,10 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   
   const resetGraph = () => {
     initializeGraph()
+    dispatch(setPositionChangeOnly(false));
+    dispatch(setWasChangeDetected(false));
   };
-  
-  useEffect(() => {
-    if (wasChangeDetected) {
-      setIsGraphLocked(false);
-    } else {
-      setIsGraphLocked(true);
-    }
 
-  }, [wasChangeDetected]);
-  
   // This effect runs once to set up the engine
   useEffect(() => {
     engine.getNodeFactories().registerFactory(new CustomNodeFactory());

@@ -12,7 +12,7 @@ import {CONFIRMATION_DIALOG_CONFIG} from "../settings";
 import ConfirmationDialog from "./ConfirmationDialog";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../redux/store";
-import {setDialogState, setWasChangeDetected} from "../redux/statementSlice";
+import {setDialogState, setPositionChangeOnly, setWasChangeDetected} from "../redux/statementSlice";
 
 const Sidebar = () => {
   const profile = userProfile.getProfile();
@@ -22,6 +22,8 @@ const Sidebar = () => {
   const wasChangeDetected = useSelector(
     (state: RootState) => state.statement.wasChangeDetected
   );
+  const positionChangeOnly = useSelector((state: RootState) => state.statement.positionChangeOnly);
+  
   const dialogsState = useSelector((state: RootState) => state.statement.dialogs);
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -63,10 +65,11 @@ const Sidebar = () => {
       navigate(url);
       setSelectedItem(selectedItem);
       dispatch(setWasChangeDetected(false));
+      dispatch(setPositionChangeOnly(false));
       return;
     }
     
-    if (wasChangeDetected) {
+    if (wasChangeDetected || positionChangeOnly) {
       setIsDialogOpen(true);
     } else {
       navigate(url);
@@ -83,6 +86,7 @@ const Sidebar = () => {
     setSelectedItem(selectedMenuItem.selectedItem);
     setIsDialogOpen(false);
     dispatch(setWasChangeDetected(false));
+    dispatch(setPositionChangeOnly(false));
   };
 
   return (
