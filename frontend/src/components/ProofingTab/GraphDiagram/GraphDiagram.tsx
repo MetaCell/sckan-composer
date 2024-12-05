@@ -84,8 +84,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     g.setDefaultEdgeLabel(() => ({}));
     
     nodes.forEach(node => {
+      node.setPosition(0, 0);
       g.setNode(node.getID(), { width: 100, height: 50 });
-      node.setLocked(isGraphLocked);
     });
     
     links.forEach(link => {
@@ -94,26 +94,16 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     
     dagre.layout(g);
     
-    const originNodes = nodes.filter(node => node.getCustomType() === NodeTypes.Origin);
-    const maxOriginX = Math.max(...originNodes.map(node => g.node(node.getID()).x || 0));
-    const minOriginY = Math.min(...originNodes.map(node => g.node(node.getID()).y || 0));
-
-    const afferentTNodes = nodes.filter(
-      node => node.getOptions().anatomicalType === DestinationTypeMapping[TypeC11Enum.AfferentT]
-    );
-
-    afferentTNodes.forEach(afferentNode => {
-      const { x } = g.node(afferentNode.getID());
-      afferentNode.setPosition(maxOriginX + x, minOriginY);
-    });
-    
     g.nodes().forEach((nodeId: string) => {
       const node = nodes.find(n => n.getID() === nodeId);
-      if (node && !afferentTNodes.includes(node)) {
-        const { x, y } = g.node(nodeId);
-        node.setPosition(x, y);
-      }
+      const { x, y } = g.node(nodeId);
+      node?.setPosition(x, y);
     });
+
+    const model = engine.getModel();
+    if (isGraphLocked && !model.isLocked()) {
+      model.setLocked(true);
+    }
   }
   
   const toggleRankdir = () => {
@@ -123,9 +113,9 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   
   const switchLockedGraph = (lock: boolean) => {
     const model = engine.getModel();
-    model.getNodes().forEach((node) => {
-      node.setLocked(lock);
-    });
+    if (lock && !model.isLocked()) {
+      model.setLocked(lock);
+    }
     setIsGraphLocked(lock);
   };
   
