@@ -116,8 +116,8 @@ describe('End to End Tests', () => {
 
         });
 
-        // (shouldSkipLoginTest ? it.skip : it)('Login', async () => {
-        it('Login', async () => {
+        (shouldSkipLoginTest ? it.skip : it)('Login', async () => {
+        //it('Login', async () => {
             console.log('Logging in ...');
     
             await page.waitForSelector(selectors.USERNAME, { timeout: 60000 });
