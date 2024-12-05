@@ -53,6 +53,7 @@ export const processData = ({
   const nodes: CustomNodeModel[] = [];
   const links: DefaultLinkModel[] = [];
   const nodeMap = new Map<string, CustomNodeModel>();
+  const linkKeySet = new Set<string>();
 
   // Extract positions per node type
   const existingPositions = extractNodePositionsFromSerializedGraph(serializedGraph);
@@ -84,6 +85,7 @@ export const processData = ({
       entityMap,
       nodeMap,
       nodes,
+      linkKeySet,
       links,
       existingPositions,
       0 // initial level
@@ -99,6 +101,7 @@ export const processData = ({
       entityId,
       entityMap,
       nodeMap,
+      linkKeySet,
       existingPositions,
       maxLevelAfferent + 1 // initial level
     );
@@ -224,9 +227,10 @@ function traverseFromAfferentTerminal(
   entityMap: Map<string, EntityInfo>,
   nodeMap: Map<string, CustomNodeModel>,
   nodes: CustomNodeModel[],
+  linkKeySet: Set<string>,
   links: DefaultLinkModel[],
   existingPositions: Map<string, Map<string, { x: number; y: number }>>,
-  level: number
+  level: number,
 ): number {
   const visited = new Set<string>();
   const stack: { id: string; level: number }[] = [{ id: entityId, level }];
@@ -296,11 +300,15 @@ function traverseFromAfferentTerminal(
         nodes.push(fromNode);
       }
 
-      // Create link from current node to from node
-      const link = createLink(currentNode, fromNode, 'out', 'in');
-      if (link) {
-        links.push(link);
-        updateNodeOptions(currentNode, fromNode, fromNode.getCustomType());
+      // Create link from currentNode to fromNode
+      const linkKey = getLinkId(currentNode, fromNode)
+      if (!linkKeySet.has(linkKey)) {
+        const link = createLink(currentNode, fromNode, 'out', 'in');
+        if (link) {
+          links.push(link);
+          updateNodeOptions(currentNode, fromNode, fromNode.getCustomType());
+          linkKeySet.add(linkKey); // Mark this link as created
+        }
       }
     });
   }
@@ -308,12 +316,14 @@ function traverseFromAfferentTerminal(
   return maxLevel;
 }
 
+
 function traverseFromNonAfferentTerminal(
   entityId: string,
   entityMap: Map<string, EntityInfo>,
   nodeMap: Map<string, CustomNodeModel>,
+  linkKeySet: Set<string>,
   existingPositions: Map<string, Map<string, { x: number; y: number }>>,
-  initialLevel: number
+  initialLevel: number,
 ): { nodes: CustomNodeModel[]; links: DefaultLinkModel[]; maxLevel: number } {
   const visited = new Set<string>();
   const stack: { id: string; level: number }[] = [{ id: entityId, level: initialLevel }];
@@ -321,7 +331,6 @@ function traverseFromNonAfferentTerminal(
   const newLinks: DefaultLinkModel[] = [];
   let maxLevel = initialLevel;
   const levelXPositions = new Map<number, number>();
-
 
   while (stack.length > 0) {
     const { id: currentId, level } = stack.pop()!;
@@ -353,6 +362,8 @@ function traverseFromNonAfferentTerminal(
 
     if (isCurrentNodeNew) {
       newNodes.push({ node: currentNode, level });
+    } else if (!newNodes.some(n => n.node === currentNode)) {
+      newNodes.push({ node: currentNode, level });
     }
 
     // Process from_entities
@@ -382,12 +393,19 @@ function traverseFromNonAfferentTerminal(
 
       if (isFromNodeNew) {
         newNodes.push({ node: fromNode, level: level + 1 });
+      } else if (!newNodes.some(n => n.node === fromNode)) {
+        newNodes.push({ node: fromNode, level: level + 1 });
       }
+
       // Create link from fromNode to currentNode (since we're traversing backward)
-      const link = createLink(fromNode, currentNode, 'out', 'in');
-      if (link) {
-        newLinks.push(link);
-        updateNodeOptions(fromNode, currentNode, currentNode.getCustomType());
+      const linkKey = getLinkId(fromNode, currentNode)
+      if (!linkKeySet.has(linkKey)) {
+        const link = createLink(fromNode, currentNode, 'out', 'in');
+        if (link) {
+          newLinks.push(link);
+          updateNodeOptions(fromNode, currentNode, currentNode.getCustomType());
+          linkKeySet.add(linkKey); // Mark this link as created
+        }
       }
     });
   }
@@ -401,6 +419,8 @@ function traverseFromNonAfferentTerminal(
 
   return { nodes: newNodes.map(n => n.node), links: newLinks, maxLevel };
 }
+
+
 
 function adjustNodesYPosition(
   traversalNodes: { node: CustomNodeModel; level: number }[],
@@ -573,3 +593,7 @@ function getOrCreateNode(
   return { node, created };
 }
 
+
+function getLinkId(fromNode: CustomNodeModel, currentNode: CustomNodeModel) {
+  return `${fromNode.getID()}-${currentNode.getID()}`;
+}
