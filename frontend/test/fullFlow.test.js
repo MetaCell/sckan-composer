@@ -104,18 +104,20 @@ describe('End to End Tests', () => {
 
     describe('Login Flow', () => {
 
-        (shouldSkipLoginTest ? it.skip : it)('HomePage', async () => {
-
-            
+        // (shouldSkipLoginTest ? it.skip : it)('HomePage', async () => {
+        it('Home Page', async () => {
+            console.log('Homepage')
             await page.waitForSelector(selectors.LOGIN_PAGE, { timeout: 60000 })
             await page.waitForSelector(selectors.COOKIE_MODAL, { timeout: 60000 })
             await page.waitForSelector(selectors.ACCEPT_COOKIES, { timeout: 60000 })
             await page.click(selectors.ACCEPT_COOKIES)
             await page.waitForSelector(selectors.ACCEPT_COOKIES, { hidden: true });
+            console.log('Cookies accepted')
 
         });
 
-        (shouldSkipLoginTest ? it.skip : it)('Login', async () => {
+        // (shouldSkipLoginTest ? it.skip : it)('Login', async () => {
+        it('Login', async () => {
             console.log('Logging in ...');
     
             await page.waitForSelector(selectors.USERNAME, { timeout: 60000 });
