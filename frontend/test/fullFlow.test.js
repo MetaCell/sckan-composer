@@ -104,8 +104,8 @@ describe('End to End Tests', () => {
 
     describe('Login Flow', () => {
 
-        // (shouldSkipLoginTest ? it.skip : it)('HomePage', async () => {
-        it('Home Page', async () => {
+        (shouldSkipLoginTest ? it.skip : it)('HomePage', async () => {
+        // it('Home Page', async () => {
             console.log('Homepage')
             await page.waitForSelector(selectors.LOGIN_PAGE, { timeout: 60000 })
             await page.waitForSelector(selectors.COOKIE_MODAL, { timeout: 60000 })
