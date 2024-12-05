@@ -39,7 +39,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../redux/store";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import {CONFIRMATION_DIALOG_CONFIG} from "../settings";
-import {setDialogState, setWasChangeDetected} from "../redux/statementSlice";
+import {setDialogState, setPositionChangeOnly, setWasChangeDetected} from "../redux/statementSlice";
 
 const StatementDetails = () => {
   const {statementId} = useParams();
@@ -63,13 +63,15 @@ const StatementDetails = () => {
     useRef<HTMLElement | null>(null),
   ];
   const wasChangeDetected = useSelector((state: RootState) => state.statement.wasChangeDetected);
+  const positionChangeOnly = useSelector((state: RootState) => state.statement.positionChangeOnly);
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     if (dialogsState.navigate) {
       setActiveTab(newValue);
       dispatch(setWasChangeDetected(false));
+      dispatch(setPositionChangeOnly(false));
       return;
     }
-    if (wasChangeDetected) {
+    if (wasChangeDetected || positionChangeOnly) {
       setIsNavigateDialogOpen(true);
     } else {
       setActiveTab(newValue);
@@ -80,6 +82,7 @@ const StatementDetails = () => {
     setIsNavigateDialogOpen(false);
     setActiveTab(0)
     dispatch(setWasChangeDetected(false));
+    dispatch(setPositionChangeOnly(false));
   };
   
   const handleNavigateCancel = () => {

@@ -16,7 +16,7 @@ import {CONFIRMATION_DIALOG_CONFIG} from "../../../settings";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../redux/store";
 import {checkOwnership, getOwnershipAlertMessage} from "../../../helpers/ownershipAlert";
-import {setDialogState, setWasChangeDetected} from "../../../redux/statementSlice";
+import {setDialogState, setPositionChangeOnly, setWasChangeDetected} from "../../../redux/statementSlice";
 
 const ZOOM_CHANGE = 25
 
@@ -105,6 +105,7 @@ const NavigationMenu = (props: NavigationMenuProps) => {
         graph_rendering_state: updatedStatement.graph_rendering_state
       })
       dispatch(setWasChangeDetected(false));
+      dispatch(setPositionChangeOnly(false));
     } catch (error) {
       // TODO: Provide proper feedback
       console.error("Error saving graph:", error)
@@ -246,7 +247,7 @@ const NavigationMenu = (props: NavigationMenuProps) => {
           </Stack>
           <Stack direction="row" spacing="1rem" alignItems='center'>
             {
-              wasChangeDetected ?
+              wasChangeDetected || positionChangeOnly ?
                 <Tooltip arrow title='This diagram does not match the Path Builder. It will be updated with default routing if you leave this page.'>
                   <Alert severity="warning">The diagram is outdated, please use the reset button on the left to update the diagram</Alert>
                 </Tooltip> :
@@ -258,7 +259,7 @@ const NavigationMenu = (props: NavigationMenuProps) => {
             }
             <Divider />
             <CustomSwitch
-              disabled={wasChangeDetected && !positionChangeOnly}
+              disabled={(wasChangeDetected && !positionChangeOnly) || (wasChangeDetected && positionChangeOnly)}
               locked={isGraphLocked}
               setLocked={(lock: boolean) => toggleGraphLock(lock)}
             />
