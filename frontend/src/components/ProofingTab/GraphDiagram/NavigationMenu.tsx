@@ -16,7 +16,7 @@ import {CONFIRMATION_DIALOG_CONFIG} from "../../../settings";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../redux/store";
 import {checkOwnership, getOwnershipAlertMessage} from "../../../helpers/ownershipAlert";
-import {setWasChangeDetected} from "../../../redux/statementSlice";
+import {setDialogState, setWasChangeDetected} from "../../../redux/statementSlice";
 
 const ZOOM_CHANGE = 25
 
@@ -37,22 +37,37 @@ const NavigationMenu = (props: NavigationMenuProps) => {
   const [isSaving, setIsSaving] = useState<boolean>(false)
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
   const [dialogConfig, setDialogConfig] = useState({
+    key: "",
     title: "",
     confirmationText: "",
     Icon: <></> as React.ReactNode,
     onConfirm: () => {},
   });
   const dispatch = useDispatch();
-  
+  const dialogsState = useSelector((state: RootState) => state.statement.dialogs);
   const { wasChangeDetected, positionChangeOnly } = useSelector((state: RootState) => state.statement);
   
   const openDialog = (config: {
+    key: string;
     title: string;
     confirmationText: string;
     Icon: React.ReactNode;
     onConfirm: () => void;
   }) => {
-    setDialogConfig(config);
+    const dontShowAgainFromStore = dialogsState[config.key] || false;
+    
+    if (dontShowAgainFromStore) {
+      // Skip the dialog if "Don't show this again" is selected
+      config.onConfirm();
+      return;
+    }
+    setDialogConfig({
+      ...config,
+      onConfirm: () => {
+        config.onConfirm();
+        closeDialog();
+      },
+    });
     setIsConfirmationDialogOpen(true);
   };
   
@@ -97,9 +112,10 @@ const NavigationMenu = (props: NavigationMenuProps) => {
       setIsSaving(false)
     }
   }
-  
+
   const switchOrientation = () => {
     return openDialog({
+      key: "switchOrientation",
       title: CONFIRMATION_DIALOG_CONFIG.Redraw.title,
       confirmationText: CONFIRMATION_DIALOG_CONFIG.Redraw.confirmationText,
       Icon: <CONFIRMATION_DIALOG_CONFIG.Redraw.Icon />,
@@ -112,12 +128,12 @@ const NavigationMenu = (props: NavigationMenuProps) => {
   
   const redrawGraph = async () => {
     return openDialog({
+      key: "redrawGraph",
       title: CONFIRMATION_DIALOG_CONFIG.Redraw.title,
       confirmationText: CONFIRMATION_DIALOG_CONFIG.Redraw.confirmationText,
       Icon: <CONFIRMATION_DIALOG_CONFIG.Redraw.Icon />,
       onConfirm: async () => {
         await resetGraph();
-        await saveGraph()
         closeDialog();
       },
     })
@@ -129,6 +145,7 @@ const NavigationMenu = (props: NavigationMenuProps) => {
       async () => {
         // If ownership is valid, proceed with dialog confirmation
         openDialog({
+          key: "toggleGraphLock",
           title: !lock
             ? CONFIRMATION_DIALOG_CONFIG.Locked.title
             : CONFIRMATION_DIALOG_CONFIG.Unlocked.title,
@@ -256,6 +273,8 @@ const NavigationMenu = (props: NavigationMenuProps) => {
       title={dialogConfig.title}
       confirmationText={dialogConfig.confirmationText}
       Icon={dialogConfig.Icon}
+      dontShowAgain={dialogsState[dialogConfig.key] || false}
+      setDontShowAgain={() => dispatch(setDialogState({ dialogKey: dialogConfig.key, dontShow: true }))}
     />
   </>
 };

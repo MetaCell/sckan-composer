@@ -16,10 +16,14 @@ export interface QueryParams {
   origins: number[] | undefined;
 }
 
+export interface DialogsState {
+  [dialogKey: string]: boolean;
+}
 export interface StatementState {
   queryOptions: QueryParams;
   wasChangeDetected: boolean;
   positionChangeOnly: boolean;
+  dialogs: DialogsState;
 }
 
 export const initialState: StatementState = {
@@ -38,6 +42,12 @@ export const initialState: StatementState = {
   },
   wasChangeDetected: false,
   positionChangeOnly: false,
+  dialogs: {
+    switchOrientation: false,
+    redrawGraph: false,
+    toggleGraphLock: false,
+    navigate: false,
+  },
 };
 
 export const statementSlice = createSlice({
@@ -69,10 +79,14 @@ export const statementSlice = createSlice({
         state.positionChangeOnly = false; // Reset when other changes occur
       }
     },
+    setDialogState: (state, action) => {
+      const { dialogKey, dontShow } = action.payload;
+      state.dialogs[dialogKey] = dontShow;
+    },
   },
 });
 
-export const { setFilters, setSorting, setKnowledgeStatementQuery, setIndex, setWasChangeDetected, setPositionChangeOnly } =
+export const { setFilters, setSorting, setKnowledgeStatementQuery, setIndex, setWasChangeDetected, setPositionChangeOnly, setDialogState } =
   statementSlice.actions;
 
 export default statementSlice.reducer;

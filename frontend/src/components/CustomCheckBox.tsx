@@ -70,13 +70,9 @@ function BpCheckbox(props: CheckboxProps) {
   );
 }
 
-const CheckBoxWidget = () => {
-  const onChangeCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e)
-  }
-  
+const CheckBoxWidget = ({ checked = false, onChange }: { checked?: boolean; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }) => {
   return (
-    <BpCheckbox onChange={onChangeCheckbox}/>
+    <BpCheckbox checked={checked} onChange={onChange}/>
   );
 };
 

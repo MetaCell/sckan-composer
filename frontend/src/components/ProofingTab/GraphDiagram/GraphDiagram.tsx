@@ -20,7 +20,7 @@ import {CustomNodeModel} from "./Models/CustomNodeModel";
 import Box from "@mui/material/Box";
 import {useTheme} from "@mui/system";
 import {useDispatch, useSelector} from "react-redux";
-import {setPositionChangeOnly, setWasChangeDetected} from "../../../redux/statementSlice";
+import {setPositionChangeOnly} from "../../../redux/statementSlice";
 import {RootState} from "../../../redux/store";
 
 export enum NodeTypes {
@@ -161,8 +161,6 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   
   const resetGraph = () => {
     initializeGraph()
-    setIsGraphLocked(true)
-    dispatch(setWasChangeDetected(false));
   };
   
   useEffect(() => {

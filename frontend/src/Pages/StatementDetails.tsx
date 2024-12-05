@@ -39,7 +39,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../redux/store";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import {CONFIRMATION_DIALOG_CONFIG} from "../settings";
-import {setWasChangeDetected} from "../redux/statementSlice";
+import {setDialogState, setWasChangeDetected} from "../redux/statementSlice";
 
 const StatementDetails = () => {
   const {statementId} = useParams();
@@ -50,6 +50,7 @@ const StatementDetails = () => {
   const [refetch, setRefetch] = useState(false);
   const [isNavigateDialogOpen, setIsNavigateDialogOpen] = useState(false);
   const dispatch = useDispatch();
+  const dialogsState = useSelector((state: RootState) => state.statement.dialogs);
   
   const refs = [
     useRef<HTMLElement | null>(null),
@@ -63,6 +64,11 @@ const StatementDetails = () => {
   ];
   const wasChangeDetected = useSelector((state: RootState) => state.statement.wasChangeDetected);
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    if (dialogsState.navigate) {
+      setActiveTab(newValue);
+      dispatch(setWasChangeDetected(false));
+      return;
+    }
     if (wasChangeDetected) {
       setIsNavigateDialogOpen(true);
     } else {
@@ -384,6 +390,8 @@ const StatementDetails = () => {
         title={CONFIRMATION_DIALOG_CONFIG.Navigate.title}
         confirmationText={CONFIRMATION_DIALOG_CONFIG.Navigate.confirmationText}
         Icon={<CONFIRMATION_DIALOG_CONFIG.Navigate.Icon />}
+        dontShowAgain={dialogsState.navigate}
+        setDontShowAgain={() => dispatch(setDialogState({ dialogKey: "navigate", dontShow: true }))}
       />
     </Grid>
   );

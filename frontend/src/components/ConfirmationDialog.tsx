@@ -5,14 +5,16 @@ import Stack from "@mui/material/Stack";
 import { vars } from "../theme/variables";
 import CustomCheckBox from "./CustomCheckBox";
 const ConfirmationDialog = ({
-  open, onConfirm, onCancel, title, confirmationText, Icon
+  open, onConfirm, onCancel, title, confirmationText, Icon, dontShowAgain, setDontShowAgain
 }: {
   open: boolean,
   onConfirm: () => void,
   onCancel: () => void,
   title: string,
   confirmationText: string,
-  Icon: React.ReactNode
+  Icon: React.ReactNode,
+  dontShowAgain?: boolean;
+  setDontShowAgain?: (checked: boolean) => void;
 }) => {
   return (
     <Dialog open={open} onClose={onCancel} PaperProps={{
@@ -52,7 +54,15 @@ const ConfirmationDialog = ({
             {confirmationText}
           </Typography>
         </Stack>
-        <FormControlLabel sx={{ml: 0}} control={<CustomCheckBox />} label="Don't show this again for this session." />
+        <FormControlLabel
+          sx={{ml: 0}}
+          control={
+            <CustomCheckBox
+              checked={dontShowAgain || false}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDontShowAgain?.(e.target.checked)}
+            />
+          }
+          label="Don't show this again for this session." />
       </DialogContent>
       <DialogActions sx={{
         display: "flex",

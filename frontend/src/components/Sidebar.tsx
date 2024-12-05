@@ -12,7 +12,7 @@ import {CONFIRMATION_DIALOG_CONFIG} from "../settings";
 import ConfirmationDialog from "./ConfirmationDialog";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../redux/store";
-import {setWasChangeDetected} from "../redux/statementSlice";
+import {setDialogState, setWasChangeDetected} from "../redux/statementSlice";
 
 const Sidebar = () => {
   const profile = userProfile.getProfile();
@@ -22,6 +22,8 @@ const Sidebar = () => {
   const wasChangeDetected = useSelector(
     (state: RootState) => state.statement.wasChangeDetected
   );
+  const dialogsState = useSelector((state: RootState) => state.statement.dialogs);
+  
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedMenuItem, setSelectedMenuItem] = useState({
     selectedItem: 0,
@@ -56,12 +58,20 @@ const Sidebar = () => {
       selectedItem,
       url,
     })
-      if (wasChangeDetected) {
-        setIsDialogOpen(true);
-      } else {
-        navigate(url);
-        setSelectedItem(selectedItem);
-      }
+    
+    if (dialogsState.navigate) {
+      navigate(url);
+      setSelectedItem(selectedItem);
+      dispatch(setWasChangeDetected(false));
+      return;
+    }
+    
+    if (wasChangeDetected) {
+      setIsDialogOpen(true);
+    } else {
+      navigate(url);
+      setSelectedItem(selectedItem);
+    }
   };
   
   const handleCancel = () => {
@@ -114,6 +124,8 @@ const Sidebar = () => {
         title={CONFIRMATION_DIALOG_CONFIG.Navigate.title}
         confirmationText={CONFIRMATION_DIALOG_CONFIG.Navigate.confirmationText}
         Icon={<CONFIRMATION_DIALOG_CONFIG.Navigate.Icon />}
+        dontShowAgain={dialogsState.navigate}
+        setDontShowAgain={() => dispatch(setDialogState({ dialogKey: "navigate", dontShow: true }))}
       />
     </>
    
