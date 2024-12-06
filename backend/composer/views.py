@@ -1,5 +1,6 @@
 import os
 
+from django.utils import timezone
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import loader
 from django.urls import reverse
@@ -8,6 +9,7 @@ from composer.enums import CSState
 from composer.models import ConnectivityStatement
 from composer.services.export_services import export_connectivity_statements
 
+from version import VERSION
 
 def index(request):
     if not hasattr(request, "user") or not request.user.is_authenticated:
@@ -47,7 +49,10 @@ def export(request):
         messages.add_message(request, messages.INFO, f"Exported {export_batch.get_count_connectivity_statements_in_this_export} connectivity statements.")
         if os.path.exists(file_path):
             with open(file_path, 'rb') as fh:
-                response = HttpResponse(fh.read(), content_type="application/text")
+                composer_version = f'# SCKAN Composer version: {VERSION}\n' 
+                date_exported = f'# Export date: {timezone.now().strftime("%Y-%m-%d")}\n'
+                content = composer_version + date_exported + fh.read().decode()
+                response = HttpResponse(content.encode(), content_type="application/text")
                 response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
                 return response
         raise Http404
