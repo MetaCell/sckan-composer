@@ -63,12 +63,14 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   const [modelUpdated, setModelUpdated] = useState(false)
   const [modelFitted, setModelFitted] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null);
-  const [rankdir, setRankdir] = useState<"TB" | "LR">("TB");
+  const [rankdir, setRankdir] = useState<string>("TB");
   const [isGraphLocked, setIsGraphLocked] = React.useState(true);
   const [ignoreSerializedGraph, setIgnoreSerializedGraph] = useState(false);
-  
+  const [updateRequired, setUpdateRequired] = useState(false);
+  let g = new dagre.graphlib.Graph();
+
   const layoutNodes = (nodes: CustomNodeModel[], links: DefaultLinkModel[]) => {
-    const g = new dagre.graphlib.Graph();
+    g = new dagre.graphlib.Graph();
 
     g.setGraph({
       rankdir: rankdir,
@@ -98,19 +100,51 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     });
 
     const model = engine.getModel();
-    if (isGraphLocked && !model.isLocked()) {
-      model.setLocked(true);
+    if (model !== null) {
+      model.setLocked(isGraphLocked);
     }
   }
   
   const toggleRankdir = () => {
-    setRankdir((prev) => (prev === "TB" ? "LR" : "TB"));
+    g = new dagre.graphlib.Graph();
+    let newDir = rankdir === "TB" ? "LR" : "TB";
+    const nodes = engine.getModel().getNodes();
+    const links = engine.getModel().getLinks();
+    const firstPos = nodes[0].getPosition();
+    const lastPos = nodes[nodes.length - 1].getPosition();
+    g.setGraph({
+      rankdir: newDir,
+      ranksep: 350,
+      marginx: 150,
+      marginy: 100,
+      edgesep: 10,
+    });
+    g.setDefaultEdgeLabel(() => ({}));
+    nodes.forEach(node => {
+      g.setNode(node.getID(), { width: 100, height: 50 });
+    });
+
+    links.forEach(link => {
+      g.setEdge(link.getSourcePort().getNode().getID(), link.getTargetPort().getNode().getID());
+    });
+
+    dagre.layout(g);
+
+    const newFirst = g.node(nodes[0].getID());
+    const newLast = g.node(nodes[nodes.length - 1].getID());
+
+    if ((firstPos.x === newFirst.x) && (firstPos.y === newFirst.y) && (lastPos.x === newLast.x) && (lastPos.y === newLast.y)) {
+      newDir = newDir === "TB" ? "LR" : "TB";
+      setUpdateRequired(!updateRequired);
+    }
+
+    setRankdir(newDir);
     setIgnoreSerializedGraph(true);
   };
   
   const switchLockedGraph = (lock: boolean) => {
     const model = engine.getModel();
-    if (lock && !model.isLocked()) {
+    if (model !== null) {
       model.setLocked(lock);
     }
     setIsGraphLocked(lock);
@@ -162,7 +196,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   useEffect(() => {
     initializeGraph();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rankdir]);
+  }, [rankdir, updateRequired]);
   
   // This effect prevents the default scroll and touchmove behavior
   useEffect(() => {
