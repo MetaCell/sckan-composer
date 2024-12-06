@@ -8,11 +8,13 @@ import Typography from "@mui/material/Typography";
 import { vars } from "../theme/variables";
 import { userProfile } from "../services/UserService";
 import { useNavigate, useLocation } from "react-router";
+import { getSckanComposerVersion } from "../services/CommonService";
 
 const Sidebar = () => {
   const profile = userProfile.getProfile();
   const navigate = useNavigate();
   const location = useLocation();
+  const sckanComposerVersion = getSckanComposerVersion();
 
   const userIsCuratorAndTriageOperator =
     profile.is_triage_operator && (profile.is_curator || profile.is_reviewer);
@@ -40,38 +42,45 @@ const Sidebar = () => {
   return (
     <Drawer variant="permanent" sx={drawerStyle}>
       <Toolbar />
-      <Box sx={{ overflow: "auto" }} color="#D0D5DD">
-        <Typography variant="caption" component="p" p={2.5} pb={1}>
-          Manage
-        </Typography>
-        <MenuList variant="selectedMenu" sx={{ p: 0 }}>
-          <MenuItem
-            sx={{ padding: "0.875rem 1.25rem" }}
-            selected={selectedItem === 0}
-            onClick={() => {
-              setSelectedItem(0);
-              navigate("/");
-            }}
-          >
-            <Typography variant="subtitle1">
-              {profile.is_triage_operator
-                ? "Sentences List"
-                : "Statements List"}
-            </Typography>
-          </MenuItem>
-          {userIsCuratorAndTriageOperator && (
+      <Box flex={1} justifyContent="space-between" display="flex" flexDirection="column">
+        <Box sx={{ overflow: "auto" }} color="#D0D5DD">
+          <Typography variant="caption" component="p" p={2.5} pb={1}>
+            Manage
+          </Typography>
+          <MenuList variant="selectedMenu" sx={{ p: 0 }}>
             <MenuItem
               sx={{ padding: "0.875rem 1.25rem" }}
-              selected={selectedItem === 1}
+              selected={selectedItem === 0}
               onClick={() => {
-                setSelectedItem(1);
-                navigate("/statement");
+                setSelectedItem(0);
+                navigate("/");
               }}
             >
-              <Typography variant="subtitle1">Statements List</Typography>
+              <Typography variant="subtitle1">
+                {profile.is_triage_operator
+                  ? "Sentences List"
+                  : "Statements List"}
+              </Typography>
             </MenuItem>
-          )}
-        </MenuList>
+            {userIsCuratorAndTriageOperator && (
+              <MenuItem
+                sx={{ padding: "0.875rem 1.25rem" }}
+                selected={selectedItem === 1}
+                onClick={() => {
+                  setSelectedItem(1);
+                  navigate("/statement");
+                }}
+              >
+                <Typography variant="subtitle1">Statements List</Typography>
+              </MenuItem>
+            )}
+          </MenuList>
+        </Box>
+        <Typography variant="caption" component="p"
+          mb={1.5} color="#D0D5DD" mx={'auto'}
+        >
+          SCKAN Composer version: {sckanComposerVersion}
+        </Typography>
       </Box>
     </Drawer>
   );
