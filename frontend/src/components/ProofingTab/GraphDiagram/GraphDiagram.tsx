@@ -9,11 +9,11 @@ import {CanvasWidget} from '@projectstorm/react-canvas-core';
 import {CustomNodeFactory} from "./Factories/CustomNodeFactory";
 import {
   AnatomicalEntity, ConnectivityStatement,
-  DestinationSerializerDetails, TypeC11Enum,
+  DestinationSerializerDetails,
   ViaSerializerDetails
 } from "../../../apiclient/backend";
 import {useParams} from "react-router-dom";
-import {DestinationTypeMapping, processData} from "../../../services/GraphDiagramService";
+import {processData} from "../../../services/GraphDiagramService";
 
 import dagre from 'dagre';
 import {CustomNodeModel} from "./Models/CustomNodeModel";
