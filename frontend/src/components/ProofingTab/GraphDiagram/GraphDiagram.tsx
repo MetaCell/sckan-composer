@@ -98,8 +98,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     });
 
     const model = engine.getModel();
-    if (isGraphLocked && !model.isLocked()) {
-      model.setLocked(true);
+    if (isGraphLocked && !model?.isLocked()) {
+      model?.setLocked(isGraphLocked);
     }
   }
   
