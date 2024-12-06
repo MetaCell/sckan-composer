@@ -23,6 +23,7 @@ export interface StatementState {
   queryOptions: QueryParams;
   wasChangeDetected: boolean;
   positionChangeOnly: boolean;
+  isResetInvoked: boolean;
   dialogs: DialogsState;
 }
 
@@ -42,6 +43,7 @@ export const initialState: StatementState = {
   },
   wasChangeDetected: false,
   positionChangeOnly: false,
+  isResetInvoked: false,
   dialogs: {
     switchOrientation: false,
     redrawGraph: false,
@@ -79,6 +81,9 @@ export const statementSlice = createSlice({
         state.positionChangeOnly = false; // Reset when other changes occur
       }
     },
+    setIsResetInvoked(state, action) {
+      state.isResetInvoked = action.payload;
+    },
     setDialogState: (state, action) => {
       const { dialogKey, dontShow } = action.payload;
       state.dialogs[dialogKey] = dontShow;
@@ -86,7 +91,7 @@ export const statementSlice = createSlice({
   },
 });
 
-export const { setFilters, setSorting, setKnowledgeStatementQuery, setIndex, setWasChangeDetected, setPositionChangeOnly, setDialogState } =
+export const { setFilters, setSorting, setKnowledgeStatementQuery, setIndex, setWasChangeDetected, setPositionChangeOnly, setDialogState, setIsResetInvoked } =
   statementSlice.actions;
 
 export default statementSlice.reducer;

@@ -19,8 +19,9 @@ import dagre from 'dagre';
 import {CustomNodeModel} from "./Models/CustomNodeModel";
 import Box from "@mui/material/Box";
 import {useTheme} from "@mui/system";
-import {useDispatch} from "react-redux";
-import {setPositionChangeOnly, setWasChangeDetected} from "../../../redux/statementSlice";
+import {useDispatch, useSelector} from "react-redux";
+import {setIsResetInvoked, setPositionChangeOnly, setWasChangeDetected} from "../../../redux/statementSlice";
+import {RootState} from "../../../redux/store";
 
 export enum NodeTypes {
   Origin = 'Origin',
@@ -66,6 +67,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   const [rankdir, setRankdir] = useState<"TB" | "LR">("TB");
   const [isGraphLocked, setIsGraphLocked] = React.useState(true);
   const [ignoreSerializedGraph, setIgnoreSerializedGraph] = useState(false);
+  const { wasChangeDetected, isResetInvoked } = useSelector((state: RootState) => state.statement);
   
   const layoutNodes = (nodes: CustomNodeModel[], links: DefaultLinkModel[]) => {
     const g = new dagre.graphlib.Graph();
@@ -103,6 +105,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     }
   }
   
+  console.log({isGraphLocked})
+  
   const toggleRankdir = () => {
     setRankdir((prev) => (prev === "TB" ? "LR" : "TB"));
     setIgnoreSerializedGraph(true);
@@ -110,9 +114,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   
   const switchLockedGraph = (lock: boolean) => {
     const model = engine.getModel();
-    if (lock && !model.isLocked()) {
-      model.setLocked(lock);
-    }
+    model.setLocked(lock);
     setIsGraphLocked(lock);
   };
   
@@ -148,6 +150,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   
   const resetGraph = () => {
     initializeGraph()
+    dispatch(setIsResetInvoked(true));
     dispatch(setPositionChangeOnly(false));
     dispatch(setWasChangeDetected(false));
   };
@@ -163,6 +166,16 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     initializeGraph();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rankdir]);
+  
+  
+  useEffect(() => {
+    if (wasChangeDetected || isResetInvoked) {
+      setIsGraphLocked(false);
+    } else {
+      setIsGraphLocked(true);
+    }
+    
+  }, [wasChangeDetected, isResetInvoked]);
   
   // This effect prevents the default scroll and touchmove behavior
   useEffect(() => {
