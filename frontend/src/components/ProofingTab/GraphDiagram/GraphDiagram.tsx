@@ -1,31 +1,38 @@
-import React, { useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import InfoMenu from "./InfoMenu";
 import NavigationMenu from "./NavigationMenu";
 import createEngine, {
   BasePositionModelOptions,
-  DiagramModel, DefaultLinkModel
-} from '@projectstorm/react-diagrams';
-import {CanvasWidget} from '@projectstorm/react-canvas-core';
-import {CustomNodeFactory} from "./Factories/CustomNodeFactory";
+  DiagramModel,
+  DefaultLinkModel,
+} from "@projectstorm/react-diagrams";
+import { CanvasWidget } from "@projectstorm/react-canvas-core";
+import { CustomNodeFactory } from "./Factories/CustomNodeFactory";
 import {
-  AnatomicalEntity, ConnectivityStatement,
+  AnatomicalEntity,
+  ConnectivityStatement,
   DestinationSerializerDetails,
-  ViaSerializerDetails
+  ViaSerializerDetails,
 } from "../../../apiclient/backend";
-import {useParams} from "react-router-dom";
-import {processData} from "../../../services/GraphDiagramService";
+import { useParams } from "react-router-dom";
+import { processData } from "../../../services/GraphDiagramService";
 
-import dagre from 'dagre';
-import {CustomNodeModel} from "./Models/CustomNodeModel";
+import dagre from "dagre";
+import { CustomNodeModel } from "./Models/CustomNodeModel";
 import Box from "@mui/material/Box";
-import {useTheme} from "@mui/system";
-import {useDispatch} from "react-redux";
-import {setPositionChangeOnly, setWasChangeDetected} from "../../../redux/statementSlice";
+import { useTheme } from "@mui/system";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setIsResetInvoked,
+  setPositionChangeOnly,
+  setWasChangeDetected,
+} from "../../../redux/statementSlice";
+import { RootState } from "../../../redux/store";
 
 export enum NodeTypes {
-  Origin = 'Origin',
-  Via = 'Via',
-  Destination = 'Destination'
+  Origin = "Origin",
+  Via = "Via",
+  Destination = "Destination",
 }
 
 export interface CustomNodeOptions extends BasePositionModelOptions {
@@ -35,38 +42,39 @@ export interface CustomNodeOptions extends BasePositionModelOptions {
   anatomicalType?: string;
 }
 
-
 interface GraphDiagramProps {
   origins: AnatomicalEntity[] | undefined;
   vias: ViaSerializerDetails[] | undefined;
   destinations: DestinationSerializerDetails[] | undefined;
   forwardConnection?: any[] | undefined;
-  serializedGraph?: any | undefined
+  serializedGraph?: any | undefined;
   statement: ConnectivityStatement;
-  setStatement: (statement: any) => void,
+  setStatement: (statement: any) => void;
 }
 
 const GraphDiagram: React.FC<GraphDiagramProps> = ({
-                                                     origins,
-                                                     vias,
-                                                     destinations,
-                                                     forwardConnection = [],
-                                                     serializedGraph,
-                                                     statement,
-                                                     setStatement
-                                                   }) => {
+  origins,
+  vias,
+  destinations,
+  forwardConnection = [],
+  serializedGraph,
+  statement,
+  setStatement,
+}) => {
   const theme = useTheme();
-  const {statementId} = useParams();
+  const { statementId } = useParams();
   const dispatch = useDispatch();
-  
+
   const [engine] = useState(() => createEngine());
-  const [modelUpdated, setModelUpdated] = useState(false)
-  const [modelFitted, setModelFitted] = useState(false)
+  const [modelUpdated, setModelUpdated] = useState(false);
+  const [modelFitted, setModelFitted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [rankdir, setRankdir] = useState<string>("TB");
   const [isGraphLocked, setIsGraphLocked] = React.useState(true);
   const [ignoreSerializedGraph, setIgnoreSerializedGraph] = useState(false);
-  const [updateRequired, setUpdateRequired] = useState(false);
+  const { wasChangeDetected, isResetInvoked } = useSelector(
+    (state: RootState) => state.statement
+  );
   let g = new dagre.graphlib.Graph();
 
   const layoutNodes = (nodes: CustomNodeModel[], links: DefaultLinkModel[]) => {
@@ -74,37 +82,40 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
 
     g.setGraph({
       rankdir: rankdir,
-      ranksep: 350,
+      ranksep: 250,
       marginx: 150,
       marginy: 100,
       edgesep: 10,
     });
-    
+
     g.setDefaultEdgeLabel(() => ({}));
-    
-    nodes.forEach(node => {
+
+    nodes.forEach((node) => {
       node.setPosition(0, 0);
       g.setNode(node.getID(), { width: 100, height: 50 });
     });
-    
-    links.forEach(link => {
-      g.setEdge(link.getSourcePort().getNode().getID(), link.getTargetPort().getNode().getID());
+
+    links.forEach((link) => {
+      g.setEdge(
+        link.getSourcePort().getNode().getID(),
+        link.getTargetPort().getNode().getID()
+      );
     });
-    
+
     dagre.layout(g);
-    
+
     g.nodes().forEach((nodeId: string) => {
-      const node = nodes.find(n => n.getID() === nodeId);
+      const node = nodes.find((n) => n.getID() === nodeId);
       const { x, y } = g.node(nodeId);
       node?.setPosition(x, y);
     });
 
     const model = engine.getModel();
-    if (model !== null) {
+    if (model !== null && !model?.isLocked() === isGraphLocked) {
       model.setLocked(isGraphLocked);
     }
-  }
-  
+  };
+
   const toggleRankdir = () => {
     g = new dagre.graphlib.Graph();
     let newDir = rankdir === "TB" ? "LR" : "TB";
@@ -120,12 +131,15 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
       edgesep: 10,
     });
     g.setDefaultEdgeLabel(() => ({}));
-    nodes.forEach(node => {
+    nodes.forEach((node) => {
       g.setNode(node.getID(), { width: 100, height: 50 });
     });
 
-    links.forEach(link => {
-      g.setEdge(link.getSourcePort().getNode().getID(), link.getTargetPort().getNode().getID());
+    links.forEach((link) => {
+      g.setEdge(
+        link.getSourcePort().getNode().getID(),
+        link.getTargetPort().getNode().getID()
+      );
     });
 
     dagre.layout(g);
@@ -133,26 +147,31 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     const newFirst = g.node(nodes[0].getID());
     const newLast = g.node(nodes[nodes.length - 1].getID());
 
-    if ((firstPos.x === newFirst.x) && (firstPos.y === newFirst.y) && (lastPos.x === newLast.x) && (lastPos.y === newLast.y)) {
+    if (
+      firstPos.x === newFirst.x &&
+      firstPos.y === newFirst.y &&
+      lastPos.x === newLast.x &&
+      lastPos.y === newLast.y
+    ) {
       newDir = newDir === "TB" ? "LR" : "TB";
-      setUpdateRequired(!updateRequired);
     }
 
     setRankdir(newDir);
     setIgnoreSerializedGraph(true);
+    resetGraph();
   };
-  
+
   const switchLockedGraph = (lock: boolean) => {
     const model = engine.getModel();
-    if (model !== null) {
+    if (model !== null && lock === !model.isLocked()) {
       model.setLocked(lock);
     }
     setIsGraphLocked(lock);
   };
-  
+
   const initializeGraph = () => {
     const model = new DiagramModel();
-    
+
     // Process data to revert to the initial layout
     const { nodes, links } = processData({
       origins,
@@ -161,12 +180,12 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
       forwardConnection,
       serializedGraph,
     });
-    
+
     // If the backend does NOT provides us a serialised graph then we use the smart routing.
     if (ignoreSerializedGraph || serializedGraph === undefined) {
       layoutNodes(nodes, links);
     }
-    
+
     nodes.forEach((node) => {
       node.registerListener({
         positionChanged: () => {
@@ -178,10 +197,11 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     engine.setModel(model);
     setModelUpdated(true);
     setModelFitted(false);
-  }
-  
+  };
+
   const resetGraph = () => {
-    initializeGraph()
+    initializeGraph();
+    dispatch(setIsResetInvoked(true));
     dispatch(setPositionChangeOnly(false));
     dispatch(setWasChangeDetected(false));
   };
@@ -191,13 +211,20 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     engine.getNodeFactories().registerFactory(new CustomNodeFactory());
   }, [engine]);
 
-
   // This effect runs whenever origins, vias, or destinations change
   useEffect(() => {
     initializeGraph();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rankdir, updateRequired]);
-  
+  }, [rankdir]);
+
+  useEffect(() => {
+    if (wasChangeDetected || isResetInvoked) {
+      setIsGraphLocked(false);
+    } else {
+      setIsGraphLocked(true);
+    }
+  }, [wasChangeDetected, isResetInvoked]);
+
   // This effect prevents the default scroll and touchmove behavior
   useEffect(() => {
     const currentContainer = containerRef.current;
@@ -207,12 +234,16 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
         event.stopPropagation();
       };
 
-      currentContainer.addEventListener('wheel', disableScroll, {passive: false});
-      currentContainer.addEventListener('touchmove', disableScroll, {passive: false});
+      currentContainer.addEventListener("wheel", disableScroll, {
+        passive: false,
+      });
+      currentContainer.addEventListener("touchmove", disableScroll, {
+        passive: false,
+      });
 
       return () => {
-        currentContainer?.removeEventListener('wheel', disableScroll);
-        currentContainer?.removeEventListener('touchmove', disableScroll);
+        currentContainer?.removeEventListener("wheel", disableScroll);
+        currentContainer?.removeEventListener("touchmove", disableScroll);
       };
     }
   }, [modelUpdated]);
@@ -228,51 +259,47 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     }
   }, [modelUpdated, modelFitted, engine]);
 
-  
   useEffect(() => {
     const model = engine.getModel();
-    if (!model) return
+    if (!model) return;
     model.getNodes().forEach((node) => {
       node.setLocked(isGraphLocked);
     });
   }, [isGraphLocked, engine]);
-  
-  
+
   useEffect(() => {
     return () => setIgnoreSerializedGraph(false); // Reset the flag on unmount
   }, []);
-  
+
   return (
-      <Box>
-        <NavigationMenu
-          engine={engine}
-          statementId={statementId || "-1"}
-          rankdir={rankdir}
-          toggleRankdir={toggleRankdir}
-          resetGraph={resetGraph}
-          isGraphLocked={isGraphLocked}
-          switchLockedGraph={switchLockedGraph}
-          statement={statement}
-          setStatement={setStatement}
-        />
-        <Box
-          display="flex"
-          justifyContent="center"
-          sx={{background: theme.palette.grey[100], borderRadius: 1}}
-        >
-          <Box sx={{height: '800px', width: '100%'}}>
-            {
-              modelUpdated ? (
-                  <div ref={containerRef} className={"graphContainer"}>
-                    <CanvasWidget className={"graphContainer"} engine={engine}/>
-                  </div>)
-                : null
-            }
-          </Box>
+    <Box>
+      <NavigationMenu
+        engine={engine}
+        statementId={statementId || "-1"}
+        rankdir={rankdir}
+        toggleRankdir={toggleRankdir}
+        resetGraph={resetGraph}
+        isGraphLocked={isGraphLocked}
+        switchLockedGraph={switchLockedGraph}
+        statement={statement}
+        setStatement={setStatement}
+      />
+      <Box
+        display="flex"
+        justifyContent="center"
+        sx={{ background: theme.palette.grey[100], borderRadius: 1 }}
+      >
+        <Box sx={{ height: "800px", width: "100%" }}>
+          {modelUpdated ? (
+            <div ref={containerRef} className={"graphContainer"}>
+              <CanvasWidget className={"graphContainer"} engine={engine} />
+            </div>
+          ) : null}
         </Box>
-        <InfoMenu engine={engine} forwardConnection={true}/>
       </Box>
+      <InfoMenu engine={engine} forwardConnection={true} />
+    </Box>
   );
-}
+};
 
 export default GraphDiagram;

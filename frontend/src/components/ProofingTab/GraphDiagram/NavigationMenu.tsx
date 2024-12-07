@@ -16,7 +16,12 @@ import {CONFIRMATION_DIALOG_CONFIG} from "../../../settings";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../redux/store";
 import {checkOwnership, getOwnershipAlertMessage} from "../../../helpers/ownershipAlert";
-import {setDialogState, setPositionChangeOnly, setWasChangeDetected} from "../../../redux/statementSlice";
+import {
+  setDialogState,
+  setIsResetInvoked,
+  setPositionChangeOnly,
+  setWasChangeDetected
+} from "../../../redux/statementSlice";
 
 const ZOOM_CHANGE = 25
 
@@ -45,7 +50,7 @@ const NavigationMenu = (props: NavigationMenuProps) => {
   });
   const dispatch = useDispatch();
   const dialogsState = useSelector((state: RootState) => state.statement.dialogs);
-  const { wasChangeDetected, positionChangeOnly } = useSelector((state: RootState) => state.statement);
+  const { wasChangeDetected, positionChangeOnly, isResetInvoked } = useSelector((state: RootState) => state.statement);
   
   const openDialog = (config: {
     key: string;
@@ -160,7 +165,8 @@ const NavigationMenu = (props: NavigationMenuProps) => {
             if (lock) {
               await saveGraph();
             }
-            switchLockedGraph(!isGraphLocked);
+            switchLockedGraph(lock);
+            dispatch(setIsResetInvoked(false));
             closeDialog();
           },
         });
@@ -247,20 +253,26 @@ const NavigationMenu = (props: NavigationMenuProps) => {
           </Stack>
           <Stack direction="row" spacing="1rem" alignItems='center'>
             {
-              wasChangeDetected || positionChangeOnly ?
+              wasChangeDetected || positionChangeOnly ? (
                 <Tooltip arrow title='This diagram does not match the Path Builder. It will be updated with default routing if you leave this page.'>
                   <Alert severity="warning">The diagram is outdated, please use the reset button on the left to update the diagram</Alert>
-                </Tooltip> :
-                <Tooltip arrow title='The diagram is saved for all users'>
-                  <CheckCircleOutlineRoundedIcon sx={{
-                    color: "#039855 !important",
-                  }} />
                 </Tooltip>
+              ) : (
+                !isResetInvoked && (
+                  <Tooltip arrow title='The diagram is saved for all users'>
+                    <CheckCircleOutlineRoundedIcon
+                      sx={{
+                        color: "#039855 !important",
+                      }}
+                    />
+                  </Tooltip>
+                )
+              )
             }
             <Divider />
             <CustomSwitch
               disabled={(wasChangeDetected && !positionChangeOnly) || (wasChangeDetected && positionChangeOnly)}
-              locked={isGraphLocked}
+              locked={isGraphLocked && !isResetInvoked}
               setLocked={(lock: boolean) => toggleGraphLock(lock)}
             />
           </Stack>
