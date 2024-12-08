@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { PortWidget } from "@projectstorm/react-diagrams";
-import { Typography, Box, Chip } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import { DestinationIcon, OriginIcon, ViaIcon } from "./icons";
 import Stack from "@mui/material/Stack";
 import Divider from "@mui/material/Divider";
@@ -27,6 +27,8 @@ export const OriginNodeWidget: React.FC<OriginNodeProps> = ({
 }) => {
     const [isActive, setIsActive] = useState(false);
     const [zIndex, setZIndex] = useState(0);
+    const innerRef = useRef(null);
+    const valueRef = useRef(isActive);
 
     const toggleColor = (event: any) => {
         if (event.shiftKey) {
@@ -38,8 +40,27 @@ export const OriginNodeWidget: React.FC<OriginNodeProps> = ({
     const inPort = model.getPort("in");
     const outPort = model.getPort("out");
 
+    const handleDoubleClick = () => {
+        valueRef.current = !valueRef.current;
+        setIsActive(valueRef.current);
+        setZIndex((prevZIndex) => prevZIndex + 1);
+    };
+
+    useEffect(() => {
+        if (innerRef !== null && innerRef.current !== null) {
+            // @ts-expect-error I am already checking the innerRef in the if clause
+            innerRef.current.addEventListener("dblclick", handleDoubleClick);
+        }
+        return () => {
+            if (innerRef !== null) {
+                // @ts-expect-error I am already checking the innerRef in the if clause
+                innerRef.removeEventListener("dblclick", handleDoubleClick);
+            }
+        }}, []);
+
     return (
         <Box
+            ref={innerRef}
             style={{
                 position: "relative",
                 display: "flex",
@@ -279,4 +300,3 @@ export const OriginNodeWidget: React.FC<OriginNodeProps> = ({
         </Box>
     );
 };
-

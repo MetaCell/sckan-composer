@@ -1,7 +1,6 @@
 import { NodeModel, DefaultPortModel } from '@projectstorm/react-diagrams';
 import { NodeTypes } from "../GraphDiagram";
 import {CustomNodeOptions} from "../GraphDiagram";
-import { DestinationTypeMapping } from '../../../../services/GraphDiagramService';
 import { TypeC11Enum } from '../../../../apiclient/backend/api';
 
 export class CustomNodeModel extends NodeModel {

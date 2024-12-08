@@ -4,15 +4,15 @@ import {
   ViaSerializerDetails,
   DestinationSerializerDetails,
   TypeC11Enum,
-  TypeB60Enum
+  // TypeB60Enum
 } from "../apiclient/backend";
 import { CustomNodeModel } from "../components/ProofingTab/GraphDiagram/Models/CustomNodeModel";
 import { CustomNodeOptions, NodeTypes } from "../components/ProofingTab/GraphDiagram/GraphDiagram";
 
-const ViaTypeMapping: Record<TypeB60Enum, string> = {
-  [TypeB60Enum.Axon]: 'Axon',
-  [TypeB60Enum.Dendrite]: 'Dendrite'
-};
+// const ViaTypeMapping: Record<TypeB60Enum, string> = {
+//   [TypeB60Enum.Axon]: 'Axon',
+//   [TypeB60Enum.Dendrite]: 'Dendrite'
+// };
 
 export const DestinationTypeMapping: Record<TypeC11Enum, string> = {
   [TypeC11Enum.AxonT]: 'Axon terminal',

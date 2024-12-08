@@ -82,10 +82,11 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
 
     g.setGraph({
       rankdir: rankdir,
-      ranksep: 250,
-      marginx: 150,
-      marginy: 100,
-      edgesep: 10,
+      ranksep: rankdir === "TB" ? 150 : 100,
+      marginx: rankdir === "TB" ? 150 : 100,
+      marginy: rankdir === "TB" ? 100 : 150,
+      edgesep: 50,
+      nodesep: 150,
     });
 
     g.setDefaultEdgeLabel(() => ({}));
@@ -125,10 +126,11 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     const lastPos = nodes[nodes.length - 1].getPosition();
     g.setGraph({
       rankdir: newDir,
-      ranksep: 350,
-      marginx: 150,
-      marginy: 100,
-      edgesep: 10,
+      ranksep: newDir === "TB" ? 150 : 100,
+      marginx: newDir === "TB" ? 150 : 100,
+      marginy: newDir === "TB" ? 100 : 150,
+      edgesep: 50,
+      nodesep: 150,
     });
     g.setDefaultEdgeLabel(() => ({}));
     nodes.forEach((node) => {

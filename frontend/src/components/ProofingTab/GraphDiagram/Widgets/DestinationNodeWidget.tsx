@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { PortWidget } from "@projectstorm/react-diagrams";
 import { Typography, Box, Chip, Divider } from "@mui/material";
 import Stack from "@mui/material/Stack";
@@ -19,6 +19,8 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
 }) => {
     const [isActive, setIsActive] = useState(false);
     const [zIndex, setZIndex] = useState(0);
+    const innerRef = useRef(null);
+    const valueRef = useRef(isActive);
 
     const toggleColor = (event: any) => {
         if (event.shiftKey) {
@@ -36,8 +38,27 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
         model.getOptions().anatomicalType ===
         TypeC11Enum.AfferentT;
 
+    const handleDoubleClick = () => {
+        valueRef.current = !valueRef.current;
+        setIsActive(valueRef.current);
+        setZIndex((prevZIndex) => prevZIndex + 1);
+    };
+
+    useEffect(() => {
+        if (innerRef !== null && innerRef.current !== null) {
+            // @ts-expect-error I am already checking the innerRef in the if clause
+            innerRef.current.addEventListener("dblclick", handleDoubleClick);
+        }
+        return () => {
+            if (innerRef !== null) {
+                // @ts-expect-error I am already checking the innerRef in the if clause
+                innerRef.removeEventListener("dblclick", handleDoubleClick);
+            }
+        }}, []);
+
     return (
         <Box
+            ref={innerRef}
             style={{
                 position: "relative",
                 display: "flex",
@@ -390,4 +411,3 @@ const NonAfferentTerminalDetails: React.FC<{ model: CustomNodeModel }> = ({
         </>
     );
 };
-
