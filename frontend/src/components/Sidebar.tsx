@@ -13,6 +13,7 @@ import ConfirmationDialog from "./ConfirmationDialog";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../redux/store";
 import {setDialogState, setPositionChangeOnly, setWasChangeDetected} from "../redux/statementSlice";
+import { getSckanComposerVersion } from "../services/CommonService";
 
 const Sidebar = () => {
   const profile = userProfile.getProfile();
@@ -32,6 +33,8 @@ const Sidebar = () => {
     url: "/",
   });
   
+  const sckanComposerVersion = getSckanComposerVersion();
+
   const userIsCuratorAndTriageOperator =
     profile.is_triage_operator && (profile.is_curator || profile.is_reviewer);
 
@@ -91,8 +94,9 @@ const Sidebar = () => {
 
   return (
     <>
-      <Drawer variant="permanent" sx={drawerStyle}>
-        <Toolbar />
+    <Drawer variant="permanent" sx={drawerStyle}>
+      <Toolbar />
+      <Box flex={1} justifyContent="space-between" display="flex" flexDirection="column">
         <Box sx={{ overflow: "auto" }} color="#D0D5DD">
           <Typography variant="caption" component="p" p={2.5} pb={1}>
             Manage
@@ -120,8 +124,14 @@ const Sidebar = () => {
             )}
           </MenuList>
         </Box>
-      </Drawer>
-      <ConfirmationDialog
+        <Typography variant="caption" component="p"
+          mb={1.5} color="#D0D5DD" mx={'auto'}
+        >
+          SCKAN Composer version: {sckanComposerVersion}
+        </Typography>
+      </Box>
+    </Drawer>
+    <ConfirmationDialog
         open={isDialogOpen}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
@@ -132,7 +142,6 @@ const Sidebar = () => {
         setDontShowAgain={() => dispatch(setDialogState({ dialogKey: "navigate", dontShow: true }))}
       />
     </>
-   
   );
 };
 
