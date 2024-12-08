@@ -503,7 +503,7 @@ export default function CustomEntitiesDropdown({
                 >
                   <Typography variant="body2">{header?.label}</Typography>
                   {header?.values?.map((item: any, index: number) => (
-                    <Tooltip title={item} placement="top" arrow>
+                    <Tooltip key={`tooltip${index}`} title={item} placement="top" arrow>
                       <Chip
                         key={item?.id}
                         sx={{
