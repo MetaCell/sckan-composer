@@ -919,6 +919,11 @@ paths:
         schema:
           type: integer
           nullable: true
+      - in: query
+        name: include_system_notes
+        schema:
+          type: boolean
+        description: Include System Notes
       - name: limit
         required: false
         in: query
@@ -1317,8 +1322,10 @@ paths:
             enum:
             - -id
             - -last_edited
+            - -owner
             - id
             - last_edited
+            - owner
         description: Ordering
         explode: false
         style: form

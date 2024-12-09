@@ -36,17 +36,18 @@ import Stack from "@mui/material/Stack";
 interface DataGridProps {
   entityType: "sentence" | "statement";
   entityList: (Sentence | BaseConnectivityStatement)[] | undefined;
+  allowSortByOwner?: boolean;
   queryOptions: SentenceQueryParams | StatementQueryParams;
   loading: boolean;
   totalResults: number;
 }
 
 type criteria =
-  | ("id" | "-id" | "last_edited" | "-last_edited")[]
+  | ("id" | "-id" | "last_edited" | "-last_edited" | "owner" | "-owner")[]
   | undefined;
 
 const EntityDataGrid = (props: DataGridProps) => {
-  const { entityList, entityType, queryOptions, loading, totalResults } = props;
+  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false } = props;
 
   const currentPage = (queryOptions.index || 0) / queryOptions.limit;
 
@@ -102,7 +103,7 @@ const EntityDataGrid = (props: DataGridProps) => {
       flex: 1,
       renderCell: renderDate,
     },
-    { field: "owner", headerName: "Owner", sortable: false, flex: 1 },
+    { field: "owner", headerName: "Owner", flex: 1, sortable: allowSortByOwner },
     {
       field: "tags",
       headerName: "Tags",
@@ -154,6 +155,10 @@ const EntityDataGrid = (props: DataGridProps) => {
         ordering = ["last_edited"];
       } else if (sortingCriteria === "last_edited desc") {
         ordering = ["-last_edited"];
+      } else if (sortingCriteria === "owner asc") {
+        ordering = ["owner"];
+      } else if (sortingCriteria === "owner desc") {
+        ordering = ["-owner"];
       } else {
         ordering = undefined;
       }

@@ -251,7 +251,7 @@ const SentencesDetails = () => {
           <Grid item xs={12} mb={4}>
             <Grid container>
               <Grid item xs={12} md={6}>
-                <Box>
+                <Box ref={refs[0]}>
                   <Typography variant="h3" mb={1}>
                     Sentence Details #{sentenceId}{" "}
                     <span>
@@ -296,7 +296,7 @@ const SentencesDetails = () => {
           <Grid item xs={12}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <Box ref={refs[0]}>
+                <Box>
                   <Paper sx={{ mb: 2, ...sectionStyle }}>
                     <Grid container>
                       <Grid item xs={12}>
@@ -366,7 +366,10 @@ const SentencesDetails = () => {
                       setter={refreshSentence}
                     />
                     <Divider sx={{ margin: "36px 0" }} />
-                    <NoteDetails extraData={{ sentence_id: sentence.id, type: 'sentence' }} />
+                    <NoteDetails
+                      extraData={{ sentence_id: sentence.id, type: 'sentence' }}
+                      setter={refreshSentence}
+                    />
                   </Paper>
                 </Box>
               </Grid>
