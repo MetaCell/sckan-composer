@@ -20,12 +20,20 @@ const StyledInput = styled(TextField)(({ theme }) => ({
 }));
 
 
-export default function TextArea({ id, value, placeholder, required, onChange, onBlur, onFocus, options: { rows, isDisabled } }: any) {
-
+export default function TextArea({ id, value, placeholder, required, onChange, onBlur, onFocus, options: { rows, isDisabled, onBlur: customOnBlur } }: any) {
+  
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const blurredValue = e.target.value;
+    onBlur(id, blurredValue);
+    if (customOnBlur) {
+      customOnBlur(blurredValue, id);
+    }
+  };
 
   return (
     <FormControl variant="standard">
       <StyledInput
+        id={id}
       value={value?value:''}
       multiline
       rows={rows}
@@ -33,7 +41,7 @@ export default function TextArea({ id, value, placeholder, required, onChange, o
       fullWidth
       required={required}
       onChange={(e)=>onChange(e.target.value)}
-      onBlur={(e)=>onBlur(id,e.target.value)}
+      onBlur={handleBlur}
       onFocus={(e)=>onFocus(id,e.target.value)}
       disabled={isDisabled}
       />

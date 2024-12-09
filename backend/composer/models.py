@@ -887,7 +887,6 @@ class Provenance(models.Model):
     class Meta:
         verbose_name_plural = "Provenances"
 
-
 class Note(models.Model):
     """Note"""
 
@@ -1013,3 +1012,40 @@ class ExportMetrics(models.Model):
                 name="unique_state_per_export_batch",
             ),
         ]
+
+
+class AlertType(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+    predicate = models.CharField(max_length=200)
+    uri = models.URLField()
+
+    def __str__(self):
+        return self.name
+    
+
+class StatementAlert(models.Model):
+    connectivity_statement = models.ForeignKey(
+        ConnectivityStatement,
+        on_delete=models.CASCADE,
+        related_name='statement_alerts'
+    )
+    alert_type = models.ForeignKey(
+        AlertType,
+        on_delete=models.CASCADE,
+        related_name='statement_alerts'
+    )
+    text = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    saved_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    class Meta:
+        unique_together = ('connectivity_statement', 'alert_type')
+
+    def __str__(self):
+        return f"{self.alert_type.name} for Statement {self.connectivity_statement.id}"

@@ -182,7 +182,7 @@ export const OriginInfoIcon = (props: SvgIconProps) => (
         filterUnits="userSpaceOnUse"
         color-interpolation-filters="sRGB"
       >
-        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+        <feFlood floodOpacity="0" result="BackgroundImageFix" />
         <feColorMatrix
           in="SourceAlpha"
           type="matrix"
@@ -266,7 +266,7 @@ export const ViaInfoIcon = (props: SvgIconProps) => (
         filterUnits="userSpaceOnUse"
         color-interpolation-filters="sRGB"
       >
-        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+        <feFlood floodOpacity="0" result="BackgroundImageFix" />
         <feColorMatrix
           in="SourceAlpha"
           type="matrix"
@@ -350,7 +350,7 @@ export const DestinationInfoIcon = (props: SvgIconProps) => (
         filterUnits="userSpaceOnUse"
         color-interpolation-filters="sRGB"
       >
-        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+        <feFlood floodOpacity="0" result="BackgroundImageFix" />
         <feColorMatrix
           in="SourceAlpha"
           type="matrix"
@@ -402,4 +402,13 @@ export const DestinationInfoIcon = (props: SvgIconProps) => (
       </filter>
     </defs>
   </SvgIcon>
+);
+
+export const DeleteIcon = () => (
+  <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4" y="4" width="48" height="48" rx="24" fill="#FEE4E2"/>
+    <rect x="4" y="4" width="48" height="48" rx="24" stroke="#FEF3F2" strokeWidth="8"/>
+    <path d="M32 25V35H24V25H32ZM30.5 19H25.5L24.5 20H21V22H35V20H31.5L30.5 19ZM34 23H22V35C22 36.1 22.9 37 24 37H32C33.1 37 34 36.1 34 35V23Z" fill="#DC6803"/>
+  </svg>
+
 );

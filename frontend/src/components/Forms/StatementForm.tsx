@@ -43,7 +43,7 @@ import {useDispatch} from "react-redux";
 import {setWasChangeDetected} from "../../redux/statementSlice";
 
 const StatementForm = (props: any) => {
-  const {uiFields, statement, isDisabled, action: refreshStatement} = props;
+  const {uiFields, statement, isDisabled, action: refreshStatement, onInputBlur} = props;
   const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
@@ -52,9 +52,43 @@ const StatementForm = (props: any) => {
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
+  copiedSchema.properties.statement_alerts.items.properties.alert_type.type = "number";
+  copiedSchema.properties.statement_alerts.items.properties.connectivity_statement.type = "number";
 
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["destination_type", "*"];
+  copiedSchema.properties.statement_alerts.title = " ";
+  copiedSchema.properties.statement_alerts.items.required = ["alert_type"]
+  
+  copiedUISchema.statement_alerts ={
+    "ui:options": {
+      orderable: false,
+      addable: false,
+      removable: false,
+      label: false,
+    },
+    items: {
+      "ui:label": false,
+      
+      id: {
+        "ui:widget": "hidden",
+      },
+      alert_type: {
+        "ui:widget": "hidden",
+      },
+      text: {
+        "ui:widget": "CustomTextArea",
+        "ui:options": {
+          placeholder: "Enter alert text here...",
+          rows: 3,
+          onBlur: (value: string) => onInputBlur(value),
+        },
+      },
+      connectivity_statement: {
+        "ui:widget": "hidden",
+      }
+    },
+  }
   copiedUISchema.circuit_type = {
     "ui:widget": "CustomSingleSelect",
     "ui:options": {
