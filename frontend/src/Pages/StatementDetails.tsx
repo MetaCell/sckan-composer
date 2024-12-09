@@ -19,7 +19,7 @@ import {formatDate, formatTime, StatementsLabels} from "../helpers/helpers";
 import GroupedButtons from "../components/Widgets/CustomGroupedButtons";
 import Divider from "@mui/material/Divider";
 import NoteDetails from "../components/Widgets/NotesFomList";
-import DistillationTab from "../components/DistillationTab";
+import DistillationTab from "../components/DistillationTab/DistillationTab";
 import {useSectionStyle} from "../styles/styles";
 import {useTheme} from "@mui/system";
 import IconButton from "@mui/material/IconButton";
