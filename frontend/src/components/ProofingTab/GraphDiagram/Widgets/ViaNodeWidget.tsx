@@ -47,15 +47,14 @@ export const ViaNodeWidget: React.FC<ViaNodeProps> = ({ model, engine }) => {
     };
 
     useEffect(() => {
+        let localRef: any = undefined;
         if (innerRef !== null && innerRef.current !== null) {
+            localRef = innerRef.current;
             // @ts-expect-error I am already checking the innerRef in the if clause
             innerRef.current.addEventListener("dblclick", handleDoubleClick);
         }
         return () => {
-            if (innerRef !== null) {
-                // @ts-expect-error I am already checking the innerRef in the if clause
-                innerRef.removeEventListener("dblclick", handleDoubleClick);
-            }
+            localRef.removeEventListener("dblclick", handleDoubleClick);
         };
     }, []);
 
