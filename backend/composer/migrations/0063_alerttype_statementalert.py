@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("composer", "0061_graphrenderingstate_and_more"),
+        ("composer", "0062_auto_20241122_1333"),
     ]
 
     operations = [

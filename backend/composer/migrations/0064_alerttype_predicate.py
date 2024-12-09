@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("composer", "0062_alerttype_statementalert"),
+        ("composer", "0063_alerttype_statementalert"),
     ]
 
     operations = [
