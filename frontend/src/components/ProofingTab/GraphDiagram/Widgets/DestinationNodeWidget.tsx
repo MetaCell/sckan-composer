@@ -7,7 +7,6 @@ import { DiagramEngine } from "@projectstorm/react-diagrams-core";
 import { NodeTypes } from "../GraphDiagram";
 import { ArrowDownwardIcon, ArrowOutward, DestinationIcon, OriginIcon, ViaIcon } from "./icons";
 import { TypeC11Enum } from "../../../../apiclient/backend";
-import { LaptopChromebook } from "@mui/icons-material";
 
 interface DestinationNodeProps {
     model: CustomNodeModel;
