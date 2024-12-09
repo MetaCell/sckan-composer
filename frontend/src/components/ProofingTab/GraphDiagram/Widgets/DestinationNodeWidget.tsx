@@ -7,6 +7,7 @@ import { DiagramEngine } from "@projectstorm/react-diagrams-core";
 import { NodeTypes } from "../GraphDiagram";
 import { ArrowDownwardIcon, ArrowOutward, DestinationIcon, OriginIcon, ViaIcon } from "./icons";
 import { TypeC11Enum } from "../../../../apiclient/backend";
+import { LaptopChromebook } from "@mui/icons-material";
 
 interface DestinationNodeProps {
     model: CustomNodeModel;
@@ -45,15 +46,14 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
     };
 
     useEffect(() => {
+        let localRef: any = undefined;
         if (innerRef !== null && innerRef.current !== null) {
+            localRef = innerRef.current;
             // @ts-expect-error I am already checking the innerRef in the if clause
             innerRef.current.addEventListener("dblclick", handleDoubleClick);
         }
         return () => {
-            if (innerRef !== null) {
-                // @ts-expect-error I am already checking the innerRef in the if clause
-                innerRef.removeEventListener("dblclick", handleDoubleClick);
-            }
+            localRef.removeEventListener("dblclick", handleDoubleClick);
         }}, []);
 
     return (
