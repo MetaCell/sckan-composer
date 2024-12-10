@@ -159,7 +159,6 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     }
 
     setRankdir(newDir);
-    setIgnoreSerializedGraph(true);
     resetGraph();
   };
 
@@ -171,7 +170,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     setIsGraphLocked(lock);
   };
 
-  const initializeGraph = () => {
+  const initializeGraph = (ignoreGraphSerialised = false) => {
     const model = new DiagramModel();
 
     // Process data to revert to the initial layout
@@ -184,7 +183,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
     });
 
     // If the backend does NOT provides us a serialised graph then we use the smart routing.
-    if (ignoreSerializedGraph || serializedGraph === undefined) {
+    if (ignoreGraphSerialised ||ignoreSerializedGraph || serializedGraph === undefined) {
       layoutNodes(nodes, links);
     }
 
@@ -202,7 +201,8 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   };
 
   const resetGraph = () => {
-    initializeGraph();
+    setIgnoreSerializedGraph(true);
+    initializeGraph(true);
     dispatch(setIsResetInvoked(true));
     dispatch(setPositionChangeOnly(false));
     dispatch(setWasChangeDetected(false));
@@ -215,7 +215,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
 
   // This effect runs whenever origins, vias, or destinations change
   useEffect(() => {
-    initializeGraph();
+    initializeGraph(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rankdir]);
 
