@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
@@ -91,6 +91,12 @@ const Sidebar = () => {
     dispatch(setWasChangeDetected(false));
     dispatch(setPositionChangeOnly(false));
   };
+
+  useEffect(() => {
+    document.getElementById("graph-container")?.scrollIntoView();
+    document.getElementById("graph-container")?.focus();
+  }
+  , [isDialogOpen]);
 
   return (
     <>

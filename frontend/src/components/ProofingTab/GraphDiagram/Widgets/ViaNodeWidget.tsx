@@ -66,6 +66,8 @@ export const ViaNodeWidget: React.FC<ViaNodeProps> = ({ model, engine }) => {
                 display: "flex",
                 width: "6.25rem",
                 height: "6.25rem",
+                marginTop: "1.5rem",
+                marginLeft: "1.5rem",
                 padding: "1.25rem 0.75rem",
                 flexDirection: "column",
                 justifyContent: "center",
@@ -135,7 +137,7 @@ export const ViaNodeWidget: React.FC<ViaNodeProps> = ({ model, engine }) => {
                         boxShadow:
                             "0px 4px 8px -2px rgba(16, 24, 40, 0.10), 0px 2px 4px -2px rgba(16, 24, 40, 0.06)",
                         position: "absolute",
-                        top: 0,
+                        top: "-1px",
                         width: "18rem",
                         zIndex: isActive ? zIndex : "auto",
                         maxHeight: "36rem",

@@ -87,6 +87,7 @@ const StatementDetails = () => {
   
   const handleNavigateCancel = () => {
     setIsNavigateDialogOpen(false);
+    scrollToElement(6);
   };
   
   const scrollToElement = (index: number) => {

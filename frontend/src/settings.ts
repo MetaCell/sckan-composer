@@ -16,13 +16,13 @@ export const CONFIRMATION_DIALOG_CONFIG = {
     Icon: LockIcon
   },
   Navigate: {
-    title: 'Your changes are not locked.',
-    confirmationText: 'The connectivity data have been changed. The diagram will reset to match data in the Path Builder.',
+    title: 'Changes have been made.',
+    confirmationText: 'The diagram will revert to default routing to match the Path Builder information.',
     Icon: WarningIcon
   },
   Redraw: {
     title: 'Are you sure you want to redraw the diagram?',
-    confirmationText: 'The diagram will be redrawn using default routing. return to default. Are you sure you’d like to proceed?',
+    confirmationText: 'The diagram will be redrawn using the default routing. Are you sure you’d like to proceed?',
     Icon: RestartIcon
   },
 }
