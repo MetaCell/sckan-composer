@@ -63,6 +63,8 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
                 display: "flex",
                 width: "7rem",
                 height: "7rem",
+                marginTop: "1rem",
+                marginLeft: "1rem",
                 padding: "0",
                 flexDirection: "column",
                 justifyContent: "center",

@@ -274,7 +274,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   }, []);
 
   return (
-    <Box>
+    <Box id='graph-container'>
       <NavigationMenu
         engine={engine}
         statementId={statementId || "-1"}
