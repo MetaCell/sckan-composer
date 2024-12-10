@@ -76,12 +76,11 @@ const ProofingTab = (props: any) => {
                 paddingBottom: '1.5rem'
               }}>
                 <Typography variant="h5">Statement Display</Typography>
-                <Button startIcon={<ArrowCircleDownIcon />} variant="text" sx={{
+                <Button startIcon={<ArrowCircleDownIcon />} variant="text" disabled={true} sx={{
                   color: theme.palette.primary.dark,
                   p: 0
                 }}>Download graph</Button>
               </Box>
-              
               <StatementChart statement={statement} setStatement={setStatement} />
             </Stack>
             {hasJourney && (
