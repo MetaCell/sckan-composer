@@ -566,6 +566,8 @@ class ConnectivityStatement(models.Model):
     )
     created_date = models.DateTimeField(auto_now_add=True, db_index=True)
     modified_date = models.DateTimeField(auto_now=True, db_index=True)
+    journey_description = models.JSONField(null=True, blank=True)
+    journey_entities = models.JSONField(null=True, blank=True)
 
     def __str__(self):
         suffix = ""
@@ -682,11 +684,10 @@ class ConnectivityStatement(models.Model):
             return set(self.via_set.get(order=via_order - 1).anatomical_entities.all())
 
     def get_journey(self):
-        return compile_journey(self)['journey']
+        return self.journey_description
 
     def get_entities_journey(self):
-        entities_journey = compile_journey(self)['entities']
-        return entities_journey
+        return self.journey_entities
 
     def get_laterality_description(self):
         laterality_map = {
@@ -715,6 +716,11 @@ class ConnectivityStatement(models.Model):
             self.reference_uri = create_reference_uri(self.pk)
             self.save(update_fields=["reference_uri"])
 
+        # recompute - journey
+        journey_data = compile_journey(self)
+        self.journey_description = journey_data['journey']
+        self.journey_entities = journey_data['entities']
+        super().save(update_fields=["journey_description", "journey_entities"])
 
     def set_origins(self, origin_ids):
         self.origins.set(origin_ids, clear=True)
