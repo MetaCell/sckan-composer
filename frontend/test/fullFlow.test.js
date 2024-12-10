@@ -71,7 +71,7 @@ describe('End to End Tests', () => {
 
         browser = await puppeteer.launch({
             args: [
-                "--no-sandbox",
+                '--no-sandbox', '--disable-setuid-sandbox',
             ],
             headless: 'new',
             // headless: false,
