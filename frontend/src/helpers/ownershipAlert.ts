@@ -23,7 +23,7 @@ export const checkOwnership = (
             statementService.assignOwner(fetchedData.id, {})
               .then(() => {
                 return onSave(fetchedData, userId)
-                  .then(() => resolve(ChangeRequestStatus.SAVED))
+                  .then((res) => resolve(res))
                   .catch((error) => reject(error));
               })
               .catch((error) => {
@@ -36,7 +36,7 @@ export const checkOwnership = (
           }
         } else {
           onSave(fetchedData, userId)
-            .then(() => resolve(ChangeRequestStatus.SAVED))
+            .then((res) => resolve(res))
             .catch((error) => reject(error));
         }
       })

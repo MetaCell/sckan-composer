@@ -11,7 +11,7 @@ import StatementForm from "../Forms/StatementForm";
 import connectivityStatementService from "../../services/StatementService";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
-import { DeleteOutlined} from "@mui/icons-material";
+import { DeleteOutlined } from "@mui/icons-material";
 import statementService from "../../services/StatementService";
 import Select from "@mui/material/Select";
 import AlertMenuItem from "./AlertMenuItem";
@@ -59,46 +59,61 @@ const StatementAlertsAccordion = (props: any) => {
   
   const addAlert = (typeId: number) => {
     if (!activeTypes.includes(typeId)) {
-      const newAlert = { connectivity_statement_id: parseInt(statement.id), alert_type: typeId, text: "" }
+      const newAlert = { connectivity_statement_id: parseInt(statement.id), alert_type: typeId, text: "" };
+      let isCancelled = false;
       
-      connectivityStatementService.createAlert(newAlert).then((res: any) => {
-        currentAlertRef.current = res;
-        
-        const updatedAlerts = [
-          ...(statement.statement_alerts || []),
-          res,
-        ];
-        const updatedStatement = { ...statement, statement_alerts: updatedAlerts };
-        setActiveTypes([...activeTypes, typeId]);
-        setStatement(updatedStatement);
-        const newIndex = updatedAlerts.length - 1;
-        setOpenFormIndex(newIndex);
-        setTimeout(() => {
-          const textArea = document.querySelectorAll(`#root_statement_alerts_0_text`);
-          if (textArea) {
-            (textArea[newIndex] as HTMLTextAreaElement).focus();
-          }
-        }, 500);
+      connectivityStatementService.createAlert(newAlert, () => {
+        isCancelled = true;
       })
+        .then((res: any) => {
+          if (isCancelled) return;
+          
+          currentAlertRef.current = res;
+          console.log(res)
+          const updatedAlerts = [
+            ...(statement.statement_alerts || []),
+            res,
+          ];
+          const updatedStatement = { ...statement, statement_alerts: updatedAlerts };
+          setActiveTypes([...activeTypes, typeId]);
+          setStatement(updatedStatement);
+          const newIndex = updatedAlerts.length - 1;
+          setOpenFormIndex(newIndex);
+          setTimeout(() => {
+            const textArea = document.querySelectorAll(`#root_statement_alerts_0_text`);
+            if (textArea) {
+              (textArea[newIndex] as HTMLTextAreaElement).focus();
+            }
+          }, 500);
+        })
     }
   };
-  
-  
   const confirmDelete = async () => {
     if (alertToDelete === null) return;
- 
-    try {
-     await statementService.destroyAlert(alertToDelete).then(() => {
-       refreshStatement();
-     })
-    } catch (error) {
-      alert(`Error deleting alert: ${error}`);
-    }
     
-    setOpenFormIndex(null);
-    setOpenDialog(false);
-    setAlertToDelete(null);
+    let isCancelled = false;
+
+    try {
+      await statementService.destroyAlert(alertToDelete, parseInt(statement.id),() => {
+        isCancelled = true;
+      }).then(() => {
+        if (isCancelled) return;
+        
+        refreshStatement();
+      });
+    } catch (error) {
+      if (!isCancelled) {
+        alert(`Error deleting alert: ${error}`);
+      }
+    } finally {
+      if (!isCancelled) {
+        setOpenFormIndex(null);
+        setOpenDialog(false);
+        setAlertToDelete(null);
+      }
+    }
   };
+
   const handleDelete = async (index: number) => {
     setAlertToDelete(index);
     setOpenDialog(true);
@@ -122,10 +137,16 @@ const StatementAlertsAccordion = (props: any) => {
   
   const onInputBlur = async (value: string) => {
     const alert = currentAlertRef.current;
+    if (!alert) return;
+    
     const updatedAlert = { ...alert, text: value };
-   await connectivityStatementService.updateAlert(alert.id, updatedAlert).then(() => refreshStatement())
-  }
-
+    await connectivityStatementService.updateAlert(alert.id, updatedAlert, () => {
+      return
+    }).then(() => {
+      refreshStatement();
+    });
+  };
+  
   return (
     <Box px={2} py={0.5}>
       <Accordion
@@ -154,7 +175,7 @@ const StatementAlertsAccordion = (props: any) => {
             flexDirection: "column",
             gap: '0.75rem'
           }}>
-            <Select
+            {!isDisabled && <Select
               sx={{
                 alignSelf: 'flex-end',
                 fontWeight: 600,
@@ -164,9 +185,9 @@ const StatementAlertsAccordion = (props: any) => {
                 minWidth: '10rem',
                 padding: '0.625rem 1rem',
                 
-                  '& .MuiSelect-select': {
-                    padding: 0
-                  }
+                '& .MuiSelect-select': {
+                  padding: 0
+                }
               }}
               value=""
               displayEmpty
@@ -207,30 +228,30 @@ const StatementAlertsAccordion = (props: any) => {
               {/* DISPLAYED Alerts */}
               {alerts.filter((type: any) => activeTypes.includes(type.id)).length > 0 && (
                 <Box>
-                <Typography sx={{
-                  padding: "0.875rem 0.875rem 0.5rem 0.875rem",
-                  color: vars.inputPlaceholderColor,
-                  fontWeight: 700,
-                  fontSize: '0.75rem'
-                }}>
-                  DISPLAYED
-                </Typography>
-                {alerts
-                  .filter((type: any) => activeTypes.includes(type.id))
-                  .map((type: any) => (
-                    <AlertMenuItem
-                      key={type.id}
-                      type={type}
-                      isSelected={true}
-                      isDisabled={isDisabled}
-                      onAdd={addAlert}
-                      alertStatus={'displayed'}
-                    />
-                  ))}
-              </Box>
+                  <Typography sx={{
+                    padding: "0.875rem 0.875rem 0.5rem 0.875rem",
+                    color: vars.inputPlaceholderColor,
+                    fontWeight: 700,
+                    fontSize: '0.75rem'
+                  }}>
+                    DISPLAYED
+                  </Typography>
+                  {alerts
+                    .filter((type: any) => activeTypes.includes(type.id))
+                    .map((type: any) => (
+                      <AlertMenuItem
+                        key={type.id}
+                        type={type}
+                        isSelected={true}
+                        isDisabled={isDisabled}
+                        onAdd={addAlert}
+                        alertStatus={'displayed'}
+                      />
+                    ))}
+                </Box>
               )}
             
-            </Select>
+            </Select>}
             <Stack spacing="2rem" pt='.75rem' pb='.75rem'>
               {statement.statement_alerts?.map((alert: any, index: number) => (
                 <Box
@@ -245,6 +266,7 @@ const StatementAlertsAccordion = (props: any) => {
                   }}
                 >
                   <Accordion
+                    disabled={isDisabled}
                     expanded={openFormIndex === index}
                     onChange={() => toggleFormVisibility(index)}
                     elevation={0}
@@ -261,7 +283,10 @@ const StatementAlertsAccordion = (props: any) => {
                       expandIcon={<ExpandMoreIcon />}
                       aria-controls="panel1bh-content"
                       className="panel1bh-header"
-                      sx={{ p: 0, display: "flex", flexDirection: "row-reverse", m: 0 }}
+                      sx={{ p: 0, display: "flex", flexDirection: "row-reverse", m: 0, '&.Mui-disabled':{
+                          opacity: '1 !important',
+                        }
+                    }}
                     >
                       <Typography variant="subtitle1" ml={1}>
                         {alerts.find((type: any) => type.id === alert.alert_type)?.name || "Unknown"}
@@ -305,13 +330,13 @@ const StatementAlertsAccordion = (props: any) => {
                         onInputBlur={onInputBlur}
                       />
                       <IconButton onClick={() => handleDelete(alert.id)}
-                                  disabled={alert?.text?.trim() !== ''}
+                                  disabled={alert?.text?.trim() !== '' || isDisabled}
                       >
                         <DeleteOutlined />
                       </IconButton>
                     </AccordionDetails>
                   </Accordion>
-                  {openFormIndex !== index && (
+                  {(openFormIndex !== index) && (
                     <Box display='flex' alignItems='center' gap='.5rem'>
                       <Box sx={{
                         borderRadius: ".5rem",
@@ -328,7 +353,7 @@ const StatementAlertsAccordion = (props: any) => {
                       </Box>
                       <IconButton
                         onClick={() => handleDelete(alert.id)}
-                        disabled={alert?.text?.trim() !== ''}
+                        disabled={alert?.text?.trim() !== '' || isDisabled}
                       >
                         <DeleteOutlined />
                       </IconButton>

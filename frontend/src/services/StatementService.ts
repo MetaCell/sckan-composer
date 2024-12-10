@@ -235,17 +235,17 @@ class ConnectivityStatementService extends AbstractService {
     return composerApi.composerAlertList(undefined).then((res: any) => res.data);
   }
 
-  async createAlert(statementAlert: any) {
+  async createAlert(statementAlert: any, onCancel: () => void) {
     try {
       return await composerApi.composerStatementAlertCreate(statementAlert).then((res: any) => res.data);
     } catch (err) {
       return await checkOwnership(
-        statementAlert.connectivity_statement,
+        statementAlert.connectivity_statement_id,
         async () => {
           return await composerApi.composerStatementAlertCreate(statementAlert).then((res: any) => res.data);
         },
         () => {
-          return ChangeRequestStatus.CANCELLED;
+          onCancel()
         },
         (owner) =>
           `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
@@ -253,11 +253,39 @@ class ConnectivityStatementService extends AbstractService {
     }
   }
   
-  async destroyAlert(id: number) {
-    return composerApi.composerStatementAlertDestroy(id).then((response: any) => response.data);
+  async destroyAlert(id: number, connectivity_statement_id: number, onCancel: () => void) {
+    try {
+      return await composerApi.composerStatementAlertDestroy(id).then((response: any) => response.data);
+    } catch (err) {
+      return await checkOwnership(
+        connectivity_statement_id,
+        async () => {
+          return await composerApi.composerStatementAlertDestroy(id).then((response: any) => response.data);
+        },
+        () => {
+          onCancel()
+        },
+        (owner) =>
+          `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+      );
+    }
   }
-  async updateAlert(id: number, statementAlert: any) {
-    return composerApi.composerStatementAlertUpdate(id, statementAlert).then((response: any) => response.data);
+  async updateAlert(id: number, statementAlert: any, onCancel: () => void) {
+    try {
+      return await composerApi.composerStatementAlertUpdate(id, statementAlert).then((response: any) => response.data);
+    } catch (err) {
+      return await checkOwnership(
+        statementAlert.connectivity_statement_id,
+        async () => {
+          return await composerApi.composerStatementAlertUpdate(id, statementAlert).then((response: any) => response.data);
+        },
+        () => {
+          onCancel()
+        },
+        (owner) =>
+          `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+      );
+    }
   }
   
   async assignOwner(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement): Promise<ConnectivityStatement> {
