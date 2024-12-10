@@ -5,7 +5,7 @@ const puppeteer = require("puppeteer");
 // INFO
 const USERNAME = process.env.USERNAME || 'simao@metacell.us'
 const PASSWORD = process.env.PASSWORD || 'Pokemon9897!'
-const baseURL = process.env.TEST_URL || 'https://composer.sckan.dev.metacell.us/'
+const baseURL = 'https://composer.sckan.dev.metacell.us/'
 
 
 
