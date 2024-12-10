@@ -157,12 +157,12 @@ def compile_journey(connectivity_statement) -> dict:
     # Extract origins, vias, and destinations from the connectivity statement
     Via = apps.get_model('composer', 'Via')
     Destination = apps.get_model('composer', 'Destination')
+    Origin = apps.get_model('composer', 'AnatomicalEntity')
 
-    origins = list(connectivity_statement.origins.all())
-
-    vias = list(Via.objects.filter(connectivity_statement=connectivity_statement))
-    destinations = list(Destination.objects.filter(connectivity_statement=connectivity_statement))
-
+    vias = list(Via.objects.filter(connectivity_statement__id=connectivity_statement.id))
+    destinations = list(Destination.objects.filter(connectivity_statement__id=connectivity_statement.id))
+    origins = list(Origin.objects.filter(origins_relations__id=connectivity_statement.id).distinct())
+    
     # Generate all paths and then consolidate them
     all_paths2 = generate_paths(origins, vias, destinations)
     consolidated_paths, journey_paths = consolidate_paths(all_paths2)
