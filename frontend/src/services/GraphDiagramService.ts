@@ -4,15 +4,9 @@ import {
   ViaSerializerDetails,
   DestinationSerializerDetails,
   TypeC11Enum,
-  // TypeB60Enum
 } from "../apiclient/backend";
 import { CustomNodeModel } from "../components/ProofingTab/GraphDiagram/Models/CustomNodeModel";
 import { CustomNodeOptions, NodeTypes } from "../components/ProofingTab/GraphDiagram/GraphDiagram";
-
-// const ViaTypeMapping: Record<TypeB60Enum, string> = {
-//   [TypeB60Enum.Axon]: 'Axon',
-//   [TypeB60Enum.Dendrite]: 'Dendrite'
-// };
 
 export const DestinationTypeMapping: Record<TypeC11Enum, string> = {
   [TypeC11Enum.AxonT]: 'Axon terminal',
@@ -96,8 +90,9 @@ export const processData = ({
   });
 
   // Process paths from non-afferent destinations back to origins
-  nonAfferentDestinationIds.forEach(entityId => {
-    const { nodes: traversalNodes, links: traversalLinks } = traverseFromNonAfferentTerminal(
+  let maxLevelNonAfferent = 0;
+  nonAfferentDestinationIds.forEach((entityId) => {
+    const { nodes: traversalNodes, links: traversalLinks, maxLevel } = traverseFromNonAfferentTerminal(
       entityId,
       entityMap,
       nodeMap,
@@ -105,6 +100,10 @@ export const processData = ({
       existingPositions,
       maxLevelAfferent + 1 // initial level
     );
+
+    if (maxLevel > maxLevelNonAfferent) {
+      maxLevelNonAfferent = maxLevel;
+    }
 
     // Add nodes and links if they are not already in the main arrays
     traversalNodes.forEach(node => {
@@ -119,17 +118,42 @@ export const processData = ({
   // Process forward connections for destinations
   processForwardConnections(forwardConnection, nodeMap);
 
+  // Add disconnected nodes (entities in entityMap not represented in nodeMap)
+  const globalMaxLevel = Math.max(maxLevelAfferent, maxLevelNonAfferent);
+  addDisconnectedNodes(entityMap, nodeMap, nodes, existingPositions, globalMaxLevel + 1);
+
   return { nodes, links };
 };
 
+function addDisconnectedNodes(
+  entityMap: Map<string, EntityInfo>,
+  nodeMap: Map<string, CustomNodeModel>,
+  nodes: CustomNodeModel[],
+  existingPositions: Map<string, Map<string, { x: number; y: number }>>,
+  startingLevel: number
+) {
+  // Find all entity IDs not in nodeMap
+  const disconnectedEntities = [...entityMap.entries()].filter(([id, _]) => !nodeMap.has(id));
 
+  if (disconnectedEntities.length === 0) return;
+
+  // Place them at a new row below the known maximum level (dagre will overule this)
+  let xPos = POSITION_CONSTANTS.xStart;
+  const yPos = POSITION_CONSTANTS.yStart + startingLevel * POSITION_CONSTANTS.yIncrement;
+
+  disconnectedEntities.forEach(([entityId, entityInfo]) => {
+    const node = createNode(entityInfo);
+    setPosition(node, existingPositions, xPos, yPos, nodes);
+    nodeMap.set(entityId, node);
+    nodes.push(node);
+
+    xPos += POSITION_CONSTANTS.xIncrement;
+  });
+}
 
 // Helper functions
 
-function extractNodePositionsFromSerializedGraph(serializedGraph: any): Map<string, Map<string, {
-  x: number;
-  y: number
-}>> {
+function extractNodePositionsFromSerializedGraph(serializedGraph: any): Map<string, Map<string, { x: number; y: number }>> {
   const positions = new Map<string, Map<string, { x: number; y: number }>>();
   if (!serializedGraph) return positions;
 
@@ -160,7 +184,6 @@ function collectEntityMap(
 ): Map<string, EntityInfo> {
   const entityMap = new Map<string, EntityInfo>();
 
-  // Helper function to get or create EntityInfo
   const getOrCreateEntityInfo = (entityId: string, entity: AnatomicalEntity, nodeType: NodeTypes = NodeTypes.Via): EntityInfo => {
     if (!entityMap.has(entityId)) {
       entityMap.set(entityId, {
