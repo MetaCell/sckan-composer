@@ -6,7 +6,6 @@ const puppeteer = require("puppeteer");
 const USERNAME = process.env.USERNAME || 'simao@metacell.us'
 const PASSWORD = process.env.PASSWORD || 'Pokemon9897!'
 const baseURL = process.env.TEST_URL || 'https://composer.sckan.dev.metacell.us/'
-const shouldSkipLoginTest = !!process.env.TEST_URL;
 
 
 
@@ -104,8 +103,8 @@ describe('End to End Tests', () => {
 
     describe('Login Flow', () => {
 
-        (shouldSkipLoginTest ? it.skip : it)('HomePage', async () => {
-        // it('Home Page', async () => {
+        // (shouldSkipLoginTest ? it.skip : it)('HomePage', async () => {
+        it('Home Page', async () => {
             console.log('Homepage')
             await page.waitForSelector(selectors.LOGIN_PAGE, { timeout: 60000 })
             await page.waitForSelector(selectors.COOKIE_MODAL, { timeout: 60000 })
@@ -116,8 +115,8 @@ describe('End to End Tests', () => {
 
         });
 
-        (shouldSkipLoginTest ? it.skip : it)('Login', async () => {
-        //it('Login', async () => {
+        // (shouldSkipLoginTest ? it.skip : it)('Login', async () => {
+        it('Login', async () => {
             console.log('Logging in ...');
     
             await page.waitForSelector(selectors.USERNAME, { timeout: 60000 });
