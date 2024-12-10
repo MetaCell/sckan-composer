@@ -77,7 +77,7 @@ class ConnectivityStatementService extends AbstractService {
       return checkOwnership(
         id,
         // Retry the partial update after ownership is reassigned, including new owner ID
-        async (userId: number) => {
+        async () => {
           const updatedPatchedStatement = {
             ...patchedConnectivityStatementUpdate,
           };
@@ -236,7 +236,21 @@ class ConnectivityStatementService extends AbstractService {
   }
 
   async createAlert(statementAlert: any) {
-    return composerApi.composerStatementAlertCreate(statementAlert).then((res: any) => res.data);
+    try {
+      return await composerApi.composerStatementAlertCreate(statementAlert).then((res: any) => res.data);
+    } catch (err) {
+      return await checkOwnership(
+        statementAlert.connectivity_statement,
+        async () => {
+          return await composerApi.composerStatementAlertCreate(statementAlert).then((res: any) => res.data);
+        },
+        () => {
+          return ChangeRequestStatus.CANCELLED;
+        },
+        (owner) =>
+          `This statement is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+      );
+    }
   }
   
   async destroyAlert(id: number) {
