@@ -19,7 +19,7 @@ import {formatDate, formatTime, StatementsLabels} from "../helpers/helpers";
 import GroupedButtons from "../components/Widgets/CustomGroupedButtons";
 import Divider from "@mui/material/Divider";
 import NoteDetails from "../components/Widgets/NotesFomList";
-import DistillationTab from "../components/DistillationTab";
+import DistillationTab from "../components/DistillationTab/DistillationTab";
 import {useSectionStyle} from "../styles/styles";
 import {useTheme} from "@mui/system";
 import IconButton from "@mui/material/IconButton";
@@ -35,6 +35,11 @@ import {ViaIcon, DestinationIcon, OriginIcon} from "../components/icons";
 import {CircularProgress} from "@mui/material";
 import {checkOwnership, getOwnershipAlertMessage} from "../helpers/ownershipAlert";
 import {ChangeRequestStatus} from "../helpers/settings";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../redux/store";
+import ConfirmationDialog from "../components/ConfirmationDialog";
+import {CONFIRMATION_DIALOG_CONFIG} from "../settings";
+import {setDialogState, setPositionChangeOnly, setWasChangeDetected} from "../redux/statementSlice";
 
 const StatementDetails = () => {
   const {statementId} = useParams();
@@ -43,6 +48,10 @@ const StatementDetails = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [refetch, setRefetch] = useState(false);
+  const [isNavigateDialogOpen, setIsNavigateDialogOpen] = useState(false);
+  const dispatch = useDispatch();
+  const dialogsState = useSelector((state: RootState) => state.statement.dialogs);
+  
   const refs = [
     useRef<HTMLElement | null>(null),
     useRef<HTMLElement | null>(null),
@@ -53,7 +62,34 @@ const StatementDetails = () => {
     useRef<HTMLElement | null>(null),
     useRef<HTMLElement | null>(null),
   ];
-
+  const wasChangeDetected = useSelector((state: RootState) => state.statement.wasChangeDetected);
+  const positionChangeOnly = useSelector((state: RootState) => state.statement.positionChangeOnly);
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    if (dialogsState.navigate) {
+      setActiveTab(newValue);
+      dispatch(setWasChangeDetected(false));
+      dispatch(setPositionChangeOnly(false));
+      return;
+    }
+    if (wasChangeDetected || positionChangeOnly) {
+      setIsNavigateDialogOpen(true);
+    } else {
+      setActiveTab(newValue);
+    }
+  };
+  
+  const handleNavigateConfirm = () => {
+    setIsNavigateDialogOpen(false);
+    setActiveTab(0)
+    dispatch(setWasChangeDetected(false));
+    dispatch(setPositionChangeOnly(false));
+  };
+  
+  const handleNavigateCancel = () => {
+    setIsNavigateDialogOpen(false);
+    scrollToElement(6);
+  };
+  
   const scrollToElement = (index: number) => {
     const element = refs[index].current;
     if (element) {
@@ -226,7 +262,7 @@ const StatementDetails = () => {
               <Grid item xs={12} mb={4}>
                 <Grid container>
                   <Grid item xs={12} md={6}>
-                    <Box>
+                    <Box ref={refs[0]}>
                       <Typography variant="h3" mb={1}>
                         Statement Details #{statementId}{" "}
                         <span>
@@ -279,7 +315,7 @@ const StatementDetails = () => {
                   <Tabs
                     value={activeTab}
                     variant="standard"
-                    onChange={(e, i: number) => setActiveTab(i)}
+                    onChange={handleTabChange}
                     sx={{
                       borderBottom: "1px solid #EAECF0",
                     }}
@@ -351,6 +387,16 @@ const StatementDetails = () => {
           </Grid>
         </>
       )}
+      <ConfirmationDialog
+        open={isNavigateDialogOpen}
+        onConfirm={handleNavigateConfirm}
+        onCancel={handleNavigateCancel}
+        title={CONFIRMATION_DIALOG_CONFIG.Navigate.title}
+        confirmationText={CONFIRMATION_DIALOG_CONFIG.Navigate.confirmationText}
+        Icon={<CONFIRMATION_DIALOG_CONFIG.Navigate.Icon />}
+        dontShowAgain={dialogsState.navigate}
+        setDontShowAgain={() => dispatch(setDialogState({ dialogKey: "navigate", dontShow: true }))}
+      />
     </Grid>
   );
 };

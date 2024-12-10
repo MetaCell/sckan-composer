@@ -34,6 +34,7 @@ COPY backend/requirements.txt ${APP_DIR}
 RUN pip3 install --no-cache-dir --upgrade -r requirements.txt
 
 COPY backend/requirements.txt backend/setup.py ${APP_DIR}
+COPY backend/requirements.txt backend/version.py ${APP_DIR}
 RUN python3 -m pip install -e .
 
 RUN ontutils set ontology-local-repo ./NIF-Ontology/

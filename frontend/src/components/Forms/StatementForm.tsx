@@ -39,18 +39,56 @@ import {CustomFooter} from "../Widgets/HoveredOptionContent";
 import {StatementStateChip} from "../Widgets/StateChip";
 import {projections} from "../../services/ProjectionService";
 import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
+import {useDispatch} from "react-redux";
+import {setWasChangeDetected} from "../../redux/statementSlice";
 
 const StatementForm = (props: any) => {
-  const {uiFields, statement, setStatement, isDisabled, action: refreshStatement} = props;
+  const {uiFields, statement, isDisabled, action: refreshStatement, onInputBlur} = props;
   const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
+  const dispatch = useDispatch();
+  
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
+  copiedSchema.properties.statement_alerts.items.properties.alert_type.type = "number";
+  copiedSchema.properties.statement_alerts.items.properties.connectivity_statement.type = "number";
 
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["destination_type", "*"];
+  copiedSchema.properties.statement_alerts.title = " ";
+  copiedSchema.properties.statement_alerts.items.required = ["alert_type"]
+  
+  copiedUISchema.statement_alerts ={
+    "ui:options": {
+      orderable: false,
+      addable: false,
+      removable: false,
+      label: false,
+    },
+    items: {
+      "ui:label": false,
+      
+      id: {
+        "ui:widget": "hidden",
+      },
+      alert_type: {
+        "ui:widget": "hidden",
+      },
+      text: {
+        "ui:widget": "CustomTextArea",
+        "ui:options": {
+          placeholder: "Enter alert text here...",
+          rows: 3,
+          onBlur: (value: string) => onInputBlur(value),
+        },
+      },
+      connectivity_statement: {
+        "ui:widget": "hidden",
+      }
+    },
+  }
   copiedUISchema.circuit_type = {
     "ui:widget": "CustomSingleSelect",
     "ui:options": {
@@ -174,7 +212,7 @@ const StatementForm = (props: any) => {
         );
       },
       onUpdate: async (selectedOptions: any) => {
-        return await updateOrigins(selectedOptions, statement.id, setStatement);
+        return await updateOrigins(selectedOptions, statement.id, refreshStatement, dispatch);
       },
       errors: "",
       mapValueToOption: () =>
@@ -210,6 +248,7 @@ const StatementForm = (props: any) => {
         id={statement.id}
         onElementDelete={async (element: any) => {
           await api.composerViaDestroy(element.children.props.formData.id);
+          dispatch(setWasChangeDetected(true));
           refreshStatement();
         }}
         onElementAdd={async () => {
@@ -229,6 +268,7 @@ const StatementForm = (props: any) => {
           await api.composerViaPartialUpdate(statement.vias[sourceIndex].id, {
             order: destinationIndex,
           });
+          dispatch(setWasChangeDetected(true));
           refreshStatement();
         }}
         hideDeleteBtn={statement?.vias?.length < 1 || isDisabled}
@@ -261,6 +301,7 @@ const StatementForm = (props: any) => {
                   type: typeOption,
                 });
                 refreshStatement()
+                dispatch(setWasChangeDetected(true));
                 return ChangeRequestStatus.SAVED;
               } catch (error) {
                 return checkOwnership(
@@ -269,6 +310,7 @@ const StatementForm = (props: any) => {
                     await api.composerViaPartialUpdate(viaIndex, {
                       type: typeOption,
                     });
+                    dispatch(setWasChangeDetected(true));
                     refreshStatement()
                     return ChangeRequestStatus.SAVED;
                   },
@@ -316,7 +358,8 @@ const StatementForm = (props: any) => {
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
               propertyToUpdate: "anatomical_entities",
-              refreshStatement
+              refreshStatement,
+              dispatch
             });
           },
           errors: "",
@@ -359,7 +402,8 @@ const StatementForm = (props: any) => {
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
               propertyToUpdate: "from_entities",
-              refreshStatement
+              refreshStatement,
+              dispatch
             });
           },
           areConnectionsExplicit: (formId: any) => {
@@ -420,6 +464,7 @@ const StatementForm = (props: any) => {
           await api.composerDestinationDestroy(
             element.children.props.formData.id,
           );
+          dispatch(setWasChangeDetected(true));
           refreshStatement();
         }}
         onElementAdd={async () => {
@@ -460,6 +505,7 @@ const StatementForm = (props: any) => {
                 await api.composerDestinationPartialUpdate(destinationIndex, {
                   type: typeOption,
                 })
+                dispatch(setWasChangeDetected(true));
                 refreshStatement()
                 return ChangeRequestStatus.SAVED;
               } catch (error) {
@@ -469,6 +515,7 @@ const StatementForm = (props: any) => {
                     await api.composerDestinationPartialUpdate(destinationIndex, {
                       type: typeOption,
                     })
+                    dispatch(setWasChangeDetected(true));
                     refreshStatement()
                     return ChangeRequestStatus.SAVED;
                   },
@@ -515,7 +562,8 @@ const StatementForm = (props: any) => {
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
               propertyToUpdate: "anatomical_entities",
-              refreshStatement
+              refreshStatement,
+              dispatch
             });
           },
           errors: "",
@@ -561,7 +609,8 @@ const StatementForm = (props: any) => {
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
               propertyToUpdate: "from_entities",
-              refreshStatement
+              refreshStatement,
+              dispatch
             });
           },
           areConnectionsExplicit: (formId: any) => {
@@ -648,7 +697,7 @@ const StatementForm = (props: any) => {
         return searchForwardConnection(searchValue, statement, excludedIds);
       },
       onUpdate: async (selectedOptions: Option[]) => {
-        return await updateForwardConnections(selectedOptions, statement);
+        return await updateForwardConnections(selectedOptions, statement, dispatch);
       },
       statement: statement,
       errors: statement?.errors?.includes("Invalid forward connection")

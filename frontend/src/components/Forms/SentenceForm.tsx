@@ -71,6 +71,7 @@ const SentenceForm = (props: any) => {
     ...schema,
     "title": ""
   }
+
   return (
     <Paper sx={sectionStyle}>
       <Box mb={3}>

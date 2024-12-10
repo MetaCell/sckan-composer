@@ -28,6 +28,7 @@ from .filtersets import (
     DestinationFilter,
 )
 from .serializers import (
+    AlertTypeSerializer,
     AnatomicalEntitySerializer,
     PhenotypeSerializer,
     ProjectionPhenotypeSerializer,
@@ -37,6 +38,7 @@ from .serializers import (
     ProfileSerializer,
     SentenceSerializer,
     SpecieSerializer,
+    StatementAlertSerializer,
     TagSerializer,
     ViaSerializer,
     ProvenanceSerializer,
@@ -51,6 +53,7 @@ from .permissions import (
     IsOwnerOfConnectivityStatementOrReadOnly,
 )
 from ..models import (
+    AlertType,
     AnatomicalEntity,
     Phenotype,
     ProjectionPhenotype,
@@ -59,6 +62,7 @@ from ..models import (
     Profile,
     Sentence,
     Specie,
+    StatementAlert,
     Tag,
     Via,
     Provenance,
@@ -326,6 +330,14 @@ class NoteViewSet(viewsets.ModelViewSet):
     filterset_class = NoteFilter
 
 
+class AlertTypeViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A viewset for viewing the list of alert types.
+    """
+
+    queryset = AlertType.objects.all()
+    serializer_class = AlertTypeSerializer
+
 class ConnectivityStatementViewSet(
     ProvenanceMixin,
     SpecieMixin,
@@ -349,7 +361,7 @@ class ConnectivityStatementViewSet(
     service = ConnectivityStatementStateService
 
     def get_serializer_class(self):
-        if self.action in ['update', 'partial_update']:
+        if self.action in ["update", "partial_update"]:
             return ConnectivityStatementUpdateSerializer
         if self.action == "list":
             return BaseConnectivityStatementSerializer
@@ -534,6 +546,20 @@ class DestinationViewSet(viewsets.ModelViewSet):
         return super().partial_update(request, *args, **kwargs)
 
 
+class StatementAlertViewSet(viewsets.ModelViewSet):
+    """
+    StatementAlert
+    """
+    queryset = StatementAlert.objects.all()
+    serializer_class = StatementAlertSerializer
+    permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except Exception as e:
+            raise
+
 
 @extend_schema(
     responses=OpenApiTypes.OBJECT,
@@ -549,6 +575,7 @@ def jsonschemas(request):
         ProvenanceSerializer,
         SpecieSerializer,
         NoteSerializer,
+        StatementAlertSerializer
     ]
 
     schema = {}

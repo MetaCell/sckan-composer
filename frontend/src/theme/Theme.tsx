@@ -196,6 +196,24 @@ const theme = createTheme({
         flex: 2
       }
       
+      .MuiBox-root:has(.alerts-form) {
+        flex: 1;
+      }
+      
+      .alerts-form .MuiBox-root {
+      padding: 0;
+      margin: 0
+      }
+      
+      .alerts-form .MuiPaper-root {
+        box-shadow: none;
+        border: 0;
+      }
+      .alerts-form .MuiPaper-root:has(.Mui-focused) {
+        box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+        border: 1px solid #EAECF0;
+      }
+      
       `,
     },
     MuiButton: {
@@ -452,6 +470,50 @@ const theme = createTheme({
         indicator: ({ theme }) => ({
           backgroundColor: theme.palette.primary.dark,
         }),
+      },
+    },
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          padding: 0,
+          cursor: 'default',
+          
+          '& .MuiAlert-message, & .MuiAlert-icon': {
+            padding: 0
+          },
+          
+          '& .MuiAlert-icon': {
+            marginRight: '4px'
+          },
+          
+          '&.MuiAlert-standardWarning': {
+            '& .MuiAlert-message': {
+              color: vars.warning600,
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              lineHeight: '1.125rem',
+            },
+            '& .MuiAlert-icon': {
+              '& .MuiSvgIcon-root': {
+                color: vars.warning600,
+                fontSize: '1rem',
+              }
+            }
+          }
+        }
+      },
+    },
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          backgroundColor: '#232325',
+          padding: '0.5rem 0.75rem',
+          fontWeight: 600,
+          fontSize: '0.75rem'
+        },
+        arrow: {
+          color: '#232325'
+        }
       },
     },
   },

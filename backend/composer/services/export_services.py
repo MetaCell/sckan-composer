@@ -84,6 +84,7 @@ class Row:
         layer: str = "",
         connected_from_names: str = "",
         connected_from_uris: str = "",
+        object_text__from_alert_notes: str = "",
     ):
         self.structure = structure
         self.identifier = identifier
@@ -94,6 +95,7 @@ class Row:
         self.layer = layer
         self.connected_from_names = connected_from_names
         self.connected_from_uris = connected_from_uris
+        self.object_text__from_alert_notes = object_text__from_alert_notes
 
 
 def get_sentence_number(cs: ConnectivityStatement, row: Row):
@@ -103,6 +105,9 @@ def get_sentence_number(cs: ConnectivityStatement, row: Row):
 def get_statement_uri(cs: ConnectivityStatement, row: Row):
     return cs.reference_uri
 
+
+def get_alert_text(cs: ConnectivityStatement, row: Row):
+    return row.object_text__from_alert_notes
 
 def get_nlp_id(cs: ConnectivityStatement, row: Row):
     return cs.export_id
@@ -196,19 +201,15 @@ def get_tag_filter(tag_name):
 
 def generate_csv_attributes_mapping() -> Dict[str, Callable]:
     attributes_map = {
-        "Sentence Number": get_sentence_number,
-        "NLP-ID": get_nlp_id,
-        "Neuron population label (A to B via C)": get_neuron_population_label,
-        "Type": get_type,
-        "Structure": get_structure,
-        "Identifier": get_identifier,
-        "Relationship": get_relationship,
-        "Axonal course poset": get_layer,
-        "Connected From": get_connected_from_names,
-        "Connected From URIs": get_connected_from_uri,
+        "Subject URI": get_statement_uri,
         "Predicate": get_predicate,
-        "Observed in species": get_observed_in_species,
-        "Different from existing": get_different_from_existing,
+        "Predicate Relationship": get_relationship,
+        "Object": get_structure,
+        "Object URI": get_identifier,
+        "Object Text": get_alert_text,
+        "Axonal course poset": get_layer,
+        "Connected from": get_connected_from_names,
+        "Connected from uri": get_connected_from_uri,
         "Curation notes": get_curation_notes,
         "Reference (pubmed ID, DOI or text)": get_reference,
         "Has nerve branches": has_nerve_branches,
@@ -216,7 +217,12 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
         "Review notes": get_review_notes,
         "Proposed action": get_proposed_action,
         "Added to SCKAN (time stamp)": get_added_to_sckan_timestamp,
-        "URI": get_statement_uri,
+        "Sentence Number": get_sentence_number,
+        "NLP-ID": get_nlp_id,
+        "Neuron population label (A to B via C)": get_neuron_population_label,
+        # "Type": get_type,
+        # "Observed in species": get_observed_in_species,
+        # "Different from existing": get_different_from_existing,
     }
     exportable_tags = Tag.objects.filter(exportable=True)
     for tag in exportable_tags:
@@ -465,6 +471,15 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
     # Forward Connections
     for forward_conn in cs.forward_connection.all():
         rows.append(get_forward_connection_row(forward_conn))
+
+    for statement_alert in cs.statement_alerts.all():
+        rows.append(Row(
+            identifier=statement_alert.alert_type.uri,
+            structure="",
+            relationship=statement_alert.alert_type.name,
+            predicate=statement_alert.alert_type.predicate,
+            object_text__from_alert_notes=statement_alert.text,
+        ))
 
     return rows
 
