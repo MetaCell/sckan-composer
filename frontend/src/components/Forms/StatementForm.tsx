@@ -288,6 +288,7 @@ const StatementForm = (props: any) => {
       type: {
         "ui:CustomSingleSelect": "CustomSingleSelect",
         "ui:options": {
+          isDisabled,
           label: false,
           isPathBuilderComponent: true,
           InputIcon: ViaIcon,
@@ -494,6 +495,7 @@ const StatementForm = (props: any) => {
       type: {
         "ui:widget": "CustomSingleSelect",
         "ui:options": {
+          isDisabled,
           label: false,
           isPathBuilderComponent: true,
           InputIcon: DestinationIcon,
