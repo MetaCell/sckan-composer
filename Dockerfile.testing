@@ -3,7 +3,7 @@ FROM ghcr.io/puppeteer/puppeteer:16.1.0
 COPY frontend/package.json .
 COPY frontend/package-lock.json .
 
-RUN npm i
+RUN npm ci
 
 USER pptruser
 COPY --chown=pptruser:pptruser frontend frontend
