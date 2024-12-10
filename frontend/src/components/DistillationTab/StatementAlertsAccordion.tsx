@@ -59,7 +59,7 @@ const StatementAlertsAccordion = (props: any) => {
   
   const addAlert = (typeId: number) => {
     if (!activeTypes.includes(typeId)) {
-      const newAlert = { connectivity_statement: parseInt(statement.id), alert_type: typeId, text: "" }
+      const newAlert = { connectivity_statement_id: parseInt(statement.id), alert_type: typeId, text: "" }
       
       connectivityStatementService.createAlert(newAlert).then((res: any) => {
         currentAlertRef.current = res;

@@ -2094,7 +2094,7 @@ export interface PatchedStatementAlert {
      * @type {number}
      * @memberof PatchedStatementAlert
      */
-    'connectivity_statement'?: number;
+    'connectivity_statement_id'?: number;
 }
 /**
  * Via
@@ -2610,7 +2610,7 @@ export interface StatementAlert {
      * @type {number}
      * @memberof StatementAlert
      */
-    'connectivity_statement': number;
+    'connectivity_statement_id': number;
 }
 /**
  * Note Tag

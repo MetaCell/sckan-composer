@@ -517,7 +517,7 @@ class AlertTypeSerializer(serializers.ModelSerializer):
 class StatementAlertSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
 
-    connectivity_statement = serializers.PrimaryKeyRelatedField(
+    connectivity_statement_id = serializers.PrimaryKeyRelatedField(
         queryset=ConnectivityStatement.objects.all(), required=True
     )
     alert_type = serializers.PrimaryKeyRelatedField(
@@ -533,7 +533,7 @@ class StatementAlertSerializer(serializers.ModelSerializer):
             "saved_by",
             "created_at",
             "updated_at",
-            "connectivity_statement",
+            "connectivity_statement_id",
         )
         read_only_fields = ("created_at", "updated_at", "saved_by")
         validators = []
@@ -542,24 +542,24 @@ class StatementAlertSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
 
         # If 'connectivity_statement' is provided in context, make it not required
-        if 'connectivity_statement' in self.context:
-            self.fields['connectivity_statement'].required = False
+        if 'connectivity_statement_id' in self.context:
+            self.fields['connectivity_statement_id'].required = False
 
         # If updating an instance, set 'alert_type' and 'connectivity_statement' as read-only
         if self.instance:
             self.fields['alert_type'].read_only = True
-            self.fields['connectivity_statement'].read_only = True
+            self.fields['connectivity_statement_id'].read_only = True
 
     def validate(self, data):
         # Get 'connectivity_statement' from context or instance
-        connectivity_statement = self.context.get('connectivity_statement') or data.get('connectivity_statement')
+        connectivity_statement = self.context.get('connectivity_statement_id') or data.get('connectivity_statement_id')
         if not connectivity_statement and self.instance:
             connectivity_statement = self.instance.connectivity_statement
         if not connectivity_statement:
             raise serializers.ValidationError({
-                'connectivity_statement': 'This field is required.'
+                'connectivity_statement_id': 'This field is required.'
             })
-        data['connectivity_statement'] = connectivity_statement
+        data['connectivity_statement_id'] = connectivity_statement.id
 
         # Get 'alert_type' from data or instance
         alert_type = data.get('alert_type') or getattr(self.instance, 'alert_type', None)
@@ -850,13 +850,13 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
                 alert_instance = existing_alerts[alert_id]
                 # Remove 'alert_type' and 'connectivity_statement' from alert_data
                 alert_data.pop('alert_type', None)
-                alert_data.pop('connectivity_statement', None)
+                alert_data.pop('connectivity_statement_id', None)
                 serializer = StatementAlertSerializer(
                     alert_instance,
                     data=alert_data,
                     context={
                         "request": self.context.get("request"),
-                        "connectivity_statement": instance,  # Pass the parent instance
+                        "connectivity_statement_id": instance.id,  # Pass the parent instance
                     },
                 )
                 serializer.is_valid(raise_exception=True)
@@ -867,7 +867,7 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
                     data=alert_data,
                     context={
                         "request": self.context.get("request"),
-                        "connectivity_statement": instance,  # Pass the parent instance
+                        "connectivity_statement_id": instance.id,  # Pass the parent instance
                     },
                 )
                 serializer.is_valid(raise_exception=True)
