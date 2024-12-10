@@ -508,6 +508,13 @@ class ViaViewSet(viewsets.ModelViewSet):
     ]
     filterset_class = ViaFilter
 
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        connectivity_statement = instance.connectivity_statement
+        connectivity_statement.save()
+
+        return super().partial_update(request, *args, **kwargs)
+
 
 class DestinationViewSet(viewsets.ModelViewSet):
     """
@@ -518,6 +525,14 @@ class DestinationViewSet(viewsets.ModelViewSet):
     serializer_class = DestinationSerializer
     permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
     filterset_class = DestinationFilter
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        connectivity_statement = instance.connectivity_statement
+        connectivity_statement.save()
+
+        return super().partial_update(request, *args, **kwargs)
+
 
 
 @extend_schema(
