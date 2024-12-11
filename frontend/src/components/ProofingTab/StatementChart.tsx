@@ -5,8 +5,8 @@ import {ConnectivityStatement} from "../../apiclient/backend";
 import {useTheme} from "@mui/system";
 import GraphDiagram from "./GraphDiagram/GraphDiagram";
 
-const StatementChart = (props: { statement: ConnectivityStatement, setStatement: () => void }) => {
-    const {statement, setStatement} = props;
+const StatementChart = (props: { statement: ConnectivityStatement, setStatement: () => void, isDisabled: boolean }) => {
+    const {statement, setStatement, isDisabled} = props;
     const theme = useTheme();
 
     const displayChart = statement.origins && statement.origins.length > 0
@@ -21,6 +21,7 @@ const StatementChart = (props: { statement: ConnectivityStatement, setStatement:
                                   serializedGraph={statement.graph_rendering_state?.serialized_graph}
                                   statement={statement}
                                   setStatement={setStatement}
+                                  isDisabled={isDisabled}
                     />
             ) : (
               <Box

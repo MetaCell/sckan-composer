@@ -50,6 +50,7 @@ interface GraphDiagramProps {
   serializedGraph?: any | undefined;
   statement: ConnectivityStatement;
   setStatement: (statement: any) => void;
+  isDisabled?: boolean;
 }
 
 const GraphDiagram: React.FC<GraphDiagramProps> = ({
@@ -60,6 +61,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
   serializedGraph,
   statement,
   setStatement,
+  isDisabled = false,
 }) => {
   const theme = useTheme();
   const { statementId } = useParams();
@@ -285,6 +287,7 @@ const GraphDiagram: React.FC<GraphDiagramProps> = ({
         switchLockedGraph={switchLockedGraph}
         statement={statement}
         setStatement={setStatement}
+        isDisabled={isDisabled}
       />
       <Box
         display="flex"
