@@ -3481,7 +3481,7 @@ components:
           type: string
           format: date-time
           readOnly: true
-        connectivity_statement:
+        connectivity_statement_id:
           type: integer
     PatchedVia:
       type: object
@@ -3810,11 +3810,11 @@ components:
           type: string
           format: date-time
           readOnly: true
-        connectivity_statement:
+        connectivity_statement_id:
           type: integer
       required:
       - alert_type
-      - connectivity_statement
+      - connectivity_statement_id
       - created_at
       - saved_by
       - updated_at

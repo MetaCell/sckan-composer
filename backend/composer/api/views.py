@@ -338,6 +338,7 @@ class AlertTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = AlertType.objects.all()
     serializer_class = AlertTypeSerializer
 
+
 class ConnectivityStatementViewSet(
     ProvenanceMixin,
     SpecieMixin,
@@ -456,13 +457,18 @@ class SentenceViewSet(
 
     def get_queryset(self):
         if "ordering" not in self.request.query_params:
-            return super().get_queryset().annotate(
-                is_current_user=Case(
-                    When(owner=self.request.user, then=Value(1)),
-                    default=Value(0),
-                    output_field=IntegerField(),
+            return (
+                super()
+                .get_queryset()
+                .annotate(
+                    is_current_user=Case(
+                        When(owner=self.request.user, then=Value(1)),
+                        default=Value(0),
+                        output_field=IntegerField(),
+                    )
                 )
-            ).order_by("-is_current_user", "-modified_date")
+                .order_by("-is_current_user", "-modified_date")
+            )
         return super().get_queryset()
 
 
@@ -531,20 +537,15 @@ class DestinationViewSet(viewsets.ModelViewSet):
     permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
     filterset_class = DestinationFilter
 
+
 class StatementAlertViewSet(viewsets.ModelViewSet):
     """
     StatementAlert
     """
+
     queryset = StatementAlert.objects.all()
     serializer_class = StatementAlertSerializer
     permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
-
-    def create(self, request, *args, **kwargs):
-        try:
-            return super().create(request, *args, **kwargs)
-        except Exception as e:
-            raise
-
 
 @extend_schema(
     responses=OpenApiTypes.OBJECT,
@@ -560,7 +561,7 @@ def jsonschemas(request):
         ProvenanceSerializer,
         SpecieSerializer,
         NoteSerializer,
-        StatementAlertSerializer
+        StatementAlertSerializer,
     ]
 
     schema = {}

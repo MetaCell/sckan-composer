@@ -53,7 +53,7 @@ const StatementForm = (props: any) => {
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
   copiedSchema.properties.statement_alerts.items.properties.alert_type.type = "number";
-  copiedSchema.properties.statement_alerts.items.properties.connectivity_statement.type = "number";
+  copiedSchema.properties.statement_alerts.items.properties.connectivity_statement_id.type = "number";
 
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["destination_type", "*"];
@@ -84,7 +84,7 @@ const StatementForm = (props: any) => {
           onBlur: (value: string) => onInputBlur(value),
         },
       },
-      connectivity_statement: {
+      connectivity_statement_id: {
         "ui:widget": "hidden",
       }
     },
