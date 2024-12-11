@@ -3,8 +3,8 @@ const selectors = require('./selectors');
 const puppeteer = require("puppeteer");
 
 // INFO
-const USERNAME = process.env.USERNAME || 'simao@metacell.us'
-const PASSWORD = process.env.PASSWORD || 'Pokemon9897!'
+const USERNAME = process.env.USERNAME 
+const PASSWORD = process.env.PASSWORD 
 const baseURL = 'https://composer.sckan.dev.metacell.us/'
 
 
@@ -707,6 +707,7 @@ describe('End to End Tests', () => {
         it('Check Population Diagram', async () => {
             console.log('Checking Population Diagram ...')
             await page.waitForTimeout(1000)
+            await page.waitForSelector('button[aria-label="Reset to default visualisation"]', {hidden:false})
             await page.waitForSelector('div.node', {hidden:false})
             const nodes = await page.$$('div.node');
             //expect(nodes.length).toBe(3);
