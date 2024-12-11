@@ -17,6 +17,7 @@ import Select from "@mui/material/Select";
 import AlertMenuItem from "./AlertMenuItem";
 import {vars} from "../../theme/variables";
 import ConfirmationDialog from "./ConfiramtionDialog";
+import Tooltip from "@mui/material/Tooltip";
 
 const parseTextWithLinks = (text: string, vars: any): JSX.Element[] => {
   const urlRegex = /(https?:\/\/\S+|www\.\S+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi;
@@ -42,6 +43,24 @@ const parseTextWithLinks = (text: string, vars: any): JSX.Element[] => {
     return <React.Fragment key={index}>{part}</React.Fragment>;
   });
 };
+
+
+const DeleteAlertBtn = ({alert, isDisabled, handleDelete}: any) => {
+  return  <Tooltip
+    title={alert?.text?.trim() !== '' && !isDisabled ? 'To enable this icon, clear the comment' : null}
+    arrow
+    open={true}
+  >
+      <span>
+        <IconButton
+          onClick={() => handleDelete(alert.id)}
+          disabled={alert?.text?.trim() !== '' || isDisabled}
+        >
+          <DeleteOutlined />
+        </IconButton>
+      </span>
+  </Tooltip>
+}
 const StatementAlertsAccordion = (props: any) => {
   const { statement, refreshStatement, isDisabled, setStatement } = props;
   
@@ -329,11 +348,7 @@ const StatementAlertsAccordion = (props: any) => {
                         className="alerts-form"
                         onInputBlur={onInputBlur}
                       />
-                      <IconButton onClick={() => handleDelete(alert.id)}
-                                  disabled={alert?.text?.trim() !== '' || isDisabled}
-                      >
-                        <DeleteOutlined />
-                      </IconButton>
+                      <DeleteAlertBtn alert={alert} isDisabled={isDisabled} handleDelete={handleDelete} />
                     </AccordionDetails>
                   </Accordion>
                   {(openFormIndex !== index) && (
@@ -351,12 +366,7 @@ const StatementAlertsAccordion = (props: any) => {
                           {parseTextWithLinks(alert.text, vars)}
                         </Typography>
                       </Box>
-                      <IconButton
-                        onClick={() => handleDelete(alert.id)}
-                        disabled={alert?.text?.trim() !== '' || isDisabled}
-                      >
-                        <DeleteOutlined />
-                      </IconButton>
+                      <DeleteAlertBtn alert={alert} isDisabled={isDisabled} handleDelete={handleDelete} />
                     </Box>
                   )}
                 </Box>
