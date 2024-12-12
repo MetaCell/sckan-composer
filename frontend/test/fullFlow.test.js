@@ -3,8 +3,8 @@ const selectors = require('./selectors');
 const puppeteer = require("puppeteer");
 
 // INFO
-const USERNAME = process.env.USERNAME 
-const PASSWORD = process.env.PASSWORD 
+const USERNAME = process.env.TEST_USERNAME 
+const PASSWORD = process.env.TEST_PASSWORD 
 const baseURL = 'https://composer.sckan.dev.metacell.us/'
 
 
