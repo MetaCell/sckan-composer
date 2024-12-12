@@ -3,7 +3,7 @@ import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
 import { styled } from "@mui/material";
 
-const StyledInput = styled(TextField)(({ theme }) => ({
+const StyledInput = styled(TextField)(({  }) => ({
   "& .MuiInputBase-root": {
     boxShadow: 'none',
     border:0,
@@ -20,7 +20,7 @@ const StyledInput = styled(TextField)(({ theme }) => ({
 }));
 
 
-export default function TextArea({ id, value, placeholder, required, onChange, onBlur, onFocus, options: { rows, isDisabled, onBlur: customOnBlur } }: any) {
+export default function TextArea({ id, value, placeholder, required, onChange, onBlur, onFocus, options: { rows, isDisabled, onBlur: customOnBlur, ref } }: any) {
   
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const blurredValue = e.target.value;
@@ -44,6 +44,7 @@ export default function TextArea({ id, value, placeholder, required, onChange, o
       onBlur={handleBlur}
       onFocus={(e)=>onFocus(id,e.target.value)}
       disabled={isDisabled}
+        inputRef={ref}
       />
     </FormControl>
   );

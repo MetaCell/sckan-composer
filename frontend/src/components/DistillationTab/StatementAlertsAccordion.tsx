@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import {
   Accordion,
   AccordionDetails,
@@ -7,7 +7,6 @@ import {
   Box,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import StatementForm from "../Forms/StatementForm";
 import connectivityStatementService from "../../services/StatementService";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
@@ -18,7 +17,7 @@ import AlertMenuItem from "./AlertMenuItem";
 import {vars} from "../../theme/variables";
 import ConfirmationDialog from "./ConfiramtionDialog";
 import Tooltip from "@mui/material/Tooltip";
-
+import StatementForm from "../Forms/StatementForm";
 const parseTextWithLinks = (text: string, vars: any): JSX.Element[] => {
   const urlRegex = /(https?:\/\/\S+|www\.\S+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi;
   
@@ -49,7 +48,6 @@ const DeleteAlertBtn = ({alert, isDisabled, handleDelete}: any) => {
   return  <Tooltip
     title={alert?.text?.trim() !== '' && !isDisabled ? 'To enable this icon, clear the comment' : null}
     arrow
-    open={true}
   >
       <span>
         <IconButton
@@ -72,6 +70,9 @@ const StatementAlertsAccordion = (props: any) => {
   const [alertToDelete, setAlertToDelete] = useState<number | null>(null);
   
   const currentAlertRef = useRef<any>(null);
+  
+  const newTextAreaRef = useRef<HTMLTextAreaElement | null>(null);
+  
   const handleChange = (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded);
   };
@@ -88,7 +89,6 @@ const StatementAlertsAccordion = (props: any) => {
           if (isCancelled) return;
           
           currentAlertRef.current = res;
-          console.log(res)
           const updatedAlerts = [
             ...(statement.statement_alerts || []),
             res,
@@ -96,17 +96,16 @@ const StatementAlertsAccordion = (props: any) => {
           const updatedStatement = { ...statement, statement_alerts: updatedAlerts };
           setActiveTypes([...activeTypes, typeId]);
           setStatement(updatedStatement);
-          const newIndex = updatedAlerts.length - 1;
-          setOpenFormIndex(newIndex);
+          setOpenFormIndex(updatedAlerts.length - 1);
           setTimeout(() => {
-            const textArea = document.querySelectorAll(`#root_statement_alerts_0_text`);
-            if (textArea) {
-              (textArea[newIndex] as HTMLTextAreaElement).focus();
+            if (newTextAreaRef.current) {
+              newTextAreaRef.current.focus();
             }
-          }, 500);
+          }, 50);
         })
     }
   };
+  
   const confirmDelete = async () => {
     if (alertToDelete === null) return;
     
@@ -347,6 +346,7 @@ const StatementAlertsAccordion = (props: any) => {
                         isDisabled={isDisabled}
                         className="alerts-form"
                         onInputBlur={onInputBlur}
+                        ref={newTextAreaRef}
                       />
                       <DeleteAlertBtn alert={alert} isDisabled={isDisabled} handleDelete={handleDelete} />
                     </AccordionDetails>
