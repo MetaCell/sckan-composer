@@ -118,6 +118,7 @@ describe('End to End Tests', () => {
         // (shouldSkipLoginTest ? it.skip : it)('Login', async () => {
         it('Login', async () => {
             console.log('Logging in ...');
+            console.log('Testing user: ' + USERNAME)
     
             await page.waitForSelector(selectors.USERNAME, { timeout: 60000 });
             await page.type(selectors.USERNAME, USERNAME);
