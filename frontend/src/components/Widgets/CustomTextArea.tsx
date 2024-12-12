@@ -3,7 +3,7 @@ import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
 import { styled } from "@mui/material";
 
-const StyledInput = styled(TextField)(({  }) => ({
+const StyledInput = styled(TextField)(() => ({
   "& .MuiInputBase-root": {
     boxShadow: 'none',
     border:0,
