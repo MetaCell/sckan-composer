@@ -2,6 +2,7 @@ import * as React from "react";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
 import { styled } from "@mui/material";
+import {useEffect} from "react";
 
 const StyledInput = styled(TextField)(() => ({
   "& .MuiInputBase-root": {
@@ -29,7 +30,13 @@ export default function TextArea({ id, value, placeholder, required, onChange, o
       customOnBlur(blurredValue, id);
     }
   };
-
+  
+  useEffect(() => {
+    if (ref?.current) {
+      ref.current.focus();
+    }
+  }, []);
+  
   return (
     <FormControl variant="standard">
       <StyledInput

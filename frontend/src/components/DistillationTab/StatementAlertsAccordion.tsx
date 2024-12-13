@@ -68,6 +68,7 @@ const StatementAlertsAccordion = (props: any) => {
   const [openFormIndex, setOpenFormIndex] = useState<number | null>(null);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [alertToDelete, setAlertToDelete] = useState<number | null>(null);
+  const [removedTypes, setRemovedTypes] = useState<number[]>([]); // Track removed types
   
   const currentAlertRef = useRef<any>(null);
   
@@ -151,6 +152,10 @@ const StatementAlertsAccordion = (props: any) => {
     const alert = statement.statement_alerts[index] || null;
     setOpenFormIndex(openFormIndex === index ? null : index);
     currentAlertRef.current = alert;
+  };
+  
+  const removeAlert = (typeId: number) => {
+    console.log(typeId)
   };
   
   const onInputBlur = async (value: string) => {
@@ -264,6 +269,7 @@ const StatementAlertsAccordion = (props: any) => {
                         isDisabled={isDisabled}
                         onAdd={addAlert}
                         alertStatus={'displayed'}
+                        onRemove={removeAlert}
                       />
                     ))}
                 </Box>
