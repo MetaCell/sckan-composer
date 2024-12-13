@@ -49,7 +49,6 @@ const DeleteAlertBtn = ({alert, isDisabled, handleDelete}: any) => {
   return  <Tooltip
     title={alert?.text?.trim() !== '' && !isDisabled ? 'To enable this icon, clear the comment' : null}
     arrow
-    open={true}
   >
       <span>
         <IconButton
