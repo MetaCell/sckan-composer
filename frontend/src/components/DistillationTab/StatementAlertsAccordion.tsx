@@ -90,15 +90,13 @@ const StatementAlertsAccordion = (props: any) => {
   };
   
   const addAlert = (typeId: number) => {
+    const wasPreviouslyAdded = hiddenAlerts.includes(typeId);
+    if (wasPreviouslyAdded) {
+      setHiddenAlerts(hiddenAlerts.filter((id) => id !== typeId));
+    }
     if (!activeTypes.includes(typeId)) {
-      const wasPreviouslyAdded = hiddenAlerts.includes(typeId);
       const newAlert = { connectivity_statement_id: parseInt(statement.id), alert_type: typeId, text: "" };
       let isCancelled = false;
-      
-      if (wasPreviouslyAdded) {
-        console.log(typeId)
-        
-      } else {
         connectivityStatementService.createAlert(newAlert, () => {
           isCancelled = true;
         })
@@ -116,7 +114,6 @@ const StatementAlertsAccordion = (props: any) => {
             setStatement(updatedStatement);
             setExpandedPanels((prev) => [...prev, res.id]);
           })
-      }
     }
   };
   
@@ -164,9 +161,8 @@ const StatementAlertsAccordion = (props: any) => {
     setStatementAlerts(statement.statement_alerts);
   }, [statement]);
   const hideAlert = (typeId: number) => {
-    console.log(typeId)
+    setHiddenAlerts((prev) => [...prev, typeId]);
   };
-  
   const onInputBlur = async (value: string, alertId: number) => {
     const alertRef = currentAlertRef.current;
     if (!alertRef) return;
@@ -254,7 +250,7 @@ const StatementAlertsAccordion = (props: any) => {
                     AVAILABLE
                   </Typography>
                   {alerts
-                    .filter((type: any) => !activeTypes.includes(type.id))
+                    .filter((type: any) => !activeTypes.includes(type.id) || hiddenAlerts.includes(type.id))
                     .map((type: any) => (
                       <AlertMenuItem
                         key={type.id}
@@ -280,7 +276,7 @@ const StatementAlertsAccordion = (props: any) => {
                       DISPLAYED
                     </Typography>
                     {alerts
-                      .filter((type: any) => activeTypes.includes(type.id))
+                      .filter((type: any) => activeTypes.includes(type.id) && !hiddenAlerts.includes(type.id))
                       .map((type: any) => (
                         <AlertMenuItem
                           key={type.id}
@@ -297,7 +293,9 @@ const StatementAlertsAccordion = (props: any) => {
               </Select>
             )}
             <Stack spacing="2rem" pt=".75rem" pb=".75rem">
-              {statementAlerts?.map((alert: any) => (
+              {statementAlerts
+                ?.filter((alert: any) => !hiddenAlerts.includes(alert.alert_type)) // Exclude hidden alerts
+                ?.map((alert: any) => (
                 <Box
                   key={alert.id}
                   sx={{
