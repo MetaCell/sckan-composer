@@ -74,7 +74,6 @@ const styles = {
 const AlertMenuItem: React.FC<AlertMenuItemProps> = ({
                                                        type,
                                                        isSelected,
-                                                       isDisabled,
                                                        onAdd,
                                                        hideAlert, // New callback
                                                        alertStatus,

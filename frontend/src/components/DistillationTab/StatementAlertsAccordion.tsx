@@ -179,6 +179,13 @@ const StatementAlertsAccordion = (props: any) => {
       });
   };
   
+  const goToAccordion = (alertId: number) => {
+    const id = statementAlerts.find(alert => alert.alert_type === alertId).id
+    setExpandedPanels((prev) =>
+      prev.includes(id) ? prev : [...prev, id]
+    );
+  };
+
   return (
     <Box px={2} py={0.5}>
       <Accordion
@@ -286,6 +293,7 @@ const StatementAlertsAccordion = (props: any) => {
                           onAdd={addAlert}
                           alertStatus={"displayed"}
                           hideAlert={hideAlert}
+                          onGoTo={goToAccordion}
                         />
                       ))}
                   </Box>
