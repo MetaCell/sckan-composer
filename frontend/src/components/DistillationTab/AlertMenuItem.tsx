@@ -12,7 +12,7 @@ interface AlertMenuItemProps {
   isDisabled: boolean;
   onAdd?: (typeId: number) => void;
   onGoTo?: (typeId: number) => void;
-  onRemove?: (typeId: number) => void;
+  hideAlert?: (typeId: number) => void;
   alertStatus: string;
 }
 
@@ -76,15 +76,15 @@ const AlertMenuItem: React.FC<AlertMenuItemProps> = ({
                                                        isSelected,
                                                        isDisabled,
                                                        onAdd,
-                                                       onRemove, // New callback
+                                                       hideAlert, // New callback
                                                        alertStatus,
                                                        onGoTo,
                                                      }) => {
   const [isHovered, setIsHovered] = useState(false);
   
-  const handleRemove = () => {
-    if (onRemove) {
-      onRemove(type.id);
+  const handleHide= () => {
+    if (hideAlert) {
+      hideAlert(type.id);
     }
   };
   
@@ -117,7 +117,7 @@ const AlertMenuItem: React.FC<AlertMenuItemProps> = ({
         <IconButton
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          onClick={handleRemove} sx={{
+          onClick={handleHide} sx={{
           p: 0,
           '&:hover': {
             backgroundColor: "transparent",
@@ -139,7 +139,6 @@ const AlertMenuItem: React.FC<AlertMenuItemProps> = ({
           startIcon={<AddIcon />}
           size="small"
           onClick={handleAdd}
-          disabled={isDisabled}
           className="add-button"
           sx={styles.btnStyle}
         >
@@ -151,7 +150,6 @@ const AlertMenuItem: React.FC<AlertMenuItemProps> = ({
           endIcon={<ArrowOutward />}
           size="small"
           onClick={handleGoTo}
-          disabled={isDisabled}
           className="add-button"
           sx={styles.btnStyle}
         >

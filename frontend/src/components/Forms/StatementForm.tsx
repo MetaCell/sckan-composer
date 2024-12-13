@@ -43,7 +43,7 @@ import {useDispatch} from "react-redux";
 import {setWasChangeDetected} from "../../redux/statementSlice";
 
 const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement>) => {
-  const {uiFields, statement, isDisabled, action: refreshStatement, onInputBlur} = props;
+  const {uiFields, statement, isDisabled, action: refreshStatement, onInputBlur, alertId} = props;
   const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
@@ -80,8 +80,9 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
         "ui:options": {
           placeholder: "Enter alert text here...",
           rows: 3,
-          onBlur: (value: string) => onInputBlur(value),
-          ref: ref
+          onBlur: onInputBlur,
+          ref: ref,
+          alertId
         },
       },
       connectivity_statement_id: {

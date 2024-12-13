@@ -21,13 +21,13 @@ const StyledInput = styled(TextField)(() => ({
 }));
 
 
-export default function TextArea({ id, value, placeholder, required, onChange, onBlur, onFocus, options: { rows, isDisabled, onBlur: customOnBlur, ref } }: any) {
+export default function TextArea({ id, value, placeholder, required, onChange, onBlur, onFocus, options: { rows, isDisabled, onBlur: customOnBlur, ref, alertId } }: any) {
   
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const blurredValue = e.target.value;
     onBlur(id, blurredValue);
     if (customOnBlur) {
-      customOnBlur(blurredValue, id);
+      customOnBlur(blurredValue, alertId);
     }
   };
   
