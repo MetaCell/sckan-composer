@@ -180,6 +180,7 @@ const StatementAlertsAccordion = (props: any) => {
       })
       .then(() => {
          refreshStatement()
+        setCurrentExpanded(null)
       });
   };
   
