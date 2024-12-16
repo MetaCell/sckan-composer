@@ -14,6 +14,7 @@ interface AlertMenuItemProps {
   onGoTo?: (typeId: number) => void;
   hideAlert?: (typeId: number) => void;
   alertStatus: string;
+  statementAlerts: any[]
 }
 
 const styles = {
@@ -75,9 +76,10 @@ const AlertMenuItem: React.FC<AlertMenuItemProps> = ({
                                                        type,
                                                        isSelected,
                                                        onAdd,
-                                                       hideAlert, // New callback
+                                                       hideAlert,
                                                        alertStatus,
                                                        onGoTo,
+                                                       statementAlerts
                                                      }) => {
   const [isHovered, setIsHovered] = useState(false);
   
@@ -99,6 +101,8 @@ const AlertMenuItem: React.FC<AlertMenuItemProps> = ({
     }
   };
   
+  const currentType = statementAlerts.find(alert => alert.alert_type === type.id)
+
   return (
     <MenuItem
       key={type.id}
@@ -141,7 +145,7 @@ const AlertMenuItem: React.FC<AlertMenuItemProps> = ({
           className="add-button"
           sx={styles.btnStyle}
         >
-          Add
+          {currentType ? "Show" : "Add"}
         </Button>
       ) : (
         <Button

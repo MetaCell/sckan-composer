@@ -77,9 +77,11 @@ const StatementAlertsAccordion = (props: any) => {
   const [hiddenAlerts, setHiddenAlerts] = useState<number[]>([]);
   const [statementAlerts, setStatementAlerts] = useState<any[]>([]);
   const [expandedPanels, setExpandedPanels] = useState<number[]>([]);
-  
+  const [open, setOpen] = useState<boolean>(false)
+  const [currentExpanded, setCurrentExpanded] = useState<number | null>(null)
   const currentAlertRef = useRef<any>(null);
   
+  const textAreaRefs = useRef<{ [key: number]: React.RefObject<HTMLTextAreaElement> }>({});
   const toggleAccordion = (id: number) => {
     setExpandedPanels((prev) =>
       prev.includes(id) ? prev.filter((panelId) => panelId !== id) : [...prev, id]
@@ -90,9 +92,11 @@ const StatementAlertsAccordion = (props: any) => {
   };
   
   const addAlert = (typeId: number) => {
+    setOpen(false)
     const wasPreviouslyAdded = hiddenAlerts.includes(typeId);
     if (wasPreviouslyAdded) {
       setHiddenAlerts(hiddenAlerts.filter((id) => id !== typeId));
+      goToAccordion(typeId);
     }
     if (!activeTypes.includes(typeId)) {
       const newAlert = { connectivity_statement_id: parseInt(statement.id), alert_type: typeId, text: "" };
@@ -129,7 +133,7 @@ const StatementAlertsAccordion = (props: any) => {
         })
         .then(() => {
           if (isCancelled) return;
-          
+          delete textAreaRefs.current[alertToDelete];
           refreshStatement();
         });
     } catch (error) {
@@ -181,11 +185,22 @@ const StatementAlertsAccordion = (props: any) => {
   
   const goToAccordion = (alertId: number) => {
     const id = statementAlerts.find(alert => alert.alert_type === alertId).id
+    setCurrentExpanded(id)
     setExpandedPanels((prev) =>
       prev.includes(id) ? prev : [...prev, id]
     );
+    currentAlertRef.current = alertId;
+    setOpen(false)
+    const textarea = textAreaRefs.current[id];
+    if (textarea) {
+      textarea.current?.focus();
+    }
   };
-
+  
+  const onInputFocus = (focusedValue: string, alertId: number) => {
+    currentAlertRef.current = alertId;
+  }
+  
   return (
     <Box px={2} py={0.5}>
       <Accordion
@@ -218,6 +233,9 @@ const StatementAlertsAccordion = (props: any) => {
           >
             {!isDisabled && (
               <Select
+                open={open}
+                onOpen={() => setOpen(true)}
+                onClose={() => setOpen(false)}
                 sx={{
                   alignSelf: "flex-end",
                   fontWeight: 600,
@@ -266,6 +284,7 @@ const StatementAlertsAccordion = (props: any) => {
                         isDisabled={isDisabled}
                         onAdd={addAlert}
                         alertStatus={"available"}
+                        statementAlerts={statementAlerts}
                       />
                     ))}
                 </Box>
@@ -294,6 +313,7 @@ const StatementAlertsAccordion = (props: any) => {
                           alertStatus={"displayed"}
                           hideAlert={hideAlert}
                           onGoTo={goToAccordion}
+                          statementAlerts={statementAlerts}
                         />
                       ))}
                   </Box>
@@ -384,8 +404,10 @@ const StatementAlertsAccordion = (props: any) => {
                         isDisabled={isDisabled}
                         className="alerts-form"
                         onInputBlur={onInputBlur}
-                        ref={currentAlertRef}
+                        ref={textAreaRefs.current[alert.id] || (textAreaRefs.current[alert.id] = React.createRef())}
                         alertId={alert.id}
+                        currentExpanded={currentExpanded}
+                        onInputFocus={onInputFocus}
                       />
                       <DeleteAlertBtn
                         alert={alert}
