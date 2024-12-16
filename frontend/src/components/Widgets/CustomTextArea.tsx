@@ -54,6 +54,7 @@ export default function TextArea({ id, value, placeholder, required, onChange, o
     if (ref?.current) {
       ref.current.focus();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
