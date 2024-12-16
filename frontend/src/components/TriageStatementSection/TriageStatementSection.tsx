@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
@@ -32,12 +32,16 @@ const TriageStatementSection = (props: any) => {
   const onCloneStatement = (id: number) =>{
     statementService.clone(id).then(()=>refreshSentence())
   }
-
-  statementService.getObject(statement.id).then((response: any) => {
-    if (response.state === statementStates.Exported || response.state === statementStates.Invalid) {
-      setIsDisabled(true);
+  
+  useEffect(() => {
+    if (statement.id) {
+      statementService.getObject(statement.id).then((response: any) => {
+        if (response.state === statementStates.Exported || response.state === statementStates.Invalid) {
+          setIsDisabled(true);
+        }
+      });
     }
-  });
+  }, [statement.id]);
 
   return (
     <Grid item xs={12}>
