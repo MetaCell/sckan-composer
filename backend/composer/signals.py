@@ -1,8 +1,9 @@
-from django.core.exceptions import ValidationError
 from django.dispatch import receiver
-from django.db.models.signals import post_save, m2m_changed, pre_save, post_delete
+from django.db.models.signals import post_save, m2m_changed, post_delete
 from django.contrib.auth import get_user_model
 from django_fsm.signals import post_transition
+
+from composer.services.layers_service import update_from_entities_on_deletion
 from .utils import update_modified_date
 from .enums import CSState, NoteType
 from .models import (
@@ -86,7 +87,13 @@ def delete_associated_entities(sender, instance, **kwargs):
 
 # Signals for ConnectivityStatement origins
 @receiver(m2m_changed, sender=ConnectivityStatement.origins.through)
-def connectivity_statement_origins_changed(sender, instance, action, **kwargs):
+def connectivity_statement_origins_changed(sender, instance, action, pk_set, **kwargs):
+    """
+    Signal handler for changes in the origins ManyToMany relationship.
+
+    - Deletes the graph_rendering_state on 'post_add', 'post_remove', or 'post_clear'.
+    - Calls `update_from_entities_on_deletion` for each deleted entity on 'post_remove'.
+    """
     if action in ["post_add", "post_remove", "post_clear"]:
         try:
             instance.graph_rendering_state.delete()
@@ -95,10 +102,15 @@ def connectivity_statement_origins_changed(sender, instance, action, **kwargs):
         except ValueError:
             pass
 
+    # Call `update_from_entities_on_deletion` for each removed entity
+    if action == "post_remove" and pk_set:
+        for deleted_entity_id in pk_set:
+            update_from_entities_on_deletion(instance, deleted_entity_id)
+
 
 # Signals for Via anatomical_entities
 @receiver(m2m_changed, sender=Via.anatomical_entities.through)
-def via_anatomical_entities_changed(sender, instance, action, **kwargs):
+def via_anatomical_entities_changed(sender, instance, action, pk_set, **kwargs):
     if action in ["post_add", "post_remove", "post_clear"]:
         try:
             instance.connectivity_statement.graph_rendering_state.delete()
@@ -106,6 +118,11 @@ def via_anatomical_entities_changed(sender, instance, action, **kwargs):
             pass
         except ValueError:
             pass
+
+    # Call `update_from_entities_on_deletion` for each removed entity
+    if action == "post_remove" and pk_set:
+        for deleted_entity_id in pk_set:
+            update_from_entities_on_deletion(instance.connectivity_statement, deleted_entity_id)
 
 
 # Signals for Via from_entities
