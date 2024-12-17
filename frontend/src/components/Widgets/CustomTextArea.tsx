@@ -2,8 +2,9 @@ import * as React from "react";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
 import { styled } from "@mui/material";
+import {useEffect} from "react";
 
-const StyledInput = styled(TextField)(({ theme }) => ({
+const StyledInput = styled(TextField)(() => ({
   "& .MuiInputBase-root": {
     boxShadow: 'none',
     border:0,
@@ -20,15 +21,40 @@ const StyledInput = styled(TextField)(({ theme }) => ({
 }));
 
 
-export default function TextArea({ id, value, placeholder, required, onChange, onBlur, onFocus, options: { rows, isDisabled, onBlur: customOnBlur } }: any) {
+export default function TextArea({ id, value, placeholder, required, onChange, onBlur, onFocus, options: { rows, isDisabled, onBlur: customOnBlur, ref, alertId, currentExpanded, onFocus: customFocus } }: any) {
   
+  const refocus = (ref: any) => {
+    if (ref?.current) {
+      ref.current.focus();
+    }
+  }
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const blurredValue = e.target.value;
     onBlur(id, blurredValue);
     if (customOnBlur) {
-      customOnBlur(blurredValue, id);
+      customOnBlur(blurredValue, alertId);
     }
   };
+  
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    const focusedValue = e.target.value;
+    if (customFocus) {
+      customFocus(focusedValue, alertId);
+    }
+    onFocus(id, focusedValue);
+  };
+  
+  useEffect(() => {
+    if (alertId === currentExpanded) {
+      refocus(ref);
+    }
+  }, [alertId, ref, currentExpanded]);
+  
+  useEffect(() => {
+    if (ref?.current) {
+      ref.current.focus();
+    }
+  }, [ref]);
 
   return (
     <FormControl variant="standard">
@@ -42,8 +68,9 @@ export default function TextArea({ id, value, placeholder, required, onChange, o
       required={required}
       onChange={(e)=>onChange(e.target.value)}
       onBlur={handleBlur}
-      onFocus={(e)=>onFocus(id,e.target.value)}
+      onFocus={handleFocus}
       disabled={isDisabled}
+        inputRef={ref}
       />
     </FormControl>
   );

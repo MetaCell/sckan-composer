@@ -1,4 +1,4 @@
-import React from "react";
+import React, {forwardRef} from "react";
 import {FormBase} from "./FormBase";
 import {jsonSchemas} from "../../services/JsonSchema";
 import statementService from "../../services/StatementService";
@@ -42,13 +42,12 @@ import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipA
 import {useDispatch} from "react-redux";
 import {setWasChangeDetected} from "../../redux/statementSlice";
 
-const StatementForm = (props: any) => {
-  const {uiFields, statement, isDisabled, action: refreshStatement, onInputBlur} = props;
+const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement>) => {
+  const {uiFields, statement, isDisabled, action: refreshStatement, onInputBlur, alertId, currentExpanded, onInputFocus} = props;
   const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
   const dispatch = useDispatch();
-  
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
@@ -81,7 +80,11 @@ const StatementForm = (props: any) => {
         "ui:options": {
           placeholder: "Enter alert text here...",
           rows: 3,
-          onBlur: (value: string) => onInputBlur(value),
+          onBlur: onInputBlur,
+          onFocus: onInputFocus,
+          ref: ref,
+          alertId,
+          currentExpanded
         },
       },
       connectivity_statement_id: {
@@ -821,6 +824,6 @@ const StatementForm = (props: any) => {
       {...props}
     />
   );
-};
+});
 
 export default StatementForm;
