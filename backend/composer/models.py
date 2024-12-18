@@ -718,8 +718,7 @@ class ConnectivityStatement(models.Model):
             self.save(update_fields=["reference_uri"])
 
         # recompute - journey
-        journey_data = compile_journey(self)
-        self.journey_path = journey_data
+        self.journey_path = compile_journey(self)
         super().save(update_fields=["journey_path"])
 
     def set_origins(self, origin_ids):
