@@ -4,6 +4,7 @@ from django.db.models import Q, CheckConstraint
 from django.db.models.expressions import F
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
+from composer.services.graph_service import build_journey_description, build_journey_entities
 
 from composer.services.layers_service import update_from_entities_on_deletion
 from composer.services.state_services import (
@@ -567,8 +568,7 @@ class ConnectivityStatement(models.Model):
     )
     created_date = models.DateTimeField(auto_now_add=True, db_index=True)
     modified_date = models.DateTimeField(auto_now=True, db_index=True)
-    journey_description = models.JSONField(null=True, blank=True)
-    journey_entities = models.JSONField(null=True, blank=True)
+    journey_path = models.JSONField(null=True, blank=True)
 
     def __str__(self):
         suffix = ""
@@ -685,10 +685,10 @@ class ConnectivityStatement(models.Model):
             return set(self.via_set.get(order=via_order - 1).anatomical_entities.all())
 
     def get_journey(self):
-        return self.journey_description
+        return build_journey_description(self.journey_path, self)
 
     def get_entities_journey(self):
-        return self.journey_entities
+        return build_journey_entities(self.journey_path, self)
 
     def get_laterality_description(self):
         laterality_map = {
@@ -719,9 +719,8 @@ class ConnectivityStatement(models.Model):
 
         # recompute - journey
         journey_data = compile_journey(self)
-        self.journey_description = journey_data['journey']
-        self.journey_entities = journey_data['entities']
-        super().save(update_fields=["journey_description", "journey_entities"])
+        self.journey_path = journey_data
+        super().save(update_fields=["journey_path"])
 
     def set_origins(self, origin_ids):
         self.origins.set(origin_ids, clear=True)
