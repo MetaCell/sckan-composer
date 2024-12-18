@@ -118,6 +118,7 @@ def via_anatomical_entities_changed(sender, instance, action, pk_set, **kwargs):
             pass
         except ValueError:
             pass
+        instance.connectivity_statement.save()
 
     # Call `update_from_entities_on_deletion` for each removed entity
     if action == "post_remove" and pk_set:
@@ -135,6 +136,7 @@ def via_from_entities_changed(sender, instance, action, **kwargs):
             pass
         except ValueError:
             pass
+        instance.connectivity_statement.save()
 
 
 # Signals for Destination anatomical_entities
@@ -147,6 +149,7 @@ def destination_anatomical_entities_changed(sender, instance, action, **kwargs):
             pass
         except ValueError:
             pass
+        instance.connectivity_statement.save()
 
 
 # Signals for Destination from_entities
@@ -159,6 +162,7 @@ def destination_from_entities_changed(sender, instance, action, **kwargs):
             pass
         except ValueError:
             pass
+        instance.connectivity_statement.save()
 
 
 # Signals for Via model changes
