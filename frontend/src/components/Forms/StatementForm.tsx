@@ -1,4 +1,4 @@
-import React from "react";
+import React, {forwardRef} from "react";
 import {FormBase} from "./FormBase";
 import {jsonSchemas} from "../../services/JsonSchema";
 import statementService from "../../services/StatementService";
@@ -42,18 +42,17 @@ import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipA
 import {useDispatch} from "react-redux";
 import {setWasChangeDetected} from "../../redux/statementSlice";
 
-const StatementForm = (props: any) => {
-  const {uiFields, statement, isDisabled, action: refreshStatement, onInputBlur} = props;
+const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement>) => {
+  const {uiFields, statement, isDisabled, action: refreshStatement, onInputBlur, alertId, currentExpanded, onInputFocus} = props;
   const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
   const dispatch = useDispatch();
-  
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
   copiedSchema.properties.statement_alerts.items.properties.alert_type.type = "number";
-  copiedSchema.properties.statement_alerts.items.properties.connectivity_statement.type = "number";
+  copiedSchema.properties.statement_alerts.items.properties.connectivity_statement_id.type = "number";
 
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["destination_type", "*"];
@@ -81,10 +80,14 @@ const StatementForm = (props: any) => {
         "ui:options": {
           placeholder: "Enter alert text here...",
           rows: 3,
-          onBlur: (value: string) => onInputBlur(value),
+          onBlur: onInputBlur,
+          onFocus: onInputFocus,
+          ref: ref,
+          alertId,
+          currentExpanded
         },
       },
-      connectivity_statement: {
+      connectivity_statement_id: {
         "ui:widget": "hidden",
       }
     },
@@ -288,6 +291,7 @@ const StatementForm = (props: any) => {
       type: {
         "ui:CustomSingleSelect": "CustomSingleSelect",
         "ui:options": {
+          isDisabled,
           label: false,
           isPathBuilderComponent: true,
           InputIcon: ViaIcon,
@@ -494,6 +498,7 @@ const StatementForm = (props: any) => {
       type: {
         "ui:widget": "CustomSingleSelect",
         "ui:options": {
+          isDisabled,
           label: false,
           isPathBuilderComponent: true,
           InputIcon: DestinationIcon,
@@ -819,6 +824,6 @@ const StatementForm = (props: any) => {
       {...props}
     />
   );
-};
+});
 
 export default StatementForm;

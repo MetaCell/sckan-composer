@@ -35,10 +35,21 @@ interface NavigationMenuProps {
   switchLockedGraph: (locked: boolean) => void;
   statement: ConnectivityStatement;
   setStatement: (statement: any) => void;
+  isDisabled?: boolean;
 }
 
 const NavigationMenu = (props: NavigationMenuProps) => {
-  const {engine, statementId, toggleRankdir, resetGraph, isGraphLocked, switchLockedGraph, statement, setStatement} = props
+  const {
+    engine,
+    statementId,
+    toggleRankdir,
+    resetGraph,
+    isGraphLocked,
+    switchLockedGraph,
+    statement,
+    setStatement,
+    isDisabled
+  } = props
   const [isSaving, setIsSaving] = useState<boolean>(false)
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
   const [dialogConfig, setDialogConfig] = useState({
@@ -239,43 +250,51 @@ const NavigationMenu = (props: NavigationMenuProps) => {
                 <FitScreenOutlinedIcon/>
               </IconButton>
             </Tooltip>
-            <Tooltip arrow title='Switch orientation'>
-              <IconButton onClick={switchOrientation} disabled={isGraphLocked}>
-                <CameraswitchOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-            <Divider />
-            <Tooltip arrow title='Reset to default visualisation'>
-              <IconButton onClick={redrawGraph} disabled={isGraphLocked}>
-                <RestartAltOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-          <Stack direction="row" spacing="1rem" alignItems='center'>
-            {
-              wasChangeDetected || positionChangeOnly ? (
-                <Tooltip arrow title='This diagram does not match the Path Builder. It will be updated with default routing if you leave this page.'>
-                  <Alert severity="warning">The diagram is outdated, please use the reset button on the left to update the diagram</Alert>
+            {!isDisabled && (
+              <>
+                <Tooltip arrow title='Switch orientation'>
+                <IconButton onClick={switchOrientation} disabled={isGraphLocked}>
+                  <CameraswitchOutlinedIcon />
+                </IconButton>
                 </Tooltip>
-              ) : (
-                !isResetInvoked && (
-                  <Tooltip arrow title='The diagram is saved for all users'>
-                    <CheckCircleOutlineRoundedIcon
-                      sx={{
-                        color: "#039855 !important",
-                      }}
-                    />
-                  </Tooltip>
-                )
-              )
-            }
-            <Divider />
-            <CustomSwitch
-              disabled={(wasChangeDetected && !positionChangeOnly) || (wasChangeDetected && positionChangeOnly)}
-              locked={isGraphLocked && !isResetInvoked}
-              setLocked={(lock: boolean) => toggleGraphLock(lock)}
-            />
+                <Divider />
+                <Tooltip arrow title='Reset to default visualisation'>
+                  <IconButton onClick={redrawGraph} disabled={isGraphLocked}>
+                    <RestartAltOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+              </>
+            )}
           </Stack>
+          {!isDisabled && (
+            <>
+              <Stack direction="row" spacing="1rem" alignItems='center'>
+                {
+                  wasChangeDetected || positionChangeOnly ? (
+                    <Tooltip arrow title='This diagram does not match the Path Builder. It will be updated with default routing if you leave this page.'>
+                      <Alert severity="warning">The diagram is outdated, please use the reset button on the left to update the diagram</Alert>
+                    </Tooltip>
+                  ) : (
+                    !isResetInvoked && (
+                      <Tooltip arrow title='The diagram is saved for all users'>
+                        <CheckCircleOutlineRoundedIcon
+                          sx={{
+                            color: "#039855 !important",
+                          }}
+                        />
+                      </Tooltip>
+                    )
+                  )
+                }
+                <Divider />
+                <CustomSwitch
+                  disabled={(wasChangeDetected && !positionChangeOnly) || (wasChangeDetected && positionChangeOnly)}
+                  locked={isGraphLocked && !isResetInvoked}
+                  setLocked={(lock: boolean) => toggleGraphLock(lock)}
+                />
+              </Stack>
+            </>
+          )}
         </Stack>
       )
     }

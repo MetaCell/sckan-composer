@@ -506,13 +506,13 @@ const theme = createTheme({
     MuiTooltip: {
       styleOverrides: {
         tooltip: {
-          backgroundColor: '#232325',
-          padding: '0.5rem 0.75rem',
+          backgroundColor: '#101828',
+          padding: '0.75rem',
           fontWeight: 600,
           fontSize: '0.75rem'
         },
         arrow: {
-          color: '#232325'
+          color: '#101828'
         }
       },
     },

@@ -252,20 +252,23 @@ class ModelRetrieveViewSet(
     # mixins.DestroyModelMixin,
     # mixins.ListModelMixin,
     viewsets.GenericViewSet,
-): ...
+):
+    ...
 
 
 class ModelCreateRetrieveViewSet(
     ModelRetrieveViewSet,
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
-): ...
+):
+    ...
 
 
 class ModelNoDeleteViewSet(
     ModelCreateRetrieveViewSet,
     mixins.UpdateModelMixin,
-): ...
+):
+    ...
 
 
 class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
@@ -337,6 +340,7 @@ class AlertTypeViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = AlertType.objects.all()
     serializer_class = AlertTypeSerializer
+
 
 class ConnectivityStatementViewSet(
     ProvenanceMixin,
@@ -456,13 +460,18 @@ class SentenceViewSet(
 
     def get_queryset(self):
         if "ordering" not in self.request.query_params:
-            return super().get_queryset().annotate(
-                is_current_user=Case(
-                    When(owner=self.request.user, then=Value(1)),
-                    default=Value(0),
-                    output_field=IntegerField(),
+            return (
+                super()
+                .get_queryset()
+                .annotate(
+                    is_current_user=Case(
+                        When(owner=self.request.user, then=Value(1)),
+                        default=Value(0),
+                        output_field=IntegerField(),
+                    )
                 )
-            ).order_by("-is_current_user", "-modified_date")
+                .order_by("-is_current_user", "-modified_date")
+            )
         return super().get_queryset()
 
 
@@ -500,7 +509,8 @@ class ProfileViewSet(viewsets.GenericViewSet):
             msg = "User not logged in."
             raise ValidationError(msg, code="authorization")
 
-        profile, created = Profile.objects.get_or_create(user=self.request.user)
+        profile, created = Profile.objects.get_or_create(
+            user=self.request.user)
         return Response(self.get_serializer(profile).data)
 
 
@@ -550,15 +560,10 @@ class StatementAlertViewSet(viewsets.ModelViewSet):
     """
     StatementAlert
     """
+
     queryset = StatementAlert.objects.all()
     serializer_class = StatementAlertSerializer
     permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
-
-    def create(self, request, *args, **kwargs):
-        try:
-            return super().create(request, *args, **kwargs)
-        except Exception as e:
-            raise
 
 
 @extend_schema(
@@ -575,7 +580,7 @@ def jsonschemas(request):
         ProvenanceSerializer,
         SpecieSerializer,
         NoteSerializer,
-        StatementAlertSerializer
+        StatementAlertSerializer,
     ]
 
     schema = {}

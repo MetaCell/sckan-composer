@@ -5,6 +5,7 @@ from django.db.models.expressions import F
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
 
+from composer.services.layers_service import update_from_entities_on_deletion
 from composer.services.state_services import (
     ConnectivityStatementStateService,
     SentenceStateService,
@@ -861,12 +862,21 @@ class Via(AbstractConnectionLayer):
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():
+            # Collect the IDs of the anatomical entities from 'from_entities'
+            anatomical_entities_ids = list(self.anatomical_entities.values_list("id", flat=True))
+
+            # Call update_from_entities_on_deletion for each entity ID
+            for entity_id in anatomical_entities_ids:
+                update_from_entities_on_deletion(self.connectivity_statement, entity_id)
+
+            # Proceed with the deletion
             super().delete(*args, **kwargs)
+
+            # Update the order of remaining 'Via' instances
             vias_to_update = Via.objects.filter(
-                connectivity_statement=self.connectivity_statement,
-                order__gt=self.order
+                connectivity_statement=self.connectivity_statement, order__gt=self.order
             )
-            vias_to_update.update(order=F('order') - 1)
+            vias_to_update.update(order=F("order") - 1)
 
     class Meta:
         ordering = ["order"]
