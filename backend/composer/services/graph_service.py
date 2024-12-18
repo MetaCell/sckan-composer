@@ -168,11 +168,16 @@ def compile_journey(connectivity_statement) -> List[str]:
     return consolidated_paths
 
 
-def build_journey_description(consolidated_paths, connectivity_statement):
+def get_journey_path_from_consolidated_paths(consolidated_paths):
     journey_paths = [[((node[1].replace(JOURNEY_DELIMITER, ' or '), node[2]) if (
         node[2] == 0 or path.index(node) == len(path) - 1) else (
         node[1].replace(JOURNEY_DELIMITER, ', '), node[2])) for node in path] for path in consolidated_paths]
+    return journey_paths
 
+
+def build_journey_description(consolidated_paths, connectivity_statement):
+    journey_paths = get_journey_path_from_consolidated_paths(
+        consolidated_paths)
     Via = apps.get_model('composer', 'Via')
     vias = list(Via.objects.filter(
         connectivity_statement=connectivity_statement))
