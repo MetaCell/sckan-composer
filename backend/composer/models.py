@@ -22,7 +22,6 @@ from .enums import (
     ViaType,
     Projection,
 )
-from .services.graph_service import compile_journey
 from .utils import doi_uri, pmcid_uri, pmid_uri, create_reference_uri
 
 
@@ -716,7 +715,6 @@ class ConnectivityStatement(models.Model):
         if self.reference_uri is None:
             self.reference_uri = create_reference_uri(self.pk)
             self.save(update_fields=["reference_uri"])
-
 
     def set_origins(self, origin_ids):
         self.origins.set(origin_ids, clear=True)

@@ -218,3 +218,8 @@ def build_journey_entities(consolidated_paths, connectivity_statement):
         }
         entities.append(entity)
     return entities
+
+
+def recompile_journey_path(instance):
+    instance.journey_path = compile_journey(instance)
+    instance.save(update_fields=["journey_path"])

@@ -19,6 +19,8 @@ from .models import (
     Via,
 )
 from .services.export_services import compute_metrics, ConnectivityStatementStateService
+from .services.graph_service import recompile_journey_path
+
 
 
 @receiver(post_save, sender=ExportBatch)
@@ -101,6 +103,8 @@ def connectivity_statement_origins_changed(sender, instance, action, pk_set, **k
             pass
         except ValueError:
             pass
+        recompile_journey_path(instance)
+
 
     # Call `update_from_entities_on_deletion` for each removed entity
     if action == "post_remove" and pk_set:
@@ -118,7 +122,7 @@ def via_anatomical_entities_changed(sender, instance, action, pk_set, **kwargs):
             pass
         except ValueError:
             pass
-        instance.connectivity_statement.save()
+        recompile_journey_path(instance.connectivity_statement)
 
     # Call `update_from_entities_on_deletion` for each removed entity
     if action == "post_remove" and pk_set:
@@ -136,7 +140,8 @@ def via_from_entities_changed(sender, instance, action, **kwargs):
             pass
         except ValueError:
             pass
-        instance.connectivity_statement.save()
+        recompile_journey_path(instance.connectivity_statement)
+
 
 
 # Signals for Destination anatomical_entities
@@ -149,7 +154,8 @@ def destination_anatomical_entities_changed(sender, instance, action, **kwargs):
             pass
         except ValueError:
             pass
-        instance.connectivity_statement.save()
+        recompile_journey_path(instance.connectivity_statement)
+
 
 
 # Signals for Destination from_entities
@@ -162,7 +168,8 @@ def destination_from_entities_changed(sender, instance, action, **kwargs):
             pass
         except ValueError:
             pass
-        instance.connectivity_statement.save()
+        recompile_journey_path(instance.connectivity_statement)
+
 
 
 # Signals for Via model changes
