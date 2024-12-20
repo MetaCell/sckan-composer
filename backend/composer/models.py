@@ -717,9 +717,6 @@ class ConnectivityStatement(models.Model):
             self.reference_uri = create_reference_uri(self.pk)
             self.save(update_fields=["reference_uri"])
 
-        # recompute - journey
-        self.journey_path = compile_journey(self)
-        super().save(update_fields=["journey_path"])
 
     def set_origins(self, origin_ids):
         self.origins.set(origin_ids, clear=True)
