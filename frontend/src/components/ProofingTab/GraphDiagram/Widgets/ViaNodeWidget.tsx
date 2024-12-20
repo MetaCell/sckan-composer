@@ -8,6 +8,8 @@ import Chip from "@mui/material/Chip";
 import { CustomNodeModel } from "../Models/CustomNodeModel";
 import { DiagramEngine } from "@projectstorm/react-diagrams-core";
 import { NodeTypes } from "../GraphDiagram";
+import { TypeB60Enum } from "../../../../apiclient/backend";
+
 
 interface ViaNodeProps {
     model: CustomNodeModel;
@@ -232,10 +234,10 @@ export const ViaNodeWidget: React.FC<ViaNodeProps> = ({ model, engine }) => {
                                 marginTop: ".12rem !important",
                             }}
                         >
-                            {model.externalId}
+                            {model.getOptions().uri}
                         </Typography>
                         <Chip
-                            label={model.getOptions().anatomicalType}
+                            label={model.getOptions().anatomicalType === TypeB60Enum.Axon ? "Axon" : "Dendrite"}
                             variant="filled"
                             sx={{
                                 background: "#F2F2FC",

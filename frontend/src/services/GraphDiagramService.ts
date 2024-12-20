@@ -556,6 +556,7 @@ function createNode(entityInfo: EntityInfo): CustomNodeModel {
     from: [],
     to: [],
     anatomicalType,
+    uri: entity.region_layer == null ? entity.simple_entity?.ontology_uri : `${entity.region_layer.region.ontology_uri}, ${entity.region_layer.layer.ontology_uri}`
   };
 
   return new CustomNodeModel(nodeType, name, externalId, options);
