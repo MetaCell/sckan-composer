@@ -201,11 +201,9 @@ describe('End to End Tests', () => {
             //Species
             await page.waitForSelector(selectors.SPECIES_FIELD, {hidden:false})
             await page.click(selectors.SPECIES_FIELD)
-            // await page.type(selectors.SPECIES_FIELD, species_1)
             await page.keyboard.press('ArrowDown');
             await page.keyboard.press('Enter')
-            // await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-            // await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
+           
             await page.waitForTimeout(3000)
             await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR, {hidden:false})
             await page.click(selectors.BIOTECH_ICON_SELECTOR)
@@ -216,11 +214,7 @@ describe('End to End Tests', () => {
             //Phenotype
             const statement_details_fields = await page.$$('div.MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl')
             await statement_details_fields[3].click()
-            // await page.waitForSelector('ul > li[data-value="1"]')
-            // await page.click('ul > li[data-value="1"]')
-            // await page.waitForSelector('div:has(> input[value="1"]')
-            // await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-            // await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
+           
             await page.keyboard.press('ArrowDown');
             await page.keyboard.press('Enter')
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
@@ -235,11 +229,7 @@ describe('End to End Tests', () => {
             //Projection Phenotype
             const statement_details_fields = await page.$$('div.MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl')
             await statement_details_fields[4].click()
-            // await page.waitForSelector('ul > li[data-value="RIGHT"]')
-            // await page.click('ul > li[data-value="RIGHT"]')
-            // await page.waitForSelector('div:has(> input[value="RIGHT"]')
-            // await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-            // await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
+           
             await page.keyboard.press('ArrowDown');
             await page.keyboard.press('Enter')
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
@@ -266,11 +256,7 @@ describe('End to End Tests', () => {
             //Projection laterality
             const statement_details_fields = await page.$$('div.MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl')
             await statement_details_fields[6].click()
-            // await page.waitForSelector('ul > li[data-value="BI"]')
-            // await page.click('ul > li[data-value="BI"]')
-            // await page.waitForSelector('div:has(> input[value="BI"]')
-            // await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-            // await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
+           
             await page.keyboard.press('ArrowDown');
             await page.keyboard.press('Enter')
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
@@ -284,11 +270,7 @@ describe('End to End Tests', () => {
             // Circuit Type
             const statement_details_fields = await page.$$('div.MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl')
             await statement_details_fields[7].click()
-            // await page.waitForSelector('ul > li[data-value="MOTOR"]')
-            // await page.click('ul > li[data-value="MOTOR"]')
-            // await page.waitForSelector('div:has(> input[value="MOTOR"]')
-            // await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-            // await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
+           
             await page.keyboard.press('ArrowDown');
             await page.keyboard.press('Enter')
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
@@ -303,9 +285,6 @@ describe('End to End Tests', () => {
             // Sex 
             const statement_details_fields = await page.$$('div.MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl')
             await statement_details_fields[8].click()
-            // await page.waitForSelector('ul > li[data-value="2"]')
-            // await page.click('ul > li[data-value="2"]')
-            // await page.waitForSelector('div:has(> input[value="2"]')
             await page.keyboard.press('ArrowDown');
             await page.keyboard.press('Enter')
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
@@ -329,8 +308,8 @@ describe('End to End Tests', () => {
         })
 
         it('Add Additional info to KS', async () => {
-
             // Additional Information
+            await page.waitForSelector(selectors.ADDITIONAL_INFORMATION)
             await page.click(selectors.ADDITIONAL_INFORMATION)
             await page.type(selectors.ADDITIONAL_INFORMATION, additional_info_1)
             await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR, {hidden:false})
@@ -338,8 +317,6 @@ describe('End to End Tests', () => {
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-
-
 
             console.log('Knowledge Statement created')
 
@@ -370,6 +347,7 @@ describe('End to End Tests', () => {
 
             await page.waitForTimeout(3000)
             await page.waitForSelector('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected')
+            await page.waitForSelector('ul.MuiList-root.MuiList-padding > li')
             const sidebar_buttons = await page.$$('ul.MuiList-root.MuiList-padding > li')
             await sidebar_buttons[0].click()
             await page.waitForSelector(selectors.SEARCH_ICON)
@@ -555,15 +533,9 @@ describe('End to End Tests', () => {
             await page.click(selectors.SEARCH_ORIGINS)
             await page.click('#simple-popper ul li')
 
-            // await page.type(selectors.SEARCH_ORIGINS, path_builder_origin_)
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-            // await page.waitForSelector(selectors.CHECKBOX_ITEM)
-            // const searched_origins = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
-            // expect(searched_origins).toBe(1)
-            // await page.waitForSelector(selectors.FIRST_SEARCHED_ELEMENT)
-            // await page.click(selectors.FIRST_SEARCHED_ELEMENT)
             await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR)
             await page.click(selectors.BIOTECH_ICON_SELECTOR)
 
@@ -573,9 +545,7 @@ describe('End to End Tests', () => {
                 return status.map(status => status.innerText)
             })
             expect(added_origin).not.toHaveLength(0)
-            // await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-            // await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
-
+           
             console.log('Origin added')
         })
 
@@ -600,11 +570,6 @@ describe('End to End Tests', () => {
             await page.click(selectors.BIOTECH_ICON_SELECTOR)
             await page.waitForTimeout(3000)
 
-            // await page.waitForFunction((selector, expectedText) => {
-            //     const elements = document.querySelectorAll(selector);
-            //     return Array.from(elements, element => element.innerText).includes(expectedText);
-            // }, { timeout: 15000 }, 'form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div', path_builder_origin_);
-
             const added_via_from_field = await page.$$eval('form[class="vias"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(2) > div > div > div > div:nth-child(4) > div > div > div > span > div', status => {
                 return status.map(status => status.innerText);
             });
@@ -623,14 +588,6 @@ describe('End to End Tests', () => {
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-
-
-            // await page.waitForSelector(selectors.CHECKBOX_ITEM)
-            // const searched_vias = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
-            // expect(searched_vias).toBe(1)
-            // await page.waitForSelector(selectors.FIRST_SEARCHED_ELEMENT)
-            // await page.click(selectors.FIRST_SEARCHED_ELEMENT)
-            // await page.click(selectors.VIAS_FIELD)
 
             await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR)
             await page.click(selectors.BIOTECH_ICON_SELECTOR)
@@ -662,14 +619,7 @@ describe('End to End Tests', () => {
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-            // await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR)
-            // await page.click(selectors.BIOTECH_ICON_SELECTOR)
-            // await page.waitForTimeout(3000)
-            // await page.waitForFunction((selector, expectedText) => {
-            //     const elements = document.querySelectorAll(selector);
-            //     return Array.from(elements, element => element.innerText).includes(expectedText);
-            // }, { timeout: 15000 }, 'form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div', path_builder_via);
-
+           
             const added_destination_from_field = await page.$$eval('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div', status => {
                 return status.map(status => status.innerText);
             });
@@ -688,27 +638,33 @@ describe('End to End Tests', () => {
             await page.waitForSelector('#simple-popper ul li', {hidden:false})
             await page.click('#simple-popper ul li')
             await page.waitForTimeout(1000)
-            // await page.waitForSelector('#simple-popper ul li', {hidden:false})
-            // await page.click('#simple-popper ul li')
-            // await page.type(selectors.SEARCH_FOR_DESTINATIONS, path_builder_destination)
+           
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
             await page.waitForTimeout(3000)
-            // await page.waitForSelector(selectors.CHECKBOX_ITEM)
-            // const searched_destination = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
-            // expect(searched_destination).toBeGreaterThan(1)
-            // await page.waitForSelector(selectors.FIRST_SEARCHED_ELEMENT)
-            // await page.click(selectors.FIRST_SEARCHED_ELEMENT)
-            // await page.click(selectors.FROM_FIELD)
-            // await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
-            // await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
-            // await page.waitForTimeout(3000)
+           
             const added_destination = await page.$$eval('form[class="destinations"] > div > div > div > div > div > div > tr > td > div > div > div > div:nth-child(2) > div > div > div > span > div', status => {
                 return status.map(status => status.innerText)
             })
             expect(added_destination).not.toHaveLength(0)
 
             console.log('Destination added')
+        })
+
+        it('Add Forward Connection', async () => {
+            console.log('Adding Forward Connection ...')
+            page.on('dialog', async dialog => {
+                await dialog.accept();
+            });
+            await page.waitForSelector('.form-group.field.field-string > div > div > span > div')
+            await page.click('.form-group.field.field-string > div > div > span > div')
+            await page.waitForSelector('#simple-popper ul li', {hidden:false})
+            await page.click('#simple-popper ul li')
+            await page.waitForTimeout(3000)
+            const forward_connection_element = await page.$('.form-group.field.field-string > div > div > span > div');
+            const fctextContent = await page.evaluate(el => el.textContent, forward_connection_element);
+            expect(fctextContent).not.toBe('');
+            console.log('Forward Connection added')
         })
 
 
@@ -723,19 +679,20 @@ describe('End to End Tests', () => {
         })
 
         it.skip('Reset Population Diagram', async () => {
-            console.log('Checking Population Diagram ...')
+            console.log('Reseting Population Diagram ...')
             await page.waitForTimeout(1000)
             await page.waitForSelector('button[aria-label="Reset to default visualisation"]', {hidden:false})
             await page.click('button[aria-label="Reset to default visualisation"]')
             await page.waitForSelector('.MuiDialogActions-root.MuiDialogActions-spacing', {hidden:false})
             const buttons = await page.$$('.MuiDialogActions-root.MuiDialogActions-spacing button');
             await buttons[1].click();
-
+            await page.waitForTimeout(3000)
             console.log('Population Diagram reset')
         })
 
         it('Check Population Diagram', async () => {
             console.log('Checking Population Diagram ...')
+
             await page.waitForTimeout(1000)
             await page.waitForSelector('button[aria-label="Reset to default visualisation"]', {hidden:false})
             await page.waitForSelector('div.node', {hidden:false})
@@ -758,12 +715,8 @@ describe('End to End Tests', () => {
             await page.keyboard.press('Enter')
             await page.waitForTimeout(300)
             await page.click(selectors.STATUS_BUTTON)
-            await page.waitForTimeout(2000)
-            // await page.waitForFunction((selector, expectedText) => {
-            //     const elements = document.querySelectorAll(selector);
-            //     return Array.from(elements, element => element.innerText).includes(expectedText);
-            // }, { timeout: 15000 }, 'span.MuiChip-label.MuiChip-labelSmall', "To be reviewed");
-
+            await page.waitForTimeout(3000)
+        
             const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
                 return status.map(status => status.innerText.toLowerCase());
             });
@@ -785,19 +738,10 @@ describe('End to End Tests', () => {
             await page.keyboard.press('ArrowDown');
             await page.keyboard.press('Enter')
             await page.waitForTimeout(1000)
-            // await page.click(selectors.STATUS_DROPDOWN)
-            // await page.waitForSelector('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiMenuItem-root.MuiMenuItem-gutters')
-            // await page.evaluate(() => {
-            //     [...document.querySelectorAll('li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiMenuItem-root.MuiMenuItem-gutters')].find(element => element.innerText === 'NPO approved').click();
-            // });
 
             await page.click(selectors.STATUS_BUTTON)
-            await page.waitForTimeout(2000)
-            // await page.waitForFunction((selector, expectedText) => {
-            //     const elements = document.querySelectorAll(selector);
-            //     return Array.from(elements, element => element.innerText).includes(expectedText);
-            // }, { timeout: 15000 }, 'span.MuiChip-label.MuiChip-labelSmall', "NPO approved");
-
+            await page.waitForTimeout(3000)
+        
             const sentence_final_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
                 return status.map(status => status.innerText.toLowerCase());
             });
