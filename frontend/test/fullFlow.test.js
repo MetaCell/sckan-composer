@@ -118,7 +118,7 @@ describe('End to End Tests', () => {
         // (shouldSkipLoginTest ? it.skip : it)('Login', async () => {
         it('Login', async () => {
             console.log('Logging in ...');
-            console.log('Testing user: ' + process.env.TEST_USERNAME)
+            console.log('Testing user: ' + USERNAME)
     
             await page.waitForSelector(selectors.USERNAME, { timeout: 60000 });
             await page.type(selectors.USERNAME, USERNAME);
@@ -465,6 +465,35 @@ describe('End to End Tests', () => {
             console.log('Tags and Notes added')
         })
 
+
+        it('Add Alert', async () => {
+            console.log('Adding Alert ...')
+            await page.waitForSelector('.panel1bh-header')
+            const headers = await page.$$('.panel1bh-header');
+            await headers[1].click();
+            await page.waitForTimeout(3000)
+
+            await page.waitForSelector('div[role="combobox"]')
+            const comboboxes = await page.$$('div[role="combobox"]');
+            await comboboxes[comboboxes.length - 1].click();
+            await page.waitForTimeout(3000)
+
+            await page.waitForSelector('li > button')
+            await page.click('li > button')
+            await page.waitForTimeout(3000)
+            await page.waitForSelector('button > svg[data-testid="DeleteOutlinedIcon"]', {hidden:false})
+
+            const statement_details_fields = await page.$$('div.MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl')
+            await statement_details_fields[11].click()
+            await statement_details_fields[11].type('Alert Example')
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR, {hidden:false})
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
+            await page.waitForTimeout(3000)
+            const AlertTextContent = await page.evaluate(el => el.textContent, statement_details_fields[11]);
+            expect(AlertTextContent).not.toBe('');
+
+            console.log('Alert added')
+        })
 
         it('Set status as In progress', async () => {
             console.log('Changing Status ...')
