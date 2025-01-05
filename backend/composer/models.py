@@ -191,10 +191,6 @@ class Sex(models.Model):
     def __str__(self):
         return self.name
 
-    @property
-    def sex_str(self):
-        return str(self.name) if self.name else ''
-
     class Meta:
         ordering = ["name"]
         verbose_name_plural = "Sex"
@@ -568,6 +564,8 @@ class ConnectivityStatement(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, db_index=True)
     modified_date = models.DateTimeField(auto_now=True, db_index=True)
     journey_path = models.JSONField(null=True, blank=True)
+    statement_prefix = models.TextField(null=True, blank=True)
+    statement_suffix = models.TextField(null=True, blank=True)
 
     def __str__(self):
         suffix = ""
@@ -1030,7 +1028,7 @@ class AlertType(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 
 class StatementAlert(models.Model):
     connectivity_statement = models.ForeignKey(
