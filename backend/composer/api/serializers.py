@@ -27,6 +27,7 @@ from ..models import (
 )
 from ..services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
+from ..services.statement_service import create_statement_preview
 from ..services.errors_service import get_connectivity_errors
 
 
@@ -643,14 +644,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     def get_statement_preview(self, instance):
         if 'journey' not in self.context:
             self.context['journey'] = instance.get_journey()
-        return self.create_statement_preview(instance, self.context['journey'])
-
-    def create_statement_preview(self, instance, journey):
-        prefix = instance.statement_prefix
-        journey_sentence = ';  '.join(journey)
-        suffix = instance.statement_suffix
-        statement = f'{prefix} {journey_sentence}.\n{suffix}'
-        return statement.strip().replace("  ", " ")
+        return create_statement_preview(instance, self.context['journey'])
 
     def get_errors(self, instance) -> List:
         return get_connectivity_errors(instance)

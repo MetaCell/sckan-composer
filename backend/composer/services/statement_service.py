@@ -63,3 +63,11 @@ def get_suffix_for_statement_preview(cs):
     if apinatomy:
         statement += f" It is described in {apinatomy} model."
     return statement
+
+
+def create_statement_preview(cs, journey):
+    prefix = cs.statement_prefix
+    journey_sentence = ';  '.join(journey)
+    suffix = cs.statement_suffix
+    statement = f'{prefix} {journey_sentence}.\n{suffix}'
+    return statement.strip().replace("  ", " ")
