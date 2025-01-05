@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django_fsm.signals import post_transition
 
 from composer.services.layers_service import update_from_entities_on_deletion
+from composer.services.statement_service import get_suffix_for_statement_preview, get_prefix_for_statement_preview
 from .utils import update_modified_date
 from .enums import CSState, NoteType
 from .models import (
@@ -17,10 +18,10 @@ from .models import (
     Layer,
     Region,
     Via,
+    Specie,
 )
 from .services.export_services import compute_metrics, ConnectivityStatementStateService
 from .services.graph_service import recompile_journey_path
-
 
 
 @receiver(post_save, sender=ExportBatch)
@@ -105,7 +106,6 @@ def connectivity_statement_origins_changed(sender, instance, action, pk_set, **k
             pass
         recompile_journey_path(instance)
 
-
     # Call `update_from_entities_on_deletion` for each removed entity
     if action == "post_remove" and pk_set:
         for deleted_entity_id in pk_set:
@@ -143,7 +143,6 @@ def via_from_entities_changed(sender, instance, action, **kwargs):
         recompile_journey_path(instance.connectivity_statement)
 
 
-
 # Signals for Destination anatomical_entities
 @receiver(m2m_changed, sender=Destination.anatomical_entities.through)
 def destination_anatomical_entities_changed(sender, instance, action, **kwargs):
@@ -157,7 +156,6 @@ def destination_anatomical_entities_changed(sender, instance, action, **kwargs):
         recompile_journey_path(instance.connectivity_statement)
 
 
-
 # Signals for Destination from_entities
 @receiver(m2m_changed, sender=Destination.from_entities.through)
 def destination_from_entities_changed(sender, instance, action, **kwargs):
@@ -169,7 +167,6 @@ def destination_from_entities_changed(sender, instance, action, **kwargs):
         except ValueError:
             pass
         recompile_journey_path(instance.connectivity_statement)
-
 
 
 # Signals for Via model changes
@@ -210,3 +207,29 @@ def note_post_save_and_delete(sender, instance, **kwargs):
         update_modified_date(instance.sentence)
     if instance.connectivity_statement:
         update_modified_date(instance.connectivity_statement)
+
+
+@receiver(m2m_changed, sender=ConnectivityStatement.species.through, dispatch_uid="update_prefix_suffix_for_connectivity_statement_preview")
+@receiver(m2m_changed, sender=ConnectivityStatement.origins.through, dispatch_uid="update_prefix_suffix_for_connectivity_statement_preview")
+@receiver([post_save, post_delete], sender=ConnectivityStatement, dispatch_uid="update_prefix_suffix_for_connectivity_statement_preview")
+def update_prefix_suffix_for_connectivity_statement_preview(sender, instance, action=None, **kwargs):
+    if isinstance(instance, ConnectivityStatement):
+        relevant_fields_for_suffix = ['circuit_type', 'projection',
+                                      'projection_phenotype_id', 'laterality', 'apinatomy_model']
+
+        relevant_fields_for_prefix = ['sex', 'phenotype']
+        relevant_fields = relevant_fields_for_suffix + relevant_fields_for_prefix
+        updated_fields = kwargs.get('update_fields', [])
+        updated_fields = updated_fields if updated_fields else []
+
+        has_species_or_origin_changed = action in [
+            "post_add", "post_remove", "post_clear"]
+        has_relevant_field_changed = any(
+            [field in updated_fields for field in relevant_fields])
+        if has_species_or_origin_changed or has_relevant_field_changed:
+            instance.statement_prefix = get_prefix_for_statement_preview(
+                instance)
+            instance.statement_suffix = get_suffix_for_statement_preview(
+                instance)
+            instance.save(
+                update_fields=["statement_prefix", "statement_suffix"])
