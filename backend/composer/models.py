@@ -565,6 +565,7 @@ class ConnectivityStatement(models.Model):
         null=True,
         blank=True,
     )
+    curie_id = models.CharField(max_length=500, null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True, db_index=True)
     modified_date = models.DateTimeField(auto_now=True, db_index=True)
 
