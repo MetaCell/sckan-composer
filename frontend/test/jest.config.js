@@ -1,6 +1,9 @@
 module.exports = {
     verbose: true,
     preset: "jest-puppeteer",
-    "testEnvironment": "jsdom"
+    "testEnvironment": "jsdom",
+    transform: {
+      "^.+\\.jsx?$": "babel-jest"
+    }
     
   };
