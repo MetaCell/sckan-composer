@@ -551,15 +551,18 @@ class StatementAlertSerializer(serializers.ModelSerializer):
             self.fields['connectivity_statement_id'].read_only = True
 
     def validate(self, data):
-        # Get 'connectivity_statement' from context or instance
-        connectivity_statement = self.context.get('connectivity_statement_id') or data.get('connectivity_statement_id')
-        if not connectivity_statement and self.instance:
-            connectivity_statement = self.instance.connectivity_statement
-        if not connectivity_statement:
+        # Resolve 'connectivity_statement_id' from context, data, or instance
+        connectivity_statement_id = self.context.get('connectivity_statement_id') or \
+                                    (data.get('connectivity_statement_id').id if data.get('connectivity_statement_id') else None) or \
+                                    (self.instance.connectivity_statement.id if self.instance else None)
+
+        if not connectivity_statement_id:
             raise serializers.ValidationError({
                 'connectivity_statement_id': 'This field is required.'
             })
-        data['connectivity_statement_id'] = connectivity_statement.id
+
+        data['connectivity_statement_id'] = connectivity_statement_id
+
 
         # Get 'alert_type' from data or instance
         alert_type = data.get('alert_type') or getattr(self.instance, 'alert_type', None)
@@ -573,7 +576,7 @@ class StatementAlertSerializer(serializers.ModelSerializer):
 
         # Perform uniqueness check
         existing_qs = StatementAlert.objects.filter(
-            connectivity_statement=connectivity_statement,
+            connectivity_statement=connectivity_statement_id,
             alert_type=alert_type
         )
         if alert_id:
