@@ -237,7 +237,7 @@ export const OriginNodeWidget: React.FC<OriginNodeProps> = ({
                                 marginTop: ".12rem !important",
                             }}
                         >
-                            {model.externalId}
+                            {model.getOptions().uri}
                         </Typography>
                     </Stack>
                     <VerticalDivider />

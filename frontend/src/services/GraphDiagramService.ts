@@ -470,12 +470,12 @@ function processForwardConnections(
   destinationNodes.forEach(node => {
     const externalId = node.externalId;
 
-    // Find forward connections where this node's externalId is in the destinations
+    // Find forward connections where this node's externalId is in the origins
     const relevantForwardConnections = forwardConnections.filter(single_fw => {
-      const destinations = single_fw.destinations.map((destination: { id: string } | string) =>
+      const origins = single_fw.origins.map((destination: { id: string } | string) =>
         typeof destination === 'object' ? destination.id.toString() : destination.toString()
       );
-      return destinations.includes(externalId);
+      return origins.includes(externalId);
     });
 
     if (relevantForwardConnections.length > 0) {
@@ -556,6 +556,7 @@ function createNode(entityInfo: EntityInfo): CustomNodeModel {
     from: [],
     to: [],
     anatomicalType,
+    uri: entity.region_layer == null ? entity.simple_entity?.ontology_uri : `${entity.region_layer.region.ontology_uri}, ${entity.region_layer.layer.ontology_uri}`
   };
 
   return new CustomNodeModel(nodeType, name, externalId, options);

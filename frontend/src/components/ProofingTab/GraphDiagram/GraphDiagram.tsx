@@ -40,6 +40,7 @@ export interface CustomNodeOptions extends BasePositionModelOptions {
   to?: Array<{ name: string; type: string }>;
   from?: Array<{ name: string; type: string }>;
   anatomicalType?: string;
+  uri?: string;
 }
 
 interface GraphDiagramProps {
