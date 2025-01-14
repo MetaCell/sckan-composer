@@ -159,8 +159,8 @@ def compile_journey(connectivity_statement) -> List[str]:
 
     vias = list(Via.objects.filter(connectivity_statement__id=connectivity_statement.id))
     destinations = list(Destination.objects.filter(connectivity_statement__id=connectivity_statement.id))
-    origins = list(Origin.objects.filter(origins_relations__id=connectivity_statement.id).distinct())
-    # origins = list(connectivity_statement.origins.all())
+    origins = list(Origin.objects.filter(
+        origins_relations__id=connectivity_statement.id).distinct())
 
     # Generate all paths and then consolidate them
     all_paths2 = generate_paths(origins, vias, destinations)
