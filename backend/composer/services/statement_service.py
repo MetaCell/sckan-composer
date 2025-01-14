@@ -3,20 +3,15 @@ from django.apps import apps
 
 
 def get_prefix_for_statement_preview(cs) -> str:
-    connectivity_statement_obj = apps.get_model(
-        'composer', 'ConnectivityStatement')
-    connectivity_statement = connectivity_statement_obj.objects.get(
-        id=cs.id)
-
-    sex = connectivity_statement.sex.name if connectivity_statement.sex else None
+    sex = cs.sex.name if cs.sex else None
 
     species_list = [
-        specie.name for specie in connectivity_statement.species.all()]
+        specie.name for specie in cs.species.all()]
     species = join_entities(species_list)
     if not species:
         species = ""
 
-    phenotype = connectivity_statement.phenotype.name if connectivity_statement.phenotype else ''
+    phenotype = cs.phenotype.name if cs.phenotype else ''
     if sex or species != "":
         statement = f"In {sex or ''} {species}, the {phenotype.lower()} connection goes"
     else:
@@ -25,9 +20,9 @@ def get_prefix_for_statement_preview(cs) -> str:
 
 
 def get_suffix_for_statement_preview(cs):
-    connectivity_statement_obj = apps.get_model(
+    ConnectivityStatement = apps.get_model(
         'composer', 'ConnectivityStatement')
-    connectivity_statement = connectivity_statement_obj.objects.get(
+    connectivity_statement = ConnectivityStatement.objects.get(
         id=cs.id)
 
     circuit_type = connectivity_statement.get_circuit_type_display(
