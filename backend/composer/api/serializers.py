@@ -2,6 +2,7 @@ from typing import List
 
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.forms import ValidationError
 from django_fsm import FSMField
 from drf_writable_nested.mixins import UniqueFieldsMixin
 from drf_writable_nested.serializers import WritableNestedModelSerializer
@@ -9,8 +10,10 @@ from rest_framework import serializers
 
 from ..enums import SentenceState, CSState
 from ..models import (
+    AlertType,
     AnatomicalEntity,
     Phenotype,
+    ProjectionPhenotype,
     Sex,
     ConnectivityStatement,
     Provenance,
@@ -18,8 +21,9 @@ from ..models import (
     Profile,
     Sentence,
     Specie,
+    StatementAlert,
     Tag,
-    Via, Destination, AnatomicalEntityIntersection, Region, Layer, AnatomicalEntityMeta,
+    Via, Destination, AnatomicalEntityIntersection, AnatomicalEntityMeta, GraphRenderingState,
 )
 from ..services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
@@ -66,7 +70,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "username", "first_name", "last_name", "email")
+        fields = ("id", "username", "first_name", "last_name", "email", "is_staff")
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -80,29 +84,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         dept = 2
 
 
-class LayerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Layer
-        fields = (
-            "id",
-            "name",
-            "ontology_uri",
-        )
-
-
-class RegionSerializer(serializers.ModelSerializer):
-    layers = LayerSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Region
-        fields = (
-            "id",
-            "name",
-            "ontology_uri",
-            "layers",
-        )
-
-
 class AnatomicalEntityMetaSerializer(serializers.ModelSerializer):
     class Meta:
         model = AnatomicalEntityMeta
@@ -114,8 +95,8 @@ class AnatomicalEntityMetaSerializer(serializers.ModelSerializer):
 
 
 class AnatomicalEntityIntersectionSerializer(serializers.ModelSerializer):
-    layer = LayerSerializer(read_only=True)
-    region = RegionSerializer(read_only=True)
+    layer = AnatomicalEntityMetaSerializer(read_only=True)
+    region = AnatomicalEntityMetaSerializer(read_only=True)
 
     class Meta:
         model = AnatomicalEntityIntersection
@@ -176,6 +157,14 @@ class PhenotypeSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Phenotype
+        fields = ("id", "name")
+
+
+class ProjectionPhenotypeSerializer(UniqueFieldsMixin, serializers.ModelSerializer):
+    """Phenotype"""
+
+    class Meta:
+        model = ProjectionPhenotype
         fields = ("id", "name")
 
 
@@ -368,6 +357,9 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
     phenotype_id = serializers.IntegerField(
         required=False, default=None, allow_null=True
     )
+    projection_phenotype_id = serializers.IntegerField(
+        required=False, default=None, allow_null=True
+    )
     provenances = ProvenanceSerializer(
         source="provenance_set", many=True, read_only=False
     )
@@ -375,6 +367,7 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
     species = SpecieSerializer(many=True, read_only=True)
     owner = UserSerializer(required=False, read_only=True)
     phenotype = PhenotypeSerializer(required=False, read_only=True)
+    projection_phenotype = ProjectionPhenotypeSerializer(required=False, read_only=True)
 
     class Meta:
         model = ConnectivityStatement
@@ -385,6 +378,8 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "provenances",
             "phenotype_id",
             "phenotype",
+            "projection_phenotype",
+            "projection_phenotype_id",
             "laterality",
             "projection",
             "circuit_type",
@@ -403,6 +398,8 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "provenances",
             "phenotype_id",
             "phenotype",
+            "projection_phenotype",
+            "projection_phenotype_id",
             "laterality",
             "projection",
             "circuit_type",
@@ -501,11 +498,115 @@ class BaseConnectivityStatementSerializer(FixManyToManyMixin, FixedWritableNeste
         read_only_fields = ("state",)
 
 
+class GraphStateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GraphRenderingState
+        fields = ['serialized_graph']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return {
+            'serialized_graph': representation['serialized_graph'],
+        }
+    
+class AlertTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlertType
+        fields = ('id', 'name', 'uri')
+
+class StatementAlertSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+
+    connectivity_statement_id = serializers.PrimaryKeyRelatedField(
+        queryset=ConnectivityStatement.objects.all(), required=True
+    )
+    alert_type = serializers.PrimaryKeyRelatedField(
+        queryset=AlertType.objects.all(), required=True
+    )
+
+    class Meta:
+        model = StatementAlert
+        fields = (
+            "id",
+            "alert_type",
+            "text",
+            "saved_by",
+            "created_at",
+            "updated_at",
+            "connectivity_statement_id",
+        )
+        read_only_fields = ("created_at", "updated_at", "saved_by")
+        validators = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # If 'connectivity_statement' is provided in context, make it not required
+        if 'connectivity_statement_id' in self.context:
+            self.fields['connectivity_statement_id'].required = False
+
+        # If updating an instance, set 'alert_type' and 'connectivity_statement' as read-only
+        if self.instance:
+            self.fields['alert_type'].read_only = True
+            self.fields['connectivity_statement_id'].read_only = True
+
+    def validate(self, data):
+        # Resolve 'connectivity_statement_id' from context, data, or instance
+        connectivity_statement_id = self.context.get('connectivity_statement_id') or \
+                                    (data.get('connectivity_statement_id').id if data.get('connectivity_statement_id') else None) or \
+                                    (self.instance.connectivity_statement.id if self.instance else None)
+
+        if not connectivity_statement_id:
+            raise serializers.ValidationError({
+                'connectivity_statement_id': 'This field is required.'
+            })
+
+        data['connectivity_statement_id'] = connectivity_statement_id
+
+
+        # Get 'alert_type' from data or instance
+        alert_type = data.get('alert_type') or getattr(self.instance, 'alert_type', None)
+        if not alert_type:
+            raise serializers.ValidationError({
+                'alert_type': 'This field is required.'
+            })
+        data['alert_type'] = alert_type
+
+        alert_id = data.get('id', getattr(self.instance, 'id', None))
+
+        # Perform uniqueness check
+        existing_qs = StatementAlert.objects.filter(
+            connectivity_statement=connectivity_statement_id,
+            alert_type=alert_type
+        )
+        if alert_id:
+            existing_qs = existing_qs.exclude(id=alert_id)
+        if existing_qs.exists():
+            raise serializers.ValidationError({
+                "non_field_errors": "The fields connectivity_statement and alert_type must make a unique set."
+            })
+
+        return data
+    
+    def create(self, validated_data):
+        request = self.context.get("request")
+        user = request.user if request else None
+        validated_data["saved_by"] = user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        user = request.user if request else None
+        validated_data["saved_by"] = user
+        return super().update(instance, validated_data)
+
+
 class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     """Connectivity Statement"""
 
     sentence_id = serializers.IntegerField(required=False)
     phenotype_id = serializers.IntegerField(required=False, allow_null=True)
+    projection_phenotype_id = serializers.IntegerField(required=False, allow_null=True)
     sex_id = serializers.IntegerField(required=False, allow_null=True)
     species = SpecieSerializer(many=True, read_only=False, required=False)
     provenances = ProvenanceSerializer(source="provenance_set", many=True, read_only=False, required=False)
@@ -513,6 +614,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     vias = ViaSerializerDetails(source="via_set", many=True, read_only=False, required=False)
     destinations = DestinationSerializerDetails(many=True, required=False)
     phenotype = PhenotypeSerializer(required=False, read_only=True)
+    projection_phenotype = ProjectionPhenotypeSerializer(required=False, read_only=True)
     sex = SexSerializer(required=False, read_only=True)
     sentence = SentenceSerializer(required=False, read_only=True)
     forward_connection = serializers.PrimaryKeyRelatedField(
@@ -520,8 +622,13 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     )
     available_transitions = serializers.SerializerMethodField()
     journey = serializers.SerializerMethodField()
+    entities_journey = serializers.SerializerMethodField()
     statement_preview = serializers.SerializerMethodField()
     errors = serializers.SerializerMethodField()
+    graph_rendering_state = GraphStateSerializer(required=False, allow_null=True)
+    statement_alerts = StatementAlertSerializer(
+        many=True, read_only=False, required=False
+    )
 
     def get_available_transitions(self, instance) -> list[CSState]:
         request = self.context.get("request", None)
@@ -532,6 +639,10 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         if 'journey' not in self.context:
             self.context['journey'] = instance.get_journey()
         return self.context['journey']
+
+    def get_entities_journey(self, instance):
+        self.context['entities_journey'] = instance.get_entities_journey()
+        return self.context['entities_journey']
 
     def get_statement_preview(self, instance):
         if 'journey' not in self.context:
@@ -554,6 +665,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
 
         circuit_type = instance.get_circuit_type_display() if instance.circuit_type else None
         projection = instance.get_projection_display() if instance.projection else None
+        projection_phenotype = str(instance.projection_phenotype) if instance.projection_phenotype else ''
 
         laterality_description = instance.get_laterality_description()
 
@@ -569,6 +681,8 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         statement += f"This "
         if projection:
             statement += f"{projection.lower()} "
+        if projection_phenotype:
+            statement += f"{projection_phenotype.lower()} "
         if circuit_type:
             statement += f"{circuit_type.lower()} "
 
@@ -597,15 +711,17 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
                 many=True,
                 context={**self.context, 'depth': depth + 1}
             ).data
+
+        if 'journey' in self.context:
+            del self.context['journey']
+
         return representation
 
     def update(self, instance, validated_data):
-        # Remove 'vias' and 'destinations' from validated_data if they exist
+        # Remove 'via_set' and 'destinations' from validated_data if they exist
         validated_data.pop('via_set', None)
         validated_data.pop('destinations', None)
-
-        # Call the super class's update method with the modified validated_data
-        return super(ConnectivityStatementSerializer, self).update(instance, validated_data)
+        return super().update(instance, validated_data)
 
     class Meta(BaseConnectivityStatementSerializer.Meta):
         fields = (
@@ -624,7 +740,10 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             "destinations",
             "phenotype_id",
             "phenotype",
+            "projection_phenotype",
+            "projection_phenotype_id",
             "journey",
+            "entities_journey",
             "laterality",
             "projection",
             "circuit_type",
@@ -637,7 +756,9 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             "modified_date",
             "has_notes",
             "statement_preview",
-            "errors"
+            "errors",
+            "graph_rendering_state",
+            "statement_alerts",
         )
 
 
@@ -645,6 +766,7 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
     origins = serializers.PrimaryKeyRelatedField(
         many=True, queryset=AnatomicalEntity.objects.all()
     )
+    statement_alerts = StatementAlertSerializer(many=True, required=False)
 
     class Meta:
         model = ConnectivityStatement
@@ -664,6 +786,8 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
             "destinations",
             "phenotype_id",
             "phenotype",
+            "projection_phenotype",
+            "projection_phenotype_id",
             "journey",
             "laterality",
             "projection",
@@ -677,12 +801,86 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
             "modified_date",
             "has_notes",
             "statement_preview",
-            "errors"
+            "errors",
+            "graph_rendering_state",
+            "statement_alerts",
         )
+        read_only_fields = ("state", "owner", "owner_id")
+
+    def update(self, instance, validated_data):
+        validated_data.pop("owner", None)
+        validated_data.pop("owner_id", None)
+
+        # Handle graph_rendering_state
+        graph_rendering_state_data = validated_data.pop("graph_rendering_state", None)
+        if graph_rendering_state_data is not None:
+            graph_state, _ = GraphRenderingState.objects.get_or_create(
+                connectivity_statement=instance, defaults={"serialized_graph": {}}
+            )
+
+            # Update the serialized_graph with incoming data
+            graph_state.serialized_graph = graph_rendering_state_data.get(
+                "serialized_graph", graph_state.serialized_graph
+            )
+            graph_state.saved_by = self.context["request"].user
+            graph_state.save()
+
+        # Handle origins
+        origins = validated_data.pop("origins", None)
+        if origins is not None:
+            instance.origins.set(origins)
+
+        # Handle statement alerts
+        alerts_data = validated_data.pop("statement_alerts", [])
+        self._update_statement_alerts(instance, alerts_data)
+
+        return super().update(instance, validated_data)
+
+    def to_representation(self, instance):
+        """
+        After updating, use the main serializer to represent the instance,
+        ensuring that 'origins' are serialized as full objects.
+        """
+        return ConnectivityStatementSerializer(instance, context=self.context).data
+
+    def _update_statement_alerts(self, instance, alerts_data):
+        existing_alerts = {alert.id: alert for alert in instance.statement_alerts.all()}
+
+        for alert_data in alerts_data:
+            alert_id = alert_data.get("id")
+            if alert_id and alert_id in existing_alerts:
+                # Update existing alert
+                alert_instance = existing_alerts[alert_id]
+                # Remove 'alert_type' and 'connectivity_statement' from alert_data
+                alert_data.pop('alert_type', None)
+                alert_data.pop('connectivity_statement_id', None)
+                serializer = StatementAlertSerializer(
+                    alert_instance,
+                    data=alert_data,
+                    context={
+                        "request": self.context.get("request"),
+                        "connectivity_statement_id": instance.id,  # Pass the parent instance
+                    },
+                )
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+            else:
+                # Create new alert
+                serializer = StatementAlertSerializer(
+                    data=alert_data,
+                    context={
+                        "request": self.context.get("request"),
+                        "connectivity_statement_id": instance.id,  # Pass the parent instance
+                    },
+                )
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+
 
 
 class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
     """Knowledge Statement"""
+
     def to_representation(self, instance):
         representation = super(ConnectivityStatementSerializer, self).to_representation(instance)
         depth = self.context.get('depth', 0)
@@ -693,8 +891,12 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
                 many=True,
                 context={**self.context, 'depth': depth + 1}
             ).data
+
+        if 'journey' in self.context:
+            del self.context['journey']
+
         return representation
-    
+
     class Meta(ConnectivityStatementSerializer.Meta):
         fields = (
             "id",
@@ -710,6 +912,7 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
             "provenances",
             "knowledge_statement",
             "journey",
+            "entities_journey",
             "laterality",
             "projection",
             "circuit_type",
@@ -717,4 +920,3 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
             "apinatomy_model",
             "statement_preview",
         )
-        

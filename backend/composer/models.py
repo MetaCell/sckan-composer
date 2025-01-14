@@ -5,6 +5,7 @@ from django.db.models.expressions import F
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
 
+from composer.services.layers_service import update_from_entities_on_deletion
 from composer.services.state_services import (
     ConnectivityStatementStateService,
     SentenceStateService,
@@ -97,7 +98,7 @@ class ConnectivityStatementManager(models.Manager):
 
     def excluding_draft(self):
         return self.get_queryset().exclude(state=CSState.DRAFT)
-        
+
     def exported(self):
         return self.get_queryset().filter(state=CSState.EXPORTED)
 
@@ -240,22 +241,55 @@ class AnatomicalEntityMeta(models.Model):
         verbose_name_plural = "Anatomical Entities"
 
 
-class Layer(AnatomicalEntityMeta):
-    ...
+class Layer(models.Model):
+    layer_id = models.BigAutoField(primary_key=True, auto_created=True)
+    ae_meta = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='layer_meta', null=False)
+
+    def __str__(self):
+        return self.ae_meta.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Layer"
+        verbose_name_plural = "Layers"
+        constraints = [
+            models.UniqueConstraint(fields=['ae_meta'], name='unique_layer_ae_meta')
+        ]
 
 
-class Region(AnatomicalEntityMeta):
-    ...
-    layers = models.ManyToManyField(Layer, through='AnatomicalEntityIntersection')
+class Region(models.Model):
+    region_id = models.BigAutoField(primary_key=True, auto_created=True)
+    ae_meta = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='region_meta', null=False)
+
+    def __str__(self):
+        return self.ae_meta.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Region"
+        verbose_name_plural = "Regions"
+        constraints = [
+            models.UniqueConstraint(fields=['ae_meta'], name='unique_region_ae_meta')
+        ]
 
 
 class AnatomicalEntityIntersection(models.Model):
-    layer = models.ForeignKey(Layer, on_delete=models.CASCADE)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE)
+    layer = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='layer_intersection')
+    region = models.ForeignKey(AnatomicalEntityMeta, on_delete=models.CASCADE, related_name='region_intersection')
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Region/Layer Combination"
         verbose_name_plural = "Region/Layer Combinations"
+        constraints = [
+            models.UniqueConstraint(fields=['layer', 'region'], name='unique_layer_region_combination')
+        ]
 
     def __str__(self):
         return f"{self.region.name} ({self.layer.name})"
@@ -272,7 +306,7 @@ class AnatomicalEntity(models.Model):
         if self.region_layer:
             return str(self.region_layer)
         return 'Unknown Anatomical Entity'
-        
+
     @property
     def ontology_uri(self):
         if self.simple_entity:
@@ -406,9 +440,26 @@ class Sentence(models.Model):
         ...
 
     def assign_owner(self, request):
+        if SentenceStateService(self).can_assign_owner(request):
+            self.owner = request.user
+            self.save(update_fields=["owner"])
+
+            # Update the owner of related draft ConnectivityStatements
+            ConnectivityStatement.objects.filter(
+                sentence=self,
+                state=CSState.DRAFT
+            ).update(owner=request.user)
+
+    def auto_assign_owner(self, request):
         if SentenceStateService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
+
+            # Update the owner of related draft ConnectivityStatements
+            ConnectivityStatement.objects.filter(
+                sentence=self,
+                state=CSState.DRAFT
+            ).update(owner=request.user)
 
     @property
     def pmid_uri(self) -> str:
@@ -584,7 +635,10 @@ class ConnectivityStatement(models.Model):
 
     @transition(
         field=state,
-        source=CSState.NPO_APPROVED,
+        source=[
+            CSState.NPO_APPROVED,
+            CSState.INVALID
+        ],
         target=CSState.EXPORTED,
         conditions=[ConnectivityStatementStateService.is_valid],
         permission=ConnectivityStatementStateService.has_permission_to_transition_to_exported,
@@ -629,7 +683,11 @@ class ConnectivityStatement(models.Model):
             return set(self.via_set.get(order=via_order - 1).anatomical_entities.all())
 
     def get_journey(self):
-        return compile_journey(self)
+        return compile_journey(self)['journey']
+
+    def get_entities_journey(self):
+        entities_journey = compile_journey(self)['entities']
+        return entities_journey
 
     def get_laterality_description(self):
         laterality_map = {
@@ -639,15 +697,25 @@ class ConnectivityStatement(models.Model):
         return laterality_map.get(self.laterality, None)
 
     def assign_owner(self, request):
+        if ConnectivityStatementStateService(self).can_assign_owner(request):
+            self.owner = request.user
+            self.save(update_fields=["owner"])
+
+    def auto_assign_owner(self, request):
         if ConnectivityStatementStateService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
 
     def save(self, *args, **kwargs):
+        if not self.pk and self.sentence and not self.owner:
+            self.owner = self.sentence.owner
+
         super().save(*args, **kwargs)
+
         if self.reference_uri is None:
             self.reference_uri = create_reference_uri(self.pk)
             self.save(update_fields=["reference_uri"])
+
 
     def set_origins(self, origin_ids):
         self.origins.set(origin_ids, clear=True)
@@ -668,12 +736,25 @@ class ConnectivityStatement(models.Model):
                 check=Q(circuit_type__in=[c[0] for c in CircuitType.choices]),
                 name="circuit_type_valid",
             ),
-
             models.CheckConstraint(
                 check=Q(projection__in=[p[0] for p in Projection.choices]),
                 name="projection_valid",
-            ),
+            )
         ]
+
+
+class GraphRenderingState(models.Model):
+    connectivity_statement = models.OneToOneField(
+        ConnectivityStatement,
+        on_delete=models.CASCADE,
+        related_name='graph_rendering_state',
+    )
+    serialized_graph = models.JSONField()  # Stores the serialized diagram model
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    saved_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
 
 class AbstractConnectionLayer(models.Model):
@@ -737,6 +818,7 @@ class Via(AbstractConnectionLayer):
                 if old_via.order != self.order:
                     self._update_order_for_other_vias(old_via.order)
                     self.from_entities.clear()
+
             super(Via, self).save(*args, **kwargs)
 
     def _update_order_for_other_vias(self, old_order):
@@ -774,12 +856,21 @@ class Via(AbstractConnectionLayer):
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():
+            # Collect the IDs of the anatomical entities from 'from_entities'
+            anatomical_entities_ids = list(self.anatomical_entities.values_list("id", flat=True))
+
+            # Call update_from_entities_on_deletion for each entity ID
+            for entity_id in anatomical_entities_ids:
+                update_from_entities_on_deletion(self.connectivity_statement, entity_id)
+
+            # Proceed with the deletion
             super().delete(*args, **kwargs)
+
+            # Update the order of remaining 'Via' instances
             vias_to_update = Via.objects.filter(
-                connectivity_statement=self.connectivity_statement,
-                order__gt=self.order
+                connectivity_statement=self.connectivity_statement, order__gt=self.order
             )
-            vias_to_update.update(order=F('order') - 1)
+            vias_to_update.update(order=F("order") - 1)
 
     class Meta:
         ordering = ["order"]
@@ -805,7 +896,6 @@ class Provenance(models.Model):
 
     class Meta:
         verbose_name_plural = "Provenances"
-
 
 class Note(models.Model):
     """Note"""
@@ -932,3 +1022,40 @@ class ExportMetrics(models.Model):
                 name="unique_state_per_export_batch",
             ),
         ]
+
+
+class AlertType(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+    predicate = models.CharField(max_length=200)
+    uri = models.URLField()
+
+    def __str__(self):
+        return self.name
+    
+
+class StatementAlert(models.Model):
+    connectivity_statement = models.ForeignKey(
+        ConnectivityStatement,
+        on_delete=models.CASCADE,
+        related_name='statement_alerts'
+    )
+    alert_type = models.ForeignKey(
+        AlertType,
+        on_delete=models.CASCADE,
+        related_name='statement_alerts'
+    )
+    text = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    saved_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    class Meta:
+        unique_together = ('connectivity_statement', 'alert_type')
+
+    def __str__(self):
+        return f"{self.alert_type.name} for Statement {self.connectivity_statement.id}"

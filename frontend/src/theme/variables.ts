@@ -31,5 +31,9 @@ export const vars = {
     badgeBg: '#C6D9F6',
     drodownDetailBg: '#FCFCFD',
     dropdownHeadingColor: '#373A3E',
-    dropdownTextColor: '#A9ACB2'
+    dropdownTextColor: '#A9ACB2',
+    primary800: '#0C2751',
+    gray200: '#EAECF0',
+    warning600: '#DC6803',
+    gray600: '#475467'
 };

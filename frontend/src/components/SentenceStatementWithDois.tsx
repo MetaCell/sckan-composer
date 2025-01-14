@@ -8,7 +8,7 @@ import StatementWithProvenances from "./StatementWithProvenances";
 import { useSectionStyle } from "../styles/styles";
 import { useTheme } from "@mui/system";
 
-const SentenceStatementWithDois = ({ statement } : any) => {
+const SentenceStatementWithDois = ({ statement, refreshStatement } : any) => {
   const theme = useTheme()
   const sectionStyle = useSectionStyle(theme)
 
@@ -37,7 +37,7 @@ const SentenceStatementWithDois = ({ statement } : any) => {
               spacing={{ xs: 1, sm: 2 }}
               alignItems='center'
             >
-              <StatementWithProvenances background={"#F9FAFB"} statement={row} disabled/>
+              <StatementWithProvenances background={"#F9FAFB"} statement={row} refreshStatement={refreshStatement} disabled/>
               <Box>
                 <OpenInNewIcon
                   onClick={() => openStatement(row)}

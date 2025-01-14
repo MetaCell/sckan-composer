@@ -92,5 +92,5 @@ def annotate_invalid_forward_connections(statement: Dict, statement_ids: Set[str
 
 def found_entity(uri: str, Model: Type[DjangoModel] = None) -> bool:
     if Model:
-        return Model.objects.filter(ontology_uri=uri).exists()
+        return Model.objects.filter(ae_meta__ontology_uri=uri).exists()
     return AnatomicalEntityMeta.objects.filter(ontology_uri=uri).exists()

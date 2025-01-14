@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Case, When, Value, IntegerField
 
 from composer.services.state_services import (
     ConnectivityStatementStateService,
@@ -23,48 +24,71 @@ from .filtersets import (
     AnatomicalEntityFilter,
     NoteFilter,
     ViaFilter,
-    SpecieFilter, DestinationFilter,
+    SpecieFilter,
+    DestinationFilter,
 )
 from .serializers import (
+    AlertTypeSerializer,
     AnatomicalEntitySerializer,
     PhenotypeSerializer,
+    ProjectionPhenotypeSerializer,
     ConnectivityStatementSerializer,
     KnowledgeStatementSerializer,
     NoteSerializer,
     ProfileSerializer,
     SentenceSerializer,
     SpecieSerializer,
+    StatementAlertSerializer,
     TagSerializer,
     ViaSerializer,
     ProvenanceSerializer,
-    SexSerializer, ConnectivityStatementUpdateSerializer, DestinationSerializer, BaseConnectivityStatementSerializer,
+    SexSerializer,
+    ConnectivityStatementUpdateSerializer,
+    DestinationSerializer,
+    BaseConnectivityStatementSerializer,
 )
-from .permissions import IsStaffUserIfExportedStateInConnectivityStatement
+from .permissions import (
+    IsStaffUserIfExportedStateInConnectivityStatement,
+    IsOwnerOrAssignOwnerOrCreateOrReadOnly,
+    IsOwnerOfConnectivityStatementOrReadOnly,
+)
 from ..models import (
+    AlertType,
     AnatomicalEntity,
     Phenotype,
+    ProjectionPhenotype,
     ConnectivityStatement,
     Note,
     Profile,
     Sentence,
     Specie,
+    StatementAlert,
     Tag,
     Via,
     Provenance,
-    Sex, Destination,
+    Sex,
+    Destination,
+    GraphRenderingState,
 )
 
 
 # Mixins
 class AssignOwnerMixin(viewsets.GenericViewSet):
+    @action(
+        detail=True, methods=["patch"], permission_classes=[permissions.IsAuthenticated]
+    )
+    def assign_owner(self, request, pk=None):
+        instance = self.get_object()
+        instance.assign_owner(request)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
     def retrieve(self, request, *args, **kwargs):
-        self.get_object().assign_owner(request)
+        self.get_object().auto_assign_owner(request)
         return super().retrieve(request, *args, **kwargs)
 
 
-class TagMixin(
-    viewsets.GenericViewSet,
-):
+class TagMixin(viewsets.GenericViewSet):
     @extend_schema(
         parameters=[
             OpenApiParameter(
@@ -137,7 +161,11 @@ class ProvenanceMixin(
         ],
         request=None,
     )
-    @action(detail=True, methods=["delete"], url_path="del_provenance/(?P<provenance_id>\d+)")
+    @action(
+        detail=True,
+        methods=["delete"],
+        url_path="del_provenance/(?P<provenance_id>\d+)",
+    )
     def del_provenance(self, request, pk=None, provenance_id=None):
         count, deleted = Provenance.objects.filter(
             id=provenance_id, connectivity_statement_id=pk
@@ -206,8 +234,10 @@ class CSCloningMixin(viewsets.GenericViewSet):
         instance.origins = None
         instance.save()
         instance.species.add(*self.get_object().species.all())
-        provenances = (Provenance(connectivity_statement=instance, uri=provenance.uri) for provenance in
-                       self.get_object().provenance_set.all())
+        provenances = (
+            Provenance(connectivity_statement=instance, uri=provenance.uri)
+            for provenance in self.get_object().provenance_set.all()
+        )
         Provenance.objects.bulk_create(provenances)
         return Response(self.get_serializer(instance).data)
 
@@ -222,23 +252,20 @@ class ModelRetrieveViewSet(
     # mixins.DestroyModelMixin,
     # mixins.ListModelMixin,
     viewsets.GenericViewSet,
-):
-    ...
+): ...
 
 
 class ModelCreateRetrieveViewSet(
     ModelRetrieveViewSet,
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
-):
-    ...
+): ...
 
 
 class ModelNoDeleteViewSet(
     ModelCreateRetrieveViewSet,
     mixins.UpdateModelMixin,
-):
-    ...
+): ...
 
 
 class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
@@ -261,6 +288,18 @@ class PhenotypeViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Phenotype.objects.all()
     serializer_class = PhenotypeSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+    ]
+
+
+class ProjectionPhenotypeViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Projection Phenotype
+    """
+
+    queryset = ProjectionPhenotype.objects.all()
+    serializer_class = ProjectionPhenotypeSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
@@ -291,6 +330,15 @@ class NoteViewSet(viewsets.ModelViewSet):
     filterset_class = NoteFilter
 
 
+class AlertTypeViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A viewset for viewing the list of alert types.
+    """
+
+    queryset = AlertType.objects.all()
+    serializer_class = AlertTypeSerializer
+
+
 class ConnectivityStatementViewSet(
     ProvenanceMixin,
     SpecieMixin,
@@ -308,14 +356,15 @@ class ConnectivityStatementViewSet(
     serializer_class = ConnectivityStatementSerializer
     permission_classes = [
         IsStaffUserIfExportedStateInConnectivityStatement,
-        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrAssignOwnerOrCreateOrReadOnly,
     ]
     filterset_class = ConnectivityStatementFilter
     service = ConnectivityStatementStateService
 
-
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action in ["update", "partial_update"]:
+            return ConnectivityStatementUpdateSerializer
+        if self.action == "list":
             return BaseConnectivityStatementSerializer
         return ConnectivityStatementSerializer
 
@@ -324,26 +373,28 @@ class ConnectivityStatementViewSet(
             return ConnectivityStatement.objects.excluding_draft()
         return super().get_queryset()
 
+    """
+    Override the update method to apply the extend_schema decorator.
+    The actual update logic is handled by the serializer.
+    """
+
     @extend_schema(
-        methods=['PUT'],
+        methods=["PUT"],
         request=ConnectivityStatementUpdateSerializer,
-        responses={200: ConnectivityStatementSerializer}
+        responses={200: ConnectivityStatementSerializer},
     )
     def update(self, request, *args, **kwargs):
-        origin_ids = request.data.pop('origins', None)
+        return super().update(request, *args, **kwargs)
 
-        response = super().update(request, *args, **kwargs)
-
-        if origin_ids and response.status_code == status.HTTP_200_OK:
-            instance = self.get_object()
-            instance.set_origins(origin_ids)
-
-        return response
+    """
+    Override the partial_update method to apply the extend_schema decorator.
+    The actual update logic is handled by the serializer.
+    """
 
     @extend_schema(
-        methods=['PATCH'],
+        methods=["PATCH"],
         request=ConnectivityStatementUpdateSerializer,
-        responses={200: ConnectivityStatementSerializer}
+        responses={200: ConnectivityStatementSerializer},
     )
     def partial_update(self, request, *args, **kwargs):
         return super().partial_update(request, *args, **kwargs)
@@ -356,6 +407,7 @@ class KnowledgeStatementViewSet(
     """
     KnowledgeStatement that only allows GET to get the list of ConnectivityStatements
     """
+
     model = ConnectivityStatement
     queryset = ConnectivityStatement.objects.exported()
     serializer_class = KnowledgeStatementSerializer
@@ -367,11 +419,10 @@ class KnowledgeStatementViewSet(
 
     @property
     def allowed_methods(self):
-        return ['GET']
+        return ["GET"]
 
     def get_serializer_class(self):
         return KnowledgeStatementSerializer
-
 
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
@@ -399,10 +450,26 @@ class SentenceViewSet(
     queryset = Sentence.objects.all()
     serializer_class = SentenceSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrAssignOwnerOrCreateOrReadOnly,
     ]
     filterset_class = SentenceFilter
     service = SentenceStateService
+
+    def get_queryset(self):
+        if "ordering" not in self.request.query_params:
+            return (
+                super()
+                .get_queryset()
+                .annotate(
+                    is_current_user=Case(
+                        When(owner=self.request.user, then=Value(1)),
+                        default=Value(0),
+                        output_field=IntegerField(),
+                    )
+                )
+                .order_by("-is_current_user", "-modified_date")
+            )
+        return super().get_queryset()
 
 
 class SpecieViewSet(viewsets.ReadOnlyModelViewSet):
@@ -443,6 +510,10 @@ class ProfileViewSet(viewsets.GenericViewSet):
         return Response(self.get_serializer(profile).data)
 
 
+class IsOwnerOfConnectivityStatement:
+    pass
+
+
 class ViaViewSet(viewsets.ModelViewSet):
     """
     Via
@@ -451,7 +522,7 @@ class ViaViewSet(viewsets.ModelViewSet):
     queryset = Via.objects.all()
     serializer_class = ViaSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOfConnectivityStatementOrReadOnly,
     ]
     filterset_class = ViaFilter
 
@@ -463,11 +534,18 @@ class DestinationViewSet(viewsets.ModelViewSet):
 
     queryset = Destination.objects.all()
     serializer_class = DestinationSerializer
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-    ]
+    permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
     filterset_class = DestinationFilter
 
+
+class StatementAlertViewSet(viewsets.ModelViewSet):
+    """
+    StatementAlert
+    """
+
+    queryset = StatementAlert.objects.all()
+    serializer_class = StatementAlertSerializer
+    permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
 
 @extend_schema(
     responses=OpenApiTypes.OBJECT,
@@ -483,6 +561,7 @@ def jsonschemas(request):
         ProvenanceSerializer,
         SpecieSerializer,
         NoteSerializer,
+        StatementAlertSerializer,
     ]
 
     schema = {}

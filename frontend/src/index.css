@@ -17,8 +17,9 @@ code {
 .graphContainer {
     height: 100%;
     width: 100%;
-    position: relative;
 }
+
+/* Vertical graph */
 
 .outPort {
   position: absolute;
@@ -36,4 +37,14 @@ code {
   position: absolute;
   top: 0%;
   left: 0%;
+}
+
+.inPortAfferentTDestination {
+  position: absolute;
+  top: 100%;
+  left: 100%;
+}
+
+.tooltipWarning {
+  color: #DC6803 !important;
 }

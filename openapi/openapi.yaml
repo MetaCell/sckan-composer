@@ -4,6 +4,62 @@ info:
   version: 1.0.0
   description: SCKAN Composer API
 paths:
+  /api/composer/alert/:
+    get:
+      operationId: composer_alert_list
+      description: A viewset for viewing the list of alert types.
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAlertTypeList'
+          description: ''
+  /api/composer/alert/{id}/:
+    get:
+      operationId: composer_alert_retrieve
+      description: A viewset for viewing the list of alert types.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this alert type.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertType'
+          description: ''
   /api/composer/anatomical-entity/:
     get:
       operationId: composer_anatomical_entity_list
@@ -178,7 +234,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -230,7 +285,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -413,6 +467,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConnectivityStatement'
           description: ''
+  /api/composer/connectivity-statement/{id}/assign_owner/:
+    patch:
+      operationId: composer_connectivity_statement_assign_owner_partial_update
+      description: ConnectivityStatement
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedConnectivityStatement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedConnectivityStatement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedConnectivityStatement'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatement'
+          description: ''
   /api/composer/connectivity-statement/{id}/clone_statement/:
     get:
       operationId: composer_connectivity_statement_clone_statement_retrieve
@@ -430,7 +519,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -589,7 +677,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -642,7 +729,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -833,6 +919,11 @@ paths:
         schema:
           type: integer
           nullable: true
+      - in: query
+        name: include_system_notes
+        schema:
+          type: boolean
+        description: Include System Notes
       - name: limit
         required: false
         in: query
@@ -1135,6 +1226,62 @@ paths:
               schema:
                 $ref: '#/components/schemas/Profile'
           description: ''
+  /api/composer/projection/:
+    get:
+      operationId: composer_projection_list
+      description: Projection Phenotype
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProjectionPhenotypeList'
+          description: ''
+  /api/composer/projection/{id}/:
+    get:
+      operationId: composer_projection_retrieve
+      description: Projection Phenotype
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this projection phenotype.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectionPhenotype'
+          description: ''
   /api/composer/sentence/:
     get:
       operationId: composer_sentence_list
@@ -1175,8 +1322,10 @@ paths:
             enum:
             - -id
             - -last_edited
+            - -owner
             - id
             - last_edited
+            - owner
         description: Ordering
         explode: false
         style: form
@@ -1214,7 +1363,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1267,7 +1415,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1362,6 +1509,41 @@ paths:
         required: true
       tags:
       - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sentence'
+          description: ''
+  /api/composer/sentence/{id}/assign_owner/:
+    patch:
+      operationId: composer_sentence_assign_owner_partial_update
+      description: Sentence
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sentence.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSentence'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSentence'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSentence'
       security:
       - tokenAuth: []
       - basicAuth: []
@@ -1560,6 +1742,176 @@ paths:
               schema:
                 $ref: '#/components/schemas/Specie'
           description: ''
+  /api/composer/statementAlert/:
+    get:
+      operationId: composer_statementAlert_list
+      description: StatementAlert
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStatementAlertList'
+          description: ''
+    post:
+      operationId: composer_statementAlert_create
+      description: StatementAlert
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatementAlert'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StatementAlert'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StatementAlert'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementAlert'
+          description: ''
+  /api/composer/statementAlert/{id}/:
+    get:
+      operationId: composer_statementAlert_retrieve
+      description: StatementAlert
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this statement alert.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementAlert'
+          description: ''
+    put:
+      operationId: composer_statementAlert_update
+      description: StatementAlert
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this statement alert.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatementAlert'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StatementAlert'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StatementAlert'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementAlert'
+          description: ''
+    patch:
+      operationId: composer_statementAlert_partial_update
+      description: StatementAlert
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this statement alert.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStatementAlert'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStatementAlert'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStatementAlert'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementAlert'
+          description: ''
+    delete:
+      operationId: composer_statementAlert_destroy
+      description: StatementAlert
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this statement alert.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/composer/tag/:
     get:
       operationId: composer_tag_list
@@ -1643,7 +1995,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1696,7 +2047,6 @@ paths:
       - tokenAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1828,6 +2178,23 @@ paths:
           description: ''
 components:
   schemas:
+    AlertType:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        uri:
+          type: string
+          format: uri
+          maxLength: 200
+      required:
+      - id
+      - name
+      - uri
     AnatomicalEntity:
       type: object
       properties:
@@ -1858,11 +2225,11 @@ components:
           readOnly: true
         layer:
           allOf:
-          - $ref: '#/components/schemas/Layer'
+          - $ref: '#/components/schemas/AnatomicalEntityMeta'
           readOnly: true
         region:
           allOf:
-          - $ref: '#/components/schemas/Region'
+          - $ref: '#/components/schemas/AnatomicalEntityMeta'
           readOnly: true
       required:
       - id
@@ -2006,7 +2373,17 @@ components:
           allOf:
           - $ref: '#/components/schemas/Phenotype'
           readOnly: true
+        projection_phenotype:
+          allOf:
+          - $ref: '#/components/schemas/ProjectionPhenotype'
+          readOnly: true
+        projection_phenotype_id:
+          type: integer
+          nullable: true
         journey:
+          type: string
+          readOnly: true
+        entities_journey:
           type: string
           readOnly: true
         laterality:
@@ -2063,8 +2440,17 @@ components:
           type: array
           items: {}
           readOnly: true
+        graph_rendering_state:
+          allOf:
+          - $ref: '#/components/schemas/GraphState'
+          nullable: true
+        statement_alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatementAlert'
       required:
       - available_transitions
+      - entities_journey
       - errors
       - has_notes
       - id
@@ -2072,6 +2458,7 @@ components:
       - modified_date
       - owner
       - phenotype
+      - projection_phenotype
       - sentence
       - sex
       - state
@@ -2111,7 +2498,7 @@ components:
           nullable: true
         state:
           type: string
-          maxLength: 50
+          readOnly: true
         available_transitions:
           type: array
           items:
@@ -2136,6 +2523,13 @@ components:
           allOf:
           - $ref: '#/components/schemas/Phenotype'
           readOnly: true
+        projection_phenotype:
+          allOf:
+          - $ref: '#/components/schemas/ProjectionPhenotype'
+          readOnly: true
+        projection_phenotype_id:
+          type: integer
+          nullable: true
         journey:
           type: string
           readOnly: true
@@ -2193,6 +2587,14 @@ components:
           type: array
           items: {}
           readOnly: true
+        graph_rendering_state:
+          allOf:
+          - $ref: '#/components/schemas/GraphState'
+          nullable: true
+        statement_alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatementAlert'
       required:
       - available_transitions
       - errors
@@ -2203,8 +2605,10 @@ components:
       - origins
       - owner
       - phenotype
+      - projection_phenotype
       - sentence
       - sex
+      - state
       - statement_preview
       - tags
     Destination:
@@ -2258,6 +2662,14 @@ components:
       - connectivity_statement_id
       - from_entities
       - id
+    GraphState:
+      type: object
+      properties:
+        serialized_graph:
+          type: object
+          additionalProperties: {}
+      required:
+      - serialized_graph
     KnowledgeStatement:
       type: object
       description: Knowledge Statement
@@ -2300,31 +2712,55 @@ components:
           format: uri
           nullable: true
           maxLength: 200
+        provenances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Provenance'
+        knowledge_statement:
+          type: string
+        journey:
+          type: string
+          readOnly: true
+        entities_journey:
+          type: string
+          readOnly: true
+        laterality:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/LateralityEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        projection:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/ProjectionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        circuit_type:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/CircuitTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        sex:
+          allOf:
+          - $ref: '#/components/schemas/Sex'
+          readOnly: true
+        statement_preview:
+          type: string
+          readOnly: true
       required:
+      - entities_journey
       - id
+      - journey
       - phenotype
+      - sex
+      - statement_preview
     LateralityEnum:
       enum:
       - RIGHT
       - LEFT
       type: string
-    Layer:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          maxLength: 200
-        ontology_uri:
-          type: string
-          format: uri
-          maxLength: 200
-      required:
-      - id
-      - name
-      - ontology_uri
     Login:
       type: object
       properties:
@@ -2372,6 +2808,26 @@ components:
     NullEnum:
       enum:
       - null
+    PaginatedAlertTypeList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlertType'
     PaginatedAnatomicalEntityList:
       type: object
       properties:
@@ -2492,6 +2948,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Phenotype'
+    PaginatedProjectionPhenotypeList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectionPhenotype'
     PaginatedSentenceList:
       type: object
       properties:
@@ -2552,6 +3028,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Specie'
+    PaginatedStatementAlertList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatementAlert'
     PaginatedTagList:
       type: object
       properties:
@@ -2592,6 +3088,140 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Via'
+    PatchedConnectivityStatement:
+      type: object
+      description: Connectivity Statement
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          nullable: true
+        sentence_id:
+          type: integer
+        sentence:
+          allOf:
+          - $ref: '#/components/schemas/Sentence'
+          readOnly: true
+        knowledge_statement:
+          type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+          readOnly: true
+        provenances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Provenance'
+        owner:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        owner_id:
+          type: integer
+          nullable: true
+        state:
+          type: string
+          readOnly: true
+        available_transitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AvailableTransitions24dEnum'
+          readOnly: true
+        origins:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnatomicalEntity'
+        vias:
+          type: array
+          items:
+            $ref: '#/components/schemas/ViaSerializerDetails'
+        destinations:
+          type: array
+          items:
+            $ref: '#/components/schemas/DestinationSerializerDetails'
+        phenotype_id:
+          type: integer
+          nullable: true
+        phenotype:
+          allOf:
+          - $ref: '#/components/schemas/Phenotype'
+          readOnly: true
+        projection_phenotype:
+          allOf:
+          - $ref: '#/components/schemas/ProjectionPhenotype'
+          readOnly: true
+        projection_phenotype_id:
+          type: integer
+          nullable: true
+        journey:
+          type: string
+          readOnly: true
+        entities_journey:
+          type: string
+          readOnly: true
+        laterality:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/LateralityEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        projection:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/ProjectionEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        circuit_type:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/CircuitTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        species:
+          type: array
+          items:
+            $ref: '#/components/schemas/Specie'
+        sex_id:
+          type: integer
+          nullable: true
+        sex:
+          allOf:
+          - $ref: '#/components/schemas/Sex'
+          readOnly: true
+        forward_connection:
+          type: array
+          items:
+            type: integer
+        apinatomy_model:
+          type: string
+          nullable: true
+          maxLength: 200
+        additional_information:
+          type: string
+          nullable: true
+        modified_date:
+          type: string
+          format: date-time
+          readOnly: true
+        has_notes:
+          type: boolean
+          readOnly: true
+        statement_preview:
+          type: string
+          readOnly: true
+        errors:
+          type: array
+          items: {}
+          readOnly: true
+        graph_rendering_state:
+          allOf:
+          - $ref: '#/components/schemas/GraphState'
+          nullable: true
+        statement_alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatementAlert'
     PatchedConnectivityStatementUpdate:
       type: object
       description: Connectivity Statement
@@ -2626,7 +3256,7 @@ components:
           nullable: true
         state:
           type: string
-          maxLength: 50
+          readOnly: true
         available_transitions:
           type: array
           items:
@@ -2651,6 +3281,13 @@ components:
           allOf:
           - $ref: '#/components/schemas/Phenotype'
           readOnly: true
+        projection_phenotype:
+          allOf:
+          - $ref: '#/components/schemas/ProjectionPhenotype'
+          readOnly: true
+        projection_phenotype_id:
+          type: integer
+          nullable: true
         journey:
           type: string
           readOnly: true
@@ -2708,6 +3345,14 @@ components:
           type: array
           items: {}
           readOnly: true
+        graph_rendering_state:
+          allOf:
+          - $ref: '#/components/schemas/GraphState'
+          nullable: true
+        statement_alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatementAlert'
     PatchedDestination:
       type: object
       description: Destination
@@ -2815,6 +3460,29 @@ components:
         doi_uri:
           type: string
           readOnly: true
+    PatchedStatementAlert:
+      type: object
+      properties:
+        id:
+          type: integer
+        alert_type:
+          type: integer
+        text:
+          type: string
+        saved_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        connectivity_statement_id:
+          type: integer
     PatchedVia:
       type: object
       description: Via
@@ -2875,6 +3543,19 @@ components:
       - CONTRAT
       - BI
       type: string
+    ProjectionPhenotype:
+      type: object
+      description: Phenotype
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+      required:
+      - id
+      - name
     Provenance:
       type: object
       description: Provenance
@@ -2890,29 +3571,6 @@ components:
       - connectivity_statement_id
       - id
       - uri
-    Region:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          maxLength: 200
-        ontology_uri:
-          type: string
-          format: uri
-          maxLength: 200
-        layers:
-          type: array
-          items:
-            $ref: '#/components/schemas/Layer'
-          readOnly: true
-      required:
-      - id
-      - layers
-      - name
-      - ontology_uri
     Sentence:
       type: object
       description: Sentence
@@ -3030,6 +3688,13 @@ components:
           allOf:
           - $ref: '#/components/schemas/Phenotype'
           readOnly: true
+        projection_phenotype:
+          allOf:
+          - $ref: '#/components/schemas/ProjectionPhenotype'
+          readOnly: true
+        projection_phenotype_id:
+          type: integer
+          nullable: true
         laterality:
           readOnly: true
           nullable: true
@@ -3085,6 +3750,7 @@ components:
       - owner
       - phenotype
       - projection
+      - projection_phenotype
       - provenances
       - sentence_id
       - sex
@@ -3123,6 +3789,35 @@ components:
       required:
       - id
       - name
+    StatementAlert:
+      type: object
+      properties:
+        id:
+          type: integer
+        alert_type:
+          type: integer
+        text:
+          type: string
+        saved_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        connectivity_statement_id:
+          type: integer
+      required:
+      - alert_type
+      - connectivity_statement_id
+      - created_at
+      - saved_by
+      - updated_at
     Tag:
       type: object
       description: Note Tag
@@ -3171,6 +3866,10 @@ components:
           format: email
           title: Email address
           maxLength: 254
+        is_staff:
+          type: boolean
+          title: Staff status
+          description: Designates whether the user can log into this admin site.
       required:
       - id
       - username

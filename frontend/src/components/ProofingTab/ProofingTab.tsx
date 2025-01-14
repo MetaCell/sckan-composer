@@ -7,7 +7,11 @@ import { useSectionStyle, useGreyBgContainer } from "../../styles/styles";
 import { useTheme } from "@mui/system";
 import PathsBuilder from "./PathsBuilder";
 import StatementPreviewForm from "../Forms/StatementPreviewForm";
+import Button from "@mui/material/Button";
+import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
+import { vars } from "../../theme/variables";
 
+const {gray200} = vars;
 const ProofingTab = (props: any) => {
   const { statement, refreshStatement, setStatement, refs, isDisabled } = props;
   const theme = useTheme();
@@ -19,7 +23,7 @@ const ProofingTab = (props: any) => {
   return (
     <Grid container mb={2} spacing={2}>
       <Grid item xs={12}>
-        <Box ref={refs[0]}>
+        <Box>
           <Paper sx={sectionStyle}>
             <Stack
               direction="row"
@@ -64,10 +68,20 @@ const ProofingTab = (props: any) => {
 
       <Grid item xs={12}>
         <Box ref={refs[6]}>
-          <Paper sx={sectionStyle}>
-            <Stack spacing={2}>
-              <Typography variant="h5">Population Diagram</Typography>
-              <StatementChart statement={statement} />
+          <Paper sx={{...sectionStyle}}>
+            <Stack>
+              <Box display="flex" justifyContent='space-between'
+              sx={{
+                borderBottom: `1px solid ${gray200}`,
+                paddingBottom: '1.5rem'
+              }}>
+                <Typography variant="h5">Statement Display</Typography>
+                <Button startIcon={<ArrowCircleDownIcon />} variant="text" disabled={true} sx={{
+                  color: theme.palette.primary.dark,
+                  p: 0
+                }}>Download graph</Button>
+              </Box>
+              <StatementChart statement={statement} setStatement={setStatement} isDisabled={isDisabled} />
             </Stack>
             {hasJourney && (
               <>

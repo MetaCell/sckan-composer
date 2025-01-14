@@ -1,21 +1,22 @@
-import React from "react";
-import { FormBase } from "./FormBase";
-import { jsonSchemas } from "../../services/JsonSchema";
+import React, {forwardRef} from "react";
+import {FormBase} from "./FormBase";
+import {jsonSchemas} from "../../services/JsonSchema";
 import statementService from "../../services/StatementService";
 import CustomTextField from "../Widgets/CustomTextField";
 import CustomSingleSelect from "../Widgets/CustomSingleSelect";
 import CustomTextArea from "../Widgets/CustomTextArea";
 import ArrayFieldTemplate from "../Widgets/ArrayFieldTemplate";
 import AnatomicalEntitiesField from "../AnatomicalEntitiesField";
-import { sexes } from "../../services/SexService";
-import { phenotypes } from "../../services/PhenotypeService";
-import { Box, Chip } from "@mui/material";
+import {sexes} from "../../services/SexService";
+import {phenotypes} from "../../services/PhenotypeService";
+import {Box, Chip} from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
   createOptionsFromStatements,
   getAnatomicalEntities,
-  getConnectionId, getFirstNumberFromString,
+  getConnectionId,
+  getFirstNumberFromString,
   searchForwardConnection,
   searchFromEntitiesDestination,
   searchFromEntitiesVia,
@@ -24,38 +25,73 @@ import {
   updateOrigins,
 } from "../../services/CustomDropdownService";
 import {
-  mapAnatomicalEntitiesToOptions,
   DROPDOWN_MAPPER_STATE,
-  getViasGroupLabel,
   findMatchingEntities,
+  getViasGroupLabel,
+  mapAnatomicalEntitiesToOptions,
 } from "../../helpers/dropdownMappers";
-import { DestinationIcon, ViaIcon } from "../icons";
-import {
-  DestinationsGroupLabel,
-  OriginsGroupLabel,
-  ViasGroupLabel,
-} from "../../helpers/settings";
-import { Option, OptionDetail } from "../../types";
-import { composerApi as api } from "../../services/apis";
-import {
-  ConnectivityStatement,
-  TypeB60Enum,
-  TypeC11Enum,
-} from "../../apiclient/backend";
-import { CustomFooter } from "../Widgets/HoveredOptionContent";
-import { StatementStateChip } from "../Widgets/StateChip";
+import {DestinationIcon, ViaIcon} from "../icons";
+import {ChangeRequestStatus, DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel,} from "../../helpers/settings";
+import {Option, OptionDetail} from "../../types";
+import {composerApi as api} from "../../services/apis";
+import {ConnectivityStatement, TypeB60Enum, TypeC11Enum,} from "../../apiclient/backend";
+import {CustomFooter} from "../Widgets/HoveredOptionContent";
+import {StatementStateChip} from "../Widgets/StateChip";
+import {projections} from "../../services/ProjectionService";
+import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
+import {useDispatch} from "react-redux";
+import {setWasChangeDetected} from "../../redux/statementSlice";
 
-const StatementForm = (props: any) => {
-  const { uiFields, statement, refreshStatement, isDisabled } = props;
-  const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
+const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement>) => {
+  const {uiFields, statement, isDisabled, action: refreshStatement, onInputBlur, alertId, currentExpanded, onInputFocus} = props;
+  const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
+  const dispatch = useDispatch();
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
+  copiedSchema.properties.statement_alerts.items.properties.alert_type.type = "number";
+  copiedSchema.properties.statement_alerts.items.properties.connectivity_statement_id.type = "number";
 
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["destination_type", "*"];
+  copiedSchema.properties.statement_alerts.title = " ";
+  copiedSchema.properties.statement_alerts.items.required = ["alert_type"]
+  
+  copiedUISchema.statement_alerts ={
+    "ui:options": {
+      orderable: false,
+      addable: false,
+      removable: false,
+      label: false,
+    },
+    items: {
+      "ui:label": false,
+      
+      id: {
+        "ui:widget": "hidden",
+      },
+      alert_type: {
+        "ui:widget": "hidden",
+      },
+      text: {
+        "ui:widget": "CustomTextArea",
+        "ui:options": {
+          placeholder: "Enter alert text here...",
+          rows: 3,
+          onBlur: onInputBlur,
+          onFocus: onInputFocus,
+          ref: ref,
+          alertId,
+          currentExpanded
+        },
+      },
+      connectivity_statement_id: {
+        "ui:widget": "hidden",
+      }
+    },
+  }
   copiedUISchema.circuit_type = {
     "ui:widget": "CustomSingleSelect",
     "ui:options": {
@@ -76,15 +112,33 @@ const StatementForm = (props: any) => {
     },
   };
 
+
   copiedUISchema.projection = {
     "ui:widget": "CustomSingleSelect",
     "ui:options": {
       isDisabled,
-      label: "Projection",
+      label: "Projection laterality",
       classNames: "col-xs-12 col-md-6",
-      placeholder: "Enter Projection",
+      placeholder: "Enter Projection Laterality",
     },
   };
+
+
+  copiedUISchema.projection_phenotype_id = {
+    "ui:widget": "CustomSingleSelect",
+    "ui:options": {
+      isDisabled,
+      label: "Projection phenotype",
+      classNames: "col-xs-12 col-md-6",
+      placeholder: "Enter Projection Phenotype",
+      data: projections.getProjections().map((row: any) => ({
+        label: row.name,
+        value: row.id,
+      })),
+    },
+    value: statement?.projection_phenotype_id ?? "",
+  };
+
 
   copiedUISchema.apinatomy_model = {
     "ui:widget": "CustomTextField",
@@ -104,7 +158,7 @@ const StatementForm = (props: any) => {
       placeholder: "Enter Sex",
       data: sexes
         .getSexes()
-        .map((row: any) => ({ label: row.name, value: row.id })),
+        .map((row: any) => ({label: row.name, value: row.id})),
     },
     value: statement?.sex_id ?? "",
   };
@@ -117,10 +171,11 @@ const StatementForm = (props: any) => {
       placeholder: "Select Phenotype",
       data: phenotypes
         .getPhenotypes()
-        .map((row: any) => ({ label: row.name, value: row.id })),
+        .map((row: any) => ({label: row.name, value: row.id})),
     },
     value: statement?.phenotype_id ?? "",
   };
+
 
   copiedUISchema.knowledge_statement = {
     "ui:widget": "CustomTextArea",
@@ -160,9 +215,8 @@ const StatementForm = (props: any) => {
         );
       },
       onUpdate: async (selectedOptions: any) => {
-        await updateOrigins(selectedOptions, statement.id);
+        return await updateOrigins(selectedOptions, statement.id, refreshStatement, dispatch);
       },
-      refreshStatement: () => refreshStatement(),
       errors: "",
       mapValueToOption: () =>
         mapAnatomicalEntitiesToOptions(statement?.origins, OriginsGroupLabel),
@@ -194,8 +248,10 @@ const StatementForm = (props: any) => {
     "ui:ArrayFieldTemplate": (props: any) => (
       <ArrayFieldTemplate
         {...props}
+        id={statement.id}
         onElementDelete={async (element: any) => {
           await api.composerViaDestroy(element.children.props.formData.id);
+          dispatch(setWasChangeDetected(true));
           refreshStatement();
         }}
         onElementAdd={async () => {
@@ -215,9 +271,10 @@ const StatementForm = (props: any) => {
           await api.composerViaPartialUpdate(statement.vias[sourceIndex].id, {
             order: destinationIndex,
           });
+          dispatch(setWasChangeDetected(true));
           refreshStatement();
         }}
-        hideDeleteBtn={statement?.vias?.length <= 1 || isDisabled}
+        hideDeleteBtn={statement?.vias?.length < 1 || isDisabled}
         showReOrderingIcon={true}
         addButtonPlaceholder={"Via"}
         canAdd={!isDisabled}
@@ -234,19 +291,41 @@ const StatementForm = (props: any) => {
       type: {
         "ui:CustomSingleSelect": "CustomSingleSelect",
         "ui:options": {
+          isDisabled,
           label: false,
           isPathBuilderComponent: true,
           InputIcon: ViaIcon,
           onUpdate: async (selectedOption: string, formId: string) => {
             const viaIndex = getConnectionId(formId, statement.vias);
             const typeOption = selectedOption as TypeB60Enum;
+
             if (viaIndex) {
-              api
-                .composerViaPartialUpdate(viaIndex, {
+              try {
+                await api.composerViaPartialUpdate(viaIndex, {
                   type: typeOption,
-                })
-                .then(() => refreshStatement());
+                });
+                refreshStatement()
+                dispatch(setWasChangeDetected(true));
+                return ChangeRequestStatus.SAVED;
+              } catch (error) {
+                return checkOwnership(
+                  statement.id,
+                  async () => {
+                    await api.composerViaPartialUpdate(viaIndex, {
+                      type: typeOption,
+                    });
+                    dispatch(setWasChangeDetected(true));
+                    refreshStatement()
+                    return ChangeRequestStatus.SAVED;
+                  },
+                  () => {
+                    return ChangeRequestStatus.CANCELLED;
+                  },
+                  (owner) => getOwnershipAlertMessage(owner)
+                );
+              }
             }
+            return ChangeRequestStatus.CANCELLED;
           },
         },
       },
@@ -277,14 +356,16 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
-            await updateEntity({
+            return await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
               propertyToUpdate: "anatomical_entities",
+              refreshStatement,
+              dispatch
             });
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) =>
             mapAnatomicalEntitiesToOptions(anatomicalEntities, ViasGroupLabel),
@@ -319,11 +400,14 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: any) => {
-            await updateEntity({
+            return await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
               propertyToUpdate: "from_entities",
+              refreshStatement,
+              dispatch
             });
           },
           areConnectionsExplicit: (formId: any) => {
@@ -336,7 +420,7 @@ const StatementForm = (props: any) => {
             const id = getFirstNumberFromString(formId)
             let entity: any = []
             if (id !== null) {
-              const preLevelItems = id === 0 ? statement['origins'] :  statement['vias'][id-1]['anatomical_entities']
+              const preLevelItems = id === 0 ? statement['origins'] : statement['vias'][id - 1]['anatomical_entities']
               const selected = findMatchingEntities(
                 statement,
                 preLevelItems,
@@ -352,7 +436,6 @@ const StatementForm = (props: any) => {
               return entity
             }
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) => {
             const entities: Option[] = [];
@@ -380,10 +463,12 @@ const StatementForm = (props: any) => {
     "ui:ArrayFieldTemplate": (props: any) => (
       <ArrayFieldTemplate
         {...props}
+        id={statement.id}
         onElementDelete={async (element: any) => {
           await api.composerDestinationDestroy(
             element.children.props.formData.id,
           );
+          dispatch(setWasChangeDetected(true));
           refreshStatement();
         }}
         onElementAdd={async () => {
@@ -396,7 +481,7 @@ const StatementForm = (props: any) => {
           });
           refreshStatement();
         }}
-        hideDeleteBtn={statement?.destinations?.length <= 1 || isDisabled}
+        hideDeleteBtn={statement?.destinations?.length < 1 || isDisabled}
         showReOrderingIcon={false}
         addButtonPlaceholder={"Destination"}
         canAdd={!isDisabled}
@@ -413,19 +498,40 @@ const StatementForm = (props: any) => {
       type: {
         "ui:widget": "CustomSingleSelect",
         "ui:options": {
+          isDisabled,
           label: false,
           isPathBuilderComponent: true,
           InputIcon: DestinationIcon,
           onUpdate: async (selectedOption: string, formId: string) => {
-            const viaIndex = getConnectionId(formId, statement?.destinations);
+            const destinationIndex = getConnectionId(formId, statement?.destinations);
             const typeOption = selectedOption as TypeC11Enum;
-            if (viaIndex) {
-              api
-                .composerDestinationPartialUpdate(viaIndex, {
+            if (destinationIndex) {
+              try {
+                await api.composerDestinationPartialUpdate(destinationIndex, {
                   type: typeOption,
                 })
-                .then(() => refreshStatement());
+                dispatch(setWasChangeDetected(true));
+                refreshStatement()
+                return ChangeRequestStatus.SAVED;
+              } catch (error) {
+                return checkOwnership(
+                  statement.id,
+                  async () => {
+                    await api.composerDestinationPartialUpdate(destinationIndex, {
+                      type: typeOption,
+                    })
+                    dispatch(setWasChangeDetected(true));
+                    refreshStatement()
+                    return ChangeRequestStatus.SAVED;
+                  },
+                  () => {
+                    return ChangeRequestStatus.CANCELLED;
+                  },
+                  (owner) => getOwnershipAlertMessage(owner)
+                );
+              }
             }
+            return ChangeRequestStatus.CANCELLED;
           },
         },
       },
@@ -455,14 +561,16 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
-            await updateEntity({
+            return await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
               propertyToUpdate: "anatomical_entities",
+              refreshStatement,
+              dispatch
             });
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) =>
             mapAnatomicalEntitiesToOptions(
@@ -500,11 +608,14 @@ const StatementForm = (props: any) => {
             );
           },
           onUpdate: async (selectedOptions: Option[], formId: string) => {
-            await updateEntity({
+            return await updateEntity({
+              statementId: statement.id,
               selected: selectedOptions,
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
               propertyToUpdate: "from_entities",
+              refreshStatement,
+              dispatch
             });
           },
           areConnectionsExplicit: (formId: any) => {
@@ -517,7 +628,7 @@ const StatementForm = (props: any) => {
             const id = getFirstNumberFromString(formId)
             let entity: any = []
             if (id !== null) {
-              const preLevelItems = id === 0 && statement['vias'].length === 0 ? statement['origins'] :  statement['vias'][statement?.vias?.length - 1]?.anatomical_entities
+              const preLevelItems = id === 0 && statement['vias'].length === 0 ? statement['origins'] : statement['vias'][statement?.vias?.length - 1]?.anatomical_entities
               const selected = findMatchingEntities(
                 statement,
                 preLevelItems,
@@ -534,7 +645,6 @@ const StatementForm = (props: any) => {
             }
 
           },
-          refreshStatement: () => refreshStatement(),
           errors: "",
           mapValueToOption: (anatomicalEntities: any[]) => {
             const entities: Option[] = [];
@@ -592,10 +702,8 @@ const StatementForm = (props: any) => {
         return searchForwardConnection(searchValue, statement, excludedIds);
       },
       onUpdate: async (selectedOptions: Option[]) => {
-        await updateForwardConnections(selectedOptions, statement);
-        refreshStatement()
+        return await updateForwardConnections(selectedOptions, statement, dispatch);
       },
-      refreshStatement: () => refreshStatement(),
       statement: statement,
       errors: statement?.errors?.includes("Invalid forward connection")
         ? "Forward connection(s) not found"
@@ -617,23 +725,23 @@ const StatementForm = (props: any) => {
             ),
           ),
       },
-      CustomInputChip: ({ entity, sx = {} }: any) => (
+      CustomInputChip: ({entity, sx = {}}: any) => (
         <Chip
           key={entity?.id}
           variant={"filled"}
           onClick={(e) => {
             e.stopPropagation();
           }}
-          deleteIcon={<OpenInNewIcon sx={{ fill: "#548CE5" }} />}
+          deleteIcon={<OpenInNewIcon sx={{fill: "#548CE5"}}/>}
           onDelete={(e) => {
             window.open(window.location.origin + "/statement/" + entity?.id, '_blank')
             e.stopPropagation();
           }}
           label={entity?.label}
-          sx={{ ...sx }}
+          sx={{...sx}}
         />
       ),
-      CustomHeader: ({ entity }: any) => {
+      CustomHeader: ({entity}: any) => {
         const stateDetail = entity.content.find(
           (detail: OptionDetail) => detail.title === DROPDOWN_MAPPER_STATE,
         );
@@ -651,24 +759,31 @@ const StatementForm = (props: any) => {
               pb: "1.5rem",
             }}
           >
-            <StatementStateChip value={stateValue} />
+            <StatementStateChip value={stateValue}/>
           </Box>
         );
       },
     },
   };
 
+
   // Add null option to the fields which have null type in dropdown.
   Object.keys(copiedSchema.properties).forEach((key) => {
-    if (copiedSchema.properties[key].type.includes("null") && copiedSchema.properties[key]?.enum && copiedSchema.properties[key]?.enumNames) {
-      copiedSchema.properties[key].enum.push(null);
-      copiedSchema.properties[key].enumNames.push("---------");
+    const property = copiedSchema.properties[key];
+
+    // Check if the 'type' exists and is an array or string that includes 'null'
+    if (property.type && Array.isArray(property.type) && property.type.includes("null")) {
+      // Check if 'enum' and 'enumNames' exist
+      if (property.enum && property.enumNames) {
+        property.enum.push(null);
+        property.enumNames.push("---------");
+      }
     }
   });
 
   Object.keys(copiedUISchema).forEach((key) => {
     if (copiedUISchema[key]["ui:options"] && copiedUISchema[key]["ui:options"].data) {
-      copiedUISchema[key]["ui:options"].data.push({ label: "---------", value: null })
+      copiedUISchema[key]["ui:options"].data.push({label: "---------", value: null})
     }
   });
 
@@ -680,10 +795,12 @@ const StatementForm = (props: any) => {
     SelectWidget: CustomSingleSelect,
   };
 
+
   return (
     <FormBase
       data={statement}
       service={statementService}
+      onSaveCancel={refreshStatement}
       schema={copiedSchema}
       uiSchema={copiedUISchema}
       uiFields={uiFields}
@@ -702,10 +819,11 @@ const StatementForm = (props: any) => {
         "laterality",
         "circuit_type",
         "projection",
+        "projection_phenotype_id",
       ]}
       {...props}
     />
   );
-};
+});
 
 export default StatementForm;

@@ -22,3 +22,4 @@ django-cors-headers==4.3.1
 django-debug-toolbar
 django-sslserver # ssl dev server, for testing orcid social login
 black
+pytest==8.3.3

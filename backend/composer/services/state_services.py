@@ -16,12 +16,14 @@ class OwnerServiceMixin(BaseServiceMixin):
     def is_owner(self, owner):
         return self.obj.owner == owner
 
+    def can_assign_owner(self, request):
+        return bool(request.user)
+
     def should_set_owner(self, request):
         if self.obj.owner:
             return False
         if request.user:
             return True
-
 
 class StateServiceMixin(OwnerServiceMixin):
     def _is_transition_available(self, transition, user=None):
@@ -74,7 +76,8 @@ class SentenceStateService(StateServiceMixin):
         for cs in sentence.connectivitystatement_set.all():
             if cs.state == CSState.DRAFT:
                 cs.compose_now(*args, **kwargs)
-                cs.save()
+                cs.owner = None
+                cs.save(update_fields=["state", "owner"])
 
     @staticmethod
     def can_be_reviewed(sentence):
@@ -173,7 +176,6 @@ class ConnectivityStatementStateService(StateServiceMixin):
         return (
                 connectivity_statement.origins.exists()
                 and connectivity_statement.destinations.exists()
-                and connectivity_statement.phenotype is not None
                 and connectivity_statement.provenance_set.count() > 0
         )
 

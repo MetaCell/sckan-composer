@@ -10,6 +10,7 @@ from fsm_admin.mixins import FSMTransitionMixin
 from django import forms
 
 from composer.models import (
+    AlertType,
     Phenotype,
     Sex,
     ConnectivityStatement,
@@ -19,6 +20,7 @@ from composer.models import (
     Profile,
     Sentence,
     Specie,
+    StatementAlert,
     Tag,
     Via,
     FunctionalCircuitRole,
@@ -68,6 +70,17 @@ class NoteConnectivityStatementInline(admin.StackedInline):
     sortable_options = "disabled"
 
 
+class AlertTypeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'uri')
+    search_fields = ('name', 'uri')
+
+class StatementAlertInline(admin.StackedInline):
+    model = StatementAlert
+    extra = 1
+    autocomplete_fields = ('alert_type', )
+    fields = ('alert_type', 'text', 'saved_by', 'created_at', 'updated_at')
+    readonly_fields = ('created_at', 'updated_at')
+
 class ConnectivityStatementInline(nested_admin.NestedStackedInline):
     model = ConnectivityStatement
     extra = 1
@@ -98,11 +111,15 @@ class SentenceAdmin(
     )
 
 class AnatomicalEntityAdmin(admin.ModelAdmin):
-    search_fields = ('simple_entity__name', 'region_layer__layer__name', 'region_layer__region__name')
-    autocomplete_fields = ('simple_entity', 'region_layer')
-    list_display = ('simple_entity', 'region_layer', "synonyms", "ontology_uri")
+    list_display = ('simple_entity', 'region_layer', 'synonyms', 'ontology_uri' )
     list_display_links = ('simple_entity', 'region_layer')
+    search_fields = (
+        'simple_entity__name',  'simple_entity__ontology_uri', 
+        'region_layer__layer__name', 'region_layer__region__name',
+        'region_layer__layer__ontology_uri', 'region_layer__region__ontology_uri',
+    )
     inlines = (SynonymInline,)
+    autocomplete_fields = ('simple_entity', 'region_layer')
 
     # we need to make efficient queries to the database to get the list of anatomical entities
     def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
@@ -130,22 +147,66 @@ class AnatomicalEntityMetaAdmin(admin.ModelAdmin):
         return {}
 
 
+class LayerAdminForm(forms.ModelForm):
+    class Meta:
+        model = Layer
+        fields = '__all__'
+        labels = {
+            'ae_meta': 'layer',
+        }
+
+
+class RegionAdminForm(forms.ModelForm):
+    class Meta:
+        model = Region
+        fields = '__all__'
+        labels = {
+            'ae_meta': 'region',
+        }
+
+
 class LayerAdmin(admin.ModelAdmin):
-    list_display = ('name', 'ontology_uri',)
-    search_fields = ('name',)
+    form = LayerAdminForm
+    list_display = ('layer_name', 'ontology_uri')
+    list_display_links = ('layer_name', 'ontology_uri')
+    search_fields = ('ae_meta__name', 'ae_meta__ontology_uri')
+    autocomplete_fields = ('ae_meta',)
+
+    @admin.display(description="Layer Name")
+    def layer_name(self, obj):
+        return obj.ae_meta.name
+    
+    @admin.display(description="Ontology URI")
+    def ontology_uri(self, obj):
+        return obj.ae_meta.ontology_uri
+
 
 
 class RegionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'ontology_uri',)
-    search_fields = ('name',)
-    filter_horizontal = ('layers',)
+    form = RegionAdminForm
+    list_display = ('region_name', 'ontology_uri')
+    list_display_links = ('region_name', 'ontology_uri')
+    search_fields = ('ae_meta__name', 'ae_meta__ontology_uri')
+    autocomplete_fields = ('ae_meta',)
+   
+    @admin.display(description="Region Name")
+    def region_name(self, obj):
+        return obj.ae_meta.name
+    
+    @admin.display(description="Ontology URI")
+    def ontology_uri(self, obj):
+        return obj.ae_meta.ontology_uri
+    
 
 
 class AnatomicalEntityIntersectionAdmin(nested_admin.NestedModelAdmin, admin.ModelAdmin):
     list_display = ('layer', 'region')
-    search_fields = ("region__name", "layer__name")
-    list_filter = ('layer', 'region',)
-    raw_id_fields = ('layer', 'region',)
+    raw_id_fields = ('layer', 'region')
+    list_filter = ('layer', 'region')
+    search_fields = (
+        'layer__ae_meta__name', 'region__ae_meta__name',
+        'layer__ae_meta__ontology_uri', 'region__ae_meta__ontology_uri'
+    )
 
     def get_model_perms(self, request):
         return {}
@@ -197,7 +258,7 @@ class ConnectivityStatementAdmin(
 
     fieldsets = ()
 
-    inlines = (ProvenanceInline, NoteConnectivityStatementInline, ViaInline, DestinationInline)
+    inlines = (ProvenanceInline, NoteConnectivityStatementInline, ViaInline, DestinationInline, StatementAlertInline)
 
     @admin.display(description="Knowledge Statement")
     def short_ks(self, obj):
@@ -248,6 +309,7 @@ class ExportBatchAdmin(admin.ModelAdmin):
         return super().get_form(request, obj=obj, change=change, **kwargs)
 
 
+
 # Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
@@ -267,6 +329,7 @@ admin.site.register(Specie)
 admin.site.register(Tag)
 admin.site.register(FunctionalCircuitRole)
 admin.site.register(ProjectionPhenotype)
+admin.site.register(AlertType, AlertTypeAdmin)
 # admin.site.register(ExportMetrics)
 
 

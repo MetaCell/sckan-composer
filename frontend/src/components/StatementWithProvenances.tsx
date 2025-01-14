@@ -20,7 +20,7 @@ const StatementWithProvenances = ({ statement, background = "#fff", refreshState
       <StatementForm
         statement={statement}
         format="small"
-        setter={refreshStatement}
+        action={refreshStatement}
         extraData={{ sentence_id: statement.sentence_id }}
         uiFields={["knowledge_statement"]}
         className='ks'

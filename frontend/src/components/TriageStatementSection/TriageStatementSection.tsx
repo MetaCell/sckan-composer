@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
@@ -12,10 +12,14 @@ import ProvenancesForm from "../Forms/ProvenanceForm";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useSectionStyle, useGreyBgContainer } from "../../styles/styles";
 import { useTheme } from "@mui/system";
-import { SentenceAvailableTransitionsEnum as SentenceStates } from "../../apiclient/backend";
+import {
+  SentenceAvailableTransitionsEnum as SentenceStates,
+  ComposerConnectivityStatementListStateEnum as statementStates,
+} from "../../apiclient/backend";
 
 const TriageStatementSection = (props: any) => {
   const { statement, refreshSentence, sentence } = props;
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const theme = useTheme()
   const sectionStyle = useSectionStyle(theme)
@@ -28,6 +32,16 @@ const TriageStatementSection = (props: any) => {
   const onCloneStatement = (id: number) =>{
     statementService.clone(id).then(()=>refreshSentence())
   }
+  
+  useEffect(() => {
+    if (statement.id) {
+      statementService.getObject(statement.id).then((response: any) => {
+        if (response.state === statementStates.Exported || response.state === statementStates.Invalid) {
+          setIsDisabled(true);
+        }
+      });
+    }
+  }, [statement.id]);
 
   return (
     <Grid item xs={12}>
@@ -47,6 +61,7 @@ const TriageStatementSection = (props: any) => {
                 uiFields={["knowledge_statement"]}
                 className='ks'
                 enableAutoSave={true}
+                isDisabled={isDisabled}
               />
 
               <ProvenancesForm
@@ -54,10 +69,12 @@ const TriageStatementSection = (props: any) => {
                 extraData={{ connectivity_statement_id: statement.id }}
                 setter={refreshSentence}
                 className='provenance'
+                isDisabled={isDisabled}
               />
               {statement.id && (
                 <StatementDetailsAccordion
                   setter={refreshSentence}
+                  isDisabled={isDisabled}
                   {...props}
                 />
               )}

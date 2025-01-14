@@ -10,9 +10,10 @@ import TagForm from "../components/Forms/TagForm";
 import {
   Sentence,
   SentenceConnectivityStatement,
-  SentenceAvailableTransitionsEnum, ComposerSentenceListStateEnum,
+  SentenceAvailableTransitionsEnum,
+  ComposerSentenceListStateEnum,
+  SentenceAvailableTransitionsEnum as SentenceStates,
 } from "../apiclient/backend/api";
-import { userProfile } from "../services/UserService";
 import CheckDuplicates from "../components/CheckForDuplicates/CheckDuplicatesDialog";
 import { SentenceStateChip } from "../components/Widgets/StateChip";
 import { SentenceLabels, formatDate, formatTime } from "../helpers/helpers";
@@ -36,10 +37,12 @@ import {
   EditOutlined,
   InputOutlined,
 } from "@mui/icons-material";
+import { checkSentenceOwnership, getOwnershipAlertMessage} from "../helpers/ownershipAlert";
+import {ChangeRequestStatus} from "../helpers/settings";
 
 const { bodyBgColor, darkBlue } = vars;
 
-const StyledAddStatementBtn = styled(Button)(({ theme }) => ({
+const StyledAddStatementBtn = styled(Button)(() => ({
   height: "60px",
   background: bodyBgColor,
   borderRadius: "16px",
@@ -120,7 +123,6 @@ const SentencesDetails = () => {
           navigate("/");
         }
       } catch (error) {
-        console.error("Error fetching the next sentence:", error);
         setIsLoading(false);
       }
     };
@@ -131,22 +133,29 @@ const SentencesDetails = () => {
       .doTransition(sentence, transition)
       .then((sentence: Sentence) => fetchNextSentence(sentence));
   };
-
+  
   const onAddNewStatement = () => {
-    setConnectivityStatements([
-      // @ts-ignore
-      ...connectivityStatements,
-      {
-        sentence_id: sentence.id,
-        knowledge_statement: "",
-        sex: null,
-        phenotype: null,
-        species: [],
-        dois: [],
+    return checkSentenceOwnership(
+      sentence.id,
+      async () => {
+        setConnectivityStatements((prev: any = []) => [
+          ...prev,
+          {
+            sentence: sentence.id,
+            knowledge_statement: "",
+            sex: null,
+            phenotype: null,
+            species: [],
+          },
+        ]);
       },
-    ]);
+      () => {
+        return ChangeRequestStatus.CANCELLED;
+      },
+      getOwnershipAlertMessage
+    );
   };
-
+  
   const handleMenuItemClick = (
     event: React.MouseEvent<HTMLLIElement, MouseEvent>,
     index: number,
@@ -176,22 +185,6 @@ const SentencesDetails = () => {
           setConnectivityStatements(
             sentence.connectivity_statements.sort((a, b) => a.id - b.id),
           );
-          if (
-            sentence.owner &&
-            sentence.owner?.id !== userProfile.getUser().id
-          ) {
-            if (
-              window.confirm(
-                `This sentence is assigned to ${sentence.owner.first_name}, assign to yourself? To view the record without assigning ownership, select Cancel.`,
-              )
-            ) {
-              sentenceService
-                .save({ ...sentence, owner_id: userProfile.getUser().id })
-                .then((sentence: Sentence) => {
-                  setSentence(sentence);
-                });
-            }
-          }
         })
         .finally(() => {
           setRefetch(false);
@@ -211,7 +204,7 @@ const SentencesDetails = () => {
     );
   }
 
-  const isDisabled = sentence.owner?.id !== userProfile.getUser().id;
+  const isDisabled = sentence?.state === SentenceStates.ComposeNow;
 
   return (
     <Grid p={6} container>
@@ -258,7 +251,7 @@ const SentencesDetails = () => {
           <Grid item xs={12} mb={4}>
             <Grid container>
               <Grid item xs={12} md={6}>
-                <Box>
+                <Box ref={refs[0]}>
                   <Typography variant="h3" mb={1}>
                     Sentence Details #{sentenceId}{" "}
                     <span>
@@ -286,7 +279,7 @@ const SentencesDetails = () => {
                     handleClick={handleClick}
                     selectedOption={
                       SentenceLabels[
-                        sentence?.available_transitions[selectedIndex]
+                        sentence?.available_transitions?.[selectedIndex]
                       ]
                     }
                     options={sentence?.available_transitions}
@@ -303,7 +296,7 @@ const SentencesDetails = () => {
           <Grid item xs={12}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <Box ref={refs[0]}>
+                <Box>
                   <Paper sx={{ mb: 2, ...sectionStyle }}>
                     <Grid container>
                       <Grid item xs={12}>
@@ -373,7 +366,10 @@ const SentencesDetails = () => {
                       setter={refreshSentence}
                     />
                     <Divider sx={{ margin: "36px 0" }} />
-                    <NoteDetails extraData={{ sentence_id: sentence.id }} />
+                    <NoteDetails
+                      extraData={{ sentence_id: sentence.id, type: 'sentence' }}
+                      setter={refreshSentence}
+                    />
                   </Paper>
                 </Box>
               </Grid>
