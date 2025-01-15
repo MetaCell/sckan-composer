@@ -3,8 +3,8 @@ from django.contrib.auth.models import User
 
 from composer.enums import CSState
 from composer.models import ConnectivityStatement, ExportBatch
-from composer.services.export_services import (
-    dump_export_batch,
+from backend.composer.services.export.export_services import (
+    create_csv,
     export_connectivity_statements,
 )
 
@@ -32,7 +32,7 @@ class Command(BaseCommand):
         export_filename = ""
         if batch_id:
             export_batch = ExportBatch.objects.get(id=batch_id)
-            export_filename = dump_export_batch(export_batch, folder_path=folder)
+            export_filename = create_csv(export_batch, folder_path=folder)
         else:
             state = options.get("state", CSState.NPO_APPROVED)
             username = options.get("username", None)

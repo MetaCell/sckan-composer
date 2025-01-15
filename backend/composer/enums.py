@@ -29,6 +29,7 @@ class ViaType(models.TextChoices):
     # axon sensory ending, axon terminal, axon sensory terminal
     AXON = "AXON", "Axon"
     DENDRITE = "DENDRITE", "Dendrite"
+    SENSORY_AXON = "SENSORY_AXON", "Axon to PNS"
 
 
 class DestinationType(models.TextChoices):
@@ -83,6 +84,7 @@ class ExportRelationships(models.TextChoices):
     hasAxonSensorySubcellularElementIn = "hasAxonSensorySubcellularElementIn", "Afferent terminal",
     hasAxonLocatedIn = "hasAxonLocatedIn", "Axon"
     hasDendriteLocatedIn = "hasDendriteLocatedIn", "Dendrite"
+    hasAxonLeadingToSensorySubcellularElementIn = "hasAxonLeadingToSensorySubcellularElementIn", "Axon to PNS"
     hasForwardConnection = "hasForwardConnectionPhenotype", "Forward Connection"
 
 

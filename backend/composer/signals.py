@@ -3,6 +3,8 @@ from django.db.models.signals import post_save, m2m_changed, post_delete
 from django.contrib.auth import get_user_model
 from django_fsm.signals import post_transition
 
+from composer.services.state_services import ConnectivityStatementStateService
+from composer.services.export.helpers.export_batch import compute_metrics
 from composer.services.layers_service import update_from_entities_on_deletion
 from .utils import update_modified_date
 from .enums import CSState, NoteType
@@ -18,7 +20,6 @@ from .models import (
     Region,
     Via,
 )
-from .services.export_services import compute_metrics, ConnectivityStatementStateService
 
 
 @receiver(post_save, sender=ExportBatch)
