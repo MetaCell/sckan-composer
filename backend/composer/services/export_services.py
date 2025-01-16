@@ -39,7 +39,6 @@ from composer.services.connections_service import (
     get_complete_from_entities_for_destination,
     get_complete_from_entities_for_via,
 )
-from ..services.statement_service import create_statement_preview
 from composer.services.filesystem_service import create_dir_if_not_exists
 from composer.services.state_services import ConnectivityStatementStateService
 
@@ -107,12 +106,8 @@ def get_statement_uri(cs: ConnectivityStatement, row: Row):
     return cs.reference_uri
 
 
-def get_object_text(cs: ConnectivityStatement, row: Row):
-    # object text can be either from - alert notes or statement preview
-    if row.object_text__from_alert_notes:
-        return row.object_text__from_alert_notes
-    else:
-        return create_statement_preview(cs, cs.get_journey())
+def get_alert_text(cs: ConnectivityStatement, row: Row):
+    return row.object_text__from_alert_notes
 
 def get_nlp_id(cs: ConnectivityStatement, row: Row):
     return cs.export_id
@@ -211,7 +206,7 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
         "Predicate Relationship": get_relationship,
         "Object": get_structure,
         "Object URI": get_identifier,
-        "Object Text": get_object_text,
+        "Object Text": get_alert_text,
         "Axonal course poset": get_layer,
         "Connected from": get_connected_from_names,
         "Connected from uri": get_connected_from_uri,
