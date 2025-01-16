@@ -44,21 +44,7 @@ code {
   top: 100%;
   left: 100%;
 }
-/* Horizontal graph */
-/* .outPort {
-  position: absolute;
-  top: 50%;
-  right: 0%;
-}
 
-.inPort {
-  position: absolute;
-  top: 50%;
-  left: 0%;
+.tooltipWarning {
+  color: #DC6803 !important;
 }
-
-.inPortDestination {
-  position: absolute;
-  top: 100%;
-  left: 0%;
-} */

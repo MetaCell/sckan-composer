@@ -22,6 +22,7 @@ import {
   setPositionChangeOnly,
   setWasChangeDetected
 } from "../../../redux/statementSlice";
+import "../../../index.css";
 
 const ZOOM_CHANGE = 25
 
@@ -271,8 +272,8 @@ const NavigationMenu = (props: NavigationMenuProps) => {
               <Stack direction="row" spacing="1rem" alignItems='center'>
                 {
                   wasChangeDetected || positionChangeOnly ? (
-                    <Tooltip arrow title='This diagram does not match the Path Builder. It will be updated with default routing if you leave this page.'>
-                      <Alert severity="warning">The diagram is outdated, please use the reset button on the left to update the diagram</Alert>
+                    <Tooltip arrow classes={{ tooltip: 'tooltipWarning'}} title={wasChangeDetected ? 'This diagram does not match the Path Builder. It will be updated with default routing if you leave this page.' : 'The graph layout has been edited. Click the save switch to save the current layout.'}>
+                      <Alert severity="warning">{wasChangeDetected ? "The diagram is outdated, please use the reset button on the left to update the diagram" : "The position of one or more nodes has been changed but not saved."}</Alert>
                     </Tooltip>
                   ) : (
                     !isResetInvoked && (

@@ -254,10 +254,10 @@ const AfferentTerminalDetails: React.FC<{ model: CustomNodeModel }> = ({
                         marginTop: "0.125rem",
                     }}
                 >
-                    {model.externalId}
+                    {model.getOptions().uri}
                 </Typography>
                 <Chip
-                    label={model.getOptions().anatomicalType}
+                    label={"Afferent Terminal"}
                     variant="outlined"
                     color="secondary"
                     sx={{
@@ -398,10 +398,10 @@ const NonAfferentTerminalDetails: React.FC<{ model: CustomNodeModel }> = ({
                         marginTop: "0.125rem",
                     }}
                 >
-                    {model.externalId}
+                    {model.getOptions().uri}
                 </Typography>
                 <Chip
-                    label={model.getOptions().anatomicalType}
+                    label={model.getOptions().anatomicalType === TypeC11Enum.AxonT ? "Axon Terminal" : "Not Specified"}
                     variant="outlined"
                     color="secondary"
                     sx={{
