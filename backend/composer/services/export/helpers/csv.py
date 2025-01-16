@@ -8,11 +8,9 @@ from typing import Dict, Callable
 from django.db.models import Prefetch
 from django.utils import timezone
 
-from composer.services.export.helpers.rows import get_rows
+from composer.services.export.helpers.rows import Row, get_rows
 from composer.services.export.helpers.utils import escape_newlines
-from composer.services.export.helpers.models import Row
 from composer.enums import NoteType
-from composer.exceptions import UnexportableConnectivityStatement
 from composer.models import (
     Tag,
     ConnectivityStatement,
@@ -73,17 +71,21 @@ def create_csv(export_batch, folder_path: typing.Optional[str] = None) -> str:
         for cs in connectivity_statements:
             try:
                 rows = get_rows(cs)
-            except UnexportableConnectivityStatement as e:
+            except Exception as e:
                 logging.warning(
                     f"Connectivity Statement with id {cs.id} skipped due to {e}"
                 )
                 continue
-
             for row in rows:
-                row_content = [
-                    func(cs, row) for func in csv_attributes_mapping.values()
-                ]
-                writer.writerow(row_content)
+                try:
+                    row_content = [
+                        func(cs, row) for func in csv_attributes_mapping.values()
+                    ]
+                    writer.writerow(row_content)
+                except Exception as e:
+                    logging.warning(
+                        f"Connectivity Statement with id {cs.id} skipped due to {e}"
+                    )
 
     return filepath
 
@@ -127,7 +129,7 @@ def get_sentence_number(cs: ConnectivityStatement, row: Row):
 
 
 def get_curie_id(cs: ConnectivityStatement, row: Row):
-    return cs.curie_id if cs.curie_id is not None else ""
+    return "TODO by @gopal"  # TODO
 
 
 def get_statement_uri(cs: ConnectivityStatement, row: Row):

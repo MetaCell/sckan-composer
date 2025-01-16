@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 from composer.enums import CSState
 from composer.models import ConnectivityStatement, ExportBatch
-from backend.composer.services.export.export_services import (
+from composer.services.export.export_services import (
     create_csv,
     export_connectivity_statements,
 )

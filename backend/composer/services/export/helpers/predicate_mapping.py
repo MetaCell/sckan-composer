@@ -1,11 +1,138 @@
-from composer.enums import DestinationType, ExportRelationships, ViaType
+from enum import Enum
+from composer.enums import DestinationType, ViaType
 
 
-class PredicateMapping:
+class IExportRelationship:
+    @property
+    def predicate(self):
+        raise NotImplementedError
+
+    @property
+    def label(self):
+        raise NotImplementedError
+
+    @property
+    def uri(self):
+        raise NotImplementedError
+
+
+class DynamicExportRelationship(IExportRelationship):
     def __init__(self, predicate, label, uri):
-        self.predicate = predicate
-        self.label = label
-        self.uri = uri
+        self._predicate = predicate
+        self._label = label
+        self._uri = uri
+
+    @property
+    def predicate(self):
+        return self._predicate
+
+    @property
+    def label(self):
+        return self._label
+
+    @property
+    def uri(self):
+        return self._uri
+
+
+class ExportRelationships(IExportRelationship, Enum):
+    hasBiologicalSex = (
+        "hasBiologicalSex",
+        "Sex",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasBiologicalSex",
+    )
+    hasCircuitRolePhenotype = (
+        "hasCircuitRolePhenotype",
+        "CircuitRole",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasCircuitRolePhenotype",
+    )
+    hasAnatomicalSystemPhenotype = (
+        "hasAnatomicalSystemPhenotype",
+        "Phenotype",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasPhenotype",
+    )
+    hasFunctionalCircuitRolePhenotype = (
+        "hasFunctionalCircuitRolePhenotype",
+        "FunctionalCircuitRole",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasFunctionalCircuitRolePhenotype",
+    )
+    hasInstanceInTaxon = (
+        "hasInstanceInTaxon",
+        "Species",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasInstanceInTaxon",
+    )
+    hasProjectionLaterality = (
+        "hasProjectionLaterality",
+        "Laterality",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasProjectionLaterality",
+    )
+    hasSomaPhenotype = (
+        "hasSomaPhenotype",
+        "SomaPhenotype",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasSomaPhenotype",
+    )
+    hasAlert = (
+        "hasAlert",
+        "Alert",
+        "http://uri.interlex.org/tgbugs/uris/readable/alertNote",
+    )
+    hasSomaLocatedIn = (
+        "hasSomaLocatedIn",
+        "Soma",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasSomaLocatedIn",
+    )
+    hasProjectionPhenotype = (
+        "hasProjectionPhenotype",
+        "ProjectionPhenotype",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasProjection",
+    )
+    hasAxonPresynapticElementIn = (
+        "hasAxonPresynapticElementIn",
+        "Axon terminal",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasAxonPresynapticElementIn",
+    )
+    hasAxonSensorySubcellularElementIn = (
+        "hasAxonSensorySubcellularElementIn",
+        "Afferent terminal",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasAxonSensorySubcellularElementIn",
+    )
+    hasAxonLocatedIn = (
+        "hasAxonLocatedIn",
+        "Axon",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasAxonLocatedIn",
+    )
+    hasDendriteLocatedIn = (
+        "hasDendriteLocatedIn",
+        "Dendrite",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasDendriteLocatedIn",
+    )
+    hasAxonLeadingToSensorySubcellularElementIn = (
+        "hasAxonLeadingToSensorySubcellularElementIn",
+        "Axon to PNS",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasAxonLeadingToSensorySubcellularElementIn",
+    )
+    hasForwardConnection = (
+        "hasForwardConnectionPhenotype",
+        "Forward Connection",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasForwardConnectionPhenotype",
+    )
+    composerGenLabel = (
+        "composerGenLabel",
+        "Knowledge Statement",
+        "http://uri.interlex.org/tgbugs/uris/readable/composerGenLabel",
+    )
+
+    @property
+    def predicate(self):
+        return self.value[0]
+
+    @property
+    def label(self):
+        return self.value[1]
+
+    @property
+    def uri(self):
+        return self.value[2]
 
 
 DESTINATION_PREDICATE_MAP = {
@@ -16,89 +143,5 @@ DESTINATION_PREDICATE_MAP = {
 VIA_PREDICATE_MAP = {
     ViaType.AXON: ExportRelationships.hasAxonLocatedIn,
     ViaType.DENDRITE: ExportRelationships.hasDendriteLocatedIn,
-    ViaType.SENSORY_AXON: ExportRelationships.hasAxonSensorySubcellularElementIn,
-}
-
-
-EXPORT_RELATIONSHIP_MAPPINGS = {
-    ExportRelationships.hasBiologicalSex: PredicateMapping(
-        predicate=ExportRelationships.hasBiologicalSex,
-        label="Sex",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/hasBiologicalSex",
-    ),
-    ExportRelationships.hasCircuitRolePhenotype: PredicateMapping(
-        predicate=ExportRelationships.hasCircuitRolePhenotype,
-        label="CircuitRole",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/hasCircuitRolePhenotype",
-    ),
-    ExportRelationships.hasAnatomicalSystemPhenotype: PredicateMapping(
-        predicate=ExportRelationships.hasAnatomicalSystemPhenotype,
-        label="Phenotype",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/hasPhenotype",
-    ),
-    ExportRelationships.hasFunctionalCircuitRolePhenotype: PredicateMapping(
-        predicate=ExportRelationships.hasFunctionalCircuitRolePhenotype,
-        label="FunctionalCircuitRole",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/hasFunctionalCircuitRolePhenotype",
-    ),
-    ExportRelationships.hasInstanceInTaxon: PredicateMapping(
-        predicate=ExportRelationships.hasInstanceInTaxon,
-        label="Species",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/hasInstanceInTaxon",
-    ),
-    ExportRelationships.hasProjectionLaterality: PredicateMapping(
-        predicate=ExportRelationships.hasProjectionLaterality,
-        label="Laterality",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/hasProjectionLaterality",
-    ),
-    ExportRelationships.hasSomaPhenotype: PredicateMapping(
-        predicate=ExportRelationships.hasSomaPhenotype,
-        label="SomaPhenotype",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/hasSomaPhenotype",
-    ),
-    ExportRelationships.hasAlert: PredicateMapping(
-        predicate=ExportRelationships.hasAlert,
-        label="Alert",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/alertNote",
-    ),
-    ExportRelationships.hasSomaLocatedIn: PredicateMapping(
-        predicate=ExportRelationships.hasSomaLocatedIn,
-        label="Soma",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/hasSomaLocatedIn",
-    ),
-    ExportRelationships.hasProjectionPhenotype: PredicateMapping(
-        predicate=ExportRelationships.hasProjectionPhenotype,
-        label="ProjectionPhenotype",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/hasProjection",
-    ),
-    ExportRelationships.hasAxonPresynapticElementIn: PredicateMapping(
-        predicate=ExportRelationships.hasAxonPresynapticElementIn,
-        label="Axon terminal",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/hasAxonPresynapticElementIn",
-    ),
-    ExportRelationships.hasAxonSensorySubcellularElementIn: PredicateMapping(
-        predicate=ExportRelationships.hasAxonSensorySubcellularElementIn,
-        label="Afferent terminal",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/hasAxonSensorySubcellularElementIn",
-    ),
-    ExportRelationships.hasAxonLocatedIn: PredicateMapping(
-        predicate=ExportRelationships.hasAxonLocatedIn,
-        label="Axon",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/hasAxonLocatedIn",
-    ),
-    ExportRelationships.hasDendriteLocatedIn: PredicateMapping(
-        predicate=ExportRelationships.hasDendriteLocatedIn,
-        label="Dendrite",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/hasDendriteLocatedIn",
-    ),
-    ExportRelationships.hasAxonLeadingToSensorySubcellularElementIn: PredicateMapping(
-        predicate=ExportRelationships.hasAxonLeadingToSensorySubcellularElementIn,
-        label="Axon to PNS",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/hasAxonLeadingToSensorySubcellularElementIn",
-    ),
-    ExportRelationships.hasForwardConnection: PredicateMapping(
-        predicate=ExportRelationships.hasForwardConnection,
-        label="Forward Connection",
-        uri="http://uri.interlex.org/tgbugs/uris/readable/hasForwardConnectionPhenotype",
-    ),
+    ViaType.SENSORY_AXON: ExportRelationships.hasAxonLeadingToSensorySubcellularElementIn,
 }

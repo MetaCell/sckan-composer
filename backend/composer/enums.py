@@ -69,25 +69,6 @@ class NoteType(models.TextChoices):
     ALERT = "alert"
 
 
-class ExportRelationships(models.TextChoices):
-    hasBiologicalSex = "hasBiologicalSex", "Sex"
-    hasCircuitRolePhenotype = "hasCircuitRolePhenotype", "CircuitRole"
-    hasAnatomicalSystemPhenotype = "hasAnatomicalSystemPhenotype", "Phenotype"
-    hasFunctionalCircuitRolePhenotype = "hasFunctionalCircuitRolePhenotype", "FunctionalCircuitRole"
-    hasInstanceInTaxon = "hasInstanceInTaxon", "Species"
-    hasProjectionLaterality = "hasProjectionLaterality", "Laterality"
-    hasSomaPhenotype = "hasSomaPhenotype", "SomaPhenotype"
-    hasAlert = "hasAlert", "Alert"
-    hasSomaLocatedIn = "hasSomaLocatedIn", "Soma"
-    hasProjectionPhenotype = "hasProjection", "ProjectionPhenotype"
-    hasAxonPresynapticElementIn = "hasAxonPresynapticElementIn", "Axon terminal"
-    hasAxonSensorySubcellularElementIn = "hasAxonSensorySubcellularElementIn", "Afferent terminal",
-    hasAxonLocatedIn = "hasAxonLocatedIn", "Axon"
-    hasDendriteLocatedIn = "hasDendriteLocatedIn", "Dendrite"
-    hasAxonLeadingToSensorySubcellularElementIn = "hasAxonLeadingToSensorySubcellularElementIn", "Axon to PNS"
-    hasForwardConnection = "hasForwardConnectionPhenotype", "Forward Connection"
-
-
 class MetricEntity(models.TextChoices):
     SENTENCE = "sentence"
     CONNECTIVITY_STATEMENT = "connectivity statement"
