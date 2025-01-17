@@ -93,15 +93,3 @@ class MetricEntity(models.TextChoices):
 
 class ConnectivityErrors(Enum):
     INVALID_FORWARD_CONNECTION = "Invalid forward connection"
-
-
-class NeurondmIngestionMapping(Enum):
-    CURIE_ID = "label"
-
-    @classmethod
-    def get_neurondm_field(cls, cs_field):
-        try:
-            return cls[cs_field.upper()].value
-        except KeyError:
-            raise ValueError(
-                f"CS field '{cs_field}' is not supported in the mapping.")

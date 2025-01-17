@@ -2,7 +2,6 @@ import time
 
 from django.core.management.base import BaseCommand
 from composer.services.cs_ingestion.neurondm_new_field_ingestion_service import ingest_neurondm_new_field_to_statements
-from composer.enums import NeurondmIngestionMapping
 
 
 class Command(BaseCommand):
