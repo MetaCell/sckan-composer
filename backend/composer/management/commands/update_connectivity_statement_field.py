@@ -5,7 +5,7 @@ from composer.services.cs_ingestion.neurondm_new_field_ingestion_service import 
 
 
 class Command(BaseCommand):
-    help = "Ingests Statement's fields from neurondm pyp package"
+    help = "Updates composer statements field with neurondm property"
 
     def add_arguments(self, parser):
         parser.add_argument(

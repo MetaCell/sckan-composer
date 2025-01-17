@@ -231,7 +231,7 @@ class ConnectivityStatementAdmin(
     list_per_page = 10
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
-    readonly_fields = ("state",)
+    readonly_fields = ("state", 'curie_id')
     autocomplete_fields = ("sentence", "origins")
     date_hierarchy = "modified_date"
     list_display = (

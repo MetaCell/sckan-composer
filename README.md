@@ -130,7 +130,7 @@ NOTE: full imports are done from `https://raw.githubusercontent.com/SciCrunch/NI
 ### Ingest Statement's Curie ID
 You can run the following command to ingest the curie id for the statements
 ```
-python manage.py ingest_neurondm_new_field --cs_field curie_id --neurondm_field label
+python manage.py update_connectivity_statement_field--cs_field curie_id --neurondm_field label
 ```
 
 ### Open the admin page
