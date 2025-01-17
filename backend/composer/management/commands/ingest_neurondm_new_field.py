@@ -24,22 +24,25 @@ class Command(BaseCommand):
             required=True,
             help='The field name in ConnectivityStatement to update.',
         )
+        parser.add_argument(
+            '--neurondm_field',
+            required=True,
+            help='The field name in Neurondm to ingest.',
+        )
 
     def handle(self, *args, **options):
         full_imports = options['full_imports']
         label_imports = options['label_imports']
         cs_field = options['cs_field']
-
-        try:
-            neurondm_field = NeurondmIngestionMapping.get_neurondm_field(
-                cs_field)
-        except ValueError as e:
-            self.stdout.write(self.style.ERROR(str(e)))
-            return
+        neurondm_field = options['neurondm_field']
 
         start_time = time.time()
-        ingest_neurondm_new_field_to_statements(
-            neurondm_field, cs_field, full_imports, label_imports)
+        try:
+            ingest_neurondm_new_field_to_statements(
+                neurondm_field, cs_field, full_imports, label_imports)
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(f"Error during ingestion: {e}"))
+            return
         end_time = time.time()
 
         duration = end_time - start_time
