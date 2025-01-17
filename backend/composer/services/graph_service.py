@@ -175,7 +175,7 @@ def get_journey_path_from_consolidated_paths(consolidated_paths):
     return journey_paths
 
 
-def build_journey_description(consolidated_paths, connectivity_statement):
+def build_journey_description(consolidated_paths):
     journey_paths = get_journey_path_from_consolidated_paths(
         consolidated_paths)
 
@@ -197,7 +197,7 @@ def build_journey_description(consolidated_paths, connectivity_statement):
     return journey_descriptions
 
 
-def build_journey_entities(consolidated_paths, connectivity_statement):
+def build_journey_entities(consolidated_paths):
     entities = []
     for path in consolidated_paths:
         origin_splits = path[0][0].split(JOURNEY_DELIMITER)
