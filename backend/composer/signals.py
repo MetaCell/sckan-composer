@@ -1,10 +1,14 @@
+import logging
 from django.dispatch import receiver
 from django.db.models.signals import post_save, m2m_changed, post_delete
 from django.contrib.auth import get_user_model
 from django_fsm.signals import post_transition
 
 from composer.services.layers_service import update_from_entities_on_deletion
-from composer.services.statement_service import get_suffix_for_statement_preview, get_prefix_for_statement_preview
+from composer.services.statement_service import (
+    get_suffix_for_statement_preview,
+    get_prefix_for_statement_preview,
+)
 from .utils import update_modified_date
 from .enums import CSState, NoteType
 from .models import (
@@ -36,7 +40,7 @@ def post_transition_callback(sender, instance, name, source, target, **kwargs):
     User = get_user_model()
     method_kwargs = kwargs.get("method_kwargs", {})
     user = method_kwargs.get("by")
-    system_user = User.objects.get(username='system')
+    system_user = User.objects.get(username="system")
     if issubclass(sender, ConnectivityStatement):
         connectivity_statement = instance
     else:
@@ -127,7 +131,9 @@ def via_anatomical_entities_changed(sender, instance, action, pk_set, **kwargs):
     # Call `update_from_entities_on_deletion` for each removed entity
     if action == "post_remove" and pk_set:
         for deleted_entity_id in pk_set:
-            update_from_entities_on_deletion(instance.connectivity_statement, deleted_entity_id)
+            update_from_entities_on_deletion(
+                instance.connectivity_statement, deleted_entity_id
+            )
 
 
 # Signals for Via from_entities
@@ -192,12 +198,20 @@ def destination_changed(sender, instance, **kwargs):
     except ValueError:
         pass
 
+
 # TAG: If a sentence/CS tag is changed, update the modified_date
-@receiver(m2m_changed, sender=Sentence.tags.through, dispatch_uid="sentence_tags_changed")
-@receiver(m2m_changed, sender=ConnectivityStatement.tags.through, dispatch_uid="cs_tags_changed")
+@receiver(
+    m2m_changed, sender=Sentence.tags.through, dispatch_uid="sentence_tags_changed"
+)
+@receiver(
+    m2m_changed,
+    sender=ConnectivityStatement.tags.through,
+    dispatch_uid="cs_tags_changed",
+)
 def sentence_and_cs_tags_changed(sender, instance, action, **kwargs):
     if action in ["post_add", "post_remove", "post_clear"]:
         update_modified_date(instance)
+
 
 # NOTE: If a note is added, updated, or deleted, update the modified_date of the sentence/CS
 @receiver(post_save, sender=Note, dispatch_uid="note_post_save")
@@ -209,27 +223,69 @@ def note_post_save_and_delete(sender, instance, **kwargs):
         update_modified_date(instance.connectivity_statement)
 
 
-@receiver(m2m_changed, sender=ConnectivityStatement.species.through, dispatch_uid="update_prefix_suffix_for_connectivity_statement_preview")
-@receiver(m2m_changed, sender=ConnectivityStatement.origins.through, dispatch_uid="update_prefix_suffix_for_connectivity_statement_preview")
-@receiver([post_save, post_delete], sender=ConnectivityStatement, dispatch_uid="update_prefix_suffix_for_connectivity_statement_preview")
-def update_prefix_suffix_for_connectivity_statement_preview(sender, instance, action=None, **kwargs):
-    if isinstance(instance, ConnectivityStatement):
-        relevant_fields_for_suffix = ['circuit_type', 'projection',
-                                      'projection_phenotype_id', 'laterality', 'apinatomy_model']
+@receiver(
+    m2m_changed,
+    sender=ConnectivityStatement.species.through,
+    dispatch_uid="update_prefix_for_species",
+)
+@receiver(
+    m2m_changed,
+    sender=ConnectivityStatement.origins.through,
+    dispatch_uid="update_suffix_for_origins",
+)
+@receiver(
+    [post_save, post_delete],
+    sender=ConnectivityStatement,
+    dispatch_uid="update_prefix_suffix_for_statement",
+)
+def update_prefix_suffix_for_connectivity_statement_preview(
+    sender, instance, action=None, **kwargs
+):
+    if not isinstance(instance, ConnectivityStatement):
+        return
 
-        relevant_fields_for_prefix = ['sex', 'phenotype']
-        relevant_fields = relevant_fields_for_suffix + relevant_fields_for_prefix
-        updated_fields = kwargs.get('update_fields', [])
-        updated_fields = updated_fields if updated_fields else []
+    relevant_suffix_fields = [
+        "circuit_type",
+        "projection",
+        "projection_phenotype_id",
+        "laterality",
+        "apinatomy_model",
+    ]
+    relevant_prefix_fields = ["sex", "phenotype"]
+    relevant_fields = relevant_suffix_fields + relevant_prefix_fields
 
-        has_species_or_origin_changed = action in [
-            "post_add", "post_remove", "post_clear"]
-        has_relevant_field_changed = any(
-            [field in updated_fields for field in relevant_fields])
-        if has_species_or_origin_changed or has_relevant_field_changed:
-            instance.statement_prefix = get_prefix_for_statement_preview(
-                instance)
-            instance.statement_suffix = get_suffix_for_statement_preview(
-                instance)
-            instance.save(
-                update_fields=["statement_prefix", "statement_suffix"])
+    updated_fields = kwargs.get("update_fields", []) or []
+    has_relevant_field_changed = any(
+        field in updated_fields for field in relevant_fields
+    )
+
+    update_prefix = False
+    update_suffix = False
+
+    if sender == ConnectivityStatement.species.through:
+        update_prefix = action in ["post_add", "post_remove", "post_clear"]
+    elif sender == ConnectivityStatement.origins.through:
+        update_suffix = action in ["post_add", "post_remove", "post_clear"]
+    elif has_relevant_field_changed:
+        update_prefix = update_suffix = True
+
+    if not (update_prefix or update_suffix):
+        return
+
+    update_fields = []
+
+    if update_prefix:
+        instance.statement_prefix = get_prefix_for_statement_preview(instance)
+        update_fields.append("statement_prefix")
+
+    if update_suffix:
+        instance.statement_suffix = get_suffix_for_statement_preview(instance)
+        update_fields.append("statement_suffix")
+
+    if update_fields:
+        try:
+            instance.save(update_fields=update_fields)
+        except Exception as e:
+            logging.error(
+                f"Error updating prefix/suffix for ConnectivityStatement {instance.id}: {str(e)}"
+            )
