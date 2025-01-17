@@ -1,7 +1,8 @@
-from ..utils import join_entities
+from composer.utils import join_entities
+from django.apps import apps
 
 
-def get_prefix_for_statement_preview(cs) -> str:
+def get_migration_prefix_for_statement_preview(cs) -> str:
     sex = cs.sex.name if cs.sex else None
 
     species_list = [
@@ -18,20 +19,24 @@ def get_prefix_for_statement_preview(cs) -> str:
     return statement
 
 
-def get_suffix_for_statement_preview(cs):
+def get_migration_suffix_for_statement_preview(cs):
+    ConnectivityStatement = apps.get_model(
+        'composer', 'ConnectivityStatement')
+    connectivity_statement = ConnectivityStatement.objects.get(
+        id=cs.id)
 
-    circuit_type = cs.get_circuit_type_display(
-    ) if cs.circuit_type else None
-    projection = cs.get_projection_display(
-    ) if cs.projection else None
+    circuit_type = connectivity_statement.get_circuit_type_display(
+    ) if connectivity_statement.circuit_type else None
+    projection = connectivity_statement.get_projection_display(
+    ) if connectivity_statement.projection else None
     projection_phenotype = str(
-        cs.projection_phenotype) if cs.projection_phenotype else ''
+        connectivity_statement.projection_phenotype) if connectivity_statement.projection_phenotype else ''
 
-    laterality_description = cs.get_laterality_description()
-    apinatomy = cs.apinatomy_model if cs.apinatomy_model else ""
+    laterality_description = connectivity_statement.get_laterality_description()
+    apinatomy = connectivity_statement.apinatomy_model if connectivity_statement.apinatomy_model else ""
 
     origin_names = [
-        origin.name for origin in cs.origins.all()]
+        origin.name for origin in connectivity_statement.origins.all()]
     origins = join_entities(origin_names)
 
     if not origins:
@@ -53,11 +58,3 @@ def get_suffix_for_statement_preview(cs):
     if apinatomy:
         statement += f" It is described in {apinatomy} model."
     return statement
-
-
-def create_statement_preview(cs, journey):
-    prefix = cs.statement_prefix
-    journey_sentence = ';  '.join(journey)
-    suffix = cs.statement_suffix
-    statement = f'{prefix} {journey_sentence}.\n{suffix}'
-    return statement.strip().replace("  ", " ")
