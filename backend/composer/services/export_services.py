@@ -102,6 +102,10 @@ def get_sentence_number(cs: ConnectivityStatement, row: Row):
     return cs.sentence.id
 
 
+def get_curie_id(cs: ConnectivityStatement, row: Row):
+    return cs.curie_id if cs.curie_id is not None else ""
+
+
 def get_statement_uri(cs: ConnectivityStatement, row: Row):
     return cs.reference_uri
 
@@ -201,6 +205,7 @@ def get_tag_filter(tag_name):
 
 def generate_csv_attributes_mapping() -> Dict[str, Callable]:
     attributes_map = {
+        "Subject": get_curie_id,
         "Subject URI": get_statement_uri,
         "Predicate": get_predicate,
         "Predicate Relationship": get_relationship,
