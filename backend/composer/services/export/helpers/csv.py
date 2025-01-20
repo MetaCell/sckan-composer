@@ -129,7 +129,7 @@ def get_sentence_number(cs: ConnectivityStatement, row: Row):
 
 
 def get_curie_id(cs: ConnectivityStatement, row: Row):
-    return "TODO by @gopal"  # TODO
+    return cs.curie_id if cs.curie_id is not None else ""
 
 
 def get_statement_uri(cs: ConnectivityStatement, row: Row):

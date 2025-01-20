@@ -83,7 +83,7 @@ class TestIngestStatements(TestCase):
             NEW_KNOWLEDGE_STATEMENT
         )
 
-        # The Knowledge statement will be the old statement (from neurodm after ingestion), if the disable_overwrite flag is disabled
+        # The Knowledge statement will be the old statement (from neurondm after ingestion), if the disable_overwrite flag is disabled
         ingest_statements()
         statement_after_edit = ConnectivityStatement.objects.get(
             id=statement_to_edit.id)

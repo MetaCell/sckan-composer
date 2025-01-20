@@ -1,13 +1,17 @@
 from typing import List
 from django.apps import apps
 
+# This file refers to graph_service.py, which contains the following code:
+# (this is a separate file because this is used for migrations - and any future changes to the
+# graph_service.py file will not affect the migrations)
 JOURNEY_DELIMITER = '\\'
 
 
-def generate_paths(origins, vias, destinations):
+def generate_paths_for_migration(origins, vias, destinations):
     paths = []
     # Calculate the total number of layers, including origins and destinations
-    destination_layer = max([via.order for via in vias] + [0]) + 2 if vias else 1
+    destination_layer = max(
+        [via.order for via in vias] + [0]) + 2 if vias else 1
 
     # Handle direct connections from origins to destinations
     for origin in origins:
@@ -15,13 +19,15 @@ def generate_paths(origins, vias, destinations):
             # Directly use pre-fetched 'from_entities' without triggering additional queries
             if origin in destination.from_entities.all() or (not destination.from_entities.exists() and len(vias) == 0):
                 for dest_entity in destination.anatomical_entities.all():
-                    paths.append([(str(origin.id), origin.name, 0), (str(dest_entity.id), dest_entity.name, destination_layer)])
+                    paths.append([(str(origin.id), origin.name, 0), (str(
+                        dest_entity.id), dest_entity.name, destination_layer)])
 
     # Handle connections involving vias
     if vias:
         for origin in origins:
             # Generate paths through vias for each origin
-            paths.extend(create_paths_from_origin(origin, vias, destinations, [(str(origin.id), origin.name, 0)], destination_layer))
+            paths.extend(create_paths_from_origin_for_migration(origin, vias, destinations, [
+                         (str(origin.id), origin.name, 0)], destination_layer))
 
     # Remove duplicates from the generated paths
     unique_paths = [list(path) for path in set(tuple(path) for path in paths)]
@@ -29,7 +35,7 @@ def generate_paths(origins, vias, destinations):
     return unique_paths
 
 
-def create_paths_from_origin(origin, vias, destinations, current_path, destination_layer):
+def create_paths_from_origin_for_migration(origin, vias, destinations, current_path, destination_layer):
     # Base case: if there are no more vias to process
     if not vias:
         # Generate direct connections from the current path to destinations
@@ -49,49 +55,24 @@ def create_paths_from_origin(origin, vias, destinations, current_path, destinati
                 or (not current_via.from_entities.exists() and current_path[-1][2] == via_layer - 1)):
             for entity in current_via.anatomical_entities.all():
                 # Build new sub-paths including the current via entity
-                new_sub_path = current_path + [(str(entity.id), entity.name, via_layer)]
+                new_sub_path = current_path + \
+                    [(str(entity.id), entity.name, via_layer)]
                 # Recursively call to build paths from the next vias
-                new_paths.extend(create_paths_from_origin(origin, vias[idx + 1:], destinations,
-                                                          new_sub_path, destination_layer))
+                new_paths.extend(create_paths_from_origin_for_migration(origin, vias[idx + 1:], destinations,
+                                                                        new_sub_path, destination_layer))
 
                 # Check for direct connections to destinations from the current via
                 for dest in destinations:
                     for dest_entity in dest.anatomical_entities.all():
                         if entity.name in list(a.name for a in dest.from_entities.all()):
                             # Add path to destinations directly from the current via
-                            new_paths.append(new_sub_path + [(str(dest_entity.id), dest_entity.name, destination_layer)])
-    
+                            new_paths.append(
+                                new_sub_path + [(str(dest_entity.id), dest_entity.name, destination_layer)])
+
     return new_paths
 
 
-def consolidate_paths(paths):
-    merges_made = True
-
-    while merges_made:
-        merges_made = False
-        consolidated = []
-        used_indices = set()
-
-        for i, path in enumerate(paths):
-            if i in used_indices:
-                continue
-
-            merged_path = path
-            for j, other_path in enumerate(paths):
-                if i != j and j not in used_indices and can_merge(path, other_path):
-                    merged_path = merge_paths(merged_path, other_path)
-                    used_indices.add(j)
-                    merges_made = True
-
-            consolidated.append(merged_path)
-            used_indices.add(i)
-
-        paths = consolidated + [paths[i] for i in range(len(paths)) if i not in used_indices]
-
-    return paths
-
-
-def can_merge(path1, path2):
+def can_merge_for_migration(path1, path2):
     # Ensure paths are of the same length
     if len(path1) != len(path2):
         return False
@@ -119,7 +100,7 @@ def can_merge(path1, path2):
     return differences <= 1
 
 
-def merge_paths(path1, path2):
+def merge_paths_for_migration(path1, path2):
     merged_path = []
     for (p1_id, p1, layer1), (p2_id, p2, layer2) in zip(path1, path2):
         if p1 == p2 and layer1 == layer2:
@@ -135,14 +116,46 @@ def merge_paths(path1, path2):
                 merged_nodes_dict[p1_nodes[i]] = p1_ids[i]
             for i in range(len(p2_nodes)):
                 merged_nodes_dict[p2_nodes[i]] = p2_ids[i]
-            
+
             sorted_merged_nodes = sorted(merged_nodes)
-            sorted_merged_nodes_id = [merged_nodes_dict[node] for node in sorted_merged_nodes]  ## also set the node ids in the same order
-            merged_path.append((JOURNEY_DELIMITER.join(sorted_merged_nodes_id), JOURNEY_DELIMITER.join(sorted_merged_nodes), layer1))
+            # also set the node ids in the same order
+            sorted_merged_nodes_id = [merged_nodes_dict[node]
+                                      for node in sorted_merged_nodes]
+            merged_path.append((JOURNEY_DELIMITER.join(
+                sorted_merged_nodes_id), JOURNEY_DELIMITER.join(sorted_merged_nodes), layer1))
     return merged_path
 
 
-def compile_journey(connectivity_statement) -> List[str]:
+def consolidate_paths_for_migration(paths):
+    merges_made = True
+
+    while merges_made:
+        merges_made = False
+        consolidated = []
+        used_indices = set()
+
+        for i, path in enumerate(paths):
+            if i in used_indices:
+                continue
+
+            merged_path = path
+            for j, other_path in enumerate(paths):
+                if i != j and j not in used_indices and can_merge_for_migration(path, other_path):
+                    merged_path = merge_paths_for_migration(
+                        merged_path, other_path)
+                    used_indices.add(j)
+                    merges_made = True
+
+            consolidated.append(merged_path)
+            used_indices.add(i)
+
+        paths = consolidated + [paths[i]
+                                for i in range(len(paths)) if i not in used_indices]
+
+    return paths
+
+
+def get_compile_journey_for_migration(connectivity_statement) -> List[str]:
     """
    Generates a string of descriptions of journey paths for a given connectivity statement.
 
@@ -157,65 +170,14 @@ def compile_journey(connectivity_statement) -> List[str]:
     Destination = apps.get_model('composer', 'Destination')
     Origin = apps.get_model('composer', 'AnatomicalEntity')
 
-    vias = list(Via.objects.filter(connectivity_statement__id=connectivity_statement.id))
-    destinations = list(Destination.objects.filter(connectivity_statement__id=connectivity_statement.id))
+    vias = list(Via.objects.filter(
+        connectivity_statement__id=connectivity_statement.id))
+    destinations = list(Destination.objects.filter(
+        connectivity_statement__id=connectivity_statement.id))
     origins = list(Origin.objects.filter(
         origins_relations__id=connectivity_statement.id))
 
     # Generate all paths and then consolidate them
-    all_paths2 = generate_paths(origins, vias, destinations)
-    consolidated_paths = consolidate_paths(all_paths2)
+    all_paths2 = generate_paths_for_migration(origins, vias, destinations)
+    consolidated_paths = consolidate_paths_for_migration(all_paths2)
     return consolidated_paths
-
-
-def get_journey_path_from_consolidated_paths(consolidated_paths):
-    journey_paths = [[((node[1].replace(JOURNEY_DELIMITER, ' or '), node[2]) if (
-        node[2] == 0 or path.index(node) == len(path) - 1) else (
-        node[1].replace(JOURNEY_DELIMITER, ', '), node[2])) for node in path] for path in consolidated_paths]
-    return journey_paths
-
-
-def build_journey_description(consolidated_paths):
-    journey_paths = get_journey_path_from_consolidated_paths(
-        consolidated_paths)
-
-    # Create sentences for each journey path
-    journey_descriptions = []
-    for path in journey_paths:
-        origin_names = path[0][0]
-        destination_names = path[-1][0]
-        destination_layer = path[-1][1]
-        via_names = ' via '.join(
-            [node for node, layer in path if 0 < layer < destination_layer])
-
-        if via_names:
-            sentence = f"from {origin_names} to {destination_names} via {via_names}"
-        else:
-            sentence = f"from {origin_names} to {destination_names}"
-
-        journey_descriptions.append(sentence)
-    return journey_descriptions
-
-
-def build_journey_entities(consolidated_paths):
-    entities = []
-    for path in consolidated_paths:
-        origin_splits = path[0][0].split(JOURNEY_DELIMITER)
-        destination_splits = path[-1][0].split(JOURNEY_DELIMITER)
-        destination_layer = path[-1][2]
-        entity = {
-            'origins': [
-                {'label': path[0][1].split(JOURNEY_DELIMITER)[i], 'id': path[0][0].split(JOURNEY_DELIMITER)[i]} for i in range(len(origin_splits))
-            ],
-            'destinations': [
-                {'label': path[-1][1].split(JOURNEY_DELIMITER)[i], 'id': path[-1][0].split(JOURNEY_DELIMITER)[i]} for i in range(len(destination_splits))
-            ],
-            'vias': [{'label': node, 'id': node_id} for node_id, node, layer in path if 0 < layer < destination_layer]
-        }
-        entities.append(entity)
-    return entities
-
-
-def recompile_journey_path(instance):
-    instance.journey_path = compile_journey(instance)
-    instance.save(update_fields=["journey_path"])

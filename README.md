@@ -127,6 +127,12 @@ here - `apinat-partial-orders` and `apinat-pops-more sparc-nlp` are the full imp
 NOTE: full imports are done from `https://raw.githubusercontent.com/SciCrunch/NIF-Ontology/neurons/ttl/generated/neurons/*.ttl` and label imports are done from `https://raw.githubusercontent.com/SciCrunch/NIF-Ontology/neurons/ttl/generated/neurons/*.ttl`, and if you want a different path, you can use it relatively like - `../../npo`
 
 
+### Ingest Statement's Curie ID
+You can run the following command to ingest the curie id for the statements
+```
+python manage.py update_connectivity_statement_field--cs_field curie_id --neurondm_field label
+```
+
 ### Open the admin page
 there will be a superuser created with username/password: `admin/admin`
 

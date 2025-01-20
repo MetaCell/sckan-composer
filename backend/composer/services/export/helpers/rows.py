@@ -1,5 +1,6 @@
 from typing import List
 
+from composer.services.statement_service import get_statement_preview
 from composer.services.export.helpers.utils import get_connected_from_info
 from composer.services.export.helpers.predicate_mapping import (
     DESTINATION_PREDICATE_MAP,
@@ -168,7 +169,7 @@ def get_knowledge_statement_row(cs: ConnectivityStatement) -> Row:
         object="Knowledge statement",
         object_uri="",
         predicate_mapping=ExportRelationships.composerGenLabel,
-        object_text="TODO from @Gopal",  # TODO ,
+        object_text=get_statement_preview(cs, cs.get_journey()) ,
     )
 
 
