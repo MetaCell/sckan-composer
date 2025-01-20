@@ -15,4 +15,9 @@ class Migration(migrations.Migration):
             name="curie_id",
             field=models.CharField(blank=True, max_length=500, null=True),
         ),
+        migrations.AddField(
+            model_name="connectivitystatement",
+            name="journey_path",
+            field=models.JSONField(blank=True, null=True),
+        ),
     ]
