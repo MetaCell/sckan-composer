@@ -1,10 +1,10 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 
+from composer.services.export.helpers.csv import create_csv
 from composer.enums import CSState
 from composer.models import ConnectivityStatement, ExportBatch
 from composer.services.export.export_services import (
-    create_csv,
     export_connectivity_statements,
 )
 
