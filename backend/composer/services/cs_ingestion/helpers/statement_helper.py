@@ -29,6 +29,7 @@ def create_or_update_connectivity_statement(statement: Dict, sentence: Sentence,
         "projection_phenotype": get_projection_phenotype(statement),
         "reference_uri": statement[ID],
         "state": CSState.EXPORTED,
+        "curie_id": statement[LABEL],
     }
 
     connectivity_statement, created = ConnectivityStatement.objects.get_or_create(

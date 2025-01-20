@@ -5,7 +5,7 @@ from composer.services.cs_ingestion.cs_ingestion_services import ingest_statemen
 
 
 class Command(BaseCommand):
-    help = "Ingests Statements from neurondm pyp package"
+    help = "Ingests Statements from neurondm"
 
     def add_arguments(self, parser):
         parser.add_argument(
