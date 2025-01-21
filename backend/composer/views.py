@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from composer.enums import CSState
 from composer.models import ConnectivityStatement
-from composer.services.export_services import export_connectivity_statements
+from composer.services.export.export_services import export_connectivity_statements
 
 from version import VERSION
 

@@ -4,6 +4,8 @@ from django.db.models.signals import post_save, m2m_changed, post_delete
 from django.contrib.auth import get_user_model
 from django_fsm.signals import post_transition
 
+from composer.services.state_services import ConnectivityStatementStateService
+from composer.services.export.helpers.export_batch import compute_metrics
 from composer.services.layers_service import update_from_entities_on_deletion
 from composer.services.statement_service import (
     get_suffix_for_statement_preview,
@@ -22,9 +24,7 @@ from .models import (
     Layer,
     Region,
     Via,
-    Specie,
 )
-from .services.export_services import compute_metrics, ConnectivityStatementStateService
 from .services.graph_service import recompile_journey_path
 
 

@@ -55,7 +55,7 @@ def get_suffix_for_statement_preview(cs):
     return statement
 
 
-def create_statement_preview(cs, journey):
+def get_statement_preview(cs, journey):
     prefix = cs.statement_prefix
     journey_sentence = ';  '.join(journey)
     suffix = cs.statement_suffix

@@ -29,6 +29,7 @@ class ViaType(models.TextChoices):
     # axon sensory ending, axon terminal, axon sensory terminal
     AXON = "AXON", "Axon"
     DENDRITE = "DENDRITE", "Dendrite"
+    SENSORY_AXON = "SENSORY_AXON", "Axon to PNS"
 
 
 class DestinationType(models.TextChoices):
@@ -66,24 +67,6 @@ class NoteType(models.TextChoices):
     DIFFERENT = "different"
     TRANSITION = "transition"
     ALERT = "alert"
-
-
-class ExportRelationships(models.TextChoices):
-    hasBiologicalSex = "hasBiologicalSex", "Sex"
-    hasCircuitRolePhenotype = "hasCircuitRolePhenotype", "CircuitRole"
-    hasAnatomicalSystemPhenotype = "hasAnatomicalSystemPhenotype", "Phenotype"
-    hasFunctionalCircuitRolePhenotype = "hasFunctionalCircuitRolePhenotype", "FunctionalCircuitRole"
-    hasInstanceInTaxon = "hasInstanceInTaxon", "Species"
-    hasProjectionLaterality = "hasProjectionLaterality", "Laterality"
-    hasSomaPhenotype = "hasSomaPhenotype", "SomaPhenotype"
-    hasAlert = "hasAlert", "Alert"
-    hasSomaLocatedIn = "hasSomaLocatedIn", "Soma"
-    hasProjectionPhenotype = "hasProjection", "ProjectionPhenotype"
-    hasAxonPresynapticElementIn = "hasAxonPresynapticElementIn", "Axon terminal"
-    hasAxonSensorySubcellularElementIn = "hasAxonSensorySubcellularElementIn", "Afferent terminal",
-    hasAxonLocatedIn = "hasAxonLocatedIn", "Axon"
-    hasDendriteLocatedIn = "hasDendriteLocatedIn", "Dendrite"
-    hasForwardConnection = "hasForwardConnectionPhenotype", "Forward Connection"
 
 
 class MetricEntity(models.TextChoices):
