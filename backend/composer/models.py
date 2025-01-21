@@ -4,6 +4,7 @@ from django.db.models import Q, CheckConstraint
 from django.db.models.expressions import F
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
+from composer.services.graph_service import build_journey_description, build_journey_entities
 
 from composer.services.layers_service import update_from_entities_on_deletion
 from composer.services.state_services import (
@@ -21,7 +22,6 @@ from .enums import (
     ViaType,
     Projection,
 )
-from .services.graph_service import compile_journey
 from .utils import doi_uri, pmcid_uri, pmid_uri, create_reference_uri
 
 
@@ -190,10 +190,6 @@ class Sex(models.Model):
 
     def __str__(self):
         return self.name
-
-    @property
-    def sex_str(self):
-        return str(self.name) if self.name else ''
 
     class Meta:
         ordering = ["name"]
@@ -568,6 +564,9 @@ class ConnectivityStatement(models.Model):
     curie_id = models.CharField(max_length=500, null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True, db_index=True)
     modified_date = models.DateTimeField(auto_now=True, db_index=True)
+    journey_path = models.JSONField(null=True, blank=True)
+    statement_prefix = models.TextField(null=True, blank=True)
+    statement_suffix = models.TextField(null=True, blank=True)
 
     def __str__(self):
         suffix = ""
@@ -684,11 +683,10 @@ class ConnectivityStatement(models.Model):
             return set(self.via_set.get(order=via_order - 1).anatomical_entities.all())
 
     def get_journey(self):
-        return compile_journey(self)['journey']
+        return build_journey_description(self.journey_path)
 
     def get_entities_journey(self):
-        entities_journey = compile_journey(self)['entities']
-        return entities_journey
+        return build_journey_entities(self.journey_path)
 
     def get_laterality_description(self):
         laterality_map = {
@@ -716,7 +714,6 @@ class ConnectivityStatement(models.Model):
         if self.reference_uri is None:
             self.reference_uri = create_reference_uri(self.pk)
             self.save(update_fields=["reference_uri"])
-
 
     def set_origins(self, origin_ids):
         self.origins.set(origin_ids, clear=True)
@@ -1032,7 +1029,7 @@ class AlertType(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 
 class StatementAlert(models.Model):
     connectivity_statement = models.ForeignKey(

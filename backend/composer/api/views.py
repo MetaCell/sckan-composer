@@ -252,20 +252,23 @@ class ModelRetrieveViewSet(
     # mixins.DestroyModelMixin,
     # mixins.ListModelMixin,
     viewsets.GenericViewSet,
-): ...
+):
+    ...
 
 
 class ModelCreateRetrieveViewSet(
     ModelRetrieveViewSet,
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
-): ...
+):
+    ...
 
 
 class ModelNoDeleteViewSet(
     ModelCreateRetrieveViewSet,
     mixins.UpdateModelMixin,
-): ...
+):
+    ...
 
 
 class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
@@ -506,7 +509,8 @@ class ProfileViewSet(viewsets.GenericViewSet):
             msg = "User not logged in."
             raise ValidationError(msg, code="authorization")
 
-        profile, created = Profile.objects.get_or_create(user=self.request.user)
+        profile, created = Profile.objects.get_or_create(
+            user=self.request.user)
         return Response(self.get_serializer(profile).data)
 
 
@@ -546,6 +550,7 @@ class StatementAlertViewSet(viewsets.ModelViewSet):
     queryset = StatementAlert.objects.all()
     serializer_class = StatementAlertSerializer
     permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
+
 
 @extend_schema(
     responses=OpenApiTypes.OBJECT,
