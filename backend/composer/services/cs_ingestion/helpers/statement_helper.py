@@ -102,13 +102,14 @@ def create_or_update_connectivity_statement(
         try:
             create_or_update_statement_alert(connectivity_statement, alert_data)
         except ValueError as e:
-            logger_service.add_anomaly(
-                LoggableAnomaly(
-                    statement_id=reference_uri,
-                    entity_id=None,
-                    message=str(e),
-                    severity=Severity.WARNING,
-                )
+            Note.objects.create(
+                connectivity_statement=connectivity_statement,
+                user=User.objects.get(username="system"),
+                type=NoteType.ALERT,
+                note=(
+                    f"Warning: A problem occurred while updating a statement alert. "
+                    f"The issue was: '{str(e)}'. Please review the alert data and ensure the associated AlertType exists."
+                ),
             )
 
     update_many_to_many_fields(
