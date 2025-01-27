@@ -44,7 +44,7 @@ def makelpesrdf():
     return lpes, lrdf, collect
 
 
-def for_composer(n):
+def for_composer(n, statement_alert_uris: Set[str] = None):
     lpes, lrdf, collect = makelpesrdf()
 
     try:
@@ -53,6 +53,15 @@ def for_composer(n):
         if logger_service:
             logger_service.add_anomaly(LoggableAnomaly(e.statement_id, e.entity_id, e.message, severity=Severity.ERROR))
         return None
+
+
+    if statement_alert_uris is None:
+        statement_alert_uris = set()
+
+    statement_alerts = [
+        item for item in n.core_graph[n.identifier:]
+        if str(item[0]) in statement_alert_uris
+    ]
 
     fc = dict(
         id=str(n.id_),
@@ -74,6 +83,7 @@ def for_composer(n):
         sentence_number=lrdf(n, ilxtr.sentenceNumber),
         note_alert=lrdf(n, ilxtr.alertNote),
         validation_errors=validation_errors,
+        statement_alerts=statement_alerts,
     )
 
     return fc
@@ -421,7 +431,7 @@ def update_from_entities(origins: NeuronDMOrigin, vias: List[NeuronDMVia], desti
 
 ## Based on:
 ## https://github.com/tgbugs/pyontutils/blob/30c415207b11644808f70c8caecc0c75bd6acb0a/neurondm/docs/composer.py#L668-L698
-def main(local=False, full_imports=[], label_imports=[], logger_service_param=Optional[LoggerService]):
+def main(local=False, full_imports=[], label_imports=[], logger_service_param=Optional[LoggerService], statement_alert_uris: Set[str] = None):
     global logger_service
     logger_service = logger_service_param
 
@@ -495,7 +505,10 @@ def main(local=False, full_imports=[], label_imports=[], logger_service_param=Op
     config.load_existing(g)
     neurons = config.neurons()
 
-    fcs = [for_composer(n) for n in neurons]
+    if statement_alert_uris is None:
+        statement_alert_uris = set()
+
+    fcs = [for_composer(n, statement_alert_uris) for n in neurons]
     composer_statements = [item for item in fcs if item is not None]
 
     return composer_statements

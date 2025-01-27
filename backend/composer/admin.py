@@ -81,7 +81,7 @@ class StatementAlertInline(admin.StackedInline):
     model = StatementAlert
     extra = 1
     autocomplete_fields = ('alert_type', )
-    fields = ('alert_type', 'text', 'saved_by', 'created_at', 'updated_at')
+    fields = ('alert_type', 'text', 'created_at', 'updated_at')
     readonly_fields = ('created_at', 'updated_at')
 
 
@@ -259,6 +259,7 @@ class ConnectivityStatementAdmin(
         "sentence__pmid",
         "sentence__pmcid",
         "knowledge_statement",
+        "reference_uri",
     )
 
     fieldsets = ()
