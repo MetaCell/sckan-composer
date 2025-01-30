@@ -17,6 +17,7 @@ from composer.models import (
     Note,
 )
 from composer.services.filesystem_service import create_dir_if_not_exists
+from version import VERSION
 
 HAS_NERVE_BRANCHES_TAG = "Has nerve branches"
 
@@ -26,7 +27,7 @@ def create_csv(export_batch, folder_path: typing.Optional[str] = None) -> str:
         folder_path = tempfile.gettempdir()
 
     now = timezone.now()
-    filename = f'export_{now.strftime("%Y-%m-%d_%H-%M-%S")}.csv'
+    filename = f'export_v{str(VERSION).replace(".", "-")}_{now.strftime("%Y-%m-%d_%H-%M-%S")}.csv'
     filepath = os.path.join(folder_path, filename)
     create_dir_if_not_exists(folder_path)
 
