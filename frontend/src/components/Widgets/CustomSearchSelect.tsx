@@ -151,7 +151,10 @@ function CustomSearchSelect<T>({
               <ListItem
                 key={index}
                 onClick={() => onOptionSelect(option)}
-                sx={styles.listItem}
+                sx={{
+                  ...styles.listItem,
+                  backgroundColor: isOptionSelected(option) ? vars.gray50 : 'transparent',
+              }}
               >
                 <ListItemText
                   sx={{

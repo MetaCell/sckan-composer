@@ -16,6 +16,7 @@ import {Divider, Typography} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import {AssignPopulationIcon, ChangeStatusIcon, LabelAddIcon, NoteAddIcon} from "./icons";
 import AssignUser from "./TableMultiSelectActions/AssignUser";
+import Tooltip from "@mui/material/Tooltip";
 
 const toolbarStyle = {
   background: "#fff",
@@ -73,18 +74,26 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
             </Typography>
             <Divider flexItem />
             <AssignUser />
-            <IconButton>
-              <LabelAddIcon />
-            </IconButton>
-            <IconButton>
-              <NoteAddIcon />
-            </IconButton>
-            <IconButton>
-              <ChangeStatusIcon />
-            </IconButton>
-            <IconButton>
-              <AssignPopulationIcon />
-            </IconButton>
+            <Tooltip arrow title={'Manage tag(s)'}>
+              <IconButton>
+                <LabelAddIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip arrow title={'Add a note'}>
+              <IconButton>
+                <NoteAddIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip arrow title={'Change status'}>
+              <IconButton>
+                <ChangeStatusIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip arrow title={'Assign population set'}>
+              <IconButton>
+                <AssignPopulationIcon />
+              </IconButton>
+            </Tooltip>
             <Divider flexItem />
           </Stack>
         }

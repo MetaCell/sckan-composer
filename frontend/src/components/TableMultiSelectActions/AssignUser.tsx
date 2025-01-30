@@ -2,6 +2,7 @@ import IconButton from "@mui/material/IconButton";
 import {PersonAddIcon} from "../icons";
 import CustomSearchSelect from "../Widgets/CustomSearchSelect";
 import React, {useState} from "react";
+import Tooltip from "@mui/material/Tooltip";
 
 interface User {
   id: number
@@ -45,9 +46,12 @@ const AssignUser = () => {
   
   return (
     <>
-      <IconButton onClick={handleViewUsersMenu}>
-        <PersonAddIcon />
-      </IconButton>
+      <Tooltip arrow title={'Assign to a user'}>
+        <IconButton onClick={handleViewUsersMenu}>
+          <PersonAddIcon />
+        </IconButton>
+      </Tooltip>
+     
       <CustomSearchSelect
         open={Boolean(anchorEl)}
         handleClose={handleClose}
