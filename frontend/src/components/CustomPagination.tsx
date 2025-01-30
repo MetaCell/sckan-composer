@@ -45,12 +45,6 @@ export default function CustomPagination() {
         siblingCount={1}
         boundaryCount={1}
         onChange={(event, value) => apiRef.current.setPage(value - 1)}
-        sx={{
-          flex: 1,
-          px: 3,
-          py: 2,
-          borderTop: "1px solid #EAECF0",
-        }}
         renderItem={(item) => (
           <PaginationItem slots={{ previous: Prev, next: Next }} {...item} />
         )}

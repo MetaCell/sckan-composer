@@ -9,6 +9,7 @@ import sentenceService from "../services/SentenceService";
 import EntityDataGrid from "../components/EntityDataGrid";
 import DataGridHeader from "../components/DataGridHeader";
 import AddSentencesDialog from "../components/AddSentencesDialog";
+import {GridRowId} from "@mui/x-data-grid";
 
 const SentenceList = () => {
   const [sentenceList, setSentenceList] = useState<Sentence[]>();
@@ -16,6 +17,8 @@ const SentenceList = () => {
   const [loading, setLoading] = useState(true);
 
   const [open, setOpen] = useState(false);
+  
+  const [selectedRows, setSelectedRows] = useState<GridRowId[]>([]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -50,7 +53,7 @@ const SentenceList = () => {
         ]}
       />
       <AddSentencesDialog open={open} handleClose={handleClose} />
-      <DataGridHeader entityType="sentence" queryOptions={queryOptions} />
+      <DataGridHeader entityType="sentence" queryOptions={queryOptions} selectedRows={selectedRows} />
       <EntityDataGrid
         entityList={sentenceList}
         entityType="sentence"
@@ -58,6 +61,7 @@ const SentenceList = () => {
         totalResults={totalResults}
         allowSortByOwner={true}
         queryOptions={queryOptions}
+        setSelectedRows={setSelectedRows}
       />
     </Box>
   );

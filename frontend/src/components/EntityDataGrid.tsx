@@ -4,7 +4,7 @@ import {
   DataGrid,
   GridRowsProp,
   GridColDef,
-  GridEventListener,
+  GridEventListener, GridRowId,
 } from "@mui/x-data-grid";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { BaseConnectivityStatement, Sentence, Tag } from "../apiclient/backend";
@@ -42,13 +42,15 @@ interface DataGridProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
   loading: boolean;
   totalResults: number;
+  setSelectedRows?: (selectedRows: GridRowId[]) => void;
 }
 
 type criteria =
   | ("id" | "-id" | "last_edited" | "-last_edited" | "owner" | "-owner")[]
   | undefined;
 
-const StyledCheckBox = (props: any) => {
+
+export const StyledCheckBox = (props: any) => {
   return (
     <Checkbox
       {...props}
@@ -58,9 +60,8 @@ const StyledCheckBox = (props: any) => {
     />
   );
 };
-
 const EntityDataGrid = (props: DataGridProps) => {
-  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false } = props;
+  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false, setSelectedRows } = props;
 
   const currentPage = (queryOptions.index || 0) / queryOptions.limit;
 
@@ -152,7 +153,6 @@ const EntityDataGrid = (props: DataGridProps) => {
       ? navigate(`sentence/${params.row.id}`)
       : navigate(`/statement/${params.row.id}`);
   };
-
   const handleSortModelChange = (model: any) => {
     let ordering: criteria;
     if (model.length === 0) {
@@ -205,6 +205,7 @@ const EntityDataGrid = (props: DataGridProps) => {
           ),
           pagination: CustomPagination,
         }}
+        hideFooterSelectedRowCount={true}
         paginationModel={{
           page: currentPage,
           pageSize: queryOptions.limit,
@@ -219,6 +220,11 @@ const EntityDataGrid = (props: DataGridProps) => {
             ? mapSortingModel(queryOptions.ordering[0])
             : undefined
         }
+        onRowSelectionModelChange={(selectedRows) => {
+          if (setSelectedRows) {
+            setSelectedRows(selectedRows);
+          }
+        }}
       />
     </Box>
   );

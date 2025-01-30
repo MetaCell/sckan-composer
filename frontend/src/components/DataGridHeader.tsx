@@ -10,6 +10,11 @@ import { QueryParams as StatementQueryParams } from "../redux/statementSlice";
 import { setFilters as setSentenceFilters } from "../redux/sentenceSlice";
 import { setFilters as setStatementFilters } from "../redux/statementSlice";
 import { useAppDispatch } from "../redux/hooks";
+import {GridRowId} from "@mui/x-data-grid";
+import Stack from "@mui/material/Stack";
+import {Divider, Typography} from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import {AssignPopulationIcon, ChangeStatusIcon, LabelAddIcon, NoteAddIcon, PersonAddIcon} from "./icons";
 
 const toolbarStyle = {
   background: "#fff",
@@ -21,10 +26,11 @@ const toolbarStyle = {
 interface DataGridHeaderProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
   entityType: "sentence" | "statement";
+  selectedRows?: GridRowId[]
 }
 
 const DataGridHeader = (props: DataGridHeaderProps) => {
-  const { queryOptions, entityType } = props;
+  const { queryOptions, entityType, selectedRows } = props;
 
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
@@ -45,10 +51,48 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
       alignItems="center"
       sx={toolbarStyle}
     >
-      <Grid item xs={3}>
+      <Grid item xs={12} md={3}>
         <Searchbar queryOptions={queryOptions} entityType={entityType} />
       </Grid>
-      <Grid item>
+     
+      <Grid item xs={12} md={9} display='flex' alignItems='center' justifyContent='end' gap='1rem'>
+        {
+          selectedRows && selectedRows.length > 0 &&
+          <Stack direction="row" alignItems="center" spacing={1} sx={{
+            '& .MuiButtonBase-root': {
+              padding: '0.125rem',
+              borderRadius: '8px',
+            },
+            '& .MuiDivider-root': {
+              width: '0.0625rem',
+              height: '1.5rem',
+              background: '#EAECF0',
+              borderColor: '#EAECF0',
+              alignSelf: 'center'
+            }
+          }}>
+            <Typography variant="body2">
+              {selectedRows.length} {entityType}{selectedRows.length > 1 ? "s" : ""} selected
+            </Typography>
+            <Divider flexItem />
+            <IconButton>
+              <PersonAddIcon />
+            </IconButton>
+            <IconButton>
+              <LabelAddIcon />
+            </IconButton>
+            <IconButton>
+              <NoteAddIcon />
+            </IconButton>
+            <IconButton>
+              <ChangeStatusIcon />
+            </IconButton>
+            <IconButton>
+              <AssignPopulationIcon />
+            </IconButton>
+            <Divider flexItem />
+          </Stack>
+        }
         <Button
           variant="outlined"
           color="secondary"
