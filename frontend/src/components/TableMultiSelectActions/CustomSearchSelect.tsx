@@ -6,7 +6,6 @@ import ListItem from "@mui/material/ListItem"
 import ListItemText from "@mui/material/ListItemText"
 import Button from "@mui/material/Button"
 import Box from "@mui/material/Box"
-import Paper from "@mui/material/Paper"
 import Popover from "@mui/material/Popover"
 import {ListItemVariant} from "./ListItemVariant";
 import {vars} from "../../theme/variables";
@@ -16,6 +15,8 @@ const styles = {
     width: "16.375rem",
     boxShadow: "0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)",
     borderRadius: ".5rem",
+    marginTop: 1,
+    border: `1px solid ${vars.gray200}`
   },
   textField: {
     "& .MuiInputBase-root": {
@@ -42,8 +43,7 @@ const styles = {
     },
   },
   list: {
-    mb: 2,
-    maxHeight: 300,
+    maxHeight: '25rem',
     overflow: "auto",
     padding: "0.125rem 0.375rem"
   },
@@ -133,60 +133,63 @@ function CustomSearchSelect<T>({
         vertical: "top",
         horizontal: "left",
       }}
+      slotProps={{
+        paper: {
+          sx: styles.paper
+        }
+      }}
     >
-      <Paper sx={styles.paper}>
-        <TextField
-          fullWidth
-          placeholder={placeholder}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-          variant="outlined"
-          sx={styles.textField}
-        />
-        
-        <List sx={styles.list}>
-          {filteredOptions.length > 0 ? (
-            filteredOptions.map((option: T, index: number) => (
-              <ListItemVariant
-                key={index}
-                option={option}
-                index={index}
-                isSelected={isOptionSelected(option)}
-                getOptionLabel={getOptionLabel}
-                onOptionSelect={onOptionSelect}
-                variant={variant}
-                optionsInAllRows={optionsInAllRows}
-                optionsInSomeRows={optionsInSomeRows}
-              />
-            ))
-          ) : (
-            <ListItem>
-              <ListItemText
-                primary={noOptionsText}
-                primaryTypographyProps={{
-                  sx: { color: vars.gray50 },
-                }}
-              />
-            </ListItem>
-          )}
-        </List>
-        
-        <Box sx={styles.footer}>
-          <Button variant="outlined" onClick={onCancel} fullWidth>
-            {cancelButtonText}
-          </Button>
-          <Button variant="contained" fullWidth>
-            {confirmButtonText}
-          </Button>
-        </Box>
-      </Paper>
+      <TextField
+        fullWidth
+        placeholder={placeholder}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          ),
+        }}
+        variant="outlined"
+        sx={styles.textField}
+      />
+      
+      <List sx={styles.list}>
+        {filteredOptions.length > 0 ? (
+          filteredOptions.map((option: T, index: number) => (
+            <ListItemVariant
+              key={index}
+              option={option}
+              index={index}
+              isSelected={isOptionSelected(option)}
+              getOptionLabel={getOptionLabel}
+              onOptionSelect={onOptionSelect}
+              variant={variant}
+              optionsInAllRows={optionsInAllRows}
+              optionsInSomeRows={optionsInSomeRows}
+            />
+          ))
+        ) : (
+          <ListItem>
+            <ListItemText
+              primary={noOptionsText}
+              primaryTypographyProps={{
+                sx: { color: vars.gray50 },
+              }}
+            />
+          </ListItem>
+        )}
+      </List>
+      
+      <Box sx={styles.footer}>
+        <Button variant="outlined" onClick={onCancel} fullWidth>
+          {cancelButtonText}
+        </Button>
+        <Button variant="contained" fullWidth>
+          {confirmButtonText}
+        </Button>
+      </Box>
     </Popover>
   )
 }

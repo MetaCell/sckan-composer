@@ -13,12 +13,13 @@ import { useAppDispatch } from "../redux/hooks";
 import Stack from "@mui/material/Stack";
 import {Divider, Typography} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
-import {AssignPopulationIcon, ChangeStatusIcon, NoteAddIcon} from "./icons";
+import {AssignPopulationIcon, NoteAddIcon} from "./icons";
 import AssignUser from "./TableMultiSelectActions/AssignUser";
 import Tooltip from "@mui/material/Tooltip";
 import {vars} from "../theme/variables";
 import ManageTags from "./TableMultiSelectActions/ManageTags";
 import {Sentence} from "../apiclient/backend";
+import ChangeStatus from "./TableMultiSelectActions/ChangeStatus";
 
 const toolbarStyle = {
   background: vars.whiteColor,
@@ -84,11 +85,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
                 <NoteAddIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip arrow title={'Change status'}>
-              <IconButton>
-                <ChangeStatusIcon />
-              </IconButton>
-            </Tooltip>
+            <ChangeStatus />
             <Tooltip arrow title={'Assign population set'}>
               <IconButton>
                 <AssignPopulationIcon />
