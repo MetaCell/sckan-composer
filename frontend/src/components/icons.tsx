@@ -16,6 +16,14 @@ export const UncheckedItemIcon = (props: SvgIconProps) => (
   </SvgIcon>
 );
 
+export const IndeterminateIcon = (props: SvgIconProps) => (
+  <svg {...props} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#E2ECFB"/>
+    <rect x="0.5" y="0.5" width="15" height="15" rx="3.5" stroke="#3779E1"/>
+    <path d="M4.5 8H11.5" stroke="#3779E1" strokeWidth="1.66666" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
 export const CheckedItemIcon = (props: SvgIconProps) => (
   <SvgIcon {...props} viewBox="0 0 16 16" sx={{ width: 16, height: 16 }}>
     <rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#E2ECFB" />

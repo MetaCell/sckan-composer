@@ -5,7 +5,7 @@ import React, {useEffect, useState} from "react";
 import Tooltip from "@mui/material/Tooltip";
 import {tags} from "../../services/TagService";
 import {Tag} from "../../apiclient/backend";
-const ManageTags = () => {
+const ManageTags = ({selectedTableRows}: any) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedTags, setSelectedTags] = useState<Tag[]>([])
@@ -40,6 +40,21 @@ const ManageTags = () => {
     setTagsList(tagsList)
   }, [])
   
+  // Get all unique tags from selectedTableRows
+  const allTags: string[][] = selectedTableRows.map((row: any) => row.tags as string[]); // Ensure it's an array of strings
+  const uniqueTags: string[] = [...new Set(allTags.flat())]; // Explicitly cast to string[]
+
+// Find tags that are in all rows
+  const tagsInAllRows: string[] = uniqueTags.filter((tag: string) =>
+    selectedTableRows.every((row: any) => row.tags.includes(tag))
+  );
+
+// Find tags that are in some but not all rows
+  const tagsInSomeRows: string[] = uniqueTags.filter((tag: string) =>
+    selectedTableRows.some((row: any) => row.tags.includes(tag)) &&
+    !tagsInAllRows.includes(tag)
+  );
+  
   return (
     <>
       <Tooltip arrow title={'Manage tag(s)'}>
@@ -62,6 +77,8 @@ const ManageTags = () => {
         confirmButtonText="Apply"
         onConfirm={handleConfirm}
         variant="checkbox"
+        optionsInAllRows={tagsInAllRows}
+        optionsInSomeRows={tagsInSomeRows}
       />
     </>
   )

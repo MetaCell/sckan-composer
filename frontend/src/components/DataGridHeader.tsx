@@ -10,7 +10,6 @@ import { QueryParams as StatementQueryParams } from "../redux/statementSlice";
 import { setFilters as setSentenceFilters } from "../redux/sentenceSlice";
 import { setFilters as setStatementFilters } from "../redux/statementSlice";
 import { useAppDispatch } from "../redux/hooks";
-import {GridRowId} from "@mui/x-data-grid";
 import Stack from "@mui/material/Stack";
 import {Divider, Typography} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
@@ -79,7 +78,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
             </Typography>
             <Divider flexItem />
             <AssignUser />
-            <ManageTags />
+            <ManageTags selectedTableRows={selectedRows} />
             <Tooltip arrow title={'Add a note'}>
               <IconButton>
                 <NoteAddIcon />

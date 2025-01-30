@@ -89,6 +89,8 @@ export interface CustomSearchSelectProps<T> {
   onCancel?: () => void
   onConfirm?: (selectedOptions: T[]) => void
   variant?: "default" | "checkbox",
+  optionsInAllRows?: string[]
+  optionsInSomeRows?: string[]
 }
 
 function CustomSearchSelect<T>({
@@ -108,6 +110,8 @@ function CustomSearchSelect<T>({
      onCancel,
      onConfirm,
      variant = "default",
+    optionsInAllRows,
+    optionsInSomeRows,
    }: CustomSearchSelectProps<T>) {
   const filteredOptions = data.filter((option) =>
     getOptionLabel(option).toLowerCase().includes(searchTerm.toLowerCase()),
@@ -158,6 +162,8 @@ function CustomSearchSelect<T>({
                 getOptionLabel={getOptionLabel}
                 onOptionSelect={onOptionSelect}
                 variant={variant}
+                optionsInAllRows={optionsInAllRows}
+                optionsInSomeRows={optionsInSomeRows}
               />
             ))
           ) : (
