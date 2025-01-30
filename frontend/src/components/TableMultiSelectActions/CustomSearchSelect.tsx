@@ -79,16 +79,16 @@ export interface CustomSearchSelectProps<T> {
   searchTerm: string
   setSearchTerm: (searchTerm: string) => void
   data: T[]
-  getOptionLabel: (option: T) => string
+  getOptionLabel: (option: any) => string
   selectedOptions: T[]
-  onOptionSelect: (option: T) => void
+  onOptionSelect: (option: any) => void
   placeholder?: string
   noOptionsText?: string
   cancelButtonText?: string
   confirmButtonText?: string
   onCancel?: () => void
   onConfirm?: (selectedOptions: T[]) => void
-  variant?: "default" | "checkbox"
+  variant?: "default" | "checkbox",
 }
 
 function CustomSearchSelect<T>({
@@ -129,7 +129,6 @@ function CustomSearchSelect<T>({
         vertical: "top",
         horizontal: "left",
       }}
-      sx={{ mt: 1 }}
     >
       <Paper sx={styles.paper}>
         <TextField

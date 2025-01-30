@@ -42,7 +42,7 @@ interface DataGridProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
   loading: boolean;
   totalResults: number;
-  setSelectedRows?: (selectedRows: GridRowId[]) => void;
+  setSelectedRows?: (selectedRows: any[]) => void;
 }
 
 type criteria =
@@ -220,9 +220,10 @@ const EntityDataGrid = (props: DataGridProps) => {
             ? mapSortingModel(queryOptions.ordering[0])
             : undefined
         }
-        onRowSelectionModelChange={(selectedRows) => {
+        onRowSelectionModelChange={(selectedRowIds) => {
+          const selectedRowsData = rows.filter(row => selectedRowIds.includes(row.id));
           if (setSelectedRows) {
-            setSelectedRows(selectedRows);
+            setSelectedRows(selectedRowsData);
           }
         }}
       />

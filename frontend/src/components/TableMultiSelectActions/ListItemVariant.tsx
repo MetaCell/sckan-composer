@@ -2,6 +2,8 @@ import { ListItem, ListItemText, ListItemIcon, Checkbox } from "@mui/material"
 import CheckIcon from "@mui/icons-material/Check"
 import RemoveIcon from "@mui/icons-material/Remove"
 import { vars } from "../../theme/variables"
+import {CheckedItemIcon, UncheckedItemIcon} from "../icons";
+import React from "react";
 
 const styles = {
   listItem: {
@@ -21,13 +23,24 @@ const styles = {
     }
   },
 }
+
+export const StyledCheckBox = (props: any) => {
+  return (
+    <Checkbox
+      {...props}
+      sx={{ padding: 0 }}
+      checkedIcon={<CheckedItemIcon sx={{ fontSize: 16 }} />}
+      icon={<UncheckedItemIcon sx={{ fontSize: 16 }} />}
+    />
+  );
+};
 interface ListItemVariantProps<T> {
   option: T
   index: number
   isSelected: boolean
   getOptionLabel: (option: T) => string
   onOptionSelect: (option: T) => void
-  variant: "default" | "checkbox"
+  variant: "default" | "checkbox",
 }
 
 export function ListItemVariant<T>({
@@ -63,15 +76,14 @@ export function ListItemVariant<T>({
       </ListItem>
     )
   }
-  
+
   return (
     <ListItem key={index} onClick={() => onOptionSelect(option)} sx={{
       ...styles.listItem,
       backgroundColor: isSelected ? vars.gray50 : "transparent",
+      gap: '.5rem'
     }}>
-      {
-        isSelected ? <Checkbox checked /> : <RemoveIcon sx={{ color: vars.colorPrimary }} />
-      }
+     <StyledCheckBox />
       <ListItemText
         primary={getOptionLabel(option)}
         primaryTypographyProps={{

@@ -18,7 +18,7 @@ const SentenceList = () => {
 
   const [open, setOpen] = useState(false);
   
-  const [selectedRows, setSelectedRows] = useState<GridRowId[]>([]);
+  const [selectedRows, setSelectedRows] = useState<Sentence[]>([]);
 
   const handleClickOpen = () => {
     setOpen(true);

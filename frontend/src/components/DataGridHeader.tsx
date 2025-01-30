@@ -19,6 +19,7 @@ import AssignUser from "./TableMultiSelectActions/AssignUser";
 import Tooltip from "@mui/material/Tooltip";
 import {vars} from "../theme/variables";
 import ManageTags from "./TableMultiSelectActions/ManageTags";
+import {Sentence} from "../apiclient/backend";
 
 const toolbarStyle = {
   background: vars.whiteColor,
@@ -44,7 +45,7 @@ const multiSelectActionsStyle = {
 interface DataGridHeaderProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
   entityType: "sentence" | "statement";
-  selectedRows?: GridRowId[]
+  selectedRows?: Sentence[]
 }
 const DataGridHeader = (props: DataGridHeaderProps) => {
   const { queryOptions, entityType, selectedRows } = props;
