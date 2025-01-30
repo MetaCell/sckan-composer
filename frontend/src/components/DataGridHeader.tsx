@@ -14,7 +14,8 @@ import {GridRowId} from "@mui/x-data-grid";
 import Stack from "@mui/material/Stack";
 import {Divider, Typography} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
-import {AssignPopulationIcon, ChangeStatusIcon, LabelAddIcon, NoteAddIcon, PersonAddIcon} from "./icons";
+import {AssignPopulationIcon, ChangeStatusIcon, LabelAddIcon, NoteAddIcon} from "./icons";
+import AssignUser from "./TableMultiSelectActions/AssignUser";
 
 const toolbarStyle = {
   background: "#fff",
@@ -28,14 +29,10 @@ interface DataGridHeaderProps {
   entityType: "sentence" | "statement";
   selectedRows?: GridRowId[]
 }
-
 const DataGridHeader = (props: DataGridHeaderProps) => {
   const { queryOptions, entityType, selectedRows } = props;
-
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-
   const dispatch = useAppDispatch();
-
   const handleClearFilter = () => {
     const noFilters = { stateFilter: undefined, tagFilter: undefined };
     entityType === "sentence"
@@ -75,9 +72,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               {selectedRows.length} {entityType}{selectedRows.length > 1 ? "s" : ""} selected
             </Typography>
             <Divider flexItem />
-            <IconButton>
-              <PersonAddIcon />
-            </IconButton>
+            <AssignUser />
             <IconButton>
               <LabelAddIcon />
             </IconButton>
@@ -104,7 +99,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
         <Drawer
           anchor="right"
           open={isFilterDrawerOpen}
-          onClose={(e, r) => setIsFilterDrawerOpen(false)}
+          onClose={() => setIsFilterDrawerOpen(false)}
           ModalProps={{ sx: { zIndex: 1300 } }}
         >
           <FilterDrawer

@@ -22,7 +22,7 @@ export const vars = {
     darkBlue: "#184EA2",
     lightBlue: "#E2ECFB",
     mediumBlue: "#548CE5",
-    inputPlaceholderColor: '#667085',
+    inputPlaceholderColor: '#676C74',
     whiteColor: '#fff',
     inputTextColor: '#676C74',
     dropdownChipColor: '#EAECF0',
@@ -35,5 +35,6 @@ export const vars = {
     primary800: '#0C2751',
     gray200: '#EAECF0',
     warning600: '#DC6803',
-    gray600: '#475467'
+    gray600: '#475467',
+    gray50: '#F9FAFB'
 };
