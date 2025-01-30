@@ -14,16 +14,32 @@ import {GridRowId} from "@mui/x-data-grid";
 import Stack from "@mui/material/Stack";
 import {Divider, Typography} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
-import {AssignPopulationIcon, ChangeStatusIcon, LabelAddIcon, NoteAddIcon} from "./icons";
+import {AssignPopulationIcon, ChangeStatusIcon, NoteAddIcon} from "./icons";
 import AssignUser from "./TableMultiSelectActions/AssignUser";
 import Tooltip from "@mui/material/Tooltip";
+import {vars} from "../theme/variables";
+import ManageTags from "./TableMultiSelectActions/ManageTags";
 
 const toolbarStyle = {
-  background: "#fff",
+  background: vars.whiteColor,
   padding: 2,
   borderRadius: "12px 12px 0 0",
-  border: "1px solid #EAECF0",
+  border: `1px solid ${vars.gray200}`,
 };
+
+const multiSelectActionsStyle = {
+  '& .MuiButtonBase-root': {
+    padding: '0.125rem',
+    borderRadius: '8px',
+  },
+  '& .MuiDivider-root': {
+    width: '0.0625rem',
+    height: '1.5rem',
+    background: vars.gray200,
+    borderColor: vars.gray200,
+    alignSelf: 'center'
+  }
+}
 
 interface DataGridHeaderProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
@@ -56,29 +72,13 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
       <Grid item xs={12} md={9} display='flex' alignItems='center' justifyContent='end' gap='1rem'>
         {
           selectedRows && selectedRows.length > 0 &&
-          <Stack direction="row" alignItems="center" spacing={1} sx={{
-            '& .MuiButtonBase-root': {
-              padding: '0.125rem',
-              borderRadius: '8px',
-            },
-            '& .MuiDivider-root': {
-              width: '0.0625rem',
-              height: '1.5rem',
-              background: '#EAECF0',
-              borderColor: '#EAECF0',
-              alignSelf: 'center'
-            }
-          }}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={multiSelectActionsStyle}>
             <Typography variant="body2">
               {selectedRows.length} {entityType}{selectedRows.length > 1 ? "s" : ""} selected
             </Typography>
             <Divider flexItem />
             <AssignUser />
-            <Tooltip arrow title={'Manage tag(s)'}>
-              <IconButton>
-                <LabelAddIcon />
-              </IconButton>
-            </Tooltip>
+            <ManageTags />
             <Tooltip arrow title={'Add a note'}>
               <IconButton>
                 <NoteAddIcon />

@@ -1,31 +1,22 @@
 import IconButton from "@mui/material/IconButton";
-import {PersonAddIcon} from "../icons";
+import {LabelAddIcon} from "../icons";
 import CustomSearchSelect from "./CustomSearchSelect";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Tooltip from "@mui/material/Tooltip";
-
-interface User {
-  id: number
-  name: string
-  email: string
-}
-
-const users: User[] = [
-  { id: 1, name: "Lana Steiner", email: "lana@example.com" },
-  { id: 2, name: "Candice Wu", email: "candice@example.com" },
-]
-
-const AssignUser = () => {
+import {tags} from "../../services/TagService";
+import {Tag} from "../../apiclient/backend";
+const ManageTags = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedUsers, setSelectedUsers] = useState<User[]>([])
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([])
+  const [tagsList, setTagsList] = useState<Tag[]>([])
   const handleClose = () => {
     setAnchorEl(null)
     setSearchTerm("")
   }
   
-  const handleSelectUser = (user: User) => {
-    setSelectedUsers((prevSelected) => {
+  const handleSelectTag = (user: Tag) => {
+    setSelectedTags((prevSelected) => {
       const isAlreadySelected = prevSelected.some((selectedUser) => selectedUser.id === user.id)
       if (isAlreadySelected) {
         return prevSelected.filter((selectedUser) => selectedUser.id !== user.id)
@@ -35,39 +26,45 @@ const AssignUser = () => {
     })
   }
   
-  const handleConfirm = (selectedOptions: User[]) => {
+  const handleConfirm = (selectedOptions: Tag[]) => {
     console.log("Confirmed selections:", selectedOptions)
     handleClose()
   }
   
-  const handleViewUsersMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleViewTagsMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
   
+  useEffect(() => {
+    const tagsList = tags.getTagList()
+    setTagsList(tagsList)
+  }, [])
+  
   return (
     <>
-      <Tooltip arrow title={'Assign to a user'}>
-        <IconButton onClick={handleViewUsersMenu}>
-          <PersonAddIcon />
+      <Tooltip arrow title={'Manage tag(s)'}>
+        <IconButton onClick={handleViewTagsMenu}>
+          <LabelAddIcon />
         </IconButton>
       </Tooltip>
-     
+      
       <CustomSearchSelect
         open={Boolean(anchorEl)}
         handleClose={handleClose}
         anchorEl={anchorEl}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        data={users}
-        getOptionLabel={(user) => user.name}
-        selectedOptions={selectedUsers}
-        onOptionSelect={handleSelectUser}
-        placeholder="Search for users"
-        confirmButtonText="Assign"
+        data={tagsList}
+        getOptionLabel={(tag: Tag) => tag.tag}
+        selectedOptions={selectedTags}
+        onOptionSelect={handleSelectTag}
+        placeholder="Search for tag"
+        confirmButtonText="Apply"
         onConfirm={handleConfirm}
+        variant="checkbox"
       />
     </>
   )
 }
 
-export default AssignUser
+export default ManageTags

@@ -1,15 +1,14 @@
 import TextField from "@mui/material/TextField"
 import InputAdornment from "@mui/material/InputAdornment"
 import SearchIcon from "@mui/icons-material/Search"
-import CheckIcon from "@mui/icons-material/Check"
 import List from "@mui/material/List"
 import ListItem from "@mui/material/ListItem"
 import ListItemText from "@mui/material/ListItemText"
-import ListItemIcon from "@mui/material/ListItemIcon"
 import Button from "@mui/material/Button"
 import Box from "@mui/material/Box"
 import Paper from "@mui/material/Paper"
 import Popover from "@mui/material/Popover"
+import {ListItemVariant} from "./ListItemVariant";
 import {vars} from "../../theme/variables";
 
 const styles = {
@@ -72,7 +71,8 @@ const styles = {
     justifyContent: "center",
   }
 }
-interface CustomSearchSelectProps<T> {
+
+export interface CustomSearchSelectProps<T> {
   open: boolean
   handleClose: () => void
   anchorEl: HTMLElement | null
@@ -88,25 +88,27 @@ interface CustomSearchSelectProps<T> {
   confirmButtonText?: string
   onCancel?: () => void
   onConfirm?: (selectedOptions: T[]) => void
+  variant?: "default" | "checkbox"
 }
 
 function CustomSearchSelect<T>({
-   open,
-   handleClose,
-   anchorEl,
-   searchTerm,
-   setSearchTerm,
-   data,
-   getOptionLabel,
-   selectedOptions,
-   onOptionSelect,
-   placeholder = "Search",
-   noOptionsText = "No options",
-   cancelButtonText = "Cancel",
-   confirmButtonText = "Confirm",
-   onCancel,
-   onConfirm,
- }: CustomSearchSelectProps<T>) {
+     open,
+     handleClose,
+     anchorEl,
+     searchTerm,
+     setSearchTerm,
+     data,
+     getOptionLabel,
+     selectedOptions,
+     onOptionSelect,
+     placeholder = "Search",
+     noOptionsText = "No options",
+     cancelButtonText = "Cancel",
+     confirmButtonText = "Confirm",
+     onCancel,
+     onConfirm,
+     variant = "default",
+   }: CustomSearchSelectProps<T>) {
   const filteredOptions = data.filter((option) =>
     getOptionLabel(option).toLowerCase().includes(searchTerm.toLowerCase()),
   )
@@ -127,6 +129,7 @@ function CustomSearchSelect<T>({
         vertical: "top",
         horizontal: "left",
       }}
+      sx={{ mt: 1 }}
     >
       <Paper sx={styles.paper}>
         <TextField
@@ -137,7 +140,7 @@ function CustomSearchSelect<T>({
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon color="primary" fontSize="small" sx={{ mr: 0.6 }} />
+                <SearchIcon />
               </InputAdornment>
             ),
           }}
@@ -147,54 +150,34 @@ function CustomSearchSelect<T>({
         
         <List sx={styles.list}>
           {filteredOptions.length > 0 ? (
-            filteredOptions.map((option, index) => (
-              <ListItem
+            filteredOptions.map((option: T, index: number) => (
+              <ListItemVariant
                 key={index}
-                onClick={() => onOptionSelect(option)}
-                sx={{
-                  ...styles.listItem,
-                  backgroundColor: isOptionSelected(option) ? vars.gray50 : 'transparent',
-              }}
-              >
-                <ListItemText
-                  sx={{
-                    margin: 0,
-                  }}
-                  primary={getOptionLabel(option)}
-                />
-                {isOptionSelected(option) && (
-                  <ListItemIcon sx={{ minWidth: "auto" }}>
-                    <CheckIcon sx={{ color: vars.colorPrimary }} fontSize='small' />
-                  </ListItemIcon>
-                )}
-              </ListItem>
+                option={option}
+                index={index}
+                isSelected={isOptionSelected(option)}
+                getOptionLabel={getOptionLabel}
+                onOptionSelect={onOptionSelect}
+                variant={variant}
+              />
             ))
           ) : (
             <ListItem>
-              <ListItemText primary={noOptionsText} />
+              <ListItemText
+                primary={noOptionsText}
+                primaryTypographyProps={{
+                  sx: { color: vars.gray50 },
+                }}
+              />
             </ListItem>
           )}
         </List>
         
-        <Box
-          sx={styles.footer}
-        >
-          <Button
-            variant="outlined"
-            onClick={() => {
-              onCancel?.()
-            }}
-            fullWidth
-          >
+        <Box sx={styles.footer}>
+          <Button variant="outlined" onClick={onCancel} fullWidth>
             {cancelButtonText}
           </Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              onConfirm?.(selectedOptions)
-            }}
-            fullWidth
-          >
+          <Button variant="contained" fullWidth>
             {confirmButtonText}
           </Button>
         </Box>
