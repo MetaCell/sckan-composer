@@ -32,6 +32,8 @@ import {
 import { useAppDispatch } from "../redux/hooks";
 import { useNavigate } from "react-router";
 import Stack from "@mui/material/Stack";
+import {Checkbox} from "@mui/material";
+import {CheckedItemIcon, UncheckedItemIcon} from "./icons";
 
 interface DataGridProps {
   entityType: "sentence" | "statement";
@@ -45,6 +47,17 @@ interface DataGridProps {
 type criteria =
   | ("id" | "-id" | "last_edited" | "-last_edited" | "owner" | "-owner")[]
   | undefined;
+
+const StyledCheckBox = (props: any) => {
+  return (
+    <Checkbox
+      {...props}
+      sx={{ padding: 0 }}
+      checkedIcon={<CheckedItemIcon sx={{ fontSize: 16 }} />}
+      icon={<UncheckedItemIcon sx={{ fontSize: 16 }} />}
+    />
+  );
+};
 
 const EntityDataGrid = (props: DataGridProps) => {
   const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false } = props;
@@ -177,30 +190,35 @@ const EntityDataGrid = (props: DataGridProps) => {
         rows={rows}
         columns={columns}
         getRowHeight={() => "auto"}
-        pageSize={queryOptions.limit}
         paginationMode="server"
         sortingMode="server"
         loading={loading}
         rowCount={totalResults}
-        onPageChange={handlePageChange}
+        checkboxSelection
         onRowClick={handleRowClick}
-        onSortModelChange={handleSortModelChange}
-        rowsPerPageOptions={[queryOptions.limit]}
-        page={currentPage}
+        slots={{
+          baseCheckbox: StyledCheckBox,
+          noRowsOverlay: () => (
+            <Stack height="100%" alignItems="center" justifyContent="center">
+              {`No ${entityType}s to display, clear your filter or modify your search criteria`}
+            </Stack>
+          ),
+          pagination: CustomPagination,
+        }}
+        paginationModel={{
+          page: currentPage,
+          pageSize: queryOptions.limit,
+        }}
+        onPaginationModelChange={(model) => {
+          handlePageChange(model.page);
+        }}
+        onSortModelChange={(model) => handleSortModelChange(model)}
         disableColumnMenu
         initialState={
           queryOptions.ordering
             ? mapSortingModel(queryOptions.ordering[0])
             : undefined
         }
-        components={{
-          Pagination: CustomPagination,
-          NoRowsOverlay: () => (
-              <Stack height="100%" alignItems="center" justifyContent="center">
-                {`No ${entityType}s to display, clear your filter or modify your search criteria`}
-              </Stack>
-          )
-        }}
       />
     </Box>
   );

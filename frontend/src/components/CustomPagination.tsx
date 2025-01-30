@@ -13,8 +13,6 @@ import Typography from "@mui/material/Typography";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
-const overlayerHeight = 3;
-
 const Prev = () => (
   <Stack direction="row" spacing={1.5}>
     <ArrowBackIcon fontSize="small" />
@@ -39,17 +37,7 @@ export default function CustomPagination() {
       display="flex"
       flexGrow={1}
       flexDirection="column"
-      mt={-overlayerHeight}
     >
-      <Box
-        width="100%"
-        sx={{
-          background:
-            "linear-gradient(to bottom, rgba(255,255,255,0),rgba(255,255,255,1))",
-          zIndex: 2,
-          height: 8 * overlayerHeight,
-        }}
-      />
       <Pagination
         variant="text"
         count={pageCount}
@@ -61,7 +49,7 @@ export default function CustomPagination() {
           flex: 1,
           px: 3,
           py: 2,
-          borderTop: "1px solid rgba(224, 224, 224, 1)",
+          borderTop: "1px solid #EAECF0",
         }}
         renderItem={(item) => (
           <PaginationItem slots={{ previous: Prev, next: Next }} {...item} />
