@@ -80,13 +80,12 @@ const ManageTags = ({selectedTableRows}: any) => {
     const initialSelectedTags = mapTagsToSelectOptions(tagsList).filter((tag: OptionType) =>
       tagsInAllRows.includes(tag.label) || tagsInSomeRows.includes(tag.label)
     );
-    
+
     setSelectedTags(initialSelectedTags);
     setTagsInSomeRows(tagsInSomeRows);
     setTagsInAllRows(tagsInAllRows);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTableRows]);
-  
+  }, [selectedTableRows, tagsList]);
+
   return (
     <>
       <Tooltip arrow title={'Manage tag(s)'}>
