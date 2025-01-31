@@ -58,7 +58,9 @@ const ManageTags = ({selectedTableRows}: any) => {
   useEffect(() => {
     const tagsList = tags.getTagList();
     setTagsList(tagsList);
- 
+  }, []);
+  
+  useEffect(() => {
     // Get all unique tags from selectedTableRows
     const allTags: string[][] = selectedTableRows.map((row: any) => row.tags as string[]); // Ensure it's an array of strings
     const uniqueTags: string[] = [...new Set(allTags.flat())]; // Explicitly cast to string[]
@@ -83,7 +85,7 @@ const ManageTags = ({selectedTableRows}: any) => {
     setTagsInSomeRows(tagsInSomeRows);
     setTagsInAllRows(tagsInAllRows);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [selectedTableRows]);
   
   return (
     <>
