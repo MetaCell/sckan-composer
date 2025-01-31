@@ -18,6 +18,8 @@ const ManageTags = ({selectedTableRows}: any) => {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedTags, setSelectedTags] = useState<OptionType[]>([])
   const [tagsList, setTagsList] = useState<Tag[]>([])
+  const [tagsInAllRows, setTagsInAllRows] = useState<string[]>([]);
+  const [tagsInSomeRows, setTagsInSomeRows] = useState<string[]>([]);
   const handleClose = () => {
     setAnchorEl(null)
     setSearchTerm("")
@@ -25,13 +27,23 @@ const ManageTags = ({selectedTableRows}: any) => {
   
   const handleSelectTag = (tag: OptionType) => {
     setSelectedTags((prevSelected: OptionType[]) => {
-      const isAlreadySelected = prevSelected.some((selectedUser) => selectedUser.id === tag.id)
+      const isAlreadySelected = prevSelected.some((row) => row.id === tag.id)
       if (isAlreadySelected) {
-        return prevSelected.filter((selectedUser) => selectedUser.id !== tag.id)
+        return prevSelected.filter((row) => row.id !== tag.id)
       } else {
         return [...prevSelected, tag]
       }
     })
+    
+    // If the tag exists in tagsInAllRows, remove it
+    setTagsInAllRows((prevSelected: string[]) =>
+      prevSelected.includes(tag.label) ? prevSelected.filter((row) => row !== tag.label) : prevSelected
+    );
+    
+    // If the tag exists in tagsInSomeRows, remove it
+    setTagsInSomeRows((prevSelected: string[]) =>
+      prevSelected.includes(tag.label) ? prevSelected.filter((row) => row !== tag.label) : prevSelected
+    );
   }
   
   const handleConfirm = () => {
@@ -43,29 +55,33 @@ const ManageTags = ({selectedTableRows}: any) => {
     setAnchorEl(event.currentTarget)
   }
 
-  // Get all unique tags from selectedTableRows
-  const allTags: string[][] = selectedTableRows.map((row: any) => row.tags as string[]); // Ensure it's an array of strings
-  const uniqueTags: string[] = [...new Set(allTags.flat())]; // Explicitly cast to string[]
-
-// Find tags that are in all rows
-  const tagsInAllRows: string[] = uniqueTags.filter((tag: string) =>
-    selectedTableRows.every((row: any) => row.tags.includes(tag))
-  );
-
-// Find tags that are in some but not all rows
-  const tagsInSomeRows: string[] = uniqueTags.filter((tag: string) =>
-    selectedTableRows.some((row: any) => row.tags.includes(tag)) &&
-    !tagsInAllRows.includes(tag)
-  );
-  
   useEffect(() => {
     const tagsList = tags.getTagList();
     setTagsList(tagsList);
+ 
+    // Get all unique tags from selectedTableRows
+    const allTags: string[][] = selectedTableRows.map((row: any) => row.tags as string[]); // Ensure it's an array of strings
+    const uniqueTags: string[] = [...new Set(allTags.flat())]; // Explicitly cast to string[]
+    
+    // Find tags that are in all rows
+    const tagsInAllRows: string[] = uniqueTags.filter((tag: string) =>
+      selectedTableRows.every((row: any) => row.tags.includes(tag))
+    );
+    
+    // Find tags that are in some but not all rows
+    const tagsInSomeRows: string[] = uniqueTags.filter((tag: string) =>
+      selectedTableRows.some((row: any) => row.tags.includes(tag)) &&
+      !tagsInAllRows.includes(tag)
+    );
+    
     
     const initialSelectedTags = mapTagsToSelectOptions(tagsList).filter((tag: OptionType) =>
       tagsInAllRows.includes(tag.label) || tagsInSomeRows.includes(tag.label)
     );
+    
     setSelectedTags(initialSelectedTags);
+    setTagsInSomeRows(tagsInSomeRows);
+    setTagsInAllRows(tagsInAllRows);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
