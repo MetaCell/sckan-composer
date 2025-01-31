@@ -26,22 +26,26 @@ const styles = {
 
 interface SelectionBannerProps {
   totalResults: number;
-  onSelectAll?: () => void;
   show: boolean;
   entityType?: string;
 }
 
-const SelectionBanner: React.FC<SelectionBannerProps> = ({ totalResults, onSelectAll, show, entityType }) => {
+const SelectionBanner: React.FC<SelectionBannerProps> = ({ totalResults, show, entityType }) => {
+  const handleSelectAll = () => {
+    // TODO: Implement the logic to select all sentences
+    console.log(`Select all ${entityType}s...`);
+  }
+  
   return (
     <Collapse in={show} timeout={400}>
       <Box sx={styles.selectionBanner}>
         <Typography color={vars.darkTextColor} noWrap>
-          All the {entityType} on this page are selected.
+          All the {entityType}s on this page are selected.
         </Typography>
         <Link
           component="button"
           variant="body2"
-          onClick={onSelectAll}
+          onClick={handleSelectAll}
           sx={styles.link}
         >
           Select all {totalResults} {entityType}

@@ -30,11 +30,7 @@ const SentenceList = () => {
   const queryOptions = useAppSelector((state) => state.sentence.queryOptions);
 
   const gutters = useGutters();
-  const handleSelectAll = () => {
-    // TODO: Implement the logic to select all sentences
-    console.log("Select all sentences")
-  }
-
+  
   useEffect(() => {
     sentenceService.getList(queryOptions).then((res) => {
       setSentenceList(res.results);
@@ -71,8 +67,7 @@ const SentenceList = () => {
         <SelectionBanner
           totalResults={totalResults}
           show={showSelectionBanner}
-          onSelectAll={handleSelectAll}
-          entityType="sentences"
+          entityType="sentence"
         />
       </Box>
       <EntityDataGrid

@@ -19,10 +19,6 @@ const StatementList = () => {
   const queryOptions = useAppSelector((state) => state.statement.queryOptions);
 
   const gutters = useGutters();
-  const handleSelectAll = () => {
-    // TODO: Implement the logic to select all sentences
-    console.log("Select all entities...");
-  }
   
     useEffect(() => {
       setShowSelectionBanner(selectedRows.length === queryOptions.limit)
@@ -54,7 +50,6 @@ const StatementList = () => {
         <SelectionBanner
           totalResults={totalResults}
           show={showSelectionBanner}
-          onSelectAll={handleSelectAll}
           entityType="statements"
         />
       </Box>
