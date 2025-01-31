@@ -12,15 +12,13 @@ import { setFilters as setStatementFilters } from "../redux/statementSlice";
 import { useAppDispatch } from "../redux/hooks";
 import Stack from "@mui/material/Stack";
 import {Divider, Typography} from "@mui/material";
-import IconButton from "@mui/material/IconButton";
-import {AssignPopulationIcon} from "./icons";
 import AssignUser from "./TableMultiSelectActions/AssignUser";
-import Tooltip from "@mui/material/Tooltip";
 import {vars} from "../theme/variables";
 import ManageTags from "./TableMultiSelectActions/ManageTags";
 import {Sentence} from "../apiclient/backend";
 import ChangeStatus from "./TableMultiSelectActions/ChangeStatus";
 import AddNote from "./TableMultiSelectActions/AddNote";
+import AssignPopulationSet from "./TableMultiSelectActions/AssignPopulationSet";
 
 const toolbarStyle = {
   background: vars.whiteColor,
@@ -90,11 +88,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
             <ManageTags selectedTableRows={selectedRows} />
             <AddNote />
             <ChangeStatus selectedTableRows={selectedRows} entityType={entityType} />
-            <Tooltip arrow title={'Assign population set'}>
-              <IconButton>
-                <AssignPopulationIcon />
-              </IconButton>
-            </Tooltip>
+            <AssignPopulationSet />
             <Divider flexItem />
           </Stack>
         }
