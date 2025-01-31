@@ -47,7 +47,7 @@ const ManageTags = ({selectedTableRows}: any) => {
   }
   
   const handleConfirm = () => {
-    // TODO: Assign selected tags to the selected entities
+    // TODO: API call to Assign selected tags to the selected entities
     console.log("Confirmed selections:", selectedTags)
     handleClose()
   }

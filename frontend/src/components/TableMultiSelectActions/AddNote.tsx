@@ -61,7 +61,8 @@ const AddNote = () => {
   };
   
   const onSubmit = () => {
-    console.log(noteText)
+    // TODO: API call to submit note
+    console.log("Submitting note:", noteText);
     handleClose();
   }
   

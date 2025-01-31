@@ -9,6 +9,7 @@ const AssignPopulationSet = () => {
   
   const handleSelectSet = (set: string) => {
     setSelectedSet(set);
+    // TODO: API call to assign population set
     console.log(`Assigned population set: ${set}`);
   };
   

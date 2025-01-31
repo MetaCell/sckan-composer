@@ -47,7 +47,7 @@ const AssignUser = () => {
   }
   
   const handleConfirm = () => {
-    // TODO: Assign selected users to the selected entities
+    // TODO: API call to Assign selected users to the selected entities
     console.log("Confirmed selections:", selectedUsers)
     handleClose()
   }
@@ -76,6 +76,8 @@ const AssignUser = () => {
         placeholder="Search for users"
         confirmButtonText="Assign"
         onConfirm={handleConfirm}
+        showHelperText={true}
+        helperText={`Having trouble finding someone? </br>The list of available users is based on their roles and permissions. contact us if you need any help`}
       />
     </>
   )

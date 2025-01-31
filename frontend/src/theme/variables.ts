@@ -37,5 +37,7 @@ export const vars = {
     warning600: '#DC6803',
     gray600: '#475467',
     gray50: '#F9FAFB',
-    gray300: '#D0D5DD'
+    gray300: '#D0D5DD',
+    gray400: '#98A2B3',
+    gray500: '#667085'
 };

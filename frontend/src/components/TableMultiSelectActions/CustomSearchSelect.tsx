@@ -10,6 +10,9 @@ import Popover from "@mui/material/Popover"
 import {ListItemVariant} from "./ListItemVariant";
 import {vars} from "../../theme/variables";
 import {OptionType} from "./AssignUser";
+import {HelpOutlineRounded} from "@mui/icons-material";
+import Tooltip from "@mui/material/Tooltip";
+import React from "react";
 
 const styles = {
   paper: {
@@ -90,7 +93,9 @@ export interface CustomSearchSelectProps {
   onConfirm?: () => void
   variant?: "default" | "checkbox",
   optionsInAllRows?: string[]
-  optionsInSomeRows?: string[]
+  optionsInSomeRows?: string[],
+  showHelperText?: boolean,
+  helperText?: string
 }
 
 const CustomSearchSelect = ({
@@ -111,6 +116,8 @@ const CustomSearchSelect = ({
      variant = "default",
      optionsInAllRows,
      optionsInSomeRows,
+     showHelperText = false,
+     helperText
    }: CustomSearchSelectProps) => {
   
   const isOptionSelected = (option: OptionType) =>
@@ -143,7 +150,18 @@ const CustomSearchSelect = ({
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <SearchIcon />
+              <SearchIcon fontSize='small' sx={{color: vars.gray500}}  />
+            </InputAdornment>
+          ),
+          endAdornment: showHelperText && (
+            <InputAdornment position="end">
+              <Tooltip title={ <span
+                dangerouslySetInnerHTML={{
+                  __html: helperText || ''
+                }}
+              />}>
+                <HelpOutlineRounded fontSize='small' sx={{color: vars.gray400, cursor: 'pointer'}} />
+              </Tooltip>
             </InputAdornment>
           ),
         }}

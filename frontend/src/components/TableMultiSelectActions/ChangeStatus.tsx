@@ -27,6 +27,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
   };
   
   const handleStatusChange = (newStatus: string) => {
+    // TODO: API call to change status
     console.log(`Changing status to: ${newStatus}`);
   };
   
