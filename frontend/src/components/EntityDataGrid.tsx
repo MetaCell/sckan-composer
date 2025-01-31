@@ -44,6 +44,7 @@ interface DataGridProps {
   loading: boolean;
   totalResults: number;
   setSelectedRows?: (selectedRows: any[]) => void;
+  selectedRows?: any[];
 }
 
 type criteria =
@@ -63,7 +64,7 @@ export const StyledCheckBox = (props: any) => {
   );
 };
 const EntityDataGrid = (props: DataGridProps) => {
-  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false, setSelectedRows } = props;
+  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false, setSelectedRows, selectedRows } = props;
 
   const currentPage = (queryOptions.index || 0) / queryOptions.limit;
 
@@ -222,6 +223,7 @@ const EntityDataGrid = (props: DataGridProps) => {
             ? mapSortingModel(queryOptions.ordering[0])
             : undefined
         }
+        rowSelectionModel={selectedRows?.map(row => row.id)}
         onRowSelectionModelChange={(selectedRowIds) => {
           const selectedRowsData = rows.filter(row => selectedRowIds.includes(row.id));
           if (setSelectedRows) {

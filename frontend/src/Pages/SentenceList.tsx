@@ -31,7 +31,7 @@ const SentenceList = () => {
 
   const gutters = useGutters();
   const handleSelectAll = () => {
-    // Implement the logic to select all sentences
+    // TODO: Implement the logic to select all sentences
     console.log("Select all sentences")
   }
 
@@ -47,7 +47,10 @@ const SentenceList = () => {
     setShowSelectionBanner(selectedRows.length === queryOptions.limit)
   }, [selectedRows, queryOptions.limit])
   
-  
+  useEffect(() => {
+    setSelectedRows([])
+  }, [queryOptions.stateFilter, queryOptions.tagFilter])
+
   return (
     <Box sx={gutters} p={6} justifyContent="center">
       <Header
@@ -80,6 +83,7 @@ const SentenceList = () => {
         allowSortByOwner={true}
         queryOptions={queryOptions}
         setSelectedRows={setSelectedRows}
+        selectedRows={selectedRows}
       />
     </Box>
   );
