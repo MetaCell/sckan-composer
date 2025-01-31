@@ -1,15 +1,17 @@
-import Tooltip from "@mui/material/Tooltip";
-import IconButton from "@mui/material/IconButton";
-import { ChangeStatusIcon } from "../icons";
-import Popover from "@mui/material/Popover";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import { vars } from "../../theme/variables";
-import React, {useCallback, useState} from "react";
-import { ListItemIcon } from "@mui/material";
-import CheckIcon from "@mui/icons-material/Check";
-import {ChangeRequestStatus} from "../../helpers/settings";
+import type React from "react"
+import { useCallback, useState } from "react"
+import Tooltip from "@mui/material/Tooltip"
+import IconButton from "@mui/material/IconButton"
+import {ChangeStatusDialogIcon, ChangeStatusIcon} from "../icons"
+import Popover from "@mui/material/Popover"
+import List from "@mui/material/List"
+import ListItem from "@mui/material/ListItem"
+import ListItemText from "@mui/material/ListItemText"
+import { ListItemIcon } from "@mui/material"
+import CheckIcon from "@mui/icons-material/Check"
+import { ChangeRequestStatus } from "../../helpers/settings"
+import { vars } from "../../theme/variables"
+import ConfirmationDialog from "../ConfirmationDialog";
 
 const styles = {
   paper: {
@@ -18,31 +20,7 @@ const styles = {
     borderRadius: ".5rem",
     padding: ".25rem 0",
     marginTop: 1,
-    border: `1px solid ${vars.gray200}`
-},
-  textField: {
-    "& .MuiInputBase-root": {
-      border: "0",
-      boxShadow: "none",
-      borderBottom: `1px solid ${vars.gray200}`,
-      borderRadius: "0",
-      
-      "&.Mui-focused": {
-        boxShadow: "none",
-        border: "0 !important",
-        borderBottom: `1px solid ${vars.gray200} !important`,
-        
-        "& .MuiOutlinedInput-notchedOutline": {
-          border: "0 !important",
-          boxShadow: "none",
-        },
-      },
-      
-      "& .MuiOutlinedInput-notchedOutline": {
-        border: "0 !important",
-        boxShadow: "none",
-      },
-    },
+    border: `1px solid ${vars.gray200}`,
   },
   list: {
     maxHeight: "25rem",
@@ -65,33 +43,64 @@ const styles = {
       fontWeight: 500,
     },
   },
-};
+}
 
-const ChangeStatus = ({selectedTableRows}: any) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+interface ChangeStatusProps {
+  selectedTableRows: Array<{ state: string; id: string | number }>,
+  entityType: string
+}
+
+const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityType }) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [dontShowAgain, setDontShowAgain] = useState(false)
+  const [newStatus, setNewStatus] = useState<string | null>(null)
   
-  const statusOptions = Object.values(ChangeRequestStatus);
+  const statusOptions = Object.values(ChangeRequestStatus)
   
   const handleClose = () => {
-    setAnchorEl(null);
-  };
+    setAnchorEl(null)
+    setSelectedStatus(null)
+    setNewStatus(null)
+  }
   
   const handleViewStatusMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+    setAnchorEl(event.currentTarget)
+  }
   
   const handleStatusSelect = (status: string) => {
-    setSelectedStatus(status);
-    handleClose();
-  };
+    setNewStatus(status)
+    if (dontShowAgain) {
+      handleStatusConfirm(status)
+    } else {
+      setIsModalOpen(true)
+    }
+  }
   
-  const isUniformState = useCallback(() => {
-    if (!Array.isArray(selectedTableRows) || selectedTableRows.length === 0) return false;
-    const firstState = selectedTableRows[0]?.state;
-    return selectedTableRows.every(item => item.state === firstState);
-  }, [selectedTableRows]);
+  const handleStatusChange = (newStatus: string) => {
+    console.log(`Changing status to: ${newStatus}`)
+    // Handle the status change here
+  }
+  
+  const handleStatusConfirm = (status: string) => {
+    setSelectedStatus(status)
+    handleStatusChange(status)
+    handleClose()
+    setIsModalOpen(false)
+  }
+  
+  const handleModalCancel = () => {
+    setIsModalOpen(false)
+    setNewStatus(null)
+  }
 
+  const isUniformState = useCallback(() => {
+    if (!Array.isArray(selectedTableRows) || selectedTableRows.length === 0) return false
+    const firstState = selectedTableRows[0]?.state
+    return selectedTableRows.every((item) => item.state === firstState)
+  }, [selectedTableRows])
+  
   return (
     <>
       <Tooltip
@@ -105,7 +114,6 @@ const ChangeStatus = ({selectedTableRows}: any) => {
           </IconButton>
         </span>
       </Tooltip>
-
       
       <Popover
         open={Boolean(anchorEl)}
@@ -121,8 +129,8 @@ const ChangeStatus = ({selectedTableRows}: any) => {
         }}
         slotProps={{
           paper: {
-           sx: styles.paper
-          }
+            sx: styles.paper,
+          },
         }}
       >
         <List sx={styles.list}>
@@ -136,13 +144,7 @@ const ChangeStatus = ({selectedTableRows}: any) => {
                   backgroundColor: selectedStatus === status ? vars.gray50 : "transparent",
                 }}
               >
-                <ListItemText
-                  sx={{ margin: 0 }}
-                  primary={status}
-                  primaryTypographyProps={{
-                    sx: { color: vars.darkTextColor, fontWeight: 500 },
-                  }}
-                />
+                <ListItemText sx={{ margin: 0 }} primary={status} />
                 {selectedStatus === status && (
                   <ListItemIcon sx={{ minWidth: "auto" }}>
                     <CheckIcon sx={{ color: vars.colorPrimary }} fontSize="small" />
@@ -162,8 +164,20 @@ const ChangeStatus = ({selectedTableRows}: any) => {
           )}
         </List>
       </Popover>
+      
+      <ConfirmationDialog
+        open={isModalOpen}
+        onConfirm={() => handleStatusConfirm(newStatus!)}
+        onCancel={handleModalCancel}
+        title={`Change status of ${selectedTableRows.length} ${entityType}.`}
+        confirmationText={`By proceeding, the selected ${entityType} <strong>status</strong> will change from ${selectedTableRows[0]?.state} to ${newStatus}. Are you sure?`}
+        Icon={<ChangeStatusDialogIcon />}
+        dontShowAgain={dontShowAgain}
+        setDontShowAgain={setDontShowAgain}
+      />
     </>
-  );
-};
+  )
+}
 
-export default ChangeStatus;
+export default ChangeStatus
+

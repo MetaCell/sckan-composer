@@ -89,7 +89,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
             <AssignUser />
             <ManageTags selectedTableRows={selectedRows} />
             <AddNote />
-            <ChangeStatus selectedTableRows={selectedRows} />
+            <ChangeStatus selectedTableRows={selectedRows} entityType={entityType} />
             <Tooltip arrow title={'Assign population set'}>
               <IconButton>
                 <AssignPopulationIcon />
