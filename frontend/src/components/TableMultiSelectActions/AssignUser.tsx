@@ -10,21 +10,32 @@ interface User {
   email: string
 }
 
+export interface OptionType {
+  id: number
+  label: string
+}
+
 const users: User[] = [
   { id: 1, name: "Lana Steiner", email: "lana@example.com" },
   { id: 2, name: "Candice Wu", email: "candice@example.com" },
 ]
 
+const mapUsersToSelectOptions = (users: User[]) => {
+  return users.map((user) => ({
+    id: user.id,
+    label: user.name,
+  }));
+};
 const AssignUser = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedUsers, setSelectedUsers] = useState<User[]>([])
+  const [selectedUsers, setSelectedUsers] = useState<OptionType[]>([])
   const handleClose = () => {
     setAnchorEl(null)
     setSearchTerm("")
   }
   
-  const handleSelectUser = (user: User) => {
+  const handleSelectUser = (user: OptionType) => {
     setSelectedUsers((prevSelected) => {
       const isAlreadySelected = prevSelected.some((selectedUser) => selectedUser.id === user.id)
       if (isAlreadySelected) {
@@ -35,8 +46,9 @@ const AssignUser = () => {
     })
   }
   
-  const handleConfirm = (selectedOptions: User[]) => {
-    console.log("Confirmed selections:", selectedOptions)
+  const handleConfirm = () => {
+    // TODO: Assign selected users to the selected entities
+    console.log("Confirmed selections:", selectedUsers)
     handleClose()
   }
   
@@ -58,8 +70,7 @@ const AssignUser = () => {
         anchorEl={anchorEl}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        data={users}
-        getOptionLabel={(user) => user.name}
+        data={mapUsersToSelectOptions(users)}
         selectedOptions={selectedUsers}
         onOptionSelect={handleSelectUser}
         placeholder="Search for users"

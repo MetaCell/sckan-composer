@@ -38,7 +38,6 @@ interface ListItemVariantProps<T> {
   option: any;
   index: number
   isSelected: boolean
-  getOptionLabel: (option: T) => string
   onOptionSelect: (option: T) => void
   variant: "default" | "checkbox",
   optionsInAllRows?: string[],
@@ -49,7 +48,6 @@ export function ListItemVariant<T>({
      option,
      index,
      isSelected,
-     getOptionLabel,
      onOptionSelect,
      variant,
      optionsInAllRows,
@@ -67,7 +65,7 @@ export function ListItemVariant<T>({
       >
         <ListItemText
           sx={{ margin: 0 }}
-          primary={getOptionLabel(option)}
+          primary={option.label}
           primaryTypographyProps={{
             sx: { color: vars.darkTextColor, fontWeight: 500 },
           }}
@@ -87,9 +85,9 @@ export function ListItemVariant<T>({
       backgroundColor: isSelected ? vars.gray50 : "transparent",
       gap: '.5rem'
     }}>
-     <StyledCheckBox checked={optionsInAllRows?.includes(option.tag)} indeterminate={optionsInSomeRows?.includes(option.tag)} />
+     <StyledCheckBox checked={optionsInAllRows?.includes(option.label)} indeterminate={optionsInSomeRows?.includes(option.label)} />
       <ListItemText
-        primary={getOptionLabel(option)}
+        primary={option.label}
         primaryTypographyProps={{
           sx: {
             color: vars.darkTextColor,

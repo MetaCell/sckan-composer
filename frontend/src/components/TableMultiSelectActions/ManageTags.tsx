@@ -5,32 +5,40 @@ import React, {useEffect, useState} from "react";
 import Tooltip from "@mui/material/Tooltip";
 import {tags} from "../../services/TagService";
 import {Tag} from "../../apiclient/backend";
+import {OptionType} from "./AssignUser";
+
+const mapTagsToSelectOptions = (tags: Tag[]) => {
+  return tags.map((tag) => ({
+    id: tag.id,
+    label: tag.tag,
+  }));
+}
 const ManageTags = ({selectedTableRows}: any) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([])
+  const [selectedTags, setSelectedTags] = useState<OptionType[]>([])
   const [tagsList, setTagsList] = useState<Tag[]>([])
   const handleClose = () => {
     setAnchorEl(null)
     setSearchTerm("")
   }
   
-  const handleSelectTag = (user: Tag) => {
-    setSelectedTags((prevSelected) => {
-      const isAlreadySelected = prevSelected.some((selectedUser) => selectedUser.id === user.id)
+  const handleSelectTag = (tag: OptionType) => {
+    setSelectedTags((prevSelected: OptionType[]) => {
+      const isAlreadySelected = prevSelected.some((selectedUser) => selectedUser.id === tag.id)
       if (isAlreadySelected) {
-        return prevSelected.filter((selectedUser) => selectedUser.id !== user.id)
+        return prevSelected.filter((selectedUser) => selectedUser.id !== tag.id)
       } else {
-        return [...prevSelected, user]
+        return [...prevSelected, tag]
       }
     })
   }
   
-  const handleConfirm = (selectedOptions: Tag[]) => {
-    console.log("Confirmed selections:", selectedOptions)
+  const handleConfirm = () => {
+    // TODO: Assign selected tags to the selected entities
+    console.log("Confirmed selections:", selectedTags)
     handleClose()
   }
-  
   const handleViewTagsMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -69,8 +77,7 @@ const ManageTags = ({selectedTableRows}: any) => {
         anchorEl={anchorEl}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        data={tagsList}
-        getOptionLabel={(tag: Tag) => tag.tag}
+        data={mapTagsToSelectOptions(tagsList)}
         selectedOptions={selectedTags}
         onOptionSelect={handleSelectTag}
         placeholder="Search for tag"

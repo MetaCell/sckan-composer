@@ -9,6 +9,7 @@ import Box from "@mui/material/Box"
 import Popover from "@mui/material/Popover"
 import {ListItemVariant} from "./ListItemVariant";
 import {vars} from "../../theme/variables";
+import {OptionType} from "./AssignUser";
 
 const styles = {
   paper: {
@@ -72,35 +73,33 @@ const styles = {
   }
 }
 
-export interface CustomSearchSelectProps<T> {
+export interface CustomSearchSelectProps {
   open: boolean
   handleClose: () => void
   anchorEl: HTMLElement | null
   searchTerm: string
   setSearchTerm: (searchTerm: string) => void
-  data: T[]
-  getOptionLabel: (option: any) => string
-  selectedOptions: T[]
-  onOptionSelect: (option: any) => void
+  data: OptionType[]
+  selectedOptions: any
+  onOptionSelect: (option: OptionType) => void
   placeholder?: string
   noOptionsText?: string
   cancelButtonText?: string
   confirmButtonText?: string
   onCancel?: () => void
-  onConfirm?: (selectedOptions: T[]) => void
+  onConfirm?: () => void
   variant?: "default" | "checkbox",
   optionsInAllRows?: string[]
   optionsInSomeRows?: string[]
 }
 
-function CustomSearchSelect<T>({
+const CustomSearchSelect = ({
      open,
      handleClose,
      anchorEl,
      searchTerm,
      setSearchTerm,
      data,
-     getOptionLabel,
      selectedOptions,
      onOptionSelect,
      placeholder = "Search",
@@ -110,15 +109,12 @@ function CustomSearchSelect<T>({
      onCancel,
      onConfirm,
      variant = "default",
-    optionsInAllRows,
-    optionsInSomeRows,
-   }: CustomSearchSelectProps<T>) {
-  const filteredOptions = data.filter((option) =>
-    getOptionLabel(option).toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+     optionsInAllRows,
+     optionsInSomeRows,
+   }: CustomSearchSelectProps) => {
   
-  const isOptionSelected = (option: T) =>
-    selectedOptions.some((selectedOption) => getOptionLabel(selectedOption) === getOptionLabel(option))
+  const isOptionSelected = (option: OptionType) =>
+    selectedOptions.some((selectedOption: OptionType) => selectedOption.label === option.label);
   
   return (
     <Popover
@@ -156,14 +152,13 @@ function CustomSearchSelect<T>({
       />
       
       <List sx={styles.list}>
-        {filteredOptions.length > 0 ? (
-          filteredOptions.map((option: T, index: number) => (
+        {data.length > 0 ? (
+          data.map((option: OptionType, index: number) => (
             <ListItemVariant
               key={index}
               option={option}
               index={index}
               isSelected={isOptionSelected(option)}
-              getOptionLabel={getOptionLabel}
               onOptionSelect={onOptionSelect}
               variant={variant}
               optionsInAllRows={optionsInAllRows}
@@ -186,7 +181,7 @@ function CustomSearchSelect<T>({
         <Button variant="outlined" onClick={onCancel} fullWidth>
           {cancelButtonText}
         </Button>
-        <Button variant="contained" fullWidth>
+        <Button variant="contained" onClick={onConfirm} fullWidth>
           {confirmButtonText}
         </Button>
       </Box>
