@@ -9,13 +9,14 @@ import sentenceService from "../services/SentenceService";
 import EntityDataGrid from "../components/EntityDataGrid";
 import DataGridHeader from "../components/DataGridHeader";
 import AddSentencesDialog from "../components/AddSentencesDialog";
+import SelectionBanner from "../components/TableMultiSelectActions/SelectionBanner";
 
 const SentenceList = () => {
   const [sentenceList, setSentenceList] = useState<Sentence[]>();
   const [totalResults, setTotalResults] = useState<number>(0);
   const [loading, setLoading] = useState(true);
-
   const [open, setOpen] = useState(false);
+  const [showSelectionBanner, setShowSelectionBanner] = useState(false)
   
   const [selectedRows, setSelectedRows] = useState<Sentence[]>([]);
 
@@ -29,6 +30,10 @@ const SentenceList = () => {
   const queryOptions = useAppSelector((state) => state.sentence.queryOptions);
 
   const gutters = useGutters();
+  const handleSelectAll = () => {
+    // Implement the logic to select all sentences
+    console.log("Select all sentences")
+  }
 
   useEffect(() => {
     sentenceService.getList(queryOptions).then((res) => {
@@ -37,7 +42,12 @@ const SentenceList = () => {
       setLoading(false);
     });
   }, [queryOptions]);
-
+  
+  useEffect(() => {
+    setShowSelectionBanner(selectedRows.length === queryOptions.limit)
+  }, [selectedRows, queryOptions.limit])
+  
+  
   return (
     <Box sx={gutters} p={6} justifyContent="center">
       <Header
@@ -52,7 +62,16 @@ const SentenceList = () => {
         ]}
       />
       <AddSentencesDialog open={open} handleClose={handleClose} />
+     
       <DataGridHeader entityType="sentence" queryOptions={queryOptions} selectedRows={selectedRows} />
+      <Box sx={{ position: "relative", zIndex: 1 }}>
+        <SelectionBanner
+          totalResults={totalResults}
+          show={showSelectionBanner}
+          onSelectAll={handleSelectAll}
+          entityType="sentences"
+        />
+      </Box>
       <EntityDataGrid
         entityList={sentenceList}
         entityType="sentence"

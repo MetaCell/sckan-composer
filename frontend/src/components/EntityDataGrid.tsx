@@ -34,6 +34,7 @@ import { useNavigate } from "react-router";
 import Stack from "@mui/material/Stack";
 import {Checkbox} from "@mui/material";
 import {CheckedItemIcon, IndeterminateIcon, UncheckedItemIcon} from "./icons";
+import {vars} from "../theme/variables";
 
 interface DataGridProps {
   entityType: "sentence" | "statement";
@@ -226,6 +227,11 @@ const EntityDataGrid = (props: DataGridProps) => {
           if (setSelectedRows) {
             setSelectedRows(selectedRowsData);
           }
+        }}
+        sx={{
+          borderRadius: 0,
+          borderColor: vars.gray200,
+          borderTop: 0
         }}
       />
     </Box>
