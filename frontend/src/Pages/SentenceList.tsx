@@ -9,7 +9,6 @@ import sentenceService from "../services/SentenceService";
 import EntityDataGrid from "../components/EntityDataGrid";
 import DataGridHeader from "../components/DataGridHeader";
 import AddSentencesDialog from "../components/AddSentencesDialog";
-import {GridRowId} from "@mui/x-data-grid";
 
 const SentenceList = () => {
   const [sentenceList, setSentenceList] = useState<Sentence[]>();
