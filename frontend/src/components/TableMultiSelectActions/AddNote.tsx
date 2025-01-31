@@ -49,7 +49,7 @@ const styles = {
     padding: "0 1.5rem 1.5rem",
   },
 };
-const AddNote = ({selectedTableRows}: any) => {
+const AddNote = ({selectedTableRows, entityType}: any) => {
   const [open, setOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
   const handleOpen = () => {
@@ -62,7 +62,7 @@ const AddNote = ({selectedTableRows}: any) => {
   
   const onSubmit = () => {
     // TODO: API call to submit note
-    console.log("Submitting note:", noteText, selectedTableRows);
+    console.log("Submitting note:", noteText, selectedTableRows, entityType);
     handleClose();
   }
   

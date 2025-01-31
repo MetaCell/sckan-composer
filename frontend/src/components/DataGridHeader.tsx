@@ -84,11 +84,11 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               {selectedRows.length} {entityType}{selectedRows.length > 1 ? "s" : ""} selected
             </Typography>
             <Divider flexItem />
-            <AssignUser selectedTableRows={selectedRows} />
-            <ManageTags selectedTableRows={selectedRows} />
-            <AddNote selectedTableRows={selectedRows} />
+            <AssignUser selectedTableRows={selectedRows} entityType={entityType} />
+            <ManageTags selectedTableRows={selectedRows} entityType={entityType} />
+            <AddNote selectedTableRows={selectedRows} entityType={entityType} />
             <ChangeStatus selectedTableRows={selectedRows} entityType={entityType} />
-            <AssignPopulationSet selectedTableRows={selectedRows} />
+            <AssignPopulationSet selectedTableRows={selectedRows} entityType={entityType} />
             <Divider flexItem />
           </Stack>
         }

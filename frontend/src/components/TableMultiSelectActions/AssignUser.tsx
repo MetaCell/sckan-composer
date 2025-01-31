@@ -26,7 +26,7 @@ const mapUsersToSelectOptions = (users: User[]) => {
     label: user.name,
   }));
 };
-const AssignUser = ({selectedTableRows}: any) => {
+const AssignUser = ({selectedTableRows, entityType}: any) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedUsers, setSelectedUsers] = useState<OptionType[]>([])
@@ -48,7 +48,7 @@ const AssignUser = ({selectedTableRows}: any) => {
   
   const handleConfirm = () => {
     // TODO: API call to Assign selected users to the selected entities
-    console.log("Confirmed selections:", selectedUsers, selectedTableRows)
+    console.log("Confirmed selections:", selectedUsers, selectedTableRows, entityType)
     handleClose()
   }
   

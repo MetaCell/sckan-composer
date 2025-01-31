@@ -13,7 +13,7 @@ const mapTagsToSelectOptions = (tags: Tag[]) => {
     label: tag.tag,
   }));
 }
-const ManageTags = ({selectedTableRows}: any) => {
+const ManageTags = ({selectedTableRows, entityType}: any) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedTags, setSelectedTags] = useState<OptionType[]>([])
@@ -48,7 +48,7 @@ const ManageTags = ({selectedTableRows}: any) => {
   
   const handleConfirm = () => {
     // TODO: API call to Assign selected tags to the selected entities
-    console.log("Confirmed selections:", selectedTags)
+    console.log("Confirmed selections:", selectedTags, selectedTableRows, entityType)
     handleClose()
   }
   const handleViewTagsMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
