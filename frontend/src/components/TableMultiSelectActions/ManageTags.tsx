@@ -42,12 +42,7 @@ const ManageTags = ({selectedTableRows}: any) => {
   const handleViewTagsMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
-  
-  useEffect(() => {
-    const tagsList = tags.getTagList()
-    setTagsList(tagsList)
-  }, [])
-  
+
   // Get all unique tags from selectedTableRows
   const allTags: string[][] = selectedTableRows.map((row: any) => row.tags as string[]); // Ensure it's an array of strings
   const uniqueTags: string[] = [...new Set(allTags.flat())]; // Explicitly cast to string[]
@@ -62,6 +57,17 @@ const ManageTags = ({selectedTableRows}: any) => {
     selectedTableRows.some((row: any) => row.tags.includes(tag)) &&
     !tagsInAllRows.includes(tag)
   );
+  
+  useEffect(() => {
+    const tagsList = tags.getTagList();
+    setTagsList(tagsList);
+    
+    const initialSelectedTags = mapTagsToSelectOptions(tagsList).filter((tag: OptionType) =>
+      tagsInAllRows.includes(tag.label) || tagsInSomeRows.includes(tag.label)
+    );
+    setSelectedTags(initialSelectedTags);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   return (
     <>
@@ -78,7 +84,7 @@ const ManageTags = ({selectedTableRows}: any) => {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         data={mapTagsToSelectOptions(tagsList)}
-        selectedOptions={selectedTags}
+        selectedOptions={selectedTags.map((tag: OptionType) => tag.label)}
         onOptionSelect={handleSelectTag}
         placeholder="Search for tag"
         confirmButtonText="Apply"

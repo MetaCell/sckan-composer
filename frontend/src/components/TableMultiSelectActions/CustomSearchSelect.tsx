@@ -80,7 +80,7 @@ export interface CustomSearchSelectProps {
   searchTerm: string
   setSearchTerm: (searchTerm: string) => void
   data: OptionType[]
-  selectedOptions: any
+  selectedOptions: string[]
   onOptionSelect: (option: OptionType) => void
   placeholder?: string
   noOptionsText?: string
@@ -114,7 +114,7 @@ const CustomSearchSelect = ({
    }: CustomSearchSelectProps) => {
   
   const isOptionSelected = (option: OptionType) =>
-    selectedOptions.some((selectedOption: OptionType) => selectedOption.label === option.label);
+    selectedOptions.some((selectedOption: string) => selectedOption === option.label);
   
   return (
     <Popover
@@ -163,6 +163,7 @@ const CustomSearchSelect = ({
               variant={variant}
               optionsInAllRows={optionsInAllRows}
               optionsInSomeRows={optionsInSomeRows}
+              selectedOptions={selectedOptions}
             />
           ))
         ) : (

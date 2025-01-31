@@ -71,7 +71,7 @@ const AssignUser = () => {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         data={mapUsersToSelectOptions(users)}
-        selectedOptions={selectedUsers}
+        selectedOptions={selectedUsers.map((user: OptionType) => user.label)}
         onOptionSelect={handleSelectUser}
         placeholder="Search for users"
         confirmButtonText="Assign"

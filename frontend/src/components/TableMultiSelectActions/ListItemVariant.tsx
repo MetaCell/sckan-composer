@@ -42,6 +42,7 @@ interface ListItemVariantProps<T> {
   variant: "default" | "checkbox",
   optionsInAllRows?: string[],
   optionsInSomeRows?: string[]
+  selectedOptions?: string[]
 }
 
 export function ListItemVariant<T>({
@@ -52,6 +53,7 @@ export function ListItemVariant<T>({
      variant,
      optionsInAllRows,
      optionsInSomeRows,
+     selectedOptions
    }: ListItemVariantProps<T>) {
   if (variant === "default") {
     return (
@@ -85,7 +87,7 @@ export function ListItemVariant<T>({
       backgroundColor: isSelected ? vars.gray50 : "transparent",
       gap: '.5rem'
     }}>
-     <StyledCheckBox checked={optionsInAllRows?.includes(option.label)} indeterminate={optionsInSomeRows?.includes(option.label)} />
+     <StyledCheckBox checked={selectedOptions?.includes(option.label) || optionsInAllRows?.includes(option.label)} indeterminate={selectedOptions?.includes(option.label) && optionsInSomeRows?.includes(option.label)} />
       <ListItemText
         primary={option.label}
         primaryTypographyProps={{
