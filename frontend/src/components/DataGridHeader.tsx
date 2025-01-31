@@ -13,13 +13,14 @@ import { useAppDispatch } from "../redux/hooks";
 import Stack from "@mui/material/Stack";
 import {Divider, Typography} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
-import {AssignPopulationIcon, NoteAddIcon} from "./icons";
+import {AssignPopulationIcon} from "./icons";
 import AssignUser from "./TableMultiSelectActions/AssignUser";
 import Tooltip from "@mui/material/Tooltip";
 import {vars} from "../theme/variables";
 import ManageTags from "./TableMultiSelectActions/ManageTags";
 import {Sentence} from "../apiclient/backend";
 import ChangeStatus from "./TableMultiSelectActions/ChangeStatus";
+import AddNote from "./TableMultiSelectActions/AddNote";
 
 const toolbarStyle = {
   background: vars.whiteColor,
@@ -32,6 +33,13 @@ const multiSelectActionsStyle = {
   '& .MuiButtonBase-root': {
     padding: '0.125rem',
     borderRadius: '8px',
+    '&.Mui-disabled': {
+      '& .MuiSvgIcon-root': {
+        '& path': {
+          fill: `${vars.gray300} !important`
+        }
+      }
+    }
   },
   '& .MuiDivider-root': {
     width: '0.0625rem',
@@ -80,12 +88,8 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
             <Divider flexItem />
             <AssignUser />
             <ManageTags selectedTableRows={selectedRows} />
-            <Tooltip arrow title={'Add a note'}>
-              <IconButton>
-                <NoteAddIcon />
-              </IconButton>
-            </Tooltip>
-            <ChangeStatus />
+            <AddNote />
+            <ChangeStatus selectedTableRows={selectedRows} />
             <Tooltip arrow title={'Assign population set'}>
               <IconButton>
                 <AssignPopulationIcon />

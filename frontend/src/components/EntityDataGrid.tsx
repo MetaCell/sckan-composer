@@ -4,7 +4,7 @@ import {
   DataGrid,
   GridRowsProp,
   GridColDef,
-  GridEventListener, GridRowId,
+  GridEventListener,
 } from "@mui/x-data-grid";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { BaseConnectivityStatement, Sentence, Tag } from "../apiclient/backend";
@@ -33,7 +33,7 @@ import { useAppDispatch } from "../redux/hooks";
 import { useNavigate } from "react-router";
 import Stack from "@mui/material/Stack";
 import {Checkbox} from "@mui/material";
-import {CheckedItemIcon, UncheckedItemIcon} from "./icons";
+import {CheckedItemIcon, IndeterminateIcon, UncheckedItemIcon} from "./icons";
 
 interface DataGridProps {
   entityType: "sentence" | "statement";
@@ -57,6 +57,7 @@ export const StyledCheckBox = (props: any) => {
       sx={{ padding: 0 }}
       checkedIcon={<CheckedItemIcon sx={{ fontSize: 16 }} />}
       icon={<UncheckedItemIcon sx={{ fontSize: 16 }} />}
+      indeterminateIcon={<IndeterminateIcon sx={{ fontSize: 16 }} />}
     />
   );
 };

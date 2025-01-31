@@ -6,7 +6,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import { vars } from "../../theme/variables";
-import React, { useState } from "react";
+import React, {useCallback, useState} from "react";
 import { ListItemIcon } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import {ChangeRequestStatus} from "../../helpers/settings";
@@ -67,7 +67,7 @@ const styles = {
   },
 };
 
-const ChangeStatus = () => {
+const ChangeStatus = ({selectedTableRows}: any) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   
@@ -86,13 +86,26 @@ const ChangeStatus = () => {
     handleClose();
   };
   
+  const isUniformState = useCallback(() => {
+    if (!Array.isArray(selectedTableRows) || selectedTableRows.length === 0) return false;
+    const firstState = selectedTableRows[0]?.state;
+    return selectedTableRows.every(item => item.state === firstState);
+  }, [selectedTableRows]);
+
   return (
     <>
-      <Tooltip arrow title={"Change status"}>
-        <IconButton onClick={handleViewStatusMenu}>
-          <ChangeStatusIcon />
-        </IconButton>
+      <Tooltip
+        arrow
+        title={isUniformState() ? "Change status" : "Select statements with the same status to enable bulk change"}
+        disableInteractive
+      >
+        <span>
+          <IconButton onClick={handleViewStatusMenu} disabled={!isUniformState()}>
+            <ChangeStatusIcon />
+          </IconButton>
+        </span>
       </Tooltip>
+
       
       <Popover
         open={Boolean(anchorEl)}
