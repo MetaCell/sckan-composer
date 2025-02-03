@@ -9,6 +9,7 @@ import Header from "../components/Header";
 import { useGutters } from "../styles/styles";
 import { Typography } from "@mui/material";
 import SelectionBanner from "../components/TableMultiSelectActions/SelectionBanner";
+import {ENTITY_TYPES} from "../helpers/settings";
 
 const StatementList = () => {
   const [statementList, setStatementList] = useState<BaseConnectivityStatement[]>();
@@ -45,17 +46,17 @@ const StatementList = () => {
         title="Knowledge Statements List"
         caption={`${totalResults} statements in total`}
       />
-      <DataGridHeader entityType="statement" queryOptions={queryOptions} selectedRows={selectedRows} />
+      <DataGridHeader entityType={ENTITY_TYPES.STATEMENT} queryOptions={queryOptions} selectedRows={selectedRows} />
       <Box sx={{ position: "relative", zIndex: 1 }}>
         <SelectionBanner
           totalResults={totalResults}
           show={showSelectionBanner}
-          entityType="statements"
+          entityType={ENTITY_TYPES.STATEMENT}
         />
       </Box>
       <EntityDataGrid
         entityList={statementList}
-        entityType="statement"
+        entityType={ENTITY_TYPES.STATEMENT}
         loading={loading}
         totalResults={totalResults}
         queryOptions={queryOptions}

@@ -5,7 +5,7 @@ import { ChangeRequestStatus } from "../../helpers/settings";
 import ConfirmationDialog from "../ConfirmationDialog";
 
 interface ChangeStatusProps {
-  selectedTableRows: Array<{ state: string; id: string | number }>;
+  selectedTableRows: any;
   entityType: string;
 }
 

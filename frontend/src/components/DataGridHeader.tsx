@@ -19,6 +19,7 @@ import {Sentence} from "../apiclient/backend";
 import ChangeStatus from "./TableMultiSelectActions/ChangeStatus";
 import AddNote from "./TableMultiSelectActions/AddNote";
 import AssignPopulationSet from "./TableMultiSelectActions/AssignPopulationSet";
+import {ENTITY_TYPES} from "../helpers/settings";
 
 const toolbarStyle = {
   background: vars.whiteColor,
@@ -50,7 +51,7 @@ const multiSelectActionsStyle = {
 
 interface DataGridHeaderProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
-  entityType: "sentence" | "statement";
+  entityType: ENTITY_TYPES.STATEMENT | ENTITY_TYPES.SENTENCE;
   selectedRows?: Sentence[]
 }
 const DataGridHeader = (props: DataGridHeaderProps) => {

@@ -35,9 +35,10 @@ import Stack from "@mui/material/Stack";
 import {Checkbox} from "@mui/material";
 import {CheckedItemIcon, IndeterminateIcon, UncheckedItemIcon} from "./icons";
 import {vars} from "../theme/variables";
+import {ENTITY_TYPES} from "../helpers/settings";
 
 interface DataGridProps {
-  entityType: "sentence" | "statement";
+  entityType: ENTITY_TYPES.STATEMENT | ENTITY_TYPES.SENTENCE;
   entityList: (Sentence | BaseConnectivityStatement)[] | undefined;
   allowSortByOwner?: boolean;
   queryOptions: SentenceQueryParams | StatementQueryParams;

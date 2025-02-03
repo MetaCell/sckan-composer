@@ -10,6 +10,7 @@ import EntityDataGrid from "../components/EntityDataGrid";
 import DataGridHeader from "../components/DataGridHeader";
 import AddSentencesDialog from "../components/AddSentencesDialog";
 import SelectionBanner from "../components/TableMultiSelectActions/SelectionBanner";
+import { ENTITY_TYPES } from "../helpers/settings";
 
 const SentenceList = () => {
   const [sentenceList, setSentenceList] = useState<Sentence[]>();
@@ -62,17 +63,17 @@ const SentenceList = () => {
       />
       <AddSentencesDialog open={open} handleClose={handleClose} />
      
-      <DataGridHeader entityType="sentence" queryOptions={queryOptions} selectedRows={selectedRows} />
+      <DataGridHeader entityType={ENTITY_TYPES.SENTENCE} queryOptions={queryOptions} selectedRows={selectedRows} />
       <Box sx={{ position: "relative", zIndex: 1 }}>
         <SelectionBanner
           totalResults={totalResults}
           show={showSelectionBanner}
-          entityType="sentence"
+          entityType={ENTITY_TYPES.SENTENCE}
         />
       </Box>
       <EntityDataGrid
         entityList={sentenceList}
-        entityType="sentence"
+        entityType={ENTITY_TYPES.SENTENCE}
         loading={loading}
         totalResults={totalResults}
         allowSortByOwner={true}
