@@ -5,7 +5,6 @@ import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
 import {tags} from "../../services/TagService";
 import {mapStateFilterSelectionToCheckbox, mapTagFilterSelectionToCheckbox,} from "../../helpers/helpers";
 import {useAppDispatch} from "../../redux/hooks";
@@ -19,6 +18,7 @@ import StateFilter from "./StateFilter";
 import TagFilter from "./TagFilter";
 import {ENTITY_TYPES, SENTENCE_STATE_ORDER, STATEMENT_STATE_ORDER} from "../../helpers/settings";
 import PopulationSetFilter from "./PopulationSetFilter";
+import {vars} from "../../theme/variables";
 
 const {Draft, ...statementStatesExDraft } = statementStates
 
@@ -127,10 +127,21 @@ const FilterDrawer = (props: any) => {
           selectedPopulations={selectedPopulations}
           setSelectedPopulations={setSelectedPopulations}
         />
-      
       </Stack>
-      <Divider />
-      <Box px={3} py={2} textAlign="right">
+      {/*<Divider />*/}
+      <Box
+       sx={{
+         position: "sticky",
+         bottom: 0,
+         background: "white",
+         boxShadow: "0px 1px 2px 0px rgba(16, 24, 40, 0.05)",
+         borderTop: `1px solid ${vars.gray200}`,
+         px: 3,
+         py: 2,
+         textAlign: "right",
+         zIndex: 10,
+       }}
+      >
         <Button
           variant="outlined"
           color="secondary"
