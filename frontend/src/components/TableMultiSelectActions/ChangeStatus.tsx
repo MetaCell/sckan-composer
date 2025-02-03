@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import PopoverMenu from "./PopoverMenu";
 import { ChangeStatusIcon, ChangeStatusDialogIcon } from "../icons";
-import { ChangeRequestStatus } from "../../helpers/settings";
+import {ChangeRequestStatus} from "../../helpers/settings";
 import ConfirmationDialog from "../ConfirmationDialog";
+import {snakeToSpace} from "../../helpers/helpers";
 
 interface ChangeStatusProps {
   selectedTableRows: any;
@@ -48,6 +49,9 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
     return selectedTableRows.every((item) => item.state === firstState);
   };
   
+  const fromState = snakeToSpace(selectedTableRows[0]?.state);
+  const toState = newStatus && snakeToSpace(newStatus);
+  
   return (
     <>
       <PopoverMenu
@@ -63,7 +67,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
         onConfirm={() => handleStatusConfirm(newStatus!)}
         onCancel={handleModalCancel}
         title={`Change status of ${selectedTableRows.length} ${entityType}.`}
-        confirmationText={`By proceeding, the selected ${entityType} <strong>status</strong> will change from ${selectedTableRows[0]?.state} to ${newStatus}. Are you sure?`}
+        confirmationText={`By proceeding, the selected ${entityType} <strong>status</strong> will change from ${fromState} to ${toState}. Are you sure?`}
         Icon={<ChangeStatusDialogIcon />}
         dontShowAgain={dontShowAgain}
         setDontShowAgain={setDontShowAgain}
