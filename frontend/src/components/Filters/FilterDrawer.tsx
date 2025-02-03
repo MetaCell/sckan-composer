@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
@@ -6,45 +6,52 @@ import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
-import { tags } from "../../services/TagService";
+import {tags} from "../../services/TagService";
+import {mapStateFilterSelectionToCheckbox, mapTagFilterSelectionToCheckbox,} from "../../helpers/helpers";
+import {useAppDispatch} from "../../redux/hooks";
 import {
-  mapStateFilterSelectionToCheckbox,
-  mapTagFilterSelectionToCheckbox,
-} from "../../helpers/helpers";
-import { useAppDispatch } from "../../redux/hooks";
-import {
-  ComposerSentenceListStateEnum as sentenceStates,
   ComposerConnectivityStatementListStateEnum as statementStates,
+  ComposerSentenceListStateEnum as sentenceStates,
 } from "../../apiclient/backend/api";
-import { setFilters as setSentenceFilters } from "../../redux/sentenceSlice";
-import { setFilters as setStatementFilters } from "../../redux/statementSlice";
+import {setFilters as setSentenceFilters} from "../../redux/sentenceSlice";
+import {setFilters as setStatementFilters} from "../../redux/statementSlice";
 import StateFilter from "./StateFilter";
 import TagFilter from "./TagFilter";
+import {ENTITY_TYPES, SENTENCE_STATE_ORDER, STATEMENT_STATE_ORDER} from "../../helpers/settings";
+import PopulationSetFilter from "./PopulationSetFilter";
 
 const {Draft, ...statementStatesExDraft } = statementStates
 
 const FilterDrawer = (props: any) => {
   const { toggleDrawer, queryOptions, entity } = props;
 
-  const { stateFilter, tagFilter } = queryOptions;
+  const { stateFilter, tagFilter, populationSetFilter } = queryOptions;
   const dispatch = useAppDispatch();
 
   const tagList = tags.getTagList();
-
+  
+  
   const setInitialStateSelection = (currentSelection: any) => {
-    if (entity === "sentence") {
-      return mapStateFilterSelectionToCheckbox(
-        sentenceStates,
-        currentSelection
+    const sortStates = (states: Record<string, boolean>, order: string[]) => {
+      return order.reduce((acc, key) => {
+        acc[key] = states.hasOwnProperty(key) ? states[key] : false;
+        return acc;
+      }, {} as Record<string, boolean>);
+    };
+    
+    if (entity === ENTITY_TYPES.SENTENCE) {
+      return sortStates(
+        mapStateFilterSelectionToCheckbox(sentenceStates, currentSelection),
+        SENTENCE_STATE_ORDER
       );
-    } else if (entity === "statement") {
-      return mapStateFilterSelectionToCheckbox(
-        statementStatesExDraft,
-        currentSelection
+    } else if (entity === ENTITY_TYPES.STATEMENT) {
+      return sortStates(
+        mapStateFilterSelectionToCheckbox(statementStatesExDraft, currentSelection),
+        STATEMENT_STATE_ORDER
       );
     }
   };
-
+  
   const [selectedStates, setSelectedStates] = useState(
     setInitialStateSelection(stateFilter)
   );
@@ -52,10 +59,16 @@ const FilterDrawer = (props: any) => {
   const [selectedTags, setSelectedTags] = useState(
     mapTagFilterSelectionToCheckbox(tagList, tagFilter)
   );
-
+  
+  const [selectedPopulations, setSelectedPopulations] = useState(
+    populationSetFilter
+  );
+  
+  
   const handleClearFilter = () => {
     setSelectedStates(setInitialStateSelection(undefined));
     setSelectedTags(mapTagFilterSelectionToCheckbox(tagList, undefined));
+    setSelectedPopulations(undefined);
   };
 
   const mapObjToArray = (filterObj: any) => {
@@ -70,13 +83,14 @@ const FilterDrawer = (props: any) => {
   const handleApplyFilter = () => {
     const stateFilter = mapObjToArray(selectedStates);
     let tagFilter = mapObjToArray(selectedTags);
-    entity === "sentence" &&
-      dispatch(setSentenceFilters({ stateFilter, tagFilter }));
-    entity === "statement" &&
-      dispatch(setStatementFilters({ stateFilter, tagFilter }));
+    const populationSetFilter = mapObjToArray(selectedPopulations);
+    
+    entity === ENTITY_TYPES.SENTENCE &&
+      dispatch(setSentenceFilters({ stateFilter, tagFilter, populationSetFilter }));
+    entity === ENTITY_TYPES.STATEMENT &&
+      dispatch(setStatementFilters({ stateFilter, tagFilter, populationSetFilter }));
     toggleDrawer(false);
   };
-
   return (
     <Box
       width={400}
@@ -109,6 +123,11 @@ const FilterDrawer = (props: any) => {
           selectedTags={selectedTags}
           setSelectedTags={setSelectedTags}
         />
+        <PopulationSetFilter
+          selectedPopulations={selectedPopulations}
+          setSelectedPopulations={setSelectedPopulations}
+        />
+      
       </Stack>
       <Divider />
       <Box px={3} py={2} textAlign="right">

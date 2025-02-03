@@ -33,3 +33,30 @@ export const ChangeRequestStatus = {
   CANCELLED: "canceled",
   SAVED: "saved",
 }
+
+export enum ENTITY_TYPES {
+  STATEMENT = "statement",
+  SENTENCE = "sentence",
+}
+
+
+export const STATEMENT_STATE_ORDER = [
+  "compose_now",
+  "in_progress",
+  "to_be_reviewed",
+  "npo_approved",
+  "exported",
+  "revise",
+  "invalid",
+  "rejected",
+];
+
+export const SENTENCE_STATE_ORDER = [
+  "open",
+  "compose_later",
+  "ready_to_compose",
+  "needs_further_review",
+  "compose_now",
+  "completed",
+  "excluded",
+];
