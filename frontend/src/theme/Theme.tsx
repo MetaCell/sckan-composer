@@ -134,7 +134,8 @@ const theme = createTheme({
       .MuiDataGrid-footerContainer {
         background: #fff;
         border-radius: 0 0 12px 12px;
-        border-top: 0 !important;
+        padding: 1rem 1.5rem;
+        min-height: auto !important;
       }
       .MuiDataGrid-main {
         background: #fff;

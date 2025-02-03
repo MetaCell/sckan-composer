@@ -33,3 +33,8 @@ export const ChangeRequestStatus = {
   CANCELLED: "canceled",
   SAVED: "saved",
 }
+
+export enum ENTITY_TYPES {
+  STATEMENT = "statement",
+  SENTENCE = "sentence",
+}

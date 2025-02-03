@@ -10,26 +10,54 @@ import { QueryParams as StatementQueryParams } from "../redux/statementSlice";
 import { setFilters as setSentenceFilters } from "../redux/sentenceSlice";
 import { setFilters as setStatementFilters } from "../redux/statementSlice";
 import { useAppDispatch } from "../redux/hooks";
+import Stack from "@mui/material/Stack";
+import {Divider, Typography} from "@mui/material";
+import AssignUser from "./TableMultiSelectActions/AssignUser";
+import {vars} from "../theme/variables";
+import ManageTags from "./TableMultiSelectActions/ManageTags";
+import {Sentence} from "../apiclient/backend";
+import ChangeStatus from "./TableMultiSelectActions/ChangeStatus";
+import AddNote from "./TableMultiSelectActions/AddNote";
+import AssignPopulationSet from "./TableMultiSelectActions/AssignPopulationSet";
+import {ENTITY_TYPES} from "../helpers/settings";
 
 const toolbarStyle = {
-  background: "#fff",
+  background: vars.whiteColor,
   padding: 2,
   borderRadius: "12px 12px 0 0",
-  border: "1px solid #EAECF0",
+  border: `1px solid ${vars.gray200}`,
 };
+
+const multiSelectActionsStyle = {
+  '& .MuiButtonBase-root': {
+    padding: '0.125rem',
+    borderRadius: '8px',
+    '&.Mui-disabled': {
+      '& .MuiSvgIcon-root': {
+        '& path': {
+          fill: `${vars.gray300} !important`
+        }
+      }
+    }
+  },
+  '& .MuiDivider-root': {
+    width: '0.0625rem',
+    height: '1.5rem',
+    background: vars.gray200,
+    borderColor: vars.gray200,
+    alignSelf: 'center'
+  }
+}
 
 interface DataGridHeaderProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
-  entityType: "sentence" | "statement";
+  entityType: ENTITY_TYPES.STATEMENT | ENTITY_TYPES.SENTENCE;
+  selectedRows?: Sentence[]
 }
-
 const DataGridHeader = (props: DataGridHeaderProps) => {
-  const { queryOptions, entityType } = props;
-
+  const { queryOptions, entityType, selectedRows } = props;
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-
   const dispatch = useAppDispatch();
-
   const handleClearFilter = () => {
     const noFilters = { stateFilter: undefined, tagFilter: undefined };
     entityType === "sentence"
@@ -45,10 +73,26 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
       alignItems="center"
       sx={toolbarStyle}
     >
-      <Grid item xs={3}>
+      <Grid item xs={12} md={3}>
         <Searchbar queryOptions={queryOptions} entityType={entityType} />
       </Grid>
-      <Grid item>
+     
+      <Grid item xs={12} md={9} display='flex' alignItems='center' justifyContent='end' gap='1rem'>
+        {
+          selectedRows && selectedRows.length > 0 &&
+          <Stack direction="row" alignItems="center" spacing={1} sx={multiSelectActionsStyle}>
+            <Typography variant="body2">
+              {selectedRows.length} {entityType}{selectedRows.length > 1 ? "s" : ""} selected
+            </Typography>
+            <Divider flexItem />
+            <AssignUser selectedTableRows={selectedRows} entityType={entityType} />
+            <ManageTags selectedTableRows={selectedRows} entityType={entityType} />
+            <AddNote selectedTableRows={selectedRows} entityType={entityType} />
+            <ChangeStatus selectedTableRows={selectedRows} entityType={entityType} />
+            <AssignPopulationSet selectedTableRows={selectedRows} entityType={entityType} />
+            <Divider flexItem />
+          </Stack>
+        }
         <Button
           variant="outlined"
           color="secondary"
@@ -60,7 +104,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
         <Drawer
           anchor="right"
           open={isFilterDrawerOpen}
-          onClose={(e, r) => setIsFilterDrawerOpen(false)}
+          onClose={() => setIsFilterDrawerOpen(false)}
           ModalProps={{ sx: { zIndex: 1300 } }}
         >
           <FilterDrawer

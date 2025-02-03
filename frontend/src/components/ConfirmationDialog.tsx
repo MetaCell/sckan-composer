@@ -50,9 +50,13 @@ const ConfirmationDialog = ({
           <Typography variant='h4'>
             {title}
           </Typography>
-          <Typography variant='body2' color={vars.gray600}>
-            {confirmationText}
-          </Typography>
+          <Typography
+            variant="body2"
+            color={vars.gray600}
+            dangerouslySetInnerHTML={{
+              __html: confirmationText
+            }}
+          />
         </Stack>
         <FormControlLabel
           sx={{ml: 0}}

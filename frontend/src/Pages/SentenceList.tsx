@@ -9,13 +9,17 @@ import sentenceService from "../services/SentenceService";
 import EntityDataGrid from "../components/EntityDataGrid";
 import DataGridHeader from "../components/DataGridHeader";
 import AddSentencesDialog from "../components/AddSentencesDialog";
+import SelectionBanner from "../components/TableMultiSelectActions/SelectionBanner";
+import { ENTITY_TYPES } from "../helpers/settings";
 
 const SentenceList = () => {
   const [sentenceList, setSentenceList] = useState<Sentence[]>();
   const [totalResults, setTotalResults] = useState<number>(0);
   const [loading, setLoading] = useState(true);
-
   const [open, setOpen] = useState(false);
+  const [showSelectionBanner, setShowSelectionBanner] = useState(false)
+  
+  const [selectedRows, setSelectedRows] = useState<Sentence[]>([]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -27,7 +31,7 @@ const SentenceList = () => {
   const queryOptions = useAppSelector((state) => state.sentence.queryOptions);
 
   const gutters = useGutters();
-
+  
   useEffect(() => {
     sentenceService.getList(queryOptions).then((res) => {
       setSentenceList(res.results);
@@ -35,6 +39,14 @@ const SentenceList = () => {
       setLoading(false);
     });
   }, [queryOptions]);
+  
+  useEffect(() => {
+    setShowSelectionBanner(selectedRows.length === queryOptions.limit)
+  }, [selectedRows, queryOptions.limit])
+  
+  useEffect(() => {
+    setSelectedRows([])
+  }, [queryOptions.stateFilter, queryOptions.tagFilter])
 
   return (
     <Box sx={gutters} p={6} justifyContent="center">
@@ -50,14 +62,24 @@ const SentenceList = () => {
         ]}
       />
       <AddSentencesDialog open={open} handleClose={handleClose} />
-      <DataGridHeader entityType="sentence" queryOptions={queryOptions} />
+     
+      <DataGridHeader entityType={ENTITY_TYPES.SENTENCE} queryOptions={queryOptions} selectedRows={selectedRows} />
+      <Box sx={{ position: "relative", zIndex: 1 }}>
+        <SelectionBanner
+          totalResults={totalResults}
+          show={showSelectionBanner}
+          entityType={ENTITY_TYPES.SENTENCE}
+        />
+      </Box>
       <EntityDataGrid
         entityList={sentenceList}
-        entityType="sentence"
+        entityType={ENTITY_TYPES.SENTENCE}
         loading={loading}
         totalResults={totalResults}
         allowSortByOwner={true}
         queryOptions={queryOptions}
+        setSelectedRows={setSelectedRows}
+        selectedRows={selectedRows}
       />
     </Box>
   );

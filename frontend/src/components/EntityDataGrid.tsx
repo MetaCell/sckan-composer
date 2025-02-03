@@ -32,22 +32,40 @@ import {
 import { useAppDispatch } from "../redux/hooks";
 import { useNavigate } from "react-router";
 import Stack from "@mui/material/Stack";
+import {Checkbox} from "@mui/material";
+import {CheckedItemIcon, IndeterminateIcon, UncheckedItemIcon} from "./icons";
+import {vars} from "../theme/variables";
+import {ENTITY_TYPES} from "../helpers/settings";
 
 interface DataGridProps {
-  entityType: "sentence" | "statement";
+  entityType: ENTITY_TYPES.STATEMENT | ENTITY_TYPES.SENTENCE;
   entityList: (Sentence | BaseConnectivityStatement)[] | undefined;
   allowSortByOwner?: boolean;
   queryOptions: SentenceQueryParams | StatementQueryParams;
   loading: boolean;
   totalResults: number;
+  setSelectedRows?: (selectedRows: any[]) => void;
+  selectedRows?: any[];
 }
 
 type criteria =
   | ("id" | "-id" | "last_edited" | "-last_edited" | "owner" | "-owner")[]
   | undefined;
 
+
+export const StyledCheckBox = (props: any) => {
+  return (
+    <Checkbox
+      {...props}
+      sx={{ padding: 0 }}
+      checkedIcon={<CheckedItemIcon sx={{ fontSize: 16 }} />}
+      icon={<UncheckedItemIcon sx={{ fontSize: 16 }} />}
+      indeterminateIcon={<IndeterminateIcon sx={{ fontSize: 16 }} />}
+    />
+  );
+};
 const EntityDataGrid = (props: DataGridProps) => {
-  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false } = props;
+  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false, setSelectedRows, selectedRows } = props;
 
   const currentPage = (queryOptions.index || 0) / queryOptions.limit;
 
@@ -139,7 +157,6 @@ const EntityDataGrid = (props: DataGridProps) => {
       ? navigate(`sentence/${params.row.id}`)
       : navigate(`/statement/${params.row.id}`);
   };
-
   const handleSortModelChange = (model: any) => {
     let ordering: criteria;
     if (model.length === 0) {
@@ -177,29 +194,47 @@ const EntityDataGrid = (props: DataGridProps) => {
         rows={rows}
         columns={columns}
         getRowHeight={() => "auto"}
-        pageSize={queryOptions.limit}
         paginationMode="server"
         sortingMode="server"
         loading={loading}
         rowCount={totalResults}
-        onPageChange={handlePageChange}
+        checkboxSelection
         onRowClick={handleRowClick}
-        onSortModelChange={handleSortModelChange}
-        rowsPerPageOptions={[queryOptions.limit]}
-        page={currentPage}
+        slots={{
+          baseCheckbox: StyledCheckBox,
+          noRowsOverlay: () => (
+            <Stack height="100%" alignItems="center" justifyContent="center">
+              {`No ${entityType}s to display, clear your filter or modify your search criteria`}
+            </Stack>
+          ),
+          pagination: CustomPagination,
+        }}
+        hideFooterSelectedRowCount={true}
+        paginationModel={{
+          page: currentPage,
+          pageSize: queryOptions.limit,
+        }}
+        onPaginationModelChange={(model) => {
+          handlePageChange(model.page);
+        }}
+        onSortModelChange={(model) => handleSortModelChange(model)}
         disableColumnMenu
         initialState={
           queryOptions.ordering
             ? mapSortingModel(queryOptions.ordering[0])
             : undefined
         }
-        components={{
-          Pagination: CustomPagination,
-          NoRowsOverlay: () => (
-              <Stack height="100%" alignItems="center" justifyContent="center">
-                {`No ${entityType}s to display, clear your filter or modify your search criteria`}
-              </Stack>
-          )
+        rowSelectionModel={selectedRows?.map(row => row.id)}
+        onRowSelectionModelChange={(selectedRowIds) => {
+          const selectedRowsData = rows.filter(row => selectedRowIds.includes(row.id));
+          if (setSelectedRows) {
+            setSelectedRows(selectedRowsData);
+          }
+        }}
+        sx={{
+          borderRadius: 0,
+          borderColor: vars.gray200,
+          borderTop: 0
         }}
       />
     </Box>
