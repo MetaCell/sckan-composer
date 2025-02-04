@@ -34,7 +34,7 @@ import {DestinationIcon, ViaIcon} from "../icons";
 import {ChangeRequestStatus, DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel,} from "../../helpers/settings";
 import {Option, OptionDetail} from "../../types";
 import {composerApi as api} from "../../services/apis";
-import {ConnectivityStatement, TypeB60Enum, TypeC11Enum,} from "../../apiclient/backend";
+import {ConnectivityStatement, ViaTypeEnum, DestinationTypeEmum,} from "../../apiclient/backend";
 import {CustomFooter} from "../Widgets/HoveredOptionContent";
 import {StatementStateChip} from "../Widgets/StateChip";
 import {projections} from "../../services/ProjectionService";
@@ -297,7 +297,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
           InputIcon: ViaIcon,
           onUpdate: async (selectedOption: string, formId: string) => {
             const viaIndex = getConnectionId(formId, statement.vias);
-            const typeOption = selectedOption as TypeB60Enum;
+            const typeOption = selectedOption as ViaTypeEnum;
 
             if (viaIndex) {
               try {
@@ -475,7 +475,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
           await api.composerDestinationCreate({
             id: -1,
             connectivity_statement: statement.id,
-            type: TypeC11Enum.AxonT,
+            type: DestinationTypeEmum.AxonT,
             anatomical_entities: [],
             from_entities: [],
           });
@@ -504,7 +504,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
           InputIcon: DestinationIcon,
           onUpdate: async (selectedOption: string, formId: string) => {
             const destinationIndex = getConnectionId(formId, statement?.destinations);
-            const typeOption = selectedOption as TypeC11Enum;
+            const typeOption = selectedOption as DestinationTypeEmum;
             if (destinationIndex) {
               try {
                 await api.composerDestinationPartialUpdate(destinationIndex, {

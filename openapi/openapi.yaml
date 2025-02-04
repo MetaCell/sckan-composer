@@ -2621,7 +2621,7 @@ components:
         connectivity_statement:
           type: integer
         type:
-          $ref: '#/components/schemas/TypeC11Enum'
+          $ref: '#/components/schemas/DestinationTypeEmum'
         anatomical_entities:
           type: array
           items:
@@ -2644,7 +2644,7 @@ components:
           type: integer
           readOnly: true
         type:
-          $ref: '#/components/schemas/TypeC11Enum'
+          $ref: '#/components/schemas/DestinationTypeEmum'
         anatomical_entities:
           type: array
           items:
@@ -2662,6 +2662,12 @@ components:
       - connectivity_statement_id
       - from_entities
       - id
+    DestinationTypeEmum:
+      enum:
+      - AXON-T
+      - AFFERENT-T
+      - UNKNOWN
+      type: string
     GraphState:
       type: object
       properties:
@@ -3363,7 +3369,7 @@ components:
         connectivity_statement:
           type: integer
         type:
-          $ref: '#/components/schemas/TypeC11Enum'
+          $ref: '#/components/schemas/DestinationTypeEmum'
         anatomical_entities:
           type: array
           items:
@@ -3495,7 +3501,7 @@ components:
         connectivity_statement:
           type: integer
         type:
-          $ref: '#/components/schemas/TypeB60Enum'
+          $ref: '#/components/schemas/ViaTypeEnum'
         anatomical_entities:
           type: array
           items:
@@ -3831,17 +3837,6 @@ components:
       required:
       - id
       - tag
-    TypeB60Enum:
-      enum:
-      - AXON
-      - DENDRITE
-      type: string
-    TypeC11Enum:
-      enum:
-      - AXON-T
-      - AFFERENT-T
-      - UNKNOWN
-      type: string
     User:
       type: object
       description: User
@@ -3885,7 +3880,7 @@ components:
         connectivity_statement:
           type: integer
         type:
-          $ref: '#/components/schemas/TypeB60Enum'
+          $ref: '#/components/schemas/ViaTypeEnum'
         anatomical_entities:
           type: array
           items:
@@ -3910,7 +3905,7 @@ components:
           type: integer
           readOnly: true
         type:
-          $ref: '#/components/schemas/TypeB60Enum'
+          $ref: '#/components/schemas/ViaTypeEnum'
         anatomical_entities:
           type: array
           items:
@@ -3929,6 +3924,12 @@ components:
       - from_entities
       - id
       - order
+    ViaTypeEnum:
+      enum:
+      - AXON
+      - DENDRITE
+      - SENSORY_AXON
+      type: string
   securitySchemes:
     basicAuth:
       type: http
