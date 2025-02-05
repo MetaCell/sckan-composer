@@ -260,6 +260,10 @@ class ConnectivityStatementStateService(StateServiceMixin):
                 return True
         return False
 
+    @staticmethod
+    def has_populationset(connectivity_statement) -> bool:
+        return connectivity_statement.population is not None
+
 
 def is_system_user(user: User) -> bool:
     return user.username == 'system'

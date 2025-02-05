@@ -1,4 +1,5 @@
 from django.utils import timezone
+import re
 
 def pmid_uri(pmid):
     return f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/" if pmid else "."
@@ -28,3 +29,7 @@ def join_entities(entities):
 def update_modified_date(instance):
     instance.modified_date = timezone.now()
     instance.save(update_fields=["modified_date"])
+
+
+def is_valid_population_name(name):
+    return re.match(r"^[a-zA-Z][a-zA-Z0-9_]{7,19}$", name) is not None
