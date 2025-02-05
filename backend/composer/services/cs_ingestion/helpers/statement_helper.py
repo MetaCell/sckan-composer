@@ -3,6 +3,7 @@ from typing import Dict, Tuple, List
 from django.contrib.auth.models import User
 
 from composer.services.cs_ingestion.logging_service import LoggerService
+from composer.services.state_services import ConnectivityStatementStateService
 from composer.enums import CSState, NoteType
 from composer.management.commands.ingest_nlp_sentence import ID
 from composer.models import (
@@ -95,7 +96,10 @@ def create_or_update_connectivity_statement(
         else:
             create_invalid_note(connectivity_statement, error_message)
     else:
-        if connectivity_statement.state != CSState.EXPORTED:
+        if (
+            connectivity_statement.state != CSState.EXPORTED
+            and ConnectivityStatementStateService.has_populationset
+        ):
             do_transition_to_exported(connectivity_statement)
 
     for alert_data in statement.get(STATEMENT_ALERTS, []):

@@ -81,7 +81,9 @@ def compute_metrics(export_batch: ExportBatch):
     return export_batch
 
 
-def do_transition_to_exported(export_batch: ExportBatch, user: User):
+def do_transition_to_exported_and_get_available_export_batch(
+    export_batch: ExportBatch, user: User
+):
     system_user = User.objects.get(username="system")
     connectivity_statements = export_batch.connectivity_statements.all()
     for connectivity_statement in connectivity_statements:
@@ -96,3 +98,7 @@ def do_transition_to_exported(export_batch: ExportBatch, user: User):
                 CSState.EXPORTED, system_user, user
             )
             cs.save()
+        else:
+            export_batch.connectivity_statements.remove(connectivity_statement)
+
+    return export_batch
