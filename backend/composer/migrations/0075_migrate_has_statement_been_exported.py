@@ -4,7 +4,7 @@ from django.db import migrations
 from composer.enums import CSState
 
 
-def has_statement_been_exported(apps, schema_editor):
+def migrate_has_statement_been_exported(apps, schema_editor):
     ConnectivityStatement = apps.get_model("composer", "ConnectivityStatement")
     for statement in ConnectivityStatement.objects.all():
         statement.has_statement_been_exported = statement.state == CSState.EXPORTED
@@ -18,5 +18,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(has_statement_been_exported),
+        migrations.RunPython(migrate_has_statement_been_exported),
     ]
