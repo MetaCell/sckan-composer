@@ -6,7 +6,7 @@ import { CustomNodeModel } from "../Models/CustomNodeModel";
 import { DiagramEngine } from "@projectstorm/react-diagrams-core";
 import { NodeTypes } from "../GraphDiagram";
 import { ArrowDownwardIcon, ArrowOutward, DestinationIcon, OriginIcon, ViaIcon } from "./icons";
-import { TypeC11Enum } from "../../../../apiclient/backend";
+import { DestinationTypeEmum } from "../../../../apiclient/backend";
 
 interface DestinationNodeProps {
     model: CustomNodeModel;
@@ -36,7 +36,7 @@ export const DestinationNodeWidget: React.FC<DestinationNodeProps> = ({
     // Determine if the node is an afferent terminal
     const isAfferentTerminal =
         model.getOptions().anatomicalType ===
-        TypeC11Enum.AfferentT;
+        DestinationTypeEmum.AfferentT;
 
     const handleDoubleClick = () => {
         valueRef.current = !valueRef.current;
@@ -401,7 +401,7 @@ const NonAfferentTerminalDetails: React.FC<{ model: CustomNodeModel }> = ({
                     {model.getOptions().uri}
                 </Typography>
                 <Chip
-                    label={model.getOptions().anatomicalType === TypeC11Enum.AxonT ? "Axon Terminal" : "Not Specified"}
+                    label={model.getOptions().anatomicalType === DestinationTypeEmum.AxonT ? "Axon Terminal" : "Not Specified"}
                     variant="outlined"
                     color="secondary"
                     sx={{

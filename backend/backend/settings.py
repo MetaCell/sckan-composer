@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+
 import os
 from pathlib import Path
 
@@ -68,7 +69,6 @@ INSTALLED_APPS = [
     "nested_admin",
     "django.contrib.admin",
     "social_django",
-
     #
     "corsheaders",
 ]
@@ -353,7 +353,10 @@ SPECTACULAR_SETTINGS = {
     "SWAGGER_UI_DIST": "SIDECAR",  # shorthand to use the sidecar instead
     "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
     "REDOC_DIST": "SIDECAR",
-    # OTHER SETTINGS
+    "ENUM_NAME_OVERRIDES": {
+        "ViaTypeEnum": "composer.enums.ViaType",
+        "DestinationTypeEmum": "composer.enums.DestinationType",
+    },
 }
 
 SOCIAL_AUTH_ORCID_KEY = "APP-GRRGRZ5EZQLQ6WZT"
