@@ -393,6 +393,24 @@ export interface ConnectivityStatement {
     'sex': Sex;
     /**
      * 
+     * @type {number}
+     * @memberof ConnectivityStatement
+     */
+    'population_id'?: number | null;
+    /**
+     * 
+     * @type {PopulationSet}
+     * @memberof ConnectivityStatement
+     */
+    'population': PopulationSet;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ConnectivityStatement
+     */
+    'has_statement_been_exported': boolean;
+    /**
+     * 
      * @type {Array<number>}
      * @memberof ConnectivityStatement
      */
@@ -614,6 +632,24 @@ export interface ConnectivityStatementUpdate {
      * @memberof ConnectivityStatementUpdate
      */
     'sex': Sex;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'population_id'?: number | null;
+    /**
+     * 
+     * @type {PopulationSet}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'population': PopulationSet;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'has_statement_been_exported': boolean;
     /**
      * 
      * @type {Array<number>}
@@ -1235,6 +1271,37 @@ export interface PaginatedPhenotypeList {
 /**
  * 
  * @export
+ * @interface PaginatedPopulationSetList
+ */
+export interface PaginatedPopulationSetList {
+    /**
+     * 
+     * @type {number}
+     * @memberof PaginatedPopulationSetList
+     */
+    'count'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedPopulationSetList
+     */
+    'next'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedPopulationSetList
+     */
+    'previous'?: string | null;
+    /**
+     * 
+     * @type {Array<PopulationSet>}
+     * @memberof PaginatedPopulationSetList
+     */
+    'results'?: Array<PopulationSet>;
+}
+/**
+ * 
+ * @export
  * @interface PaginatedProjectionPhenotypeList
  */
 export interface PaginatedProjectionPhenotypeList {
@@ -1607,6 +1674,24 @@ export interface PatchedConnectivityStatement {
     'sex'?: Sex;
     /**
      * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatement
+     */
+    'population_id'?: number | null;
+    /**
+     * 
+     * @type {PopulationSet}
+     * @memberof PatchedConnectivityStatement
+     */
+    'population'?: PopulationSet;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PatchedConnectivityStatement
+     */
+    'has_statement_been_exported'?: boolean;
+    /**
+     * 
      * @type {Array<number>}
      * @memberof PatchedConnectivityStatement
      */
@@ -1810,6 +1895,24 @@ export interface PatchedConnectivityStatementUpdate {
      * @memberof PatchedConnectivityStatementUpdate
      */
     'sex'?: Sex;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatementUpdate
+     */
+    'population_id'?: number | null;
+    /**
+     * 
+     * @type {PopulationSet}
+     * @memberof PatchedConnectivityStatementUpdate
+     */
+    'population'?: PopulationSet;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PatchedConnectivityStatementUpdate
+     */
+    'has_statement_been_exported'?: boolean;
     /**
      * 
      * @type {Array<number>}
@@ -2176,6 +2279,31 @@ export interface Phenotype {
     'name': string;
 }
 /**
+ * Population Set
+ * @export
+ * @interface PopulationSet
+ */
+export interface PopulationSet {
+    /**
+     * 
+     * @type {number}
+     * @memberof PopulationSet
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PopulationSet
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PopulationSet
+     */
+    'description'?: string | null;
+}
+/**
  * Profile
  * @export
  * @interface Profile
@@ -2501,6 +2629,24 @@ export interface SentenceConnectivityStatement {
      * @memberof SentenceConnectivityStatement
      */
     'sex': Sex;
+    /**
+     * 
+     * @type {number}
+     * @memberof SentenceConnectivityStatement
+     */
+    'population_id'?: number | null;
+    /**
+     * 
+     * @type {PopulationSet}
+     * @memberof SentenceConnectivityStatement
+     */
+    'population': PopulationSet;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SentenceConnectivityStatement
+     */
+    'has_statement_been_exported': boolean;
     /**
      * 
      * @type {string}
@@ -4508,6 +4654,96 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * PopulationSet
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerPopulationList: async (limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/population/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * PopulationSet
+         * @param {number} id A unique integer value identifying this population set.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerPopulationRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerPopulationRetrieve', 'id', id)
+            const localVarPath = `/api/composer/population/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Profile
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -6383,6 +6619,31 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * PopulationSet
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerPopulationList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedPopulationSetList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerPopulationList(limit, offset, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerPopulationList']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * PopulationSet
+         * @param {number} id A unique integer value identifying this population set.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerPopulationRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PopulationSet>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerPopulationRetrieve(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerPopulationRetrieve']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Profile
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7139,6 +7400,25 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerPhenotypeRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
+         * PopulationSet
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerPopulationList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedPopulationSetList> {
+            return localVarFp.composerPopulationList(limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * PopulationSet
+         * @param {number} id A unique integer value identifying this population set.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerPopulationRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<PopulationSet> {
+            return localVarFp.composerPopulationRetrieve(id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Profile
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7874,6 +8154,29 @@ export class ComposerApi extends BaseAPI {
      */
     public composerPhenotypeRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerPhenotypeRetrieve(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * PopulationSet
+     * @param {number} [limit] Number of results to return per page.
+     * @param {number} [offset] The initial index from which to return the results.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerPopulationList(limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerPopulationList(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * PopulationSet
+     * @param {number} id A unique integer value identifying this population set.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerPopulationRetrieve(id: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerPopulationRetrieve(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
