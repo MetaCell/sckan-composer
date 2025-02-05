@@ -98,7 +98,9 @@ def create_or_update_connectivity_statement(
     else:
         if (
             connectivity_statement.state != CSState.EXPORTED
-            and ConnectivityStatementStateService.has_populationset
+            and ConnectivityStatementStateService.has_populationset(
+                connectivity_statement=connectivity_statement
+            )
         ):
             do_transition_to_exported(connectivity_statement)
 
