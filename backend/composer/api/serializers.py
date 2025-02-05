@@ -21,9 +21,14 @@ from ..models import (
     Profile,
     Sentence,
     Specie,
+    PopulationSet,
     StatementAlert,
     Tag,
-    Via, Destination, AnatomicalEntityIntersection, AnatomicalEntityMeta, GraphRenderingState,
+    Via,
+    Destination,
+    AnatomicalEntityIntersection,
+    AnatomicalEntityMeta,
+    GraphRenderingState,
 )
 from ..services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
@@ -198,6 +203,14 @@ class SexSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "ontology_uri")
 
 
+class PopulationSetSerializer(serializers.ModelSerializer):
+    """Population Set"""
+
+    class Meta:
+        model = PopulationSet
+        fields = ("id", "name", "description")
+
+
 class ViaSerializerDetails(serializers.ModelSerializer):
     """Via Serializer with Custom Logic for from_entities"""
 
@@ -354,6 +367,9 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
     sentence_id = serializers.IntegerField()
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
     sex_id = serializers.IntegerField(required=False, default=None, allow_null=True)
+    population_id = serializers.IntegerField(
+        required=False, default=None, allow_null=True
+    )
     phenotype_id = serializers.IntegerField(
         required=False, default=None, allow_null=True
     )
@@ -368,6 +384,10 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
     owner = UserSerializer(required=False, read_only=True)
     phenotype = PhenotypeSerializer(required=False, read_only=True)
     projection_phenotype = ProjectionPhenotypeSerializer(required=False, read_only=True)
+    population = PopulationSetSerializer(required=False, read_only=True)
+    has_statement_been_exported = serializers.BooleanField(
+        required=False, read_only=True
+    )
 
     class Meta:
         model = ConnectivityStatement
@@ -386,6 +406,9 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "species",
             "sex_id",
             "sex",
+            "population_id",
+            "population",
+            "has_statement_been_exported",
             "apinatomy_model",
             "additional_information",
             "owner_id",
@@ -406,6 +429,8 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "species",
             "sex_id",
             "sex",
+            "population",
+            "has_statement_been_exported",
             "apinatomy_model",
             "additional_information",
             "owner_id",
@@ -508,11 +533,13 @@ class GraphStateSerializer(serializers.ModelSerializer):
         return {
             'serialized_graph': representation['serialized_graph'],
         }
-    
+
+
 class AlertTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AlertType
         fields = ('id', 'name', 'uri')
+
 
 class StatementAlertSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
@@ -608,6 +635,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     phenotype_id = serializers.IntegerField(required=False, allow_null=True)
     projection_phenotype_id = serializers.IntegerField(required=False, allow_null=True)
     sex_id = serializers.IntegerField(required=False, allow_null=True)
+    population_id = serializers.IntegerField(required=False, allow_null=True)
     species = SpecieSerializer(many=True, read_only=False, required=False)
     provenances = ProvenanceSerializer(source="provenance_set", many=True, read_only=False, required=False)
     origins = AnatomicalEntitySerializer(many=True, required=False)
@@ -616,6 +644,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     phenotype = PhenotypeSerializer(required=False, read_only=True)
     projection_phenotype = ProjectionPhenotypeSerializer(required=False, read_only=True)
     sex = SexSerializer(required=False, read_only=True)
+    population = PopulationSetSerializer(required=False, read_only=True)
     sentence = SentenceSerializer(required=False, read_only=True)
     forward_connection = serializers.PrimaryKeyRelatedField(
         many=True, queryset=ConnectivityStatement.objects.all(), required=False
@@ -628,6 +657,9 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     graph_rendering_state = GraphStateSerializer(required=False, allow_null=True)
     statement_alerts = StatementAlertSerializer(
         many=True, read_only=False, required=False
+    )
+    has_statement_been_exported = serializers.BooleanField(
+        required=False, read_only=True
     )
 
     def get_available_transitions(self, instance) -> list[CSState]:
@@ -704,6 +736,9 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             "species",
             "sex_id",
             "sex",
+            "population_id",
+            "population",
+            "has_statement_been_exported",
             "forward_connection",
             "apinatomy_model",
             "additional_information",
@@ -749,6 +784,9 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
             "species",
             "sex_id",
             "sex",
+            "population_id",
+            "population",
+            "has_statement_been_exported",
             "forward_connection",
             "apinatomy_model",
             "additional_information",
@@ -829,7 +867,6 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
                 )
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
-
 
 
 class KnowledgeStatementSerializer(ConnectivityStatementSerializer):

@@ -43,6 +43,7 @@ from .serializers import (
     ViaSerializer,
     ProvenanceSerializer,
     SexSerializer,
+    PopulationSetSerializer,
     ConnectivityStatementUpdateSerializer,
     DestinationSerializer,
     BaseConnectivityStatementSerializer,
@@ -67,6 +68,7 @@ from ..models import (
     Via,
     Provenance,
     Sex,
+    PopulationSet,
     Destination,
     GraphRenderingState,
 )
@@ -315,6 +317,16 @@ class SexViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Sex.objects.all()
     serializer_class = SexSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+    ]
+
+
+class PopulationSetViewset(viewsets.ReadOnlyModelViewSet):
+    """PopulationSet"""
+
+    queryset = PopulationSet.objects.all()
+    serializer_class = PopulationSetSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
     ]
