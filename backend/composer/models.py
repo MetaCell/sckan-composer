@@ -676,12 +676,12 @@ class ConnectivityStatement(models.Model):
 
     @transition(
         field=state,
-        source=[
-            CSState.NPO_APPROVED,
-            CSState.INVALID
-        ],
+        source=[CSState.NPO_APPROVED, CSState.INVALID],
         target=CSState.EXPORTED,
-        conditions=[ConnectivityStatementStateService.is_valid],
+        conditions=[
+            ConnectivityStatementStateService.is_valid,
+            ConnectivityStatementStateService.has_populationset,
+        ],
         permission=ConnectivityStatementStateService.has_permission_to_transition_to_exported,
     )
     def exported(self, *args, **kwargs):
@@ -746,9 +746,19 @@ class ConnectivityStatement(models.Model):
             self.owner = request.user
             self.save(update_fields=["owner"])
 
+    def validate_population_change(self):
+        if self.pk and self.has_statement_been_exported:
+            original = ConnectivityStatement.objects.get(pk=self.pk)
+            if original.population != self.population:
+                raise ValidationError(
+                    "Cannot change population set after the statement has been exported."
+                )
+
     def save(self, *args, **kwargs):
         if not self.pk and self.sentence and not self.owner:
             self.owner = self.sentence.owner
+
+        self.validate_population_change()
 
         super().save(*args, **kwargs)
 
