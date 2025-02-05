@@ -5,6 +5,7 @@ from django.db.models.expressions import F
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
 from composer.services.graph_service import build_journey_description, build_journey_entities
+from django.core.exceptions import ValidationError
 
 from composer.services.layers_service import update_from_entities_on_deletion
 from composer.services.state_services import (
@@ -22,7 +23,14 @@ from .enums import (
     ViaType,
     Projection,
 )
-from .utils import doi_uri, pmcid_uri, pmid_uri, create_reference_uri
+from .utils import (
+    doi_uri,
+    pmcid_uri,
+    pmid_uri,
+    create_reference_uri,
+    is_valid_population_name,
+)
+import re
 
 
 # from django_fsm_log.decorators import fsm_log_by
@@ -194,6 +202,31 @@ class Sex(models.Model):
     class Meta:
         ordering = ["name"]
         verbose_name_plural = "Sex"
+
+
+class PopulationSet(models.Model):
+    """Population Set"""
+
+    name = models.CharField(max_length=200, db_index=True, unique=True)
+    description = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    def clean(self):
+        if not is_valid_population_name(self.name):
+            raise ValidationError(
+                "Name must be between 8 and 20 characters, start with a letter, and contain only letters and numbers."
+            )
+        self.name = self.name.lower()
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Population Sets"
 
 
 class FunctionalCircuitRole(models.Model):
@@ -567,6 +600,14 @@ class ConnectivityStatement(models.Model):
     journey_path = models.JSONField(null=True, blank=True)
     statement_prefix = models.TextField(null=True, blank=True)
     statement_suffix = models.TextField(null=True, blank=True)
+    population = models.ForeignKey(
+        PopulationSet,
+        verbose_name="Population Set",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    has_statement_been_exported = models.BooleanField(default=False)
 
     def __str__(self):
         suffix = ""
