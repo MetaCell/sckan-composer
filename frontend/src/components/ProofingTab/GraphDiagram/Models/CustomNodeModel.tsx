@@ -1,7 +1,7 @@
 import { NodeModel, DefaultPortModel } from '@projectstorm/react-diagrams';
 import { NodeTypes } from "../GraphDiagram";
 import {CustomNodeOptions} from "../GraphDiagram";
-import { TypeC11Enum } from '../../../../apiclient/backend/api';
+import { DestinationTypeEmum } from '../../../../apiclient/backend/api';
 
 export class CustomNodeModel extends NodeModel {
     customType: NodeTypes;
@@ -34,7 +34,7 @@ export class CustomNodeModel extends NodeModel {
         }
         // Destination nodes: ports depend on the type of destination
         if (customType === NodeTypes.Destination) {
-            if (options.anatomicalType === TypeC11Enum.AfferentT) {
+            if (options.anatomicalType === DestinationTypeEmum.AfferentT) {
                 // Afferent terminals have only an out port
                 this.addPort(new DefaultPortModel(false, 'out', 'Out'));
             } else {
