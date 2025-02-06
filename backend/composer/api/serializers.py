@@ -73,6 +73,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ("id", "username", "first_name", "last_name", "email", "is_staff")
 
 
+class MinimalUserSerializer(serializers.ModelSerializer):
+    """Minimal User Serializer (for Profile List View)"""
+
+    class Meta:
+        model = User
+        fields = ("id", "username")  # Only expose minimal user details
+
 class ProfileSerializer(serializers.ModelSerializer):
     """Profile"""
 

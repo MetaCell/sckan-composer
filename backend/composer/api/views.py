@@ -4,6 +4,7 @@ from django.http import HttpResponse, Http404
 from drf_react_template.schema_form_encoder import SchemaProcessor, UiSchemaProcessor
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
+
 from rest_framework import mixins, permissions, viewsets, status
 from rest_framework.decorators import action, api_view
 from rest_framework.renderers import INDENT_SEPARATORS
@@ -12,7 +13,9 @@ from rest_framework.serializers import ValidationError
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Case, When, Value, IntegerField
-
+from django_fsm import get_available_FIELD_transitions
+from functools import reduce
+from operator import and_
 from composer.services.state_services import (
     ConnectivityStatementStateService,
     SentenceStateService,
@@ -46,6 +49,7 @@ from .serializers import (
     ConnectivityStatementUpdateSerializer,
     DestinationSerializer,
     BaseConnectivityStatementSerializer,
+    MinimalUserSerializer
 )
 from .permissions import (
     IsStaffUserIfExportedStateInConnectivityStatement,
@@ -252,23 +256,20 @@ class ModelRetrieveViewSet(
     # mixins.DestroyModelMixin,
     # mixins.ListModelMixin,
     viewsets.GenericViewSet,
-):
-    ...
+): ...
 
 
 class ModelCreateRetrieveViewSet(
     ModelRetrieveViewSet,
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
-):
-    ...
+): ...
 
 
 class ModelNoDeleteViewSet(
     ModelCreateRetrieveViewSet,
     mixins.UpdateModelMixin,
-):
-    ...
+): ...
 
 
 class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
@@ -475,6 +476,43 @@ class SentenceViewSet(
         return super().get_queryset()
 
 
+    @extend_schema(
+        filters=True
+    )
+    @action(detail=False, methods=["get"])
+    def options(self, request):
+        """
+        Returns available users for assignment and possible state transitions
+        for selected sentences (either via `include` or filters).
+        """
+
+        has_filters = any(param for param in request.query_params if param not in ["page", "ordering"])
+
+        if not has_filters:
+            return Response({"assignable_users": [], "possible_transitions": []})
+        
+        sentences = self.filter_queryset(self.get_queryset())
+
+        # Fetch assignable users
+        assignable_users = Profile.objects.all().select_related("user")
+        assignable_users_data = MinimalUserSerializer([p.user for p in assignable_users], many=True).data
+
+        # Fetch possible state transitions
+        all_transitions = [
+            {transition.target for transition in sentence.get_available_state_transitions()}
+            for sentence in sentences
+        ]
+
+        common_transitions = list(reduce(and_, all_transitions)) if all_transitions else []
+
+        return Response(
+            {
+                "assignable_users": assignable_users_data,
+                "possible_transitions": common_transitions,
+            }
+        )
+
+
 class SpecieViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Specie
@@ -509,8 +547,7 @@ class ProfileViewSet(viewsets.GenericViewSet):
             msg = "User not logged in."
             raise ValidationError(msg, code="authorization")
 
-        profile, created = Profile.objects.get_or_create(
-            user=self.request.user)
+        profile, created = Profile.objects.get_or_create(user=self.request.user)
         return Response(self.get_serializer(profile).data)
 
 

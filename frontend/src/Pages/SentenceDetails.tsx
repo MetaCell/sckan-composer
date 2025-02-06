@@ -111,6 +111,7 @@ const SentencesDetails = () => {
             ordering: queryOptions.ordering,
             stateFilter: [ComposerSentenceListStateEnum.Open],
             exclude: [`${sentence.id}`],
+            include: undefined,
             limit: 1,
             index: 0,
           });

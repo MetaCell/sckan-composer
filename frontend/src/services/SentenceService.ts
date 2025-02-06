@@ -72,8 +72,8 @@ class SentenceService extends AbstractService {
     }
   }
   async getList(queryOptions: QueryParams): Promise<PaginatedSentenceList> {
-    const { exclude, limit, ordering, index, title, stateFilter, tagFilter } = queryOptions
-    return composerApi.composerSentenceList(exclude, limit, undefined, index, ordering, stateFilter, tagFilter, title).then((res: any) => res.data)
+    const { exclude, include, limit, ordering, index, title, stateFilter, tagFilter } = queryOptions
+    return composerApi.composerSentenceList(exclude, include, limit, undefined, index, ordering, stateFilter, tagFilter, title).then((res: any) => res.data)
   }
   async assignOwner(id: number, patchedSentence?: PatchedSentence): Promise<Sentence> {
     return composerApi.composerSentenceAssignOwnerPartialUpdate(id, patchedSentence).then((response: any) => response.data);

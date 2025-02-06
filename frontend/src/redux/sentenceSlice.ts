@@ -11,6 +11,7 @@ export interface QueryParams {
   tagFilter: number[] | undefined,
   title: string | undefined
   exclude: string[] | undefined
+  include: number[] | undefined
 }
 
 export interface SentenceState {
@@ -26,7 +27,8 @@ export const initialState: SentenceState = {
     stateFilter: undefined,
     tagFilter: undefined,
     title: undefined,
-    exclude: undefined
+    exclude: undefined,
+    include: undefined
   }
 }
 
