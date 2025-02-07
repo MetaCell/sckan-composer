@@ -8,15 +8,15 @@ import {snakeToSpace} from "../../helpers/helpers";
 interface ChangeStatusProps {
   selectedTableRows: any;
   entityType: string;
+  possibleTransitions: string[]
 }
 
-const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityType }) => {
+const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityType, possibleTransitions }) => {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const [newStatus, setNewStatus] = useState<string | null>(null);
   
-  const statusOptions = Object.values(ChangeRequestStatus);
   
   const handleSelectStatus = (status: string) => {
     setNewStatus(status);
@@ -58,7 +58,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
         icon={ChangeStatusIcon}
         tooltip={isUniformState() ? "Change status" : "Select statements with the same status to enable bulk change"}
         actionButtonDisabled={!isUniformState()}
-        options={statusOptions}
+        options={possibleTransitions}
         selectedOption={selectedStatus}
         onSelect={handleSelectStatus}
       />

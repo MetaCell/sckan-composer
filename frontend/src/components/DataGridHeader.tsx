@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import Drawer from "@mui/material/Drawer";
@@ -11,15 +11,16 @@ import { setFilters as setSentenceFilters } from "../redux/sentenceSlice";
 import { setFilters as setStatementFilters } from "../redux/statementSlice";
 import { useAppDispatch } from "../redux/hooks";
 import Stack from "@mui/material/Stack";
-import {Divider, Typography} from "@mui/material";
+import { Divider, Typography } from "@mui/material";
 import AssignUser from "./TableMultiSelectActions/AssignUser";
-import {vars} from "../theme/variables";
+import { vars } from "../theme/variables";
 import ManageTags from "./TableMultiSelectActions/ManageTags";
-import {Sentence} from "../apiclient/backend";
+import { ConnectivityStatement, Sentence } from "../apiclient/backend";
 import ChangeStatus from "./TableMultiSelectActions/ChangeStatus";
 import AddNote from "./TableMultiSelectActions/AddNote";
 import AssignPopulationSet from "./TableMultiSelectActions/AssignPopulationSet";
-import {ENTITY_TYPES} from "../helpers/settings";
+import { ENTITY_TYPES } from "../helpers/settings";
+import sentenceService from "../services/SentenceService";
 
 const toolbarStyle = {
   background: vars.whiteColor,
@@ -52,11 +53,14 @@ const multiSelectActionsStyle = {
 interface DataGridHeaderProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
   entityType: ENTITY_TYPES.STATEMENT | ENTITY_TYPES.SENTENCE;
-  selectedRows?: Sentence[]
+  selectedRows: Sentence[] | ConnectivityStatement[]
 }
 const DataGridHeader = (props: DataGridHeaderProps) => {
   const { queryOptions, entityType, selectedRows } = props;
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [assignableUsers, setAssignableUsers] = useState<any[]>([]);
+  const [possibleTransitions, setPossibleTransitions] = useState<string[]>([]);
+
   const dispatch = useAppDispatch();
   const handleClearFilter = () => {
     const noFilters = { stateFilter: undefined, tagFilter: undefined };
@@ -64,6 +68,40 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
       ? dispatch(setSentenceFilters(noFilters))
       : dispatch(setStatementFilters(noFilters));
   };
+
+  const selectedRowIds = selectedRows.map((row) => row.id).filter((id): id is number => id !== null && id !== undefined);
+
+  const updatedQueryOptions: SentenceQueryParams | StatementQueryParams = {
+    ...queryOptions,
+    include: selectedRowIds.length > 0 ? selectedRowIds : undefined, 
+  };
+
+  const fetchOptionsMap = {
+    [ENTITY_TYPES.SENTENCE]: () => sentenceService.fetchOptions(updatedQueryOptions as SentenceQueryParams),
+    [ENTITY_TYPES.STATEMENT]: async () => ({ assignable_users: [], possible_transitions: [] }), // TODO:
+  };
+
+
+  // Fetch options when selectedRows or entityType changes
+  useEffect(() => {
+    const fetchOptions = async () => {
+      if (selectedRows.length > 0) {
+        try {
+          const fetchFunction = fetchOptionsMap[entityType] || fetchOptionsMap[ENTITY_TYPES.STATEMENT];
+          const options = await fetchFunction();
+          setAssignableUsers(options.assignable_users);
+          setPossibleTransitions(options.possible_transitions);
+        } catch (error) {
+          console.error("Failed to fetch options:", error); // TODO
+        }
+      } else {
+        setAssignableUsers([]);
+        setPossibleTransitions([]);
+      }
+    };
+
+    fetchOptions();
+  }, [selectedRows, entityType, queryOptions]); 
 
   return (
     <Grid
@@ -76,7 +114,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
       <Grid item xs={12} md={3}>
         <Searchbar queryOptions={queryOptions} entityType={entityType} />
       </Grid>
-     
+
       <Grid item xs={12} md={9} display='flex' alignItems='center' justifyContent='end' gap='1rem'>
         {
           selectedRows && selectedRows.length > 0 &&
@@ -85,10 +123,10 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               {selectedRows.length} {entityType}{selectedRows.length > 1 ? "s" : ""} selected
             </Typography>
             <Divider flexItem />
-            <AssignUser selectedTableRows={selectedRows} entityType={entityType} />
+            <AssignUser selectedTableRows={selectedRows} entityType={entityType} assignableUsers={assignableUsers}/>
             <ManageTags selectedTableRows={selectedRows} entityType={entityType} />
             <AddNote selectedTableRows={selectedRows} entityType={entityType} />
-            <ChangeStatus selectedTableRows={selectedRows} entityType={entityType} />
+            <ChangeStatus selectedTableRows={selectedRows} entityType={entityType} possibleTransitions={possibleTransitions}/>
             <AssignPopulationSet selectedTableRows={selectedRows} entityType={entityType} />
             <Divider flexItem />
           </Stack>

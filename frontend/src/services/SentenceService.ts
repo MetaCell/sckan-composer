@@ -1,8 +1,8 @@
 import { composerApi } from "./apis";
-import { PaginatedSentenceList, PatchedSentence, Sentence} from '../apiclient/backend';
+import { PaginatedSentenceList, PatchedSentence, Sentence } from '../apiclient/backend';
 import { AbstractService } from "./AbstractService";
 import { QueryParams } from "../redux/sentenceSlice";
-import { checkSentenceOwnership} from "../helpers/ownershipAlert";
+import { checkSentenceOwnership } from "../helpers/ownershipAlert";
 
 
 class SentenceService extends AbstractService {
@@ -35,7 +35,7 @@ class SentenceService extends AbstractService {
     return composerApi.composerSentenceDoTransitionCreate(sentence.id, transition, sentence).then((response: any) => response.data)
   }
   // @ts-ignore
-  async addTag(id: number, tagId: number, onCancel: () => void = () => {}): Promise<string> {
+  async addTag(id: number, tagId: number, onCancel: () => void = () => { }): Promise<string> {
     try {
       return await composerApi.composerSentenceAddTagCreate(id, tagId).then((response: any) => response.data)
     } catch (err) {
@@ -53,7 +53,7 @@ class SentenceService extends AbstractService {
       );
     }
   }
-  async removeTag(id: number, tagId: number, onCancel: () => void = () => {}): Promise<string> {
+  async removeTag(id: number, tagId: number, onCancel: () => void = () => { }): Promise<string> {
     try {
       return await composerApi.composerSentenceDelTagCreate(id, tagId).then((response: any) => response.data)
     } catch (err) {
@@ -77,6 +77,19 @@ class SentenceService extends AbstractService {
   }
   async assignOwner(id: number, patchedSentence?: PatchedSentence): Promise<Sentence> {
     return composerApi.composerSentenceAssignOwnerPartialUpdate(id, patchedSentence).then((response: any) => response.data);
+  }
+
+
+  /**
+   * Fetch options for assignable users and possible state transitions
+   * Uses the sentence filters or explicit IDs to determine results.
+   */
+  async fetchOptions(queryOptions: QueryParams): Promise<{ assignable_users: any[]; possible_transitions: string[] }> {
+    const { exclude, include, notes, ordering, stateFilter, tagFilter, title } = queryOptions;
+
+    return composerApi
+      .composerSentenceOptionsRetrieve(exclude, include, notes, ordering, stateFilter, tagFilter, title)
+      .then((response: any) => response.data);
   }
 }
 

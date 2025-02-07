@@ -6,8 +6,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 interface User {
   id: number
-  name: string
-  email: string
+  full_name: string
 }
 
 export interface OptionType {
@@ -15,18 +14,14 @@ export interface OptionType {
   label: string
 }
 
-const users: User[] = [
-  { id: 1, name: "Lana Steiner", email: "lana@example.com" },
-  { id: 2, name: "Candice Wu", email: "candice@example.com" },
-]
 
 const mapUsersToSelectOptions = (users: User[]) => {
   return users.map((user) => ({
     id: user.id,
-    label: user.name,
+    label: user.full_name,
   }));
 };
-const AssignUser = ({selectedTableRows, entityType}: any) => {
+const AssignUser = ({selectedTableRows, entityType, assignableUsers}: any) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedUsers, setSelectedUsers] = useState<OptionType[]>([])
@@ -70,7 +65,7 @@ const AssignUser = ({selectedTableRows, entityType}: any) => {
         anchorEl={anchorEl}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        data={mapUsersToSelectOptions(users)}
+        data={mapUsersToSelectOptions(assignableUsers)}
         selectedOptions={selectedUsers.map((user: OptionType) => user.label)}
         onOptionSelect={handleSelectUser}
         placeholder="Search for users"

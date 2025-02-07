@@ -76,10 +76,15 @@ class UserSerializer(serializers.ModelSerializer):
 class MinimalUserSerializer(serializers.ModelSerializer):
     """Minimal User Serializer (for Profile List View)"""
 
+    full_name = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ("id", "username")  # Only expose minimal user details
+        fields = ("id", "full_name")  # Only expose minimal user details
 
+    def get_full_name(self, obj):
+        return obj.get_full_name()
+    
 class ProfileSerializer(serializers.ModelSerializer):
     """Profile"""
 
