@@ -57,9 +57,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
     try {
       const changeStatusFunction = changeStatusMap[entityType];
       if (!changeStatusFunction) throw new Error(`No function found for ${entityType}`);
-
       await changeStatusFunction(queryOptions, newStatus);
-      console.log(`Successfully changed status to`, newStatus, "for:", selectedTableRows, entityType);
     } catch (error) {
       console.error("Error changing status:", error);
     } finally {

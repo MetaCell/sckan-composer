@@ -105,12 +105,9 @@ const ManageTags: React.FC<ManageTagsProps> = ({ selectedTableRows, entityType, 
     try {
       const tagAssignmentFunction = tagManagementMap[entityType as ENTITY_TYPES];
       if (!tagAssignmentFunction) throw new Error(`No function found for ${entityType}`);
-
       for (const tag of selectedTags) {
         await tagAssignmentFunction(queryOptions, tag.id);
       }
-
-      console.log("Assigned tags:", selectedTags, "to rows:", selectedTableRows, "Entity:", entityType);
     } catch (error) {
       console.error("Error assigning tags:", error);
     } finally {
