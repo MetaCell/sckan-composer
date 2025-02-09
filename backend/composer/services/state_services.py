@@ -16,8 +16,8 @@ class OwnerServiceMixin(BaseServiceMixin):
     def is_owner(self, owner):
         return self.obj.owner == owner
 
-    def can_assign_owner(self, request):
-        return bool(request.user)
+    def can_assign_owner(self, requested_by):
+        return bool(requested_by)
 
     def should_set_owner(self, request):
         if self.obj.owner:

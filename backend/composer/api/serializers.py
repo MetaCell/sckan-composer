@@ -1,5 +1,4 @@
 from typing import List
-
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.forms import ValidationError
@@ -8,7 +7,7 @@ from drf_writable_nested.mixins import UniqueFieldsMixin
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
 
-from ..enums import SentenceState, CSState
+from ..enums import BulkActionType, SentenceState, CSState
 from ..models import (
     AlertType,
     AnatomicalEntity,
@@ -886,3 +885,62 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
             "apinatomy_model",
             "statement_preview",
         )
+
+class BulkActionSerializer(serializers.Serializer):
+    action = serializers.ChoiceField(
+        choices=[(action.value, action.value) for action in BulkActionType],
+        help_text="The bulk action to perform."
+    )
+
+class AssignUserSerializer(BulkActionSerializer):
+    user_id = serializers.IntegerField(required=True, help_text="ID of the user to assign.")
+
+    def validate(self, data):
+        if data.get("action") != BulkActionType.ASSIGN_USER.value:
+            raise serializers.ValidationError({
+                "action": f"For this serializer, action must be '{BulkActionType.ASSIGN_USER.value}'."
+            })
+        return data
+
+class AssignTagSerializer(BulkActionSerializer):
+    tag_id = serializers.IntegerField(required=True, help_text="ID of the tag to assign.")
+
+    def validate(self, data):
+        if data.get("action") != BulkActionType.ASSIGN_TAG.value:
+            raise serializers.ValidationError({
+                "action": f"For this serializer, action must be '{BulkActionType.ASSIGN_TAG.value}'."
+            })
+        return data
+
+class WriteNoteSerializer(BulkActionSerializer):
+    note_text = serializers.CharField(required=True, help_text="The note text.")
+
+    def validate(self, data):
+        if data.get("action") != BulkActionType.WRITE_NOTE.value:
+            raise serializers.ValidationError({
+                "action": f"For this serializer, action must be '{BulkActionType.WRITE_NOTE.value}'."
+            })
+        return data
+
+class ChangeStatusSerializer(BulkActionSerializer):
+    new_status = serializers.CharField(required=True, help_text="The new status.")
+
+    def validate(self, data):
+        if data.get("action") != BulkActionType.CHANGE_STATUS.value:
+            raise serializers.ValidationError({
+                "action": f"For this serializer, action must be '{BulkActionType.CHANGE_STATUS.value}'."
+            })
+        return data
+
+class AssignPopulationSetSerializer(BulkActionSerializer):
+    population_set_id = serializers.IntegerField(required=True, help_text="ID of the population set.")
+
+    def validate(self, data):
+        if data.get("action") != BulkActionType.ASSIGN_POPULATION_SET.value:
+            raise serializers.ValidationError({
+                "action": f"For this serializer, action must be '{BulkActionType.ASSIGN_POPULATION_SET.value}'."
+            })
+        return data
+    
+class BulkActionResponseSerializer(serializers.Serializer):
+    updated_count = serializers.IntegerField()

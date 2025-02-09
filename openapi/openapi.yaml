@@ -1635,6 +1635,118 @@ paths:
               schema:
                 $ref: '#/components/schemas/Sentence'
           description: ''
+  /api/composer/sentence/bulk_action/:
+    post:
+      operationId: composer_sentence_bulk_action_create
+      description: |-
+        Apply bulk actions to sentences.
+
+        Uses filters or `include` to select affected sentences.
+        The action determines which additional parameters are required.
+      parameters:
+      - in: query
+        name: exclude
+        schema:
+          type: array
+          items:
+            type: string
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: include
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: notes
+        schema:
+          type: boolean
+        description: Checks if entity has notes
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -id
+            - -last_edited
+            - -owner
+            - id
+            - last_edited
+            - owner
+        description: Ordering
+        explode: false
+        style: form
+      - in: query
+        name: state
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - completed
+            - compose_later
+            - compose_now
+            - excluded
+            - needs_further_review
+            - open
+            - ready_to_compose
+        explode: true
+        style: form
+      - in: query
+        name: tags
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
+        name: title
+        schema:
+          type: string
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BulkAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BulkAction'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSentenceList'
+          description: ''
   /api/composer/sentence/options/:
     get:
       operationId: composer_sentence_options_retrieve
@@ -2274,6 +2386,14 @@ paths:
           description: ''
 components:
   schemas:
+    ActionEnum:
+      enum:
+      - assign_user
+      - assign_tag
+      - write_note
+      - change_status
+      - assign_population_set
+      type: string
     AlertType:
       type: object
       properties:
@@ -2348,6 +2468,45 @@ components:
       - id
       - name
       - ontology_uri
+    AssignPopulationSet:
+      type: object
+      properties:
+        action:
+          allOf:
+          - $ref: '#/components/schemas/ActionEnum'
+          description: The bulk action to perform.
+        population_set_id:
+          type: integer
+          description: ID of the population set.
+      required:
+      - action
+      - population_set_id
+    AssignTag:
+      type: object
+      properties:
+        action:
+          allOf:
+          - $ref: '#/components/schemas/ActionEnum'
+          description: The bulk action to perform.
+        tag_id:
+          type: integer
+          description: ID of the tag to assign.
+      required:
+      - action
+      - tag_id
+    AssignUser:
+      type: object
+      properties:
+        action:
+          allOf:
+          - $ref: '#/components/schemas/ActionEnum'
+          description: The bulk action to perform.
+        user_id:
+          type: integer
+          description: ID of the user to assign.
+      required:
+      - action
+      - user_id
     AvailableTransitions24dEnum:
       enum:
       - draft
@@ -2402,6 +2561,34 @@ components:
     BlankEnum:
       enum:
       - ''
+    BulkAction:
+      oneOf:
+      - $ref: '#/components/schemas/AssignUser'
+      - $ref: '#/components/schemas/AssignTag'
+      - $ref: '#/components/schemas/WriteNote'
+      - $ref: '#/components/schemas/ChangeStatus'
+      - $ref: '#/components/schemas/AssignPopulationSet'
+      discriminator:
+        propertyName: action
+        mapping:
+          assign_user: '#/components/schemas/AssignUser'
+          assign_tag: '#/components/schemas/AssignTag'
+          write_note: '#/components/schemas/WriteNote'
+          change_status: '#/components/schemas/ChangeStatus'
+          assign_population_set: '#/components/schemas/AssignPopulationSet'
+    ChangeStatus:
+      type: object
+      properties:
+        action:
+          allOf:
+          - $ref: '#/components/schemas/ActionEnum'
+          description: The bulk action to perform.
+        new_status:
+          type: string
+          description: The new status.
+      required:
+      - action
+      - new_status
     CircuitTypeEnum:
       enum:
       - SENSORY
@@ -4026,6 +4213,19 @@ components:
       - DENDRITE
       - SENSORY_AXON
       type: string
+    WriteNote:
+      type: object
+      properties:
+        action:
+          allOf:
+          - $ref: '#/components/schemas/ActionEnum'
+          description: The bulk action to perform.
+        note_text:
+          type: string
+          description: The note text.
+      required:
+      - action
+      - note_text
   securitySchemes:
     basicAuth:
       type: http

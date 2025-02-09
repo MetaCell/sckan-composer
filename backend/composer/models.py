@@ -435,16 +435,19 @@ class Sentence(models.Model):
     def excluded(self, *args, **kwargs):
         ...
 
-    def assign_owner(self, request):
-        if SentenceStateService(self).can_assign_owner(request):
-            self.owner = request.user
+    def assign_owner(self, requested_by, owner=None):
+        if owner is None:
+            owner = requested_by
+
+        if SentenceStateService(self).can_assign_owner(requested_by):
+            self.owner = owner
             self.save(update_fields=["owner"])
 
             # Update the owner of related draft ConnectivityStatements
             ConnectivityStatement.objects.filter(
                 sentence=self,
                 state=CSState.DRAFT
-            ).update(owner=request.user)
+            ).update(owner=owner)
 
     def auto_assign_owner(self, request):
         if SentenceStateService(self).should_set_owner(request):
@@ -695,9 +698,12 @@ class ConnectivityStatement(models.Model):
         }
         return laterality_map.get(self.laterality, None)
 
-    def assign_owner(self, request):
-        if ConnectivityStatementStateService(self).can_assign_owner(request):
-            self.owner = request.user
+    def assign_owner(self, requested_by, owner=None):
+        if owner is None:
+            owner = requested_by
+        
+        if ConnectivityStatementStateService(self).can_assign_owner(requested_by):
+            self.owner = owner
             self.save(update_fields=["owner"])
 
     def auto_assign_owner(self, request):

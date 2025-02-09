@@ -4,7 +4,7 @@ from django.http import HttpResponse, Http404
 from drf_react_template.schema_form_encoder import SchemaProcessor, UiSchemaProcessor
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
-
+from drf_spectacular.utils import PolymorphicProxySerializer
 from rest_framework import mixins, permissions, viewsets, status
 from rest_framework.decorators import action, api_view
 from rest_framework.renderers import INDENT_SEPARATORS
@@ -13,9 +13,10 @@ from rest_framework.serializers import ValidationError
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Case, When, Value, IntegerField
-from django_fsm import get_available_FIELD_transitions
 from functools import reduce
 from operator import and_
+from composer.services import sentence_service
+from composer.enums import BulkActionType
 from composer.services.state_services import (
     ConnectivityStatementStateService,
     SentenceStateService,
@@ -30,9 +31,15 @@ from .filtersets import (
     SpecieFilter,
     DestinationFilter,
 )
+
 from .serializers import (
     AlertTypeSerializer,
     AnatomicalEntitySerializer,
+    AssignPopulationSetSerializer,
+    AssignTagSerializer,
+    AssignUserSerializer,
+    BulkActionResponseSerializer,
+    ChangeStatusSerializer,
     PhenotypeSerializer,
     ProjectionPhenotypeSerializer,
     ConnectivityStatementSerializer,
@@ -49,7 +56,8 @@ from .serializers import (
     ConnectivityStatementUpdateSerializer,
     DestinationSerializer,
     BaseConnectivityStatementSerializer,
-    MinimalUserSerializer
+    MinimalUserSerializer,
+    WriteNoteSerializer,
 )
 from .permissions import (
     IsStaffUserIfExportedStateInConnectivityStatement,
@@ -83,7 +91,7 @@ class AssignOwnerMixin(viewsets.GenericViewSet):
     )
     def assign_owner(self, request, pk=None):
         instance = self.get_object()
-        instance.assign_owner(request)
+        instance.assign_owner(request.user)
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
@@ -475,10 +483,7 @@ class SentenceViewSet(
             )
         return super().get_queryset()
 
-
-    @extend_schema(
-        filters=True
-    )
+    @extend_schema(filters=True)
     @action(detail=False, methods=["get"])
     def options(self, request):
         """
@@ -486,24 +491,33 @@ class SentenceViewSet(
         for selected sentences (either via `include` or filters).
         """
 
-        has_filters = any(param for param in request.query_params if param not in ["page", "ordering"])
+        has_filters = any(
+            param for param in request.query_params if param not in ["page", "ordering"]
+        )
 
         if not has_filters:
             return Response({"assignable_users": [], "possible_transitions": []})
-        
+
         sentences = self.filter_queryset(self.get_queryset())
 
         # Fetch assignable users
         assignable_users = Profile.objects.all().select_related("user")
-        assignable_users_data = MinimalUserSerializer([p.user for p in assignable_users], many=True).data
+        assignable_users_data = MinimalUserSerializer(
+            [p.user for p in assignable_users], many=True
+        ).data
 
         # Fetch possible state transitions
         all_transitions = [
-            {transition.target for transition in sentence.get_available_state_transitions()}
+            {
+                transition.target
+                for transition in sentence.get_available_state_transitions()
+            }
             for sentence in sentences
         ]
 
-        common_transitions = list(reduce(and_, all_transitions)) if all_transitions else []
+        common_transitions = (
+            list(reduce(and_, all_transitions)) if all_transitions else []
+        )
 
         return Response(
             {
@@ -511,6 +525,78 @@ class SentenceViewSet(
                 "possible_transitions": common_transitions,
             }
         )
+
+    @extend_schema(
+        request=PolymorphicProxySerializer(
+            component_name="BulkAction",
+            serializers={
+                BulkActionType.ASSIGN_USER.value: AssignUserSerializer,
+                BulkActionType.ASSIGN_TAG.value: AssignTagSerializer,
+                BulkActionType.WRITE_NOTE.value: WriteNoteSerializer,
+                BulkActionType.CHANGE_STATUS.value: ChangeStatusSerializer,
+                BulkActionType.ASSIGN_POPULATION_SET.value: AssignPopulationSetSerializer,
+            },
+            resource_type_field_name="action",
+        ),
+        responses={200: BulkActionResponseSerializer},
+        filters=True,
+    )
+    @action(detail=False, methods=["post"])
+    def bulk_action(self, request):
+        """
+        Apply bulk actions to sentences.
+        Uses filters or `include` to select affected sentences.
+        The action determines which additional parameters are required.
+        Returns the number of sentences updated successfully.
+        """
+        action_serializers = {
+            BulkActionType.ASSIGN_USER.value: AssignUserSerializer,
+            BulkActionType.ASSIGN_TAG.value: AssignTagSerializer,
+            BulkActionType.WRITE_NOTE.value: WriteNoteSerializer,
+            BulkActionType.CHANGE_STATUS.value: ChangeStatusSerializer,
+            BulkActionType.ASSIGN_POPULATION_SET.value: AssignPopulationSetSerializer,
+        }
+
+        action_type = request.data.get("action")
+        if action_type not in action_serializers:
+            return Response(
+                {"error": "Invalid action type."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Validate using the appropriate serializer.
+        serializer = action_serializers[action_type](data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        sentences = self.filter_queryset(self.get_queryset())
+        if not sentences.exists():
+            return Response(
+                {"error": "No sentences found."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Map action types to service functions.
+        action_map = {
+            BulkActionType.ASSIGN_USER.value: lambda: sentence_service.assign_owner(
+                sentences, request.user, serializer.validated_data.get("user_id")
+            ),
+            BulkActionType.ASSIGN_TAG.value: lambda: sentence_service.assign_tag(
+                sentences, serializer.validated_data["tag_id"]
+            ),
+            BulkActionType.WRITE_NOTE.value: lambda: sentence_service.write_note(
+                sentences, request.user, serializer.validated_data["note_text"]
+            ),
+            BulkActionType.CHANGE_STATUS.value: lambda: sentence_service.change_status(
+                sentences, serializer.validated_data["new_status"], request.user
+            ),
+            BulkActionType.ASSIGN_POPULATION_SET.value: lambda: sentence_service.assign_population_set(
+                sentences, serializer.validated_data["population_set_id"]
+            ),
+        }
+
+        # Execute the bulk action; the service returns a list of successfully updated sentence IDs.
+        successful_ids = action_map[action_type]()
+        updated_count = len(successful_ids)
+
+        return Response({"updated_count": updated_count}, status=status.HTTP_200_OK)
 
 
 class SpecieViewSet(viewsets.ReadOnlyModelViewSet):
