@@ -14,9 +14,10 @@ interface ChangeStatusProps {
   possibleTransitions: string[];
   queryOptions: SentenceQueryParams | StatementQueryParams;
   onClick: () => void;
+  onConfirm: () => void;
 }
 
-const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityType, possibleTransitions, queryOptions, onClick }) => {
+const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityType, possibleTransitions, queryOptions, onClick, onConfirm }) => {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
@@ -63,6 +64,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
       console.error("Error changing status:", error);
     } finally {
       setIsLoading(false);
+      onConfirm()
     }
   };
 

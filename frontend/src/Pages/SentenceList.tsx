@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useAppSelector } from "../redux/hooks";
 import Box from "@mui/material/Box";
 import AddIcon from "@mui/icons-material/Add";
@@ -18,7 +18,7 @@ const SentenceList = () => {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [showSelectionBanner, setShowSelectionBanner] = useState(false)
-  
+
   const [selectedRows, setSelectedRows] = useState<Sentence[]>([]);
 
   const handleClickOpen = () => {
@@ -31,19 +31,25 @@ const SentenceList = () => {
   const queryOptions = useAppSelector((state) => state.sentence.queryOptions);
 
   const gutters = useGutters();
-  
-  useEffect(() => {
+
+  const refreshSentenceList = useCallback(() => {
+    setLoading(true);
     sentenceService.getList(queryOptions).then((res) => {
       setSentenceList(res.results);
       !res.count ? setTotalResults(0) : setTotalResults(res.count);
       setLoading(false);
     });
   }, [queryOptions]);
-  
+
+  useEffect(() => {
+    // Initial fetch
+    refreshSentenceList();
+  }, [refreshSentenceList]);
+
   useEffect(() => {
     setShowSelectionBanner(selectedRows.length === queryOptions.limit)
   }, [selectedRows, queryOptions.limit])
-  
+
   useEffect(() => {
     setSelectedRows([])
   }, [queryOptions.stateFilter, queryOptions.tagFilter])
@@ -62,8 +68,13 @@ const SentenceList = () => {
         ]}
       />
       <AddSentencesDialog open={open} handleClose={handleClose} />
-     
-      <DataGridHeader entityType={ENTITY_TYPES.SENTENCE} queryOptions={queryOptions} selectedRows={selectedRows} />
+
+      <DataGridHeader 
+        entityType={ENTITY_TYPES.SENTENCE} 
+        queryOptions={queryOptions} 
+        selectedRows={selectedRows}
+        refreshList={refreshSentenceList}
+      />
       <Box sx={{ position: "relative", zIndex: 1 }}>
         <SelectionBanner
           totalResults={totalResults}

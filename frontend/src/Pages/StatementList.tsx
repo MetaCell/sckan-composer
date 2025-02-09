@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import {BaseConnectivityStatement, ConnectivityStatement} from "../apiclient/backend";
+import { BaseConnectivityStatement, ConnectivityStatement } from "../apiclient/backend";
 import { useAppSelector } from "../redux/hooks";
 import connectivityStatementService from "../services/StatementService";
 import EntityDataGrid from "../components/EntityDataGrid";
@@ -9,7 +9,7 @@ import Header from "../components/Header";
 import { useGutters } from "../styles/styles";
 import { Typography } from "@mui/material";
 import SelectionBanner from "../components/TableMultiSelectActions/SelectionBanner";
-import {ENTITY_TYPES} from "../helpers/settings";
+import { ENTITY_TYPES } from "../helpers/settings";
 
 const StatementList = () => {
   const [statementList, setStatementList] = useState<BaseConnectivityStatement[]>();
@@ -20,22 +20,28 @@ const StatementList = () => {
   const queryOptions = useAppSelector((state) => state.statement.queryOptions);
 
   const gutters = useGutters();
-  
-    useEffect(() => {
-      setShowSelectionBanner(selectedRows.length === queryOptions.limit)
-    }, [selectedRows, queryOptions.limit])
-    
-    useEffect(() => {
-      setSelectedRows([])
-    }, [queryOptions.stateFilter, queryOptions.tagFilter])
 
-  useEffect(() => {
+  const refreshStatementList = useCallback(() => {
+    setLoading(true);
     connectivityStatementService.getList(queryOptions).then((res) => {
       setStatementList(res.results);
-      !res.count ? setTotalResults(0) : setTotalResults(res.count);
+      setTotalResults(res.count ?? 0);
       setLoading(false);
     });
   }, [queryOptions]);
+
+  useEffect(() => {
+    setShowSelectionBanner(selectedRows.length === queryOptions.limit)
+  }, [selectedRows, queryOptions.limit])
+
+  useEffect(() => {
+    setSelectedRows([])
+  }, [queryOptions.stateFilter, queryOptions.tagFilter])
+
+  useEffect(() => {
+    // Initial fetch
+    refreshStatementList();
+  }, [refreshStatementList]);
 
   return (
     <Box sx={gutters} p={6} justifyContent="center">
@@ -46,7 +52,12 @@ const StatementList = () => {
         title="Knowledge Statements List"
         caption={`${totalResults} statements in total`}
       />
-      <DataGridHeader entityType={ENTITY_TYPES.STATEMENT} queryOptions={queryOptions} selectedRows={selectedRows} />
+      <DataGridHeader
+        entityType={ENTITY_TYPES.STATEMENT} 
+        queryOptions={queryOptions} 
+        selectedRows={selectedRows} 
+        refreshList={refreshStatementList}
+        />
       <Box sx={{ position: "relative", zIndex: 1 }}>
         <SelectionBanner
           totalResults={totalResults}

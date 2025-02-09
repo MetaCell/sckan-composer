@@ -25,6 +25,7 @@ interface AssignUserProps {
   assignableUsers: User[];
   queryOptions: SentenceQueryParams | StatementQueryParams;
   onClick: () => void;
+  onConfirm: () => void;
 }
 
 const mapUsersToSelectOptions = (users: User[]) => {
@@ -34,7 +35,7 @@ const mapUsersToSelectOptions = (users: User[]) => {
   }));
 };
 
-const AssignUser: React.FC<AssignUserProps> = ({ selectedTableRows, entityType, assignableUsers, queryOptions, onClick }) => {
+const AssignUser: React.FC<AssignUserProps> = ({ selectedTableRows, entityType, assignableUsers, queryOptions, onClick, onConfirm }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<OptionType | null>(null);
@@ -76,6 +77,7 @@ const AssignUser: React.FC<AssignUserProps> = ({ selectedTableRows, entityType, 
       console.error("Error assigning user:", error);
     } finally {
       setIsLoading(false);
+      onConfirm();
     }
 
     handleClose();

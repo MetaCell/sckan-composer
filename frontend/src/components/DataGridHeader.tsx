@@ -54,10 +54,11 @@ interface DataGridHeaderProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
   entityType: ENTITY_TYPES.STATEMENT | ENTITY_TYPES.SENTENCE;
   selectedRows: Sentence[] | ConnectivityStatement[];
+  refreshList: () => void;
 }
 
 const DataGridHeader = (props: DataGridHeaderProps) => {
-  const { queryOptions, entityType, selectedRows } = props;
+  const { queryOptions, entityType, selectedRows, refreshList } = props;
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [assignableUsers, setAssignableUsers] = useState<any[]>([]);
   const [possibleTransitions, setPossibleTransitions] = useState<string[]>([]);
@@ -133,6 +134,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               assignableUsers={assignableUsers}
               queryOptions={updatedQueryOptions}
               onClick={handleFetchOptions}
+              onConfirm={refreshList}
             />
             <ManageTags selectedTableRows={selectedRows} entityType={entityType} />
             <AddNote selectedTableRows={selectedRows} entityType={entityType} />
@@ -142,6 +144,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               possibleTransitions={possibleTransitions}
               queryOptions={updatedQueryOptions}
               onClick={handleFetchOptions}
+              onConfirm={refreshList}
             />
             <AssignPopulationSet selectedTableRows={selectedRows} entityType={entityType} />
             <Divider flexItem />
