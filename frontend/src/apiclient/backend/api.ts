@@ -26,6 +26,23 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @enum {string}
+ */
+
+export const ActionEnum = {
+    AssignUser: 'assign_user',
+    AssignTag: 'assign_tag',
+    WriteNote: 'write_note',
+    ChangeStatus: 'change_status',
+    AssignPopulationSet: 'assign_population_set'
+} as const;
+
+export type ActionEnum = typeof ActionEnum[keyof typeof ActionEnum];
+
+
+/**
+ * 
+ * @export
  * @interface AlertType
  */
 export interface AlertType {
@@ -132,6 +149,69 @@ export interface AnatomicalEntityMeta {
 /**
  * 
  * @export
+ * @interface AssignPopulationSet
+ */
+export interface AssignPopulationSet {
+    /**
+     * The bulk action to perform.
+     * @type {ActionEnum}
+     * @memberof AssignPopulationSet
+     */
+    'action': ActionEnum;
+    /**
+     * ID of the population set.
+     * @type {number}
+     * @memberof AssignPopulationSet
+     */
+    'population_set_id': number;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface AssignTag
+ */
+export interface AssignTag {
+    /**
+     * The bulk action to perform.
+     * @type {ActionEnum}
+     * @memberof AssignTag
+     */
+    'action': ActionEnum;
+    /**
+     * ID of the tag to assign.
+     * @type {number}
+     * @memberof AssignTag
+     */
+    'tag_id': number;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface AssignUser
+ */
+export interface AssignUser {
+    /**
+     * The bulk action to perform.
+     * @type {ActionEnum}
+     * @memberof AssignUser
+     */
+    'action': ActionEnum;
+    /**
+     * ID of the user to assign.
+     * @type {number}
+     * @memberof AssignUser
+     */
+    'user_id': number;
+}
+
+
+/**
+ * 
+ * @export
  * @enum {string}
  */
 
@@ -216,6 +296,33 @@ export const BlankEnum = {
 } as const;
 
 export type BlankEnum = typeof BlankEnum[keyof typeof BlankEnum];
+
+
+/**
+ * @type BulkAction
+ * @export
+ */
+export type BulkAction = { action: 'assign_population_set' } & AssignPopulationSet | { action: 'assign_tag' } & AssignTag | { action: 'assign_user' } & AssignUser | { action: 'change_status' } & ChangeStatus | { action: 'write_note' } & WriteNote;
+
+/**
+ * 
+ * @export
+ * @interface ChangeStatus
+ */
+export interface ChangeStatus {
+    /**
+     * The bulk action to perform.
+     * @type {ActionEnum}
+     * @memberof ChangeStatus
+     */
+    'action': ActionEnum;
+    /**
+     * The new status.
+     * @type {string}
+     * @memberof ChangeStatus
+     */
+    'new_status': string;
+}
 
 
 /**
@@ -2800,6 +2907,27 @@ export const ViaTypeEnum = {
 export type ViaTypeEnum = typeof ViaTypeEnum[keyof typeof ViaTypeEnum];
 
 
+/**
+ * 
+ * @export
+ * @interface WriteNote
+ */
+export interface WriteNote {
+    /**
+     * The bulk action to perform.
+     * @type {ActionEnum}
+     * @memberof WriteNote
+     */
+    'action': ActionEnum;
+    /**
+     * The note text.
+     * @type {string}
+     * @memberof WriteNote
+     */
+    'note_text': string;
+}
+
+
 
 /**
  * ComposerApi - axios parameter creator
@@ -4728,6 +4856,93 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Apply bulk actions to sentences.  Uses filters or `include` to select affected sentences. The action determines which additional parameters are required.
+         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {number} [limit] Number of results to return per page.
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
+         * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {string} [title] 
+         * @param {BulkAction} [bulkAction] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSentenceBulkActionCreate: async (exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/sentence/bulk_action/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (exclude) {
+                localVarQueryParameter['exclude'] = exclude.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (include) {
+                localVarQueryParameter['include'] = include.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (notes !== undefined) {
+                localVarQueryParameter['notes'] = notes;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (ordering) {
+                localVarQueryParameter['ordering'] = ordering.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (state) {
+                localVarQueryParameter['state'] = state;
+            }
+
+            if (tags) {
+                localVarQueryParameter['tags'] = tags;
+            }
+
+            if (title !== undefined) {
+                localVarQueryParameter['title'] = title;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(bulkAction, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Sentence
          * @param {Sentence} sentence 
          * @param {*} [options] Override http request option.
@@ -6523,6 +6738,27 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Apply bulk actions to sentences.  Uses filters or `include` to select affected sentences. The action determines which additional parameters are required.
+         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {number} [limit] Number of results to return per page.
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
+         * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {string} [title] 
+         * @param {BulkAction} [bulkAction] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceBulkActionCreate(exclude, include, limit, notes, offset, ordering, state, tags, title, bulkAction, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceBulkActionCreate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Sentence
          * @param {Sentence} sentence 
          * @param {*} [options] Override http request option.
@@ -7281,6 +7517,24 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          */
         composerSentenceAssignOwnerPartialUpdate(id: number, patchedSentence?: PatchedSentence, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
             return localVarFp.composerSentenceAssignOwnerPartialUpdate(id, patchedSentence, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Apply bulk actions to sentences.  Uses filters or `include` to select affected sentences. The action determines which additional parameters are required.
+         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {number} [limit] Number of results to return per page.
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
+         * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {string} [title] 
+         * @param {BulkAction} [bulkAction] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedSentenceList> {
+            return localVarFp.composerSentenceBulkActionCreate(exclude, include, limit, notes, offset, ordering, state, tags, title, bulkAction, options).then((request) => request(axios, basePath));
         },
         /**
          * Sentence
@@ -8047,6 +8301,26 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
+     * Apply bulk actions to sentences.  Uses filters or `include` to select affected sentences. The action determines which additional parameters are required.
+     * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+     * @param {Array<number>} [include] Multiple values may be separated by commas.
+     * @param {number} [limit] Number of results to return per page.
+     * @param {boolean} [notes] Checks if entity has notes
+     * @param {number} [offset] The initial index from which to return the results.
+     * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
+     * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
+     * @param {Array<number>} [tags] 
+     * @param {string} [title] 
+     * @param {BulkAction} [bulkAction] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSentenceBulkActionCreate(exclude, include, limit, notes, offset, ordering, state, tags, title, bulkAction, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Sentence
      * @param {Sentence} sentence 
      * @param {*} [options] Override http request option.
@@ -8388,6 +8662,31 @@ export const ComposerConnectivityStatementListStateEnum = {
     ToBeReviewed: 'to_be_reviewed'
 } as const;
 export type ComposerConnectivityStatementListStateEnum = typeof ComposerConnectivityStatementListStateEnum[keyof typeof ComposerConnectivityStatementListStateEnum];
+/**
+ * @export
+ */
+export const ComposerSentenceBulkActionCreateOrderingEnum = {
+    Id: '-id',
+    LastEdited: '-last_edited',
+    Owner: '-owner',
+    Id2: 'id',
+    LastEdited2: 'last_edited',
+    Owner2: 'owner'
+} as const;
+export type ComposerSentenceBulkActionCreateOrderingEnum = typeof ComposerSentenceBulkActionCreateOrderingEnum[keyof typeof ComposerSentenceBulkActionCreateOrderingEnum];
+/**
+ * @export
+ */
+export const ComposerSentenceBulkActionCreateStateEnum = {
+    Completed: 'completed',
+    ComposeLater: 'compose_later',
+    ComposeNow: 'compose_now',
+    Excluded: 'excluded',
+    NeedsFurtherReview: 'needs_further_review',
+    Open: 'open',
+    ReadyToCompose: 'ready_to_compose'
+} as const;
+export type ComposerSentenceBulkActionCreateStateEnum = typeof ComposerSentenceBulkActionCreateStateEnum[keyof typeof ComposerSentenceBulkActionCreateStateEnum];
 /**
  * @export
  */

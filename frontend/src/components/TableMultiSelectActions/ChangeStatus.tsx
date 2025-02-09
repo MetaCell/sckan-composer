@@ -1,23 +1,45 @@
 import React, { useState } from "react";
 import PopoverMenu from "./PopoverMenu";
 import { ChangeStatusIcon, ChangeStatusDialogIcon } from "../icons";
-import {ChangeRequestStatus} from "../../helpers/settings";
+import { snakeToSpace } from "../../helpers/helpers";
 import ConfirmationDialog from "../ConfirmationDialog";
-import {snakeToSpace} from "../../helpers/helpers";
+import sentenceService from "../../services/SentenceService";
+import { QueryParams as SentenceQueryParams } from "../../redux/sentenceSlice";
+import { QueryParams as StatementQueryParams } from "../../redux/statementSlice";
+import { ENTITY_TYPES } from "../../helpers/settings";
 
 interface ChangeStatusProps {
   selectedTableRows: any;
-  entityType: string;
-  possibleTransitions: string[]
+  entityType: ENTITY_TYPES;
+  possibleTransitions: string[];
+  queryOptions: SentenceQueryParams | StatementQueryParams;
+  onClick: () => void;
 }
 
-const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityType, possibleTransitions }) => {
+const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityType, possibleTransitions, queryOptions, onClick }) => {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const [newStatus, setNewStatus] = useState<string | null>(null);
-  
-  
+  const [isLoading, setIsLoading] = useState(false);
+
+  const changeStatusMap: Record<
+    ENTITY_TYPES,
+    (queryOptions: SentenceQueryParams | StatementQueryParams, newStatus: string) => Promise<{ message: string }>
+  > = {
+    [ENTITY_TYPES.SENTENCE]: (queryOptions, newStatus) =>
+      sentenceService.changeStatusBulk(queryOptions as SentenceQueryParams, newStatus),
+    [ENTITY_TYPES.STATEMENT]: async () => {
+      return new Promise((resolve) =>
+        setTimeout(() => resolve({ message: "Mocked statement status change." }), 500)
+      );
+    },
+  };
+
+  const handleOpenMenu = () => {
+    onClick(); // Fetch updated transitions
+  };
+
   const handleSelectStatus = (status: string) => {
     setNewStatus(status);
     if (dontShowAgain) {
@@ -26,41 +48,54 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
       setIsModalOpen(true);
     }
   };
-  
-  const handleStatusChange = (newStatus: string) => {
-    // TODO: API call to change status
-    console.log(`Changing status to`, newStatus, selectedTableRows, entityType);
+
+  const handleStatusChange = async (newStatus: string) => {
+    if (!newStatus) return;
+    setIsLoading(true);
+
+    try {
+      const changeStatusFunction = changeStatusMap[entityType];
+      if (!changeStatusFunction) throw new Error(`No function found for ${entityType}`);
+
+      await changeStatusFunction(queryOptions, newStatus);
+      console.log(`Successfully changed status to`, newStatus, "for:", selectedTableRows, entityType);
+    } catch (error) {
+      console.error("Error changing status:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
-  
+
   const handleStatusConfirm = (status: string) => {
     setSelectedStatus(status);
     handleStatusChange(status);
     setIsModalOpen(false);
   };
-  
+
   const handleModalCancel = () => {
     setIsModalOpen(false);
     setNewStatus(null);
   };
-  
+
   const isUniformState = () => {
     if (!Array.isArray(selectedTableRows) || selectedTableRows.length === 0) return false;
     const firstState = selectedTableRows[0]?.state;
     return selectedTableRows.every((item) => item.state === firstState);
   };
-  
+
   const fromState = snakeToSpace(selectedTableRows[0]?.state);
   const toState = newStatus && snakeToSpace(newStatus);
-  
+
   return (
     <>
       <PopoverMenu
         icon={ChangeStatusIcon}
         tooltip={isUniformState() ? "Change status" : "Select statements with the same status to enable bulk change"}
-        actionButtonDisabled={!isUniformState()}
+        actionButtonDisabled={!isUniformState() || isLoading}
         options={possibleTransitions}
         selectedOption={selectedStatus}
         onSelect={handleSelectStatus}
+        onOpen={handleOpenMenu}
       />
       <ConfirmationDialog
         open={isModalOpen}

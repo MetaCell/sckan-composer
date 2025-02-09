@@ -38,14 +38,16 @@ interface PopoverMenuProps {
   options: string[];
   selectedOption?: string | null;
   onSelect: (option: string) => void;
+  onOpen: () => void;
   actionButtonDisabled?: boolean
 }
 
-const PopoverMenu: React.FC<PopoverMenuProps> = ({ icon: IconComponent, tooltip, options, selectedOption, onSelect, actionButtonDisabled = false }) => {
+const PopoverMenu: React.FC<PopoverMenuProps> = ({ icon: IconComponent, tooltip, options, selectedOption, onSelect, onOpen, actionButtonDisabled = false }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
+    onOpen();
   };
   
   const handleClose = () => {

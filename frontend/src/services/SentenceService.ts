@@ -1,5 +1,5 @@
 import { composerApi } from "./apis";
-import { PaginatedSentenceList, PatchedSentence, Sentence } from '../apiclient/backend';
+import { ActionEnum, BulkAction, PaginatedSentenceList, PatchedSentence, Sentence } from '../apiclient/backend';
 import { AbstractService } from "./AbstractService";
 import { QueryParams } from "../redux/sentenceSlice";
 import { checkSentenceOwnership } from "../helpers/ownershipAlert";
@@ -91,6 +91,82 @@ class SentenceService extends AbstractService {
       .composerSentenceOptionsRetrieve(exclude, include, notes, ordering, stateFilter, tagFilter, title)
       .then((response: any) => response.data);
   }
+
+/**
+ * Perform a bulk action on sentences.
+ * Ensures correct parameter order even if API changes.
+ * @param queryOptions - The filters or selection criteria.
+ * @param bulkAction - The action to perform (e.g., assign user, add tag).
+ */
+async performBulkAction(queryOptions: QueryParams, bulkAction: BulkAction): Promise<{ message: string }> {
+  const { exclude, include, limit, notes, index, ordering, stateFilter, tagFilter, title } = queryOptions;
+
+  // Dynamically construct the argument object based on expected function parameters
+  const params = {
+    exclude,
+    include,
+    limit,
+    notes,
+    offset: index,
+    ordering,
+    state: stateFilter,  // Ensure correct naming conversion
+    tags: tagFilter,
+    title,
+    bulkAction
+  };
+
+  return composerApi
+    .composerSentenceBulkActionCreate(
+      params.exclude,
+      params.include,
+      params.limit,
+      params.notes,
+      params.offset,
+      params.ordering,
+      params.state,
+      params.tags,
+      params.title,
+      params.bulkAction
+    )
+    .then((response: any) => response.data);
+}
+
+
+  /**
+   * Bulk assign a user to selected sentences.
+   */
+  async assignUserBulk(queryOptions: QueryParams, userId: number): Promise<{ message: string }> {
+    return this.performBulkAction(queryOptions, { action: ActionEnum.AssignUser, user_id: userId });
+  }
+
+  /**
+   * Bulk assign a tag to selected sentences.
+   */
+  async assignTagBulk(queryOptions: QueryParams, tagId: number): Promise<{ message: string }> {
+    return this.performBulkAction(queryOptions, { action: ActionEnum.AssignTag, tag_id: tagId });
+  }
+
+  /**
+   * Bulk add a note to selected sentences.
+   */
+  async writeNoteBulk(queryOptions: QueryParams, noteText: string): Promise<{ message: string }> {
+    return this.performBulkAction(queryOptions, { action: ActionEnum.WriteNote, note_text: noteText });
+  }
+
+  /**
+   * Bulk change the status of selected sentences.
+   */
+  async changeStatusBulk(queryOptions: QueryParams, newStatus: string): Promise<{ message: string }> {
+    return this.performBulkAction(queryOptions, { action: ActionEnum.ChangeStatus, new_status: newStatus });
+  }
+
+  /**
+   * Bulk assign sentences to a population set.
+   */
+  async assignPopulationSetBulk(queryOptions: QueryParams, populationSetId: number): Promise<{ message: string }> {
+    return this.performBulkAction(queryOptions, { action: ActionEnum.AssignPopulationSet, population_set_id: populationSetId });
+  }
+
 }
 
 const sentenceService = new SentenceService()

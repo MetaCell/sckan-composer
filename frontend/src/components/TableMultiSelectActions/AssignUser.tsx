@@ -1,19 +1,31 @@
 import IconButton from "@mui/material/IconButton";
-import {PersonAddIcon} from "../icons";
+import { PersonAddIcon } from "../icons";
 import CustomSearchSelect from "./CustomSearchSelect";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Tooltip from "@mui/material/Tooltip";
+import sentenceService from "../../services/SentenceService";
+import statementService from "../../services/StatementService"; // Import the statement service
+import { QueryParams as SentenceQueryParams } from "../../redux/sentenceSlice";
+import { QueryParams as StatementQueryParams } from "../../redux/statementSlice";
+import { ENTITY_TYPES } from "../../helpers/settings";
 
 interface User {
-  id: number
-  full_name: string
+  id: number;
+  full_name: string;
 }
 
 export interface OptionType {
-  id: number
-  label: string
+  id: number;
+  label: string;
 }
 
+interface AssignUserProps {
+  selectedTableRows: any[];
+  entityType: ENTITY_TYPES;
+  assignableUsers: User[];
+  queryOptions: SentenceQueryParams | StatementQueryParams;
+  onClick: () => void;
+}
 
 const mapUsersToSelectOptions = (users: User[]) => {
   return users.map((user) => ({
@@ -21,44 +33,67 @@ const mapUsersToSelectOptions = (users: User[]) => {
     label: user.full_name,
   }));
 };
-const AssignUser = ({selectedTableRows, entityType, assignableUsers}: any) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedUsers, setSelectedUsers] = useState<OptionType[]>([])
+
+const AssignUser: React.FC<AssignUserProps> = ({ selectedTableRows, entityType, assignableUsers, queryOptions, onClick }) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedUser, setSelectedUser] = useState<OptionType | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const assignUserMap: Record<
+    ENTITY_TYPES,
+    (queryOptions: SentenceQueryParams | StatementQueryParams, userId: number) => Promise<{ message: string }>
+  > = {
+    [ENTITY_TYPES.SENTENCE]: (queryOptions, userId) =>
+      sentenceService.assignUserBulk(queryOptions as SentenceQueryParams, userId),
+    [ENTITY_TYPES.STATEMENT]: async () => {
+      return new Promise((resolve) =>
+        setTimeout(() => resolve({ message: "Mocked statement user assignment." }), 500)
+      );
+    },
+  };
+
   const handleClose = () => {
-    setAnchorEl(null)
-    setSearchTerm("")
-  }
-  
+    setAnchorEl(null);
+    setSearchTerm("");
+  };
+
   const handleSelectUser = (user: OptionType) => {
-    setSelectedUsers((prevSelected) => {
-      const isAlreadySelected = prevSelected.some((selectedUser) => selectedUser.id === user.id)
-      if (isAlreadySelected) {
-        return prevSelected.filter((selectedUser) => selectedUser.id !== user.id)
-      } else {
-        return [...prevSelected, user]
-      }
-    })
-  }
-  
-  const handleConfirm = () => {
-    // TODO: API call to Assign selected users to the selected entities
-    console.log("Confirmed selections:", selectedUsers, selectedTableRows, entityType)
-    handleClose()
-  }
-  
+    setSelectedUser(user);
+  };
+
+  const handleConfirm = async () => {
+    if (!selectedUser) return;
+    setIsLoading(true);
+
+    try {
+      const assignUserFunction = assignUserMap[entityType as ENTITY_TYPES]; // Explicitly cast entityType
+      if (!assignUserFunction) throw new Error(`No function found for ${entityType}`);
+
+      await assignUserFunction(queryOptions, selectedUser.id);
+      console.log("Assigned user:", selectedUser, "to sentences:", selectedTableRows, "Entity:", entityType);
+    } catch (error) {
+      console.error("Error assigning user:", error);
+    } finally {
+      setIsLoading(false);
+    }
+
+    handleClose();
+  };
+
   const handleViewUsersMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-  
+    setAnchorEl(event.currentTarget);
+    onClick();
+  };
+
   return (
     <>
-      <Tooltip arrow title={'Assign to a user'}>
-        <IconButton onClick={handleViewUsersMenu}>
+      <Tooltip arrow title={"Assign to a user"}>
+        <IconButton onClick={handleViewUsersMenu} disabled={isLoading}>
           <PersonAddIcon />
         </IconButton>
       </Tooltip>
-     
+
       <CustomSearchSelect
         open={Boolean(anchorEl)}
         handleClose={handleClose}
@@ -66,16 +101,16 @@ const AssignUser = ({selectedTableRows, entityType, assignableUsers}: any) => {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         data={mapUsersToSelectOptions(assignableUsers)}
-        selectedOptions={selectedUsers.map((user: OptionType) => user.label)}
+        selectedOptions={selectedUser ? [selectedUser.label] : []} // Only 1 selection
         onOptionSelect={handleSelectUser}
         placeholder="Search for users"
-        confirmButtonText="Assign"
+        confirmButtonText={isLoading ? "Assigning..." : "Assign"}
         onConfirm={handleConfirm}
         showHelperText={true}
-        helperText={`Having trouble finding someone? </br>The list of available users is based on their roles and permissions. contact us if you need any help`}
+        helperText={`Having trouble finding someone? </br>The list of available users is based on their roles and permissions. Contact us if you need any help.`}
       />
     </>
-  )
-}
+  );
+};
 
-export default AssignUser
+export default AssignUser;

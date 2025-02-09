@@ -89,7 +89,7 @@ const AddNote = ({selectedTableRows, entityType}: any) => {
         </DialogTitle>
         <DialogContent sx={styles.dialogContent}>
           <Typography mb='1.25rem'>
-            Add a note to 5 sentences.
+            Add a note to {selectedTableRows.length} {selectedTableRows.length === 1 ? 'sentence' : 'sentences'}
           </Typography>
           <TextField
             fullWidth

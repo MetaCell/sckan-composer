@@ -20,6 +20,7 @@ const AssignPopulationSet = ({selectedTableRows, entityType}: any) => {
       options={populationSets}
       selectedOption={selectedSet}
       onSelect={handleSelectSet}
+      onOpen={() => console.log("TODO")}
     />
   );
 };
