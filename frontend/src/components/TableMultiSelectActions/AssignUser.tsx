@@ -4,19 +4,14 @@ import CustomSearchSelect from "./CustomSearchSelect";
 import React, { useState } from "react";
 import Tooltip from "@mui/material/Tooltip";
 import sentenceService from "../../services/SentenceService";
-import statementService from "../../services/StatementService"; // Import the statement service
 import { QueryParams as SentenceQueryParams } from "../../redux/sentenceSlice";
 import { QueryParams as StatementQueryParams } from "../../redux/statementSlice";
 import { ENTITY_TYPES } from "../../helpers/settings";
+import { OptionType } from "../../types";
 
 interface User {
   id: number;
   full_name: string;
-}
-
-export interface OptionType {
-  id: number;
-  label: string;
 }
 
 interface AssignUserProps {

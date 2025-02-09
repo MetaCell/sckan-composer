@@ -13,3 +13,8 @@ export type Option = {
     group: string;
     content: OptionDetail[];
 };
+
+export interface OptionType {
+    id: number;
+    label: string;
+  }

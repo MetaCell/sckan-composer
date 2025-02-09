@@ -9,10 +9,10 @@ import Box from "@mui/material/Box"
 import Popover from "@mui/material/Popover"
 import {ListItemVariant} from "./ListItemVariant";
 import {vars} from "../../theme/variables";
-import {OptionType} from "./AssignUser";
 import {HelpOutlineRounded} from "@mui/icons-material";
 import Tooltip from "@mui/material/Tooltip";
 import React from "react";
+import { OptionType } from "../../types"
 
 const styles = {
   paper: {
