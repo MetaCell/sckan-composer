@@ -902,8 +902,12 @@ class AssignUserSerializer(BulkActionSerializer):
             })
         return data
 
-class AssignTagSerializer(BulkActionSerializer):
-    tag_id = serializers.IntegerField(required=True, help_text="ID of the tag to assign.")
+class AssignTagsSerializer(BulkActionSerializer):
+    tag_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=True,
+        help_text="List of tag IDs to assign (existing tags not in this list will be removed)."
+    )
 
     def validate(self, data):
         if data.get("action") != BulkActionType.ASSIGN_TAG.value:
@@ -911,6 +915,7 @@ class AssignTagSerializer(BulkActionSerializer):
                 "action": f"For this serializer, action must be '{BulkActionType.ASSIGN_TAG.value}'."
             })
         return data
+
 
 class WriteNoteSerializer(BulkActionSerializer):
     note_text = serializers.CharField(required=True, help_text="The note text.")

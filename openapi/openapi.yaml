@@ -1640,9 +1640,9 @@ paths:
       operationId: composer_sentence_bulk_action_create
       description: |-
         Apply bulk actions to sentences.
-
         Uses filters or `include` to select affected sentences.
         The action determines which additional parameters are required.
+        Returns the number of sentences updated successfully.
       parameters:
       - in: query
         name: exclude
@@ -1662,23 +1662,11 @@ paths:
         description: Multiple values may be separated by commas.
         explode: false
         style: form
-      - name: limit
-        required: false
-        in: query
-        description: Number of results to return per page.
-        schema:
-          type: integer
       - in: query
         name: notes
         schema:
           type: boolean
         description: Checks if entity has notes
-      - name: offset
-        required: false
-        in: query
-        description: The initial index from which to return the results.
-        schema:
-          type: integer
       - in: query
         name: ordering
         schema:
@@ -1745,7 +1733,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSentenceList'
+                $ref: '#/components/schemas/BulkActionResponse'
           description: ''
   /api/composer/sentence/options/:
     get:
@@ -2481,19 +2469,22 @@ components:
       required:
       - action
       - population_set_id
-    AssignTag:
+    AssignTags:
       type: object
       properties:
         action:
           allOf:
           - $ref: '#/components/schemas/ActionEnum'
           description: The bulk action to perform.
-        tag_id:
-          type: integer
-          description: ID of the tag to assign.
+        tag_ids:
+          type: array
+          items:
+            type: integer
+          description: List of tag IDs to assign (existing tags not in this list will
+            be removed).
       required:
       - action
-      - tag_id
+      - tag_ids
     AssignUser:
       type: object
       properties:
@@ -2564,7 +2555,7 @@ components:
     BulkAction:
       oneOf:
       - $ref: '#/components/schemas/AssignUser'
-      - $ref: '#/components/schemas/AssignTag'
+      - $ref: '#/components/schemas/AssignTags'
       - $ref: '#/components/schemas/WriteNote'
       - $ref: '#/components/schemas/ChangeStatus'
       - $ref: '#/components/schemas/AssignPopulationSet'
@@ -2572,10 +2563,17 @@ components:
         propertyName: action
         mapping:
           assign_user: '#/components/schemas/AssignUser'
-          assign_tag: '#/components/schemas/AssignTag'
+          assign_tag: '#/components/schemas/AssignTags'
           write_note: '#/components/schemas/WriteNote'
           change_status: '#/components/schemas/ChangeStatus'
           assign_population_set: '#/components/schemas/AssignPopulationSet'
+    BulkActionResponse:
+      type: object
+      properties:
+        updated_count:
+          type: integer
+      required:
+      - updated_count
     ChangeStatus:
       type: object
       properties:

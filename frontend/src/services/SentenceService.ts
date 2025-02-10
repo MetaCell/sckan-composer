@@ -99,17 +99,14 @@ class SentenceService extends AbstractService {
  * @param bulkAction - The action to perform (e.g., assign user, add tag).
  */
 async performBulkAction(queryOptions: QueryParams, bulkAction: BulkAction): Promise<{ message: string }> {
-  const { exclude, include, limit, notes, index, ordering, stateFilter, tagFilter, title } = queryOptions;
+  const { exclude, include, notes, ordering, stateFilter, tagFilter, title } = queryOptions;
 
-  // Dynamically construct the argument object based on expected function parameters
   const params = {
     exclude,
     include,
-    limit,
     notes,
-    offset: index,
     ordering,
-    state: stateFilter,  // Ensure correct naming conversion
+    state: stateFilter,
     tags: tagFilter,
     title,
     bulkAction
@@ -119,9 +116,7 @@ async performBulkAction(queryOptions: QueryParams, bulkAction: BulkAction): Prom
     .composerSentenceBulkActionCreate(
       params.exclude,
       params.include,
-      params.limit,
       params.notes,
-      params.offset,
       params.ordering,
       params.state,
       params.tags,
@@ -142,8 +137,8 @@ async performBulkAction(queryOptions: QueryParams, bulkAction: BulkAction): Prom
   /**
    * Bulk assign a tag to selected sentences.
    */
-  async assignTagBulk(queryOptions: QueryParams, tagId: number): Promise<{ message: string }> {
-    return this.performBulkAction(queryOptions, { action: ActionEnum.AssignTag, tag_id: tagId });
+  async assignTagBulk(queryOptions: QueryParams, tagIds: number[]): Promise<{ message: string }> {
+    return this.performBulkAction(queryOptions, { action: ActionEnum.AssignTag, tag_ids: tagIds });
   }
 
   /**

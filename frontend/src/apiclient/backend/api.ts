@@ -170,21 +170,21 @@ export interface AssignPopulationSet {
 /**
  * 
  * @export
- * @interface AssignTag
+ * @interface AssignTags
  */
-export interface AssignTag {
+export interface AssignTags {
     /**
      * The bulk action to perform.
      * @type {ActionEnum}
-     * @memberof AssignTag
+     * @memberof AssignTags
      */
     'action': ActionEnum;
     /**
-     * ID of the tag to assign.
-     * @type {number}
-     * @memberof AssignTag
+     * List of tag IDs to assign (existing tags not in this list will be removed).
+     * @type {Array<number>}
+     * @memberof AssignTags
      */
-    'tag_id': number;
+    'tag_ids': Array<number>;
 }
 
 
@@ -302,8 +302,21 @@ export type BlankEnum = typeof BlankEnum[keyof typeof BlankEnum];
  * @type BulkAction
  * @export
  */
-export type BulkAction = { action: 'assign_population_set' } & AssignPopulationSet | { action: 'assign_tag' } & AssignTag | { action: 'assign_user' } & AssignUser | { action: 'change_status' } & ChangeStatus | { action: 'write_note' } & WriteNote;
+export type BulkAction = { action: 'assign_population_set' } & AssignPopulationSet | { action: 'assign_tag' } & AssignTags | { action: 'assign_user' } & AssignUser | { action: 'change_status' } & ChangeStatus | { action: 'write_note' } & WriteNote;
 
+/**
+ * 
+ * @export
+ * @interface BulkActionResponse
+ */
+export interface BulkActionResponse {
+    /**
+     * 
+     * @type {number}
+     * @memberof BulkActionResponse
+     */
+    'updated_count': number;
+}
 /**
  * 
  * @export
@@ -4856,12 +4869,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Apply bulk actions to sentences.  Uses filters or `include` to select affected sentences. The action determines which additional parameters are required.
+         * Apply bulk actions to sentences. Uses filters or `include` to select affected sentences. The action determines which additional parameters are required. Returns the number of sentences updated successfully.
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {Array<number>} [include] Multiple values may be separated by commas.
-         * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
-         * @param {number} [offset] The initial index from which to return the results.
          * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
          * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
          * @param {Array<number>} [tags] 
@@ -4870,7 +4881,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceBulkActionCreate: async (exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceBulkActionCreate: async (exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/sentence/bulk_action/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4900,16 +4911,8 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
                 localVarQueryParameter['include'] = include.join(COLLECTION_FORMATS.csv);
             }
 
-            if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
-            }
-
             if (notes !== undefined) {
                 localVarQueryParameter['notes'] = notes;
-            }
-
-            if (offset !== undefined) {
-                localVarQueryParameter['offset'] = offset;
             }
 
             if (ordering) {
@@ -6738,12 +6741,10 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Apply bulk actions to sentences.  Uses filters or `include` to select affected sentences. The action determines which additional parameters are required.
+         * Apply bulk actions to sentences. Uses filters or `include` to select affected sentences. The action determines which additional parameters are required. Returns the number of sentences updated successfully.
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {Array<number>} [include] Multiple values may be separated by commas.
-         * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
-         * @param {number} [offset] The initial index from which to return the results.
          * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
          * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
          * @param {Array<number>} [tags] 
@@ -6752,8 +6753,8 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceBulkActionCreate(exclude, include, limit, notes, offset, ordering, state, tags, title, bulkAction, options);
+        async composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BulkActionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceBulkActionCreate(exclude, include, notes, ordering, state, tags, title, bulkAction, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceBulkActionCreate']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -7519,12 +7520,10 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerSentenceAssignOwnerPartialUpdate(id, patchedSentence, options).then((request) => request(axios, basePath));
         },
         /**
-         * Apply bulk actions to sentences.  Uses filters or `include` to select affected sentences. The action determines which additional parameters are required.
+         * Apply bulk actions to sentences. Uses filters or `include` to select affected sentences. The action determines which additional parameters are required. Returns the number of sentences updated successfully.
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {Array<number>} [include] Multiple values may be separated by commas.
-         * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
-         * @param {number} [offset] The initial index from which to return the results.
          * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
          * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
          * @param {Array<number>} [tags] 
@@ -7533,8 +7532,8 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedSentenceList> {
-            return localVarFp.composerSentenceBulkActionCreate(exclude, include, limit, notes, offset, ordering, state, tags, title, bulkAction, options).then((request) => request(axios, basePath));
+        composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): AxiosPromise<BulkActionResponse> {
+            return localVarFp.composerSentenceBulkActionCreate(exclude, include, notes, ordering, state, tags, title, bulkAction, options).then((request) => request(axios, basePath));
         },
         /**
          * Sentence
@@ -8301,12 +8300,10 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * Apply bulk actions to sentences.  Uses filters or `include` to select affected sentences. The action determines which additional parameters are required.
+     * Apply bulk actions to sentences. Uses filters or `include` to select affected sentences. The action determines which additional parameters are required. Returns the number of sentences updated successfully.
      * @param {Array<string>} [exclude] Multiple values may be separated by commas.
      * @param {Array<number>} [include] Multiple values may be separated by commas.
-     * @param {number} [limit] Number of results to return per page.
      * @param {boolean} [notes] Checks if entity has notes
-     * @param {number} [offset] The initial index from which to return the results.
      * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
      * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
      * @param {Array<number>} [tags] 
@@ -8316,8 +8313,8 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerSentenceBulkActionCreate(exclude, include, limit, notes, offset, ordering, state, tags, title, bulkAction, options).then((request) => request(this.axios, this.basePath));
+    public composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSentenceBulkActionCreate(exclude, include, notes, ordering, state, tags, title, bulkAction, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

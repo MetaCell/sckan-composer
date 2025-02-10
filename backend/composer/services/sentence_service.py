@@ -28,29 +28,35 @@ def assign_owner(sentences, requested_by, owner_id):
     return success_ids
 
 
-def assign_tag(sentences, tag_id):
+def assign_tags(sentences, tag_ids):
     """
-    Assigns a tag to the selected sentences.
-    Instead of looping over each sentence and calling `.add()`,
-    it uses the through model and bulk_create with ignore_conflicts to add associations.
-    Returns a list of sentence IDs that received the new tag.
+    Updates the tags for the selected sentences.
+    - Ensures only the provided tags remain.
+    - Removes any tags that are not in the provided list.
+    - Uses bulk operations for efficiency.
     """
-    tag = get_object_or_404(Tag, id=tag_id)
-    sentence_ids = list(sentences.values_list("id", flat=True))
+    existing_tag_ids = set(Tag.objects.filter(id__in=tag_ids).values_list("id", flat=True))
 
-    # Identify which sentences do not already have this tag.
-    existing_ids = list(
-        Sentence.tags.through.objects.filter(
-            tag_id=tag.id, sentence_id__in=sentence_ids
-        ).values_list("sentence_id", flat=True)
-    )
-    new_ids = set(sentence_ids) - set(existing_ids)
-    associations = [
-        Sentence.tags.through(sentence_id=sentence_id, tag_id=tag.id)
-        for sentence_id in new_ids
-    ]
-    Sentence.tags.through.objects.bulk_create(associations, ignore_conflicts=True)
-    return list(new_ids)
+    with transaction.atomic():
+        for sentence in sentences:
+            current_tags = set(sentence.tags.values_list("id", flat=True))
+
+            # Determine which tags to add and remove
+            tags_to_add = existing_tag_ids - current_tags
+            tags_to_remove = current_tags - existing_tag_ids
+
+            # Remove unwanted tags
+            if tags_to_remove:
+                sentence.tags.remove(*tags_to_remove)
+
+            # Add missing tags
+            associations = [
+                Sentence.tags.through(sentence_id=sentence.id, tag_id=tag_id)
+                for tag_id in tags_to_add
+            ]
+            Sentence.tags.through.objects.bulk_create(associations, ignore_conflicts=True)
+
+    return sentences
 
 
 def write_note(sentences, user, note_text):

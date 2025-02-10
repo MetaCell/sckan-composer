@@ -36,16 +36,17 @@ const ManageTags: React.FC<ManageTagsProps> = ({ selectedTableRows, entityType, 
 
   const tagManagementMap: Record<
     ENTITY_TYPES,
-    (queryOptions: SentenceQueryParams | StatementQueryParams, tagId: number) => Promise<{ message: string }>
+    (queryOptions: SentenceQueryParams | StatementQueryParams, tagIds: number[]) => Promise<{ message: string }>
   > = {
-    [ENTITY_TYPES.SENTENCE]: (queryOptions, tagId) =>
-      sentenceService.assignTagBulk(queryOptions as SentenceQueryParams, tagId),
+    [ENTITY_TYPES.SENTENCE]: (queryOptions, tagIds) =>
+      sentenceService.assignTagBulk(queryOptions as SentenceQueryParams, tagIds),
     [ENTITY_TYPES.STATEMENT]: async () => {
       return new Promise((resolve) =>
         setTimeout(() => resolve({ message: "Mocked statement tag assignment." }), 500)
       );
     },
   };
+
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -99,17 +100,17 @@ const ManageTags: React.FC<ManageTagsProps> = ({ selectedTableRows, entityType, 
   };
 
   const handleConfirm = async () => {
-    if (selectedTags.length === 0) return;
     setIsLoading(true);
 
     try {
       const tagAssignmentFunction = tagManagementMap[entityType as ENTITY_TYPES];
       if (!tagAssignmentFunction) throw new Error(`No function found for ${entityType}`);
-      for (const tag of selectedTags) {
-        await tagAssignmentFunction(queryOptions, tag.id);
-      }
+
+      const tagIds = selectedTags.map((tag) => tag.id);
+      await tagAssignmentFunction(queryOptions, tagIds);
+
     } catch (error) {
-      console.error("Error assigning tags:", error);
+      console.error("Error updating tags:", error);
     } finally {
       setIsLoading(false);
       onConfirm();

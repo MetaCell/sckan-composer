@@ -36,7 +36,7 @@ from .serializers import (
     AlertTypeSerializer,
     AnatomicalEntitySerializer,
     AssignPopulationSetSerializer,
-    AssignTagSerializer,
+    AssignTagsSerializer,
     AssignUserSerializer,
     BulkActionResponseSerializer,
     ChangeStatusSerializer,
@@ -531,7 +531,7 @@ class SentenceViewSet(
             component_name="BulkAction",
             serializers={
                 BulkActionType.ASSIGN_USER.value: AssignUserSerializer,
-                BulkActionType.ASSIGN_TAG.value: AssignTagSerializer,
+                BulkActionType.ASSIGN_TAG.value: AssignTagsSerializer,
                 BulkActionType.WRITE_NOTE.value: WriteNoteSerializer,
                 BulkActionType.CHANGE_STATUS.value: ChangeStatusSerializer,
                 BulkActionType.ASSIGN_POPULATION_SET.value: AssignPopulationSetSerializer,
@@ -551,7 +551,7 @@ class SentenceViewSet(
         """
         action_serializers = {
             BulkActionType.ASSIGN_USER.value: AssignUserSerializer,
-            BulkActionType.ASSIGN_TAG.value: AssignTagSerializer,
+            BulkActionType.ASSIGN_TAG.value: AssignTagsSerializer,
             BulkActionType.WRITE_NOTE.value: WriteNoteSerializer,
             BulkActionType.CHANGE_STATUS.value: ChangeStatusSerializer,
             BulkActionType.ASSIGN_POPULATION_SET.value: AssignPopulationSetSerializer,
@@ -578,8 +578,8 @@ class SentenceViewSet(
             BulkActionType.ASSIGN_USER.value: lambda: sentence_service.assign_owner(
                 sentences, request.user, serializer.validated_data.get("user_id")
             ),
-            BulkActionType.ASSIGN_TAG.value: lambda: sentence_service.assign_tag(
-                sentences, serializer.validated_data["tag_id"]
+            BulkActionType.ASSIGN_TAG.value: lambda: sentence_service.assign_tags(
+                sentences, serializer.validated_data["tag_ids"]
             ),
             BulkActionType.WRITE_NOTE.value: lambda: sentence_service.write_note(
                 sentences, request.user, serializer.validated_data["note_text"]
