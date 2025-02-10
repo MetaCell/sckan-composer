@@ -50,6 +50,8 @@ const AssignUser: React.FC<AssignUserProps> = ({ selectedTableRows, entityType, 
   const handleClose = () => {
     setAnchorEl(null);
     setSearchTerm("");
+    setSelectedUser(null);
+
   };
 
   const handleSelectUser = (user: OptionType) => {
@@ -101,6 +103,7 @@ const AssignUser: React.FC<AssignUserProps> = ({ selectedTableRows, entityType, 
         placeholder="Search for users"
         confirmButtonText={isLoading ? "Assigning..." : "Assign"}
         onConfirm={handleConfirm}
+        onCancel={handleClose} 
         showHelperText={true}
         helperText={`Having trouble finding someone? </br>The list of available users is based on their roles and permissions. Contact us if you need any help.`}
       />

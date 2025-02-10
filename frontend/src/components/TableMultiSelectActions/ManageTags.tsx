@@ -141,6 +141,7 @@ const ManageTags: React.FC<ManageTagsProps> = ({ selectedTableRows, entityType, 
         placeholder="Search for tag"
         confirmButtonText={isLoading ? "Applying..." : "Apply"}
         onConfirm={handleConfirm}
+        onCancel={handleClose}
         variant="checkbox"
         optionsInAllRows={tagsInAllRows}
         optionsInSomeRows={tagsInSomeRows}
