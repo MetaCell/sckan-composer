@@ -1635,14 +1635,99 @@ paths:
               schema:
                 $ref: '#/components/schemas/Sentence'
           description: ''
+  /api/composer/sentence/available_options/:
+    get:
+      operationId: composer_sentence_available_options_retrieve
+      description: |-
+        Returns available users for assignment and possible state transitions
+        for the selected items.
+      parameters:
+      - in: query
+        name: exclude
+        schema:
+          type: array
+          items:
+            type: string
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: include
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: notes
+        schema:
+          type: boolean
+        description: Checks if entity has notes
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -id
+            - -last_edited
+            - -owner
+            - id
+            - last_edited
+            - owner
+        description: Ordering
+        explode: false
+        style: form
+      - in: query
+        name: state
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - completed
+            - compose_later
+            - compose_now
+            - excluded
+            - needs_further_review
+            - open
+            - ready_to_compose
+        explode: true
+        style: form
+      - in: query
+        name: tags
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
+        name: title
+        schema:
+          type: string
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sentence'
+          description: ''
   /api/composer/sentence/bulk_action/:
     post:
       operationId: composer_sentence_bulk_action_create
       description: |-
-        Apply bulk actions to sentences.
-        Uses filters or `include` to select affected sentences.
-        The action determines which additional parameters are required.
-        Returns the number of sentences updated successfully.
+        Apply a bulk action to the selected items and return the number
+        of items updated successfully.
       parameters:
       - in: query
         name: exclude
@@ -1734,93 +1819,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BulkActionResponse'
-          description: ''
-  /api/composer/sentence/options/:
-    get:
-      operationId: composer_sentence_options_retrieve
-      description: |-
-        Returns available users for assignment and possible state transitions
-        for selected sentences (either via `include` or filters).
-      parameters:
-      - in: query
-        name: exclude
-        schema:
-          type: array
-          items:
-            type: string
-        description: Multiple values may be separated by commas.
-        explode: false
-        style: form
-      - in: query
-        name: include
-        schema:
-          type: array
-          items:
-            type: integer
-        description: Multiple values may be separated by commas.
-        explode: false
-        style: form
-      - in: query
-        name: notes
-        schema:
-          type: boolean
-        description: Checks if entity has notes
-      - in: query
-        name: ordering
-        schema:
-          type: array
-          items:
-            type: string
-            enum:
-            - -id
-            - -last_edited
-            - -owner
-            - id
-            - last_edited
-            - owner
-        description: Ordering
-        explode: false
-        style: form
-      - in: query
-        name: state
-        schema:
-          type: array
-          items:
-            type: string
-            enum:
-            - completed
-            - compose_later
-            - compose_now
-            - excluded
-            - needs_further_review
-            - open
-            - ready_to_compose
-        explode: true
-        style: form
-      - in: query
-        name: tags
-        schema:
-          type: array
-          items:
-            type: integer
-        explode: true
-        style: form
-      - in: query
-        name: title
-        schema:
-          type: string
-      tags:
-      - composer
-      security:
-      - tokenAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Sentence'
           description: ''
   /api/composer/sex/:
     get:

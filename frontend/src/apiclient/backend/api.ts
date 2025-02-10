@@ -4869,7 +4869,80 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Apply bulk actions to sentences. Uses filters or `include` to select affected sentences. The action determines which additional parameters are required. Returns the number of sentences updated successfully.
+         * Returns available users for assignment and possible state transitions for the selected items.
+         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
+         * @param {Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {string} [title] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSentenceAvailableOptionsRetrieve: async (exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/sentence/available_options/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (exclude) {
+                localVarQueryParameter['exclude'] = exclude.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (include) {
+                localVarQueryParameter['include'] = include.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (notes !== undefined) {
+                localVarQueryParameter['notes'] = notes;
+            }
+
+            if (ordering) {
+                localVarQueryParameter['ordering'] = ordering.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (state) {
+                localVarQueryParameter['state'] = state;
+            }
+
+            if (tags) {
+                localVarQueryParameter['tags'] = tags;
+            }
+
+            if (title !== undefined) {
+                localVarQueryParameter['title'] = title;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Apply a bulk action to the selected items and return the number of items updated successfully.
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {boolean} [notes] Checks if entity has notes
@@ -5141,79 +5214,6 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
 
             if (offset !== undefined) {
                 localVarQueryParameter['offset'] = offset;
-            }
-
-            if (ordering) {
-                localVarQueryParameter['ordering'] = ordering.join(COLLECTION_FORMATS.csv);
-            }
-
-            if (state) {
-                localVarQueryParameter['state'] = state;
-            }
-
-            if (tags) {
-                localVarQueryParameter['tags'] = tags;
-            }
-
-            if (title !== undefined) {
-                localVarQueryParameter['title'] = title;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Returns available users for assignment and possible state transitions for selected sentences (either via `include` or filters).
-         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
-         * @param {Array<number>} [include] Multiple values may be separated by commas.
-         * @param {boolean} [notes] Checks if entity has notes
-         * @param {Array<ComposerSentenceOptionsRetrieveOrderingEnum>} [ordering] Ordering
-         * @param {Array<ComposerSentenceOptionsRetrieveStateEnum>} [state] 
-         * @param {Array<number>} [tags] 
-         * @param {string} [title] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerSentenceOptionsRetrieve: async (exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/composer/sentence/options/`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication tokenAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
-
-            // authentication cookieAuth required
-
-            if (exclude) {
-                localVarQueryParameter['exclude'] = exclude.join(COLLECTION_FORMATS.csv);
-            }
-
-            if (include) {
-                localVarQueryParameter['include'] = include.join(COLLECTION_FORMATS.csv);
-            }
-
-            if (notes !== undefined) {
-                localVarQueryParameter['notes'] = notes;
             }
 
             if (ordering) {
@@ -6741,7 +6741,25 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Apply bulk actions to sentences. Uses filters or `include` to select affected sentences. The action determines which additional parameters are required. Returns the number of sentences updated successfully.
+         * Returns available users for assignment and possible state transitions for the selected items.
+         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
+         * @param {Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {string} [title] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerSentenceAvailableOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, state, tags, title, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceAvailableOptionsRetrieve']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Apply a bulk action to the selected items and return the number of items updated successfully.
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {boolean} [notes] Checks if entity has notes
@@ -6816,24 +6834,6 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceList(exclude, include, limit, notes, offset, ordering, state, tags, title, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceList']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * Returns available users for assignment and possible state transitions for selected sentences (either via `include` or filters).
-         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
-         * @param {Array<number>} [include] Multiple values may be separated by commas.
-         * @param {boolean} [notes] Checks if entity has notes
-         * @param {Array<ComposerSentenceOptionsRetrieveOrderingEnum>} [ordering] Ordering
-         * @param {Array<ComposerSentenceOptionsRetrieveStateEnum>} [state] 
-         * @param {Array<number>} [tags] 
-         * @param {string} [title] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async composerSentenceOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceOptionsRetrieve(exclude, include, notes, ordering, state, tags, title, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceOptionsRetrieve']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -7520,7 +7520,22 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerSentenceAssignOwnerPartialUpdate(id, patchedSentence, options).then((request) => request(axios, basePath));
         },
         /**
-         * Apply bulk actions to sentences. Uses filters or `include` to select affected sentences. The action determines which additional parameters are required. Returns the number of sentences updated successfully.
+         * Returns available users for assignment and possible state transitions for the selected items.
+         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
+         * @param {Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {string} [title] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSentenceAvailableOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
+            return localVarFp.composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, state, tags, title, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Apply a bulk action to the selected items and return the number of items updated successfully.
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {boolean} [notes] Checks if entity has notes
@@ -7581,21 +7596,6 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          */
         composerSentenceList(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedSentenceList> {
             return localVarFp.composerSentenceList(exclude, include, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Returns available users for assignment and possible state transitions for selected sentences (either via `include` or filters).
-         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
-         * @param {Array<number>} [include] Multiple values may be separated by commas.
-         * @param {boolean} [notes] Checks if entity has notes
-         * @param {Array<ComposerSentenceOptionsRetrieveOrderingEnum>} [ordering] Ordering
-         * @param {Array<ComposerSentenceOptionsRetrieveStateEnum>} [state] 
-         * @param {Array<number>} [tags] 
-         * @param {string} [title] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerSentenceOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
-            return localVarFp.composerSentenceOptionsRetrieve(exclude, include, notes, ordering, state, tags, title, options).then((request) => request(axios, basePath));
         },
         /**
          * Sentence
@@ -8300,7 +8300,24 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * Apply bulk actions to sentences. Uses filters or `include` to select affected sentences. The action determines which additional parameters are required. Returns the number of sentences updated successfully.
+     * Returns available users for assignment and possible state transitions for the selected items.
+     * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+     * @param {Array<number>} [include] Multiple values may be separated by commas.
+     * @param {boolean} [notes] Checks if entity has notes
+     * @param {Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
+     * @param {Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>} [state] 
+     * @param {Array<number>} [tags] 
+     * @param {string} [title] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerSentenceAvailableOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, state, tags, title, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Apply a bulk action to the selected items and return the number of items updated successfully.
      * @param {Array<string>} [exclude] Multiple values may be separated by commas.
      * @param {Array<number>} [include] Multiple values may be separated by commas.
      * @param {boolean} [notes] Checks if entity has notes
@@ -8370,23 +8387,6 @@ export class ComposerApi extends BaseAPI {
      */
     public composerSentenceList(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentenceList(exclude, include, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Returns available users for assignment and possible state transitions for selected sentences (either via `include` or filters).
-     * @param {Array<string>} [exclude] Multiple values may be separated by commas.
-     * @param {Array<number>} [include] Multiple values may be separated by commas.
-     * @param {boolean} [notes] Checks if entity has notes
-     * @param {Array<ComposerSentenceOptionsRetrieveOrderingEnum>} [ordering] Ordering
-     * @param {Array<ComposerSentenceOptionsRetrieveStateEnum>} [state] 
-     * @param {Array<number>} [tags] 
-     * @param {string} [title] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComposerApi
-     */
-    public composerSentenceOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerSentenceOptionsRetrieve(exclude, include, notes, ordering, state, tags, title, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -8662,6 +8662,31 @@ export type ComposerConnectivityStatementListStateEnum = typeof ComposerConnecti
 /**
  * @export
  */
+export const ComposerSentenceAvailableOptionsRetrieveOrderingEnum = {
+    Id: '-id',
+    LastEdited: '-last_edited',
+    Owner: '-owner',
+    Id2: 'id',
+    LastEdited2: 'last_edited',
+    Owner2: 'owner'
+} as const;
+export type ComposerSentenceAvailableOptionsRetrieveOrderingEnum = typeof ComposerSentenceAvailableOptionsRetrieveOrderingEnum[keyof typeof ComposerSentenceAvailableOptionsRetrieveOrderingEnum];
+/**
+ * @export
+ */
+export const ComposerSentenceAvailableOptionsRetrieveStateEnum = {
+    Completed: 'completed',
+    ComposeLater: 'compose_later',
+    ComposeNow: 'compose_now',
+    Excluded: 'excluded',
+    NeedsFurtherReview: 'needs_further_review',
+    Open: 'open',
+    ReadyToCompose: 'ready_to_compose'
+} as const;
+export type ComposerSentenceAvailableOptionsRetrieveStateEnum = typeof ComposerSentenceAvailableOptionsRetrieveStateEnum[keyof typeof ComposerSentenceAvailableOptionsRetrieveStateEnum];
+/**
+ * @export
+ */
 export const ComposerSentenceBulkActionCreateOrderingEnum = {
     Id: '-id',
     LastEdited: '-last_edited',
@@ -8709,31 +8734,6 @@ export const ComposerSentenceListStateEnum = {
     ReadyToCompose: 'ready_to_compose'
 } as const;
 export type ComposerSentenceListStateEnum = typeof ComposerSentenceListStateEnum[keyof typeof ComposerSentenceListStateEnum];
-/**
- * @export
- */
-export const ComposerSentenceOptionsRetrieveOrderingEnum = {
-    Id: '-id',
-    LastEdited: '-last_edited',
-    Owner: '-owner',
-    Id2: 'id',
-    LastEdited2: 'last_edited',
-    Owner2: 'owner'
-} as const;
-export type ComposerSentenceOptionsRetrieveOrderingEnum = typeof ComposerSentenceOptionsRetrieveOrderingEnum[keyof typeof ComposerSentenceOptionsRetrieveOrderingEnum];
-/**
- * @export
- */
-export const ComposerSentenceOptionsRetrieveStateEnum = {
-    Completed: 'completed',
-    ComposeLater: 'compose_later',
-    ComposeNow: 'compose_now',
-    Excluded: 'excluded',
-    NeedsFurtherReview: 'needs_further_review',
-    Open: 'open',
-    ReadyToCompose: 'ready_to_compose'
-} as const;
-export type ComposerSentenceOptionsRetrieveStateEnum = typeof ComposerSentenceOptionsRetrieveStateEnum[keyof typeof ComposerSentenceOptionsRetrieveStateEnum];
 
 
 /**

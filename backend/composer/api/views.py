@@ -254,6 +254,125 @@ class CSCloningMixin(viewsets.GenericViewSet):
         return Response(self.get_serializer(instance).data)
 
 
+class BulkActionMixin:
+    bulk_action_serializers = {
+        BulkActionType.ASSIGN_USER.value: AssignUserSerializer,
+        BulkActionType.ASSIGN_TAG.value: AssignTagsSerializer,
+        BulkActionType.WRITE_NOTE.value: WriteNoteSerializer,
+        BulkActionType.CHANGE_STATUS.value: ChangeStatusSerializer,
+        BulkActionType.ASSIGN_POPULATION_SET.value: AssignPopulationSetSerializer,
+    }
+    # Expect that each view to set this attribute.:
+    bulk_action_mapping = None  # a dict mapping action types to service functions
+
+
+    def get_bulk_action_serializer_mapping(self):
+        if self.bulk_action_serializers is None:
+            raise NotImplementedError("bulk_action_serializers not set.")
+        return self.bulk_action_serializers
+
+
+    def get_bulk_action_mapping(self):
+        if self.bulk_action_mapping is None:
+            raise NotImplementedError("bulk_action_mapping not set.")
+        return self.bulk_action_mapping
+
+    def get_assignable_users_data(self):
+        """
+        Default implementation: returns minimal user data from all profiles.
+        Views can override this if needed.
+        """
+        assignable_users = Profile.objects.all().select_related("user")
+        return MinimalUserSerializer([p.user for p in assignable_users], many=True).data
+
+    def get_common_transitions(self, queryset):
+        """
+        Default implementation: for each object in the queryset that has
+        `get_available_state_transitions()`, extract the set of transition targets
+        and then return the intersection (common transitions).
+        """
+        from functools import reduce
+        from operator import and_
+
+        transitions_list = []
+        for obj in queryset:
+            if hasattr(obj, "get_available_state_transitions"):
+                transitions = {
+                    transition.target
+                    for transition in obj.get_available_state_transitions()
+                }
+                transitions_list.append(transitions)
+        if transitions_list:
+            return list(reduce(and_, transitions_list))
+        return []
+
+    @extend_schema(filters=True)
+    @action(detail=False, methods=["get"])
+    def available_options(self, request):
+        """
+        Returns available users for assignment and possible state transitions
+        for the selected items.
+        """
+        has_filters = any(
+            param for param in request.query_params if param not in ["page", "ordering"]
+        )
+        if not has_filters:
+            return Response({"assignable_users": [], "possible_transitions": []})
+
+        qs = self.filter_queryset(self.get_queryset())
+        assignable_users_data = self.get_assignable_users_data()
+        common_transitions = self.get_common_transitions(qs)
+        return Response(
+            {
+                "assignable_users": assignable_users_data,
+                "possible_transitions": common_transitions,
+            }
+        )
+
+    @extend_schema(
+        request=PolymorphicProxySerializer(
+            component_name="BulkAction",
+            serializers=bulk_action_serializers,
+            resource_type_field_name="action",
+        ),
+        responses={200: BulkActionResponseSerializer},
+        filters=True,
+    )
+    @action(detail=False, methods=["post"])
+    def bulk_action(self, request):
+        """
+        Apply a bulk action to the selected items and return the number
+        of items updated successfully.
+        """
+        action_type = request.data.get("action")
+        serializer_mapping = self.get_bulk_action_serializer_mapping()
+        if action_type not in serializer_mapping:
+            return Response(
+                {"error": "Invalid action type."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer_class = serializer_mapping[action_type]
+        serializer = serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        qs = self.filter_queryset(self.get_queryset())
+        if not qs.exists():
+            return Response(
+                {"error": "No items found."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        mapping = self.get_bulk_action_mapping()
+        if action_type not in mapping:
+            return Response(
+                {"error": "No service function mapped for this action."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # The service function should return an integer (the count of items updated).
+        updated_count = mapping[action_type](qs, request, serializer.validated_data)
+        return Response({"updated_count": updated_count}, status=status.HTTP_200_OK)
+
+
 # Viewsets
 
 
@@ -453,7 +572,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class SentenceViewSet(
-    TagMixin, TransitionMixin, AssignOwnerMixin, ModelNoDeleteViewSet
+    TagMixin, TransitionMixin, AssignOwnerMixin, ModelNoDeleteViewSet, BulkActionMixin
 ):
     """
     Sentence
@@ -466,6 +585,24 @@ class SentenceViewSet(
     ]
     filterset_class = SentenceFilter
     service = SentenceStateService
+
+    bulk_action_mapping = {
+        BulkActionType.ASSIGN_USER.value: lambda qs, req, data: sentence_service.assign_owner(
+            qs, req.user, data.get("user_id")
+        ),
+        BulkActionType.ASSIGN_TAG.value: lambda qs, req, data: sentence_service.assign_tags(
+            qs, data["tag_ids"]
+        ),
+        BulkActionType.WRITE_NOTE.value: lambda qs, req, data: sentence_service.write_note(
+            qs, req.user, data["note_text"]
+        ),
+        BulkActionType.CHANGE_STATUS.value: lambda qs, req, data: sentence_service.change_status(
+            qs, data["new_status"], req.user
+        ),
+        BulkActionType.ASSIGN_POPULATION_SET.value: lambda qs, req, data: sentence_service.assign_population_set(
+            qs, data["population_set_id"]
+        ),
+    }
 
     def get_queryset(self):
         if "ordering" not in self.request.query_params:
@@ -482,121 +619,6 @@ class SentenceViewSet(
                 .order_by("-is_current_user", "-modified_date")
             )
         return super().get_queryset()
-
-    @extend_schema(filters=True)
-    @action(detail=False, methods=["get"])
-    def options(self, request):
-        """
-        Returns available users for assignment and possible state transitions
-        for selected sentences (either via `include` or filters).
-        """
-
-        has_filters = any(
-            param for param in request.query_params if param not in ["page", "ordering"]
-        )
-
-        if not has_filters:
-            return Response({"assignable_users": [], "possible_transitions": []})
-
-        sentences = self.filter_queryset(self.get_queryset())
-
-        # Fetch assignable users
-        assignable_users = Profile.objects.all().select_related("user")
-        assignable_users_data = MinimalUserSerializer(
-            [p.user for p in assignable_users], many=True
-        ).data
-
-        # Fetch possible state transitions
-        all_transitions = [
-            {
-                transition.target
-                for transition in sentence.get_available_state_transitions()
-            }
-            for sentence in sentences
-        ]
-
-        common_transitions = (
-            list(reduce(and_, all_transitions)) if all_transitions else []
-        )
-
-        return Response(
-            {
-                "assignable_users": assignable_users_data,
-                "possible_transitions": common_transitions,
-            }
-        )
-
-    @extend_schema(
-        request=PolymorphicProxySerializer(
-            component_name="BulkAction",
-            serializers={
-                BulkActionType.ASSIGN_USER.value: AssignUserSerializer,
-                BulkActionType.ASSIGN_TAG.value: AssignTagsSerializer,
-                BulkActionType.WRITE_NOTE.value: WriteNoteSerializer,
-                BulkActionType.CHANGE_STATUS.value: ChangeStatusSerializer,
-                BulkActionType.ASSIGN_POPULATION_SET.value: AssignPopulationSetSerializer,
-            },
-            resource_type_field_name="action",
-        ),
-        responses={200: BulkActionResponseSerializer},
-        filters=True,
-    )
-    @action(detail=False, methods=["post"])
-    def bulk_action(self, request):
-        """
-        Apply bulk actions to sentences.
-        Uses filters or `include` to select affected sentences.
-        The action determines which additional parameters are required.
-        Returns the number of sentences updated successfully.
-        """
-        action_serializers = {
-            BulkActionType.ASSIGN_USER.value: AssignUserSerializer,
-            BulkActionType.ASSIGN_TAG.value: AssignTagsSerializer,
-            BulkActionType.WRITE_NOTE.value: WriteNoteSerializer,
-            BulkActionType.CHANGE_STATUS.value: ChangeStatusSerializer,
-            BulkActionType.ASSIGN_POPULATION_SET.value: AssignPopulationSetSerializer,
-        }
-
-        action_type = request.data.get("action")
-        if action_type not in action_serializers:
-            return Response(
-                {"error": "Invalid action type."}, status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Validate using the appropriate serializer.
-        serializer = action_serializers[action_type](data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        sentences = self.filter_queryset(self.get_queryset())
-        if not sentences.exists():
-            return Response(
-                {"error": "No sentences found."}, status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Map action types to service functions.
-        action_map = {
-            BulkActionType.ASSIGN_USER.value: lambda: sentence_service.assign_owner(
-                sentences, request.user, serializer.validated_data.get("user_id")
-            ),
-            BulkActionType.ASSIGN_TAG.value: lambda: sentence_service.assign_tags(
-                sentences, serializer.validated_data["tag_ids"]
-            ),
-            BulkActionType.WRITE_NOTE.value: lambda: sentence_service.write_note(
-                sentences, request.user, serializer.validated_data["note_text"]
-            ),
-            BulkActionType.CHANGE_STATUS.value: lambda: sentence_service.change_status(
-                sentences, serializer.validated_data["new_status"], request.user
-            ),
-            BulkActionType.ASSIGN_POPULATION_SET.value: lambda: sentence_service.assign_population_set(
-                sentences, serializer.validated_data["population_set_id"]
-            ),
-        }
-
-        # Execute the bulk action; the service returns a list of successfully updated sentence IDs.
-        successful_ids = action_map[action_type]()
-        updated_count = len(successful_ids)
-
-        return Response({"updated_count": updated_count}, status=status.HTTP_200_OK)
 
 
 class SpecieViewSet(viewsets.ReadOnlyModelViewSet):

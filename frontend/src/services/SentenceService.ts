@@ -88,7 +88,7 @@ class SentenceService extends AbstractService {
     const { exclude, include, notes, ordering, stateFilter, tagFilter, title } = queryOptions;
 
     return composerApi
-      .composerSentenceOptionsRetrieve(exclude, include, notes, ordering, stateFilter, tagFilter, title)
+      .composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, stateFilter, tagFilter, title)
       .then((response: any) => response.data);
   }
 
