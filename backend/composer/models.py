@@ -419,7 +419,8 @@ class Sentence(models.Model, BulkActionMixin):
         ...
 
     @transition(
-        field=state, source=[SentenceState.OPEN, SentenceState.NEEDS_FURTHER_REVIEW],
+        field=state, 
+        source=[SentenceState.OPEN, SentenceState.NEEDS_FURTHER_REVIEW],
         target=SentenceState.COMPOSE_LATER,
         permission=SentenceStateService.has_permission_to_transition_to_compose_later,
     )

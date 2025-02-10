@@ -7,6 +7,7 @@ import sentenceService from "../../services/SentenceService";
 import { QueryParams as SentenceQueryParams } from "../../redux/sentenceSlice";
 import { QueryParams as StatementQueryParams } from "../../redux/statementSlice";
 import { ENTITY_TYPES } from "../../helpers/settings";
+import connectivityStatementService from "../../services/StatementService";
 
 interface ChangeStatusProps {
   selectedTableRows: any;
@@ -30,11 +31,8 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
   > = {
     [ENTITY_TYPES.SENTENCE]: (queryOptions, newStatus) =>
       sentenceService.changeStatusBulk(queryOptions as SentenceQueryParams, newStatus),
-    [ENTITY_TYPES.STATEMENT]: async () => {
-      return new Promise((resolve) =>
-        setTimeout(() => resolve({ message: "Mocked statement status change." }), 500)
-      );
-    },
+    [ENTITY_TYPES.STATEMENT]: (queryOptions, newStatus) =>
+      connectivityStatementService.changeStatusBulk(queryOptions as StatementQueryParams, newStatus)
   };
 
   const handleOpenMenu = () => {

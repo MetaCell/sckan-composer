@@ -93,6 +93,8 @@ class SentenceFilter(django_filters.FilterSet):
 class ConnectivityStatementFilter(django_filters.FilterSet):
     exclude_ids = NumberInFilter(field_name='id', exclude=True)
 
+    include = django_filters.BaseInFilter(field_name="id", lookup_expr="in")
+
     sentence_id = django_filters.NumberFilter(field_name="sentence__id")
     exclude_sentence_id = django_filters.NumberFilter(field_name="sentence__id", exclude=True)
 

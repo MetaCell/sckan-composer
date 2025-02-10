@@ -1,8 +1,10 @@
 from django.shortcuts import get_object_or_404
 from django.db import transaction
-from django_fsm import TransitionNotAllowed
-from django.db.models import ForeignKey
-from composer.models import Tag, Note, User
+from django_fsm import TransitionNotAllowed, get_available_user_FIELD_transitions
+
+from django.db.models import ForeignKey, Q
+from composer.api.serializers import MinimalUserSerializer
+from composer.models import Profile, Tag, Note, User
 
 
 def assign_owner(instances, requested_by, owner_id):
@@ -32,7 +34,9 @@ def assign_tags(instances, tag_ids):
     Returns the processed instances.
     """
     # Determine which tags actually exist.
-    existing_tag_ids = set(Tag.objects.filter(id__in=tag_ids).values_list("id", flat=True))
+    existing_tag_ids = set(
+        Tag.objects.filter(id__in=tag_ids).values_list("id", flat=True)
+    )
     with transaction.atomic():
         for obj in instances:
             current_tags = set(obj.tags.values_list("id", flat=True))
@@ -46,7 +50,7 @@ def assign_tags(instances, tag_ids):
             # Dynamically determine the through model and foreign-key field name.
             through_model = obj._meta.get_field("tags").remote_field.through
             m2m_field = obj._meta.get_field("tags")
-            field_name = m2m_field.m2m_field_name()  # e.g. "sentence_id" or "connectivitystatement_id"
+            field_name = m2m_field.m2m_field_name() + "_id"
             associations = [
                 through_model(**{field_name: obj.id, "tag_id": tag_id})
                 for tag_id in tags_to_add
@@ -105,3 +109,41 @@ def _get_note_field_for_instance(instance):
         if isinstance(field, ForeignKey) and field.related_model == instance.__class__:
             return field.name
     raise Exception(f"No matching Note field for model {instance.__class__.__name__}")
+
+
+def get_assignable_users_data(roles=None):
+    """
+    Returns minimal user data for profiles whose role field(s) match.
+
+    :param roles: A list of role field names on Profile to filter by.
+                  For example, ['is_curator', 'is_triage_operator'].
+                  If None, no role filtering is applied.
+    :return: Serialized minimal user data.
+    """
+    if roles:
+        # Build a Q object that ORs all role filters.
+        q = Q()
+        for role in roles:
+            q |= Q(**{role: True})
+        assignable_users = Profile.objects.filter(q).select_related("user")
+    else:
+        assignable_users = Profile.objects.all().select_related("user")
+    return MinimalUserSerializer([p.user for p in assignable_users], many=True).data
+
+
+def get_common_transitions(queryset, user):
+    from functools import reduce
+    from operator import and_
+
+    transitions_list = []
+    for obj in queryset:
+        if hasattr(obj, "get_available_state_transitions"):
+            state_field = obj._meta.get_field("state")
+            transitions = [
+                transition.name
+                for transition in get_available_user_FIELD_transitions(
+                    obj, user, state_field
+                )
+            ]
+            transitions_list.append(transitions)
+    return list(reduce(and_, transitions_list))

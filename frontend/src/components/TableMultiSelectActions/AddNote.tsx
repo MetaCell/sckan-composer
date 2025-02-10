@@ -16,6 +16,7 @@ import statementService from "../../services/StatementService";
 import { QueryParams as SentenceQueryParams } from "../../redux/sentenceSlice";
 import { QueryParams as StatementQueryParams } from "../../redux/statementSlice";
 import { ENTITY_TYPES } from "../../helpers/settings";
+import connectivityStatementService from "../../services/StatementService";
 
 const styles = {
   dialogPaper: {
@@ -73,11 +74,8 @@ const AddNote: React.FC<AddNoteProps> = ({ selectedTableRows, entityType, queryO
   > = {
     [ENTITY_TYPES.SENTENCE]: (queryOptions, noteText) =>
       sentenceService.writeNoteBulk(queryOptions as SentenceQueryParams, noteText),
-    [ENTITY_TYPES.STATEMENT]: async () => {
-      return new Promise((resolve) =>
-        setTimeout(() => resolve({ message: "Mocked statement note addition." }), 500)
-      );
-    },
+    [ENTITY_TYPES.STATEMENT]: (queryOptions, noteText) =>
+      connectivityStatementService.writeNoteBulk(queryOptions as StatementQueryParams, noteText),
   };
 
   const handleOpen = () => {

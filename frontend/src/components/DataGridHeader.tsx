@@ -21,6 +21,7 @@ import AddNote from "./TableMultiSelectActions/AddNote";
 import AssignPopulationSet from "./TableMultiSelectActions/AssignPopulationSet";
 import { ENTITY_TYPES } from "../helpers/settings";
 import sentenceService from "../services/SentenceService";
+import connectivityStatementService from "../services/StatementService";
 
 const toolbarStyle = {
   background: vars.whiteColor,
@@ -89,7 +90,8 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
   const fetchOptionsMap = {
     [ENTITY_TYPES.SENTENCE]: () =>
       sentenceService.fetchOptions(updatedQueryOptions as SentenceQueryParams),
-    [ENTITY_TYPES.STATEMENT]: async () => ({ assignable_users: [], possible_transitions: [] }), // TODO:
+    [ENTITY_TYPES.STATEMENT]: () => connectivityStatementService.fetchOptions(updatedQueryOptions as StatementQueryParams),
+
   };
 
   // Function to fetch options only when triggered by button click
@@ -137,7 +139,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               onConfirm={refreshList}
             />
             <ManageTags selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
-            <AddNote selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList}/>
+            <AddNote selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
             <ChangeStatus
               selectedTableRows={selectedRows}
               entityType={entityType}

@@ -282,8 +282,7 @@ class BulkActionMixin:
         Default implementation: returns minimal user data from all profiles.
         Views can override this if needed.
         """
-        assignable_users = Profile.objects.all().select_related("user")
-        return MinimalUserSerializer([p.user for p in assignable_users], many=True).data
+        return bulk_service.get_assignable_users_data()
 
     def get_common_transitions(self, queryset):
         """
@@ -291,20 +290,7 @@ class BulkActionMixin:
         `get_available_state_transitions()`, extract the set of transition targets
         and then return the intersection (common transitions).
         """
-        from functools import reduce
-        from operator import and_
-
-        transitions_list = []
-        for obj in queryset:
-            if hasattr(obj, "get_available_state_transitions"):
-                transitions = {
-                    transition.target
-                    for transition in obj.get_available_state_transitions()
-                }
-                transitions_list.append(transitions)
-        if transitions_list:
-            return list(reduce(and_, transitions_list))
-        return []
+        return bulk_service.get_common_transitions(queryset, user=self.request.user)
 
     @extend_schema(filters=True)
     @action(detail=False, methods=["get"])
@@ -522,6 +508,11 @@ class ConnectivityStatementViewSet(
         if self.action == "list" and "sentence_id" not in self.request.query_params:
             return ConnectivityStatement.objects.excluding_draft()
         return super().get_queryset()
+
+
+    def get_assignable_users_data(self):
+        # Only include profiles where the user is a curator or reviewer.
+        return bulk_service.get_assignable_users_data(roles=['is_curator', 'is_reviewer'])
 
     """
     Override the update method to apply the extend_schema decorator.

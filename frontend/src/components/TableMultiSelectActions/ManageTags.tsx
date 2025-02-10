@@ -10,6 +10,7 @@ import { ENTITY_TYPES } from "../../helpers/settings";
 import { Tag } from "../../apiclient/backend";
 import { tags as tagService } from "../../services/TagService";
 import { OptionType } from "../../types";
+import connectivityStatementService from "../../services/StatementService";
 
 const mapTagsToSelectOptions = (tags: Tag[]) => {
   return tags.map((tag) => ({
@@ -40,11 +41,8 @@ const ManageTags: React.FC<ManageTagsProps> = ({ selectedTableRows, entityType, 
   > = {
     [ENTITY_TYPES.SENTENCE]: (queryOptions, tagIds) =>
       sentenceService.assignTagBulk(queryOptions as SentenceQueryParams, tagIds),
-    [ENTITY_TYPES.STATEMENT]: async () => {
-      return new Promise((resolve) =>
-        setTimeout(() => resolve({ message: "Mocked statement tag assignment." }), 500)
-      );
-    },
+    [ENTITY_TYPES.STATEMENT]: (queryOptions, tagIds) =>
+      connectivityStatementService.assignTagBulk(queryOptions as StatementQueryParams, tagIds)
   };
 
 

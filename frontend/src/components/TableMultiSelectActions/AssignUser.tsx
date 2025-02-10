@@ -8,6 +8,7 @@ import { QueryParams as SentenceQueryParams } from "../../redux/sentenceSlice";
 import { QueryParams as StatementQueryParams } from "../../redux/statementSlice";
 import { ENTITY_TYPES } from "../../helpers/settings";
 import { OptionType } from "../../types";
+import connectivityStatementService from "../../services/StatementService";
 
 interface User {
   id: number;
@@ -42,11 +43,8 @@ const AssignUser: React.FC<AssignUserProps> = ({ selectedTableRows, entityType, 
   > = {
     [ENTITY_TYPES.SENTENCE]: (queryOptions, userId) =>
       sentenceService.assignUserBulk(queryOptions as SentenceQueryParams, userId),
-    [ENTITY_TYPES.STATEMENT]: async () => {
-      return new Promise((resolve) =>
-        setTimeout(() => resolve({ message: "Mocked statement user assignment." }), 500)
-      );
-    },
+    [ENTITY_TYPES.STATEMENT]: (queryOptions, userId) =>
+      connectivityStatementService.assignUserBulk(queryOptions as StatementQueryParams, userId),
   };
 
   const handleClose = () => {

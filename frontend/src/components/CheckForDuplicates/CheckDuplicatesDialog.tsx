@@ -40,30 +40,30 @@ export default function CheckDuplicates() {
     if (origin || destination) {
       api
         .composerConnectivityStatementList(
-          destination ? destination.id : undefined,
-          [],
-          undefined,
-          undefined,
-          duplicatesRowsPerPage,
-          undefined,
-          index,
-          ordering || sorting,
-          origin ? origin : undefined,
+          destination ? [destination.id] : undefined, // destinations: Array<number>
+          [],                                          // excludeIds: Array<number>
+          undefined,                                   // excludeSentenceId
+          undefined,                                   // include
+          undefined,                                   // knowledgeStatement
+          duplicatesRowsPerPage,                       // limit
+          undefined,                                   // notes
+          index,                                       // offset
+          ordering || sorting,                         // ordering: Array<ComposerConnectivityStatementListOrderingEnum>
+          origin && origin.length > 0 ? origin : undefined, // origins: Array<number>
+          undefined,                                   // sentenceId
+          undefined,                                   // state
+          undefined,                                   // tags
+          undefined                                    // options
         )
-        .then(
-          (res: {
-            data: React.SetStateAction<
-              PaginatedBaseConnectivityStatementList | undefined
-            >;
-          }) => {
-            setStatementsList(res.data);
-            setSorting(ordering);
-          },
-        );
+        .then((res: { data: React.SetStateAction<PaginatedBaseConnectivityStatementList | undefined> }) => {
+          setStatementsList(res.data);
+          setSorting(ordering);
+        });
     } else {
       setStatementsList(undefined);
     }
   };
+  
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);

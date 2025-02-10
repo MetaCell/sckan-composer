@@ -229,6 +229,7 @@ function getEntitiesBeforeOrder(
 
 const queryOptions = {
   knowledgeStatement: undefined,
+  include: undefined,
   limit: autocompleteRows,
   notes: undefined,
   index: 0,

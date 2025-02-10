@@ -156,6 +156,15 @@ paths:
         schema:
           type: integer
       - in: query
+        name: include
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
         name: knowledge_statement
         schema:
           type: string
@@ -649,6 +658,239 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConnectivityStatement'
+          description: ''
+  /api/composer/connectivity-statement/available_options/:
+    get:
+      operationId: composer_connectivity_statement_available_options_retrieve
+      description: |-
+        Returns available users for assignment and possible state transitions
+        for the selected items.
+      parameters:
+      - in: query
+        name: destinations
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
+        name: exclude_ids
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: exclude_sentence_id
+        schema:
+          type: integer
+      - in: query
+        name: include
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: knowledge_statement
+        schema:
+          type: string
+      - in: query
+        name: notes
+        schema:
+          type: boolean
+        description: Checks if entity has notes
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -id
+            - -last_edited
+            - id
+            - last_edited
+        description: Ordering
+        explode: false
+        style: form
+      - in: query
+        name: origins
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
+        name: sentence_id
+        schema:
+          type: integer
+      - in: query
+        name: state
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - compose_now
+            - draft
+            - exported
+            - in_progress
+            - invalid
+            - npo_approved
+            - rejected
+            - revise
+            - to_be_reviewed
+        explode: true
+        style: form
+      - in: query
+        name: tags
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatement'
+          description: ''
+  /api/composer/connectivity-statement/bulk_action/:
+    post:
+      operationId: composer_connectivity_statement_bulk_action_create
+      description: |-
+        Apply a bulk action to the selected items and return the number
+        of items updated successfully.
+      parameters:
+      - in: query
+        name: destinations
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
+        name: exclude_ids
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: exclude_sentence_id
+        schema:
+          type: integer
+      - in: query
+        name: include
+        schema:
+          type: array
+          items:
+            type: integer
+        description: Multiple values may be separated by commas.
+        explode: false
+        style: form
+      - in: query
+        name: knowledge_statement
+        schema:
+          type: string
+      - in: query
+        name: notes
+        schema:
+          type: boolean
+        description: Checks if entity has notes
+      - in: query
+        name: ordering
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - -id
+            - -last_edited
+            - id
+            - last_edited
+        description: Ordering
+        explode: false
+        style: form
+      - in: query
+        name: origins
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
+        name: sentence_id
+        schema:
+          type: integer
+      - in: query
+        name: state
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - compose_now
+            - draft
+            - exported
+            - in_progress
+            - invalid
+            - npo_approved
+            - rejected
+            - revise
+            - to_be_reviewed
+        explode: true
+        style: form
+      - in: query
+        name: tags
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkAction'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BulkAction'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BulkAction'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkActionResponse'
           description: ''
   /api/composer/destination/:
     get:
