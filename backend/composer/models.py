@@ -4,6 +4,7 @@ from django.db.models import Q, CheckConstraint
 from django.db.models.expressions import F
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
+from django.core.exceptions import ImproperlyConfigured
 from composer.services.graph_service import build_journey_description, build_journey_entities
 
 from composer.services.layers_service import update_from_entities_on_deletion
@@ -141,6 +142,32 @@ class DestinationManager(models.Manager):
             .prefetch_related('anatomical_entities', 'from_entities')
         )
 
+
+# Mixins
+
+
+class BulkActionMixin:
+    """
+    Mixin providing a common interface for bulk actions.
+    This mixin does not subclass models.Model, so you can use it in any model.
+    """
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        # If the class is a Django model (it has _meta), enforce the existence of a 'tags' field.
+        if hasattr(cls, '_meta'):
+            try:
+                cls._meta.get_field("tags")
+            except Exception as e:
+                raise ImproperlyConfigured(
+                    f"The model '{cls.__name__}' must define a 'tags' field."
+                ) from e
+
+    def assign_owner(self, requested_by, owner):
+        raise NotImplementedError("Subclasses must implement assign_owner().")
+
+    def get_state_service(self):
+        raise NotImplementedError("Subclasses must implement get_state_service().")
 
 # Create your models here.
 class Profile(models.Model):
@@ -351,7 +378,7 @@ class Tag(models.Model):
         verbose_name_plural = "Tags"
 
 
-class Sentence(models.Model):
+class Sentence(models.Model, BulkActionMixin):
     """Sentence"""
 
     objects = SentenceStatementManager()
@@ -460,6 +487,13 @@ class Sentence(models.Model):
                 state=CSState.DRAFT
             ).update(owner=request.user)
 
+
+    def get_state_service(self):
+        """
+        Returns the state service instance for this Sentence.
+        """
+        return SentenceStateService(self)
+    
     @property
     def pmid_uri(self) -> str:
         return pmid_uri(self.pmid)
@@ -508,7 +542,7 @@ class Sentence(models.Model):
         ]
 
 
-class ConnectivityStatement(models.Model):
+class ConnectivityStatement(models.Model, BulkActionMixin):
     """Connectivity Statement"""
 
     objects = ConnectivityStatementManager()
@@ -710,6 +744,12 @@ class ConnectivityStatement(models.Model):
         if ConnectivityStatementStateService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
+
+    def get_state_service(self):
+        """
+        Returns the state service instance for this Sentence.
+        """
+        return ConnectivityStatementStateService(self)
 
     def save(self, *args, **kwargs):
         if not self.pk and self.sentence and not self.owner:

@@ -15,7 +15,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Case, When, Value, IntegerField
 from functools import reduce
 from operator import and_
-from composer.services import sentence_service
+from composer.services import bulk_service
 from composer.enums import BulkActionType
 from composer.services.state_services import (
     ConnectivityStatementStateService,
@@ -478,6 +478,7 @@ class ConnectivityStatementViewSet(
     AssignOwnerMixin,
     CSCloningMixin,
     viewsets.ModelViewSet,
+    BulkActionMixin
 ):
     """
     ConnectivityStatement
@@ -491,6 +492,24 @@ class ConnectivityStatementViewSet(
     ]
     filterset_class = ConnectivityStatementFilter
     service = ConnectivityStatementStateService
+
+    bulk_action_mapping = {
+        BulkActionType.ASSIGN_USER.value: lambda qs, req, data: bulk_service.assign_owner(
+            qs, req.user, data.get("user_id")
+        ),
+        BulkActionType.ASSIGN_TAG.value: lambda qs, req, data: bulk_service.assign_tags(
+            qs, data["tag_ids"]
+        ),
+        BulkActionType.WRITE_NOTE.value: lambda qs, req, data: bulk_service.write_note(
+            qs, req.user, data["note_text"]
+        ),
+        BulkActionType.CHANGE_STATUS.value: lambda qs, req, data: bulk_service.change_status(
+            qs, data["new_status"], req.user
+        ),
+        BulkActionType.ASSIGN_POPULATION_SET.value: lambda qs, req, data: bulk_service.assign_population_set(
+            qs, data["population_set_id"]
+        ),
+    }
 
     def get_serializer_class(self):
         if self.action in ["update", "partial_update"]:
@@ -587,19 +606,19 @@ class SentenceViewSet(
     service = SentenceStateService
 
     bulk_action_mapping = {
-        BulkActionType.ASSIGN_USER.value: lambda qs, req, data: sentence_service.assign_owner(
+        BulkActionType.ASSIGN_USER.value: lambda qs, req, data: bulk_service.assign_owner(
             qs, req.user, data.get("user_id")
         ),
-        BulkActionType.ASSIGN_TAG.value: lambda qs, req, data: sentence_service.assign_tags(
+        BulkActionType.ASSIGN_TAG.value: lambda qs, req, data: bulk_service.assign_tags(
             qs, data["tag_ids"]
         ),
-        BulkActionType.WRITE_NOTE.value: lambda qs, req, data: sentence_service.write_note(
+        BulkActionType.WRITE_NOTE.value: lambda qs, req, data: bulk_service.write_note(
             qs, req.user, data["note_text"]
         ),
-        BulkActionType.CHANGE_STATUS.value: lambda qs, req, data: sentence_service.change_status(
+        BulkActionType.CHANGE_STATUS.value: lambda qs, req, data: bulk_service.change_status(
             qs, data["new_status"], req.user
         ),
-        BulkActionType.ASSIGN_POPULATION_SET.value: lambda qs, req, data: sentence_service.assign_population_set(
+        BulkActionType.ASSIGN_POPULATION_SET.value: lambda qs, req, data: bulk_service.assign_population_set(
             qs, data["population_set_id"]
         ),
     }
