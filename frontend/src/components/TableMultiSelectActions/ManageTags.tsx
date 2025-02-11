@@ -33,8 +33,8 @@ const ManageTags: React.FC<ManageTagsProps> = ({ tagsStatus, entityType, queryOp
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTags, setSelectedTags] = useState<OptionType[]>([]);
   const [tagsList, setTagsList] = useState<Tag[]>([]);
-  const [tagsInAllRows, setTagsInAllRows] = useState(tagsStatus.used_by_all || []);
-  const [tagsInSomeRows, setTagsInSomeRows] = useState(tagsStatus.used_by_some || []);
+  const [tagsInAllRows, setTagsInAllRows] = useState<string[]>([]);
+  const [tagsInSomeRows, setTagsInSomeRows] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const tagManagementMap: Record<

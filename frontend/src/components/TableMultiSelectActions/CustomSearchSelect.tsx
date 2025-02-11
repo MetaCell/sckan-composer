@@ -109,7 +109,7 @@ const CustomSearchSelect = ({
      selectedOptions,
      onOptionSelect,
      placeholder = "Search",
-     noOptionsText = "No options",
+     noOptionsText = "No options available",
      cancelButtonText = "Cancel",
      confirmButtonText = "Confirm",
      onCancel,
@@ -124,7 +124,7 @@ const CustomSearchSelect = ({
   
   const isOptionSelected = (option: OptionType) =>
     selectedOptions.some((selectedOption: string) => selectedOption === option.label);
-  
+  console.log(data.length)
   return (
     <Popover
       open={open}
@@ -190,9 +190,6 @@ const CustomSearchSelect = ({
           <ListItem>
             <ListItemText
               primary={noOptionsText}
-              primaryTypographyProps={{
-                sx: { color: vars.gray50 },
-              }}
             />
           </ListItem>
         )}

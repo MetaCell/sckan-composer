@@ -39,10 +39,11 @@ interface PopoverMenuProps {
   selectedOption?: string | null;
   onSelect: (option: string) => void;
   onOpen: () => void;
-  actionButtonDisabled?: boolean
+  actionButtonDisabled?: boolean;
+  noOptionsText?: string;
 }
 
-const PopoverMenu: React.FC<PopoverMenuProps> = ({ icon: IconComponent, tooltip, options, selectedOption, onSelect, onOpen, actionButtonDisabled = false }) => {
+const PopoverMenu: React.FC<PopoverMenuProps> = ({ icon: IconComponent, tooltip, options, selectedOption, onSelect, onOpen, actionButtonDisabled = false, noOptionsText }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -73,7 +74,12 @@ const PopoverMenu: React.FC<PopoverMenuProps> = ({ icon: IconComponent, tooltip,
         slotProps={{ paper: { sx: styles.popoverPaper } }}
       >
         <List sx={styles.list}>
-          {options.map((option, index) => (
+          {options.length === 0 ? <ListItem sx={styles.listItem}>
+              <ListItemText
+                primary={noOptionsText}
+              />
+            </ListItem> :
+            options.map((option, index) => (
             <ListItem key={index} onClick={() => onSelect(option)} sx={styles.listItem}>
               <ListItemText primary={option} />
               {selectedOption === option && (

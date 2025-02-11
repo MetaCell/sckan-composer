@@ -94,6 +94,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
         selectedOption={selectedStatus}
         onSelect={handleSelectStatus}
         onOpen={handleOpenMenu}
+        noOptionsText={"No options available!"}
       />
       <ConfirmationDialog
         open={isModalOpen}
