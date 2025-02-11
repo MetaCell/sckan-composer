@@ -1,5 +1,6 @@
 from django.utils import timezone
 import re
+from django.core.exceptions import ValidationError
 
 def pmid_uri(pmid):
     return f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/" if pmid else "."
@@ -32,4 +33,7 @@ def update_modified_date(instance):
 
 
 def is_valid_population_name(name):
-    return re.match(r"^[a-zA-Z][a-zA-Z0-9_]{7,19}$", name) is not None
+    if not re.match(r"^[a-zA-Z][a-zA-Z0-9_]{7,19}$", name):
+        raise ValidationError(
+            "Name must be between 8 and 20 characters, start with a letter, and contain only letters and numbers."
+        )
