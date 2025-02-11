@@ -124,7 +124,7 @@ const CustomSearchSelect = ({
   
   const isOptionSelected = (option: OptionType) =>
     selectedOptions.some((selectedOption: string) => selectedOption === option.label);
-  console.log(data.length)
+
   return (
     <Popover
       open={open}

@@ -56,7 +56,11 @@ const SentenceList = () => {
   useEffect(() => {
     setShowSelectionBanner((selectedRows.length > 0 && selectedRows.length === queryOptions.limit) || (sentenceList !== undefined && selectedRows.length > sentenceList.length ));
   }, [selectedRows, queryOptions.limit, selectedRows.length, sentenceList])
-
+  
+  useEffect(() => {
+    setSelectedRows([])
+  }, [queryOptions.stateFilter, queryOptions.tagFilter])
+  
   return (
     <Box sx={gutters} p={6} justifyContent="center">
       <Header

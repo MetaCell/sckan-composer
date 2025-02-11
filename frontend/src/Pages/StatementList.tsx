@@ -56,6 +56,10 @@ const StatementList = () => {
     setShowSelectionBanner((selectedRows.length > 0 && selectedRows.length === queryOptions.limit) || (statementList !== undefined && selectedRows.length > statementList.length ));
   }, [selectedRows, queryOptions.limit, selectedRows.length, statementList])
   
+  useEffect(() => {
+    setSelectedRows([])
+  }, [queryOptions.stateFilter, queryOptions.tagFilter])
+  
   return (
     <Box sx={gutters} p={6} justifyContent="center">
       <Typography variant="subtitle1" sx={{ pb: 1.5 }}>

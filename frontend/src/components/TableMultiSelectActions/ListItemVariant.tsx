@@ -55,8 +55,7 @@ export function ListItemVariant<T>({
      optionsInSomeRows,
      selectedOptions
    }: ListItemVariantProps<T>) {
-  console.log(   optionsInAllRows,
-    optionsInSomeRows, selectedOptions)
+
   if (variant === "default") {
     return (
       <ListItem
