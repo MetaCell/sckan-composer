@@ -207,21 +207,19 @@ class Sex(models.Model):
 class PopulationSet(models.Model):
     """Population Set"""
 
-    name = models.CharField(max_length=200, db_index=True, unique=True)
+    name = models.CharField(
+        max_length=200,
+        db_index=True,
+        unique=True,
+        validators=[is_valid_population_name],
+    )
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.name
 
-    def clean(self):
-        if not is_valid_population_name(self.name):
-            raise ValidationError(
-                "Name must be between 8 and 20 characters, start with a letter, and contain only letters and numbers."
-            )
-        self.name = self.name.lower()
-
     def save(self, *args, **kwargs):
-        self.clean()
+        self.name = self.name.lower()
         super().save(*args, **kwargs)
 
     class Meta:
