@@ -289,3 +289,10 @@ def update_prefix_suffix_for_connectivity_statement_preview(
             logging.error(
                 f"Error updating prefix/suffix for ConnectivityStatement {instance.id}: {str(e)}"
             )
+
+
+@receiver(post_save, sender=ConnectivityStatement)
+def set_has_statement_been_exported(sender, instance, **kwargs):
+    if instance.state == CSState.EXPORTED and not instance.has_statement_been_exported:
+        instance.has_statement_been_exported = True
+        instance.save(update_fields=["has_statement_been_exported"])
