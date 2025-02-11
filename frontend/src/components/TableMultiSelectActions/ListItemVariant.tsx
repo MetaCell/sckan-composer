@@ -2,7 +2,7 @@ import { ListItem, ListItemText, ListItemIcon, Checkbox } from "@mui/material"
 import CheckIcon from "@mui/icons-material/Check"
 import { vars } from "../../theme/variables"
 import {CheckedItemIcon, IndeterminateIcon, UncheckedItemIcon} from "../icons";
-import React from "react";
+import React, {useEffect} from "react";
 
 const styles = {
   listItem: {
@@ -55,6 +55,14 @@ export function ListItemVariant<T>({
      optionsInSomeRows,
      selectedOptions
    }: ListItemVariantProps<T>) {
+  const [isOptionChecked, setIsOptionChecked] = React.useState(false);
+  const [isOptionIndeterminate, setIsOptionIndeterminate] = React.useState(false);
+  useEffect(() => {
+    if (optionsInSomeRows && optionsInAllRows && selectedOptions) {
+      setIsOptionChecked(selectedOptions?.includes(option.label) || optionsInAllRows?.includes(option.label))
+      setIsOptionIndeterminate(selectedOptions?.includes(option.label) && optionsInSomeRows?.includes(option.label))
+    }
+  }, [optionsInAllRows, selectedOptions, optionsInSomeRows, option.label])
 
   if (variant === "default") {
     return (
@@ -81,14 +89,14 @@ export function ListItemVariant<T>({
       </ListItem>
     )
   }
-
+  
   return (
     <ListItem key={index} onClick={() => onOptionSelect(option)} sx={{
       ...styles.listItem,
       backgroundColor: isSelected ? vars.gray50 : "transparent",
       gap: '.5rem'
     }}>
-     <StyledCheckBox checked={selectedOptions?.includes(option.label) || optionsInAllRows?.includes(option.label)} indeterminate={selectedOptions?.includes(option.label) && optionsInSomeRows?.includes(option.label)} />
+     <StyledCheckBox checked={isOptionChecked} indeterminate={isOptionIndeterminate} />
       <ListItemText
         primary={option.label}
         primaryTypographyProps={{
