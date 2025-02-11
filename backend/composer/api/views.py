@@ -536,9 +536,16 @@ class ConnectivityStatementViewSet(
 
     def get_assignable_users_data(self):
         # Only include profiles where the user is a curator or reviewer.
-        return bulk_service.get_assignable_users_data(
-            roles=["is_curator", "is_reviewer"]
-        )
+
+        return MinimalUserSerializer(
+            [
+                p.user
+                for p in bulk_service.get_assignable_users_data(
+                    roles=["is_curator", "is_reviewer"]
+                )
+            ],
+            many=True,
+        ).data
 
     """
     Override the update method to apply the extend_schema decorator.
