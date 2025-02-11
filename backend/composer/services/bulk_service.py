@@ -1,7 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django_fsm import TransitionNotAllowed, get_available_user_FIELD_transitions
-
+from functools import reduce
+from operator import and_
 from django.db.models import ForeignKey, Q
 from composer.api.serializers import MinimalUserSerializer
 from composer.models import Profile, Tag, Note, User
@@ -132,18 +133,17 @@ def get_assignable_users_data(roles=None):
 
 
 def get_common_transitions(queryset, user):
-    from functools import reduce
-    from operator import and_
-
     transitions_list = []
     for obj in queryset:
         if hasattr(obj, "get_available_state_transitions"):
             state_field = obj._meta.get_field("state")
-            transitions = [
+            transitions = {
                 transition.name
-                for transition in get_available_user_FIELD_transitions(
-                    obj, user, state_field
-                )
-            ]
+                for transition in get_available_user_FIELD_transitions(obj, user, state_field)
+            }
             transitions_list.append(transitions)
-    return list(reduce(and_, transitions_list))
+    if transitions_list:
+        common = set.intersection(*transitions_list)
+    else:
+        common = set()
+    return list(common)
