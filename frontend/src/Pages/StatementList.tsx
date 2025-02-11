@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { BaseConnectivityStatement, ConnectivityStatement } from "../apiclient/backend";
+import { BaseConnectivityStatement } from "../apiclient/backend";
 import { useAppSelector } from "../redux/hooks";
 import connectivityStatementService from "../services/StatementService";
 import EntityDataGrid from "../components/EntityDataGrid";
@@ -44,6 +44,13 @@ const StatementList = () => {
     // Initial fetch
     refreshStatementList();
   }, [refreshStatementList]);
+  
+  useEffect(() => {
+    if (!showSelectionBanner) {
+      setNotIsAllDataSelected(false)
+      setIsAllDataSelected(false)
+    }
+  }, [showSelectionBanner])
   
   useEffect(() => {
     setShowSelectionBanner((selectedRows.length > 0 && selectedRows.length === queryOptions.limit) || (statementList !== undefined && selectedRows.length > statementList.length ));

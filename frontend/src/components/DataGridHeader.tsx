@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import Drawer from "@mui/material/Drawer";
@@ -15,7 +15,6 @@ import { Divider, Typography } from "@mui/material";
 import AssignUser from "./TableMultiSelectActions/AssignUser";
 import { vars } from "../theme/variables";
 import ManageTags from "./TableMultiSelectActions/ManageTags";
-import { ConnectivityStatement, Sentence } from "../apiclient/backend";
 import ChangeStatus from "./TableMultiSelectActions/ChangeStatus";
 import AddNote from "./TableMultiSelectActions/AddNote";
 import AssignPopulationSet from "./TableMultiSelectActions/AssignPopulationSet";
@@ -58,11 +57,23 @@ interface DataGridHeaderProps {
   refreshList: () => void;
 }
 
+type Tag = {
+  id: number;
+  tag: string;
+};
+
+type Tags = {
+  used_by_all: Tag[];
+  used_by_some: Tag[];
+  unused: Tag[];
+};
+
 const DataGridHeader = (props: DataGridHeaderProps) => {
   const { queryOptions, entityType, selectedRows, refreshList } = props;
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [assignableUsers, setAssignableUsers] = useState<any[]>([]);
   const [possibleTransitions, setPossibleTransitions] = useState<string[]>([]);
+  const [tagsStatus, setTagsStatus] = useState<Tags[]>([]);
   const [previousFetchDeps, setPreviousFetchDeps] = useState<{
     selectedRows: number[];
     queryOptions: SentenceQueryParams | StatementQueryParams;
@@ -105,13 +116,15 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
         const options = await fetchFunction();
         setAssignableUsers(options.assignable_users);
         setPossibleTransitions(options.possible_transitions);
+        // @ts-ignore
+        setTagsStatus(options.tags);
         setPreviousFetchDeps({ selectedRows, queryOptions, entityType }); // Store last fetch state
       } catch (error) {
         console.error("Failed to fetch options:", error); // TODO: Show error to user
       }
     }
   }, [selectedRows, queryOptions, entityType, previousFetchDeps]); // Only re-run when dependencies change
-
+  console.log(tagsStatus)
   return (
     <Grid container display="flex" justifyContent="space-between" alignItems="center" sx={toolbarStyle}>
       <Grid item xs={12} md={3}>
@@ -134,7 +147,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               onClick={handleFetchOptions}
               onConfirm={refreshList}
             />
-            {/*<ManageTags selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />*/}
+            <ManageTags onClick={handleFetchOptions} tagsStatus={tagsStatus} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
             <AddNote selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
             <ChangeStatus
               selectedTableRows={selectedRows}

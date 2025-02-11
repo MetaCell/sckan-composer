@@ -84,7 +84,9 @@ class SentenceService extends AbstractService {
    * Fetch options for assignable users and possible state transitions
    * Uses the sentence filters or explicit IDs to determine results.
    */
-  async fetchOptions(queryOptions: QueryParams): Promise<{ assignable_users: any[]; possible_transitions: string[] }> {
+  async fetchOptions(queryOptions: QueryParams): Promise<{
+    tags: any[];
+    assignable_users: any[]; possible_transitions: string[] }> {
     const { exclude, include, notes, ordering, stateFilter, tagFilter, title } = queryOptions;
 
     return composerApi

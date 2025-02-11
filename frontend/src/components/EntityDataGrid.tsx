@@ -4,7 +4,7 @@ import {
   DataGrid,
   GridRowsProp,
   GridColDef,
-  GridEventListener, GridRowId,
+  GridEventListener,
 } from "@mui/x-data-grid";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { BaseConnectivityStatement, Sentence, Tag } from "../apiclient/backend";
@@ -200,7 +200,7 @@ const EntityDataGrid = (props: DataGridProps) => {
       setSelectedRows([]);
     }
   }, [isAllDataSelected, notIsAllDataSelected, currentPageIds, setSelectedRows, showSelectionBanner]);
-  console.log(notIsAllDataSelected, isAllDataSelected)
+
   return (
     <Box
       flexGrow={1}
