@@ -58,6 +58,8 @@ const StatementList = () => {
   
   useEffect(() => {
     setSelectedRows([])
+    setNotIsAllDataSelected(false)
+    setIsAllDataSelected(false)
   }, [queryOptions.stateFilter, queryOptions.tagFilter])
   
   return (
