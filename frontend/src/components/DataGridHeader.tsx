@@ -105,7 +105,6 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
 
   // Function to fetch options only when triggered by button click
   const handleFetchOptions = useCallback(async () => {
-    setIsFetchingOptions(true);
     const hasChanged =
       !previousFetchDeps ||
       previousFetchDeps.selectedRows !== selectedRows ||
@@ -113,6 +112,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
       previousFetchDeps.entityType !== entityType;
 
     if (hasChanged) {
+      setIsFetchingOptions(true);
       try {
         const fetchFunction =
           fetchOptionsMap[entityType] || fetchOptionsMap[ENTITY_TYPES.STATEMENT];
@@ -151,6 +151,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               queryOptions={updatedQueryOptions}
               onClick={handleFetchOptions}
               onConfirm={refreshList}
+              isFetchingOptions={isFetchingOptions}
             />
             <ManageTags isFetchingOptions={isFetchingOptions} onClick={handleFetchOptions} tagsStatus={tagsStatus} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
             <AddNote selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
@@ -161,6 +162,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               queryOptions={updatedQueryOptions}
               onClick={handleFetchOptions}
               onConfirm={refreshList}
+              isFetchingOptions={isFetchingOptions}
             />
             <AssignPopulationSet selectedTableRows={selectedRows} entityType={entityType} />
             <Divider flexItem />

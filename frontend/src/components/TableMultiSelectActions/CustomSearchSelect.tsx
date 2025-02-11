@@ -13,6 +13,7 @@ import {HelpOutlineRounded} from "@mui/icons-material";
 import Tooltip from "@mui/material/Tooltip";
 import React from "react";
 import { OptionType } from "../../types"
+import {CircularProgress} from "@mui/material";
 
 const styles = {
   paper: {
@@ -172,27 +173,31 @@ const CustomSearchSelect = ({
       />
       
       <List sx={styles.list}>
-        {data.length > 0 ? (
-          data.map((option: OptionType, index: number) => (
-            <ListItemVariant
-              key={index}
-              option={option}
-              index={index}
-              isSelected={isOptionSelected(option)}
-              onOptionSelect={onOptionSelect}
-              variant={variant}
-              optionsInAllRows={optionsInAllRows}
-              optionsInSomeRows={optionsInSomeRows}
-              selectedOptions={selectedOptions}
-            />
-          ))
-        ) : (
-          <ListItem>
-            <ListItemText
-              primary={noOptionsText}
-            />
-          </ListItem>
-        )}
+        {
+          isFetchingOptions ? <ListItem sx={{justifyContent: 'center'}}>
+            <CircularProgress />
+          </ListItem> : data.length > 0 ? (
+            data.map((option: OptionType, index: number) => (
+              <ListItemVariant
+                key={index}
+                option={option}
+                index={index}
+                isSelected={isOptionSelected(option)}
+                onOptionSelect={onOptionSelect}
+                variant={variant}
+                optionsInAllRows={optionsInAllRows}
+                optionsInSomeRows={optionsInSomeRows}
+                selectedOptions={selectedOptions}
+              />
+            ))
+          ) : (
+            <ListItem>
+              <ListItemText
+                primary={noOptionsText}
+              />
+            </ListItem>
+          )
+        }
       </List>
       
       <Box sx={styles.footer}>

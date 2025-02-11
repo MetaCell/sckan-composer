@@ -16,9 +16,10 @@ interface ChangeStatusProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
   onClick: () => void;
   onConfirm: () => void;
+  isFetchingOptions: boolean;
 }
 
-const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityType, possibleTransitions, queryOptions, onClick, onConfirm }) => {
+const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityType, possibleTransitions, queryOptions, onClick, onConfirm, isFetchingOptions }) => {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
@@ -95,6 +96,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
         onSelect={handleSelectStatus}
         onOpen={handleOpenMenu}
         noOptionsText={"No options available!"}
+        isFetchingOptions={isFetchingOptions}
       />
       <ConfirmationDialog
         open={isModalOpen}

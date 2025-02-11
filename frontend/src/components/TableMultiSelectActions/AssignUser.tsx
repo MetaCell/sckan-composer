@@ -22,6 +22,7 @@ interface AssignUserProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
   onClick: () => void;
   onConfirm: () => void;
+  isFetchingOptions: boolean;
 }
 
 const mapUsersToSelectOptions = (users: User[]) => {
@@ -31,7 +32,7 @@ const mapUsersToSelectOptions = (users: User[]) => {
   }));
 };
 
-const AssignUser: React.FC<AssignUserProps> = ({ selectedTableRows, entityType, assignableUsers, queryOptions, onClick, onConfirm }) => {
+const AssignUser: React.FC<AssignUserProps> = ({ selectedTableRows, entityType, assignableUsers, queryOptions, onClick, onConfirm, isFetchingOptions }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<OptionType | null>(null);
@@ -106,6 +107,7 @@ const AssignUser: React.FC<AssignUserProps> = ({ selectedTableRows, entityType, 
         onCancel={handleClose} 
         showHelperText={true}
         helperText={`Having trouble finding someone? </br>The list of available users is based on their roles and permissions. Contact us if you need any help.`}
+        isFetchingOptions={isFetchingOptions}
       />
     </>
   );
