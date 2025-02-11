@@ -49,9 +49,7 @@ def export(request):
         messages.add_message(request, messages.INFO, f"Exported {export_batch.get_count_connectivity_statements_in_this_export} connectivity statements.")
         if os.path.exists(file_path):
             with open(file_path, 'rb') as fh:
-                composer_version = f'# SCKAN Composer version: {VERSION}\n' 
-                date_exported = f'# Export date: {timezone.now().strftime("%Y-%m-%d")}\n'
-                content = composer_version + date_exported + fh.read().decode()
+                content = fh.read().decode()
                 response = HttpResponse(content.encode(), content_type="application/text")
                 response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
                 return response
