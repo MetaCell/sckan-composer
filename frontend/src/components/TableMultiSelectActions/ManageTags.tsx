@@ -23,10 +23,11 @@ interface ManageTagsProps {
   selectedTableRows: any[];
   entityType: ENTITY_TYPES;
   queryOptions: SentenceQueryParams | StatementQueryParams;
+  onClick: () => void;
   onConfirm: () => void;
 }
 
-const ManageTags: React.FC<ManageTagsProps> = ({ selectedTableRows, entityType, queryOptions, onConfirm }) => {
+const ManageTags: React.FC<ManageTagsProps> = ({ selectedTableRows, entityType, queryOptions, onConfirm, onClick }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTags, setSelectedTags] = useState<OptionType[]>([]);
@@ -119,6 +120,7 @@ const ManageTags: React.FC<ManageTagsProps> = ({ selectedTableRows, entityType, 
 
   const handleViewTagsMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
+    onClick()
   };
 
   return (

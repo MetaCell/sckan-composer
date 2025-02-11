@@ -138,7 +138,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               onClick={handleFetchOptions}
               onConfirm={refreshList}
             />
-            <ManageTags selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
+            <ManageTags selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions} onClick={handleFetchOptions} onConfirm={refreshList} />
             <AddNote selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
             <ChangeStatus
               selectedTableRows={selectedRows}

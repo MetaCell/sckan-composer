@@ -13,8 +13,6 @@ from rest_framework.serializers import ValidationError
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Case, When, Value, IntegerField
-from functools import reduce
-from operator import and_
 from composer.services import bulk_service
 from composer.enums import BulkActionType
 from composer.services.state_services import (
@@ -80,7 +78,6 @@ from ..models import (
     Provenance,
     Sex,
     Destination,
-    GraphRenderingState,
 )
 
 
@@ -265,12 +262,10 @@ class BulkActionMixin:
     # Expect that each view to set this attribute.:
     bulk_action_mapping = None  # a dict mapping action types to service functions
 
-
     def get_bulk_action_serializer_mapping(self):
         if self.bulk_action_serializers is None:
             raise NotImplementedError("bulk_action_serializers not set.")
         return self.bulk_action_serializers
-
 
     def get_bulk_action_mapping(self):
         if self.bulk_action_mapping is None:
@@ -282,7 +277,9 @@ class BulkActionMixin:
         Default implementation: returns minimal user data from all profiles.
         Views can override this if needed.
         """
-        return bulk_service.get_assignable_users_data()
+        return MinimalUserSerializer(
+            [p.user for p in bulk_service.get_assignable_users_data()], many=True
+        ).data
 
     def get_common_transitions(self, queryset):
         """
@@ -291,6 +288,31 @@ class BulkActionMixin:
         and then return the intersection (common transitions).
         """
         return bulk_service.get_common_transitions(queryset, user=self.request.user)
+
+    def get_tags_partition(self, queryset):
+        """
+        Returns a dictionary with serialized tag data partitioned into:
+        - used_by_all: Tags present on every object,
+        - used_by_some: Tags present on some (but not all) objects,
+        - unused: Tags absent from all objects.
+        """
+        # Get the partition data from the service layer.
+        partition = bulk_service.get_tags_partition(queryset)
+        # Define partial tags as those in the union that are not common.
+        partial_ids = partition["union"] - partition["common"]
+
+        tag_partitions_serialized = {
+            "used_by_all": TagSerializer(
+                Tag.objects.filter(id__in=partition["common"]), many=True
+            ).data,
+            "used_by_some": TagSerializer(
+                Tag.objects.filter(id__in=partial_ids), many=True
+            ).data,
+            "unused": TagSerializer(
+                Tag.objects.filter(id__in=partition["missing"]), many=True
+            ).data,
+        }
+        return tag_partitions_serialized
 
     @extend_schema(filters=True)
     @action(detail=False, methods=["get"])
@@ -308,10 +330,13 @@ class BulkActionMixin:
         qs = self.filter_queryset(self.get_queryset())
         assignable_users_data = self.get_assignable_users_data()
         common_transitions = self.get_common_transitions(qs)
+        tags_partition = self.get_tags_partition(qs)
+
         return Response(
             {
                 "assignable_users": assignable_users_data,
                 "possible_transitions": common_transitions,
+                "tags": tags_partition,
             }
         )
 
@@ -464,7 +489,7 @@ class ConnectivityStatementViewSet(
     AssignOwnerMixin,
     CSCloningMixin,
     viewsets.ModelViewSet,
-    BulkActionMixin
+    BulkActionMixin,
 ):
     """
     ConnectivityStatement
@@ -509,10 +534,11 @@ class ConnectivityStatementViewSet(
             return ConnectivityStatement.objects.excluding_draft()
         return super().get_queryset()
 
-
     def get_assignable_users_data(self):
         # Only include profiles where the user is a curator or reviewer.
-        return bulk_service.get_assignable_users_data(roles=['is_curator', 'is_reviewer'])
+        return bulk_service.get_assignable_users_data(
+            roles=["is_curator", "is_reviewer"]
+        )
 
     """
     Override the update method to apply the extend_schema decorator.
