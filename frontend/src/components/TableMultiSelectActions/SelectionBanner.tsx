@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
 import Collapse from "@mui/material/Collapse";
 import { vars } from "../../theme/variables";
+import {useEffect} from "react";
 
 const styles = {
   selectionBanner: {
@@ -28,13 +29,31 @@ interface SelectionBannerProps {
   totalResults: number;
   show: boolean;
   entityType?: string;
+  setIsAllDataSelected: (isAllDataSelected: boolean) => void;
+  setNotIsAllDataSelected: (isAllDataSelected: boolean) => void;
+  isAllDataSelected: boolean;
 }
 
-const SelectionBanner: React.FC<SelectionBannerProps> = ({ totalResults, show, entityType }) => {
+const SelectionBanner: React.FC<SelectionBannerProps> = ({ totalResults, show, entityType, setIsAllDataSelected, isAllDataSelected, setNotIsAllDataSelected }) => {
   const handleSelectAll = () => {
-    // TODO: Implement the logic to select all sentences
-    console.log(`Select all ${entityType}s...`);
+    if (setNotIsAllDataSelected) {
+      setIsAllDataSelected(true)
+      setNotIsAllDataSelected(false)
+    }
   }
+    const handleUndo = () => {
+    if (setIsAllDataSelected) {
+      setNotIsAllDataSelected(true)
+      setIsAllDataSelected(false)
+    }
+  }
+  
+  useEffect(() => {
+    return () => {
+      setNotIsAllDataSelected(false)
+      setIsAllDataSelected(false)
+    }
+  }, [])
   
   return (
     <Collapse in={show} timeout={400}>
@@ -42,14 +61,26 @@ const SelectionBanner: React.FC<SelectionBannerProps> = ({ totalResults, show, e
         <Typography color={vars.darkTextColor} noWrap>
           All the {entityType}s on this page are selected.
         </Typography>
-        <Link
-          component="button"
-          variant="body2"
-          onClick={handleSelectAll}
-          sx={styles.link}
-        >
-          Select all {totalResults} {entityType}
-        </Link>
+        {
+          isAllDataSelected ? (
+            <Link
+              component="button"
+              variant="body2"
+              onClick={handleUndo}
+              sx={styles.link}
+            >
+              undo
+            </Link>
+          ) : <Link
+            component="button"
+            variant="body2"
+            onClick={handleSelectAll}
+            sx={styles.link}
+          >
+            Select all {totalResults} {entityType}
+          </Link>
+        }
+        
       </Box>
     </Collapse>
   );

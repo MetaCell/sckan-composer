@@ -16,7 +16,9 @@ const StatementList = () => {
   const [totalResults, setTotalResults] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [showSelectionBanner, setShowSelectionBanner] = useState(false)
-  const [selectedRows, setSelectedRows] = useState<ConnectivityStatement[]>([]);
+  const [isAllDataSelected, setIsAllDataSelected] = useState<boolean>(false);
+  const [notIsAllDataSelected, setNotIsAllDataSelected] = useState<boolean>(false);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const queryOptions = useAppSelector((state) => state.statement.queryOptions);
 
   const gutters = useGutters();
@@ -42,7 +44,11 @@ const StatementList = () => {
     // Initial fetch
     refreshStatementList();
   }, [refreshStatementList]);
-
+  
+  useEffect(() => {
+    setShowSelectionBanner((selectedRows.length > 0 && selectedRows.length === queryOptions.limit) || (statementList !== undefined && selectedRows.length > statementList.length ));
+  }, [selectedRows, queryOptions.limit, selectedRows.length, statementList])
+  
   return (
     <Box sx={gutters} p={6} justifyContent="center">
       <Typography variant="subtitle1" sx={{ pb: 1.5 }}>
@@ -63,6 +69,9 @@ const StatementList = () => {
           totalResults={totalResults}
           show={showSelectionBanner}
           entityType={ENTITY_TYPES.STATEMENT}
+          setIsAllDataSelected={setIsAllDataSelected}
+          isAllDataSelected={isAllDataSelected}
+          setNotIsAllDataSelected={setNotIsAllDataSelected}
         />
       </Box>
       <EntityDataGrid
@@ -74,6 +83,9 @@ const StatementList = () => {
         allowSortByOwner={true}
         setSelectedRows={setSelectedRows}
         selectedRows={selectedRows}
+        isAllDataSelected={isAllDataSelected}
+        notIsAllDataSelected={notIsAllDataSelected}
+        showSelectionBanner={showSelectionBanner}
       />
     </Box>
   );

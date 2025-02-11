@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import { useAppSelector } from "../redux/hooks";
 import Box from "@mui/material/Box";
 import AddIcon from "@mui/icons-material/Add";
@@ -18,9 +18,10 @@ const SentenceList = () => {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [showSelectionBanner, setShowSelectionBanner] = useState(false)
-
-  const [selectedRows, setSelectedRows] = useState<Sentence[]>([]);
-
+  const [isAllDataSelected, setIsAllDataSelected] = useState<boolean>(false);
+  const [notIsAllDataSelected, setNotIsAllDataSelected] = useState<boolean>(false);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
+  
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -42,17 +43,19 @@ const SentenceList = () => {
   }, [queryOptions]);
 
   useEffect(() => {
-    // Initial fetch
     refreshSentenceList();
   }, [refreshSentenceList]);
-
+  
   useEffect(() => {
-    setShowSelectionBanner(selectedRows.length === queryOptions.limit)
-  }, [selectedRows, queryOptions.limit])
-
+    if (!showSelectionBanner) {
+      setNotIsAllDataSelected(false)
+      setIsAllDataSelected(false)
+    }
+  }, [showSelectionBanner])
+  
   useEffect(() => {
-    setSelectedRows([])
-  }, [queryOptions.stateFilter, queryOptions.tagFilter])
+    setShowSelectionBanner((selectedRows.length > 0 && selectedRows.length === queryOptions.limit) || (sentenceList !== undefined && selectedRows.length > sentenceList.length ));
+  }, [selectedRows, queryOptions.limit, selectedRows.length, sentenceList])
 
   return (
     <Box sx={gutters} p={6} justifyContent="center">
@@ -80,6 +83,9 @@ const SentenceList = () => {
           totalResults={totalResults}
           show={showSelectionBanner}
           entityType={ENTITY_TYPES.SENTENCE}
+          setIsAllDataSelected={setIsAllDataSelected}
+          isAllDataSelected={isAllDataSelected}
+          setNotIsAllDataSelected={setNotIsAllDataSelected}
         />
       </Box>
       <EntityDataGrid
@@ -91,6 +97,9 @@ const SentenceList = () => {
         queryOptions={queryOptions}
         setSelectedRows={setSelectedRows}
         selectedRows={selectedRows}
+        isAllDataSelected={isAllDataSelected}
+        notIsAllDataSelected={notIsAllDataSelected}
+        showSelectionBanner={showSelectionBanner}
       />
     </Box>
   );

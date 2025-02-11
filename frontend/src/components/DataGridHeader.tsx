@@ -54,7 +54,7 @@ const multiSelectActionsStyle = {
 interface DataGridHeaderProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
   entityType: ENTITY_TYPES.STATEMENT | ENTITY_TYPES.SENTENCE;
-  selectedRows: Sentence[] | ConnectivityStatement[];
+  selectedRows: number[];
   refreshList: () => void;
 }
 
@@ -64,7 +64,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
   const [assignableUsers, setAssignableUsers] = useState<any[]>([]);
   const [possibleTransitions, setPossibleTransitions] = useState<string[]>([]);
   const [previousFetchDeps, setPreviousFetchDeps] = useState<{
-    selectedRows: Sentence[] | ConnectivityStatement[];
+    selectedRows: number[];
     queryOptions: SentenceQueryParams | StatementQueryParams;
     entityType: ENTITY_TYPES;
   } | null>(null);
@@ -78,13 +78,9 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
       : dispatch(setStatementFilters(noFilters));
   };
 
-  const selectedRowIds = selectedRows
-    .map((row) => row.id)
-    .filter((id): id is number => id !== null && id !== undefined);
-
   const updatedQueryOptions: SentenceQueryParams | StatementQueryParams = {
     ...queryOptions,
-    include: selectedRowIds.length > 0 ? selectedRowIds : undefined,
+    include: selectedRows.length > 0 ? selectedRows : undefined,
   };
 
   const fetchOptionsMap = {
@@ -138,7 +134,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               onClick={handleFetchOptions}
               onConfirm={refreshList}
             />
-            <ManageTags selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
+            {/*<ManageTags selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />*/}
             <AddNote selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
             <ChangeStatus
               selectedTableRows={selectedRows}

@@ -1,10 +1,10 @@
-import React from "react";
+import React, {useEffect, useMemo} from "react";
 import Box from "@mui/material/Box";
 import {
   DataGrid,
   GridRowsProp,
   GridColDef,
-  GridEventListener,
+  GridEventListener, GridRowId,
 } from "@mui/x-data-grid";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { BaseConnectivityStatement, Sentence, Tag } from "../apiclient/backend";
@@ -44,8 +44,11 @@ interface DataGridProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
   loading: boolean;
   totalResults: number;
-  setSelectedRows?: (selectedRows: any[]) => void;
-  selectedRows?: any[];
+  setSelectedRows: (selectedRows: number[]) => void;
+  selectedRows: number[];
+  isAllDataSelected: boolean;
+  notIsAllDataSelected: boolean;
+  showSelectionBanner: boolean;
 }
 
 type criteria =
@@ -65,12 +68,13 @@ export const StyledCheckBox = (props: any) => {
   );
 };
 const EntityDataGrid = (props: DataGridProps) => {
-  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false, setSelectedRows, selectedRows } = props;
+  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false, setSelectedRows, selectedRows, isAllDataSelected, notIsAllDataSelected, showSelectionBanner } = props;
 
   const currentPage = (queryOptions.index || 0) / queryOptions.limit;
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const currentPageIds = useMemo(() => entityList?.map((item) => item.id) || [], [entityList])
 
   const generateRowProps = (item: any) => {
     const { id, state, modified_date, owner, tags, has_notes } = item;
@@ -184,7 +188,19 @@ const EntityDataGrid = (props: DataGridProps) => {
       ? dispatch(setSentenceSorting(ordering))
       : dispatch(setStatementSorting(ordering));
   };
-
+  
+  useEffect(() => {
+    if (isAllDataSelected) {
+      // @ts-ignore
+      setSelectedRows((prevSelected: number[]) => {
+        const newSelected = new Set([...prevSelected, ...currentPageIds]);
+        return Array.from(newSelected);
+      });
+    } else if (notIsAllDataSelected) {
+      setSelectedRows([]);
+    }
+  }, [isAllDataSelected, notIsAllDataSelected, currentPageIds, setSelectedRows, showSelectionBanner]);
+  console.log(notIsAllDataSelected, isAllDataSelected)
   return (
     <Box
       flexGrow={1}
@@ -224,12 +240,10 @@ const EntityDataGrid = (props: DataGridProps) => {
             ? mapSortingModel(queryOptions.ordering[0])
             : undefined
         }
-        rowSelectionModel={selectedRows?.map(row => row.id)}
+        rowSelectionModel={selectedRows}
+        keepNonExistentRowsSelected={true}
         onRowSelectionModelChange={(selectedRowIds) => {
-          const selectedRowsData = rows.filter(row => selectedRowIds.includes(row.id));
-          if (setSelectedRows) {
-            setSelectedRows(selectedRowsData);
-          }
+          setSelectedRows(selectedRowIds as number[]);
         }}
         sx={{
           borderRadius: 0,
