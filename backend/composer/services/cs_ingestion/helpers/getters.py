@@ -1,6 +1,12 @@
 from typing import Dict, Optional
 
-from composer.models import Sex, FunctionalCircuitRole, Phenotype, ProjectionPhenotype
+from composer.models import (
+    Sex,
+    FunctionalCircuitRole,
+    Phenotype,
+    ProjectionPhenotype,
+    PopulationSet,
+)
 from composer.services.cs_ingestion.helpers.common_helpers import get_value_or_none, SEX, FUNCTIONAL_CIRCUIT_ROLE, ID, \
     CIRCUIT_TYPE, CIRCUIT_TYPE_MAPPING, PHENOTYPE, OTHER_PHENOTYPE
 from composer.services.cs_ingestion.logging_service import LoggerService
@@ -47,6 +53,15 @@ def get_phenotype(statement: Dict) -> Optional[Phenotype]:
         logger_service.add_anomaly(LoggableAnomaly(statement[ID], None, f'No valid phenotype found.'))
 
     return None
+
+
+def get_or_create_neurondm_populationset(statement: Dict):
+    # TODO: Temporarily - use neurondm as the populationset -
+    # to be merged with neurondm populationset
+    populationset = PopulationSet.objects.get_or_create(
+        name="neurondm", description="neurondm"
+    )[0]
+    return populationset
 
 
 def get_projection_phenotype(statement: Dict) -> Optional[ProjectionPhenotype]:

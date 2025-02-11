@@ -37,6 +37,7 @@ from composer.services.cs_ingestion.helpers.getters import (
     get_functional_circuit_role,
     get_phenotype,
     get_projection_phenotype,
+    get_or_create_neurondm_populationset,
 )
 from composer.services.cs_ingestion.helpers.notes_helper import (
     do_transition_to_invalid_with_note,
@@ -65,6 +66,7 @@ def create_or_update_connectivity_statement(
         "circuit_type": get_circuit_type(statement),
         "functional_circuit_role": get_functional_circuit_role(statement),
         "phenotype": get_phenotype(statement),
+        "population": get_or_create_neurondm_populationset(statement),
         "projection_phenotype": get_projection_phenotype(statement),
         "reference_uri": statement[ID],
         "state": CSState.EXPORTED,
