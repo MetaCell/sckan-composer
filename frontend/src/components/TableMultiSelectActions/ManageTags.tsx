@@ -25,9 +25,10 @@ interface ManageTagsProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
   onClick: () => void;
   onConfirm: () => void;
+  isFetchingOptions: boolean
 }
 
-const ManageTags: React.FC<ManageTagsProps> = ({ tagsStatus, entityType, queryOptions, onConfirm, onClick }) => {
+const ManageTags: React.FC<ManageTagsProps> = ({ tagsStatus, entityType, queryOptions, onConfirm, onClick, isFetchingOptions }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTags, setSelectedTags] = useState<OptionType[]>([]);
@@ -138,6 +139,7 @@ const ManageTags: React.FC<ManageTagsProps> = ({ tagsStatus, entityType, queryOp
         variant="checkbox"
         optionsInAllRows={tagsInAllRows}
         optionsInSomeRows={tagsInSomeRows}
+        isFetchingOptions={isFetchingOptions}
       />
     </>
   );

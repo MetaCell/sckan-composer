@@ -70,6 +70,7 @@ const StatementList = () => {
         queryOptions={queryOptions} 
         selectedRows={selectedRows} 
         refreshList={refreshStatementList}
+        isAllDataSelected={isAllDataSelected}
         />
       <Box sx={{ position: "relative", zIndex: 1 }}>
         <SelectionBanner

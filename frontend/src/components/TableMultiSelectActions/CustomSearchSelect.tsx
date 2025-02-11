@@ -96,6 +96,7 @@ export interface CustomSearchSelectProps {
   optionsInSomeRows?: string[],
   showHelperText?: boolean,
   helperText?: string
+  isFetchingOptions?: boolean
 }
 
 const CustomSearchSelect = ({
@@ -117,7 +118,8 @@ const CustomSearchSelect = ({
      optionsInAllRows,
      optionsInSomeRows,
      showHelperText = false,
-     helperText
+     helperText,
+     isFetchingOptions = false
    }: CustomSearchSelectProps) => {
   
   const isOptionSelected = (option: OptionType) =>

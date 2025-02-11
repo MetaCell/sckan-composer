@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import { useAppSelector } from "../redux/hooks";
 import Box from "@mui/material/Box";
 import AddIcon from "@mui/icons-material/Add";
@@ -77,6 +77,7 @@ const SentenceList = () => {
         queryOptions={queryOptions} 
         selectedRows={selectedRows}
         refreshList={refreshSentenceList}
+        isAllDataSelected={isAllDataSelected}
       />
       <Box sx={{ position: "relative", zIndex: 1 }}>
         <SelectionBanner

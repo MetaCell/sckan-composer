@@ -55,6 +55,7 @@ interface DataGridHeaderProps {
   entityType: ENTITY_TYPES.STATEMENT | ENTITY_TYPES.SENTENCE;
   selectedRows: number[];
   refreshList: () => void;
+  isAllDataSelected: boolean;
 }
 
 type Tag = {
@@ -69,8 +70,9 @@ type Tags = {
 };
 
 const DataGridHeader = (props: DataGridHeaderProps) => {
-  const { queryOptions, entityType, selectedRows, refreshList } = props;
+  const { queryOptions, entityType, selectedRows, refreshList, isAllDataSelected } = props;
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [isFetchingOptions, setIsFetchingOptions] = useState(false);
   const [assignableUsers, setAssignableUsers] = useState<any[]>([]);
   const [possibleTransitions, setPossibleTransitions] = useState<string[]>([]);
   const [tagsStatus, setTagsStatus] = useState<Tags[]>([]);
@@ -91,7 +93,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
 
   const updatedQueryOptions: SentenceQueryParams | StatementQueryParams = {
     ...queryOptions,
-    include: selectedRows.length > 0 ? selectedRows : undefined,
+    include: !isAllDataSelected ? selectedRows : undefined,
   };
 
   const fetchOptionsMap = {
@@ -103,6 +105,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
 
   // Function to fetch options only when triggered by button click
   const handleFetchOptions = useCallback(async () => {
+    setIsFetchingOptions(true);
     const hasChanged =
       !previousFetchDeps ||
       previousFetchDeps.selectedRows !== selectedRows ||
@@ -119,12 +122,14 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
         // @ts-ignore
         setTagsStatus(options.tags);
         setPreviousFetchDeps({ selectedRows, queryOptions, entityType }); // Store last fetch state
+        setIsFetchingOptions(false);
       } catch (error) {
+        setIsFetchingOptions(false);
         console.error("Failed to fetch options:", error); // TODO: Show error to user
       }
     }
   }, [selectedRows, queryOptions, entityType, previousFetchDeps]); // Only re-run when dependencies change
-  console.log(tagsStatus)
+
   return (
     <Grid container display="flex" justifyContent="space-between" alignItems="center" sx={toolbarStyle}>
       <Grid item xs={12} md={3}>
@@ -147,7 +152,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               onClick={handleFetchOptions}
               onConfirm={refreshList}
             />
-            <ManageTags onClick={handleFetchOptions} tagsStatus={tagsStatus} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
+            <ManageTags isFetchingOptions={isFetchingOptions} onClick={handleFetchOptions} tagsStatus={tagsStatus} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
             <AddNote selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
             <ChangeStatus
               selectedTableRows={selectedRows}
