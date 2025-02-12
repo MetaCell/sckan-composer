@@ -69,9 +69,8 @@ def post_transition_cs(sender, instance, name, source, target, **kwargs):
             instance = ConnectivityStatementStateService.add_important_tag(instance)
 
         if target == CSState.EXPORTED and not instance.has_statement_been_exported:
-            ConnectivityStatement.objects.filter(id=instance.id).update(
-                has_statement_been_exported=True
-            )
+            instance.has_statement_been_exported = True
+            instance.save()
 
 
 @receiver(post_save, sender=Layer)
