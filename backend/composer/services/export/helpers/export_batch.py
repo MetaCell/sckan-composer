@@ -81,24 +81,30 @@ def compute_metrics(export_batch: ExportBatch):
     return export_batch
 
 
-def do_transition_to_exported_and_get_available_export_batch(
-    export_batch: ExportBatch, user: User
-):
+def filter_statements_with_exported_transition(qs: QuerySet, user: User) -> QuerySet:
+    system_user = User.objects.get(username="system")
+    filtered_qs = qs.filter(
+        id__in=[
+            cs.id
+            for cs in qs
+            if CSState.EXPORTED
+            in [
+                available_state.target
+                for available_state in cs.get_available_user_state_transitions(
+                    system_user
+                )
+            ]
+        ]
+    )
+    return filtered_qs
+
+
+def transition_statements_to_exported(export_batch: ExportBatch, user: User):
     system_user = User.objects.get(username="system")
     connectivity_statements = export_batch.connectivity_statements.all()
     for connectivity_statement in connectivity_statements:
-        available_transitions = [
-            available_state.target
-            for available_state in connectivity_statement.get_available_user_state_transitions(
-                system_user
-            )
-        ]
-        if CSState.EXPORTED in available_transitions:
-            cs = ConnectivityStatementStateService(connectivity_statement).do_transition(
-                CSState.EXPORTED, system_user, user
-            )
-            cs.save()
-        else:
-            export_batch.connectivity_statements.remove(connectivity_statement)
+        ConnectivityStatementStateService(connectivity_statement).do_transition(
+            CSState.EXPORTED, system_user, user
+        ).save()
 
     return export_batch
