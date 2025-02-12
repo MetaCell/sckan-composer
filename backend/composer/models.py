@@ -752,11 +752,14 @@ class ConnectivityStatement(models.Model):
                     "Cannot change population set after the statement has been exported."
                 )
 
+    def clean(self):
+        return self.validate_population_change()
+
     def save(self, *args, **kwargs):
         if not self.pk and self.sentence and not self.owner:
             self.owner = self.sentence.owner
 
-        self.validate_population_change()
+        self.clean()
 
         super().save(*args, **kwargs)
 

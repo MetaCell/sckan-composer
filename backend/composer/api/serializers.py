@@ -430,6 +430,7 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "sex_id",
             "sex",
             "population",
+            "population_id",
             "has_statement_been_exported",
             "apinatomy_model",
             "additional_information",
