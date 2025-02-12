@@ -174,7 +174,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
         value: row.id,
       })),
     },
-    value: statement?.population ?? "",
+    value: statement?.population_id ?? "",
   };
 
   copiedUISchema.phenotype_id = {
