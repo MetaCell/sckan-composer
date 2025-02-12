@@ -68,6 +68,11 @@ def post_transition_cs(sender, instance, name, source, target, **kwargs):
             # add important tag to CS when transition to COMPOSE_NOW from NPO Approved or Exported
             instance = ConnectivityStatementStateService.add_important_tag(instance)
 
+        if target == CSState.EXPORTED and not instance.has_statement_been_exported:
+            ConnectivityStatement.objects.filter(id=instance.id).update(
+                has_statement_been_exported=True
+            )
+
 
 @receiver(post_save, sender=Layer)
 def create_layer_anatomical_entity(sender, instance=None, created=False, **kwargs):
@@ -289,10 +294,3 @@ def update_prefix_suffix_for_connectivity_statement_preview(
             logging.error(
                 f"Error updating prefix/suffix for ConnectivityStatement {instance.id}: {str(e)}"
             )
-
-
-@receiver(post_save, sender=ConnectivityStatement)
-def set_has_statement_been_exported(sender, instance, **kwargs):
-    if instance.state == CSState.EXPORTED and not instance.has_statement_been_exported:
-        instance.has_statement_been_exported = True
-        instance.save(update_fields=["has_statement_been_exported"])
