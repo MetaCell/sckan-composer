@@ -60,6 +60,8 @@ const SentenceList = () => {
     handleUndoSelectAll()
   }, [queryOptions.stateFilter, queryOptions.tagFilter])
   
+  const selectedRowsCount = isAllDataSelected ? totalResults - manuallyDeselectedRows.length : selectedRows.length;
+  
   return (
     <Box sx={gutters} p={6} justifyContent="center">
       <Header
@@ -81,6 +83,7 @@ const SentenceList = () => {
         selectedRows={selectedRows}
         refreshList={refreshSentenceList}
         isAllDataSelected={isAllDataSelected}
+        selectedRowsCount={selectedRowsCount}
       />
       <Box sx={{ position: "relative", zIndex: 1 }}>
         <SelectionBanner

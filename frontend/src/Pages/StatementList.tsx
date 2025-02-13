@@ -50,6 +50,8 @@ const StatementList = () => {
     handleUndoSelectAll()
   }, [queryOptions.stateFilter, queryOptions.tagFilter])
   
+  const selectedRowsCount = isAllDataSelected ? totalResults - manuallyDeselectedRows.length : selectedRows.length;
+  
   return (
     <Box sx={gutters} p={6} justifyContent="center">
       <Typography variant="subtitle1" sx={{ pb: 1.5 }}>
@@ -65,6 +67,7 @@ const StatementList = () => {
         selectedRows={selectedRows} 
         refreshList={refreshStatementList}
         isAllDataSelected={isAllDataSelected}
+        selectedRowsCount={selectedRowsCount}
         />
       <Box sx={{ position: "relative", zIndex: 1 }}>
         <SelectionBanner

@@ -56,6 +56,7 @@ interface DataGridHeaderProps {
   selectedRows: number[];
   refreshList: () => void;
   isAllDataSelected: boolean;
+  selectedRowsCount: number;
 }
 
 type Tag = {
@@ -70,7 +71,7 @@ type Tags = {
 };
 
 const DataGridHeader = (props: DataGridHeaderProps) => {
-  const { queryOptions, entityType, selectedRows, refreshList, isAllDataSelected } = props;
+  const { queryOptions, entityType, selectedRows, refreshList, isAllDataSelected, selectedRowsCount } = props;
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isFetchingOptions, setIsFetchingOptions] = useState(false);
   const [assignableUsers, setAssignableUsers] = useState<any[]>([]);
@@ -140,8 +141,8 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
         {selectedRows && selectedRows.length > 0 && (
           <Stack direction="row" alignItems="center" spacing={1} sx={multiSelectActionsStyle}>
             <Typography variant="body2">
-              {selectedRows.length} {entityType}
-              {selectedRows.length > 1 ? "s" : ""} selected
+              {selectedRowsCount} {entityType}
+              {selectedRowsCount > 1 ? "s" : ""} selected
             </Typography>
             <Divider flexItem />
             <AssignUser
