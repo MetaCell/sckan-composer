@@ -1,10 +1,10 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo} from "react";
 import Box from "@mui/material/Box";
 import {
   DataGrid,
   GridRowsProp,
   GridColDef,
-  GridEventListener, useGridApiRef, useGridApiEventHandler,
+  GridEventListener,
 } from "@mui/x-data-grid";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { BaseConnectivityStatement, Sentence, Tag } from "../apiclient/backend";
@@ -47,7 +47,6 @@ interface DataGridProps {
   setSelectedRows: (selectedRows: number[]) => void;
   selectedRows: number[];
   isAllDataSelected: boolean;
-  setShowSelectionBanner: (showSelectionBanner: boolean) => void;
   manuallyDeselectedRows: number[];
   setManuallyDeselectedRows: (selectedRows: number[]) => void;
 }
@@ -69,7 +68,7 @@ export const StyledCheckBox = (props: any) => {
   );
 };
 const EntityDataGrid = (props: DataGridProps) => {
-  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false, setSelectedRows, selectedRows, isAllDataSelected, setShowSelectionBanner, manuallyDeselectedRows, setManuallyDeselectedRows } = props;
+  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false, setSelectedRows, selectedRows, isAllDataSelected, manuallyDeselectedRows, setManuallyDeselectedRows } = props;
 
   const currentPage = (queryOptions.index || 0) / queryOptions.limit;
 

@@ -102,7 +102,6 @@ const SentenceList = () => {
         setSelectedRows={setSelectedRows}
         selectedRows={selectedRows}
         isAllDataSelected={isAllDataSelected}
-        setShowSelectionBanner={setShowSelectionBanner}
         setManuallyDeselectedRows={setManuallyDeselectedRows}
         manuallyDeselectedRows={manuallyDeselectedRows}
       />
