@@ -30,30 +30,17 @@ interface SelectionBannerProps {
   show: boolean;
   entityType?: string;
   setIsAllDataSelected: (isAllDataSelected: boolean) => void;
-  setNotIsAllDataSelected: (isAllDataSelected: boolean) => void;
+  handleUndoSelectAll: () => void;
   isAllDataSelected: boolean;
 }
 
-const SelectionBanner: React.FC<SelectionBannerProps> = ({ totalResults, show, entityType, setIsAllDataSelected, isAllDataSelected, setNotIsAllDataSelected }) => {
+const SelectionBanner: React.FC<SelectionBannerProps> = ({ totalResults, show, entityType, setIsAllDataSelected, isAllDataSelected, handleUndoSelectAll }) => {
   const handleSelectAll = () => {
-    if (setNotIsAllDataSelected) {
-      setIsAllDataSelected(true)
-      setNotIsAllDataSelected(false)
-    }
+    setIsAllDataSelected(true)
   }
     const handleUndo = () => {
-    if (setIsAllDataSelected) {
-      setNotIsAllDataSelected(true)
-      setIsAllDataSelected(false)
-    }
+      handleUndoSelectAll()
   }
-  
-  useEffect(() => {
-    return () => {
-      setNotIsAllDataSelected(false)
-      setIsAllDataSelected(false)
-    }
-  }, [])
   
   return (
     <Collapse in={show} timeout={400}>

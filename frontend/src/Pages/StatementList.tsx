@@ -17,9 +17,9 @@ const StatementList = () => {
   const [loading, setLoading] = useState(true);
   const [showSelectionBanner, setShowSelectionBanner] = useState(false)
   const [isAllDataSelected, setIsAllDataSelected] = useState<boolean>(false);
-  const [notIsAllDataSelected, setNotIsAllDataSelected] = useState<boolean>(false);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const queryOptions = useAppSelector((state) => state.statement.queryOptions);
+  const [manuallyDeselectedRows, setManuallyDeselectedRows] = useState<number[]>([]);
 
   const gutters = useGutters();
 
@@ -31,14 +31,11 @@ const StatementList = () => {
       setLoading(false);
     });
   }, [queryOptions]);
-
-  useEffect(() => {
-    setShowSelectionBanner(selectedRows.length === queryOptions.limit)
-  }, [selectedRows, queryOptions.limit])
-
-  useEffect(() => {
+  const handleUndoSelectAll = () => {
     setSelectedRows([])
-  }, [queryOptions.stateFilter, queryOptions.tagFilter])
+    setManuallyDeselectedRows([])
+    setIsAllDataSelected(false)
+  }
 
   useEffect(() => {
     // Initial fetch
@@ -46,20 +43,11 @@ const StatementList = () => {
   }, [refreshStatementList]);
   
   useEffect(() => {
-    if (!showSelectionBanner) {
-      setNotIsAllDataSelected(false)
-      setIsAllDataSelected(false)
-    }
-  }, [showSelectionBanner])
-  
-  useEffect(() => {
     setShowSelectionBanner((selectedRows.length > 0 && selectedRows.length === queryOptions.limit) || (statementList !== undefined && selectedRows.length > statementList.length ));
   }, [selectedRows, queryOptions.limit, selectedRows.length, statementList])
   
   useEffect(() => {
-    setSelectedRows([])
-    setNotIsAllDataSelected(false)
-    setIsAllDataSelected(false)
+    handleUndoSelectAll()
   }, [queryOptions.stateFilter, queryOptions.tagFilter])
   
   return (
@@ -85,7 +73,7 @@ const StatementList = () => {
           entityType={ENTITY_TYPES.STATEMENT}
           setIsAllDataSelected={setIsAllDataSelected}
           isAllDataSelected={isAllDataSelected}
-          setNotIsAllDataSelected={setNotIsAllDataSelected}
+          handleUndoSelectAll={handleUndoSelectAll}
         />
       </Box>
       <EntityDataGrid
@@ -98,8 +86,9 @@ const StatementList = () => {
         setSelectedRows={setSelectedRows}
         selectedRows={selectedRows}
         isAllDataSelected={isAllDataSelected}
-        notIsAllDataSelected={notIsAllDataSelected}
-        showSelectionBanner={showSelectionBanner}
+        setShowSelectionBanner={setShowSelectionBanner}
+        setManuallyDeselectedRows={setManuallyDeselectedRows}
+        manuallyDeselectedRows={manuallyDeselectedRows}
       />
     </Box>
   );

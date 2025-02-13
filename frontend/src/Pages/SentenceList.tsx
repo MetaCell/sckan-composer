@@ -19,9 +19,8 @@ const SentenceList = () => {
   const [open, setOpen] = useState(false);
   const [showSelectionBanner, setShowSelectionBanner] = useState(false)
   const [isAllDataSelected, setIsAllDataSelected] = useState<boolean>(false);
-  const [notIsAllDataSelected, setNotIsAllDataSelected] = useState<boolean>(false);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
-  
+  const [manuallyDeselectedRows, setManuallyDeselectedRows] = useState<number[]>([]);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -32,6 +31,13 @@ const SentenceList = () => {
   const queryOptions = useAppSelector((state) => state.sentence.queryOptions);
 
   const gutters = useGutters();
+  
+  const handleUndoSelectAll = () => {
+    setSelectedRows([])
+    setManuallyDeselectedRows([])
+    setIsAllDataSelected(false)
+    setShowSelectionBanner(false)
+  }
 
   const refreshSentenceList = useCallback(() => {
     setLoading(true);
@@ -47,20 +53,11 @@ const SentenceList = () => {
   }, [refreshSentenceList]);
   
   useEffect(() => {
-    if (!showSelectionBanner) {
-      setNotIsAllDataSelected(false)
-      setIsAllDataSelected(false)
-    }
-  }, [showSelectionBanner])
-  
-  useEffect(() => {
     setShowSelectionBanner((selectedRows.length > 0 && selectedRows.length === queryOptions.limit) || (sentenceList !== undefined && selectedRows.length > sentenceList.length ));
   }, [selectedRows, queryOptions.limit, selectedRows.length, sentenceList])
   
   useEffect(() => {
-    setSelectedRows([])
-    setNotIsAllDataSelected(false)
-    setIsAllDataSelected(false)
+    handleUndoSelectAll()
   }, [queryOptions.stateFilter, queryOptions.tagFilter])
   
   return (
@@ -92,7 +89,7 @@ const SentenceList = () => {
           entityType={ENTITY_TYPES.SENTENCE}
           setIsAllDataSelected={setIsAllDataSelected}
           isAllDataSelected={isAllDataSelected}
-          setNotIsAllDataSelected={setNotIsAllDataSelected}
+          handleUndoSelectAll={handleUndoSelectAll}
         />
       </Box>
       <EntityDataGrid
@@ -105,8 +102,9 @@ const SentenceList = () => {
         setSelectedRows={setSelectedRows}
         selectedRows={selectedRows}
         isAllDataSelected={isAllDataSelected}
-        notIsAllDataSelected={notIsAllDataSelected}
-        showSelectionBanner={showSelectionBanner}
+        setShowSelectionBanner={setShowSelectionBanner}
+        setManuallyDeselectedRows={setManuallyDeselectedRows}
+        manuallyDeselectedRows={manuallyDeselectedRows}
       />
     </Box>
   );

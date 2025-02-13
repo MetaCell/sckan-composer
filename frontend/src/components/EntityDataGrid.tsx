@@ -1,10 +1,10 @@
-import React, {useEffect, useMemo} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import Box from "@mui/material/Box";
 import {
   DataGrid,
   GridRowsProp,
   GridColDef,
-  GridEventListener,
+  GridEventListener, useGridApiRef, useGridApiEventHandler,
 } from "@mui/x-data-grid";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { BaseConnectivityStatement, Sentence, Tag } from "../apiclient/backend";
@@ -47,8 +47,9 @@ interface DataGridProps {
   setSelectedRows: (selectedRows: number[]) => void;
   selectedRows: number[];
   isAllDataSelected: boolean;
-  notIsAllDataSelected: boolean;
-  showSelectionBanner: boolean;
+  setShowSelectionBanner: (showSelectionBanner: boolean) => void;
+  manuallyDeselectedRows: number[];
+  setManuallyDeselectedRows: (selectedRows: number[]) => void;
 }
 
 type criteria =
@@ -68,14 +69,13 @@ export const StyledCheckBox = (props: any) => {
   );
 };
 const EntityDataGrid = (props: DataGridProps) => {
-  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false, setSelectedRows, selectedRows, isAllDataSelected, notIsAllDataSelected, showSelectionBanner } = props;
+  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false, setSelectedRows, selectedRows, isAllDataSelected, setShowSelectionBanner, manuallyDeselectedRows, setManuallyDeselectedRows } = props;
 
   const currentPage = (queryOptions.index || 0) / queryOptions.limit;
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const currentPageIds = useMemo(() => entityList?.map((item) => item.id) || [], [entityList])
-
+  
   const generateRowProps = (item: any) => {
     const { id, state, modified_date, owner, tags, has_notes } = item;
     const ownerName = !owner ? "" : `${owner.first_name} ${owner.last_name}`;
@@ -189,18 +189,38 @@ const EntityDataGrid = (props: DataGridProps) => {
       : dispatch(setStatementSorting(ordering));
   };
   
+  const allRowIds = useMemo(() => rows.map((row) => row.id), [rows]);
+  
   useEffect(() => {
     if (isAllDataSelected) {
-      // @ts-ignore
-      setSelectedRows((prevSelected: number[]) => {
-        const newSelected = new Set([...prevSelected, ...currentPageIds]);
-        return Array.from(newSelected);
-      });
-    } else if (notIsAllDataSelected) {
-      setSelectedRows([]);
+      const newSelectedRows = allRowIds.filter(id => !manuallyDeselectedRows.includes(id));
+      if (JSON.stringify(newSelectedRows) !== JSON.stringify(selectedRows)) {
+        setSelectedRows(newSelectedRows);
+      }
     }
-  }, [isAllDataSelected, notIsAllDataSelected, currentPageIds, setSelectedRows, showSelectionBanner]);
+  }, [isAllDataSelected, manuallyDeselectedRows, allRowIds, selectedRows]);
 
+  const handleRowSelectionChange = (selectedRowIds: number[]) => {
+    if (isAllDataSelected) {
+      const newlyDeselectedRows = [...manuallyDeselectedRows];
+      
+      allRowIds.forEach((id) => {
+        if (!selectedRowIds.includes(id) && !newlyDeselectedRows.includes(id)) {
+          newlyDeselectedRows.push(id);
+        } else if (selectedRowIds.includes(id)) {
+          const index = newlyDeselectedRows.indexOf(id);
+          if (index !== -1) {
+            newlyDeselectedRows.splice(index, 1);
+          }
+        }
+      });
+      
+      setManuallyDeselectedRows(newlyDeselectedRows);
+    } else {
+      setSelectedRows(selectedRowIds);
+    }
+  };
+  console.log(selectedRows)
   return (
     <Box
       flexGrow={1}
@@ -242,9 +262,7 @@ const EntityDataGrid = (props: DataGridProps) => {
         }
         rowSelectionModel={selectedRows}
         keepNonExistentRowsSelected={true}
-        onRowSelectionModelChange={(selectedRowIds) => {
-          setSelectedRows(selectedRowIds as number[]);
-        }}
+        onRowSelectionModelChange={(selectedRowIds) => handleRowSelectionChange(selectedRowIds as number[])}
         sx={{
           borderRadius: 0,
           borderColor: vars.gray200,
