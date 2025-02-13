@@ -11,6 +11,7 @@ from composer.services.layers_service import update_from_entities_on_deletion
 from composer.services.state_services import (
     ConnectivityStatementStateService,
     SentenceStateService,
+    is_system_user
 )
 from .enums import (
     CircuitType,
@@ -701,6 +702,18 @@ class ConnectivityStatement(models.Model):
         permission=ConnectivityStatementStateService.has_permission_to_transition_to_invalid,
     )
     def invalid(self, *args, **kwargs):
+        ...
+
+
+    @transition(
+        field=state,
+        source=[
+            CSState.EXPORTED,
+        ],
+        target=CSState.DEPRECATED,
+        permission=is_system_user,
+    )
+    def deprecated(self, *args, **kwargs):
         ...
 
     @property
