@@ -65,7 +65,7 @@ def for_composer(n, statement_alert_uris: Set[str] = None):
 
     fc = dict(
         id=str(n.id_),
-        label=str(n.origLabel),
+        label=lrdf(n, rdfs.label)[0],
         origins=origins,
         destinations=destinations,
         vias=vias,
