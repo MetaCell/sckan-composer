@@ -56,9 +56,9 @@ def get_phenotype(statement: Dict) -> Optional[Phenotype]:
 
 
 
-def get_or_create_neurondm_populationset(statement_id: str) -> PopulationSet:
+def get_or_create_neurondm_populationset(population_name: str) -> PopulationSet:
     populationset = PopulationSet.objects.get_or_create(
-        name=statement_id, description=statement_id
+        name=population_name, description=population_name
     )[0]
     return populationset
 
