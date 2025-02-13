@@ -1,3 +1,4 @@
+import re
 from typing import Dict, Tuple, List
 
 from django.contrib.auth.models import User
@@ -52,6 +53,23 @@ from composer.services.cs_ingestion.models import (
 )
 
 
+def get_populationset_from_neurondm_id(statement_id: str) -> str:
+    """
+    NOTE: keep the order of re.search calls as is, to address the case for 
+    /readable/sparc-nlp/ - in the first place
+    """
+    match = re.search(r'/sparc-nlp/([^/]+)', statement_id)
+    if match:
+        return match.group(1)
+    
+    match = re.search(r'/readable/[^-]+-[^-]+-([^-/]+)', statement_id)
+    if match:
+        return match.group(1)
+    
+    
+    raise ValueError(f"Unable to extract population set from statement ID: {statement_id}")
+
+
 def create_or_update_connectivity_statement(
     statement: Dict,
     sentence: Sentence,
@@ -59,6 +77,7 @@ def create_or_update_connectivity_statement(
     logger_service: LoggerService,
 ) -> Tuple[ConnectivityStatement, bool]:
     reference_uri = statement[ID]
+    population = get_populationset_from_neurondm_id(reference_uri)
     defaults = {
         "sentence": sentence,
         "knowledge_statement": statement[LABEL],
@@ -66,7 +85,7 @@ def create_or_update_connectivity_statement(
         "circuit_type": get_circuit_type(statement),
         "functional_circuit_role": get_functional_circuit_role(statement),
         "phenotype": get_phenotype(statement),
-        "population": get_or_create_neurondm_populationset(statement),
+        "population": get_or_create_neurondm_populationset(population),
         "projection_phenotype": get_projection_phenotype(statement),
         "reference_uri": statement[ID],
         "state": CSState.EXPORTED,
