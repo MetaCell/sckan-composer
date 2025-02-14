@@ -266,5 +266,12 @@ def is_system_user(user: User) -> bool:
 
 
 def get_user_profile(user):
+    
     from composer.models import Profile
-    return Profile.objects.get(user=user)
+
+    if hasattr(user, '_profile_cache'): 
+        return user._profile_cache
+    
+    profile = Profile.objects.get(user=user)
+    user._profile_cache = profile
+    return profile
