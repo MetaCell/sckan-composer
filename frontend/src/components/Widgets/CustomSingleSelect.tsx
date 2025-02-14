@@ -112,7 +112,7 @@ const CustomSingleSelect = ({
                     onChange(event.target.value);
                   }
                 } catch (e) {
-                  console.log(e)
+                  console.error(e)
                 }
               } else {
                 onChange(event.target.value);

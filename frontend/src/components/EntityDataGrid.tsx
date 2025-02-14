@@ -220,7 +220,6 @@ const EntityDataGrid = (props: DataGridProps) => {
       setSelectedRows(selectedRowIds);
     }
   };
-  console.log(selectedRows)
   return (
     <Box
       flexGrow={1}

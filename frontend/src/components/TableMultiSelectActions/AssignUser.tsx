@@ -68,7 +68,6 @@ const AssignUser: React.FC<AssignUserProps> = ({ selectedTableRows, entityType, 
       if (!assignUserFunction) throw new Error(`No function found for ${entityType}`);
 
       await assignUserFunction(queryOptions, selectedUser.id);
-      console.log("Assigned user:", selectedUser, "to sentences:", selectedTableRows, "Entity:", entityType);
     } catch (error) {
       console.error("Error assigning user:", error);
     } finally {

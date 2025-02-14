@@ -119,7 +119,7 @@ class ConnectivityStatementService extends AbstractService {
     try {
       return await composerApi.composerConnectivityStatementCloneStatementRetrieve(id).then((response: any) => response.data);
     } catch (e) {
-      console.log(e)
+      console.error(e)
     }
   }
 
