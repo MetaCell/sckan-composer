@@ -68,10 +68,6 @@ def post_transition_cs(sender, instance, name, source, target, **kwargs):
             # add important tag to CS when transition to COMPOSE_NOW from NPO Approved or Exported
             instance = ConnectivityStatementStateService.add_important_tag(instance)
 
-        if target == CSState.EXPORTED and not instance.has_statement_been_exported:
-            instance.has_statement_been_exported = True
-            instance.save()
-
 
 @receiver(post_save, sender=Layer)
 def create_layer_anatomical_entity(sender, instance=None, created=False, **kwargs):
