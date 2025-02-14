@@ -168,6 +168,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               onClick={handleFetchOptions}
               onConfirm={refreshList}
               isFetchingOptions={isFetchingOptions}
+              selectedRowsCount={selectedRowsCount}
             />
             <AssignPopulationSet selectedTableRows={selectedRows} entityType={entityType} />
             <Divider flexItem />

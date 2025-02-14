@@ -11,6 +11,7 @@ import connectivityStatementService from "../../services/StatementService";
 
 interface ChangeStatusProps {
   selectedTableRows: any;
+  selectedRowsCount: number;
   entityType: ENTITY_TYPES;
   possibleTransitions: string[];
   queryOptions: SentenceQueryParams | StatementQueryParams;
@@ -19,7 +20,7 @@ interface ChangeStatusProps {
   isFetchingOptions: boolean;
 }
 
-const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityType, possibleTransitions, queryOptions, onClick, onConfirm, isFetchingOptions }) => {
+const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityType, possibleTransitions, queryOptions, onClick, onConfirm, isFetchingOptions, selectedRowsCount }) => {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
@@ -102,7 +103,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
         open={isModalOpen}
         onConfirm={() => handleStatusConfirm(newStatus!)}
         onCancel={handleModalCancel}
-        title={`Change status of ${selectedTableRows.length} ${entityType}.`}
+        title={`Change status of ${selectedRowsCount} ${entityType}.`}
         confirmationText={`By proceeding, the selected ${entityType} <strong>status</strong> will change from ${fromState} to ${toState}. Are you sure?`}
         Icon={<ChangeStatusDialogIcon />}
         dontShowAgain={dontShowAgain}
