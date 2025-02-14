@@ -52,7 +52,6 @@ def get_populationset_from_neurondm(id_: str, owl_class: str) -> str:
     /readable/sparc-nlp/ - in the first place
     """
     if str(owl_class) == SPARC_NLP_OWL_CLASS_PREFIX:
-        print(id_, id_.split("/")[-2])
         return id_.split("/")[-2]
     
     match = re.search(r'/readable/[^-]+-[^-]+-([^-/]+)', id_)
