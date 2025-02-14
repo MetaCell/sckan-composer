@@ -26,7 +26,7 @@ from ..models import (
 )
 from ..services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
-from ..services.statement_service import get_statement_preview
+from ..services.statement_service import get_statement_preview as get_statement_preview_aux
 from ..services.errors_service import get_connectivity_errors
 
 
@@ -658,7 +658,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     def get_statement_preview(self, instance):
         if 'journey' not in self.context:
             self.context['journey'] = instance.get_journey()
-        return get_statement_preview(instance, self.context['journey'])
+        return get_statement_preview_aux(instance, self.context['journey'])
 
     def get_errors(self, instance) -> List:
         return get_connectivity_errors(instance)
@@ -681,7 +681,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             del self.context['journey']
 
         return representation
-
+    
     def update(self, instance, validated_data):
         # Remove 'via_set' and 'destinations' from validated_data if they exist
         validated_data.pop('via_set', None)

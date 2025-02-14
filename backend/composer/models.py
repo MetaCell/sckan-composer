@@ -721,10 +721,10 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
             return set(self.via_set.get(order=via_order - 1).anatomical_entities.all())
 
     def get_journey(self):
-        return build_journey_description(self.journey_path)
+        return build_journey_description(self.journey_path) if self.journey_path else []
 
     def get_entities_journey(self):
-        return build_journey_entities(self.journey_path)
+        return build_journey_entities(self.journey_path) if self.journey_path else []
 
     def get_laterality_description(self):
         laterality_map = {
