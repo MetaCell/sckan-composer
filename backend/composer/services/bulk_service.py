@@ -55,21 +55,19 @@ def assign_tags(instances, tag_ids):
 def write_note(instances, user, note_text):
     """
     Adds a note to each selected instance using bulk_create for efficiency.
-    Determines the proper foreign key for Note using the instance’s get_note_field() method.
     Returns the number of notes created.
     """
-    notes_to_create = []
-    for obj in instances:
-        note_field = _get_note_field_for_instance(obj)
-        note_kwargs = {
-            "user": user,
-            "note": note_text,
-            note_field: obj,
-        }
-        notes_to_create.append(Note(**note_kwargs))
+    # Determine the model class from the queryset (assuming a homogeneous queryset)
+    model_class = instances.model if hasattr(instances, "model") else type(next(iter(instances)))
+    note_field = _get_note_field_for_model(model_class)
+
+    # Use iterator() to avoid loading all instances into memory.
+    notes_to_create = [
+        Note(user=user, note=note_text, **{note_field: instance})
+        for instance in instances.iterator()
+    ]
     Note.objects.bulk_create(notes_to_create)
     return len(notes_to_create)
-
 
 def change_status(instances, new_status, user=None):
     """
@@ -96,12 +94,11 @@ def assign_population_set(instances, population_set_id):
     raise NotImplementedError("assign_population_set is not implemented yet.")
 
 
-def _get_note_field_for_instance(instance):
+def _get_note_field_for_model(model_class):
     for field in Note._meta.fields:
-        # Check if the field is a ForeignKey and the related model matches the instance’s class.
-        if isinstance(field, ForeignKey) and field.related_model == instance.__class__:
+        if isinstance(field, ForeignKey) and field.related_model == model_class:
             return field.name
-    raise Exception(f"No matching Note field for model {instance.__class__.__name__}")
+    raise Exception(f"No matching Note field for model {model_class.__name__}")
 
 
 def get_assignable_users_data(roles=None):
