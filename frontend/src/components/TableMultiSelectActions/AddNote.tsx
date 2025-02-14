@@ -57,13 +57,13 @@ const styles = {
 };
 
 interface AddNoteProps {
-  selectedTableRows: any[];
+  selectedRowsCount: number;
   entityType: ENTITY_TYPES;
   queryOptions: SentenceQueryParams | StatementQueryParams;
   onConfirm: () => void;
 }
 
-const AddNote: React.FC<AddNoteProps> = ({ selectedTableRows, entityType, queryOptions, onConfirm }) => {
+const AddNote: React.FC<AddNoteProps> = ({ selectedRowsCount, entityType, queryOptions, onConfirm }) => {
   const [open, setOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -128,7 +128,7 @@ const AddNote: React.FC<AddNoteProps> = ({ selectedTableRows, entityType, queryO
         </DialogTitle>
         <DialogContent sx={styles.dialogContent}>
           <Typography mb="1.25rem">
-            Add a note to {selectedTableRows.length} {selectedTableRows.length === 1 ? "sentence" : "sentences"}
+            Add a note to {selectedRowsCount} {selectedRowsCount === 1 ? "sentence" : "sentences"}
           </Typography>
           <TextField
             fullWidth
