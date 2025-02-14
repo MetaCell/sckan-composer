@@ -38,7 +38,7 @@ from composer.services.cs_ingestion.helpers.getters import (
     get_functional_circuit_role,
     get_phenotype,
     get_projection_phenotype,
-    get_or_create_neurondm_populationset,
+    get_or_create_populationset,
 )
 from composer.services.cs_ingestion.helpers.notes_helper import (
     do_transition_to_invalid_with_note,
@@ -53,21 +53,6 @@ from composer.services.cs_ingestion.models import (
 )
 
 
-def get_populationset_from_neurondm_id(statement_id: str) -> str:
-    """
-    NOTE: keep the order of re.search calls as is, to address the case for 
-    /readable/sparc-nlp/ - in the first place
-    """
-    match = re.search(r'/sparc-nlp/([^/]+)', statement_id)
-    if match:
-        return match.group(1)
-    
-    match = re.search(r'/readable/[^-]+-[^-]+-([^-/]+)', statement_id)
-    if match:
-        return match.group(1)
-    
-    
-    raise ValueError(f"Unable to extract population set from statement ID: {statement_id}")
 
 
 def create_or_update_connectivity_statement(
@@ -77,7 +62,7 @@ def create_or_update_connectivity_statement(
     logger_service: LoggerService,
 ) -> Tuple[ConnectivityStatement, bool]:
     reference_uri = statement[ID]
-    population = get_populationset_from_neurondm_id(reference_uri)
+    populationset_name = statement.get("populationset", "")
     defaults = {
         "sentence": sentence,
         "knowledge_statement": statement[LABEL],
@@ -85,7 +70,7 @@ def create_or_update_connectivity_statement(
         "circuit_type": get_circuit_type(statement),
         "functional_circuit_role": get_functional_circuit_role(statement),
         "phenotype": get_phenotype(statement),
-        "population": get_or_create_neurondm_populationset(population),
+        "population": get_or_create_populationset(populationset_name),
         "projection_phenotype": get_projection_phenotype(statement),
         "reference_uri": statement[ID],
         "state": CSState.EXPORTED,
