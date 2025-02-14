@@ -683,7 +683,9 @@ class ConnectivityStatement(models.Model):
         permission=ConnectivityStatementStateService.has_permission_to_transition_to_exported,
     )
     def exported(self, *args, **kwargs):
-        ...
+        self.has_statement_been_exported = True
+        self.save(update_fields=["has_statement_been_exported"])
+
 
     @transition(
         field=state,
