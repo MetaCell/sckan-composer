@@ -1,5 +1,5 @@
 import json
-
+from silk.profiling.profiler import silk_profile
 from django.http import HttpResponse, Http404
 from drf_react_template.schema_form_encoder import SchemaProcessor, UiSchemaProcessor
 from drf_spectacular.types import OpenApiTypes
@@ -349,6 +349,8 @@ class BulkActionMixin:
         responses={200: BulkActionResponseSerializer},
         filters=True,
     )
+
+    @silk_profile(name='Bulk Action Profiling')
     @action(detail=False, methods=["post"])
     def bulk_action(self, request):
         """
@@ -536,7 +538,6 @@ class ConnectivityStatementViewSet(
 
     def get_assignable_users_data(self):
         # Only include profiles where the user is a curator or reviewer.
-
         return MinimalUserSerializer(
             [
                 p.user

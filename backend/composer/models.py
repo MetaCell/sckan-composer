@@ -163,9 +163,6 @@ class BulkActionMixin:
                     f"The model '{cls.__name__}' must define a 'tags' field."
                 ) from e
 
-    def assign_owner(self, requested_by, owner):
-        raise NotImplementedError("Subclasses must implement assign_owner().")
-
     def get_state_service(self):
         raise NotImplementedError("Subclasses must implement get_state_service().")
 
@@ -464,6 +461,7 @@ class Sentence(models.Model, BulkActionMixin):
         ...
 
     def assign_owner(self, requested_by, owner=None):
+        # This logic is repeated in the bulk service for performance reasons
         if owner is None:
             owner = requested_by
 

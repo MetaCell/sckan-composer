@@ -2,25 +2,18 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django_fsm import TransitionNotAllowed, get_available_user_FIELD_transitions
 from django.db.models import ForeignKey, Q, Count
-from composer.models import Profile, Tag, Note, User
+from composer.enums import CSState
+from composer.models import ConnectivityStatement, Profile, Tag, Note, User
 
 def assign_owner(instances, requested_by, owner_id):
-    """
-    For each instance, call instance.assign_owner(requested_by, owner).
-    Returns the number of IDs that were successfully updated.
-    """
-    success_ids = []
     owner = get_object_or_404(User, id=owner_id)
-    for obj in instances:
-        try:
-            with transaction.atomic():
-                obj.assign_owner(requested_by, owner)
-            success_ids.append(obj.id)
-        except Exception:
-            # Skip instances where assign_owner fails (e.g., due to permission or state issues)
-            continue
-    return len(success_ids)
-
+    updated_count = instances.update(owner=owner)
+    
+    ConnectivityStatement.objects.filter(
+        sentence__in=instances, state=CSState.DRAFT
+    ).update(owner=owner)
+    
+    return updated_count
 
 def assign_tags(instances, tag_ids):
     """
