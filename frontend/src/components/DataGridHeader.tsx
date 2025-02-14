@@ -57,6 +57,7 @@ interface DataGridHeaderProps {
   refreshList: () => void;
   isAllDataSelected: boolean;
   selectedRowsCount: number;
+  manuallyDeselectedRows: string[];
 }
 
 type Tag = {
@@ -71,7 +72,7 @@ type Tags = {
 };
 
 const DataGridHeader = (props: DataGridHeaderProps) => {
-  const { queryOptions, entityType, selectedRows, refreshList, isAllDataSelected, selectedRowsCount } = props;
+  const { queryOptions, entityType, selectedRows, refreshList, isAllDataSelected, selectedRowsCount, manuallyDeselectedRows } = props;
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isFetchingOptions, setIsFetchingOptions] = useState(false);
   const [assignableUsers, setAssignableUsers] = useState<any[]>([]);
@@ -95,6 +96,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
   const updatedQueryOptions: SentenceQueryParams | StatementQueryParams = {
     ...queryOptions,
     include: !isAllDataSelected ? selectedRows : undefined,
+    exclude: isAllDataSelected ? manuallyDeselectedRows : undefined,
   };
 
   const fetchOptionsMap = {

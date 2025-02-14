@@ -47,8 +47,8 @@ interface DataGridProps {
   setSelectedRows: (selectedRows: number[]) => void;
   selectedRows: number[];
   isAllDataSelected: boolean;
-  manuallyDeselectedRows: number[];
-  setManuallyDeselectedRows: (selectedRows: number[]) => void;
+  manuallyDeselectedRows: string[];
+  setManuallyDeselectedRows: (selectedRows: string[]) => void;
 }
 
 type criteria =

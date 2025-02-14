@@ -19,7 +19,7 @@ const StatementList = () => {
   const [isAllDataSelected, setIsAllDataSelected] = useState<boolean>(false);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const queryOptions = useAppSelector((state) => state.statement.queryOptions);
-  const [manuallyDeselectedRows, setManuallyDeselectedRows] = useState<number[]>([]);
+  const [manuallyDeselectedRows, setManuallyDeselectedRows] = useState<string[]>([]);
 
   const gutters = useGutters();
 
@@ -68,6 +68,7 @@ const StatementList = () => {
         refreshList={refreshStatementList}
         isAllDataSelected={isAllDataSelected}
         selectedRowsCount={selectedRowsCount}
+        manuallyDeselectedRows={manuallyDeselectedRows}
         />
       <Box sx={{ position: "relative", zIndex: 1 }}>
         <SelectionBanner

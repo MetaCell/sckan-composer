@@ -20,7 +20,7 @@ const SentenceList = () => {
   const [showSelectionBanner, setShowSelectionBanner] = useState(false)
   const [isAllDataSelected, setIsAllDataSelected] = useState<boolean>(false);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
-  const [manuallyDeselectedRows, setManuallyDeselectedRows] = useState<number[]>([]);
+  const [manuallyDeselectedRows, setManuallyDeselectedRows] = useState<string[]>([]);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -84,6 +84,7 @@ const SentenceList = () => {
         refreshList={refreshSentenceList}
         isAllDataSelected={isAllDataSelected}
         selectedRowsCount={selectedRowsCount}
+        manuallyDeselectedRows={manuallyDeselectedRows}
       />
       <Box sx={{ position: "relative", zIndex: 1 }}>
         <SelectionBanner
