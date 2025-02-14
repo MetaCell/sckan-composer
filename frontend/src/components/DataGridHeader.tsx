@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import Drawer from "@mui/material/Drawer";
@@ -15,7 +15,6 @@ import { Divider, Typography } from "@mui/material";
 import AssignUser from "./TableMultiSelectActions/AssignUser";
 import { vars } from "../theme/variables";
 import ManageTags from "./TableMultiSelectActions/ManageTags";
-import { ConnectivityStatement, Sentence } from "../apiclient/backend";
 import ChangeStatus from "./TableMultiSelectActions/ChangeStatus";
 import AddNote from "./TableMultiSelectActions/AddNote";
 import AssignPopulationSet from "./TableMultiSelectActions/AssignPopulationSet";
@@ -54,17 +53,33 @@ const multiSelectActionsStyle = {
 interface DataGridHeaderProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
   entityType: ENTITY_TYPES.STATEMENT | ENTITY_TYPES.SENTENCE;
-  selectedRows: Sentence[] | ConnectivityStatement[];
+  selectedRows: number[];
   refreshList: () => void;
+  isAllDataSelected: boolean;
+  selectedRowsCount: number;
+  manuallyDeselectedRows: string[];
 }
 
+type Tag = {
+  id: number;
+  tag: string;
+};
+
+type Tags = {
+  used_by_all: Tag[];
+  used_by_some: Tag[];
+  unused: Tag[];
+};
+
 const DataGridHeader = (props: DataGridHeaderProps) => {
-  const { queryOptions, entityType, selectedRows, refreshList } = props;
+  const { queryOptions, entityType, selectedRows, refreshList, isAllDataSelected, selectedRowsCount, manuallyDeselectedRows } = props;
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [isFetchingOptions, setIsFetchingOptions] = useState(false);
   const [assignableUsers, setAssignableUsers] = useState<any[]>([]);
   const [possibleTransitions, setPossibleTransitions] = useState<string[]>([]);
+  const [tagsStatus, setTagsStatus] = useState<Tags[]>([]);
   const [previousFetchDeps, setPreviousFetchDeps] = useState<{
-    selectedRows: Sentence[] | ConnectivityStatement[];
+    selectedRows: number[];
     queryOptions: SentenceQueryParams | StatementQueryParams;
     entityType: ENTITY_TYPES;
   } | null>(null);
@@ -78,13 +93,10 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
       : dispatch(setStatementFilters(noFilters));
   };
 
-  const selectedRowIds = selectedRows
-    .map((row) => row.id)
-    .filter((id): id is number => id !== null && id !== undefined);
-
   const updatedQueryOptions: SentenceQueryParams | StatementQueryParams = {
     ...queryOptions,
-    include: selectedRowIds.length > 0 ? selectedRowIds : undefined,
+    include: !isAllDataSelected ? selectedRows : undefined,
+    exclude: isAllDataSelected ? manuallyDeselectedRows : undefined,
   };
 
   const fetchOptionsMap = {
@@ -103,14 +115,19 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
       previousFetchDeps.entityType !== entityType;
 
     if (hasChanged) {
+      setIsFetchingOptions(true);
       try {
         const fetchFunction =
           fetchOptionsMap[entityType] || fetchOptionsMap[ENTITY_TYPES.STATEMENT];
         const options = await fetchFunction();
         setAssignableUsers(options.assignable_users);
         setPossibleTransitions(options.possible_transitions);
+        // @ts-ignore
+        setTagsStatus(options.tags);
         setPreviousFetchDeps({ selectedRows, queryOptions, entityType }); // Store last fetch state
+        setIsFetchingOptions(false);
       } catch (error) {
+        setIsFetchingOptions(false);
         console.error("Failed to fetch options:", error); // TODO: Show error to user
       }
     }
@@ -126,8 +143,8 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
         {selectedRows && selectedRows.length > 0 && (
           <Stack direction="row" alignItems="center" spacing={1} sx={multiSelectActionsStyle}>
             <Typography variant="body2">
-              {selectedRows.length} {entityType}
-              {selectedRows.length > 1 ? "s" : ""} selected
+              {selectedRowsCount} {entityType}
+              {selectedRowsCount > 1 ? "s" : ""} selected
             </Typography>
             <Divider flexItem />
             <AssignUser
@@ -137,9 +154,10 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               queryOptions={updatedQueryOptions}
               onClick={handleFetchOptions}
               onConfirm={refreshList}
+              isFetchingOptions={isFetchingOptions}
             />
-            <ManageTags selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions} onClick={handleFetchOptions} onConfirm={refreshList} />
-            <AddNote selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
+            <ManageTags isFetchingOptions={isFetchingOptions} onClick={handleFetchOptions} tagsStatus={tagsStatus} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
+            <AddNote selectedRowsCount={selectedRowsCount} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
             <ChangeStatus
               selectedTableRows={selectedRows}
               entityType={entityType}
@@ -147,6 +165,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               queryOptions={updatedQueryOptions}
               onClick={handleFetchOptions}
               onConfirm={refreshList}
+              isFetchingOptions={isFetchingOptions}
             />
             <AssignPopulationSet selectedTableRows={selectedRows} entityType={entityType} />
             <Divider flexItem />

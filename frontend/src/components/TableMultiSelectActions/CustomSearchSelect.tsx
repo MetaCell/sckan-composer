@@ -13,6 +13,7 @@ import {HelpOutlineRounded} from "@mui/icons-material";
 import Tooltip from "@mui/material/Tooltip";
 import React from "react";
 import { OptionType } from "../../types"
+import {CircularProgress} from "@mui/material";
 
 const styles = {
   paper: {
@@ -96,6 +97,7 @@ export interface CustomSearchSelectProps {
   optionsInSomeRows?: string[],
   showHelperText?: boolean,
   helperText?: string
+  isFetchingOptions?: boolean
 }
 
 const CustomSearchSelect = ({
@@ -108,7 +110,7 @@ const CustomSearchSelect = ({
      selectedOptions,
      onOptionSelect,
      placeholder = "Search",
-     noOptionsText = "No options",
+     noOptionsText = "No options available",
      cancelButtonText = "Cancel",
      confirmButtonText = "Confirm",
      onCancel,
@@ -117,12 +119,13 @@ const CustomSearchSelect = ({
      optionsInAllRows,
      optionsInSomeRows,
      showHelperText = false,
-     helperText
+     helperText,
+     isFetchingOptions = false
    }: CustomSearchSelectProps) => {
   
   const isOptionSelected = (option: OptionType) =>
     selectedOptions.some((selectedOption: string) => selectedOption === option.label);
-  
+
   return (
     <Popover
       open={open}
@@ -170,30 +173,31 @@ const CustomSearchSelect = ({
       />
       
       <List sx={styles.list}>
-        {data.length > 0 ? (
-          data.map((option: OptionType, index: number) => (
-            <ListItemVariant
-              key={index}
-              option={option}
-              index={index}
-              isSelected={isOptionSelected(option)}
-              onOptionSelect={onOptionSelect}
-              variant={variant}
-              optionsInAllRows={optionsInAllRows}
-              optionsInSomeRows={optionsInSomeRows}
-              selectedOptions={selectedOptions}
-            />
-          ))
-        ) : (
-          <ListItem>
-            <ListItemText
-              primary={noOptionsText}
-              primaryTypographyProps={{
-                sx: { color: vars.gray50 },
-              }}
-            />
-          </ListItem>
-        )}
+        {
+          isFetchingOptions ? <ListItem sx={{justifyContent: 'center'}}>
+            <CircularProgress />
+          </ListItem> : data.length > 0 ? (
+            data.map((option: OptionType, index: number) => (
+              <ListItemVariant
+                key={index}
+                option={option}
+                index={index}
+                isSelected={isOptionSelected(option)}
+                onOptionSelect={onOptionSelect}
+                variant={variant}
+                optionsInAllRows={optionsInAllRows}
+                optionsInSomeRows={optionsInSomeRows}
+                selectedOptions={selectedOptions}
+              />
+            ))
+          ) : (
+            <ListItem>
+              <ListItemText
+                primary={noOptionsText}
+              />
+            </ListItem>
+          )
+        }
       </List>
       
       <Box sx={styles.footer}>

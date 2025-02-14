@@ -20,14 +20,15 @@ const mapTagsToSelectOptions = (tags: Tag[]) => {
 };
 
 interface ManageTagsProps {
-  selectedTableRows: any[];
+  tagsStatus: any;
   entityType: ENTITY_TYPES;
   queryOptions: SentenceQueryParams | StatementQueryParams;
   onClick: () => void;
   onConfirm: () => void;
+  isFetchingOptions: boolean
 }
 
-const ManageTags: React.FC<ManageTagsProps> = ({ selectedTableRows, entityType, queryOptions, onConfirm, onClick }) => {
+const ManageTags: React.FC<ManageTagsProps> = ({ tagsStatus, entityType, queryOptions, onConfirm, onClick, isFetchingOptions }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTags, setSelectedTags] = useState<OptionType[]>([]);
@@ -55,29 +56,6 @@ const ManageTags: React.FC<ManageTagsProps> = ({ selectedTableRows, entityType, 
 
     fetchTags();
   }, []);
-
-  useEffect(() => {
-    const allTags: string[][] = selectedTableRows.map((row: any) => row.tags as string[]);
-    const uniqueTags: string[] = [...new Set(allTags.flat())];
-
-    const tagsInAllRows: string[] = uniqueTags.filter((tag: string) =>
-      selectedTableRows.every((row: any) => row.tags.includes(tag))
-    );
-
-    const tagsInSomeRows: string[] = uniqueTags.filter(
-      (tag: string) =>
-        selectedTableRows.some((row: any) => row.tags.includes(tag)) && !tagsInAllRows.includes(tag)
-    );
-
-    const initialSelectedTags = mapTagsToSelectOptions(tagsList).filter((tag: OptionType) =>
-      tagsInAllRows.includes(tag.label) || tagsInSomeRows.includes(tag.label)
-    );
-
-    setSelectedTags(initialSelectedTags);
-    setTagsInSomeRows(tagsInSomeRows);
-    setTagsInAllRows(tagsInAllRows);
-  }, [selectedTableRows, tagsList]);
-
   const handleClose = () => {
     setAnchorEl(null);
     setSearchTerm("");
@@ -122,6 +100,20 @@ const ManageTags: React.FC<ManageTagsProps> = ({ selectedTableRows, entityType, 
     setAnchorEl(event.currentTarget);
     onClick()
   };
+  
+  useEffect(() => {
+    if (tagsStatus) {
+      const initialTagsInAllRows = tagsStatus?.used_by_all?.map((row: any) => row.tag)
+      const initialTagsInSomeRows = tagsStatus?.used_by_some?.map((row: any) => row.tag)
+      const initialSelectedTags = mapTagsToSelectOptions(tagsList)?.filter((tag: OptionType) =>
+        initialTagsInAllRows?.includes(tag?.label) || initialTagsInSomeRows?.includes(tag?.label)
+      );
+      
+      setTagsInAllRows(initialTagsInAllRows);
+      setTagsInSomeRows(initialTagsInSomeRows);
+      setSelectedTags(initialSelectedTags)
+    }
+  }, [tagsStatus, tagsList])
 
   return (
     <>
@@ -147,6 +139,7 @@ const ManageTags: React.FC<ManageTagsProps> = ({ selectedTableRows, entityType, 
         variant="checkbox"
         optionsInAllRows={tagsInAllRows}
         optionsInSomeRows={tagsInSomeRows}
+        isFetchingOptions={isFetchingOptions}
       />
     </>
   );

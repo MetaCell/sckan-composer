@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import { useAppSelector } from "../redux/hooks";
 import Box from "@mui/material/Box";
 import AddIcon from "@mui/icons-material/Add";
@@ -18,9 +18,9 @@ const SentenceList = () => {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [showSelectionBanner, setShowSelectionBanner] = useState(false)
-
-  const [selectedRows, setSelectedRows] = useState<Sentence[]>([]);
-
+  const [isAllDataSelected, setIsAllDataSelected] = useState<boolean>(false);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
+  const [manuallyDeselectedRows, setManuallyDeselectedRows] = useState<string[]>([]);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -31,6 +31,13 @@ const SentenceList = () => {
   const queryOptions = useAppSelector((state) => state.sentence.queryOptions);
 
   const gutters = useGutters();
+  
+  const handleUndoSelectAll = () => {
+    setSelectedRows([])
+    setManuallyDeselectedRows([])
+    setIsAllDataSelected(false)
+    setShowSelectionBanner(false)
+  }
 
   const refreshSentenceList = useCallback(() => {
     setLoading(true);
@@ -42,18 +49,19 @@ const SentenceList = () => {
   }, [queryOptions]);
 
   useEffect(() => {
-    // Initial fetch
     refreshSentenceList();
   }, [refreshSentenceList]);
-
+  
   useEffect(() => {
-    setShowSelectionBanner(selectedRows.length === queryOptions.limit)
-  }, [selectedRows, queryOptions.limit])
-
+    setShowSelectionBanner((selectedRows.length > 0 && selectedRows.length === queryOptions.limit) || (sentenceList !== undefined && selectedRows.length > sentenceList.length ));
+  }, [selectedRows, queryOptions.limit, selectedRows.length, sentenceList])
+  
   useEffect(() => {
-    setSelectedRows([])
+    handleUndoSelectAll()
   }, [queryOptions.stateFilter, queryOptions.tagFilter])
-
+  
+  const selectedRowsCount = isAllDataSelected ? totalResults - manuallyDeselectedRows.length : selectedRows.length;
+  
   return (
     <Box sx={gutters} p={6} justifyContent="center">
       <Header
@@ -74,12 +82,18 @@ const SentenceList = () => {
         queryOptions={queryOptions} 
         selectedRows={selectedRows}
         refreshList={refreshSentenceList}
+        isAllDataSelected={isAllDataSelected}
+        selectedRowsCount={selectedRowsCount}
+        manuallyDeselectedRows={manuallyDeselectedRows}
       />
       <Box sx={{ position: "relative", zIndex: 1 }}>
         <SelectionBanner
           totalResults={totalResults}
           show={showSelectionBanner}
           entityType={ENTITY_TYPES.SENTENCE}
+          setIsAllDataSelected={setIsAllDataSelected}
+          isAllDataSelected={isAllDataSelected}
+          handleUndoSelectAll={handleUndoSelectAll}
         />
       </Box>
       <EntityDataGrid
@@ -91,6 +105,9 @@ const SentenceList = () => {
         queryOptions={queryOptions}
         setSelectedRows={setSelectedRows}
         selectedRows={selectedRows}
+        isAllDataSelected={isAllDataSelected}
+        setManuallyDeselectedRows={setManuallyDeselectedRows}
+        manuallyDeselectedRows={manuallyDeselectedRows}
       />
     </Box>
   );

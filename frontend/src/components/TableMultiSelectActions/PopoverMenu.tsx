@@ -5,7 +5,7 @@ import Popover from "@mui/material/Popover";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
-import { ListItemIcon } from "@mui/material";
+import {CircularProgress, ListItemIcon} from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import { vars } from "../../theme/variables";
 
@@ -39,10 +39,12 @@ interface PopoverMenuProps {
   selectedOption?: string | null;
   onSelect: (option: string) => void;
   onOpen: () => void;
-  actionButtonDisabled?: boolean
+  actionButtonDisabled?: boolean;
+  noOptionsText?: string;
+  isFetchingOptions?: boolean;
 }
 
-const PopoverMenu: React.FC<PopoverMenuProps> = ({ icon: IconComponent, tooltip, options, selectedOption, onSelect, onOpen, actionButtonDisabled = false }) => {
+const PopoverMenu: React.FC<PopoverMenuProps> = ({ icon: IconComponent, tooltip, options, selectedOption, onSelect, onOpen, actionButtonDisabled = false, noOptionsText, isFetchingOptions }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -73,16 +75,23 @@ const PopoverMenu: React.FC<PopoverMenuProps> = ({ icon: IconComponent, tooltip,
         slotProps={{ paper: { sx: styles.popoverPaper } }}
       >
         <List sx={styles.list}>
-          {options.map((option, index) => (
-            <ListItem key={index} onClick={() => onSelect(option)} sx={styles.listItem}>
-              <ListItemText primary={option} />
-              {selectedOption === option && (
-                <ListItemIcon sx={{ minWidth: "auto" }}>
-                  <CheckIcon sx={{ color: vars.colorPrimary }} fontSize="small" />
-                </ListItemIcon>
-              )}
-            </ListItem>
-          ))}
+          {isFetchingOptions ? <ListItem sx={{justifyContent: 'center'}}>
+            <CircularProgress />
+          </ListItem> : options.length === 0 ? <ListItem sx={styles.listItem}>
+              <ListItemText
+                primary={noOptionsText}
+              />
+            </ListItem> :
+            options.map((option, index) => (
+              <ListItem key={index} onClick={() => onSelect(option)} sx={styles.listItem}>
+                <ListItemText primary={option} />
+                {selectedOption === option && (
+                  <ListItemIcon sx={{ minWidth: "auto" }}>
+                    <CheckIcon sx={{ color: vars.colorPrimary }} fontSize="small" />
+                  </ListItemIcon>
+                )}
+              </ListItem>
+            ))}
         </List>
       </Popover>
     </>

@@ -21,6 +21,7 @@ const AssignPopulationSet = ({selectedTableRows, entityType}: any) => {
       selectedOption={selectedSet}
       onSelect={handleSelectSet}
       onOpen={() => console.log("TODO")}
+      noOptionsText={"No options available!"}
     />
   );
 };

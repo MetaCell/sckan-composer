@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useMemo} from "react";
 import Box from "@mui/material/Box";
 import {
   DataGrid,
@@ -44,8 +44,11 @@ interface DataGridProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
   loading: boolean;
   totalResults: number;
-  setSelectedRows?: (selectedRows: any[]) => void;
-  selectedRows?: any[];
+  setSelectedRows: (selectedRows: number[]) => void;
+  selectedRows: number[];
+  isAllDataSelected: boolean;
+  manuallyDeselectedRows: string[];
+  setManuallyDeselectedRows: (selectedRows: string[]) => void;
 }
 
 type criteria =
@@ -65,13 +68,13 @@ export const StyledCheckBox = (props: any) => {
   );
 };
 const EntityDataGrid = (props: DataGridProps) => {
-  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false, setSelectedRows, selectedRows } = props;
+  const { entityList, entityType, queryOptions, loading, totalResults, allowSortByOwner = false, setSelectedRows, selectedRows, isAllDataSelected, manuallyDeselectedRows, setManuallyDeselectedRows } = props;
 
   const currentPage = (queryOptions.index || 0) / queryOptions.limit;
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
+  
   const generateRowProps = (item: any) => {
     const { id, state, modified_date, owner, tags, has_notes } = item;
     const ownerName = !owner ? "" : `${owner.first_name} ${owner.last_name}`;
@@ -184,7 +187,39 @@ const EntityDataGrid = (props: DataGridProps) => {
       ? dispatch(setSentenceSorting(ordering))
       : dispatch(setStatementSorting(ordering));
   };
+  
+  const allRowIds = useMemo(() => rows.map((row) => row.id), [rows]);
+  
+  useEffect(() => {
+    if (isAllDataSelected) {
+      const newSelectedRows = allRowIds.filter(id => !manuallyDeselectedRows.includes(id));
+      if (JSON.stringify(newSelectedRows) !== JSON.stringify(selectedRows)) {
+        setSelectedRows(newSelectedRows);
+      }
+    }
+  }, [isAllDataSelected, manuallyDeselectedRows, allRowIds, selectedRows]);
 
+  const handleRowSelectionChange = (selectedRowIds: number[]) => {
+    if (isAllDataSelected) {
+      const newlyDeselectedRows = [...manuallyDeselectedRows];
+      
+      allRowIds.forEach((id) => {
+        if (!selectedRowIds.includes(id) && !newlyDeselectedRows.includes(id)) {
+          newlyDeselectedRows.push(id);
+        } else if (selectedRowIds.includes(id)) {
+          const index = newlyDeselectedRows.indexOf(id);
+          if (index !== -1) {
+            newlyDeselectedRows.splice(index, 1);
+          }
+        }
+      });
+      
+      setManuallyDeselectedRows(newlyDeselectedRows);
+    } else {
+      setSelectedRows(selectedRowIds);
+    }
+  };
+  console.log(selectedRows)
   return (
     <Box
       flexGrow={1}
@@ -224,13 +259,9 @@ const EntityDataGrid = (props: DataGridProps) => {
             ? mapSortingModel(queryOptions.ordering[0])
             : undefined
         }
-        rowSelectionModel={selectedRows?.map(row => row.id)}
-        onRowSelectionModelChange={(selectedRowIds) => {
-          const selectedRowsData = rows.filter(row => selectedRowIds.includes(row.id));
-          if (setSelectedRows) {
-            setSelectedRows(selectedRowsData);
-          }
-        }}
+        rowSelectionModel={selectedRows}
+        keepNonExistentRowsSelected={true}
+        onRowSelectionModelChange={(selectedRowIds) => handleRowSelectionChange(selectedRowIds as number[])}
         sx={{
           borderRadius: 0,
           borderColor: vars.gray200,
