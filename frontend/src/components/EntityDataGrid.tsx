@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo} from "react";
+import React, {useCallback, useEffect, useMemo} from "react";
 import Box from "@mui/material/Box";
 import {
   DataGrid,
@@ -75,7 +75,7 @@ const EntityDataGrid = (props: DataGridProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   
-  const generateRowProps = (item: any) => {
+  const generateRowProps = useCallback((item: any) => {
     const { id, state, modified_date, owner, tags, has_notes } = item;
     const ownerName = !owner ? "" : `${owner.first_name} ${owner.last_name}`;
     const commonRowProps = {
@@ -87,18 +87,19 @@ const EntityDataGrid = (props: DataGridProps) => {
       notes: has_notes,
     };
     if (entityType === "sentence") {
-      const { id, text } = item;
-      return { ...commonRowProps, id, text };
+      const { text } = item;
+      return { ...commonRowProps, text };
     }
     if (entityType === "statement") {
-      const {  id, knowledge_statement } = item;
-      return { ...commonRowProps, id: id, knowledge_statement };
+      const { knowledge_statement } = item;
+      return { ...commonRowProps, knowledge_statement };
     }
     return {};
-  };
+  }, [entityType]);
 
-  const rows: GridRowsProp =
-    entityList?.map((item) => generateRowProps(item)) || [];
+  const rows: GridRowsProp = useMemo(() => {
+    return entityList?.map(generateRowProps) || [];
+  }, [entityList, generateRowProps]);
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", renderCell: renderID },
@@ -197,7 +198,7 @@ const EntityDataGrid = (props: DataGridProps) => {
         setSelectedRows(newSelectedRows);
       }
     }
-  }, [isAllDataSelected, manuallyDeselectedRows, allRowIds, selectedRows]);
+  }, [isAllDataSelected, manuallyDeselectedRows, allRowIds, selectedRows, setSelectedRows]);
 
   const handleRowSelectionChange = (selectedRowIds: number[]) => {
     if (isAllDataSelected) {

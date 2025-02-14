@@ -4,7 +4,6 @@ import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
 import Collapse from "@mui/material/Collapse";
 import { vars } from "../../theme/variables";
-import {useEffect} from "react";
 
 const styles = {
   selectionBanner: {

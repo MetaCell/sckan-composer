@@ -12,7 +12,6 @@ import Typography from "@mui/material/Typography";
 import { vars } from "../../theme/variables";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import sentenceService from "../../services/SentenceService";
-import statementService from "../../services/StatementService";
 import { QueryParams as SentenceQueryParams } from "../../redux/sentenceSlice";
 import { QueryParams as StatementQueryParams } from "../../redux/statementSlice";
 import { ENTITY_TYPES } from "../../helpers/settings";

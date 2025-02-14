@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import Drawer from "@mui/material/Drawer";
@@ -93,18 +93,20 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
       : dispatch(setStatementFilters(noFilters));
   };
 
-  const updatedQueryOptions: SentenceQueryParams | StatementQueryParams = {
-    ...queryOptions,
-    include: !isAllDataSelected ? selectedRows : undefined,
-    exclude: isAllDataSelected ? manuallyDeselectedRows : undefined,
-  };
+  const updatedQueryOptions: SentenceQueryParams | StatementQueryParams = useMemo(() => {
+    return {
+      ...queryOptions,
+      include: !isAllDataSelected ? selectedRows : undefined,
+      exclude: isAllDataSelected ? manuallyDeselectedRows : undefined,
+    };
+  }, [queryOptions, isAllDataSelected, selectedRows, manuallyDeselectedRows]);
 
-  const fetchOptionsMap = {
+  const fetchOptionsMap = useMemo(() => ({
     [ENTITY_TYPES.SENTENCE]: () =>
       sentenceService.fetchOptions(updatedQueryOptions as SentenceQueryParams),
-    [ENTITY_TYPES.STATEMENT]: () => connectivityStatementService.fetchOptions(updatedQueryOptions as StatementQueryParams),
-
-  };
+    [ENTITY_TYPES.STATEMENT]: () =>
+      connectivityStatementService.fetchOptions(updatedQueryOptions as StatementQueryParams),
+  }), [updatedQueryOptions]);
 
   // Function to fetch options only when triggered by button click
   const handleFetchOptions = useCallback(async () => {
@@ -131,7 +133,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
         console.error("Failed to fetch options:", error); // TODO: Show error to user
       }
     }
-  }, [selectedRows, queryOptions, entityType, previousFetchDeps]); // Only re-run when dependencies change
+  }, [selectedRows, queryOptions, entityType, previousFetchDeps, fetchOptionsMap]); // Only re-run when dependencies change
 
   return (
     <Grid container display="flex" justifyContent="space-between" alignItems="center" sx={toolbarStyle}>
