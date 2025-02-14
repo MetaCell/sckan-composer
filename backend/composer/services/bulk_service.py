@@ -17,36 +17,40 @@ def assign_owner(instances, requested_by, owner_id):
 
 def assign_tags(instances, tag_ids):
     """
-    Updates the tags for each instance.
-    Ensures that only the provided tags remain.
-    Uses bulk operations for efficiency.
-    Returns the number ofprocessed instances.
+    Updates the tags for each instance in the queryset,
+    ensuring that only the provided tags remain.
+    Returns the number of processed instances.
     """
-    # Determine which tags actually exist.
-    existing_tag_ids = set(
+    # Get the list of tag IDs that actually exist.
+    existing_tag_ids = list(
         Tag.objects.filter(id__in=tag_ids).values_list("id", flat=True)
     )
-    with transaction.atomic():
-        for obj in instances:
-            current_tags = set(obj.tags.values_list("id", flat=True))
-            tags_to_add = existing_tag_ids - current_tags
-            tags_to_remove = current_tags - existing_tag_ids
+    m2m_field = instances.model._meta.get_field("tags")
+    through_model = m2m_field.remote_field.through
+    source_field_name = m2m_field.m2m_field_name() + "_id"
 
-            # Remove any tags that are not in the provided list.
-            if tags_to_remove:
-                obj.tags.remove(*tags_to_remove)
+    # 1. Bulk delete associations for instances that are not in the new set.
+    # We use values_list() on the queryset so we don’t load entire objects.
+    through_model.objects.filter(
+        **{f"{source_field_name}__in": instances.values_list("id", flat=True)}
+    ).exclude(tag_id__in=existing_tag_ids).delete()
 
-            # Dynamically determine the through model and foreign-key field name.
-            through_model = obj._meta.get_field("tags").remote_field.through
-            m2m_field = obj._meta.get_field("tags")
-            field_name = m2m_field.m2m_field_name() + "_id"
-            associations = [
-                through_model(**{field_name: obj.id, "tag_id": tag_id})
-                for tag_id in tags_to_add
-            ]
-            through_model.objects.bulk_create(associations, ignore_conflicts=True)
-    return len(instances)
-
+    # 2. Bulk insert missing associations.
+    batch_size = 1000
+    associations = []
+    qs = instances.values_list("id", flat=True).iterator(chunk_size=batch_size)
+    for instance_id in qs:
+        # For each instance, add an association for each tag in the provided list.
+        for tag_id in existing_tag_ids:
+            associations.append(through_model(**{source_field_name: instance_id, "tag_id": tag_id}))
+            if len(associations) >= batch_size:
+                through_model.objects.bulk_create(associations, ignore_conflicts=True, batch_size=batch_size)
+                associations = []
+    if associations:
+        through_model.objects.bulk_create(associations, ignore_conflicts=True, batch_size=batch_size)
+        
+    # Return the count of processed instances.
+    return instances.count()
 
 def write_note(instances, user, note_text):
     """
