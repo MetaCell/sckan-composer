@@ -55,11 +55,10 @@ def get_phenotype(statement: Dict) -> Optional[Phenotype]:
     return None
 
 
-def get_or_create_neurondm_populationset(statement: Dict):
-    # TODO: Temporarily - use neurondm as the populationset -
-    # to be merged with neurondm populationset
+
+def get_or_create_populationset(populationset_name: str) -> PopulationSet:
     populationset = PopulationSet.objects.get_or_create(
-        name="neurondm", description="neurondm"
+        name=populationset_name, description=populationset_name
     )[0]
     return populationset
 
