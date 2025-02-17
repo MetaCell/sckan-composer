@@ -53,21 +53,24 @@ export const processData = ({
   const existingPositions = extractNodePositionsFromSerializedGraph(serializedGraph);
 
   // Collect entity information and mappings
-  const entityMap = collectEntityMap(origins, vias, destinations);
+  // const entityMap = collectEntityMap(origins, vias, destinations);
+  const originsMap = collectEntityMap(origins, undefined, undefined);
+  const viasMap = collectEntityMap(undefined, vias, undefined);
+  const destinationsMap = collectEntityMap(undefined, undefined, destinations);
 
   // Identify afferent terminal IDs
-  const afferentTerminalIds = [...entityMap.entries()]
+  const afferentTerminalIds = [...destinationsMap.entries()]
     .filter(
       ([_, info]) =>
-        info.nodeType === NodeTypes.Destination && info.anatomicalType === TypeC11Enum.AfferentT
+        info.anatomicalType === TypeC11Enum.AfferentT
     )
     .map(([id, _]) => id);
 
   // Identify non-afferent destination IDs
-  const nonAfferentDestinationIds = [...entityMap.entries()]
+  const nonAfferentDestinationIds = [...destinationsMap.entries()]
     .filter(
       ([_, info]) =>
-        info.nodeType === NodeTypes.Destination && info.anatomicalType !== TypeC11Enum.AfferentT
+        info.anatomicalType !== TypeC11Enum.AfferentT
     )
     .map(([id, _]) => id);
 
@@ -76,7 +79,9 @@ export const processData = ({
   afferentTerminalIds.forEach(entityId => {
     const level = traverseFromAfferentTerminal(
       entityId,
-      entityMap,
+      originsMap,
+      viasMap,
+      destinationsMap,
       nodeMap,
       nodes,
       linkKeySet,
@@ -94,7 +99,9 @@ export const processData = ({
   nonAfferentDestinationIds.forEach((entityId) => {
     const { nodes: traversalNodes, links: traversalLinks, maxLevel } = traverseFromNonAfferentTerminal(
       entityId,
-      entityMap,
+      originsMap,
+      viasMap,
+      destinationsMap,
       nodeMap,
       linkKeySet,
       existingPositions,
@@ -120,7 +127,7 @@ export const processData = ({
 
   // Add disconnected nodes (entities in entityMap not represented in nodeMap)
   const globalMaxLevel = Math.max(maxLevelAfferent, maxLevelNonAfferent);
-  addDisconnectedNodes(entityMap, nodeMap, nodes, existingPositions, globalMaxLevel + 1);
+  addDisconnectedNodes(new Map([...originsMap, ...viasMap, ...destinationsMap]), nodeMap, nodes, existingPositions, globalMaxLevel + 1);
 
   return { nodes, links };
 };
@@ -133,7 +140,7 @@ function addDisconnectedNodes(
   startingLevel: number
 ) {
   // Find all entity IDs not in nodeMap
-  const disconnectedEntities = [...entityMap.entries()].filter(([id, _]) => !nodeMap.has(id));
+  const disconnectedEntities = [...entityMap.entries()].filter(([id, _]) => !nodeMap.has(id + '_' + _.nodeType.toString()));
 
   if (disconnectedEntities.length === 0) return;
 
@@ -247,7 +254,9 @@ function collectEntityMap(
 
 function traverseFromAfferentTerminal(
   entityId: string,
-  entityMap: Map<string, EntityInfo>,
+  originsMap: Map<string, EntityInfo>,
+  viasMap: Map<string, EntityInfo>,
+  destinationMap: Map<string, EntityInfo>,
   nodeMap: Map<string, CustomNodeModel>,
   nodes: CustomNodeModel[],
   linkKeySet: Set<string>,
@@ -270,7 +279,13 @@ function traverseFromAfferentTerminal(
       maxLevel = level;
     }
 
-    const entityInfo = entityMap.get(currentId);
+    let entityInfo = destinationMap.get(currentId);
+    if (!entityInfo) {
+      entityInfo = viasMap.get(currentId);
+    }
+    if (!entityInfo) {
+      entityInfo = originsMap.get(currentId);
+    }
     if (!entityInfo) {
       console.warn(`Entity with ID ${currentId} not found in entityMap.`);
       continue;
@@ -301,7 +316,10 @@ function traverseFromAfferentTerminal(
         stack.push({ id: fromId, level: level + 1 });
       }
 
-      const fromEntityInfo = entityMap.get(fromId);
+      let fromEntityInfo = viasMap.get(fromId);
+      if (!fromEntityInfo) {
+        fromEntityInfo = originsMap.get(fromId);
+      }
       if (!fromEntityInfo) {
         console.warn(`Entity with ID ${fromId} not found in entityMap.`);
         return;
@@ -342,7 +360,9 @@ function traverseFromAfferentTerminal(
 
 function traverseFromNonAfferentTerminal(
   entityId: string,
-  entityMap: Map<string, EntityInfo>,
+  originsMap: Map<string, EntityInfo>,
+  viasMap: Map<string, EntityInfo>,
+  destinationMap: Map<string, EntityInfo>,
   nodeMap: Map<string, CustomNodeModel>,
   linkKeySet: Set<string>,
   existingPositions: Map<string, Map<string, { x: number; y: number }>>,
@@ -366,7 +386,13 @@ function traverseFromNonAfferentTerminal(
       maxLevel = level;
     }
 
-    const entityInfo = entityMap.get(currentId);
+    let entityInfo = destinationMap.get(currentId);
+    if (!entityInfo) {
+      entityInfo = viasMap.get(currentId);
+    }
+    if (!entityInfo) {
+      entityInfo = originsMap.get(currentId);
+    }
     if (!entityInfo) {
       console.warn(`Entity with ID ${currentId} not found in entityMap.`);
       continue;
@@ -398,7 +424,10 @@ function traverseFromNonAfferentTerminal(
         stack.push({ id: fromId, level: level + 1 });
       }
 
-      const fromEntityInfo = entityMap.get(fromId);
+      let fromEntityInfo = viasMap.get(fromId);
+      if (!fromEntityInfo) {
+        fromEntityInfo = originsMap.get(fromId);
+      }
       if (!fromEntityInfo) {
         console.warn(`Entity with ID ${fromId} not found in entityMap.`);
         return;
@@ -549,7 +578,7 @@ function findNonOverlappingPosition(
 function createNode(entityInfo: EntityInfo): CustomNodeModel {
   const { entity, nodeType, anatomicalType } = entityInfo;
   const { name } = getEntityNameAndUri(entity);
-  const externalId = entity.id.toString();
+  const externalId = entity.id.toString() + '_' + nodeType.toString();
 
   const options: CustomNodeOptions = {
     forward_connection: [],
@@ -601,7 +630,7 @@ function getOrCreateNode(
   levelXPositions: Map<number, number>,
   allNodes: CustomNodeModel[]
 ): { node: CustomNodeModel; created: boolean } {
-  let node = nodeMap.get(nodeId);
+  let node = nodeMap.get(nodeId + '_' + entityInfo.nodeType.toString());
   let created = false;
   if (!node) {
     node = createNode(entityInfo);
@@ -609,7 +638,7 @@ function getOrCreateNode(
     const defaultY = POSITION_CONSTANTS.yStart + level * POSITION_CONSTANTS.yIncrement;
     const defaultX = levelXPositions.get(level) || POSITION_CONSTANTS.xStart;
     setPosition(node, existingPositions, defaultX, defaultY, allNodes);
-    nodeMap.set(nodeId, node);
+    nodeMap.set(nodeId + '_' + entityInfo.nodeType.toString(), node);
     // Update x position for this level
     levelXPositions.set(level, defaultX + POSITION_CONSTANTS.xIncrement);
     created = true;
