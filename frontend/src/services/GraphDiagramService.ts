@@ -48,12 +48,13 @@ export const processData = ({
   const links: DefaultLinkModel[] = [];
   const nodeMap = new Map<string, CustomNodeModel>();
   const linkKeySet = new Set<string>();
+  const linkUUIDtoIds = new Map<string, string[]>();
 
   // Extract positions per node type
   const existingPositions = extractNodePositionsFromSerializedGraph(serializedGraph);
 
   // Collect entity information and mappings
-  const entityMap = collectEntityMap(origins, vias, destinations);
+  const entityMap = collectEntityMap(origins, vias, destinations, linkUUIDtoIds);
 
   // Identify afferent terminal IDs
   const afferentTerminalIds = [...entityMap.entries()]
@@ -76,6 +77,7 @@ export const processData = ({
   afferentTerminalIds.forEach(entityId => {
     const level = traverseFromAfferentTerminal(
       entityId,
+      linkUUIDtoIds,
       entityMap,
       nodeMap,
       nodes,
@@ -94,6 +96,7 @@ export const processData = ({
   nonAfferentDestinationIds.forEach((entityId) => {
     const { nodes: traversalNodes, links: traversalLinks, maxLevel } = traverseFromNonAfferentTerminal(
       entityId,
+      linkUUIDtoIds,
       entityMap,
       nodeMap,
       linkKeySet,
@@ -180,7 +183,8 @@ function extractNodePositionsFromSerializedGraph(serializedGraph: any): Map<stri
 function collectEntityMap(
   origins: AnatomicalEntity[] | undefined,
   vias: ViaSerializerDetails[] | undefined,
-  destinations: DestinationSerializerDetails[] | undefined
+  destinations: DestinationSerializerDetails[] | undefined,
+  linkUUIDtoIds: Map<string, string[]>
 ): Map<string, EntityInfo> {
   const entityMap = new Map<string, EntityInfo>();
 
@@ -196,48 +200,96 @@ function collectEntityMap(
     return entityMap.get(entityId)!;
   };
 
+  const mapUUIDtoId = (uuid: string, id: string) => {
+    if (!linkUUIDtoIds.has(id)) {
+      linkUUIDtoIds.set(id, [uuid]);
+    } else {
+      linkUUIDtoIds.get(id)!.push(uuid);
+    }
+  };
+
   // Process origins
   origins?.forEach(origin => {
+    const uuid = createUUID();
     const entityId = origin.id.toString();
-    getOrCreateEntityInfo(entityId, origin, NodeTypes.Origin);
+    mapUUIDtoId(uuid, entityId);
+    getOrCreateEntityInfo(uuid, origin, NodeTypes.Origin);
+  });
+
+  vias?.forEach(via => {
+    const anatomicalType = via.type;
+    via.anatomical_entities.forEach(entity => {
+      const uuid = createUUID();
+      const entityId = entity.id.toString();
+      mapUUIDtoId(uuid, entityId);
+      const entityInfo = getOrCreateEntityInfo(uuid, entity, NodeTypes.Via);
+      entityInfo.anatomicalType = anatomicalType;
+    });
+  });
+
+  destinations?.forEach(destination => {
+    const anatomicalType = destination.type;
+    destination.anatomical_entities.forEach(entity => {
+      const uuid = createUUID();
+      const entityId = entity.id.toString();
+      mapUUIDtoId(uuid, entityId);
+      const entityInfo = getOrCreateEntityInfo(uuid, entity, NodeTypes.Destination);
+      entityInfo.anatomicalType = anatomicalType;
+    });
   });
 
   // Process vias
   vias?.forEach(via => {
-    const anatomicalType = via.type;
     via.anatomical_entities.forEach(entity => {
       const entityId = entity.id.toString();
-      const entityInfo = getOrCreateEntityInfo(entityId, entity, NodeTypes.Via);
-      entityInfo.anatomicalType = anatomicalType;
+      const entitiesInfo = linkUUIDtoIds?.get(entityId)?.filter(id => {
+        const info = entityMap.get(id)
+        if (info?.nodeType === NodeTypes.Via) {
+          return true;
+        }
+        return false;
+      }).map(id => entityMap.get(id));
+      // set from entities
+      entitiesInfo?.forEach((innerEntityInfo: EntityInfo | undefined) => {
+        if (innerEntityInfo) {
+          innerEntityInfo.from_entities = via.from_entities;
+        }
+      });
 
-      // Set from_entities
-      entityInfo.from_entities = via.from_entities;
-
-      // Update to_entities of from_entities
-      via.from_entities.forEach(fromEntity => {
-        const fromEntityId = fromEntity.id.toString();
-        const fromEntityInfo = getOrCreateEntityInfo(fromEntityId, fromEntity);
-        fromEntityInfo.to_entities.push(entity);
+      // get from entities and set to_entities
+      via.from_entities.map(fromEntity => fromEntity.id.toString()).map(id => linkUUIDtoIds?.get(id)).forEach(uuids => {
+        uuids?.forEach(uuid => {
+          const entityInfo = entityMap.get(uuid);
+          entityInfo?.to_entities.push(entity);
+        });
       });
     });
   });
 
   // Process destinations
   destinations?.forEach(destination => {
-    const anatomicalType = destination.type;
     destination.anatomical_entities.forEach(entity => {
       const entityId = entity.id.toString();
-      const entityInfo = getOrCreateEntityInfo(entityId, entity, NodeTypes.Destination);
-      entityInfo.anatomicalType = anatomicalType;
+      const entitiesInfo = linkUUIDtoIds?.get(entityId)?.filter(id => {
+        const info = entityMap.get(id)
+        if (info?.nodeType === NodeTypes.Destination) {
+          return true;
+        }
+        return false;
+      }).map(id => entityMap.get(id));
+      // set from entities
+      entitiesInfo?.forEach((innerEntityInfo: EntityInfo | undefined) => {
+        if (innerEntityInfo) {
+          innerEntityInfo.from_entities = destination.from_entities;
+        }
+      });
 
-      // Set from_entities
-      entityInfo.from_entities = destination.from_entities;
-
-      // Update to_entities of from_entities
-      destination.from_entities.forEach(fromEntity => {
-        const fromEntityId = fromEntity.id.toString();
-        const fromEntityInfo = getOrCreateEntityInfo(fromEntityId, fromEntity, NodeTypes.Via);
-        fromEntityInfo.to_entities.push(entity);
+      // get from entities and set to_entities
+      destination.from_entities.map(fromEntity => fromEntity.id.toString()).map(id => linkUUIDtoIds?.get(id)).forEach(uuids => {
+        uuids?.forEach(uuid => {
+          const entityInfo = entityMap.get(uuid);
+          entityInfo?.to_entities.push(entity);
+        });
       });
     });
   });
@@ -247,6 +299,7 @@ function collectEntityMap(
 
 function traverseFromAfferentTerminal(
   entityId: string,
+  linkUUIDtoIds: Map<string, string[]>,
   entityMap: Map<string, EntityInfo>,
   nodeMap: Map<string, CustomNodeModel>,
   nodes: CustomNodeModel[],
@@ -295,44 +348,47 @@ function traverseFromAfferentTerminal(
     // Process from_entities
     entityInfo.from_entities.forEach(fromEntity => {
       const fromId = fromEntity.id.toString();
-
-      // Add to stack
-      if (!visited.has(fromId)) {
-        stack.push({ id: fromId, level: level + 1 });
-      }
-
-      const fromEntityInfo = entityMap.get(fromId);
-      if (!fromEntityInfo) {
-        console.warn(`Entity with ID ${fromId} not found in entityMap.`);
+      const fromUUIDs = linkUUIDtoIds.get(fromId);
+      if (!fromUUIDs) {
+        console.warn(`No UUIDs found for entity with ID ${fromId}`);
         return;
       }
-
-      // Get or create from node
-      const { node: fromNode, created: isFromNodeNew } = getOrCreateNode(
-        fromId,
-        fromEntityInfo,
-        nodeMap,
-        existingPositions,
-        level + 1,
-        levelXPositions,
-        nodes
-      );
-
-      // Add to nodes array if new
-      if (isFromNodeNew) {
-        nodes.push(fromNode);
-      }
-
-      // Create link from currentNode to fromNode
-      const linkKey = getLinkId(currentNode, fromNode)
-      if (!linkKeySet.has(linkKey)) {
-        const link = createLink(currentNode, fromNode, 'out', 'in');
-        if (link) {
-          links.push(link);
-          updateNodeOptions(currentNode, fromNode, fromNode.getCustomType());
-          linkKeySet.add(linkKey); // Mark this link as created
+      fromUUIDs.forEach(uuid => {
+        const fromEntityInfo = entityMap.get(uuid)
+        if (!fromEntityInfo) {
+          console.warn(`Entity with ID ${fromId} not found in entityMap.`);
+          return null;
         }
-      }
+        if (!visited.has(uuid)) {
+          stack.push({ id: uuid, level: level + 1 });
+        }
+
+        // Get or create from node
+        const { node: fromNode, created: isFromNodeNew } = getOrCreateNode(
+          uuid,
+          fromEntityInfo,
+          nodeMap,
+          existingPositions,
+          level + 1,
+          levelXPositions,
+          nodes
+        );
+
+        // Add to nodes array if new
+        if (isFromNodeNew) {
+          nodes.push(fromNode);
+        }
+
+        const linkKey = getLinkId(currentNode, fromNode)
+        if (!linkKeySet.has(linkKey)) {
+          const link = createLink(currentNode, fromNode, 'out', 'in');
+          if (link) {
+            links.push(link);
+            updateNodeOptions(currentNode, fromNode, fromNode.getCustomType());
+            linkKeySet.add(linkKey); // Mark this link as created
+          }
+        }
+      });
     });
   }
 
@@ -342,6 +398,7 @@ function traverseFromAfferentTerminal(
 
 function traverseFromNonAfferentTerminal(
   entityId: string,
+  linkUUIDtoIds: Map<string, string[]>,
   entityMap: Map<string, EntityInfo>,
   nodeMap: Map<string, CustomNodeModel>,
   linkKeySet: Set<string>,
@@ -392,44 +449,49 @@ function traverseFromNonAfferentTerminal(
     // Process from_entities
     entityInfo.from_entities.forEach(fromEntity => {
       const fromId = fromEntity.id.toString();
-
-      // Add to stack
-      if (!visited.has(fromId)) {
-        stack.push({ id: fromId, level: level + 1 });
-      }
-
-      const fromEntityInfo = entityMap.get(fromId);
-      if (!fromEntityInfo) {
-        console.warn(`Entity with ID ${fromId} not found in entityMap.`);
+      const fromUUIDs = linkUUIDtoIds.get(fromId);
+      if (!fromUUIDs) {
+        console.warn(`No UUIDs found for entity with ID ${fromId}`);
         return;
       }
-
-      const { node: fromNode, created: isFromNodeNew } = getOrCreateNode(
-        fromId,
-        fromEntityInfo,
-        nodeMap,
-        existingPositions,
-        level + 1,
-        levelXPositions,
-        newNodes.map(n => n.node)
-      );
-
-      if (isFromNodeNew) {
-        newNodes.push({ node: fromNode, level: level + 1 });
-      } else if (!newNodes.some(n => n.node === fromNode)) {
-        newNodes.push({ node: fromNode, level: level + 1 });
-      }
-
-      // Create link from fromNode to currentNode (since we're traversing backward)
-      const linkKey = getLinkId(fromNode, currentNode)
-      if (!linkKeySet.has(linkKey)) {
-        const link = createLink(fromNode, currentNode, 'out', 'in');
-        if (link) {
-          newLinks.push(link);
-          updateNodeOptions(fromNode, currentNode, currentNode.getCustomType());
-          linkKeySet.add(linkKey); // Mark this link as created
+      fromUUIDs.forEach(uuid => {
+        const fromEntityInfo = entityMap.get(uuid)
+        if (!fromEntityInfo) {
+          console.warn(`Entity with ID ${fromId} not found in entityMap.`);
+          return null;
         }
-      }
+        if (!visited.has(uuid)) {
+          stack.push({ id: uuid, level: level + 1 });
+        }
+
+        // get or create from node
+        const { node: fromNode, created: isFromNodeNew } = getOrCreateNode(
+          uuid,
+          fromEntityInfo,
+          nodeMap,
+          existingPositions,
+          level + 1,
+          levelXPositions,
+          newNodes.map(n => n.node)
+        );
+
+        // add not newnodes array if new
+        if (isFromNodeNew) {
+          newNodes.push({ node: fromNode, level: level + 1 });
+        } else if (!newNodes.some(n => n.node === fromNode)) {
+          newNodes.push({ node: fromNode, level: level + 1 });
+        }
+
+        const linkKey = getLinkId(fromNode, currentNode)
+        if (!linkKeySet.has(linkKey)) {
+          const link = createLink(fromNode, currentNode, 'out', 'in');
+          if (link) {
+            newLinks.push(link);
+            updateNodeOptions(fromNode, currentNode, currentNode.getCustomType());
+            linkKeySet.add(linkKey); // Mark this link as created
+          }
+        }
+      });
     });
   }
 
@@ -620,4 +682,9 @@ function getOrCreateNode(
 
 function getLinkId(fromNode: CustomNodeModel, currentNode: CustomNodeModel) {
   return `${fromNode.getID()}-${currentNode.getID()}`;
+}
+
+
+function createUUID(): string {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
