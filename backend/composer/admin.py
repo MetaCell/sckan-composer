@@ -296,9 +296,6 @@ class ConnectivityStatementAdmin(
         """Handles deletion from Django Admin."""
         try:
             obj.delete(user=request.user)
-            request._messages._queued_messages.clear()
-            if obj.state == CSState.DEPRECATED:
-                self.message_user(request, "The object was deprecated instead of being deleted.", level="info")
         except ValidationError as e:
             self.message_user(request, str(e), level="error")
 
