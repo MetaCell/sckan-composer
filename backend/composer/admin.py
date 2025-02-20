@@ -243,7 +243,7 @@ class ConnectivityStatementAdmin(
     list_per_page = 10
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
-    readonly_fields = ("state", "curie_id", "has_statement_been_exported")
+    readonly_fields = ("state", "curie_id", "has_statement_been_exported", "compr_uri")
     exclude = ("journey_path",)
     autocomplete_fields = ("sentence", "origins")
     date_hierarchy = "modified_date"
@@ -364,6 +364,10 @@ class ExportBatchAdmin(admin.ModelAdmin):
         return super().get_form(request, obj=obj, change=change, **kwargs)
 
 
+class PopulationSetAdmin(admin.ModelAdmin):
+    readonly_fields = ('cs_exported_from_this_populationset_incremental_index',)
+
+
 # Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
@@ -377,7 +381,7 @@ admin.site.register(AnatomicalEntityIntersection,
 admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
 admin.site.register(Phenotype)
 admin.site.register(Sex)
-admin.site.register(PopulationSet)
+admin.site.register(PopulationSet, PopulationSetAdmin)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
 admin.site.register(ExportBatch, ExportBatchAdmin)
 admin.site.register(Sentence, SentenceAdmin)
