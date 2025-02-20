@@ -112,6 +112,7 @@ def transition_statements_to_exported(export_batch: ExportBatch, user: User):
 
 
 def generate_and_save_compr_uri(connectivity_statements):
+    _has_checked_incremental_index = False
     for connectivity_statement in connectivity_statements.order_by('id'):
         populationset = connectivity_statement.population
         COMPR_URI_PREFIX = "https://uri.interlex.org/composer/uris/set/"
@@ -125,8 +126,15 @@ def generate_and_save_compr_uri(connectivity_statements):
             return 
     
         with transaction.atomic():
-            if populationset.cs_exported_from_this_populationset_incremental_index != populationset.connectivitystatement_set.filter(has_statement_been_exported=True).count():
+            # WE check if the incremental index matches the number of exported statements - only once
+            # This is to ensure that the incremental index is correct - 
+            # Only once - because the has_statement_been_exported is not updated - and done only in the next step. 
+            if not _has_checked_incremental_index and (
+                populationset.cs_exported_from_this_populationset_incremental_index != populationset.connectivitystatement_set.filter(has_statement_been_exported=True).count()
+            ):
                 raise ValueError("Incremental index does not match the number of exported statements")
+            
+            _has_checked_incremental_index = True
             
             # increment the index - only if has_statement_been_exported is False
             incremental_index = populationset.cs_exported_from_this_populationset_incremental_index + 1
