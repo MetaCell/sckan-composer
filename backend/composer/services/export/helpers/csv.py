@@ -93,7 +93,7 @@ def create_csv(export_batch, folder_path: typing.Optional[str] = None) -> str:
 def generate_csv_attributes_mapping() -> Dict[str, Callable]:
     attributes_map = {
         "Subject": get_curie_id,
-        "Subject URI": get_statement_uri,
+        "Subject URI": get_compr_uri,
         "Predicate": get_predicate,
         "Predicate URI": get_predicate_uri,
         "Predicate Relationship": get_relationship,
@@ -132,8 +132,8 @@ def get_curie_id(cs: ConnectivityStatement, row: Row):
     return cs.curie_id if cs.curie_id is not None else ""
 
 
-def get_statement_uri(cs: ConnectivityStatement, row: Row):
-    return cs.reference_uri
+def get_compr_uri(cs: ConnectivityStatement, row: Row):
+    return cs.compr_uri if cs.compr_uri else ""
 
 
 def get_nlp_id(cs: ConnectivityStatement, row: Row):

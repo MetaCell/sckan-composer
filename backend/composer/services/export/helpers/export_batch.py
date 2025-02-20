@@ -1,6 +1,6 @@
 from django.db.models import Count, QuerySet
 from django.contrib.auth.models import User
-
+from django.db import transaction
 
 from composer.services.state_services import ConnectivityStatementStateService
 from composer.enums import (
@@ -108,3 +108,33 @@ def transition_statements_to_exported(export_batch: ExportBatch, user: User):
         ).save()
 
     return export_batch
+
+
+
+def generate_and_save_compr_uri(connectivity_statements):
+    for connectivity_statement in connectivity_statements.order_by('id'):
+        populationset = connectivity_statement.population
+        COMPR_URI_PREFIX = "https://uri.interlex.org/composer/uris/set/"
+        if connectivity_statement.population:
+            compr_uri_population_label = connectivity_statement.population.name
+        else:
+            """All Exported ConnectivityStatements should have a PopulationSet"""
+            raise ValueError("PopulationSet is required")
+        
+        if connectivity_statement.has_statement_been_exported:
+            return 
+    
+        with transaction.atomic():
+            if populationset.cs_exported_from_this_populationset_incremental_index != populationset.connectivitystatement_set.filter(has_statement_been_exported=True).count():
+                raise ValueError("Incremental index does not match the number of exported statements")
+            
+            # increment the index - only if has_statement_been_exported is False
+            incremental_index = populationset.cs_exported_from_this_populationset_incremental_index + 1
+            populationset.cs_exported_from_this_populationset_incremental_index = incremental_index
+            populationset.save()
+
+            # generate compr_uri
+            compr_uri = f"{COMPR_URI_PREFIX}{compr_uri_population_label}/{incremental_index}"
+            
+            connectivity_statement.compr_uri = compr_uri
+            connectivity_statement.save()
