@@ -6,14 +6,20 @@ from composer.enums import CSState
 def handle_compr_uri_generation(apps):
     ConnectivityStatement = apps.get_model("composer", "ConnectivityStatement")
     connectivity_statements = ConnectivityStatement.objects.filter(state=CSState.EXPORTED).order_by('id')
-    for index, connectivity_statement in enumerate(connectivity_statements, start=1):
+    population_index_hashmap = {}
+    for connectivity_statement in connectivity_statements:
         COMPR_URI_PREFIX = "https://uri.interlex.org/composer/uris/set/"
         if connectivity_statement.population:
             compr_uri_population_label = connectivity_statement.population.name
         else:
             """All Exported ConnectivityStatements should have a PopulationSet"""
             raise ValueError("PopulationSet is required")
-        incremental_index = index
+        
+        if connectivity_statement.population.id not in population_index_hashmap:
+            population_index_hashmap[connectivity_statement.population.id] = 0
+
+        incremental_index = population_index_hashmap[connectivity_statement.population.id] + 1
+        population_index_hashmap[connectivity_statement.population.id] = incremental_index
         compr_uri = f"{COMPR_URI_PREFIX}{compr_uri_population_label}/{incremental_index}"
         
         connectivity_statement.compr_uri = compr_uri
