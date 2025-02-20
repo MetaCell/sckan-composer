@@ -289,7 +289,7 @@ class ConnectivityStatementAdmin(
 
         # Exclude deprecated statements from the changelist
         if request.resolver_match and request.resolver_match.url_name == f"{self.model._meta.app_label}_{self.model._meta.model_name}_changelist":
-            return qs.exclude(state="deprecated")
+            return qs.exclude(state=CSState.DEPRECATED)
         return qs
 
     def delete_model(self, request, obj):
