@@ -59,6 +59,7 @@ class CSState(models.TextChoices):
     REJECTED = "rejected"
     NPO_APPROVED = "npo_approved"
     EXPORTED = "exported"
+    DEPRECATED = "deprecated"
     INVALID = "invalid"
 
 

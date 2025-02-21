@@ -9,6 +9,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from fsm_admin.mixins import FSMTransitionMixin
 from django import forms
+from django.core.exceptions import ValidationError
 
 from composer.models import (
     AlertType,
@@ -34,6 +35,7 @@ from composer.models import (
     Region,
     AnatomicalEntityIntersection,
     AnatomicalEntity,
+    CSState
 )
 
 
@@ -273,6 +275,35 @@ class ConnectivityStatementAdmin(
     inlines = (ProvenanceInline, NoteConnectivityStatementInline,
                ViaInline, DestinationInline, StatementAlertInline)
 
+    def _filter_admin_transitions(self, transitions_generator):
+        """
+        Override to filter out specific transitions.
+        """
+        for transition in transitions_generator:
+            # Filter out the 'deprecated' transition from available transitions
+            if transition.name != CSState.DEPRECATED:
+                yield transition
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        # Exclude deprecated statements from the changelist
+        if request.resolver_match and request.resolver_match.url_name == f"{self.model._meta.app_label}_{self.model._meta.model_name}_changelist":
+            return qs.exclude(state=CSState.DEPRECATED)
+        return qs
+
+    def delete_model(self, request, obj):
+        """Handles deletion from Django Admin."""
+        try:
+            obj.delete(user=request.user)
+        except ValidationError as e:
+            self.message_user(request, str(e), level="error")
+
+    def delete_queryset(self, request, queryset):
+        """Handles bulk deletion from Django Admin."""
+        for obj in queryset:
+            self.delete_model(request, obj)
+
     @admin.display(description="Knowledge Statement")
     def short_ks(self, obj):
         return str(obj)
@@ -288,6 +319,13 @@ class ConnectivityStatementAdmin(
     @admin.display(description="REFERENCE")
     def reference(self, obj):
         return str(obj)
+    
+    # def get_actions(self, request):
+    #     print(self)
+    #     actions = super().get_actions(request)
+    #     if 'deprecate' in actions:
+    #         del actions['deprecate']
+    #     return actions
 
 
 class ExportBatchAdmin(admin.ModelAdmin):
