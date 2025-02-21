@@ -269,6 +269,11 @@ class ConnectivityStatementStateService(StateServiceMixin):
         return connectivity_statement.population is not None
 
 
+    @staticmethod
+    def can_be_deprecated(connectivity_statement):
+        return connectivity_statement.has_statement_been_exported
+
+
 def is_system_user(user: User) -> bool:
     return user.username == 'system'
 

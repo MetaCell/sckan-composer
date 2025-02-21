@@ -244,7 +244,7 @@ class ConnectivityStatementAdmin(
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
     readonly_fields = ("state", "curie_id", "has_statement_been_exported")
-    exclude = ("journey_path",)
+    exclude = ("journey_path", "statement_prefix", "statement_suffix")
     autocomplete_fields = ("sentence", "origins")
     date_hierarchy = "modified_date"
     list_display = (
@@ -284,14 +284,6 @@ class ConnectivityStatementAdmin(
             if transition.name != CSState.DEPRECATED:
                 yield transition
 
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-
-        # Exclude deprecated statements from the changelist
-        if request.resolver_match and request.resolver_match.url_name == f"{self.model._meta.app_label}_{self.model._meta.model_name}_changelist":
-            return qs.exclude(state=CSState.DEPRECATED)
-        return qs
-
     def delete_model(self, request, obj):
         """Handles deletion from Django Admin."""
         try:
@@ -319,13 +311,6 @@ class ConnectivityStatementAdmin(
     @admin.display(description="REFERENCE")
     def reference(self, obj):
         return str(obj)
-    
-    # def get_actions(self, request):
-    #     print(self)
-    #     actions = super().get_actions(request)
-    #     if 'deprecate' in actions:
-    #         del actions['deprecate']
-    #     return actions
 
 
 class ExportBatchAdmin(admin.ModelAdmin):

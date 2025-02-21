@@ -104,6 +104,7 @@ class ConnectivityStatementManager(models.Manager):
                 "sex",
             )
             .prefetch_related("notes", "tags", "provenance_set", "species", "origins", "destinations")
+            .exclude(state=CSState.DEPRECATED)
         )
 
     def excluding_draft(self):
@@ -603,7 +604,6 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
     circuit_type = models.CharField(
         max_length=20, choices=CircuitType.choices, null=True, blank=True
     )
-    # TODO for next releases we could have only 1 field for phenotype + an intermediate table with the phenotype's categories such as circuit_type, laterality, projection, functional_circuit_role, projection_phenotype among others
     phenotype = models.ForeignKey(
         Phenotype,
         verbose_name="Phenotype",
@@ -760,6 +760,9 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
             CSState.EXPORTED,
         ],
         target=CSState.DEPRECATED,
+        conditions=[
+            ConnectivityStatementStateService.can_be_deprecated,
+        ],
         permission=ConnectivityStatementStateService.has_permission_to_transition_to_deprecated,
     )
     def deprecated(self, *args, **kwargs):
@@ -826,7 +829,7 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
             # If the original population exists and has changed, raise an error
             if (
                 original_population is not None
-                and original_population != self.population
+                and original_population != self.population.id
             ):
                 raise ValidationError(
                     "Cannot change population set after the statement has been exported."
@@ -849,12 +852,18 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
             self.save(update_fields=["reference_uri"])
 
     def delete(self, user=None, *args, **kwargs):
+        """
+        Soft delete by transitioning to DEPRECATED if has_statement_been_exported is True.
+        Otherwise, perform an actual deletion.
+        """
         if self.has_statement_been_exported:
             if not user:
                 raise ValidationError("User is required to deprecate the statement before deletion.")
 
             try:
-                self.deprecated(by=user)
+                state_service = ConnectivityStatementStateService(self)
+                state_service.do_transition(CSState.DEPRECATED, user=user)
+
                 self.save(update_fields=["state"])
             except Exception as e:
                 raise ValidationError(f"Cannot deprecate the connectivity statement: {e}")
