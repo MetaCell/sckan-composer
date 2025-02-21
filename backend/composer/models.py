@@ -461,7 +461,12 @@ class Sentence(models.Model, BulkActionMixin):
         ...
 
     def assign_owner(self, requested_by, owner=None):
-        # This logic is repeated in the bulk service for performance reasons
+        """
+        This function assigns an owner to the Sentence instance.
+        
+        This logic is also implemented in the bulk `assign_owner` function for performance reasons.
+        If any changes are made here, ensure the bulk function is updated accordingly.
+        """
         if owner is None:
             owner = requested_by
 

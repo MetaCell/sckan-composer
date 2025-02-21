@@ -2,19 +2,29 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django_fsm import TransitionNotAllowed
 from django.db.models import ForeignKey, Q, Count
-from composer.services.state_services import get_available_FIELD_transitions_without_conditions_check
+from composer.services.state_services import (
+    get_available_FIELD_transitions_without_conditions_check,
+)
 from composer.enums import CSState
-from composer.models import ConnectivityStatement, Profile, Tag, Note, User
+from composer.models import ConnectivityStatement, Profile, Sentence, Tag, Note, User
+
 
 def assign_owner(instances, requested_by, owner_id):
+    """
+    This function optimizes the owner assignment process for bulk updates.
+    The same logic exists in the model's `assign_owner` method for single-object updates.
+    Any modifications to this logic should be applied to both places to maintain consistency.
+    """
     owner = get_object_or_404(User, id=owner_id)
     updated_count = instances.update(owner=owner)
-    
-    ConnectivityStatement.objects.filter(
-        sentence__in=instances, state=CSState.DRAFT
-    ).update(owner=owner)
-    
+
+    if instances.model == Sentence:
+        ConnectivityStatement.objects.filter(
+            sentence__in=instances, state=CSState.DRAFT
+        ).update(owner=owner)
+
     return updated_count
+
 
 def assign_tags(instances, tag_ids):
     """
@@ -22,7 +32,6 @@ def assign_tags(instances, tag_ids):
     ensuring that only the provided tags remain.
     Returns the number of processed instances.
     """
-    # Get the list of tag IDs that actually exist.
     existing_tag_ids = list(
         Tag.objects.filter(id__in=tag_ids).values_list("id", flat=True)
     )
@@ -31,7 +40,6 @@ def assign_tags(instances, tag_ids):
     source_field_name = m2m_field.m2m_field_name() + "_id"
 
     # 1. Bulk delete associations for instances that are not in the new set.
-    # We use values_list() on the queryset so we don’t load entire objects.
     through_model.objects.filter(
         **{f"{source_field_name}__in": instances.values_list("id", flat=True)}
     ).exclude(tag_id__in=existing_tag_ids).delete()
@@ -41,34 +49,42 @@ def assign_tags(instances, tag_ids):
     associations = []
     qs = instances.values_list("id", flat=True).iterator(chunk_size=batch_size)
     for instance_id in qs:
-        # For each instance, add an association for each tag in the provided list.
         for tag_id in existing_tag_ids:
-            associations.append(through_model(**{source_field_name: instance_id, "tag_id": tag_id}))
+            associations.append(
+                through_model(**{source_field_name: instance_id, "tag_id": tag_id})
+            )
             if len(associations) >= batch_size:
-                through_model.objects.bulk_create(associations, ignore_conflicts=True, batch_size=batch_size)
+                through_model.objects.bulk_create(
+                    associations, ignore_conflicts=True, batch_size=batch_size
+                )
                 associations = []
     if associations:
-        through_model.objects.bulk_create(associations, ignore_conflicts=True, batch_size=batch_size)
-        
+        through_model.objects.bulk_create(
+            associations, ignore_conflicts=True, batch_size=batch_size
+        )
+
     # Return the count of processed instances.
     return instances.count()
+
 
 def write_note(instances, user, note_text):
     """
     Adds a note to each selected instance using bulk_create for efficiency.
     Returns the number of notes created.
     """
-    # Determine the model class from the queryset (assuming a homogeneous queryset)
-    model_class = instances.model if hasattr(instances, "model") else type(next(iter(instances)))
+    # Determine the model class from the queryset
+    model_class = (
+        instances.model if hasattr(instances, "model") else type(next(iter(instances)))
+    )
     note_field = _get_note_field_for_model(model_class)
 
-    # Use iterator() to avoid loading all instances into memory.
     notes_to_create = [
         Note(user=user, note=note_text, **{note_field: instance})
         for instance in instances.iterator()
     ]
     Note.objects.bulk_create(notes_to_create)
     return len(notes_to_create)
+
 
 def change_status(instances, new_status, user=None):
     """
@@ -91,7 +107,6 @@ def change_status(instances, new_status, user=None):
 
 def assign_population_set(instances, population_set_id):
     # TODO: Implement this function generically.
-    # For now, you might raise a NotImplementedError.
     raise NotImplementedError("assign_population_set is not implemented yet.")
 
 
@@ -112,7 +127,6 @@ def get_assignable_users_data(roles=None):
     :return: Serialized minimal user data.
     """
     if roles:
-        # Build a Q object that ORs all role filters.
         q = Q()
         for role in roles:
             q |= Q(**{role: True})
@@ -120,7 +134,6 @@ def get_assignable_users_data(roles=None):
     else:
         assignable_users = Profile.objects.all().select_related("user")
     return assignable_users
-
 
 
 def get_common_transitions(queryset, user):
@@ -134,7 +147,7 @@ def get_common_transitions(queryset, user):
         return []
 
     state_field_name = "state"
-    
+
     states_count = queryset.values_list(state_field_name, flat=True).distinct().count()
 
     if states_count > 1:
@@ -142,22 +155,25 @@ def get_common_transitions(queryset, user):
 
     # Get the first object (only one exists since all have the same state)
     first_obj = queryset.first()
-    
+
     # Get available state transitions for the first object
     if hasattr(first_obj, "get_available_state_transitions"):
         state_field = first_obj._meta.get_field(state_field_name)
         transitions = {
             transition.name
-            for transition in get_available_FIELD_transitions_without_conditions_check(first_obj, state_field)
+            for transition in get_available_FIELD_transitions_without_conditions_check(
+                first_obj, state_field
+            )
         }
         return list(transitions)
 
     return []
 
+
 def get_tags_partition(queryset):
     """
     Compute tag partitions for the given queryset of objects that have a ManyToMany 'tags' field.
-    
+
     Returns a dictionary with:
       - 'common': IDs of tags that appear on every object.
       - 'union': IDs of tags that appear on at least one object.
@@ -173,7 +189,7 @@ def get_tags_partition(queryset):
             "partial": set(),
             "missing": all_tag_ids,
         }
-    
+
     # Get the through model from the 'tags' field.
     m2m_field = queryset.model._meta.get_field("tags")
     through_model = m2m_field.remote_field.through
@@ -182,15 +198,14 @@ def get_tags_partition(queryset):
     target_field = m2m_field.m2m_field_name()
     if not target_field.endswith("_id"):
         target_field += "_id"
-    
+
     # Use the through model to count how many times each tag is attached to objects in the queryset.
     tag_counts = (
-        through_model.objects
-        .filter(**{f"{target_field}__in": queryset})
+        through_model.objects.filter(**{f"{target_field}__in": queryset})
         .values("tag_id")
         .annotate(cnt=Count("tag_id"))
     )
-    
+
     union_tag_ids = set()
     common_tag_ids = set()
     for entry in tag_counts:
@@ -199,13 +214,13 @@ def get_tags_partition(queryset):
         # If a tag appears in all objects, count equals qs_count.
         if entry["cnt"] == qs_count:
             common_tag_ids.add(tag_id)
-    
+
     partial_tag_ids = union_tag_ids - common_tag_ids
-    
+
     # All tags in the system.
     all_tag_ids = set(Tag.objects.all().values_list("id", flat=True))
     missing_tag_ids = all_tag_ids - union_tag_ids
-    
+
     return {
         "common": common_tag_ids,
         "union": union_tag_ids,
