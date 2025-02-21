@@ -6,10 +6,12 @@ from composer.enums import CSState
 
 def migrate_has_statement_been_exported(apps, schema_editor):
     ConnectivityStatement = apps.get_model("composer", "ConnectivityStatement")
-    for statement in ConnectivityStatement.objects.all():
-        statement.has_statement_been_exported = statement.state == CSState.EXPORTED
-        statement.save()
 
+    # Get all connectivity statements associated with an export batch
+    statements_to_update = ConnectivityStatement.objects.filter(exportbatch__isnull=False)
+
+    # Perform a bulk update to set `has_statement_been_exported = True`
+    statements_to_update.update(has_statement_been_exported=True)
 
 class Migration(migrations.Migration):
 
