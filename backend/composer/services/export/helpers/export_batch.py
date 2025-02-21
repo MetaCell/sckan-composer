@@ -15,10 +15,37 @@ from composer.models import (
     Sentence,
 )
 
-def create_export_batch(qs: QuerySet, user: User) -> ExportBatch:
-    export_batch = ExportBatch.objects.create(user=user)
-    export_batch.connectivity_statements.set(qs)
-    export_batch.save()
+def create_export_batch(user: User) -> ExportBatch:
+    """
+    Creates an empty export batch. Statements will be added after successful transition.
+    """
+    return ExportBatch.objects.create(user=user)
+
+
+def transition_statements_to_exported(export_batch: ExportBatch, qs: QuerySet):
+    """Transitions only eligible ConnectivityStatements and updates them in bulk."""
+    system_user = User.objects.get(username="system")
+
+    # Prepare successful statement list
+    successful_statements = []
+    for cs in qs:
+        if ConnectivityStatementStateService(cs).is_transition_available(CSState.EXPORTED, system_user):
+            successful_statements.append(cs)
+
+    ## This is equivalent to do_transition from NPO_APPROVED to EXPORTED but optimized for bulk.
+    ## Changes on the transition logic should be reflected here.
+    
+    # Perform bulk state update
+    ConnectivityStatement.objects.filter(id__in=[cs.id for cs in successful_statements]).update(state=CSState.EXPORTED)
+
+    # Update has_statement_been_exported flag
+    ConnectivityStatement.objects.filter(id__in=[cs.id for cs in successful_statements]).update(
+        has_statement_been_exported=True
+    )
+
+    # Add only successfully transitioned statements to the export batch
+    export_batch.connectivity_statements.set(successful_statements)
+    
     return export_batch
 
 
@@ -78,29 +105,4 @@ def compute_metrics(export_batch: ExportBatch):
             state=SentenceState(metric["state"]),
             count=metric["count"],
         )
-    return export_batch
-
-
-def filter_statements_with_exported_transition(qs: QuerySet, user: User) -> QuerySet:
-    system_user = User.objects.get(username="system")
-    filtered_ids = [
-        cs.id
-        for cs in qs.iterator()
-        if CSState.EXPORTED
-        in [
-            available_state.target
-            for available_state in cs.get_available_user_state_transitions(system_user)
-        ]
-    ]
-    return qs.filter(id__in=filtered_ids)
-
-
-def transition_statements_to_exported(export_batch: ExportBatch, user: User):
-    system_user = User.objects.get(username="system")
-    connectivity_statements = export_batch.connectivity_statements.all()
-    for connectivity_statement in connectivity_statements:
-        ConnectivityStatementStateService(connectivity_statement).do_transition(
-            CSState.EXPORTED, system_user, user
-        ).save()
-
     return export_batch

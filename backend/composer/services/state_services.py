@@ -26,7 +26,7 @@ class OwnerServiceMixin(BaseServiceMixin):
             return True
 
 class StateServiceMixin(OwnerServiceMixin):
-    def _is_transition_available(self, transition, user=None):
+    def is_transition_available(self, transition, user=None):
         """
         Checks if the requested transition is available
         """
@@ -44,7 +44,7 @@ class StateServiceMixin(OwnerServiceMixin):
         # Ensure the requested transition is available
         if not by_user:
             by_user = user
-        available = self._is_transition_available(transition, user)
+        available = self.is_transition_available(transition, user)
         trans_func = getattr(self.obj, transition, None)
         if available and trans_func:
             # Run the transition
