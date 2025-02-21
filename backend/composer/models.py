@@ -4,6 +4,7 @@ from django.db.models import Q, CheckConstraint
 from django.db.models.expressions import F
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
+from django.core.exceptions import ImproperlyConfigured
 from composer.services.graph_service import build_journey_description, build_journey_entities
 from django.core.exceptions import ValidationError
 
@@ -149,6 +150,29 @@ class DestinationManager(models.Manager):
             .prefetch_related('anatomical_entities', 'from_entities')
         )
 
+
+# Mixins
+
+
+class BulkActionMixin:
+    """
+    Mixin providing a common interface for bulk actions.
+    This mixin does not subclass models.Model, so you can use it in any model.
+    """
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        # If the class is a Django model (it has _meta), enforce the existence of a 'tags' field.
+        if hasattr(cls, '_meta'):
+            try:
+                cls._meta.get_field("tags")
+            except Exception as e:
+                raise ImproperlyConfigured(
+                    f"The model '{cls.__name__}' must define a 'tags' field."
+                ) from e
+
+    def get_state_service(self):
+        raise NotImplementedError("Subclasses must implement get_state_service().")
 
 # Create your models here.
 class Profile(models.Model):
@@ -382,7 +406,7 @@ class Tag(models.Model):
         verbose_name_plural = "Tags"
 
 
-class Sentence(models.Model):
+class Sentence(models.Model, BulkActionMixin):
     """Sentence"""
 
     objects = SentenceStatementManager()
@@ -423,7 +447,8 @@ class Sentence(models.Model):
         ...
 
     @transition(
-        field=state, source=[SentenceState.OPEN, SentenceState.NEEDS_FURTHER_REVIEW],
+        field=state, 
+        source=[SentenceState.OPEN, SentenceState.NEEDS_FURTHER_REVIEW],
         target=SentenceState.COMPOSE_LATER,
         permission=SentenceStateService.has_permission_to_transition_to_compose_later,
     )
@@ -466,16 +491,20 @@ class Sentence(models.Model):
     def excluded(self, *args, **kwargs):
         ...
 
-    def assign_owner(self, request):
-        if SentenceStateService(self).can_assign_owner(request):
-            self.owner = request.user
+    def assign_owner(self, requested_by, owner=None):
+        # This logic is repeated in the bulk service for performance reasons
+        if owner is None:
+            owner = requested_by
+
+        if SentenceStateService(self).can_assign_owner(requested_by):
+            self.owner = owner
             self.save(update_fields=["owner"])
 
             # Update the owner of related draft ConnectivityStatements
             ConnectivityStatement.objects.filter(
                 sentence=self,
                 state=CSState.DRAFT
-            ).update(owner=request.user)
+            ).update(owner=owner)
 
     def auto_assign_owner(self, request):
         if SentenceStateService(self).should_set_owner(request):
@@ -488,6 +517,13 @@ class Sentence(models.Model):
                 state=CSState.DRAFT
             ).update(owner=request.user)
 
+
+    def get_state_service(self):
+        """
+        Returns the state service instance for this Sentence.
+        """
+        return SentenceStateService(self)
+    
     @property
     def pmid_uri(self) -> str:
         return pmid_uri(self.pmid)
@@ -536,7 +572,7 @@ class Sentence(models.Model):
         ]
 
 
-class ConnectivityStatement(models.Model):
+class ConnectivityStatement(models.Model, BulkActionMixin):
     """Connectivity Statement"""
 
     objects = ConnectivityStatementManager()
@@ -724,10 +760,10 @@ class ConnectivityStatement(models.Model):
             return set(self.via_set.get(order=via_order - 1).anatomical_entities.all())
 
     def get_journey(self):
-        return build_journey_description(self.journey_path)
+        return build_journey_description(self.journey_path) if self.journey_path else []
 
     def get_entities_journey(self):
-        return build_journey_entities(self.journey_path)
+        return build_journey_entities(self.journey_path) if self.journey_path else []
 
     def get_laterality_description(self):
         laterality_map = {
@@ -736,15 +772,24 @@ class ConnectivityStatement(models.Model):
         }
         return laterality_map.get(self.laterality, None)
 
-    def assign_owner(self, request):
-        if ConnectivityStatementStateService(self).can_assign_owner(request):
-            self.owner = request.user
+    def assign_owner(self, requested_by, owner=None):
+        if owner is None:
+            owner = requested_by
+        
+        if ConnectivityStatementStateService(self).can_assign_owner(requested_by):
+            self.owner = owner
             self.save(update_fields=["owner"])
 
     def auto_assign_owner(self, request):
         if ConnectivityStatementStateService(self).should_set_owner(request):
             self.owner = request.user
             self.save(update_fields=["owner"])
+
+    def get_state_service(self):
+        """
+        Returns the state service instance for this Sentence.
+        """
+        return ConnectivityStatementStateService(self)
 
     def validate_population_change(self):
         if self.pk and self.has_statement_been_exported:

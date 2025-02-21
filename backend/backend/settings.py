@@ -375,13 +375,18 @@ LOGOUT_REDIRECT_URL = "/logged-out/"
 if DEBUG:
     INSTALLED_APPS += [
         "debug_toolbar",
+        'silk',
     ]
     MIDDLEWARE += [
+        'silk.middleware.SilkyMiddleware',
         "debug_toolbar.middleware.DebugToolbarMiddleware",
     ]
     DEBUG_TOOLBAR_CONFIG = {
         "SHOW_TOOLBAR_CALLBACK": lambda x: True,
+        'INTERCEPT_REDIRECTS': False,
     }
+    SILKY_INTERCEPT_PERCENT = 100  # Capture 100% of requests
+    SILKY_PYTHON_PROFILER = True   # Enable function-level profiling
 
 if not PRODUCTION:
     INSTALLED_APPS += [

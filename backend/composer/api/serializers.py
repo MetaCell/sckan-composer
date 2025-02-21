@@ -1,5 +1,4 @@
 from typing import List
-
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.forms import ValidationError
@@ -8,7 +7,7 @@ from drf_writable_nested.mixins import UniqueFieldsMixin
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
 
-from ..enums import SentenceState, CSState
+from ..enums import BulkActionType, SentenceState, CSState
 from ..models import (
     AlertType,
     AnatomicalEntity,
@@ -32,7 +31,7 @@ from ..models import (
 )
 from ..services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
-from ..services.statement_service import get_statement_preview
+from ..services.statement_service import get_statement_preview as get_statement_preview_aux
 from ..services.errors_service import get_connectivity_errors
 
 
@@ -78,6 +77,18 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ("id", "username", "first_name", "last_name", "email", "is_staff")
 
 
+class MinimalUserSerializer(serializers.ModelSerializer):
+    """Minimal User Serializer (for Profile List View)"""
+
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ("id", "full_name")  # Only expose minimal user details
+
+    def get_full_name(self, obj):
+        return obj.get_full_name()
+    
 class ProfileSerializer(serializers.ModelSerializer):
     """Profile"""
 
@@ -680,7 +691,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     def get_statement_preview(self, instance):
         if 'journey' not in self.context:
             self.context['journey'] = instance.get_journey()
-        return get_statement_preview(instance, self.context['journey'])
+        return get_statement_preview_aux(instance, self.context['journey'])
 
     def get_errors(self, instance) -> List:
         return get_connectivity_errors(instance)
@@ -703,7 +714,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             del self.context['journey']
 
         return representation
-
+    
     def update(self, instance, validated_data):
         # Remove 'via_set' and 'destinations' from validated_data if they exist
         validated_data.pop('via_set', None)
@@ -912,3 +923,67 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
             "apinatomy_model",
             "statement_preview",
         )
+
+class BulkActionSerializer(serializers.Serializer):
+    action = serializers.ChoiceField(
+        choices=[(action.value, action.value) for action in BulkActionType],
+        help_text="The bulk action to perform."
+    )
+
+class AssignUserSerializer(BulkActionSerializer):
+    user_id = serializers.IntegerField(required=True, help_text="ID of the user to assign.")
+
+    def validate(self, data):
+        if data.get("action") != BulkActionType.ASSIGN_USER.value:
+            raise serializers.ValidationError({
+                "action": f"For this serializer, action must be '{BulkActionType.ASSIGN_USER.value}'."
+            })
+        return data
+
+class AssignTagsSerializer(BulkActionSerializer):
+    tag_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=True,
+        help_text="List of tag IDs to assign (existing tags not in this list will be removed)."
+    )
+
+    def validate(self, data):
+        if data.get("action") != BulkActionType.ASSIGN_TAG.value:
+            raise serializers.ValidationError({
+                "action": f"For this serializer, action must be '{BulkActionType.ASSIGN_TAG.value}'."
+            })
+        return data
+
+
+class WriteNoteSerializer(BulkActionSerializer):
+    note_text = serializers.CharField(required=True, help_text="The note text.")
+
+    def validate(self, data):
+        if data.get("action") != BulkActionType.WRITE_NOTE.value:
+            raise serializers.ValidationError({
+                "action": f"For this serializer, action must be '{BulkActionType.WRITE_NOTE.value}'."
+            })
+        return data
+
+class ChangeStatusSerializer(BulkActionSerializer):
+    new_status = serializers.CharField(required=True, help_text="The new status.")
+
+    def validate(self, data):
+        if data.get("action") != BulkActionType.CHANGE_STATUS.value:
+            raise serializers.ValidationError({
+                "action": f"For this serializer, action must be '{BulkActionType.CHANGE_STATUS.value}'."
+            })
+        return data
+
+class AssignPopulationSetSerializer(BulkActionSerializer):
+    population_set_id = serializers.IntegerField(required=True, help_text="ID of the population set.")
+
+    def validate(self, data):
+        if data.get("action") != BulkActionType.ASSIGN_POPULATION_SET.value:
+            raise serializers.ValidationError({
+                "action": f"For this serializer, action must be '{BulkActionType.ASSIGN_POPULATION_SET.value}'."
+            })
+        return data
+    
+class BulkActionResponseSerializer(serializers.Serializer):
+    updated_count = serializers.IntegerField()

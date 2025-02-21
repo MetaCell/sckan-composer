@@ -60,17 +60,20 @@ export default function ResultsGrid({
         rows={rows}
         columns={columns}
         getRowHeight={() => "auto"}
-        pageSize={duplicatesRowsPerPage}
         paginationMode="server"
         sortingMode="server"
         rowCount={totalResults}
-        onPageChange={handlePageChange}
-        onSortModelChange={handleSortModelChange}
-        rowsPerPageOptions={[duplicatesRowsPerPage]}
-        page={currentPage}
         disableColumnMenu
-        components={{
-          Pagination: CustomPagination,
+        paginationModel={{
+          page: currentPage,
+          pageSize: duplicatesRowsPerPage,
+        }}
+        onPaginationModelChange={(model) => {
+          handlePageChange(model.page);
+        }}
+        onSortModelChange={handleSortModelChange}
+        slots={{
+          pagination: CustomPagination,
         }}
       />
     </Box>

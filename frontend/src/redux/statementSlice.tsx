@@ -13,6 +13,7 @@ export interface QueryParams {
   sentenceId: number | undefined;
   excludeSentenceId: number | undefined;
   excludeIds: number[] | undefined;
+  include: number[] | undefined;
   origins: number[] | undefined;
 }
 
@@ -39,6 +40,7 @@ export const initialState: StatementState = {
     sentenceId: undefined,
     excludeSentenceId: undefined,
     excludeIds: undefined,
+    include: undefined,
     origins: undefined,
   },
   wasChangeDetected: false,

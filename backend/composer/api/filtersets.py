@@ -56,6 +56,9 @@ class SentenceFilter(django_filters.FilterSet):
     )
     exclude = django_filters.BaseInFilter(method=exclude_ids)
 
+    include = django_filters.BaseInFilter(field_name="id", lookup_expr="in")
+
+
     def order_by_current_user(self, queryset, name, value):
         current_user = self.request.user
         if 'owner' in value or '-owner' in value:
@@ -89,6 +92,8 @@ class SentenceFilter(django_filters.FilterSet):
 
 class ConnectivityStatementFilter(django_filters.FilterSet):
     exclude_ids = NumberInFilter(field_name='id', exclude=True)
+
+    include = django_filters.BaseInFilter(field_name="id", lookup_expr="in")
 
     sentence_id = django_filters.NumberFilter(field_name="sentence__id")
     exclude_sentence_id = django_filters.NumberFilter(field_name="sentence__id", exclude=True)
