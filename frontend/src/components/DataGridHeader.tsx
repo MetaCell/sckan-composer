@@ -55,6 +55,8 @@ interface DataGridHeaderProps {
   entityType: ENTITY_TYPES.STATEMENT | ENTITY_TYPES.SENTENCE;
   selectedRows: number[];
   refreshList: () => void;
+  setGridLoading: (loading: boolean) => void;
+  isGridLoading: boolean;
   isAllDataSelected: boolean;
   selectedRowsCount: number;
   manuallyDeselectedRows: string[];
@@ -72,7 +74,7 @@ type Tags = {
 };
 
 const DataGridHeader = (props: DataGridHeaderProps) => {
-  const { queryOptions, entityType, selectedRows, refreshList, isAllDataSelected, selectedRowsCount, manuallyDeselectedRows } = props;
+  const { queryOptions, entityType, selectedRows, refreshList, isAllDataSelected, selectedRowsCount, manuallyDeselectedRows, setGridLoading, isGridLoading } = props;
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isFetchingOptions, setIsFetchingOptions] = useState(false);
   const [assignableUsers, setAssignableUsers] = useState<any[]>([]);
@@ -169,6 +171,8 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               onConfirm={refreshList}
               isFetchingOptions={isFetchingOptions}
               selectedRowsCount={selectedRowsCount}
+              setGridLoading={setGridLoading}
+              isGridLoading={isGridLoading}
             />
             <AssignPopulationSet selectedTableRows={selectedRows} entityType={entityType} />
             <Divider flexItem />

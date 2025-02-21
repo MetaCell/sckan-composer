@@ -17,15 +17,16 @@ interface ChangeStatusProps {
   queryOptions: SentenceQueryParams | StatementQueryParams;
   onClick: () => void;
   onConfirm: () => void;
+  setGridLoading: (loading: boolean) => void;
+  isGridLoading: boolean;
   isFetchingOptions: boolean;
 }
 
-const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityType, possibleTransitions, queryOptions, onClick, onConfirm, isFetchingOptions, selectedRowsCount }) => {
+const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityType, possibleTransitions, queryOptions, onClick, onConfirm, isFetchingOptions, selectedRowsCount, setGridLoading, isGridLoading }) => {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const [newStatus, setNewStatus] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const changeStatusMap: Record<
     ENTITY_TYPES,
@@ -52,7 +53,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
 
   const handleStatusChange = async (newStatus: string) => {
     if (!newStatus) return;
-    setIsLoading(true);
+    setGridLoading(true);
 
     try {
       const changeStatusFunction = changeStatusMap[entityType];
@@ -61,7 +62,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
     } catch (error) {
       console.error("Error changing status:", error);
     } finally {
-      setIsLoading(false);
+      setGridLoading(false);
       onConfirm()
     }
   };
@@ -77,12 +78,6 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
     setNewStatus(null);
   };
 
-  const isUniformState = () => {
-    if (!Array.isArray(selectedTableRows) || selectedTableRows.length === 0) return false;
-    const firstState = selectedTableRows[0]?.state;
-    return selectedTableRows.every((item) => item.state === firstState);
-  };
-
   const fromState = snakeToSpace(selectedTableRows[0]?.state);
   const toState = newStatus && snakeToSpace(newStatus);
 
@@ -90,8 +85,8 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
     <>
       <PopoverMenu
         icon={ChangeStatusIcon}
-        tooltip={isUniformState() ? "Change status" : "Select statements with the same status to enable bulk change"}
-        actionButtonDisabled={!isUniformState() || isLoading}
+        tooltip={"Change status"}
+        actionButtonDisabled={isGridLoading}
         options={possibleTransitions}
         selectedOption={selectedStatus}
         onSelect={handleSelectStatus}
