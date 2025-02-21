@@ -8,6 +8,7 @@ import CustomTextArea from "../Widgets/CustomTextArea";
 import ArrayFieldTemplate from "../Widgets/ArrayFieldTemplate";
 import AnatomicalEntitiesField from "../AnatomicalEntitiesField";
 import {sexes} from "../../services/SexService";
+import { populations } from "../../services/PopulationService";
 import {phenotypes} from "../../services/PhenotypeService";
 import {Box, Chip} from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
@@ -161,6 +162,19 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
         .map((row: any) => ({label: row.name, value: row.id})),
     },
     value: statement?.sex_id ?? "",
+  };
+  copiedUISchema.population_id = {
+    "ui:widget": "CustomSingleSelect",
+    "ui:options": {
+      isDisabled: statement.has_statement_been_exported,
+      label: "Population",
+      placeholder: "Enter Population",
+      data: populations.getPopulations().map((row: any) => ({
+        label: row.name,
+        value: row.id,
+      })),
+    },
+    value: statement?.population_id ?? "",
   };
 
   copiedUISchema.phenotype_id = {
@@ -816,6 +830,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       submitOnChangeFields={[
         "phenotype_id",
         "sex_id",
+        "population_id",
         "laterality",
         "circuit_type",
         "projection",

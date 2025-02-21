@@ -14,6 +14,7 @@ from composer.models import (
     AlertType,
     Phenotype,
     Sex,
+    PopulationSet,
     ConnectivityStatement,
     Provenance,
     ExportBatch,
@@ -25,9 +26,14 @@ from composer.models import (
     Tag,
     Via,
     FunctionalCircuitRole,
-    ProjectionPhenotype, Destination, Synonym, AnatomicalEntityMeta, Layer, Region,
+    ProjectionPhenotype,
+    Destination,
+    Synonym,
+    AnatomicalEntityMeta,
+    Layer,
+    Region,
     AnatomicalEntityIntersection,
-    AnatomicalEntity
+    AnatomicalEntity,
 )
 
 
@@ -235,7 +241,7 @@ class ConnectivityStatementAdmin(
     list_per_page = 10
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
-    readonly_fields = ("state", 'curie_id')
+    readonly_fields = ("state", "curie_id", "has_statement_been_exported")
     exclude = ("journey_path",)
     autocomplete_fields = ("sentence", "origins")
     date_hierarchy = "modified_date"
@@ -330,6 +336,7 @@ admin.site.register(AnatomicalEntityIntersection,
 admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
 admin.site.register(Phenotype)
 admin.site.register(Sex)
+admin.site.register(PopulationSet)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
 admin.site.register(ExportBatch, ExportBatchAdmin)
 admin.site.register(Sentence, SentenceAdmin)

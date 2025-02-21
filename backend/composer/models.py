@@ -6,6 +6,7 @@ from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
 from django.core.exceptions import ImproperlyConfigured
 from composer.services.graph_service import build_journey_description, build_journey_entities
+from django.core.exceptions import ValidationError
 
 from composer.services.layers_service import update_from_entities_on_deletion
 from composer.services.state_services import (
@@ -23,7 +24,14 @@ from .enums import (
     ViaType,
     Projection,
 )
-from .utils import doi_uri, pmcid_uri, pmid_uri, create_reference_uri
+from .utils import (
+    doi_uri,
+    pmcid_uri,
+    pmid_uri,
+    create_reference_uri,
+    is_valid_population_name,
+)
+import re
 
 
 # from django_fsm_log.decorators import fsm_log_by
@@ -218,6 +226,29 @@ class Sex(models.Model):
     class Meta:
         ordering = ["name"]
         verbose_name_plural = "Sex"
+
+
+class PopulationSet(models.Model):
+    """Population Set"""
+
+    name = models.CharField(
+        max_length=200,
+        db_index=True,
+        unique=True,
+        validators=[is_valid_population_name],
+    )
+    description = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.name = self.name.lower()
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Population Sets"
 
 
 class FunctionalCircuitRole(models.Model):
@@ -416,7 +447,7 @@ class Sentence(models.Model, BulkActionMixin):
         ...
 
     @transition(
-        field=state, 
+        field=state,
         source=[SentenceState.OPEN, SentenceState.NEEDS_FURTHER_REVIEW],
         target=SentenceState.COMPOSE_LATER,
         permission=SentenceStateService.has_permission_to_transition_to_compose_later,
@@ -492,7 +523,7 @@ class Sentence(models.Model, BulkActionMixin):
         Returns the state service instance for this Sentence.
         """
         return SentenceStateService(self)
-    
+
     @property
     def pmid_uri(self) -> str:
         return pmid_uri(self.pmid)
@@ -603,6 +634,14 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
     journey_path = models.JSONField(null=True, blank=True)
     statement_prefix = models.TextField(null=True, blank=True)
     statement_suffix = models.TextField(null=True, blank=True)
+    population = models.ForeignKey(
+        PopulationSet,
+        verbose_name="Population Set",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    has_statement_been_exported = models.BooleanField(default=False)
 
     def __str__(self):
         suffix = ""
@@ -671,16 +710,18 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
 
     @transition(
         field=state,
-        source=[
-            CSState.NPO_APPROVED,
-            CSState.INVALID
-        ],
+        source=[CSState.NPO_APPROVED, CSState.INVALID],
         target=CSState.EXPORTED,
-        conditions=[ConnectivityStatementStateService.is_valid],
+        conditions=[
+            ConnectivityStatementStateService.is_valid,
+            ConnectivityStatementStateService.has_populationset,
+        ],
         permission=ConnectivityStatementStateService.has_permission_to_transition_to_exported,
     )
     def exported(self, *args, **kwargs):
-        ...
+        self.has_statement_been_exported = True
+        self.save(update_fields=["has_statement_been_exported"])
+
 
     @transition(
         field=state,
@@ -734,7 +775,7 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
     def assign_owner(self, requested_by, owner=None):
         if owner is None:
             owner = requested_by
-        
+
         if ConnectivityStatementStateService(self).can_assign_owner(requested_by):
             self.owner = owner
             self.save(update_fields=["owner"])
@@ -750,9 +791,23 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
         """
         return ConnectivityStatementStateService(self)
 
+    def validate_population_change(self):
+        if self.pk and self.has_statement_been_exported:
+            original = ConnectivityStatement.objects.get(pk=self.pk)
+            if original.population != self.population:
+                raise ValidationError(
+                    "Cannot change population set after the statement has been exported."
+                )
+
+    def clean(self):
+        return self.validate_population_change()
+
+
     def save(self, *args, **kwargs):
         if not self.pk and self.sentence and not self.owner:
             self.owner = self.sentence.owner
+
+        self.clean()
 
         super().save(*args, **kwargs)
 

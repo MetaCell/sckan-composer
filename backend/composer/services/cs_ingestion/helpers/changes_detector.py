@@ -14,7 +14,7 @@ def has_changes(connectivity_statement, statement, defaults):
         if field == 'state':
             continue
 
-        if field in ['sex', 'functional_circuit_role', 'phenotype', 'projection_phenotype']:
+        if field in ['sex', 'functional_circuit_role', 'phenotype', 'projection_phenotype', 'population']:
             current_fk_id = getattr(connectivity_statement, f'{field}_id')
             new_fk_id = value.id if value is not None else None
             if current_fk_id != new_fk_id:
