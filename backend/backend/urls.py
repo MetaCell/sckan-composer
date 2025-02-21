@@ -53,6 +53,7 @@ if not settings.PRODUCTION:
 
 if settings.DEBUG:
     urlpatterns += [
+        path("silk/", include("silk.urls", namespace="silk")),
         # Debug toolbar
         path("__debug__/", include("debug_toolbar.urls")),
     ]
