@@ -275,3 +275,17 @@ def get_user_profile(user):
     profile = Profile.objects.get(user=user)
     user._profile_cache = profile
     return profile
+
+
+def get_available_FIELD_transitions_without_conditions_check(instance, field):
+    """
+    List of transitions available in current model state
+    with all conditions met
+    """
+    curr_state = field.get_state(instance)
+    transitions = field.transitions[instance.__class__]
+
+    for name, transition in transitions.items():
+        meta = transition._django_fsm
+        if meta.has_transition(curr_state):
+            yield meta.get_transition(curr_state)

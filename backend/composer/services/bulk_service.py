@@ -1,7 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.db import transaction
-from django_fsm import TransitionNotAllowed, get_available_user_FIELD_transitions
+from django_fsm import TransitionNotAllowed
 from django.db.models import ForeignKey, Q, Count
+from composer.services.state_services import get_available_FIELD_transitions_without_conditions_check
 from composer.enums import CSState
 from composer.models import ConnectivityStatement, Profile, Tag, Note, User
 
@@ -121,22 +122,37 @@ def get_assignable_users_data(roles=None):
     return assignable_users
 
 
-def get_common_transitions(queryset, user):
-    transitions_list = []
-    for obj in queryset:
-        if hasattr(obj, "get_available_state_transitions"):
-            state_field = obj._meta.get_field("state")
-            transitions = {
-                transition.name
-                for transition in get_available_user_FIELD_transitions(obj, user, state_field)
-            }
-            transitions_list.append(transitions)
-    if transitions_list:
-        common = set.intersection(*transitions_list)
-    else:
-        common = set()
-    return list(common)
 
+def get_common_transitions(queryset, user):
+    """
+    Get common transitions for a queryset of objects.
+
+    If all objects in the queryset are in the same state, return the available state transitions
+    for the first object; otherwise, return an empty list.
+    """
+    if not queryset.exists():
+        return []
+
+    state_field_name = "state"
+    
+    states_count = queryset.values_list(state_field_name, flat=True).distinct().count()
+
+    if states_count > 1:
+        return []  # If there are multiple distinct states, return an empty list
+
+    # Get the first object (only one exists since all have the same state)
+    first_obj = queryset.first()
+    
+    # Get available state transitions for the first object
+    if hasattr(first_obj, "get_available_state_transitions"):
+        state_field = first_obj._meta.get_field(state_field_name)
+        transitions = {
+            transition.name
+            for transition in get_available_FIELD_transitions_without_conditions_check(first_obj, state_field)
+        }
+        return list(transitions)
+
+    return []
 
 def get_tags_partition(queryset):
     """
