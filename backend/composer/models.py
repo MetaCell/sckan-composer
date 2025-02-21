@@ -793,21 +793,30 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
 
     def validate_population_change(self):
         if self.pk and self.has_statement_been_exported:
-            original = ConnectivityStatement.objects.get(pk=self.pk)
-            if original.population != self.population:
+            original_population = (
+                self.__class__.objects.filter(pk=self.pk)
+                .values_list("population", flat=True)
+                .first()
+            )
+
+            # If the original population exists and has changed, raise an error
+            if (
+                original_population is not None
+                and original_population != self.population
+            ):
                 raise ValidationError(
                     "Cannot change population set after the statement has been exported."
                 )
 
     def clean(self):
-        return self.validate_population_change()
-
+        super().clean()
+        self.validate_population_change()
 
     def save(self, *args, **kwargs):
         if not self.pk and self.sentence and not self.owner:
             self.owner = self.sentence.owner
 
-        self.clean()
+        self.full_clean()
 
         super().save(*args, **kwargs)
 
