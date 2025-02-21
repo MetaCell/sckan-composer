@@ -240,7 +240,7 @@ class PopulationSet(models.Model):
         validators=[is_valid_population_name],
     )
     description = models.TextField(null=True, blank=True)
-    cs_exported_from_this_populationset_incremental_index = models.IntegerField(default=0)
+    last_used_index = models.PositiveIntegerField(default=0, help_text="Tracks the last assigned population index to ensure sequential numbering.")
 
     def __str__(self):
         return self.name
@@ -648,8 +648,8 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
         null=True,
         blank=True,
     )
+    population_index = models.PositiveIntegerField(null=True, blank=True, help_text="Index of this statement within its assigned population.")
     has_statement_been_exported = models.BooleanField(default=False)
-    compr_uri = models.URLField(null=True, blank=True)
 
     def __str__(self):
         suffix = ""
@@ -727,9 +727,20 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
         permission=ConnectivityStatementStateService.has_permission_to_transition_to_exported,
     )
     def exported(self, *args, **kwargs):
-        self.has_statement_been_exported = True
-        self.save(update_fields=["has_statement_been_exported"])
-
+        with transaction.atomic():
+                update_fields = ["has_statement_been_exported"]
+                # Only update population_index if the statement hasn't been exported yet
+                if not self.has_statement_been_exported and self.population:
+                    next_index = self.population.last_used_index + 1
+                    self.population_index = next_index
+                    update_fields.append("population_index")
+                    # Update the population's last_used_index in the same transaction.
+                    self.population.last_used_index = next_index
+                    self.population.save(update_fields=["last_used_index"])
+                
+                # Mark the statement as exported.
+                self.has_statement_been_exported = True
+                self.save(update_fields=update_fields)
 
     @transition(
         field=state,

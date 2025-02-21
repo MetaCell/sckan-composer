@@ -7,7 +7,6 @@ from composer.services.export.helpers.csv import create_csv
 from composer.services.export.helpers.export_batch import (
     create_export_batch,
     transition_statements_to_exported,
-    generate_and_save_compr_uri
 )
 from composer.models import (
     ExportBatch,
@@ -19,7 +18,7 @@ def export_connectivity_statements(
 ) -> typing.Tuple[str, ExportBatch]:
     with transaction.atomic():
         export_batch = create_export_batch(user)
-        export_batch = transition_statements_to_exported(export_batch, qs)
+        export_batch = transition_statements_to_exported(export_batch, qs, user)
 
     export_file = create_csv(export_batch, folder_path)
     return export_file, export_batch

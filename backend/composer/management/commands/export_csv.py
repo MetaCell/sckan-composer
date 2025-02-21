@@ -37,6 +37,6 @@ class Command(BaseCommand):
             state = options.get("state", CSState.NPO_APPROVED)
             username = options.get("username", None)
             user = User.objects.get(username=username)
-            qs = ConnectivityStatement.objects.filter(state=state)
+            qs = ConnectivityStatement.objects.filter(state=state).order_by("id")
             export_filename, _ = export_connectivity_statements(qs=qs, user=user, folder_path=folder)
         self.stdout.write(self.style.SUCCESS(f"Saved export batch to: {export_filename}"))

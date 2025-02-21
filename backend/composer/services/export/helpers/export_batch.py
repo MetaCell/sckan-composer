@@ -22,32 +22,26 @@ def create_export_batch(user: User) -> ExportBatch:
     return ExportBatch.objects.create(user=user)
 
 
-def transition_statements_to_exported(export_batch: ExportBatch, qs: QuerySet):
-    """Transitions only eligible ConnectivityStatements and updates them in bulk."""
+def transition_statements_to_exported(export_batch: ExportBatch, qs: QuerySet, user: User):
+    """Transitions only eligible ConnectivityStatements"""
     system_user = User.objects.get(username="system")
 
-    # Prepare successful statement list
-    successful_statements = []
+    transitioned_statements = []
+
     for cs in qs:
-        if ConnectivityStatementStateService(cs).is_transition_available(CSState.EXPORTED, system_user):
-            successful_statements.append(cs)
+        service = ConnectivityStatementStateService(cs)
+        try:
+            service.do_transition(
+                CSState.EXPORTED, system_user, user
+            )
+            transitioned_statements.append(cs)
+        except Exception as exc:
+            # Handle or log the exception as needed. Here we simply print an error.
+            print(f"Failed to transition ConnectivityStatement {cs.pk}: {exc}")
 
-    ## This is equivalent to do_transition from NPO_APPROVED to EXPORTED but optimized for bulk.
-    ## Changes on the transition logic should be reflected here.
-    
-    # Perform bulk state update
-    ConnectivityStatement.objects.filter(id__in=[cs.id for cs in successful_statements]).update(state=CSState.EXPORTED)
-
-    # Update has_statement_been_exported flag
-    ConnectivityStatement.objects.filter(id__in=[cs.id for cs in successful_statements]).update(
-        has_statement_been_exported=True
-    )
-
-    # Add only successfully transitioned statements to the export batch
-    export_batch.connectivity_statements.set(successful_statements)
-    
+    # Add successfully transitioned statements to the export batch
+    export_batch.connectivity_statements.set(transitioned_statements)
     return export_batch
-
 
 def compute_metrics(export_batch: ExportBatch):
     last_export_batch = (

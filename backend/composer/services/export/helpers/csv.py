@@ -8,6 +8,7 @@ from typing import Dict, Callable
 from django.db.models import Prefetch
 from django.utils import timezone
 
+from composer.utils import compr_uri
 from composer.services.export.helpers.rows import Row, get_rows
 from composer.services.export.helpers.utils import escape_newlines
 from composer.enums import NoteType
@@ -133,7 +134,7 @@ def get_curie_id(cs: ConnectivityStatement, row: Row):
 
 
 def get_compr_uri(cs: ConnectivityStatement, row: Row):
-    return cs.compr_uri if cs.compr_uri else ""
+    return compr_uri(cs.population.name, cs.population_index) if cs.population and cs.population_index else ""
 
 
 def get_nlp_id(cs: ConnectivityStatement, row: Row):
