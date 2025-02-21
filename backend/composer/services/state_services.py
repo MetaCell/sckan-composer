@@ -226,6 +226,10 @@ class ConnectivityStatementStateService(StateServiceMixin):
         return is_system_user(user)
 
     @staticmethod
+    def has_permission_to_transition_to_deprecated(connectivity_statement, user) -> bool:
+        return user.is_staff
+    
+    @staticmethod
     def add_important_tag(connectivity_statement):
         # when a ConnectivityStatement record goes to compose_now state and the previous
         # state is in NPO Approved or Exported then flag the CS with Tag IMPORTANT

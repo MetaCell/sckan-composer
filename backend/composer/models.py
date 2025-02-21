@@ -12,6 +12,7 @@ from composer.services.layers_service import update_from_entities_on_deletion
 from composer.services.state_services import (
     ConnectivityStatementStateService,
     SentenceStateService,
+    is_system_user
 )
 from .enums import (
     CircuitType,
@@ -746,6 +747,24 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
     def invalid(self, *args, **kwargs):
         ...
 
+
+    @transition(
+        field=state,
+        source=[
+            CSState.COMPOSE_NOW,
+            CSState.IN_PROGRESS,
+            CSState.REJECTED,
+            CSState.REVISE,
+            CSState.TO_BE_REVIEWED,
+            CSState.NPO_APPROVED,
+            CSState.EXPORTED,
+        ],
+        target=CSState.DEPRECATED,
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_deprecated,
+    )
+    def deprecated(self, *args, **kwargs):
+        ...
+
     @property
     def export_id(self):
         return f"CPR:{self.id:06d}"
@@ -828,6 +847,19 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
         if self.reference_uri is None:
             self.reference_uri = create_reference_uri(self.pk)
             self.save(update_fields=["reference_uri"])
+
+    def delete(self, user=None, *args, **kwargs):
+        if self.has_statement_been_exported:
+            if not user:
+                raise ValidationError("User is required to deprecate the statement before deletion.")
+
+            try:
+                self.deprecated(by=user)
+                self.save(update_fields=["state"])
+            except Exception as e:
+                raise ValidationError(f"Cannot deprecate the connectivity statement: {e}")
+        else:
+            super().delete(*args, **kwargs)
 
     def set_origins(self, origin_ids):
         self.origins.set(origin_ids, clear=True)
