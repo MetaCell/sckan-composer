@@ -821,7 +821,7 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
         if not self.pk and self.sentence and not self.owner:
             self.owner = self.sentence.owner
 
-        self.full_clean()
+        self.clean()
 
         super().save(*args, **kwargs)
 
