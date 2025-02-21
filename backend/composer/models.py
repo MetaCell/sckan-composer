@@ -240,6 +240,7 @@ class PopulationSet(models.Model):
         validators=[is_valid_population_name],
     )
     description = models.TextField(null=True, blank=True)
+    cs_exported_from_this_populationset_incremental_index = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -648,6 +649,7 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
         blank=True,
     )
     has_statement_been_exported = models.BooleanField(default=False)
+    compr_uri = models.URLField(null=True, blank=True)
 
     def __str__(self):
         suffix = ""

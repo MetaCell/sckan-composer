@@ -7,6 +7,7 @@ from composer.services.export.helpers.csv import create_csv
 from composer.services.export.helpers.export_batch import (
     create_export_batch,
     transition_statements_to_exported,
+    generate_and_save_compr_uri
 )
 from composer.models import (
     ExportBatch,
