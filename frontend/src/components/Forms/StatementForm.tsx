@@ -167,7 +167,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
     "ui:widget": "CustomSingleSelect",
     "ui:options": {
       isDisabled: statement.has_statement_been_exported,
-      label: "Population",
+      label: "Population Set",
       placeholder: "Enter Population",
       data: populations.getPopulations().map((row: any) => ({
         label: row.name,

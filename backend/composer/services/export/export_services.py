@@ -8,6 +8,7 @@ from composer.services.export.helpers.export_batch import (
     create_export_batch,
     filter_statements_with_exported_transition,
     transition_statements_to_exported,
+    generate_and_save_compr_uri
 )
 from composer.models import (
     ExportBatch,
@@ -19,6 +20,7 @@ def export_connectivity_statements(
 ) -> typing.Tuple[str, ExportBatch]:
     with transaction.atomic():
         filtered_qs = filter_statements_with_exported_transition(qs, user)
+        generate_and_save_compr_uri(filtered_qs)
         export_batch = create_export_batch(filtered_qs, user)
         export_batch = transition_statements_to_exported(export_batch, user)
 
