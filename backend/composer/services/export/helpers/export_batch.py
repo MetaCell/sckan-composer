@@ -28,16 +28,16 @@ def transition_statements_to_exported(export_batch: ExportBatch, qs: QuerySet, u
 
     transitioned_statements = []
 
-    for cs in qs:
+    for cs in qs.order_by("id"):
         service = ConnectivityStatementStateService(cs)
         try:
             service.do_transition(
-                CSState.EXPORTED, system_user, user
+                CSState.EXPORTED.value, system_user, user
             )
+            cs.save()
             transitioned_statements.append(cs)
         except Exception as exc:
-            # Handle or log the exception as needed. Here we simply print an error.
-            print(f"Failed to transition ConnectivityStatement {cs.pk}: {exc}")
+            pass
 
     # Add successfully transitioned statements to the export batch
     export_batch.connectivity_statements.set(transitioned_statements)

@@ -244,7 +244,7 @@ class ConnectivityStatementAdmin(
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
     readonly_fields = ("state", "curie_id", "has_statement_been_exported", "compr_uri")
-    exclude = ("journey_path", "statement_prefix", "statement_suffix")
+    exclude = ("journey_path", "statement_prefix", "statement_suffix", "population_index")
     autocomplete_fields = ("sentence", "origins")
     date_hierarchy = "modified_date"
     list_display = (
@@ -300,7 +300,7 @@ class ConnectivityStatementAdmin(
     def compr_uri(self, obj):
         if obj.population and obj.population_index is not None:
             return compr_uri(obj.population.name, obj.population_index)
-        return ""
+        return "Not available"
 
 
     @admin.display(description="Knowledge Statement")

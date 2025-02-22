@@ -875,7 +875,7 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
 
             try:
                 state_service = ConnectivityStatementStateService(self)
-                state_service.do_transition(CSState.DEPRECATED, user=user)
+                state_service.do_transition(CSState.DEPRECATED.value, user=user)
 
                 self.save(update_fields=["state"])
             except Exception as e:
