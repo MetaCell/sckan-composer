@@ -37,4 +37,17 @@ class Migration(migrations.Migration):
                 name="state_valid",
             ),
         ),
+        migrations.AlterField(
+            model_name="connectivitystatement",
+            name="reference_uri",
+            field=models.URLField(blank=True, null=True),
+        ),
+        migrations.AddConstraint(
+            model_name="connectivitystatement",
+            constraint=models.UniqueConstraint(
+                condition=models.Q(("state", "deprecated"), _negated=True),
+                fields=("reference_uri",),
+                name="unique_reference_uri_active",
+            ),
+        ),
     ]

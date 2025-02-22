@@ -622,7 +622,7 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
     )
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
     additional_information = models.TextField(null=True, blank=True)
-    reference_uri = models.URLField(null=True, blank=True, unique=True)
+    reference_uri = models.URLField(null=True, blank=True)
     functional_circuit_role = models.ForeignKey(
         FunctionalCircuitRole,
         on_delete=models.DO_NOTHING,
@@ -905,6 +905,11 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
             models.CheckConstraint(
                 check=Q(projection__in=[p[0] for p in Projection.choices]),
                 name="projection_valid",
+            ),
+            models.UniqueConstraint(
+                fields=['reference_uri'],
+                condition=~Q(state=CSState.DEPRECATED),
+                name="unique_reference_uri_active"
             )
         ]
 
