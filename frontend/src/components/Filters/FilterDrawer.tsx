@@ -6,7 +6,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import {tags} from "../../services/TagService";
-import { mapStateFilterSelectionToCheckbox, mapTagAndPopulationSetFilterSelectionToCheckbox, } from "../../helpers/helpers";
+import { mapStateFilterSelectionToCheckbox, mapFilterSelectionToCheckbox, } from "../../helpers/helpers";
 import {useAppDispatch} from "../../redux/hooks";
 import {
   ComposerConnectivityStatementListStateEnum as statementStates,
@@ -63,19 +63,19 @@ const FilterDrawer = (props: any) => {
   );
 
   const [selectedTags, setSelectedTags] = useState(
-    mapTagAndPopulationSetFilterSelectionToCheckbox(tagList, tagFilter)
+    mapFilterSelectionToCheckbox(tagList, tagFilter)
   );
 
   const [selectedPopulations, setSelectedPopulations] = useState(
-    mapTagAndPopulationSetFilterSelectionToCheckbox(populationList, populationSetFilter)
+    mapFilterSelectionToCheckbox(populationList, populationSetFilter)
   );
 
 
   const handleClearFilter = () => {
     setSelectedStates(setInitialStateSelection(undefined));
-    setSelectedTags(mapTagAndPopulationSetFilterSelectionToCheckbox(tagList, undefined));
+    setSelectedTags(mapFilterSelectionToCheckbox(tagList, undefined));
     setHasCSBeenExportedChecked(false);
-    setSelectedPopulations(mapTagAndPopulationSetFilterSelectionToCheckbox(populationList, undefined));
+    setSelectedPopulations(mapFilterSelectionToCheckbox(populationList, undefined));
   };
 
   const mapObjToArray = (filterObj: any) => {

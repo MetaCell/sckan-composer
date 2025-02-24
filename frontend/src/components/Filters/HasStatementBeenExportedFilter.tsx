@@ -1,11 +1,10 @@
 import React from "react";
 import { Stack, Typography } from "@mui/material";
 import ControlledCheckbox from "../Widgets/ControlledCheckbox";
-import { exportOptions } from "../../services/hasStatementBeenExportedService";
 
 const HasStatementBeenExportedFilter = (props: any) => {
   const { hasStatementBeenExported, setHasStatementBeenExported } = props;
-  const option = exportOptions.getOption();
+  const option = { id: 1, option: "Does this exist in SCKAN?" };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setHasStatementBeenExported(event.target.checked);
