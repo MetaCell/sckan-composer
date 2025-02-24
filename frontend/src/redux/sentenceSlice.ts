@@ -8,7 +8,7 @@ export interface QueryParams {
   index: number | undefined,
   ordering: Array<'-last_edited' | '-id' | 'last_edited' | 'id' | 'owner' | '-owner'> | undefined,
   stateFilter: ComposerSentenceListStateEnum[] | undefined,
-  populationSetFilter: number[] | undefined,
+  populationSetFilter: string[] | undefined,
   tagFilter: number[] | undefined,
   title: string | undefined
   exclude: string[] | undefined

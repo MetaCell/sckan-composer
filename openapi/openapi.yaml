@@ -213,6 +213,14 @@ paths:
         explode: true
         style: form
       - in: query
+        name: populationset
+        schema:
+          type: array
+          items:
+            type: string
+        explode: true
+        style: form
+      - in: query
         name: sentence_id
         schema:
           type: integer
@@ -738,6 +746,14 @@ paths:
         explode: true
         style: form
       - in: query
+        name: populationset
+        schema:
+          type: array
+          items:
+            type: string
+        explode: true
+        style: form
+      - in: query
         name: sentence_id
         schema:
           type: integer
@@ -851,6 +867,14 @@ paths:
           type: array
           items:
             type: integer
+        explode: true
+        style: form
+      - in: query
+        name: populationset
+        schema:
+          type: array
+          items:
+            type: string
         explode: true
         style: form
       - in: query
@@ -1652,6 +1676,14 @@ paths:
         explode: false
         style: form
       - in: query
+        name: populationset
+        schema:
+          type: array
+          items:
+            type: string
+        explode: true
+        style: form
+      - in: query
         name: state
         schema:
           type: array
@@ -1995,6 +2027,14 @@ paths:
         explode: false
         style: form
       - in: query
+        name: populationset
+        schema:
+          type: array
+          items:
+            type: string
+        explode: true
+        style: form
+      - in: query
         name: state
         schema:
           type: array
@@ -2080,6 +2120,14 @@ paths:
             - owner
         description: Ordering
         explode: false
+        style: form
+      - in: query
+        name: populationset
+        schema:
+          type: array
+          items:
+            type: string
+        explode: true
         style: form
       - in: query
         name: state
