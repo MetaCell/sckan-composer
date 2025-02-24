@@ -19,7 +19,7 @@ const HasStatementBeenExportedFilter = (props: any) => {
   ];
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} sx={{ mt: 3 }}>
       <Typography variant="subtitle1" color="#344054">
         Exported data
       </Typography>
