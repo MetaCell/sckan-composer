@@ -43,6 +43,7 @@ export default function CheckDuplicates() {
           destination ? [destination.id] : undefined, // destinations: Array<number>
           [],                                          // excludeIds: Array<number>
           undefined,                                   // excludeSentenceId
+          false,                                       // hasStatementBeenExportedFilter
           undefined,                                   // include
           undefined,                                   // knowledgeStatement
           duplicatesRowsPerPage,                       // limit

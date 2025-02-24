@@ -61,12 +61,12 @@ export const mapStateFilterSelectionToCheckbox = (
   return initialSelection;
 };
 
-export const mapTagFilterSelectionToCheckbox = (
-  tags: any[],
+export const mapFilterSelectionToCheckbox = (
+  options: any[],
   currentSelection: any,
 ) => {
   let initialSelection: { [key: string]: boolean } = {};
-  tags.forEach(
+  options.forEach(
     (i) =>
       (initialSelection = {
         ...initialSelection,

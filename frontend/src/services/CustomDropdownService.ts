@@ -235,6 +235,7 @@ const queryOptions = {
   index: 0,
   ordering: undefined,
   stateFilter: undefined,
+  populationSetFilter: undefined,
   tagFilter: undefined,
 };
 

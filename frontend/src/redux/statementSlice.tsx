@@ -6,9 +6,11 @@ export interface QueryParams {
   knowledgeStatement: string | undefined;
   limit: number;
   notes: boolean | undefined;
+  hasStatementBeenExportedFilter?: boolean | undefined;
   index: number | undefined;
   ordering: Array<"-last_edited" | "-id" | "last_edited" | "id"> | undefined;
   stateFilter: ComposerConnectivityStatementListStateEnum[] | undefined;
+  populationSetFilter: number[] | undefined;
   tagFilter: number[] | undefined;
   sentenceId: number | undefined;
   excludeSentenceId: number | undefined;
@@ -34,7 +36,9 @@ export const initialState: StatementState = {
     notes: undefined,
     index: undefined,
     ordering: undefined,
+    hasStatementBeenExportedFilter: false,
     stateFilter: undefined,
+    populationSetFilter: undefined,
     tagFilter: undefined,
     knowledgeStatement: undefined,
     sentenceId: undefined,
@@ -61,6 +65,8 @@ export const statementSlice = createSlice({
     setFilters: (state, action) => {
       state.queryOptions.stateFilter = action.payload.stateFilter;
       state.queryOptions.tagFilter = action.payload.tagFilter;
+      state.queryOptions.hasStatementBeenExportedFilter = action.payload.hasStatementBeenExportedFilter;
+      state.queryOptions.populationSetFilter = action.payload.populationSetFilter;
       state.queryOptions.index = 0;
     },
     setSorting: (state, action) => {

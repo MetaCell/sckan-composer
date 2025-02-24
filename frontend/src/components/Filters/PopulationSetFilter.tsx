@@ -4,21 +4,12 @@ import TextField from "@mui/material/TextField";
 import { vars } from "../../theme/variables";
 import IconButton from "@mui/material/IconButton";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
+import { populations } from "../../services/PopulationService";
 
-const populationSetList = [
-  { id: "mmset1", label: "mmset1" },
-  { id: "mmset2", label: "mmset2" },
-  { id: "mmset3", label: "mmset3" },
-  { id: "mmset4", label: "mmset4" },
-  { id: "brain", label: "brain" },
-  { id: "vagus", label: "vagus" },
-  { id: "keast", label: "keast" },
-  { id: "liver", label: "liver" },
-  { id: "mmset6", label: "mmset6" },
-];
 
 const PopulationSetFilter = (props: any) => {
   const { selectedPopulations, setSelectedPopulations } = props;
+  const populationSetList = populations.getPopulations()
   
   const handleChange = (event: any, newValue: any[]) => {
     const newSelectedPopulations = populationSetList.reduce((acc: any, option) => {
@@ -36,14 +27,14 @@ const PopulationSetFilter = (props: any) => {
       <Autocomplete
         multiple
         options={populationSetList}
-        getOptionLabel={(option) => option.label}
+        getOptionLabel={(option) => option.name}
         value={populationSetList.filter((option) => selectedPopulations && selectedPopulations[option.id])}
         onChange={handleChange}
         renderTags={(value, getTagProps) =>
           value.map((option, index) => (
             <Chip
               variant="outlined"
-              label={option.label}
+              label={option.name}
               {...getTagProps({ index })}
               key={option.id}
               deleteIcon={

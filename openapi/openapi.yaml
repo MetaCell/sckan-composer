@@ -156,6 +156,11 @@ paths:
         schema:
           type: integer
       - in: query
+        name: has_statement_been_exported
+        schema:
+          type: boolean
+        description: Is Exported
+      - in: query
         name: include
         schema:
           type: array
@@ -208,6 +213,14 @@ paths:
         explode: true
         style: form
       - in: query
+        name: populationset
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
         name: sentence_id
         schema:
           type: integer
@@ -219,6 +232,7 @@ paths:
             type: string
             enum:
             - compose_now
+            - deprecated
             - draft
             - exported
             - in_progress
@@ -688,6 +702,11 @@ paths:
         schema:
           type: integer
       - in: query
+        name: has_statement_been_exported
+        schema:
+          type: boolean
+        description: Is Exported
+      - in: query
         name: include
         schema:
           type: array
@@ -728,6 +747,14 @@ paths:
         explode: true
         style: form
       - in: query
+        name: populationset
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
         name: sentence_id
         schema:
           type: integer
@@ -739,6 +766,7 @@ paths:
             type: string
             enum:
             - compose_now
+            - deprecated
             - draft
             - exported
             - in_progress
@@ -799,6 +827,11 @@ paths:
         schema:
           type: integer
       - in: query
+        name: has_statement_been_exported
+        schema:
+          type: boolean
+        description: Is Exported
+      - in: query
         name: include
         schema:
           type: array
@@ -839,6 +872,14 @@ paths:
         explode: true
         style: form
       - in: query
+        name: populationset
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
         name: sentence_id
         schema:
           type: integer
@@ -850,6 +891,7 @@ paths:
             type: string
             enum:
             - compose_now
+            - deprecated
             - draft
             - exported
             - in_progress
@@ -2794,7 +2836,7 @@ components:
       required:
       - action
       - user_id
-    AvailableTransitions24dEnum:
+    AvailableTransitionsBc5Enum:
       enum:
       - draft
       - compose_now
@@ -2804,6 +2846,7 @@ components:
       - rejected
       - npo_approved
       - exported
+      - deprecated
       - invalid
       type: string
     BaseConnectivityStatement:
@@ -2929,7 +2972,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitions24dEnum'
+            $ref: '#/components/schemas/AvailableTransitionsBc5Enum'
           readOnly: true
         origins:
           type: array
@@ -3091,7 +3134,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitions24dEnum'
+            $ref: '#/components/schemas/AvailableTransitionsBc5Enum'
           readOnly: true
         origins:
           type: array
@@ -3753,7 +3796,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitions24dEnum'
+            $ref: '#/components/schemas/AvailableTransitionsBc5Enum'
           readOnly: true
         origins:
           type: array
@@ -3897,7 +3940,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitions24dEnum'
+            $ref: '#/components/schemas/AvailableTransitionsBc5Enum'
           readOnly: true
         origins:
           type: array
