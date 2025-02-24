@@ -156,6 +156,11 @@ paths:
         schema:
           type: integer
       - in: query
+        name: has_statement_been_exported
+        schema:
+          type: boolean
+        description: Is Exported
+      - in: query
         name: include
         schema:
           type: array
@@ -688,6 +693,11 @@ paths:
         schema:
           type: integer
       - in: query
+        name: has_statement_been_exported
+        schema:
+          type: boolean
+        description: Is Exported
+      - in: query
         name: include
         schema:
           type: array
@@ -798,6 +808,11 @@ paths:
         name: exclude_sentence_id
         schema:
           type: integer
+      - in: query
+        name: has_statement_been_exported
+        schema:
+          type: boolean
+        description: Is Exported
       - in: query
         name: include
         schema:
