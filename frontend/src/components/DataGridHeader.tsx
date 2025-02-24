@@ -94,15 +94,39 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
       ? dispatch(setSentenceFilters(noFilters))
       : dispatch(setStatementFilters(noFilters));
   };
-
   const updatedQueryOptions: SentenceQueryParams | StatementQueryParams = useMemo(() => {
+    if (!isAllDataSelected && selectedRows?.length) {
+      return {
+        include: selectedRows,
+        // Required fields need valid values, so we provide sensible defaults
+        limit: queryOptions.limit, // Keep the existing limit
+        notes: undefined,
+        index: undefined,
+        ordering: undefined,
+        stateFilter: undefined,
+        tagFilter: undefined,
+        title: undefined,
+        exclude: undefined, // Ensure exclude is ignored
+  
+        // StatementQueryParams specific fields
+        knowledgeStatement: undefined,
+        hasStatementBeenExportedFilter: undefined,
+        populationSetFilter: undefined,
+        sentenceId: undefined,
+        excludeSentenceId: undefined,
+        excludeIds: undefined,
+        origins: undefined,
+      } as SentenceQueryParams | StatementQueryParams; // Explicit type assertion
+    }
+  
+    // If include is not used, return queryOptions with exclude applied when needed.
     return {
       ...queryOptions,
-      include: !isAllDataSelected ? selectedRows : undefined,
       exclude: isAllDataSelected ? manuallyDeselectedRows : undefined,
     };
   }, [queryOptions, isAllDataSelected, selectedRows, manuallyDeselectedRows]);
-
+  
+  
   const fetchOptionsMap = useMemo(() => ({
     [ENTITY_TYPES.SENTENCE]: () =>
       sentenceService.fetchOptions(updatedQueryOptions as SentenceQueryParams),
