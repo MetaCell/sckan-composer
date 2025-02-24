@@ -317,7 +317,7 @@ class ConnectivityStatementService extends AbstractService {
    * Fetch options for assignable users and possible state transitions.
    * Uses connectivity statement filters or explicit IDs.
    */
-  async fetchOptions(queryOptions: QueryParams): Promise<{ assignable_users: any[]; possible_transitions: string[] }> {
+  async fetchOptions(queryOptions: QueryParams): Promise<{ assignable_users: any[]; possible_transitions: any }> {
     const {
       excludeIds,
       include,
