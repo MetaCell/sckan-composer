@@ -120,12 +120,18 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
     notes = django_filters.BooleanFilter(
         field_name="notes", label="Checks if entity has notes", method=field_has_content
     )
+    has_statement_been_exported = django_filters.BooleanFilter(method='filter_has_statement_been_exported', label='Is Exported')
     ordering = django_filters.OrderingFilter(
         fields=(
             ("id", "id"),
             ("modified_date", "last_edited"),
         ),
     )
+
+    def filter_has_statement_been_exported(self, queryset, name, value):
+        if value:
+            return queryset.filter(has_statement_been_exported=True)
+        return queryset
 
     class Meta:
         model = ConnectivityStatement
