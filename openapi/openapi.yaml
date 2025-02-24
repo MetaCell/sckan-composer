@@ -217,7 +217,7 @@ paths:
         schema:
           type: array
           items:
-            type: string
+            type: integer
         explode: true
         style: form
       - in: query
@@ -232,6 +232,7 @@ paths:
             type: string
             enum:
             - compose_now
+            - deprecated
             - draft
             - exported
             - in_progress
@@ -750,7 +751,7 @@ paths:
         schema:
           type: array
           items:
-            type: string
+            type: integer
         explode: true
         style: form
       - in: query
@@ -765,6 +766,7 @@ paths:
             type: string
             enum:
             - compose_now
+            - deprecated
             - draft
             - exported
             - in_progress
@@ -874,7 +876,7 @@ paths:
         schema:
           type: array
           items:
-            type: string
+            type: integer
         explode: true
         style: form
       - in: query
@@ -889,6 +891,7 @@ paths:
             type: string
             enum:
             - compose_now
+            - deprecated
             - draft
             - exported
             - in_progress
@@ -1676,14 +1679,6 @@ paths:
         explode: false
         style: form
       - in: query
-        name: populationset
-        schema:
-          type: array
-          items:
-            type: string
-        explode: true
-        style: form
-      - in: query
         name: state
         schema:
           type: array
@@ -2027,14 +2022,6 @@ paths:
         explode: false
         style: form
       - in: query
-        name: populationset
-        schema:
-          type: array
-          items:
-            type: string
-        explode: true
-        style: form
-      - in: query
         name: state
         schema:
           type: array
@@ -2120,14 +2107,6 @@ paths:
             - owner
         description: Ordering
         explode: false
-        style: form
-      - in: query
-        name: populationset
-        schema:
-          type: array
-          items:
-            type: string
-        explode: true
         style: form
       - in: query
         name: state
@@ -2857,7 +2836,7 @@ components:
       required:
       - action
       - user_id
-    AvailableTransitions24dEnum:
+    AvailableTransitionsBc5Enum:
       enum:
       - draft
       - compose_now
@@ -2867,6 +2846,7 @@ components:
       - rejected
       - npo_approved
       - exported
+      - deprecated
       - invalid
       type: string
     BaseConnectivityStatement:
@@ -2992,7 +2972,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitions24dEnum'
+            $ref: '#/components/schemas/AvailableTransitionsBc5Enum'
           readOnly: true
         origins:
           type: array
@@ -3154,7 +3134,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitions24dEnum'
+            $ref: '#/components/schemas/AvailableTransitionsBc5Enum'
           readOnly: true
         origins:
           type: array
@@ -3816,7 +3796,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitions24dEnum'
+            $ref: '#/components/schemas/AvailableTransitionsBc5Enum'
           readOnly: true
         origins:
           type: array
@@ -3960,7 +3940,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitions24dEnum'
+            $ref: '#/components/schemas/AvailableTransitionsBc5Enum'
           readOnly: true
         origins:
           type: array

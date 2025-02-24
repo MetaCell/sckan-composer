@@ -107,7 +107,6 @@ const SentencesDetails = () => {
           res = await sentenceService.getList({
             notes: undefined,
             tagFilter: undefined,
-            populationSetFilter: undefined,
             title: undefined,
             ordering: queryOptions.ordering,
             stateFilter: [ComposerSentenceListStateEnum.Open],

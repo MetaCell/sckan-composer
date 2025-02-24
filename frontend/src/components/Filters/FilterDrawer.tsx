@@ -33,7 +33,6 @@ const FilterDrawer = (props: any) => {
   const tagList = tags.getTagList();
   const populationList = populations.getPopulations();
 
-
   const setInitialStateSelection = (currentSelection: any) => {
     const sortStates = (states: Record<string, boolean>, order: string[]) => {
       return order.reduce((acc, key) => {
@@ -95,7 +94,7 @@ const FilterDrawer = (props: any) => {
     const hasStatementBeenExportedFilter = hasCSBeenExportedChecked ? true : false;
 
     entity === ENTITY_TYPES.SENTENCE &&
-      dispatch(setSentenceFilters({ stateFilter, tagFilter, populationSetFilter }));
+      dispatch(setSentenceFilters({ stateFilter, tagFilter }));
     entity === ENTITY_TYPES.STATEMENT &&
       dispatch(setStatementFilters({ stateFilter, tagFilter, populationSetFilter, hasStatementBeenExportedFilter }));
     toggleDrawer(false);
@@ -132,16 +131,19 @@ const FilterDrawer = (props: any) => {
           selectedTags={selectedTags}
           setSelectedTags={setSelectedTags}
         />
-        <PopulationSetFilter
-          selectedPopulations={selectedPopulations}
-          setSelectedPopulations={setSelectedPopulations}
-        />
         {
-          entity === ENTITY_TYPES.STATEMENT &&
-          <HasStatementBeenExportedFilter
-            hasStatementBeenExported={hasCSBeenExportedChecked}
-            setHasStatementBeenExported={setHasCSBeenExportedChecked}
-          />
+          entity === ENTITY_TYPES.STATEMENT && (
+            <Box>
+              <PopulationSetFilter
+                selectedPopulations={selectedPopulations}
+                setSelectedPopulations={setSelectedPopulations}
+              />
+              <HasStatementBeenExportedFilter
+                hasStatementBeenExported={hasCSBeenExportedChecked}
+                setHasStatementBeenExported={setHasCSBeenExportedChecked}
+              />
+            </Box>
+          )
         }
 
       </Stack>
