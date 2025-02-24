@@ -193,7 +193,9 @@ def get_common_transitions(queryset, user):
             for transition in get_available_FIELD_transitions_without_conditions_check(
                 first_obj, state_field
             )
+            if transition.name != CSState.DEPRECATED  # Exclude deprecated state
         }
+
         return {"transitions": list(transitions), "original_state": original_state}
 
     return {"transitions": list(transitions), "original_state": original_state}
