@@ -10,7 +10,7 @@ export interface QueryParams {
   index: number | undefined;
   ordering: Array<"-last_edited" | "-id" | "last_edited" | "id"> | undefined;
   stateFilter: ComposerConnectivityStatementListStateEnum[] | undefined;
-  populationSetFilter: string[] | undefined;
+  populationSetFilter: number[] | undefined;
   tagFilter: number[] | undefined;
   sentenceId: number | undefined;
   excludeSentenceId: number | undefined;
