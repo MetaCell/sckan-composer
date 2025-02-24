@@ -20,7 +20,6 @@ const AssignPopulationSet: React.FC<AssignPopulationSetProps> = ({
   queryOptions,
 }) => {
   const [selectedSet, setSelectedSet] = useState<PopoverOptionType | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const populationSets: PopoverOptionType[] = PopulationService.getPopulations().map((popSet) => ({
     label: popSet.name,
@@ -55,7 +54,6 @@ const AssignPopulationSet: React.FC<AssignPopulationSetProps> = ({
     }
 
     setSelectedSet(selectedOption);
-    setIsLoading(true);
 
     try {
       const assignPopulationFunction = assignPopulationSetMap[entityType];
@@ -64,8 +62,6 @@ const AssignPopulationSet: React.FC<AssignPopulationSetProps> = ({
       await assignPopulationFunction(queryOptions, parsedSetId);
     } catch (error) {
       console.error("Error assigning population set:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PopoverMenu from "./PopoverMenu";
 import { ChangeStatusIcon, ChangeStatusDialogIcon } from "../icons";
-import { SentenceLabels, snakeToSpace, StatementsLabels } from "../../helpers/helpers";
+import { SentenceLabels, StatementsLabels } from "../../helpers/helpers";
 import ConfirmationDialog from "../ConfirmationDialog";
 import sentenceService from "../../services/SentenceService";
 import { QueryParams as SentenceQueryParams } from "../../redux/sentenceSlice";
