@@ -51,6 +51,7 @@ export const initialState: StatementState = {
     redrawGraph: false,
     toggleGraphLock: false,
     navigate: false,
+    changeStatus: false
   },
 };
 

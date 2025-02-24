@@ -5,9 +5,11 @@ import { snakeToSpace } from "../../helpers/helpers";
 import ConfirmationDialog from "../ConfirmationDialog";
 import sentenceService from "../../services/SentenceService";
 import { QueryParams as SentenceQueryParams } from "../../redux/sentenceSlice";
-import { QueryParams as StatementQueryParams } from "../../redux/statementSlice";
+import {QueryParams as StatementQueryParams, setDialogState} from "../../redux/statementSlice";
 import { ENTITY_TYPES } from "../../helpers/settings";
 import connectivityStatementService from "../../services/StatementService";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../../redux/store";
 
 interface ChangeStatusProps {
   selectedRowsCount: number;
@@ -25,7 +27,9 @@ interface ChangeStatusProps {
 const ChangeStatus: React.FC<ChangeStatusProps> = ({ entityType, possibleTransitions, queryOptions, onClick, onConfirm, isFetchingOptions, selectedRowsCount, setGridLoading, isGridLoading, originalStatus }) => {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [dontShowAgain, setDontShowAgain] = useState(false);
+  const dialogsState = useSelector((state: RootState) => state.statement.dialogs);
+  
+  const dispatch = useDispatch();
 
   const changeStatusMap: Record<
     ENTITY_TYPES,
@@ -43,7 +47,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ entityType, possibleTransit
 
   const handleSelectStatus = (status: string) => {
     setSelectedStatus(status);
-    if (dontShowAgain) {
+    if (dialogsState.changeStatus) {
       handleStatusConfirm(status);
     } else {
       setIsModalOpen(true);
@@ -101,8 +105,8 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ entityType, possibleTransit
         title={`Change status of ${selectedRowsCount} ${entityType}.`}
         confirmationText={`By proceeding, the selected ${entityType} <strong>status</strong> will change from ${fromState} to ${toState}. Are you sure?`}
         Icon={<ChangeStatusDialogIcon />}
-        dontShowAgain={dontShowAgain}
-        setDontShowAgain={setDontShowAgain}
+        dontShowAgain={dialogsState.changeStatus}
+        setDontShowAgain={() => dispatch(setDialogState({ dialogKey: "changeStatus", dontShow: true }))}
       />
     </>
   );
