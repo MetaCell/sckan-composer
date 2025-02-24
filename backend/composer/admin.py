@@ -9,11 +9,13 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from fsm_admin.mixins import FSMTransitionMixin
 from django import forms
-
+from django.core.exceptions import ValidationError
+from composer.utils import compr_uri
 from composer.models import (
     AlertType,
     Phenotype,
     Sex,
+    PopulationSet,
     ConnectivityStatement,
     Provenance,
     ExportBatch,
@@ -25,9 +27,15 @@ from composer.models import (
     Tag,
     Via,
     FunctionalCircuitRole,
-    ProjectionPhenotype, Destination, Synonym, AnatomicalEntityMeta, Layer, Region,
+    ProjectionPhenotype,
+    Destination,
+    Synonym,
+    AnatomicalEntityMeta,
+    Layer,
+    Region,
     AnatomicalEntityIntersection,
-    AnatomicalEntity
+    AnatomicalEntity,
+    CSState
 )
 
 
@@ -235,8 +243,8 @@ class ConnectivityStatementAdmin(
     list_per_page = 10
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
-    readonly_fields = ("state", 'curie_id')
-    exclude = ("journey_path",)
+    readonly_fields = ("state", "curie_id", "has_statement_been_exported", "compr_uri")
+    exclude = ("journey_path", "statement_prefix", "statement_suffix", "population_index")
     autocomplete_fields = ("sentence", "origins")
     date_hierarchy = "modified_date"
     list_display = (
@@ -266,6 +274,34 @@ class ConnectivityStatementAdmin(
 
     inlines = (ProvenanceInline, NoteConnectivityStatementInline,
                ViaInline, DestinationInline, StatementAlertInline)
+
+    def _filter_admin_transitions(self, transitions_generator):
+        """
+        Override to filter out specific transitions.
+        """
+        for transition in transitions_generator:
+            # Filter out the 'deprecated' transition from available transitions
+            if transition.name != CSState.DEPRECATED:
+                yield transition
+
+    def delete_model(self, request, obj):
+        """Handles deletion from Django Admin."""
+        try:
+            obj.delete(user=request.user)
+        except ValidationError as e:
+            self.message_user(request, str(e), level="error")
+
+    def delete_queryset(self, request, queryset):
+        """Handles bulk deletion from Django Admin."""
+        for obj in queryset:
+            self.delete_model(request, obj)
+
+
+    def compr_uri(self, obj):
+        if obj.population and obj.population_index is not None:
+            return compr_uri(obj.population.name, obj.population_index)
+        return "Not available"
+
 
     @admin.display(description="Knowledge Statement")
     def short_ks(self, obj):
@@ -317,6 +353,10 @@ class ExportBatchAdmin(admin.ModelAdmin):
         return super().get_form(request, obj=obj, change=change, **kwargs)
 
 
+class PopulationSetAdmin(admin.ModelAdmin):
+    readonly_fields = ('last_used_index',)
+
+
 # Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
@@ -330,6 +370,7 @@ admin.site.register(AnatomicalEntityIntersection,
 admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
 admin.site.register(Phenotype)
 admin.site.register(Sex)
+admin.site.register(PopulationSet, PopulationSetAdmin)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
 admin.site.register(ExportBatch, ExportBatchAdmin)
 admin.site.register(Sentence, SentenceAdmin)

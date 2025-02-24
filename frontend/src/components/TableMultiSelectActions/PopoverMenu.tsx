@@ -5,15 +5,16 @@ import Popover from "@mui/material/Popover";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
-import {CircularProgress, ListItemIcon} from "@mui/material";
+import { CircularProgress, ListItemIcon } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import { vars } from "../../theme/variables";
-import {snakeToSpace} from "../../helpers/helpers";
+import { PopoverOptionType } from "../../types";
 
 const styles = {
   popoverPaper: {
     width: "16rem",
-    boxShadow: "0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)",
+    boxShadow:
+      "0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)",
     borderRadius: ".5rem",
     padding: ".25rem 0",
     border: `1px solid ${vars.gray200}`,
@@ -36,27 +37,37 @@ const styles = {
 interface PopoverMenuProps {
   icon: React.ElementType;
   tooltip: string;
-  options: string[];
-  selectedOption?: string | null;
-  onSelect: (option: string) => void;
+  options: PopoverOptionType[];
+  selectedOption?: PopoverOptionType | null;
+  onSelect: (option: PopoverOptionType) => void;
   onOpen: () => void;
   actionButtonDisabled?: boolean;
   noOptionsText?: string;
   isFetchingOptions?: boolean;
 }
 
-const PopoverMenu: React.FC<PopoverMenuProps> = ({ icon: IconComponent, tooltip, options, selectedOption, onSelect, onOpen, actionButtonDisabled = false, noOptionsText, isFetchingOptions }) => {
+const PopoverMenu: React.FC<PopoverMenuProps> = ({
+  icon: IconComponent,
+  tooltip,
+  options,
+  selectedOption,
+  onSelect,
+  onOpen,
+  actionButtonDisabled = false,
+  noOptionsText,
+  isFetchingOptions,
+}) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  
+
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
     onOpen();
   };
-  
+
   const handleClose = () => {
     setAnchorEl(null);
   };
-  
+
   return (
     <>
       <Tooltip arrow title={tooltip}>
@@ -66,7 +77,7 @@ const PopoverMenu: React.FC<PopoverMenuProps> = ({ icon: IconComponent, tooltip,
           </IconButton>
         </span>
       </Tooltip>
-      
+
       <Popover
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
@@ -76,23 +87,30 @@ const PopoverMenu: React.FC<PopoverMenuProps> = ({ icon: IconComponent, tooltip,
         slotProps={{ paper: { sx: styles.popoverPaper } }}
       >
         <List sx={styles.list}>
-          {isFetchingOptions ? <ListItem sx={{justifyContent: 'center'}}>
-            <CircularProgress />
-          </ListItem> : options.length === 0 ? <ListItem sx={styles.listItem}>
-              <ListItemText
-                primary={noOptionsText}
-              />
-            </ListItem> :
+          {isFetchingOptions ? (
+            <ListItem sx={{ justifyContent: "center" }}>
+              <CircularProgress />
+            </ListItem>
+          ) : options.length === 0 ? (
+            <ListItem sx={styles.listItem}>
+              <ListItemText primary={noOptionsText} />
+            </ListItem>
+          ) : (
             options.map((option, index) => (
-              <ListItem key={index} onClick={() => onSelect(option)} sx={styles.listItem}>
-                <ListItemText primary={snakeToSpace(option)} />
-                {selectedOption !== null && selectedOption === option && (
+              <ListItem
+                key={index}
+                onClick={() => onSelect(option)}
+                sx={styles.listItem}
+              >
+                <ListItemText primary={option.label} />
+                {selectedOption?.value === option.value && (
                   <ListItemIcon sx={{ minWidth: "auto" }}>
                     <CheckIcon sx={{ color: vars.colorPrimary }} fontSize="small" />
                   </ListItemIcon>
                 )}
               </ListItem>
-            ))}
+            ))
+          )}
         </List>
       </Popover>
     </>

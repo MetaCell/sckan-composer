@@ -6,7 +6,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import {tags} from "../../services/TagService";
-import {mapStateFilterSelectionToCheckbox, mapTagFilterSelectionToCheckbox,} from "../../helpers/helpers";
+import { mapStateFilterSelectionToCheckbox, mapFilterSelectionToCheckbox, } from "../../helpers/helpers";
 import {useAppDispatch} from "../../redux/hooks";
 import {
   ComposerConnectivityStatementListStateEnum as statementStates,
@@ -16,21 +16,23 @@ import {setFilters as setSentenceFilters} from "../../redux/sentenceSlice";
 import {setFilters as setStatementFilters} from "../../redux/statementSlice";
 import StateFilter from "./StateFilter";
 import TagFilter from "./TagFilter";
-import {ENTITY_TYPES, SENTENCE_STATE_ORDER, STATEMENT_STATE_ORDER} from "../../helpers/settings";
+import HasStatementBeenExportedFilter from "./HasStatementBeenExportedFilter";
+import { ENTITY_TYPES, SENTENCE_STATE_ORDER, STATEMENT_STATE_ORDER } from "../../helpers/settings";
 import PopulationSetFilter from "./PopulationSetFilter";
 import {vars} from "../../theme/variables";
+import { populations } from "../../services/PopulationService";
 
 const {Draft, ...statementStatesExDraft } = statementStates
 
 const FilterDrawer = (props: any) => {
   const { toggleDrawer, queryOptions, entity } = props;
 
-  const { stateFilter, tagFilter, populationSetFilter } = queryOptions;
+  const { stateFilter, tagFilter, populationSetFilter, hasStatementBeenExportedFilter } = queryOptions;
   const dispatch = useAppDispatch();
 
   const tagList = tags.getTagList();
-  
-  
+  const populationList = populations.getPopulations();
+
   const setInitialStateSelection = (currentSelection: any) => {
     const sortStates = (states: Record<string, boolean>, order: string[]) => {
       return order.reduce((acc, key) => {
@@ -38,7 +40,7 @@ const FilterDrawer = (props: any) => {
         return acc;
       }, {} as Record<string, boolean>);
     };
-    
+
     if (entity === ENTITY_TYPES.SENTENCE) {
       return sortStates(
         mapStateFilterSelectionToCheckbox(sentenceStates, currentSelection),
@@ -51,24 +53,29 @@ const FilterDrawer = (props: any) => {
       );
     }
   };
-  
+
   const [selectedStates, setSelectedStates] = useState(
     setInitialStateSelection(stateFilter)
   );
 
+  const [hasCSBeenExportedChecked, setHasCSBeenExportedChecked] = useState(
+    hasStatementBeenExportedFilter ? true : false
+  );
+
   const [selectedTags, setSelectedTags] = useState(
-    mapTagFilterSelectionToCheckbox(tagList, tagFilter)
+    mapFilterSelectionToCheckbox(tagList, tagFilter)
   );
-  
+
   const [selectedPopulations, setSelectedPopulations] = useState(
-    populationSetFilter
+    mapFilterSelectionToCheckbox(populationList, populationSetFilter)
   );
-  
-  
+
+
   const handleClearFilter = () => {
     setSelectedStates(setInitialStateSelection(undefined));
-    setSelectedTags(mapTagFilterSelectionToCheckbox(tagList, undefined));
-    setSelectedPopulations(undefined);
+    setSelectedTags(mapFilterSelectionToCheckbox(tagList, undefined));
+    setHasCSBeenExportedChecked(false);
+    setSelectedPopulations(mapFilterSelectionToCheckbox(populationList, undefined));
   };
 
   const mapObjToArray = (filterObj: any) => {
@@ -84,11 +91,12 @@ const FilterDrawer = (props: any) => {
     const stateFilter = mapObjToArray(selectedStates);
     let tagFilter = mapObjToArray(selectedTags);
     const populationSetFilter = mapObjToArray(selectedPopulations);
-    
+    const hasStatementBeenExportedFilter = hasCSBeenExportedChecked ? true : false;
+
     entity === ENTITY_TYPES.SENTENCE &&
-      dispatch(setSentenceFilters({ stateFilter, tagFilter, populationSetFilter }));
+      dispatch(setSentenceFilters({ stateFilter, tagFilter }));
     entity === ENTITY_TYPES.STATEMENT &&
-      dispatch(setStatementFilters({ stateFilter, tagFilter, populationSetFilter }));
+      dispatch(setStatementFilters({ stateFilter, tagFilter, populationSetFilter, hasStatementBeenExportedFilter }));
     toggleDrawer(false);
   };
   return (
@@ -123,24 +131,35 @@ const FilterDrawer = (props: any) => {
           selectedTags={selectedTags}
           setSelectedTags={setSelectedTags}
         />
-        <PopulationSetFilter
-          selectedPopulations={selectedPopulations}
-          setSelectedPopulations={setSelectedPopulations}
-        />
+        {
+          entity === ENTITY_TYPES.STATEMENT && (
+            <Box>
+              <PopulationSetFilter
+                selectedPopulations={selectedPopulations}
+                setSelectedPopulations={setSelectedPopulations}
+              />
+              <HasStatementBeenExportedFilter
+                hasStatementBeenExported={hasCSBeenExportedChecked}
+                setHasStatementBeenExported={setHasCSBeenExportedChecked}
+              />
+            </Box>
+          )
+        }
+
       </Stack>
       {/*<Divider />*/}
       <Box
-       sx={{
-         position: "sticky",
-         bottom: 0,
-         background: "white",
-         boxShadow: "0px 1px 2px 0px rgba(16, 24, 40, 0.05)",
-         borderTop: `1px solid ${vars.gray200}`,
-         px: 3,
-         py: 2,
-         textAlign: "right",
-         zIndex: 10,
-       }}
+        sx={{
+          position: "sticky",
+          bottom: 0,
+          background: "white",
+          boxShadow: "0px 1px 2px 0px rgba(16, 24, 40, 0.05)",
+          borderTop: `1px solid ${vars.gray200}`,
+          px: 3,
+          py: 2,
+          textAlign: "right",
+          zIndex: 10,
+        }}
       >
         <Button
           variant="outlined"

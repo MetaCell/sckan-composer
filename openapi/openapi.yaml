@@ -156,6 +156,11 @@ paths:
         schema:
           type: integer
       - in: query
+        name: has_statement_been_exported
+        schema:
+          type: boolean
+        description: Is Exported
+      - in: query
         name: include
         schema:
           type: array
@@ -208,6 +213,14 @@ paths:
         explode: true
         style: form
       - in: query
+        name: populationset
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
         name: sentence_id
         schema:
           type: integer
@@ -219,6 +232,7 @@ paths:
             type: string
             enum:
             - compose_now
+            - deprecated
             - draft
             - exported
             - in_progress
@@ -688,6 +702,11 @@ paths:
         schema:
           type: integer
       - in: query
+        name: has_statement_been_exported
+        schema:
+          type: boolean
+        description: Is Exported
+      - in: query
         name: include
         schema:
           type: array
@@ -728,6 +747,14 @@ paths:
         explode: true
         style: form
       - in: query
+        name: populationset
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
         name: sentence_id
         schema:
           type: integer
@@ -739,6 +766,7 @@ paths:
             type: string
             enum:
             - compose_now
+            - deprecated
             - draft
             - exported
             - in_progress
@@ -799,6 +827,11 @@ paths:
         schema:
           type: integer
       - in: query
+        name: has_statement_been_exported
+        schema:
+          type: boolean
+        description: Is Exported
+      - in: query
         name: include
         schema:
           type: array
@@ -839,6 +872,14 @@ paths:
         explode: true
         style: form
       - in: query
+        name: populationset
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      - in: query
         name: sentence_id
         schema:
           type: integer
@@ -850,6 +891,7 @@ paths:
             type: string
             enum:
             - compose_now
+            - deprecated
             - draft
             - exported
             - in_progress
@@ -1449,6 +1491,62 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Phenotype'
+          description: ''
+  /api/composer/population/:
+    get:
+      operationId: composer_population_list
+      description: PopulationSet
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPopulationSetList'
+          description: ''
+  /api/composer/population/{id}/:
+    get:
+      operationId: composer_population_retrieve
+      description: PopulationSet
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this population set.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PopulationSet'
           description: ''
   /api/composer/profile/my/:
     get:
@@ -2738,7 +2836,7 @@ components:
       required:
       - action
       - user_id
-    AvailableTransitions24dEnum:
+    AvailableTransitionsBc5Enum:
       enum:
       - draft
       - compose_now
@@ -2748,6 +2846,7 @@ components:
       - rejected
       - npo_approved
       - exported
+      - deprecated
       - invalid
       type: string
     BaseConnectivityStatement:
@@ -2873,7 +2972,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitions24dEnum'
+            $ref: '#/components/schemas/AvailableTransitionsBc5Enum'
           readOnly: true
         origins:
           type: array
@@ -2936,6 +3035,16 @@ components:
           allOf:
           - $ref: '#/components/schemas/Sex'
           readOnly: true
+        population_id:
+          type: integer
+          nullable: true
+        population:
+          allOf:
+          - $ref: '#/components/schemas/PopulationSet'
+          readOnly: true
+        has_statement_been_exported:
+          type: boolean
+          readOnly: true
         forward_connection:
           type: array
           items:
@@ -2974,11 +3083,13 @@ components:
       - entities_journey
       - errors
       - has_notes
+      - has_statement_been_exported
       - id
       - journey
       - modified_date
       - owner
       - phenotype
+      - population
       - projection_phenotype
       - sentence
       - sex
@@ -3023,7 +3134,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitions24dEnum'
+            $ref: '#/components/schemas/AvailableTransitionsBc5Enum'
           readOnly: true
         origins:
           type: array
@@ -3083,6 +3194,16 @@ components:
           allOf:
           - $ref: '#/components/schemas/Sex'
           readOnly: true
+        population_id:
+          type: integer
+          nullable: true
+        population:
+          allOf:
+          - $ref: '#/components/schemas/PopulationSet'
+          readOnly: true
+        has_statement_been_exported:
+          type: boolean
+          readOnly: true
         forward_connection:
           type: array
           items:
@@ -3120,12 +3241,14 @@ components:
       - available_transitions
       - errors
       - has_notes
+      - has_statement_been_exported
       - id
       - journey
       - modified_date
       - origins
       - owner
       - phenotype
+      - population
       - projection_phenotype
       - sentence
       - sex
@@ -3475,6 +3598,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Phenotype'
+    PaginatedPopulationSetList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PopulationSet'
     PaginatedProjectionPhenotypeList:
       type: object
       properties:
@@ -3653,7 +3796,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitions24dEnum'
+            $ref: '#/components/schemas/AvailableTransitionsBc5Enum'
           readOnly: true
         origins:
           type: array
@@ -3715,6 +3858,16 @@ components:
         sex:
           allOf:
           - $ref: '#/components/schemas/Sex'
+          readOnly: true
+        population_id:
+          type: integer
+          nullable: true
+        population:
+          allOf:
+          - $ref: '#/components/schemas/PopulationSet'
+          readOnly: true
+        has_statement_been_exported:
+          type: boolean
           readOnly: true
         forward_connection:
           type: array
@@ -3787,7 +3940,7 @@ components:
         available_transitions:
           type: array
           items:
-            $ref: '#/components/schemas/AvailableTransitions24dEnum'
+            $ref: '#/components/schemas/AvailableTransitionsBc5Enum'
           readOnly: true
         origins:
           type: array
@@ -3846,6 +3999,16 @@ components:
         sex:
           allOf:
           - $ref: '#/components/schemas/Sex'
+          readOnly: true
+        population_id:
+          type: integer
+          nullable: true
+        population:
+          allOf:
+          - $ref: '#/components/schemas/PopulationSet'
+          readOnly: true
+        has_statement_been_exported:
+          type: boolean
           readOnly: true
         forward_connection:
           type: array
@@ -4041,6 +4204,22 @@ components:
         name:
           type: string
           maxLength: 200
+      required:
+      - id
+      - name
+    PopulationSet:
+      type: object
+      description: Population Set
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          nullable: true
       required:
       - id
       - name
@@ -4252,6 +4431,16 @@ components:
           allOf:
           - $ref: '#/components/schemas/Sex'
           readOnly: true
+        population_id:
+          type: integer
+          nullable: true
+        population:
+          allOf:
+          - $ref: '#/components/schemas/PopulationSet'
+          readOnly: true
+        has_statement_been_exported:
+          type: boolean
+          readOnly: true
         apinatomy_model:
           type: string
           readOnly: true
@@ -4271,11 +4460,13 @@ components:
       - additional_information
       - apinatomy_model
       - circuit_type
+      - has_statement_been_exported
       - id
       - knowledge_statement
       - laterality
       - owner
       - phenotype
+      - population
       - projection
       - projection_phenotype
       - provenances

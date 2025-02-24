@@ -26,7 +26,7 @@ class OwnerServiceMixin(BaseServiceMixin):
             return True
 
 class StateServiceMixin(OwnerServiceMixin):
-    def _is_transition_available(self, transition, user=None):
+    def is_transition_available(self, transition, user=None):
         """
         Checks if the requested transition is available
         """
@@ -44,7 +44,7 @@ class StateServiceMixin(OwnerServiceMixin):
         # Ensure the requested transition is available
         if not by_user:
             by_user = user
-        available = self._is_transition_available(transition, user)
+        available = self.is_transition_available(transition, user)
         trans_func = getattr(self.obj, transition, None)
         if available and trans_func:
             # Run the transition
@@ -226,6 +226,10 @@ class ConnectivityStatementStateService(StateServiceMixin):
         return is_system_user(user)
 
     @staticmethod
+    def has_permission_to_transition_to_deprecated(connectivity_statement, user) -> bool:
+        return user.is_staff
+    
+    @staticmethod
     def add_important_tag(connectivity_statement):
         # when a ConnectivityStatement record goes to compose_now state and the previous
         # state is in NPO Approved or Exported then flag the CS with Tag IMPORTANT
@@ -259,6 +263,15 @@ class ConnectivityStatementStateService(StateServiceMixin):
             if any(entity in forward_connection.origins.all() for entity in destination_anatomical_entities):
                 return True
         return False
+
+    @staticmethod
+    def has_populationset(connectivity_statement) -> bool:
+        return connectivity_statement.population is not None
+
+
+    @staticmethod
+    def can_be_deprecated(connectivity_statement):
+        return connectivity_statement.has_statement_been_exported
 
 
 def is_system_user(user: User) -> bool:

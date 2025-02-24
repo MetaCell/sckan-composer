@@ -1,18 +1,74 @@
 import React, { useState } from "react";
 import PopoverMenu from "./PopoverMenu";
 import { AssignPopulationIcon } from "../icons";
+import { populations as PopulationService } from "../../services/PopulationService";
+import { ENTITY_TYPES } from "../../helpers/settings";
+import sentenceService from "../../services/SentenceService";
+import connectivityStatementService from "../../services/StatementService";
+import { QueryParams as SentenceQueryParams } from "../../redux/sentenceSlice";
+import { QueryParams as StatementQueryParams } from "../../redux/statementSlice";
+import { PopoverOptionType } from "../../types";
 
-const AssignPopulationSet = ({selectedTableRows, entityType}: any) => {
-  const [selectedSet, setSelectedSet] = useState<string | null>(null);
-  
-  const populationSets = ["mmset1", "mmset2", "mmset3", "mmset4", "brain", "vagus", "keast", "liver", "mmset6"];
-  
-  const handleSelectSet = (set: string) => {
-    setSelectedSet(set);
-    // TODO: API call to assign population set
-    console.log(`Assigned population set:`, set, entityType, selectedTableRows);
+interface AssignPopulationSetProps {
+  selectedTableRows: any[];
+  entityType: ENTITY_TYPES;
+  queryOptions: SentenceQueryParams | StatementQueryParams;
+}
+
+const AssignPopulationSet: React.FC<AssignPopulationSetProps> = ({
+  entityType,
+  queryOptions,
+}) => {
+  const [selectedSet, setSelectedSet] = useState<PopoverOptionType | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const populationSets: PopoverOptionType[] = PopulationService.getPopulations().map((popSet) => ({
+    label: popSet.name,
+    value: popSet.id.toString(),
+  }));
+
+
+  const assignPopulationSetMap: Record<
+    ENTITY_TYPES,
+    (
+      queryOptions: SentenceQueryParams | StatementQueryParams,
+      selectedSet: number
+    ) => Promise<{ message: string }>
+  > = {
+    [ENTITY_TYPES.SENTENCE]: (queryOptions, selectedSet) =>
+      sentenceService.assignPopulationSetBulk(
+        queryOptions as SentenceQueryParams,
+        selectedSet
+      ),
+    [ENTITY_TYPES.STATEMENT]: (queryOptions, selectedSet) =>
+      connectivityStatementService.assignPopulationSetBulk(
+        queryOptions as StatementQueryParams,
+        selectedSet
+      ),
   };
-  
+
+  const handleSelectSet = async (selectedOption: PopoverOptionType) => {
+    const parsedSetId = parseInt(selectedOption.value, 10);
+    if (isNaN(parsedSetId)) {
+      console.error("Invalid population set ID:", selectedOption.value);
+      return;
+    }
+
+    setSelectedSet(selectedOption);
+    setIsLoading(true);
+
+    try {
+      const assignPopulationFunction = assignPopulationSetMap[entityType];
+      if (!assignPopulationFunction) throw new Error(`No function found for ${entityType}`);
+
+      await assignPopulationFunction(queryOptions, parsedSetId);
+    } catch (error) {
+      console.error("Error assigning population set:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <PopoverMenu
       icon={AssignPopulationIcon}
@@ -20,7 +76,7 @@ const AssignPopulationSet = ({selectedTableRows, entityType}: any) => {
       options={populationSets}
       selectedOption={selectedSet}
       onSelect={handleSelectSet}
-      onOpen={() => console.log("TODO")}
+      onOpen={() => { }}
       noOptionsText={"No options available!"}
     />
   );

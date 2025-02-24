@@ -1,6 +1,6 @@
 from django.db.models import Count, QuerySet
 from django.contrib.auth.models import User
-
+from django.db import transaction
 
 from composer.services.state_services import ConnectivityStatementStateService
 from composer.enums import (
@@ -15,12 +15,33 @@ from composer.models import (
     Sentence,
 )
 
-def create_export_batch(qs: QuerySet, user: User) -> ExportBatch:
-    export_batch = ExportBatch.objects.create(user=user)
-    export_batch.connectivity_statements.set(qs)
-    export_batch.save()
-    return export_batch
+def create_export_batch(user: User) -> ExportBatch:
+    """
+    Creates an empty export batch. Statements will be added after successful transition.
+    """
+    return ExportBatch.objects.create(user=user)
 
+
+def transition_statements_to_exported(export_batch: ExportBatch, qs: QuerySet, user: User):
+    """Transitions only eligible ConnectivityStatements"""
+    system_user = User.objects.get(username="system")
+
+    transitioned_statements = []
+
+    for cs in qs.order_by("id"):
+        service = ConnectivityStatementStateService(cs)
+        try:
+            service.do_transition(
+                CSState.EXPORTED.value, system_user, user
+            )
+            cs.save()
+            transitioned_statements.append(cs)
+        except Exception as exc:
+            pass
+
+    # Add successfully transitioned statements to the export batch
+    export_batch.connectivity_statements.set(transitioned_statements)
+    return export_batch
 
 def compute_metrics(export_batch: ExportBatch):
     last_export_batch = (
@@ -79,20 +100,3 @@ def compute_metrics(export_batch: ExportBatch):
             count=metric["count"],
         )
     return export_batch
-
-
-def do_transition_to_exported(export_batch: ExportBatch, user: User):
-    system_user = User.objects.get(username="system")
-    connectivity_statements = export_batch.connectivity_statements.all()
-    for connectivity_statement in connectivity_statements:
-        available_transitions = [
-            available_state.target
-            for available_state in connectivity_statement.get_available_user_state_transitions(
-                system_user
-            )
-        ]
-        if CSState.EXPORTED in available_transitions:
-            cs = ConnectivityStatementStateService(connectivity_statement).do_transition(
-                CSState.EXPORTED, system_user, user
-            )
-            cs.save()
