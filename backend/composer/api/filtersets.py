@@ -9,6 +9,7 @@ from composer.models import (
     Sentence,
     ConnectivityStatement,
     AnatomicalEntity,
+    PopulationSet,
     Note,
     Tag,
     Via,
@@ -42,6 +43,9 @@ class SentenceFilter(django_filters.FilterSet):
     )
     tags = django_filters.ModelMultipleChoiceFilter(
         field_name="tags", queryset=Tag.objects.all()
+    )
+    populationset = django_filters.ModelMultipleChoiceFilter(
+        field_name="connectivitystatement__population", queryset=PopulationSet.objects.all()
     )
     notes = django_filters.BooleanFilter(
         field_name="notes", label="Checks if entity has notes", method=field_has_content
@@ -106,6 +110,9 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
     )
     tags = django_filters.ModelMultipleChoiceFilter(
         field_name="tags", queryset=Tag.objects.all()
+    )
+    populationset = django_filters.ModelMultipleChoiceFilter(
+        field_name="population", queryset=PopulationSet.objects.all()
     )
     origins = django_filters.ModelMultipleChoiceFilter(
         field_name="origins",
