@@ -86,7 +86,7 @@ class SentenceService extends AbstractService {
    */
   async fetchOptions(queryOptions: QueryParams): Promise<{
     tags: any[];
-    assignable_users: any[]; possible_transitions: string[] }> {
+    assignable_users: any[]; possible_transitions: any }> {
     const { exclude, include, notes, ordering, stateFilter, tagFilter, title } = queryOptions;
 
     return composerApi
