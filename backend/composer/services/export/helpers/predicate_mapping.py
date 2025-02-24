@@ -121,6 +121,11 @@ class ExportRelationships(IExportRelationship, Enum):
         "Knowledge Statement",
         "http://uri.interlex.org/tgbugs/uris/readable/composerGenLabel",
     )
+    hasComposerUri = (
+        "hasComposerUri",
+        "Composer URI",
+        "https://uri.interlex.org/composer/uris/readable/hasComposerURI",
+    )
 
     @property
     def predicate(self):

@@ -1,7 +1,7 @@
 from typing import List
 
 from composer.services.statement_service import get_statement_preview
-from composer.services.export.helpers.utils import get_connected_from_info
+from composer.services.export.helpers.utils import get_connected_from_info, get_composer_uri
 from composer.services.export.helpers.predicate_mapping import (
     DESTINATION_PREDICATE_MAP,
     VIA_PREDICATE_MAP,
@@ -156,7 +156,9 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
                 object_text=statement_alert.text,
             )
         )
-
+    
+    # the composer URI
+    rows.append(get_composer_uri_row(cs))
     return rows
 
 
@@ -317,5 +319,15 @@ def get_forward_connection_row(forward_conn: ConnectivityStatement):
     return Row(
         object=forward_conn.sentence.pk,
         object_uri=forward_conn.reference_uri,
+        predicate_mapping=predicate_mapping,
+    )
+
+
+
+def get_composer_uri_row(cs: ConnectivityStatement):
+    predicate_mapping = ExportRelationships.hasComposerUri
+    return Row(
+        object="Composer URI",
+        object_uri=get_composer_uri(cs),
         predicate_mapping=predicate_mapping,
     )

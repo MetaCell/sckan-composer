@@ -57,9 +57,9 @@ def get_phenotype(statement: Dict) -> Optional[Phenotype]:
 
 
 def get_or_create_populationset(populationset_name: str) -> PopulationSet:
-    populationset = PopulationSet.objects.get_or_create(
+    populationset, _ = PopulationSet.objects.get_or_create(
         name=populationset_name, description=populationset_name
-    )[0]
+    )
     return populationset
 
 

@@ -677,7 +677,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     def get_available_transitions(self, instance) -> list[CSState]:
         request = self.context.get("request", None)
         user = request.user if request else None
-        return [t.name for t in instance.get_available_user_state_transitions(user)]
+        return [t.name for t in instance.get_available_user_state_transitions(user) if t.name != CSState.DEPRECATED]
 
     def get_journey(self, instance):
         if 'journey' not in self.context:

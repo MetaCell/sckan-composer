@@ -85,6 +85,8 @@ const SentenceList = () => {
         isAllDataSelected={isAllDataSelected}
         selectedRowsCount={selectedRowsCount}
         manuallyDeselectedRows={manuallyDeselectedRows}
+        setGridLoading={setLoading}
+        isGridLoading={loading}
       />
       <Box sx={{ position: "relative", zIndex: 1 }}>
         <SelectionBanner

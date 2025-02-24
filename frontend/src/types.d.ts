@@ -17,4 +17,9 @@ export type Option = {
 export interface OptionType {
     id: number;
     label: string;
-  }
+}
+
+interface PopoverOptionType {
+    label: string;
+    value: string;
+}
