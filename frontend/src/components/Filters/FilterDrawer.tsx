@@ -6,7 +6,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import {tags} from "../../services/TagService";
-import {mapStateFilterSelectionToCheckbox, mapTagFilterSelectionToCheckbox,} from "../../helpers/helpers";
+import { mapStateFilterSelectionToCheckbox, mapTagAndPopulationSetFilterSelectionToCheckbox, } from "../../helpers/helpers";
 import {useAppDispatch} from "../../redux/hooks";
 import {
   ComposerConnectivityStatementListStateEnum as statementStates,
@@ -20,6 +20,7 @@ import HasStatementBeenExportedFilter from "./HasStatementBeenExportedFilter";
 import { ENTITY_TYPES, SENTENCE_STATE_ORDER, STATEMENT_STATE_ORDER } from "../../helpers/settings";
 import PopulationSetFilter from "./PopulationSetFilter";
 import {vars} from "../../theme/variables";
+import { populations } from "../../services/PopulationService";
 
 const {Draft, ...statementStatesExDraft } = statementStates
 
@@ -30,6 +31,7 @@ const FilterDrawer = (props: any) => {
   const dispatch = useAppDispatch();
 
   const tagList = tags.getTagList();
+  const populationList = populations.getPopulations();
 
 
   const setInitialStateSelection = (currentSelection: any) => {
@@ -62,19 +64,19 @@ const FilterDrawer = (props: any) => {
   );
 
   const [selectedTags, setSelectedTags] = useState(
-    mapTagFilterSelectionToCheckbox(tagList, tagFilter)
+    mapTagAndPopulationSetFilterSelectionToCheckbox(tagList, tagFilter)
   );
 
   const [selectedPopulations, setSelectedPopulations] = useState(
-    populationSetFilter
+    mapTagAndPopulationSetFilterSelectionToCheckbox(populationList, populationSetFilter)
   );
 
 
   const handleClearFilter = () => {
     setSelectedStates(setInitialStateSelection(undefined));
-    setSelectedTags(mapTagFilterSelectionToCheckbox(tagList, undefined));
+    setSelectedTags(mapTagAndPopulationSetFilterSelectionToCheckbox(tagList, undefined));
     setHasCSBeenExportedChecked(false);
-    setSelectedPopulations(undefined);
+    setSelectedPopulations(mapTagAndPopulationSetFilterSelectionToCheckbox(populationList, undefined));
   };
 
   const mapObjToArray = (filterObj: any) => {
@@ -89,8 +91,8 @@ const FilterDrawer = (props: any) => {
   const handleApplyFilter = () => {
     const stateFilter = mapObjToArray(selectedStates);
     let tagFilter = mapObjToArray(selectedTags);
-    const hasStatementBeenExportedFilter = hasCSBeenExportedChecked ? true : false;
     const populationSetFilter = mapObjToArray(selectedPopulations);
+    const hasStatementBeenExportedFilter = hasCSBeenExportedChecked ? true : false;
 
     entity === ENTITY_TYPES.SENTENCE &&
       dispatch(setSentenceFilters({ stateFilter, tagFilter, populationSetFilter }));
