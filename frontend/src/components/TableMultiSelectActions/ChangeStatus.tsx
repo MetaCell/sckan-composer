@@ -1,13 +1,18 @@
 import React, { useState } from "react";
 import PopoverMenu from "./PopoverMenu";
 import { ChangeStatusIcon, ChangeStatusDialogIcon } from "../icons";
-import { snakeToSpace } from "../../helpers/helpers";
 import ConfirmationDialog from "../ConfirmationDialog";
 import sentenceService from "../../services/SentenceService";
+import connectivityStatementService from "../../services/StatementService";
 import { QueryParams as SentenceQueryParams } from "../../redux/sentenceSlice";
 import { QueryParams as StatementQueryParams } from "../../redux/statementSlice";
 import { ENTITY_TYPES } from "../../helpers/settings";
-import connectivityStatementService from "../../services/StatementService";
+import { SentenceLabels, StatementsLabels } from "../../helpers/helpers";
+
+interface PopoverOptionType {
+  label: string;
+  value: string;
+}
 
 interface ChangeStatusProps {
   selectedTableRows: any;
@@ -22,11 +27,30 @@ interface ChangeStatusProps {
   isFetchingOptions: boolean;
 }
 
-const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityType, possibleTransitions, queryOptions, onClick, onConfirm, isFetchingOptions, selectedRowsCount, setGridLoading, isGridLoading }) => {
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+const ChangeStatus: React.FC<ChangeStatusProps> = ({
+  selectedTableRows,
+  entityType,
+  possibleTransitions,
+  queryOptions,
+  onClick,
+  onConfirm,
+  isFetchingOptions,
+  selectedRowsCount,
+  setGridLoading,
+  isGridLoading,
+}) => {
+  const [selectedStatus, setSelectedStatus] = useState<PopoverOptionType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
-  const [newStatus, setNewStatus] = useState<string | null>(null);
+  const [newStatus, setNewStatus] = useState<PopoverOptionType | null>(null);
+
+  const statusLabels = entityType === ENTITY_TYPES.SENTENCE ? SentenceLabels : StatementsLabels;
+
+  const transitionOptions: PopoverOptionType[] = possibleTransitions.map((status) => ({
+    label: statusLabels[status as keyof typeof statusLabels] || status,
+    value: status,
+  }));
+  
 
   const changeStatusMap: Record<
     ENTITY_TYPES,
@@ -35,41 +59,41 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
     [ENTITY_TYPES.SENTENCE]: (queryOptions, newStatus) =>
       sentenceService.changeStatusBulk(queryOptions as SentenceQueryParams, newStatus),
     [ENTITY_TYPES.STATEMENT]: (queryOptions, newStatus) =>
-      connectivityStatementService.changeStatusBulk(queryOptions as StatementQueryParams, newStatus)
+      connectivityStatementService.changeStatusBulk(queryOptions as StatementQueryParams, newStatus),
   };
 
   const handleOpenMenu = () => {
     onClick(); // Fetch updated transitions
   };
 
-  const handleSelectStatus = (status: string) => {
-    setNewStatus(status);
+  const handleSelectStatus = (statusOption: PopoverOptionType) => {
+    setNewStatus(statusOption);
     if (dontShowAgain) {
-      handleStatusConfirm(status);
+      handleStatusConfirm(statusOption);
     } else {
       setIsModalOpen(true);
     }
   };
 
-  const handleStatusChange = async (newStatus: string) => {
-    if (!newStatus) return;
+  const handleStatusChange = async (statusOption: PopoverOptionType) => {
+    if (!statusOption) return;
     setGridLoading(true);
 
     try {
       const changeStatusFunction = changeStatusMap[entityType];
       if (!changeStatusFunction) throw new Error(`No function found for ${entityType}`);
-      await changeStatusFunction(queryOptions, newStatus);
+      await changeStatusFunction(queryOptions, statusOption.value);
     } catch (error) {
       console.error("Error changing status:", error);
     } finally {
       setGridLoading(false);
-      onConfirm()
+      onConfirm();
     }
   };
 
-  const handleStatusConfirm = (status: string) => {
-    setSelectedStatus(status);
-    handleStatusChange(status);
+  const handleStatusConfirm = (statusOption: PopoverOptionType) => {
+    setSelectedStatus(statusOption);
+    handleStatusChange(statusOption);
     setIsModalOpen(false);
   };
 
@@ -78,8 +102,10 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
     setNewStatus(null);
   };
 
-  const fromState = snakeToSpace(selectedTableRows[0]?.state);
-  const toState = newStatus && snakeToSpace(newStatus);
+  const fromState = selectedTableRows[0]?.state
+    ? statusLabels[selectedTableRows[0]?.state as keyof typeof statusLabels] || selectedTableRows[0]?.state
+    : "";
+  const toState = newStatus ? newStatus.label : "";
 
   return (
     <>
@@ -87,7 +113,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
         icon={ChangeStatusIcon}
         tooltip={"Change status"}
         actionButtonDisabled={isGridLoading}
-        options={possibleTransitions}
+        options={transitionOptions}
         selectedOption={selectedStatus}
         onSelect={handleSelectStatus}
         onOpen={handleOpenMenu}

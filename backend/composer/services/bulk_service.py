@@ -106,8 +106,37 @@ def change_status(instances, new_status, user=None):
 
 
 def assign_population_set(instances, population_set_id):
-    # TODO: Implement this function generically.
-    raise NotImplementedError("assign_population_set is not implemented yet.")
+    from django.db.models import Q
+
+
+def assign_population_set(instances, population_set_id):
+    """
+    Assigns the given population_set_id to all ConnectivityStatement instances in 'instances'
+    that are eligible to change their population. An instance is eligible if either:
+      - It has not yet been exported (has_statement_been_exported is False), or
+      - It is exported but already has the given population_set_id.
+
+    If the provided instances are not ConnectivityStatements (e.g. Sentences),
+    a NotImplementedError is raised.
+
+    Returns:
+        int: The number of instances successfully updated.
+    """
+    model = getattr(instances, "model", None)
+
+    if not hasattr(model, "population"):
+        raise NotImplementedError(
+            "assign_population_set is not implemented for non-ConnectivityStatement models."
+        )
+
+    # Allowed to update if not exported or (if exported) already assigned to the target population.
+    allowed_condition = Q(has_statement_been_exported=False) | Q(
+        population=population_set_id
+    )
+
+    qs_allowed = instances.filter(allowed_condition)
+    n_updated = qs_allowed.update(population=population_set_id)
+    return n_updated
 
 
 def _get_note_field_for_model(model_class):

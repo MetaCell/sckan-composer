@@ -174,7 +174,8 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               setGridLoading={setGridLoading}
               isGridLoading={isGridLoading}
             />
-            <AssignPopulationSet selectedTableRows={selectedRows} entityType={entityType} />
+            <AssignPopulationSet selectedTableRows={selectedRows} entityType={entityType} queryOptions={updatedQueryOptions}
+            />
             <Divider flexItem />
           </Stack>
         )}

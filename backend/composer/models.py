@@ -833,13 +833,12 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
 
     def validate_population_change(self):
         if self.pk and self.has_statement_been_exported:
+
             original_population = (
                 self.__class__.objects.filter(pk=self.pk)
                 .values_list("population", flat=True)
                 .first()
             )
-
-            # If the original population exists and has changed, raise an error
             if (
                 original_population is not None
                 and original_population != self.population.id
