@@ -3,15 +3,15 @@ import {
   AnatomicalEntity,
   ViaSerializerDetails,
   DestinationSerializerDetails,
-  TypeC11Enum,
+  DestinationTypeEmum,
 } from "../apiclient/backend";
 import { CustomNodeModel } from "../components/ProofingTab/GraphDiagram/Models/CustomNodeModel";
 import { CustomNodeOptions, NodeTypes } from "../components/ProofingTab/GraphDiagram/GraphDiagram";
 
-export const DestinationTypeMapping: Record<TypeC11Enum, string> = {
-  [TypeC11Enum.AxonT]: 'Axon terminal',
-  [TypeC11Enum.AfferentT]: 'Afferent terminal',
-  [TypeC11Enum.Unknown]: 'Not specified'
+export const DestinationTypeMapping: Record<DestinationTypeEmum, string> = {
+  [DestinationTypeEmum.AxonT]: 'Axon terminal',
+  [DestinationTypeEmum.AfferentT]: 'Afferent terminal',
+  [DestinationTypeEmum.Unknown]: 'Not specified'
 };
 
 interface EntityInfo {
@@ -60,7 +60,7 @@ export const processData = ({
   const afferentTerminalIds = [...entityMap.entries()]
     .filter(
       ([_, info]) =>
-        info.nodeType === NodeTypes.Destination && info.anatomicalType === TypeC11Enum.AfferentT
+        info.nodeType === NodeTypes.Destination && info.anatomicalType === DestinationTypeEmum.AfferentT
     )
     .map(([id, _]) => id);
 
@@ -68,7 +68,7 @@ export const processData = ({
   const nonAfferentDestinationIds = [...entityMap.entries()]
     .filter(
       ([_, info]) =>
-        info.nodeType === NodeTypes.Destination && info.anatomicalType !== TypeC11Enum.AfferentT
+        info.nodeType === NodeTypes.Destination && info.anatomicalType !== DestinationTypeEmum.AfferentT
     )
     .map(([id, _]) => id);
 

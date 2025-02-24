@@ -689,10 +689,10 @@ export interface Destination {
     'connectivity_statement': number;
     /**
      * 
-     * @type {TypeC11Enum}
+     * @type {DestinationTypeEmum}
      * @memberof Destination
      */
-    'type'?: TypeC11Enum;
+    'type'?: DestinationTypeEmum;
     /**
      * 
      * @type {Array<number>}
@@ -728,10 +728,10 @@ export interface DestinationSerializerDetails {
     'connectivity_statement_id': number;
     /**
      * 
-     * @type {TypeC11Enum}
+     * @type {DestinationTypeEmum}
      * @memberof DestinationSerializerDetails
      */
-    'type'?: TypeC11Enum;
+    'type'?: DestinationTypeEmum;
     /**
      * 
      * @type {Array<AnatomicalEntity>}
@@ -751,6 +751,21 @@ export interface DestinationSerializerDetails {
      */
     'are_connections_explicit': string;
 }
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const DestinationTypeEmum = {
+    AxonT: 'AXON-T',
+    AfferentT: 'AFFERENT-T',
+    Unknown: 'UNKNOWN'
+} as const;
+
+export type DestinationTypeEmum = typeof DestinationTypeEmum[keyof typeof DestinationTypeEmum];
 
 
 /**
@@ -1870,10 +1885,10 @@ export interface PatchedDestination {
     'connectivity_statement'?: number;
     /**
      * 
-     * @type {TypeC11Enum}
+     * @type {DestinationTypeEmum}
      * @memberof PatchedDestination
      */
-    'type'?: TypeC11Enum;
+    'type'?: DestinationTypeEmum;
     /**
      * 
      * @type {Array<number>}
@@ -2122,10 +2137,10 @@ export interface PatchedVia {
     'connectivity_statement'?: number;
     /**
      * 
-     * @type {TypeB60Enum}
+     * @type {ViaTypeEnum}
      * @memberof PatchedVia
      */
-    'type'?: TypeB60Enum;
+    'type'?: ViaTypeEnum;
     /**
      * 
      * @type {Array<number>}
@@ -2632,35 +2647,6 @@ export interface Tag {
     'tag': string;
 }
 /**
- * 
- * @export
- * @enum {string}
- */
-
-export const TypeB60Enum = {
-    Axon: 'AXON',
-    Dendrite: 'DENDRITE'
-} as const;
-
-export type TypeB60Enum = typeof TypeB60Enum[keyof typeof TypeB60Enum];
-
-
-/**
- * 
- * @export
- * @enum {string}
- */
-
-export const TypeC11Enum = {
-    AxonT: 'AXON-T',
-    AfferentT: 'AFFERENT-T',
-    Unknown: 'UNKNOWN'
-} as const;
-
-export type TypeC11Enum = typeof TypeC11Enum[keyof typeof TypeC11Enum];
-
-
-/**
  * User
  * @export
  * @interface User
@@ -2729,10 +2715,10 @@ export interface Via {
     'connectivity_statement'?: number;
     /**
      * 
-     * @type {TypeB60Enum}
+     * @type {ViaTypeEnum}
      * @memberof Via
      */
-    'type'?: TypeB60Enum;
+    'type'?: ViaTypeEnum;
     /**
      * 
      * @type {Array<number>}
@@ -2774,10 +2760,10 @@ export interface ViaSerializerDetails {
     'connectivity_statement_id': number;
     /**
      * 
-     * @type {TypeB60Enum}
+     * @type {ViaTypeEnum}
      * @memberof ViaSerializerDetails
      */
-    'type'?: TypeB60Enum;
+    'type'?: ViaTypeEnum;
     /**
      * 
      * @type {Array<AnatomicalEntity>}
@@ -2797,6 +2783,21 @@ export interface ViaSerializerDetails {
      */
     'are_connections_explicit': string;
 }
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const ViaTypeEnum = {
+    Axon: 'AXON',
+    Dendrite: 'DENDRITE',
+    SensoryAxon: 'SENSORY_AXON'
+} as const;
+
+export type ViaTypeEnum = typeof ViaTypeEnum[keyof typeof ViaTypeEnum];
 
 
 
