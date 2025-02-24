@@ -16,7 +16,6 @@ interface User {
 }
 
 interface AssignUserProps {
-  selectedTableRows: any[];
   entityType: ENTITY_TYPES;
   assignableUsers: User[];
   queryOptions: SentenceQueryParams | StatementQueryParams;
@@ -32,7 +31,7 @@ const mapUsersToSelectOptions = (users: User[]) => {
   }));
 };
 
-const AssignUser: React.FC<AssignUserProps> = ({ selectedTableRows, entityType, assignableUsers, queryOptions, onClick, onConfirm, isFetchingOptions }) => {
+const AssignUser: React.FC<AssignUserProps> = ({ entityType, assignableUsers, queryOptions, onClick, onConfirm, isFetchingOptions }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<OptionType | null>(null);

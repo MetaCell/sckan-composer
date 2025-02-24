@@ -10,7 +10,6 @@ import { ENTITY_TYPES } from "../../helpers/settings";
 import connectivityStatementService from "../../services/StatementService";
 
 interface ChangeStatusProps {
-  selectedTableRows: any;
   selectedRowsCount: number;
   entityType: ENTITY_TYPES;
   possibleTransitions: string[];
@@ -20,9 +19,10 @@ interface ChangeStatusProps {
   setGridLoading: (loading: boolean) => void;
   isGridLoading: boolean;
   isFetchingOptions: boolean;
+  originalStatus: string;
 }
 
-const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityType, possibleTransitions, queryOptions, onClick, onConfirm, isFetchingOptions, selectedRowsCount, setGridLoading, isGridLoading }) => {
+const ChangeStatus: React.FC<ChangeStatusProps> = ({ entityType, possibleTransitions, queryOptions, onClick, onConfirm, isFetchingOptions, selectedRowsCount, setGridLoading, isGridLoading, originalStatus }) => {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
@@ -78,7 +78,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
     setSelectedStatus(null);
   };
 
-  const fromState = snakeToSpace(selectedTableRows[0]?.state);
+  const fromState = snakeToSpace(originalStatus);
   const toState = selectedStatus && snakeToSpace(selectedStatus);
 
   return (

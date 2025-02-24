@@ -8,6 +8,7 @@ import ListItemText from "@mui/material/ListItemText";
 import {CircularProgress, ListItemIcon} from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import { vars } from "../../theme/variables";
+import {snakeToSpace} from "../../helpers/helpers";
 
 const styles = {
   popoverPaper: {
@@ -84,7 +85,7 @@ const PopoverMenu: React.FC<PopoverMenuProps> = ({ icon: IconComponent, tooltip,
             </ListItem> :
             options.map((option, index) => (
               <ListItem key={index} onClick={() => onSelect(option)} sx={styles.listItem}>
-                <ListItemText primary={option} />
+                <ListItemText primary={snakeToSpace(option)} />
                 {selectedOption !== null && selectedOption === option && (
                   <ListItemIcon sx={{ minWidth: "auto" }}>
                     <CheckIcon sx={{ color: vars.colorPrimary }} fontSize="small" />

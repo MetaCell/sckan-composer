@@ -85,7 +85,8 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
     queryOptions: SentenceQueryParams | StatementQueryParams;
     entityType: ENTITY_TYPES;
   } | null>(null);
-
+  const [originalStatus, setIsOriginalStatus] = useState('');
+  
   const dispatch = useAppDispatch();
 
   const handleClearFilter = () => {
@@ -126,6 +127,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
         const options = await fetchFunction();
         setAssignableUsers(options.assignable_users);
         setPossibleTransitions(options.possible_transitions.transitions);
+        setIsOriginalStatus(options.possible_transitions.original_state);
         // @ts-ignore
         setTagsStatus(options.tags);
         setPreviousFetchDeps({ selectedRows, queryOptions, entityType }); // Store last fetch state
@@ -157,7 +159,6 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
             </Typography>
             <Divider flexItem />
             <AssignUser
-              selectedTableRows={selectedRows}
               entityType={entityType}
               assignableUsers={assignableUsers}
               queryOptions={updatedQueryOptions}
@@ -168,7 +169,6 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
             <ManageTags isFetchingOptions={isFetchingOptions} onClick={handleFetchOptions} tagsStatus={tagsStatus} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
             <AddNote selectedRowsCount={selectedRowsCount} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
             <ChangeStatus
-              selectedTableRows={selectedRows}
               entityType={entityType}
               possibleTransitions={possibleTransitions}
               queryOptions={updatedQueryOptions}
@@ -178,6 +178,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               selectedRowsCount={selectedRowsCount}
               setGridLoading={setGridLoading}
               isGridLoading={isGridLoading}
+              originalStatus={originalStatus}
             />
             <AssignPopulationSet selectedTableRows={selectedRows} entityType={entityType} />
             <Divider flexItem />
