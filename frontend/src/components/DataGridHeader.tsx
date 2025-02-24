@@ -111,9 +111,9 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
   }), [updatedQueryOptions]);
 
   // Function to fetch options only when triggered by button click
-  const handleFetchOptions = useCallback(async () => {
+  const handleFetchOptions = useCallback(async (changed?: boolean) => {
     const hasChanged =
-      !previousFetchDeps ||
+      !previousFetchDeps || changed ||
       previousFetchDeps.selectedRows !== selectedRows ||
       previousFetchDeps.queryOptions !== queryOptions ||
       previousFetchDeps.entityType !== entityType;
@@ -137,6 +137,11 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
     }
   }, [selectedRows, queryOptions, entityType, previousFetchDeps, fetchOptionsMap]); // Only re-run when dependencies change
 
+  const onConfirm = async () => {
+    await refreshList();
+    handleFetchOptions(true)
+  }
+
   return (
     <Grid container display="flex" justifyContent="space-between" alignItems="center" sx={toolbarStyle}>
       <Grid item xs={12} md={3}>
@@ -157,7 +162,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               assignableUsers={assignableUsers}
               queryOptions={updatedQueryOptions}
               onClick={handleFetchOptions}
-              onConfirm={refreshList}
+              onConfirm={onConfirm}
               isFetchingOptions={isFetchingOptions}
             />
             <ManageTags isFetchingOptions={isFetchingOptions} onClick={handleFetchOptions} tagsStatus={tagsStatus} entityType={entityType} queryOptions={updatedQueryOptions} onConfirm={refreshList} />
@@ -168,7 +173,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
               possibleTransitions={possibleTransitions}
               queryOptions={updatedQueryOptions}
               onClick={handleFetchOptions}
-              onConfirm={refreshList}
+              onConfirm={onConfirm}
               isFetchingOptions={isFetchingOptions}
               selectedRowsCount={selectedRowsCount}
               setGridLoading={setGridLoading}

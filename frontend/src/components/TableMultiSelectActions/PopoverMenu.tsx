@@ -85,7 +85,7 @@ const PopoverMenu: React.FC<PopoverMenuProps> = ({ icon: IconComponent, tooltip,
             options.map((option, index) => (
               <ListItem key={index} onClick={() => onSelect(option)} sx={styles.listItem}>
                 <ListItemText primary={option} />
-                {selectedOption === option && (
+                {selectedOption !== null && selectedOption === option && (
                   <ListItemIcon sx={{ minWidth: "auto" }}>
                     <CheckIcon sx={{ color: vars.colorPrimary }} fontSize="small" />
                   </ListItemIcon>

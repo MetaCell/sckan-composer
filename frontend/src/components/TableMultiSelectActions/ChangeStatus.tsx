@@ -26,7 +26,6 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
-  const [newStatus, setNewStatus] = useState<string | null>(null);
 
   const changeStatusMap: Record<
     ENTITY_TYPES,
@@ -43,7 +42,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
   };
 
   const handleSelectStatus = (status: string) => {
-    setNewStatus(status);
+    setSelectedStatus(status);
     if (dontShowAgain) {
       handleStatusConfirm(status);
     } else {
@@ -64,6 +63,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
     } finally {
       setGridLoading(false);
       onConfirm()
+      setSelectedStatus(null)
     }
   };
 
@@ -75,11 +75,11 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
 
   const handleModalCancel = () => {
     setIsModalOpen(false);
-    setNewStatus(null);
+    setSelectedStatus(null);
   };
 
   const fromState = snakeToSpace(selectedTableRows[0]?.state);
-  const toState = newStatus && snakeToSpace(newStatus);
+  const toState = selectedStatus && snakeToSpace(selectedStatus);
 
   return (
     <>
@@ -96,7 +96,7 @@ const ChangeStatus: React.FC<ChangeStatusProps> = ({ selectedTableRows, entityTy
       />
       <ConfirmationDialog
         open={isModalOpen}
-        onConfirm={() => handleStatusConfirm(newStatus!)}
+        onConfirm={() => handleStatusConfirm(selectedStatus!)}
         onCancel={handleModalCancel}
         title={`Change status of ${selectedRowsCount} ${entityType}.`}
         confirmationText={`By proceeding, the selected ${entityType} <strong>status</strong> will change from ${fromState} to ${toState}. Are you sure?`}
