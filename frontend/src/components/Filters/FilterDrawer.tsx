@@ -16,7 +16,8 @@ import {setFilters as setSentenceFilters} from "../../redux/sentenceSlice";
 import {setFilters as setStatementFilters} from "../../redux/statementSlice";
 import StateFilter from "./StateFilter";
 import TagFilter from "./TagFilter";
-import {ENTITY_TYPES, SENTENCE_STATE_ORDER, STATEMENT_STATE_ORDER} from "../../helpers/settings";
+import HasStatementBeenExportedFilter from "./HasStatementBeenExportedFilter";
+import { ENTITY_TYPES, SENTENCE_STATE_ORDER, STATEMENT_STATE_ORDER } from "../../helpers/settings";
 import PopulationSetFilter from "./PopulationSetFilter";
 import {vars} from "../../theme/variables";
 
@@ -25,12 +26,12 @@ const {Draft, ...statementStatesExDraft } = statementStates
 const FilterDrawer = (props: any) => {
   const { toggleDrawer, queryOptions, entity } = props;
 
-  const { stateFilter, tagFilter, populationSetFilter } = queryOptions;
+  const { stateFilter, tagFilter, populationSetFilter, hasStatementBeenExportedFilter } = queryOptions;
   const dispatch = useAppDispatch();
 
   const tagList = tags.getTagList();
-  
-  
+
+
   const setInitialStateSelection = (currentSelection: any) => {
     const sortStates = (states: Record<string, boolean>, order: string[]) => {
       return order.reduce((acc, key) => {
@@ -38,7 +39,7 @@ const FilterDrawer = (props: any) => {
         return acc;
       }, {} as Record<string, boolean>);
     };
-    
+
     if (entity === ENTITY_TYPES.SENTENCE) {
       return sortStates(
         mapStateFilterSelectionToCheckbox(sentenceStates, currentSelection),
@@ -51,23 +52,28 @@ const FilterDrawer = (props: any) => {
       );
     }
   };
-  
+
   const [selectedStates, setSelectedStates] = useState(
     setInitialStateSelection(stateFilter)
+  );
+
+  const [hasCSBeenExportedChecked, setHasCSBeenExportedChecked] = useState(
+    hasStatementBeenExportedFilter ? true : false
   );
 
   const [selectedTags, setSelectedTags] = useState(
     mapTagFilterSelectionToCheckbox(tagList, tagFilter)
   );
-  
+
   const [selectedPopulations, setSelectedPopulations] = useState(
     populationSetFilter
   );
-  
-  
+
+
   const handleClearFilter = () => {
     setSelectedStates(setInitialStateSelection(undefined));
     setSelectedTags(mapTagFilterSelectionToCheckbox(tagList, undefined));
+    setHasCSBeenExportedChecked(false);
     setSelectedPopulations(undefined);
   };
 
@@ -83,12 +89,13 @@ const FilterDrawer = (props: any) => {
   const handleApplyFilter = () => {
     const stateFilter = mapObjToArray(selectedStates);
     let tagFilter = mapObjToArray(selectedTags);
+    const hasStatementBeenExportedFilter = hasCSBeenExportedChecked ? true : false;
     const populationSetFilter = mapObjToArray(selectedPopulations);
-    
+
     entity === ENTITY_TYPES.SENTENCE &&
       dispatch(setSentenceFilters({ stateFilter, tagFilter, populationSetFilter }));
     entity === ENTITY_TYPES.STATEMENT &&
-      dispatch(setStatementFilters({ stateFilter, tagFilter, populationSetFilter }));
+      dispatch(setStatementFilters({ stateFilter, tagFilter, populationSetFilter, hasStatementBeenExportedFilter }));
     toggleDrawer(false);
   };
   return (
@@ -127,20 +134,28 @@ const FilterDrawer = (props: any) => {
           selectedPopulations={selectedPopulations}
           setSelectedPopulations={setSelectedPopulations}
         />
+        {
+          entity === ENTITY_TYPES.STATEMENT &&
+          <HasStatementBeenExportedFilter
+            hasStatementBeenExported={hasCSBeenExportedChecked}
+            setHasStatementBeenExported={setHasCSBeenExportedChecked}
+          />
+        }
+
       </Stack>
       {/*<Divider />*/}
       <Box
-       sx={{
-         position: "sticky",
-         bottom: 0,
-         background: "white",
-         boxShadow: "0px 1px 2px 0px rgba(16, 24, 40, 0.05)",
-         borderTop: `1px solid ${vars.gray200}`,
-         px: 3,
-         py: 2,
-         textAlign: "right",
-         zIndex: 10,
-       }}
+        sx={{
+          position: "sticky",
+          bottom: 0,
+          background: "white",
+          boxShadow: "0px 1px 2px 0px rgba(16, 24, 40, 0.05)",
+          borderTop: `1px solid ${vars.gray200}`,
+          px: 3,
+          py: 2,
+          textAlign: "right",
+          zIndex: 10,
+        }}
       >
         <Button
           variant="outlined"
