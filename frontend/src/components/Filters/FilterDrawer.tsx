@@ -1,28 +1,28 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import {tags} from "../../services/TagService";
+import { tags } from "../../services/TagService";
 import { mapStateFilterSelectionToCheckbox, mapTagAndPopulationSetFilterSelectionToCheckbox, } from "../../helpers/helpers";
-import {useAppDispatch} from "../../redux/hooks";
+import { useAppDispatch } from "../../redux/hooks";
 import {
   ComposerConnectivityStatementListStateEnum as statementStates,
   ComposerSentenceListStateEnum as sentenceStates,
 } from "../../apiclient/backend/api";
-import {setFilters as setSentenceFilters} from "../../redux/sentenceSlice";
-import {setFilters as setStatementFilters} from "../../redux/statementSlice";
+import { setFilters as setSentenceFilters } from "../../redux/sentenceSlice";
+import { setFilters as setStatementFilters } from "../../redux/statementSlice";
 import StateFilter from "./StateFilter";
 import TagFilter from "./TagFilter";
 import HasStatementBeenExportedFilter from "./HasStatementBeenExportedFilter";
 import { ENTITY_TYPES, SENTENCE_STATE_ORDER, STATEMENT_STATE_ORDER } from "../../helpers/settings";
 import PopulationSetFilter from "./PopulationSetFilter";
-import {vars} from "../../theme/variables";
+import { vars } from "../../theme/variables";
 import { populations } from "../../services/PopulationService";
 
-const {Draft, ...statementStatesExDraft } = statementStates
+const { Draft, ...statementStatesExDraft } = statementStates
 
 const FilterDrawer = (props: any) => {
   const { toggleDrawer, queryOptions, entity } = props;
@@ -132,10 +132,12 @@ const FilterDrawer = (props: any) => {
           selectedTags={selectedTags}
           setSelectedTags={setSelectedTags}
         />
-        <PopulationSetFilter
+
+        {entity === ENTITY_TYPES.STATEMENT && <PopulationSetFilter
           selectedPopulations={selectedPopulations}
           setSelectedPopulations={setSelectedPopulations}
         />
+        }
         {
           entity === ENTITY_TYPES.STATEMENT &&
           <HasStatementBeenExportedFilter

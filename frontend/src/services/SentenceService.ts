@@ -72,8 +72,8 @@ class SentenceService extends AbstractService {
     }
   }
   async getList(queryOptions: QueryParams): Promise<PaginatedSentenceList> {
-    const { exclude, include, limit, ordering, index, title, stateFilter, tagFilter } = queryOptions
-    return composerApi.composerSentenceList(exclude, include, limit, undefined, index, ordering, stateFilter, tagFilter, title).then((res: any) => res.data)
+    const { exclude, include, limit, ordering, index, title, stateFilter, tagFilter, populationSetFilter } = queryOptions
+    return composerApi.composerSentenceList(exclude, include, limit, undefined, index, ordering, populationSetFilter, stateFilter, tagFilter, title).then((res: any) => res.data)
   }
   async assignOwner(id: number, patchedSentence?: PatchedSentence): Promise<Sentence> {
     return composerApi.composerSentenceAssignOwnerPartialUpdate(id, patchedSentence).then((response: any) => response.data);
@@ -87,10 +87,10 @@ class SentenceService extends AbstractService {
   async fetchOptions(queryOptions: QueryParams): Promise<{
     tags: any[];
     assignable_users: any[]; possible_transitions: any }> {
-    const { exclude, include, notes, ordering, stateFilter, tagFilter, title } = queryOptions;
+    const { exclude, include, notes, ordering, stateFilter, tagFilter, title, populationSetFilter } = queryOptions;
 
     return composerApi
-      .composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, stateFilter, tagFilter, title)
+      .composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, populationSetFilter, stateFilter, tagFilter, title)
       .then((response: any) => response.data);
   }
 
@@ -101,7 +101,7 @@ class SentenceService extends AbstractService {
  * @param bulkAction - The action to perform (e.g., assign user, add tag).
  */
 async performBulkAction(queryOptions: QueryParams, bulkAction: BulkAction): Promise<{ message: string }> {
-  const { exclude, include, notes, ordering, stateFilter, tagFilter, title } = queryOptions;
+  const { exclude, include, notes, ordering, stateFilter, tagFilter, title, populationSetFilter } = queryOptions;
 
   const params = {
     exclude,
@@ -111,7 +111,8 @@ async performBulkAction(queryOptions: QueryParams, bulkAction: BulkAction): Prom
     state: stateFilter,
     tags: tagFilter,
     title,
-    bulkAction
+    bulkAction,
+    populationset: populationSetFilter
   };
 
   return composerApi
@@ -120,6 +121,7 @@ async performBulkAction(queryOptions: QueryParams, bulkAction: BulkAction): Prom
       params.include,
       params.notes,
       params.ordering,
+      params.populationset,
       params.state,
       params.tags,
       params.title,

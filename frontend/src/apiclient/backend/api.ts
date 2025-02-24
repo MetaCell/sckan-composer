@@ -215,7 +215,7 @@ export interface AssignUser {
  * @enum {string}
  */
 
-export const AvailableTransitions24dEnum = {
+export const AvailableTransitionsBc5Enum = {
     Draft: 'draft',
     ComposeNow: 'compose_now',
     InProgress: 'in_progress',
@@ -224,10 +224,11 @@ export const AvailableTransitions24dEnum = {
     Rejected: 'rejected',
     NpoApproved: 'npo_approved',
     Exported: 'exported',
+    Deprecated: 'deprecated',
     Invalid: 'invalid'
 } as const;
 
-export type AvailableTransitions24dEnum = typeof AvailableTransitions24dEnum[keyof typeof AvailableTransitions24dEnum];
+export type AvailableTransitionsBc5Enum = typeof AvailableTransitionsBc5Enum[keyof typeof AvailableTransitionsBc5Enum];
 
 
 /**
@@ -417,10 +418,10 @@ export interface ConnectivityStatement {
     'state': string;
     /**
      * 
-     * @type {Array<AvailableTransitions24dEnum>}
+     * @type {Array<AvailableTransitionsBc5Enum>}
      * @memberof ConnectivityStatement
      */
-    'available_transitions': Array<AvailableTransitions24dEnum>;
+    'available_transitions': Array<AvailableTransitionsBc5Enum>;
     /**
      * 
      * @type {Array<AnatomicalEntity>}
@@ -664,10 +665,10 @@ export interface ConnectivityStatementUpdate {
     'state': string;
     /**
      * 
-     * @type {Array<AvailableTransitions24dEnum>}
+     * @type {Array<AvailableTransitionsBc5Enum>}
      * @memberof ConnectivityStatementUpdate
      */
-    'available_transitions': Array<AvailableTransitions24dEnum>;
+    'available_transitions': Array<AvailableTransitionsBc5Enum>;
     /**
      * 
      * @type {Array<number>}
@@ -1698,10 +1699,10 @@ export interface PatchedConnectivityStatement {
     'state'?: string;
     /**
      * 
-     * @type {Array<AvailableTransitions24dEnum>}
+     * @type {Array<AvailableTransitionsBc5Enum>}
      * @memberof PatchedConnectivityStatement
      */
-    'available_transitions'?: Array<AvailableTransitions24dEnum>;
+    'available_transitions'?: Array<AvailableTransitionsBc5Enum>;
     /**
      * 
      * @type {Array<AnatomicalEntity>}
@@ -1927,10 +1928,10 @@ export interface PatchedConnectivityStatementUpdate {
     'state'?: string;
     /**
      * 
-     * @type {Array<AvailableTransitions24dEnum>}
+     * @type {Array<AvailableTransitionsBc5Enum>}
      * @memberof PatchedConnectivityStatementUpdate
      */
-    'available_transitions'?: Array<AvailableTransitions24dEnum>;
+    'available_transitions'?: Array<AvailableTransitionsBc5Enum>;
     /**
      * 
      * @type {Array<number>}
@@ -3479,14 +3480,14 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {boolean} [notes] Checks if entity has notes
          * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
          * @param {Array<number>} [origins] 
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {number} [sentenceId] 
          * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAvailableOptionsRetrieve: async (destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>, origins?: Array<number>, populationset?: Array<string>, sentenceId?: number, state?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementAvailableOptionsRetrieve: async (destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/connectivity-statement/available_options/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3582,7 +3583,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {boolean} [notes] Checks if entity has notes
          * @param {Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>} [ordering] Ordering
          * @param {Array<number>} [origins] 
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {number} [sentenceId] 
          * @param {Array<ComposerConnectivityStatementBulkActionCreateStateEnum>} [state] 
          * @param {Array<number>} [tags] 
@@ -3590,7 +3591,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementBulkActionCreate: async (destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>, origins?: Array<number>, populationset?: Array<string>, sentenceId?: number, state?: Array<ComposerConnectivityStatementBulkActionCreateStateEnum>, tags?: Array<number>, bulkAction?: BulkAction, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementBulkActionCreate: async (destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementBulkActionCreateStateEnum>, tags?: Array<number>, bulkAction?: BulkAction, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/connectivity-statement/bulk_action/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4005,14 +4006,14 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {number} [offset] The initial index from which to return the results.
          * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
          * @param {Array<number>} [origins] 
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {number} [sentenceId] 
          * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList: async (destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, populationset?: Array<string>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementList: async (destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/connectivity-statement/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5335,14 +5336,14 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {string} [title] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceAvailableOptionsRetrieve: async (exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, populationset?: Array<string>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceAvailableOptionsRetrieve: async (exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, populationset?: Array<number>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/sentence/available_options/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5413,7 +5414,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {string} [title] 
@@ -5421,7 +5422,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceBulkActionCreate: async (exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, populationset?: Array<string>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceBulkActionCreate: async (exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, populationset?: Array<number>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/sentence/bulk_action/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5639,14 +5640,14 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
          * @param {Array<ComposerSentenceListOrderingEnum>} [ordering] Ordering
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {Array<ComposerSentenceListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {string} [title] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceList: async (exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, populationset?: Array<string>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceList: async (exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, populationset?: Array<number>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/sentence/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6800,14 +6801,14 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {boolean} [notes] Checks if entity has notes
          * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
          * @param {Array<number>} [origins] 
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {number} [sentenceId] 
          * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementAvailableOptionsRetrieve(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>, origins?: Array<number>, populationset?: Array<string>, sentenceId?: number, state?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+        async composerConnectivityStatementAvailableOptionsRetrieve(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAvailableOptionsRetrieve(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, notes, ordering, origins, populationset, sentenceId, state, tags, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAvailableOptionsRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -6824,7 +6825,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {boolean} [notes] Checks if entity has notes
          * @param {Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>} [ordering] Ordering
          * @param {Array<number>} [origins] 
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {number} [sentenceId] 
          * @param {Array<ComposerConnectivityStatementBulkActionCreateStateEnum>} [state] 
          * @param {Array<number>} [tags] 
@@ -6832,7 +6833,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementBulkActionCreate(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>, origins?: Array<number>, populationset?: Array<string>, sentenceId?: number, state?: Array<ComposerConnectivityStatementBulkActionCreateStateEnum>, tags?: Array<number>, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BulkActionResponse>> {
+        async composerConnectivityStatementBulkActionCreate(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementBulkActionCreateStateEnum>, tags?: Array<number>, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BulkActionResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementBulkActionCreate(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, notes, ordering, origins, populationset, sentenceId, state, tags, bulkAction, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementBulkActionCreate']?.[localVarOperationServerIndex]?.url;
@@ -6940,14 +6941,14 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {number} [offset] The initial index from which to return the results.
          * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
          * @param {Array<number>} [origins] 
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {number} [sentenceId] 
          * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, populationset?: Array<string>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedBaseConnectivityStatementList>> {
+        async composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedBaseConnectivityStatementList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, limit, notes, offset, ordering, origins, populationset, sentenceId, state, tags, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementList']?.[localVarOperationServerIndex]?.url;
@@ -7299,14 +7300,14 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {string} [title] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceAvailableOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, populationset?: Array<string>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
+        async composerSentenceAvailableOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, populationset?: Array<number>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, populationset, state, tags, title, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceAvailableOptionsRetrieve']?.[localVarOperationServerIndex]?.url;
@@ -7318,7 +7319,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {string} [title] 
@@ -7326,7 +7327,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, populationset?: Array<string>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BulkActionResponse>> {
+        async composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, populationset?: Array<number>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BulkActionResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceBulkActionCreate(exclude, include, notes, ordering, populationset, state, tags, title, bulkAction, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceBulkActionCreate']?.[localVarOperationServerIndex]?.url;
@@ -7379,14 +7380,14 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
          * @param {Array<ComposerSentenceListOrderingEnum>} [ordering] Ordering
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {Array<ComposerSentenceListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {string} [title] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceList(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, populationset?: Array<string>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
+        async composerSentenceList(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, populationset?: Array<number>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceList(exclude, include, limit, notes, offset, ordering, populationset, state, tags, title, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceList']?.[localVarOperationServerIndex]?.url;
@@ -7758,14 +7759,14 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {boolean} [notes] Checks if entity has notes
          * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
          * @param {Array<number>} [origins] 
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {number} [sentenceId] 
          * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAvailableOptionsRetrieve(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>, origins?: Array<number>, populationset?: Array<string>, sentenceId?: number, state?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
+        composerConnectivityStatementAvailableOptionsRetrieve(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementAvailableOptionsRetrieve(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, notes, ordering, origins, populationset, sentenceId, state, tags, options).then((request) => request(axios, basePath));
         },
         /**
@@ -7779,7 +7780,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {boolean} [notes] Checks if entity has notes
          * @param {Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>} [ordering] Ordering
          * @param {Array<number>} [origins] 
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {number} [sentenceId] 
          * @param {Array<ComposerConnectivityStatementBulkActionCreateStateEnum>} [state] 
          * @param {Array<number>} [tags] 
@@ -7787,7 +7788,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementBulkActionCreate(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>, origins?: Array<number>, populationset?: Array<string>, sentenceId?: number, state?: Array<ComposerConnectivityStatementBulkActionCreateStateEnum>, tags?: Array<number>, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): AxiosPromise<BulkActionResponse> {
+        composerConnectivityStatementBulkActionCreate(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementBulkActionCreateStateEnum>, tags?: Array<number>, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): AxiosPromise<BulkActionResponse> {
             return localVarFp.composerConnectivityStatementBulkActionCreate(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, notes, ordering, origins, populationset, sentenceId, state, tags, bulkAction, options).then((request) => request(axios, basePath));
         },
         /**
@@ -7871,14 +7872,14 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {number} [offset] The initial index from which to return the results.
          * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
          * @param {Array<number>} [origins] 
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {number} [sentenceId] 
          * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, populationset?: Array<string>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedBaseConnectivityStatementList> {
+        composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedBaseConnectivityStatementList> {
             return localVarFp.composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, limit, notes, offset, ordering, origins, populationset, sentenceId, state, tags, options).then((request) => request(axios, basePath));
         },
         /**
@@ -8146,14 +8147,14 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {string} [title] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceAvailableOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, populationset?: Array<string>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
+        composerSentenceAvailableOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, populationset?: Array<number>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
             return localVarFp.composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, populationset, state, tags, title, options).then((request) => request(axios, basePath));
         },
         /**
@@ -8162,7 +8163,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {string} [title] 
@@ -8170,7 +8171,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, populationset?: Array<string>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): AxiosPromise<BulkActionResponse> {
+        composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, populationset?: Array<number>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): AxiosPromise<BulkActionResponse> {
             return localVarFp.composerSentenceBulkActionCreate(exclude, include, notes, ordering, populationset, state, tags, title, bulkAction, options).then((request) => request(axios, basePath));
         },
         /**
@@ -8211,14 +8212,14 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
          * @param {Array<ComposerSentenceListOrderingEnum>} [ordering] Ordering
-         * @param {Array<string>} [populationset] 
+         * @param {Array<number>} [populationset] 
          * @param {Array<ComposerSentenceListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {string} [title] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceList(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, populationset?: Array<string>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedSentenceList> {
+        composerSentenceList(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, populationset?: Array<number>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedSentenceList> {
             return localVarFp.composerSentenceList(exclude, include, limit, notes, offset, ordering, populationset, state, tags, title, options).then((request) => request(axios, basePath));
         },
         /**
@@ -8540,7 +8541,7 @@ export class ComposerApi extends BaseAPI {
      * @param {boolean} [notes] Checks if entity has notes
      * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
      * @param {Array<number>} [origins] 
-     * @param {Array<string>} [populationset] 
+     * @param {Array<number>} [populationset] 
      * @param {number} [sentenceId] 
      * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>} [state] 
      * @param {Array<number>} [tags] 
@@ -8548,7 +8549,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementAvailableOptionsRetrieve(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>, origins?: Array<number>, populationset?: Array<string>, sentenceId?: number, state?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig) {
+    public composerConnectivityStatementAvailableOptionsRetrieve(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementAvailableOptionsRetrieve(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, notes, ordering, origins, populationset, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -8563,7 +8564,7 @@ export class ComposerApi extends BaseAPI {
      * @param {boolean} [notes] Checks if entity has notes
      * @param {Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>} [ordering] Ordering
      * @param {Array<number>} [origins] 
-     * @param {Array<string>} [populationset] 
+     * @param {Array<number>} [populationset] 
      * @param {number} [sentenceId] 
      * @param {Array<ComposerConnectivityStatementBulkActionCreateStateEnum>} [state] 
      * @param {Array<number>} [tags] 
@@ -8572,7 +8573,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementBulkActionCreate(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>, origins?: Array<number>, populationset?: Array<string>, sentenceId?: number, state?: Array<ComposerConnectivityStatementBulkActionCreateStateEnum>, tags?: Array<number>, bulkAction?: BulkAction, options?: RawAxiosRequestConfig) {
+    public composerConnectivityStatementBulkActionCreate(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementBulkActionCreateStateEnum>, tags?: Array<number>, bulkAction?: BulkAction, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementBulkActionCreate(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, notes, ordering, origins, populationset, sentenceId, state, tags, bulkAction, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -8671,7 +8672,7 @@ export class ComposerApi extends BaseAPI {
      * @param {number} [offset] The initial index from which to return the results.
      * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
      * @param {Array<number>} [origins] 
-     * @param {Array<string>} [populationset] 
+     * @param {Array<number>} [populationset] 
      * @param {number} [sentenceId] 
      * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
      * @param {Array<number>} [tags] 
@@ -8679,7 +8680,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, populationset?: Array<string>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig) {
+    public composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, limit, notes, offset, ordering, origins, populationset, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -9002,7 +9003,7 @@ export class ComposerApi extends BaseAPI {
      * @param {Array<number>} [include] Multiple values may be separated by commas.
      * @param {boolean} [notes] Checks if entity has notes
      * @param {Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
-     * @param {Array<string>} [populationset] 
+     * @param {Array<number>} [populationset] 
      * @param {Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>} [state] 
      * @param {Array<number>} [tags] 
      * @param {string} [title] 
@@ -9010,7 +9011,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceAvailableOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, populationset?: Array<string>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig) {
+    public composerSentenceAvailableOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, populationset?: Array<number>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, populationset, state, tags, title, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -9020,7 +9021,7 @@ export class ComposerApi extends BaseAPI {
      * @param {Array<number>} [include] Multiple values may be separated by commas.
      * @param {boolean} [notes] Checks if entity has notes
      * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
-     * @param {Array<string>} [populationset] 
+     * @param {Array<number>} [populationset] 
      * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
      * @param {Array<number>} [tags] 
      * @param {string} [title] 
@@ -9029,7 +9030,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, populationset?: Array<string>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig) {
+    public composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, populationset?: Array<number>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentenceBulkActionCreate(exclude, include, notes, ordering, populationset, state, tags, title, bulkAction, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -9077,7 +9078,7 @@ export class ComposerApi extends BaseAPI {
      * @param {boolean} [notes] Checks if entity has notes
      * @param {number} [offset] The initial index from which to return the results.
      * @param {Array<ComposerSentenceListOrderingEnum>} [ordering] Ordering
-     * @param {Array<string>} [populationset] 
+     * @param {Array<number>} [populationset] 
      * @param {Array<ComposerSentenceListStateEnum>} [state] 
      * @param {Array<number>} [tags] 
      * @param {string} [title] 
@@ -9085,7 +9086,7 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceList(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, populationset?: Array<string>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig) {
+    public composerSentenceList(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, populationset?: Array<number>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerSentenceList(exclude, include, limit, notes, offset, ordering, populationset, state, tags, title, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -9349,6 +9350,7 @@ export type ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum = 
  */
 export const ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum = {
     ComposeNow: 'compose_now',
+    Deprecated: 'deprecated',
     Draft: 'draft',
     Exported: 'exported',
     InProgress: 'in_progress',
@@ -9374,6 +9376,7 @@ export type ComposerConnectivityStatementBulkActionCreateOrderingEnum = typeof C
  */
 export const ComposerConnectivityStatementBulkActionCreateStateEnum = {
     ComposeNow: 'compose_now',
+    Deprecated: 'deprecated',
     Draft: 'draft',
     Exported: 'exported',
     InProgress: 'in_progress',
@@ -9399,6 +9402,7 @@ export type ComposerConnectivityStatementListOrderingEnum = typeof ComposerConne
  */
 export const ComposerConnectivityStatementListStateEnum = {
     ComposeNow: 'compose_now',
+    Deprecated: 'deprecated',
     Draft: 'draft',
     Exported: 'exported',
     InProgress: 'in_progress',
