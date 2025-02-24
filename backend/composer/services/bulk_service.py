@@ -144,16 +144,16 @@ def get_common_transitions(queryset, user):
     for the first object; otherwise, return an empty list.
     """
     if not queryset.exists():
-        return []
+        return {"transitions": [], "original_state": None}
 
     state_field_name = "state"
 
-    states_count = queryset.values_list(state_field_name, flat=True).distinct().count()
+    states = set(queryset.values_list(state_field_name, flat=True).distinct())
 
-    if states_count > 1:
-        return []  # If there are multiple distinct states, return an empty list
+    if len(states) > 1:
+        return {"transitions": [], "original_state": None}
 
-    # Get the first object (only one exists since all have the same state)
+    original_state = list(states)[0]
     first_obj = queryset.first()
 
     # Get available state transitions for the first object
@@ -165,9 +165,9 @@ def get_common_transitions(queryset, user):
                 first_obj, state_field
             )
         }
-        return list(transitions)
+        return {"transitions": list(transitions), "original_state": original_state}
 
-    return []
+    return {"transitions": list(transitions), "original_state": original_state}
 
 
 def get_tags_partition(queryset):

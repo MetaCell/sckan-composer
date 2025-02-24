@@ -125,7 +125,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
           fetchOptionsMap[entityType] || fetchOptionsMap[ENTITY_TYPES.STATEMENT];
         const options = await fetchFunction();
         setAssignableUsers(options.assignable_users);
-        setPossibleTransitions(options.possible_transitions);
+        setPossibleTransitions(options.possible_transitions.transitions);
         // @ts-ignore
         setTagsStatus(options.tags);
         setPreviousFetchDeps({ selectedRows, queryOptions, entityType }); // Store last fetch state
