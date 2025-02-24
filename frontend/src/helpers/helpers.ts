@@ -61,7 +61,7 @@ export const mapStateFilterSelectionToCheckbox = (
   return initialSelection;
 };
 
-export const mapTagFilterSelectionToCheckbox = (
+export const mapTagAndPopulationSetFilterSelectionToCheckbox = (
   tags: any[],
   currentSelection: any,
 ) => {
