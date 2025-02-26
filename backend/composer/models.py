@@ -841,7 +841,7 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
             )
             if (
                 original_population is not None
-                and original_population != self.population.id
+                and original_population != (self.population.id if self.population else None)
             ):
                 raise ValidationError(
                     "Cannot change population set after the statement has been exported."
