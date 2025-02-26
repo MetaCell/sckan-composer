@@ -206,9 +206,11 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
             />
             {entityType === ENTITY_TYPES.STATEMENT && (
               <AssignPopulationSet
-                selectedTableRows={selectedRows}
                 entityType={entityType}
                 queryOptions={updatedQueryOptions}
+                onClick={handleFetchOptions}
+                isFetchingOptions={isFetchingOptions}
+                onConfirm={onConfirm}
               />
             )}
             <Divider flexItem />

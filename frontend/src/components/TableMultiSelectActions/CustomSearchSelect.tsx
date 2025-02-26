@@ -125,7 +125,11 @@ const CustomSearchSelect = ({
   
   const isOptionSelected = (option: OptionType) =>
     selectedOptions.some((selectedOption: string) => selectedOption === option.label);
-
+  
+  const filteredData = data.filter(option =>
+    option.label.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
   return (
     <Popover
       open={open}
@@ -176,8 +180,8 @@ const CustomSearchSelect = ({
         {
           isFetchingOptions ? <ListItem sx={{justifyContent: 'center'}}>
             <CircularProgress />
-          </ListItem> : data.length > 0 ? (
-            data.map((option: OptionType, index: number) => (
+          </ListItem> : filteredData.length > 0 ? (
+            filteredData.map((option: OptionType, index: number) => (
               <ListItemVariant
                 key={index}
                 option={option}
