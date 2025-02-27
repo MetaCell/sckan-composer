@@ -50,7 +50,7 @@ steps:
       - KUBECONTEXT=${{CLUSTER}}
       - KUBERNETES_NAMESPACE=${{NAMESPACE}}
 
-  slack_notify:
+  slackNotify:
     image: byrnedo/alpine-curl
     stage: notify
     commands:
