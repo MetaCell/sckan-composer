@@ -730,13 +730,19 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
         with transaction.atomic():
                 update_fields = ["has_statement_been_exported"]
                 # Only update population_index if the statement hasn't been exported yet
-                if not self.has_statement_been_exported and self.population:
+                if not self.has_statement_been_exported:
                     next_index = self.population.last_used_index + 1
                     self.population_index = next_index
                     update_fields.append("population_index")
+
                     # Update the population's last_used_index in the same transaction.
                     self.population.last_used_index = next_index
                     self.population.save(update_fields=["last_used_index"])
+
+                    # Create a reference URI if it doesn't exist (statements created in composer)
+                    if not self.reference_uri:
+                        self.reference_uri = create_reference_uri(self.population, self.population_index)
+                        update_fields.append("reference_uri")
                 
                 # Mark the statement as exported.
                 self.has_statement_been_exported = True
@@ -854,14 +860,9 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
     def save(self, *args, **kwargs):
         if not self.pk and self.sentence and not self.owner:
             self.owner = self.sentence.owner
-
+            
         self.clean()
-
         super().save(*args, **kwargs)
-
-        if self.reference_uri is None:
-            self.reference_uri = create_reference_uri(self.pk)
-            self.save(update_fields=["reference_uri"])
 
     def delete(self, user=None, *args, **kwargs):
         """
