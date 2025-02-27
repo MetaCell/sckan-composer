@@ -384,8 +384,6 @@ if DEBUG:
     DEBUG_TOOLBAR_CONFIG = {
         "SHOW_TOOLBAR_CALLBACK": lambda x: True,
     }
-    SILKY_INTERCEPT_PERCENT = 100  # Capture 100% of requests
-    SILKY_PYTHON_PROFILER = True   # Enable function-level profiling
 
 if not PRODUCTION:
     INSTALLED_APPS += [
