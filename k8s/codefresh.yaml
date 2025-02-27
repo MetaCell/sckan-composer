@@ -4,6 +4,7 @@ stages:
   - buildComposer
   - buildNginx
   - deploy
+  - notify
 steps:
   main_clone:
     title: Clone main repository
@@ -47,5 +48,6 @@ steps:
       - KUBERNETES_NAMESPACE=${{NAMESPACE}}
   slack_notify:
     image: byrnedo/alpine-curl
+    stage: notify
     commands:
       - curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"= metacell-dev = Deployed ${CF_BRANCH}\"}" ${{SLACK_WEBHOOK}}
