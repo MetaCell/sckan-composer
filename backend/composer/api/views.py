@@ -1,5 +1,4 @@
 import json
-from silk.profiling.profiler import silk_profile
 from django.http import HttpResponse, Http404
 from drf_react_template.schema_form_encoder import SchemaProcessor, UiSchemaProcessor
 from drf_spectacular.types import OpenApiTypes
@@ -352,7 +351,6 @@ class BulkActionMixin:
         filters=True,
     )
 
-    @silk_profile(name='Bulk Action Profiling')
     @action(detail=False, methods=["post"])
     def bulk_action(self, request):
         """
