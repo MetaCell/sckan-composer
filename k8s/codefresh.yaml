@@ -13,6 +13,7 @@ steps:
     repo: '${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}'
     revision: '${{CF_BRANCH}}'
     git: github
+
   buildComposer:
     title: "Building SCKAN Composer Docker Image"
     type: build
@@ -22,6 +23,7 @@ steps:
     tag: "${{CF_SHORT_REVISION}}"
     dockerfile: Dockerfile
     registry: ${{REGISTRY}}
+
   buildNginx:
     title: "Building SCKAN nginx Docker Image"
     type: build
@@ -33,6 +35,7 @@ steps:
     tag: "${{CF_SHORT_REVISION}}"
     dockerfile: ./nginx/Dockerfile
     registry: ${{REGISTRY}}
+
   deploy-to-kubernetes:
     image: codefresh/cf-deploy-kubernetes
     tag: latest
@@ -46,6 +49,7 @@ steps:
     environment:
       - KUBECONTEXT=${{CLUSTER}}
       - KUBERNETES_NAMESPACE=${{NAMESPACE}}
+
   slack_notify:
     image: byrnedo/alpine-curl
     stage: notify
