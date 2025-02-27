@@ -10,10 +10,9 @@ steps:
     title: Clone main repository
     type: git-clone
     stage: clone
-    repo: '${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}'
-    revision: '${{CF_BRANCH}}'
+    repo: "${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}"
+    revision: "${{CF_BRANCH}}"
     git: github
-
   buildComposer:
     title: "Building SCKAN Composer Docker Image"
     type: build
@@ -23,19 +22,17 @@ steps:
     tag: "${{CF_SHORT_REVISION}}"
     dockerfile: Dockerfile
     registry: ${{REGISTRY}}
-
   buildNginx:
     title: "Building SCKAN nginx Docker Image"
     type: build
     stage: buildNginx
     buildkit: true
     build_arguments:
-    - COMPOSER=us.gcr.io/metacellllc/sckan/composer:${{CF_SHORT_REVISION}}
+      - COMPOSER=us.gcr.io/metacellllc/sckan/composer:${{CF_SHORT_REVISION}}
     image_name: "sckan/nginx"
     tag: "${{CF_SHORT_REVISION}}"
     dockerfile: ./nginx/Dockerfile
     registry: ${{REGISTRY}}
-
   deploy-to-kubernetes:
     image: codefresh/cf-deploy-kubernetes
     tag: latest
@@ -49,9 +46,8 @@ steps:
     environment:
       - KUBECONTEXT=${{CLUSTER}}
       - KUBERNETES_NAMESPACE=${{NAMESPACE}}
-
   slackNotify:
     image: byrnedo/alpine-curl
     stage: notify
     commands:
-      - curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"= metacell-dev = Deployed ${CF_BRANCH}\"}" ${{SLACK_WEBHOOK}}
+      - "curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"= ${CLUSTER} = Deployed ${CF_BRANCH}\\\"}\" ${{SLACK_WEBHOOK}}"
