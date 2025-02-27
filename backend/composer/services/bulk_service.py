@@ -26,30 +26,46 @@ def assign_owner(instances, requested_by, owner_id):
     return updated_count
 
 
-def assign_tags(instances, tag_ids):
+def assign_tags(instances, add_tag_ids, remove_tag_ids):
     """
-    Updates the tags for each instance in the queryset,
-    ensuring that only the provided tags remain.
+    For each instance in the queryset:
+      - Bulk add associations for tags in add_tag_ids (if not already present).
+      - Bulk remove associations for tags in remove_tag_ids (if present).
+    
     Returns the number of processed instances.
     """
-    existing_tag_ids = list(
-        Tag.objects.filter(id__in=tag_ids).values_list("id", flat=True)
+
+    # Validate add and remove tag IDs
+    valid_add_tag_ids = list(
+        Tag.objects.filter(id__in=add_tag_ids).values_list("id", flat=True)
     )
+    valid_remove_tag_ids = list(
+        Tag.objects.filter(id__in=remove_tag_ids).values_list("id", flat=True)
+    )
+
+    # Get the many-to-many field info.
     m2m_field = instances.model._meta.get_field("tags")
     through_model = m2m_field.remote_field.through
-    source_field_name = m2m_field.m2m_field_name() + "_id"
+    # Use the m2m_field name that references the source model.
+    source_field_name = m2m_field.m2m_field_name()  # might be "sentence" or "connectivitystatement"
+    # Ensure we work with the underlying ID field.
+    if not source_field_name.endswith("_id"):
+        source_field_name += "_id"
 
-    # 1. Bulk delete associations for instances that are not in the new set.
-    through_model.objects.filter(
-        **{f"{source_field_name}__in": instances.values_list("id", flat=True)}
-    ).exclude(tag_id__in=existing_tag_ids).delete()
+    instance_ids = list(instances.values_list("id", flat=True))
 
-    # 2. Bulk insert missing associations.
-    batch_size = 1000
+    # 1. Bulk remove associations for tags in the remove list.
+    if valid_remove_tag_ids:
+        through_model.objects.filter(
+            **{f"{source_field_name}__in": instance_ids},
+            tag_id__in=valid_remove_tag_ids
+        ).delete()
+
+    # 2. Bulk insert associations for tags in the add list.
     associations = []
-    qs = instances.values_list("id", flat=True).iterator(chunk_size=batch_size)
-    for instance_id in qs:
-        for tag_id in existing_tag_ids:
+    batch_size = 1000
+    for instance_id in instance_ids:
+        for tag_id in valid_add_tag_ids:
             associations.append(
                 through_model(**{source_field_name: instance_id, "tag_id": tag_id})
             )
@@ -63,8 +79,7 @@ def assign_tags(instances, tag_ids):
             associations, ignore_conflicts=True, batch_size=batch_size
         )
 
-    # Return the count of processed instances.
-    return instances.count()
+    return len(instance_ids)
 
 
 def write_note(instances, user, note_text):

@@ -139,8 +139,8 @@ async performBulkAction(queryOptions: QueryParams, bulkAction: BulkAction): Prom
   /**
    * Bulk assign a tag to selected sentences.
    */
-  async assignTagBulk(queryOptions: QueryParams, tagIds: number[]): Promise<{ message: string }> {
-    return this.performBulkAction(queryOptions, { action: ActionEnum.AssignTag, tag_ids: tagIds });
+  async assignTagBulk(queryOptions: QueryParams, addTagIds: number[], removeTagIds: number[]): Promise<{ message: string }> {
+    return this.performBulkAction(queryOptions, { action: ActionEnum.AssignTag, add_tag_ids: addTagIds, remove_tag_ids: removeTagIds });
   }
 
   /**
