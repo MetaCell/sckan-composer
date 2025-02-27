@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="connectivitystatement",
             name="reference_uri",
-            field=models.URLField(blank=True, null=True),
+            field=models.URLField(blank=True, db_index=True, null=True),
         ),
         migrations.AddConstraint(
             model_name="connectivitystatement",
