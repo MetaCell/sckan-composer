@@ -1,7 +1,7 @@
 import IconButton from "@mui/material/IconButton";
 import { LabelAddIcon } from "../icons";
 import CustomSearchSelect from "./CustomSearchSelect";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import Tooltip from "@mui/material/Tooltip";
 import sentenceService from "../../services/SentenceService";
 import { QueryParams as SentenceQueryParams } from "../../redux/sentenceSlice";
@@ -39,12 +39,14 @@ const ManageTags: React.FC<ManageTagsProps> = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTags, setSelectedTags] = useState<OptionType[]>([]);
-  const [initialSelectedTags, setInitialSelectedTags] = useState<OptionType[]>([]);
   const [tagsList, setTagsList] = useState<Tag[]>([]);
   const [tagsInAllRows, setTagsInAllRows] = useState<string[]>([]);
   const [tagsInSomeRows, setTagsInSomeRows] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  
+  const [unselectedTags, setUnselectedTags] = useState<OptionType[]>([]);
+  const [addedTags, setAddedTags] = useState<OptionType[]>([]);
+  
   // Update the tagManagementMap so it now accepts two arrays.
   const tagManagementMap: Record<
     ENTITY_TYPES,
@@ -80,8 +82,6 @@ const ManageTags: React.FC<ManageTagsProps> = ({
       setTagsInAllRows(initialAllRows);
       setTagsInSomeRows(initialSomeRows);
       setSelectedTags(initialOptions);
-      // Save initial selection so we can compute differences later.
-      setInitialSelectedTags(initialOptions);
     }
   }, [tagsStatus, tagsList]);
 
@@ -89,24 +89,34 @@ const ManageTags: React.FC<ManageTagsProps> = ({
     setAnchorEl(null);
     setSearchTerm("");
   };
-
+  
   const handleSelectTag = (tag: OptionType) => {
     setSelectedTags((prevSelected: OptionType[]) => {
       const isAlreadySelected = prevSelected.some((row) => row.id === tag.id);
-      return isAlreadySelected
-        ? prevSelected.filter((row) => row.id !== tag.id)
-        : [...prevSelected, tag];
+      if (isAlreadySelected) {
+        setUnselectedTags((prevUnselected) => [...prevUnselected, tag]);
+        setAddedTags((prevAdded) => prevAdded.filter((row) => row.id !== tag.id));
+        return prevSelected.filter((row) => row.id !== tag.id);
+      } else {
+        setUnselectedTags((prevUnselected) => prevUnselected.filter((row) => row.id !== tag.id));
+        setAddedTags((prevSelected) => [...prevSelected, tag])
+        return [...prevSelected, tag];
+      }
     });
+    
+    setTagsInAllRows((prevSelected: string[]) =>
+      prevSelected.includes(tag.label) ? prevSelected.filter((row) => row !== tag.label) : prevSelected
+    );
+    
+    setTagsInSomeRows((prevSelected: string[]) =>
+      prevSelected.includes(tag.label) ? prevSelected.filter((row) => row !== tag.label) : prevSelected
+    );
   };
-
   const handleConfirm = async () => {
     setIsLoading(true);
     try {
-      // Compute differences:
-      const initialIds = initialSelectedTags.map((tag) => tag.id);
-      const currentIds = selectedTags.map((tag) => tag.id);
-      const addTagIds = currentIds.filter((id) => !initialIds.includes(id));
-      const removeTagIds = initialIds.filter((id) => !currentIds.includes(id));
+      const addTagIds = addedTags.map((tag) => tag.id);
+      const removeTagIds = unselectedTags.map((tag) => tag.id);
 
       const tagAssignmentFunction = tagManagementMap[entityType as ENTITY_TYPES];
       if (!tagAssignmentFunction)
@@ -117,11 +127,12 @@ const ManageTags: React.FC<ManageTagsProps> = ({
       console.error("Error updating tags:", error);
     } finally {
       setIsLoading(false);
+      setUnselectedTags([])
+      setAddedTags([])
       onConfirm();
     }
     handleClose();
   };
-
   const handleViewTagsMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
     onClick();
