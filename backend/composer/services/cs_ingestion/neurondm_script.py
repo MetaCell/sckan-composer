@@ -9,6 +9,7 @@ from pyontutils.core import OntGraph, OntResIri, OntResPath
 from pyontutils.namespaces import rdfs, ilxtr
 from django.core.management.base import BaseCommand, CommandError
 import logging
+import re
 
 from composer.services.cs_ingestion.exceptions import NeuronDMInconsistency
 from composer.services.cs_ingestion.helpers.common_helpers import VALIDATION_ERRORS, DESTINATIONS, VIAS, ORIGINS
@@ -21,6 +22,7 @@ logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %
 logger = logging.getLogger(__name__)
 RED_COLOR = "\033[91m"
 RESET_COLOR = "\033[0m"
+SPARC_NLP_OWL_CLASS_PREFIX = "http://uri.interlex.org/tgbugs/uris/readable/NeuronSparcNlp"
 
 def log_error(message):
     logger.error(f"{RED_COLOR}{message}{RESET_COLOR}")
@@ -44,6 +46,21 @@ def makelpesrdf():
     return lpes, lrdf, collect
 
 
+def get_populationset_from_neurondm(id_: str, owl_class: str) -> str:
+    """
+    NOTE: keep the order of re.search calls as is, to address the case for 
+    /readable/sparc-nlp/ - in the first place
+    """
+    if str(owl_class) == SPARC_NLP_OWL_CLASS_PREFIX:
+        return id_.split("/")[-2]
+    
+    match = re.search(r'/readable/[^-]+-[^-]+-([^-/]+)', id_)
+    if match:
+        return match.group(1)
+    
+    raise ValueError(f"Unable to extract population set from statement ID: {id_}")
+
+
 def for_composer(n, statement_alert_uris: Set[str] = None):
     lpes, lrdf, collect = makelpesrdf()
 
@@ -65,9 +82,10 @@ def for_composer(n, statement_alert_uris: Set[str] = None):
 
     fc = dict(
         id=str(n.id_),
-        label=str(n.origLabel),
+        label=lrdf(n, rdfs.label)[0],
         origins=origins,
         destinations=destinations,
+        populationset=get_populationset_from_neurondm(n.id_, n.owlClass),
         vias=vias,
         species=lpes(n, ilxtr.hasInstanceInTaxon),
         sex=lpes(n, ilxtr.hasBiologicalSex),

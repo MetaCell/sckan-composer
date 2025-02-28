@@ -64,6 +64,7 @@ const StatementDetailsAccordion = (props: any) => {
           }}
           uiFields={[
             "sex_id",
+            "population_id",
             "apinatomy_model",
             "circuit_type",
             "laterality",

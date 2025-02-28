@@ -375,8 +375,10 @@ LOGOUT_REDIRECT_URL = "/logged-out/"
 if DEBUG:
     INSTALLED_APPS += [
         "debug_toolbar",
+        'silk',
     ]
     MIDDLEWARE += [
+        'silk.middleware.SilkyMiddleware',
         "debug_toolbar.middleware.DebugToolbarMiddleware",
     ]
     DEBUG_TOOLBAR_CONFIG = {

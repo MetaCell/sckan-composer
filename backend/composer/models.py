@@ -4,12 +4,15 @@ from django.db.models import Q, CheckConstraint
 from django.db.models.expressions import F
 from django.forms.widgets import Input as InputWidget
 from django_fsm import FSMField, transition
+from django.core.exceptions import ImproperlyConfigured
 from composer.services.graph_service import build_journey_description, build_journey_entities
+from django.core.exceptions import ValidationError
 
 from composer.services.layers_service import update_from_entities_on_deletion
 from composer.services.state_services import (
     ConnectivityStatementStateService,
     SentenceStateService,
+    is_system_user
 )
 from .enums import (
     CircuitType,
@@ -22,7 +25,14 @@ from .enums import (
     ViaType,
     Projection,
 )
-from .utils import doi_uri, pmcid_uri, pmid_uri, create_reference_uri
+from .utils import (
+    doi_uri,
+    pmcid_uri,
+    pmid_uri,
+    create_reference_uri,
+    is_valid_population_name,
+)
+import re
 
 
 # from django_fsm_log.decorators import fsm_log_by
@@ -94,6 +104,7 @@ class ConnectivityStatementManager(models.Manager):
                 "sex",
             )
             .prefetch_related("notes", "tags", "provenance_set", "species", "origins", "destinations")
+            .exclude(state=CSState.DEPRECATED)
         )
 
     def excluding_draft(self):
@@ -141,6 +152,29 @@ class DestinationManager(models.Manager):
             .prefetch_related('anatomical_entities', 'from_entities')
         )
 
+
+# Mixins
+
+
+class BulkActionMixin:
+    """
+    Mixin providing a common interface for bulk actions.
+    This mixin does not subclass models.Model, so you can use it in any model.
+    """
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        # If the class is a Django model (it has _meta), enforce the existence of a 'tags' field.
+        if hasattr(cls, '_meta'):
+            try:
+                cls._meta.get_field("tags")
+            except Exception as e:
+                raise ImproperlyConfigured(
+                    f"The model '{cls.__name__}' must define a 'tags' field."
+                ) from e
+
+    def get_state_service(self):
+        raise NotImplementedError("Subclasses must implement get_state_service().")
 
 # Create your models here.
 class Profile(models.Model):
@@ -194,6 +228,30 @@ class Sex(models.Model):
     class Meta:
         ordering = ["name"]
         verbose_name_plural = "Sex"
+
+
+class PopulationSet(models.Model):
+    """Population Set"""
+
+    name = models.CharField(
+        max_length=200,
+        db_index=True,
+        unique=True,
+        validators=[is_valid_population_name],
+    )
+    description = models.TextField(null=True, blank=True)
+    last_used_index = models.PositiveIntegerField(default=0, help_text="Tracks the last assigned population index to ensure sequential numbering.")
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.name = self.name.lower()
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Population Sets"
 
 
 class FunctionalCircuitRole(models.Model):
@@ -351,7 +409,7 @@ class Tag(models.Model):
         verbose_name_plural = "Tags"
 
 
-class Sentence(models.Model):
+class Sentence(models.Model, BulkActionMixin):
     """Sentence"""
 
     objects = SentenceStatementManager()
@@ -392,7 +450,8 @@ class Sentence(models.Model):
         ...
 
     @transition(
-        field=state, source=[SentenceState.OPEN, SentenceState.NEEDS_FURTHER_REVIEW],
+        field=state,
+        source=[SentenceState.OPEN, SentenceState.NEEDS_FURTHER_REVIEW],
         target=SentenceState.COMPOSE_LATER,
         permission=SentenceStateService.has_permission_to_transition_to_compose_later,
     )
@@ -435,16 +494,25 @@ class Sentence(models.Model):
     def excluded(self, *args, **kwargs):
         ...
 
-    def assign_owner(self, request):
-        if SentenceStateService(self).can_assign_owner(request):
-            self.owner = request.user
+    def assign_owner(self, requested_by, owner=None):
+        """
+        This function assigns an owner to the Sentence instance.
+        
+        This logic is also implemented in the bulk `assign_owner` function for performance reasons.
+        If any changes are made here, ensure the bulk function is updated accordingly.
+        """
+        if owner is None:
+            owner = requested_by
+
+        if SentenceStateService(self).can_assign_owner(requested_by):
+            self.owner = owner
             self.save(update_fields=["owner"])
 
             # Update the owner of related draft ConnectivityStatements
             ConnectivityStatement.objects.filter(
                 sentence=self,
                 state=CSState.DRAFT
-            ).update(owner=request.user)
+            ).update(owner=owner)
 
     def auto_assign_owner(self, request):
         if SentenceStateService(self).should_set_owner(request):
@@ -456,6 +524,13 @@ class Sentence(models.Model):
                 sentence=self,
                 state=CSState.DRAFT
             ).update(owner=request.user)
+
+
+    def get_state_service(self):
+        """
+        Returns the state service instance for this Sentence.
+        """
+        return SentenceStateService(self)
 
     @property
     def pmid_uri(self) -> str:
@@ -505,7 +580,7 @@ class Sentence(models.Model):
         ]
 
 
-class ConnectivityStatement(models.Model):
+class ConnectivityStatement(models.Model, BulkActionMixin):
     """Connectivity Statement"""
 
     objects = ConnectivityStatementManager()
@@ -530,7 +605,6 @@ class ConnectivityStatement(models.Model):
     circuit_type = models.CharField(
         max_length=20, choices=CircuitType.choices, null=True, blank=True
     )
-    # TODO for next releases we could have only 1 field for phenotype + an intermediate table with the phenotype's categories such as circuit_type, laterality, projection, functional_circuit_role, projection_phenotype among others
     phenotype = models.ForeignKey(
         Phenotype,
         verbose_name="Phenotype",
@@ -548,7 +622,7 @@ class ConnectivityStatement(models.Model):
     )
     apinatomy_model = models.CharField(max_length=200, null=True, blank=True)
     additional_information = models.TextField(null=True, blank=True)
-    reference_uri = models.URLField(null=True, blank=True, unique=True)
+    reference_uri = models.URLField(null=True, blank=True, db_index=True)
     functional_circuit_role = models.ForeignKey(
         FunctionalCircuitRole,
         on_delete=models.DO_NOTHING,
@@ -567,6 +641,15 @@ class ConnectivityStatement(models.Model):
     journey_path = models.JSONField(null=True, blank=True)
     statement_prefix = models.TextField(null=True, blank=True)
     statement_suffix = models.TextField(null=True, blank=True)
+    population = models.ForeignKey(
+        PopulationSet,
+        verbose_name="Population Set",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    population_index = models.PositiveIntegerField(null=True, blank=True, help_text="Index of this statement within its assigned population.")
+    has_statement_been_exported = models.BooleanField(default=False)
 
     def __str__(self):
         suffix = ""
@@ -635,16 +718,29 @@ class ConnectivityStatement(models.Model):
 
     @transition(
         field=state,
-        source=[
-            CSState.NPO_APPROVED,
-            CSState.INVALID
-        ],
+        source=[CSState.NPO_APPROVED, CSState.INVALID],
         target=CSState.EXPORTED,
-        conditions=[ConnectivityStatementStateService.is_valid],
+        conditions=[
+            ConnectivityStatementStateService.is_valid,
+            ConnectivityStatementStateService.has_populationset,
+        ],
         permission=ConnectivityStatementStateService.has_permission_to_transition_to_exported,
     )
     def exported(self, *args, **kwargs):
-        ...
+        with transaction.atomic():
+                update_fields = ["has_statement_been_exported"]
+                # Only update population_index if the statement hasn't been exported yet
+                if not self.has_statement_been_exported and self.population:
+                    next_index = self.population.last_used_index + 1
+                    self.population_index = next_index
+                    update_fields.append("population_index")
+                    # Update the population's last_used_index in the same transaction.
+                    self.population.last_used_index = next_index
+                    self.population.save(update_fields=["last_used_index"])
+                
+                # Mark the statement as exported.
+                self.has_statement_been_exported = True
+                self.save(update_fields=update_fields)
 
     @transition(
         field=state,
@@ -662,6 +758,27 @@ class ConnectivityStatement(models.Model):
         permission=ConnectivityStatementStateService.has_permission_to_transition_to_invalid,
     )
     def invalid(self, *args, **kwargs):
+        ...
+
+
+    @transition(
+        field=state,
+        source=[
+            CSState.COMPOSE_NOW,
+            CSState.IN_PROGRESS,
+            CSState.REJECTED,
+            CSState.REVISE,
+            CSState.TO_BE_REVIEWED,
+            CSState.NPO_APPROVED,
+            CSState.EXPORTED,
+        ],
+        target=CSState.DEPRECATED,
+        conditions=[
+            ConnectivityStatementStateService.can_be_deprecated,
+        ],
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_deprecated,
+    )
+    def deprecated(self, *args, **kwargs):
         ...
 
     @property
@@ -683,10 +800,10 @@ class ConnectivityStatement(models.Model):
             return set(self.via_set.get(order=via_order - 1).anatomical_entities.all())
 
     def get_journey(self):
-        return build_journey_description(self.journey_path)
+        return build_journey_description(self.journey_path) if self.journey_path else []
 
     def get_entities_journey(self):
-        return build_journey_entities(self.journey_path)
+        return build_journey_entities(self.journey_path) if self.journey_path else []
 
     def get_laterality_description(self):
         laterality_map = {
@@ -695,9 +812,12 @@ class ConnectivityStatement(models.Model):
         }
         return laterality_map.get(self.laterality, None)
 
-    def assign_owner(self, request):
-        if ConnectivityStatementStateService(self).can_assign_owner(request):
-            self.owner = request.user
+    def assign_owner(self, requested_by, owner=None):
+        if owner is None:
+            owner = requested_by
+
+        if ConnectivityStatementStateService(self).can_assign_owner(requested_by):
+            self.owner = owner
             self.save(update_fields=["owner"])
 
     def auto_assign_owner(self, request):
@@ -705,15 +825,62 @@ class ConnectivityStatement(models.Model):
             self.owner = request.user
             self.save(update_fields=["owner"])
 
+    def get_state_service(self):
+        """
+        Returns the state service instance for this Sentence.
+        """
+        return ConnectivityStatementStateService(self)
+
+    def validate_population_change(self):
+        if self.pk and self.has_statement_been_exported:
+
+            original_population = (
+                self.__class__.objects.filter(pk=self.pk)
+                .values_list("population", flat=True)
+                .first()
+            )
+            if (
+                original_population is not None
+                and original_population != (self.population.id if self.population else None)
+            ):
+                raise ValidationError(
+                    "Cannot change population set after the statement has been exported."
+                )
+
+    def clean(self):
+        super().clean()
+        self.validate_population_change()
+
     def save(self, *args, **kwargs):
         if not self.pk and self.sentence and not self.owner:
             self.owner = self.sentence.owner
+
+        self.clean()
 
         super().save(*args, **kwargs)
 
         if self.reference_uri is None:
             self.reference_uri = create_reference_uri(self.pk)
             self.save(update_fields=["reference_uri"])
+
+    def delete(self, user=None, *args, **kwargs):
+        """
+        Soft delete by transitioning to DEPRECATED if has_statement_been_exported is True.
+        Otherwise, perform an actual deletion.
+        """
+        if self.has_statement_been_exported:
+            if not user:
+                raise ValidationError("User is required to deprecate the statement before deletion.")
+
+            try:
+                state_service = ConnectivityStatementStateService(self)
+                state_service.do_transition(CSState.DEPRECATED.value, user=user)
+
+                self.save(update_fields=["state"])
+            except Exception as e:
+                raise ValidationError(f"Cannot deprecate the connectivity statement: {e}")
+        else:
+            super().delete(*args, **kwargs)
 
     def set_origins(self, origin_ids):
         self.origins.set(origin_ids, clear=True)
@@ -737,6 +904,11 @@ class ConnectivityStatement(models.Model):
             models.CheckConstraint(
                 check=Q(projection__in=[p[0] for p in Projection.choices]),
                 name="projection_valid",
+            ),
+            models.UniqueConstraint(
+                fields=['reference_uri'],
+                condition=~Q(state=CSState.DEPRECATED),
+                name="unique_reference_uri_active"
             )
         ]
 

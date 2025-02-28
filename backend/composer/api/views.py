@@ -1,9 +1,9 @@
 import json
-
 from django.http import HttpResponse, Http404
 from drf_react_template.schema_form_encoder import SchemaProcessor, UiSchemaProcessor
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import PolymorphicProxySerializer
 from rest_framework import mixins, permissions, viewsets, status
 from rest_framework.decorators import action, api_view
 from rest_framework.renderers import INDENT_SEPARATORS
@@ -12,7 +12,8 @@ from rest_framework.serializers import ValidationError
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Case, When, Value, IntegerField
-
+from composer.services import bulk_service
+from composer.enums import BulkActionType
 from composer.services.state_services import (
     ConnectivityStatementStateService,
     SentenceStateService,
@@ -27,9 +28,15 @@ from .filtersets import (
     SpecieFilter,
     DestinationFilter,
 )
+
 from .serializers import (
     AlertTypeSerializer,
     AnatomicalEntitySerializer,
+    AssignPopulationSetSerializer,
+    AssignTagsSerializer,
+    AssignUserSerializer,
+    BulkActionResponseSerializer,
+    ChangeStatusSerializer,
     PhenotypeSerializer,
     ProjectionPhenotypeSerializer,
     ConnectivityStatementSerializer,
@@ -43,9 +50,12 @@ from .serializers import (
     ViaSerializer,
     ProvenanceSerializer,
     SexSerializer,
+    PopulationSetSerializer,
     ConnectivityStatementUpdateSerializer,
     DestinationSerializer,
     BaseConnectivityStatementSerializer,
+    MinimalUserSerializer,
+    WriteNoteSerializer,
 )
 from .permissions import (
     IsStaffUserIfExportedStateInConnectivityStatement,
@@ -67,8 +77,8 @@ from ..models import (
     Via,
     Provenance,
     Sex,
+    PopulationSet,
     Destination,
-    GraphRenderingState,
 )
 
 
@@ -79,7 +89,7 @@ class AssignOwnerMixin(viewsets.GenericViewSet):
     )
     def assign_owner(self, request, pk=None):
         instance = self.get_object()
-        instance.assign_owner(request)
+        instance.assign_owner(request.user)
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
@@ -242,6 +252,140 @@ class CSCloningMixin(viewsets.GenericViewSet):
         return Response(self.get_serializer(instance).data)
 
 
+class BulkActionMixin:
+    bulk_action_serializers = {
+        BulkActionType.ASSIGN_USER.value: AssignUserSerializer,
+        BulkActionType.ASSIGN_TAG.value: AssignTagsSerializer,
+        BulkActionType.WRITE_NOTE.value: WriteNoteSerializer,
+        BulkActionType.CHANGE_STATUS.value: ChangeStatusSerializer,
+        BulkActionType.ASSIGN_POPULATION_SET.value: AssignPopulationSetSerializer,
+    }
+    # Expect that each view to set this attribute.:
+    bulk_action_mapping = None  # a dict mapping action types to service functions
+
+    def get_bulk_action_serializer_mapping(self):
+        if self.bulk_action_serializers is None:
+            raise NotImplementedError("bulk_action_serializers not set.")
+        return self.bulk_action_serializers
+
+    def get_bulk_action_mapping(self):
+        if self.bulk_action_mapping is None:
+            raise NotImplementedError("bulk_action_mapping not set.")
+        return self.bulk_action_mapping
+
+    def get_assignable_users_data(self):
+        """
+        Default implementation: returns minimal user data from all profiles.
+        Views can override this if needed.
+        """
+        return MinimalUserSerializer(
+            [p.user for p in bulk_service.get_assignable_users_data()], many=True
+        ).data
+
+    def get_common_transitions(self, queryset):
+        """
+        Default implementation: for each object in the queryset that has
+        `get_available_state_transitions()`, extract the set of transition targets
+        and then return the intersection (common transitions).
+        """
+        return bulk_service.get_common_transitions(queryset, user=self.request.user)
+
+    def get_tags_partition(self, queryset):
+        """
+        Returns a dictionary with serialized tag data partitioned into:
+        - used_by_all: Tags present on every object,
+        - used_by_some: Tags present on some (but not all) objects,
+        - unused: Tags absent from all objects.
+        """
+        # Get the partition data from the service layer.
+        partition = bulk_service.get_tags_partition(queryset)
+        # Define partial tags as those in the union that are not common.
+        partial_ids = partition["union"] - partition["common"]
+
+        tag_partitions_serialized = {
+            "used_by_all": TagSerializer(
+                Tag.objects.filter(id__in=partition["common"]), many=True
+            ).data,
+            "used_by_some": TagSerializer(
+                Tag.objects.filter(id__in=partial_ids), many=True
+            ).data,
+            "unused": TagSerializer(
+                Tag.objects.filter(id__in=partition["missing"]), many=True
+            ).data,
+        }
+        return tag_partitions_serialized
+
+    @extend_schema(filters=True)
+    @action(detail=False, methods=["get"])
+    def available_options(self, request):
+        """
+        Returns available users for assignment and possible state transitions
+        for the selected items.
+        """
+        has_filters = any(
+            param for param in request.query_params if param not in ["page", "ordering"]
+        )
+        if not has_filters:
+            return Response({"assignable_users": [], "possible_transitions": []})
+
+        qs = self.filter_queryset(self.get_queryset())
+        assignable_users_data = self.get_assignable_users_data()
+        common_transitions = self.get_common_transitions(qs)
+        tags_partition = self.get_tags_partition(qs)
+
+        return Response(
+            {
+                "assignable_users": assignable_users_data,
+                "possible_transitions": common_transitions,
+                "tags": tags_partition,
+            }
+        )
+
+    @extend_schema(
+        request=PolymorphicProxySerializer(
+            component_name="BulkAction",
+            serializers=bulk_action_serializers,
+            resource_type_field_name="action",
+        ),
+        responses={200: BulkActionResponseSerializer},
+        filters=True,
+    )
+
+    @action(detail=False, methods=["post"])
+    def bulk_action(self, request):
+        """
+        Apply a bulk action to the selected items and return the number
+        of items updated successfully.
+        """
+        action_type = request.data.get("action")
+        serializer_mapping = self.get_bulk_action_serializer_mapping()
+        if action_type not in serializer_mapping:
+            return Response(
+                {"error": "Invalid action type."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer_class = serializer_mapping[action_type]
+        serializer = serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        qs = self.filter_queryset(self.get_queryset())
+        if not qs.exists():
+            return Response(
+                {"error": "No items found."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        mapping = self.get_bulk_action_mapping()
+        if action_type not in mapping:
+            return Response(
+                {"error": "No service function mapped for this action."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # The service function should return an integer (the count of items updated).
+        updated_count = mapping[action_type](qs, request, serializer.validated_data)
+        return Response({"updated_count": updated_count}, status=status.HTTP_200_OK)
+
+
 # Viewsets
 
 
@@ -252,23 +396,20 @@ class ModelRetrieveViewSet(
     # mixins.DestroyModelMixin,
     # mixins.ListModelMixin,
     viewsets.GenericViewSet,
-):
-    ...
+): ...
 
 
 class ModelCreateRetrieveViewSet(
     ModelRetrieveViewSet,
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
-):
-    ...
+): ...
 
 
 class ModelNoDeleteViewSet(
     ModelCreateRetrieveViewSet,
     mixins.UpdateModelMixin,
-):
-    ...
+): ...
 
 
 class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
@@ -320,6 +461,16 @@ class SexViewSet(viewsets.ReadOnlyModelViewSet):
     ]
 
 
+class PopulationSetViewset(viewsets.ReadOnlyModelViewSet):
+    """PopulationSet"""
+
+    queryset = PopulationSet.objects.all()
+    serializer_class = PopulationSetSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+    ]
+
+
 class NoteViewSet(viewsets.ModelViewSet):
     """
     Note
@@ -350,6 +501,7 @@ class ConnectivityStatementViewSet(
     AssignOwnerMixin,
     CSCloningMixin,
     viewsets.ModelViewSet,
+    BulkActionMixin,
 ):
     """
     ConnectivityStatement
@@ -364,6 +516,24 @@ class ConnectivityStatementViewSet(
     filterset_class = ConnectivityStatementFilter
     service = ConnectivityStatementStateService
 
+    bulk_action_mapping = {
+        BulkActionType.ASSIGN_USER.value: lambda qs, req, data: bulk_service.assign_owner(
+            qs, req.user, data.get("user_id")
+        ),
+        BulkActionType.ASSIGN_TAG.value: lambda qs, req, data: bulk_service.assign_tags(
+            qs, data["add_tag_ids"], data["remove_tag_ids"]
+        ),
+        BulkActionType.WRITE_NOTE.value: lambda qs, req, data: bulk_service.write_note(
+            qs, req.user, data["note_text"]
+        ),
+        BulkActionType.CHANGE_STATUS.value: lambda qs, req, data: bulk_service.change_status(
+            qs, data["new_status"], req.user
+        ),
+        BulkActionType.ASSIGN_POPULATION_SET.value: lambda qs, req, data: bulk_service.assign_population_set(
+            qs, data["population_set_id"]
+        ),
+    }
+
     def get_serializer_class(self):
         if self.action in ["update", "partial_update"]:
             return ConnectivityStatementUpdateSerializer
@@ -375,6 +545,18 @@ class ConnectivityStatementViewSet(
         if self.action == "list" and "sentence_id" not in self.request.query_params:
             return ConnectivityStatement.objects.excluding_draft()
         return super().get_queryset()
+
+    def get_assignable_users_data(self):
+        # Only include profiles where the user is a curator or reviewer.
+        return MinimalUserSerializer(
+            [
+                p.user
+                for p in bulk_service.get_assignable_users_data(
+                    roles=["is_curator", "is_reviewer"]
+                )
+            ],
+            many=True,
+        ).data
 
     """
     Override the update method to apply the extend_schema decorator.
@@ -444,7 +626,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class SentenceViewSet(
-    TagMixin, TransitionMixin, AssignOwnerMixin, ModelNoDeleteViewSet
+    TagMixin, TransitionMixin, AssignOwnerMixin, ModelNoDeleteViewSet, BulkActionMixin
 ):
     """
     Sentence
@@ -457,6 +639,24 @@ class SentenceViewSet(
     ]
     filterset_class = SentenceFilter
     service = SentenceStateService
+
+    bulk_action_mapping = {
+        BulkActionType.ASSIGN_USER.value: lambda qs, req, data: bulk_service.assign_owner(
+            qs, req.user, data.get("user_id")
+        ),
+        BulkActionType.ASSIGN_TAG.value: lambda qs, req, data: bulk_service.assign_tags(
+            qs, data["add_tag_ids"], data["remove_tag_ids"]
+        ),
+        BulkActionType.WRITE_NOTE.value: lambda qs, req, data: bulk_service.write_note(
+            qs, req.user, data["note_text"]
+        ),
+        BulkActionType.CHANGE_STATUS.value: lambda qs, req, data: bulk_service.change_status(
+            qs, data["new_status"], req.user
+        ),
+        BulkActionType.ASSIGN_POPULATION_SET.value: lambda qs, req, data: bulk_service.assign_population_set(
+            qs, data["population_set_id"]
+        ),
+    }
 
     def get_queryset(self):
         if "ordering" not in self.request.query_params:
@@ -509,8 +709,7 @@ class ProfileViewSet(viewsets.GenericViewSet):
             msg = "User not logged in."
             raise ValidationError(msg, code="authorization")
 
-        profile, created = Profile.objects.get_or_create(
-            user=self.request.user)
+        profile, created = Profile.objects.get_or_create(user=self.request.user)
         return Response(self.get_serializer(profile).data)
 
 

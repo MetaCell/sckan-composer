@@ -61,12 +61,12 @@ export const mapStateFilterSelectionToCheckbox = (
   return initialSelection;
 };
 
-export const mapTagFilterSelectionToCheckbox = (
-  tags: any[],
+export const mapFilterSelectionToCheckbox = (
+  options: any[],
   currentSelection: any,
 ) => {
   let initialSelection: { [key: string]: boolean } = {};
-  tags.forEach(
+  options.forEach(
     (i) =>
       (initialSelection = {
         ...initialSelection,
@@ -83,7 +83,7 @@ export const snakeToSpace = (str: string) => {
     ?.replaceAll("_", " ")
     .split(" ")
     .map((word) => {
-      return word[0].toUpperCase() + word.substring(1);
+      return word[0]?.toUpperCase() + word?.substring(1);
     })
     .join(" ");
 };

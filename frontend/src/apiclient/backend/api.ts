@@ -26,6 +26,23 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @enum {string}
+ */
+
+export const ActionEnum = {
+    AssignUser: 'assign_user',
+    AssignTag: 'assign_tag',
+    WriteNote: 'write_note',
+    ChangeStatus: 'change_status',
+    AssignPopulationSet: 'assign_population_set'
+} as const;
+
+export type ActionEnum = typeof ActionEnum[keyof typeof ActionEnum];
+
+
+/**
+ * 
+ * @export
  * @interface AlertType
  */
 export interface AlertType {
@@ -132,10 +149,79 @@ export interface AnatomicalEntityMeta {
 /**
  * 
  * @export
+ * @interface AssignPopulationSet
+ */
+export interface AssignPopulationSet {
+    /**
+     * The bulk action to perform.
+     * @type {ActionEnum}
+     * @memberof AssignPopulationSet
+     */
+    'action': ActionEnum;
+    /**
+     * ID of the population set.
+     * @type {number}
+     * @memberof AssignPopulationSet
+     */
+    'population_set_id': number;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface AssignTags
+ */
+export interface AssignTags {
+    /**
+     * The bulk action to perform.
+     * @type {ActionEnum}
+     * @memberof AssignTags
+     */
+    'action': ActionEnum;
+    /**
+     * List of tag IDs to add.
+     * @type {Array<number>}
+     * @memberof AssignTags
+     */
+    'add_tag_ids': Array<number>;
+    /**
+     * List of tag IDs to remove.
+     * @type {Array<number>}
+     * @memberof AssignTags
+     */
+    'remove_tag_ids': Array<number>;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface AssignUser
+ */
+export interface AssignUser {
+    /**
+     * The bulk action to perform.
+     * @type {ActionEnum}
+     * @memberof AssignUser
+     */
+    'action': ActionEnum;
+    /**
+     * ID of the user to assign.
+     * @type {number}
+     * @memberof AssignUser
+     */
+    'user_id': number;
+}
+
+
+/**
+ * 
+ * @export
  * @enum {string}
  */
 
-export const AvailableTransitions24dEnum = {
+export const AvailableTransitionsBc5Enum = {
     Draft: 'draft',
     ComposeNow: 'compose_now',
     InProgress: 'in_progress',
@@ -144,10 +230,11 @@ export const AvailableTransitions24dEnum = {
     Rejected: 'rejected',
     NpoApproved: 'npo_approved',
     Exported: 'exported',
+    Deprecated: 'deprecated',
     Invalid: 'invalid'
 } as const;
 
-export type AvailableTransitions24dEnum = typeof AvailableTransitions24dEnum[keyof typeof AvailableTransitions24dEnum];
+export type AvailableTransitionsBc5Enum = typeof AvailableTransitionsBc5Enum[keyof typeof AvailableTransitionsBc5Enum];
 
 
 /**
@@ -216,6 +303,46 @@ export const BlankEnum = {
 } as const;
 
 export type BlankEnum = typeof BlankEnum[keyof typeof BlankEnum];
+
+
+/**
+ * @type BulkAction
+ * @export
+ */
+export type BulkAction = { action: 'assign_population_set' } & AssignPopulationSet | { action: 'assign_tag' } & AssignTags | { action: 'assign_user' } & AssignUser | { action: 'change_status' } & ChangeStatus | { action: 'write_note' } & WriteNote;
+
+/**
+ * 
+ * @export
+ * @interface BulkActionResponse
+ */
+export interface BulkActionResponse {
+    /**
+     * 
+     * @type {number}
+     * @memberof BulkActionResponse
+     */
+    'updated_count': number;
+}
+/**
+ * 
+ * @export
+ * @interface ChangeStatus
+ */
+export interface ChangeStatus {
+    /**
+     * The bulk action to perform.
+     * @type {ActionEnum}
+     * @memberof ChangeStatus
+     */
+    'action': ActionEnum;
+    /**
+     * The new status.
+     * @type {string}
+     * @memberof ChangeStatus
+     */
+    'new_status': string;
+}
 
 
 /**
@@ -297,10 +424,10 @@ export interface ConnectivityStatement {
     'state': string;
     /**
      * 
-     * @type {Array<AvailableTransitions24dEnum>}
+     * @type {Array<AvailableTransitionsBc5Enum>}
      * @memberof ConnectivityStatement
      */
-    'available_transitions': Array<AvailableTransitions24dEnum>;
+    'available_transitions': Array<AvailableTransitionsBc5Enum>;
     /**
      * 
      * @type {Array<AnatomicalEntity>}
@@ -391,6 +518,24 @@ export interface ConnectivityStatement {
      * @memberof ConnectivityStatement
      */
     'sex': Sex;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatement
+     */
+    'population_id'?: number | null;
+    /**
+     * 
+     * @type {PopulationSet}
+     * @memberof ConnectivityStatement
+     */
+    'population': PopulationSet;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ConnectivityStatement
+     */
+    'has_statement_been_exported': boolean;
     /**
      * 
      * @type {Array<number>}
@@ -526,10 +671,10 @@ export interface ConnectivityStatementUpdate {
     'state': string;
     /**
      * 
-     * @type {Array<AvailableTransitions24dEnum>}
+     * @type {Array<AvailableTransitionsBc5Enum>}
      * @memberof ConnectivityStatementUpdate
      */
-    'available_transitions': Array<AvailableTransitions24dEnum>;
+    'available_transitions': Array<AvailableTransitionsBc5Enum>;
     /**
      * 
      * @type {Array<number>}
@@ -614,6 +759,24 @@ export interface ConnectivityStatementUpdate {
      * @memberof ConnectivityStatementUpdate
      */
     'sex': Sex;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'population_id'?: number | null;
+    /**
+     * 
+     * @type {PopulationSet}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'population': PopulationSet;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ConnectivityStatementUpdate
+     */
+    'has_statement_been_exported': boolean;
     /**
      * 
      * @type {Array<number>}
@@ -1235,6 +1398,37 @@ export interface PaginatedPhenotypeList {
 /**
  * 
  * @export
+ * @interface PaginatedPopulationSetList
+ */
+export interface PaginatedPopulationSetList {
+    /**
+     * 
+     * @type {number}
+     * @memberof PaginatedPopulationSetList
+     */
+    'count'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedPopulationSetList
+     */
+    'next'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedPopulationSetList
+     */
+    'previous'?: string | null;
+    /**
+     * 
+     * @type {Array<PopulationSet>}
+     * @memberof PaginatedPopulationSetList
+     */
+    'results'?: Array<PopulationSet>;
+}
+/**
+ * 
+ * @export
  * @interface PaginatedProjectionPhenotypeList
  */
 export interface PaginatedProjectionPhenotypeList {
@@ -1511,10 +1705,10 @@ export interface PatchedConnectivityStatement {
     'state'?: string;
     /**
      * 
-     * @type {Array<AvailableTransitions24dEnum>}
+     * @type {Array<AvailableTransitionsBc5Enum>}
      * @memberof PatchedConnectivityStatement
      */
-    'available_transitions'?: Array<AvailableTransitions24dEnum>;
+    'available_transitions'?: Array<AvailableTransitionsBc5Enum>;
     /**
      * 
      * @type {Array<AnatomicalEntity>}
@@ -1605,6 +1799,24 @@ export interface PatchedConnectivityStatement {
      * @memberof PatchedConnectivityStatement
      */
     'sex'?: Sex;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatement
+     */
+    'population_id'?: number | null;
+    /**
+     * 
+     * @type {PopulationSet}
+     * @memberof PatchedConnectivityStatement
+     */
+    'population'?: PopulationSet;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PatchedConnectivityStatement
+     */
+    'has_statement_been_exported'?: boolean;
     /**
      * 
      * @type {Array<number>}
@@ -1722,10 +1934,10 @@ export interface PatchedConnectivityStatementUpdate {
     'state'?: string;
     /**
      * 
-     * @type {Array<AvailableTransitions24dEnum>}
+     * @type {Array<AvailableTransitionsBc5Enum>}
      * @memberof PatchedConnectivityStatementUpdate
      */
-    'available_transitions'?: Array<AvailableTransitions24dEnum>;
+    'available_transitions'?: Array<AvailableTransitionsBc5Enum>;
     /**
      * 
      * @type {Array<number>}
@@ -1810,6 +2022,24 @@ export interface PatchedConnectivityStatementUpdate {
      * @memberof PatchedConnectivityStatementUpdate
      */
     'sex'?: Sex;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatementUpdate
+     */
+    'population_id'?: number | null;
+    /**
+     * 
+     * @type {PopulationSet}
+     * @memberof PatchedConnectivityStatementUpdate
+     */
+    'population'?: PopulationSet;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PatchedConnectivityStatementUpdate
+     */
+    'has_statement_been_exported'?: boolean;
     /**
      * 
      * @type {Array<number>}
@@ -2176,6 +2406,31 @@ export interface Phenotype {
     'name': string;
 }
 /**
+ * Population Set
+ * @export
+ * @interface PopulationSet
+ */
+export interface PopulationSet {
+    /**
+     * 
+     * @type {number}
+     * @memberof PopulationSet
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PopulationSet
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PopulationSet
+     */
+    'description'?: string | null;
+}
+/**
  * Profile
  * @export
  * @interface Profile
@@ -2503,6 +2758,24 @@ export interface SentenceConnectivityStatement {
     'sex': Sex;
     /**
      * 
+     * @type {number}
+     * @memberof SentenceConnectivityStatement
+     */
+    'population_id'?: number | null;
+    /**
+     * 
+     * @type {PopulationSet}
+     * @memberof SentenceConnectivityStatement
+     */
+    'population': PopulationSet;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SentenceConnectivityStatement
+     */
+    'has_statement_been_exported': boolean;
+    /**
+     * 
      * @type {string}
      * @memberof SentenceConnectivityStatement
      */
@@ -2798,6 +3071,27 @@ export const ViaTypeEnum = {
 } as const;
 
 export type ViaTypeEnum = typeof ViaTypeEnum[keyof typeof ViaTypeEnum];
+
+
+/**
+ * 
+ * @export
+ * @interface WriteNote
+ */
+export interface WriteNote {
+    /**
+     * The bulk action to perform.
+     * @type {ActionEnum}
+     * @memberof WriteNote
+     */
+    'action': ActionEnum;
+    /**
+     * The note text.
+     * @type {string}
+     * @memberof WriteNote
+     */
+    'note_text': string;
+}
 
 
 
@@ -3182,6 +3476,216 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Returns available users for assignment and possible state transitions for the selected items.
+         * @param {Array<number>} [destinations] 
+         * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
+         * @param {number} [excludeSentenceId] 
+         * @param {boolean} [hasStatementBeenExported] Is Exported
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {string} [knowledgeStatement] 
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
+         * @param {Array<number>} [origins] 
+         * @param {Array<number>} [populationset] 
+         * @param {number} [sentenceId] 
+         * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAvailableOptionsRetrieve: async (destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/connectivity-statement/available_options/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (destinations) {
+                localVarQueryParameter['destinations'] = destinations;
+            }
+
+            if (excludeIds) {
+                localVarQueryParameter['exclude_ids'] = excludeIds.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (excludeSentenceId !== undefined) {
+                localVarQueryParameter['exclude_sentence_id'] = excludeSentenceId;
+            }
+
+            if (hasStatementBeenExported !== undefined) {
+                localVarQueryParameter['has_statement_been_exported'] = hasStatementBeenExported;
+            }
+
+            if (include) {
+                localVarQueryParameter['include'] = include.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (knowledgeStatement !== undefined) {
+                localVarQueryParameter['knowledge_statement'] = knowledgeStatement;
+            }
+
+            if (notes !== undefined) {
+                localVarQueryParameter['notes'] = notes;
+            }
+
+            if (ordering) {
+                localVarQueryParameter['ordering'] = ordering.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (origins) {
+                localVarQueryParameter['origins'] = origins;
+            }
+
+            if (populationset) {
+                localVarQueryParameter['populationset'] = populationset;
+            }
+
+            if (sentenceId !== undefined) {
+                localVarQueryParameter['sentence_id'] = sentenceId;
+            }
+
+            if (state) {
+                localVarQueryParameter['state'] = state;
+            }
+
+            if (tags) {
+                localVarQueryParameter['tags'] = tags;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Apply a bulk action to the selected items and return the number of items updated successfully.
+         * @param {Array<number>} [destinations] 
+         * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
+         * @param {number} [excludeSentenceId] 
+         * @param {boolean} [hasStatementBeenExported] Is Exported
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {string} [knowledgeStatement] 
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>} [ordering] Ordering
+         * @param {Array<number>} [origins] 
+         * @param {Array<number>} [populationset] 
+         * @param {number} [sentenceId] 
+         * @param {Array<ComposerConnectivityStatementBulkActionCreateStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {BulkAction} [bulkAction] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementBulkActionCreate: async (destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementBulkActionCreateStateEnum>, tags?: Array<number>, bulkAction?: BulkAction, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/connectivity-statement/bulk_action/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (destinations) {
+                localVarQueryParameter['destinations'] = destinations;
+            }
+
+            if (excludeIds) {
+                localVarQueryParameter['exclude_ids'] = excludeIds.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (excludeSentenceId !== undefined) {
+                localVarQueryParameter['exclude_sentence_id'] = excludeSentenceId;
+            }
+
+            if (hasStatementBeenExported !== undefined) {
+                localVarQueryParameter['has_statement_been_exported'] = hasStatementBeenExported;
+            }
+
+            if (include) {
+                localVarQueryParameter['include'] = include.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (knowledgeStatement !== undefined) {
+                localVarQueryParameter['knowledge_statement'] = knowledgeStatement;
+            }
+
+            if (notes !== undefined) {
+                localVarQueryParameter['notes'] = notes;
+            }
+
+            if (ordering) {
+                localVarQueryParameter['ordering'] = ordering.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (origins) {
+                localVarQueryParameter['origins'] = origins;
+            }
+
+            if (populationset) {
+                localVarQueryParameter['populationset'] = populationset;
+            }
+
+            if (sentenceId !== undefined) {
+                localVarQueryParameter['sentence_id'] = sentenceId;
+            }
+
+            if (state) {
+                localVarQueryParameter['state'] = state;
+            }
+
+            if (tags) {
+                localVarQueryParameter['tags'] = tags;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(bulkAction, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {*} [options] Override http request option.
@@ -3500,19 +4004,22 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {Array<number>} [destinations] 
          * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
          * @param {number} [excludeSentenceId] 
+         * @param {boolean} [hasStatementBeenExported] Is Exported
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {string} [knowledgeStatement] 
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
          * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
          * @param {Array<number>} [origins] 
+         * @param {Array<number>} [populationset] 
          * @param {number} [sentenceId] 
          * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList: async (destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementList: async (destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/connectivity-statement/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3546,6 +4053,14 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
                 localVarQueryParameter['exclude_sentence_id'] = excludeSentenceId;
             }
 
+            if (hasStatementBeenExported !== undefined) {
+                localVarQueryParameter['has_statement_been_exported'] = hasStatementBeenExported;
+            }
+
+            if (include) {
+                localVarQueryParameter['include'] = include.join(COLLECTION_FORMATS.csv);
+            }
+
             if (knowledgeStatement !== undefined) {
                 localVarQueryParameter['knowledge_statement'] = knowledgeStatement;
             }
@@ -3568,6 +4083,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
 
             if (origins) {
                 localVarQueryParameter['origins'] = origins;
+            }
+
+            if (populationset) {
+                localVarQueryParameter['populationset'] = populationset;
             }
 
             if (sentenceId !== undefined) {
@@ -4508,6 +5027,96 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * PopulationSet
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerPopulationList: async (limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/population/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * PopulationSet
+         * @param {number} id A unique integer value identifying this population set.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerPopulationRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerPopulationRetrieve', 'id', id)
+            const localVarPath = `/api/composer/population/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Profile
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4728,6 +5337,156 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Returns available users for assignment and possible state transitions for the selected items.
+         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
+         * @param {Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {string} [title] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSentenceAvailableOptionsRetrieve: async (exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/sentence/available_options/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (exclude) {
+                localVarQueryParameter['exclude'] = exclude.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (include) {
+                localVarQueryParameter['include'] = include.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (notes !== undefined) {
+                localVarQueryParameter['notes'] = notes;
+            }
+
+            if (ordering) {
+                localVarQueryParameter['ordering'] = ordering.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (state) {
+                localVarQueryParameter['state'] = state;
+            }
+
+            if (tags) {
+                localVarQueryParameter['tags'] = tags;
+            }
+
+            if (title !== undefined) {
+                localVarQueryParameter['title'] = title;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Apply a bulk action to the selected items and return the number of items updated successfully.
+         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
+         * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {string} [title] 
+         * @param {BulkAction} [bulkAction] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSentenceBulkActionCreate: async (exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/sentence/bulk_action/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (exclude) {
+                localVarQueryParameter['exclude'] = exclude.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (include) {
+                localVarQueryParameter['include'] = include.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (notes !== undefined) {
+                localVarQueryParameter['notes'] = notes;
+            }
+
+            if (ordering) {
+                localVarQueryParameter['ordering'] = ordering.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (state) {
+                localVarQueryParameter['state'] = state;
+            }
+
+            if (tags) {
+                localVarQueryParameter['tags'] = tags;
+            }
+
+            if (title !== undefined) {
+                localVarQueryParameter['title'] = title;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(bulkAction, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Sentence
          * @param {Sentence} sentence 
          * @param {*} [options] Override http request option.
@@ -4872,6 +5631,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * Sentence
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
@@ -4882,7 +5642,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceList: async (exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceList: async (exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/sentence/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4906,6 +5666,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
 
             if (exclude) {
                 localVarQueryParameter['exclude'] = exclude.join(COLLECTION_FORMATS.csv);
+            }
+
+            if (include) {
+                localVarQueryParameter['include'] = include.join(COLLECTION_FORMATS.csv);
             }
 
             if (limit !== undefined) {
@@ -6018,6 +6782,55 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Returns available users for assignment and possible state transitions for the selected items.
+         * @param {Array<number>} [destinations] 
+         * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
+         * @param {number} [excludeSentenceId] 
+         * @param {boolean} [hasStatementBeenExported] Is Exported
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {string} [knowledgeStatement] 
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
+         * @param {Array<number>} [origins] 
+         * @param {Array<number>} [populationset] 
+         * @param {number} [sentenceId] 
+         * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementAvailableOptionsRetrieve(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAvailableOptionsRetrieve(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, notes, ordering, origins, populationset, sentenceId, state, tags, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAvailableOptionsRetrieve']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Apply a bulk action to the selected items and return the number of items updated successfully.
+         * @param {Array<number>} [destinations] 
+         * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
+         * @param {number} [excludeSentenceId] 
+         * @param {boolean} [hasStatementBeenExported] Is Exported
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {string} [knowledgeStatement] 
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>} [ordering] Ordering
+         * @param {Array<number>} [origins] 
+         * @param {Array<number>} [populationset] 
+         * @param {number} [sentenceId] 
+         * @param {Array<ComposerConnectivityStatementBulkActionCreateStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {BulkAction} [bulkAction] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementBulkActionCreate(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementBulkActionCreateStateEnum>, tags?: Array<number>, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BulkActionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementBulkActionCreate(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, notes, ordering, origins, populationset, sentenceId, state, tags, bulkAction, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementBulkActionCreate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {*} [options] Override http request option.
@@ -6111,20 +6924,23 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {Array<number>} [destinations] 
          * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
          * @param {number} [excludeSentenceId] 
+         * @param {boolean} [hasStatementBeenExported] Is Exported
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {string} [knowledgeStatement] 
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
          * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
          * @param {Array<number>} [origins] 
+         * @param {Array<number>} [populationset] 
          * @param {number} [sentenceId] 
          * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedBaseConnectivityStatementList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options);
+        async composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedBaseConnectivityStatementList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, limit, notes, offset, ordering, origins, populationset, sentenceId, state, tags, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementList']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -6383,6 +7199,31 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * PopulationSet
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerPopulationList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedPopulationSetList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerPopulationList(limit, offset, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerPopulationList']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * PopulationSet
+         * @param {number} id A unique integer value identifying this population set.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerPopulationRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PopulationSet>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerPopulationRetrieve(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerPopulationRetrieve']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Profile
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -6445,6 +7286,43 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Returns available users for assignment and possible state transitions for the selected items.
+         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
+         * @param {Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {string} [title] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerSentenceAvailableOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, state, tags, title, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceAvailableOptionsRetrieve']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Apply a bulk action to the selected items and return the number of items updated successfully.
+         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
+         * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {string} [title] 
+         * @param {BulkAction} [bulkAction] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BulkActionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceBulkActionCreate(exclude, include, notes, ordering, state, tags, title, bulkAction, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceBulkActionCreate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Sentence
          * @param {Sentence} sentence 
          * @param {*} [options] Override http request option.
@@ -6486,6 +7364,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         /**
          * Sentence
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
@@ -6496,8 +7375,8 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceList(exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceList(exclude, limit, notes, offset, ordering, state, tags, title, options);
+        async composerSentenceList(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceList(exclude, include, limit, notes, offset, ordering, state, tags, title, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceList']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -6858,6 +7737,49 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementAssignOwnerPartialUpdate(id, patchedConnectivityStatement, options).then((request) => request(axios, basePath));
         },
         /**
+         * Returns available users for assignment and possible state transitions for the selected items.
+         * @param {Array<number>} [destinations] 
+         * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
+         * @param {number} [excludeSentenceId] 
+         * @param {boolean} [hasStatementBeenExported] Is Exported
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {string} [knowledgeStatement] 
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
+         * @param {Array<number>} [origins] 
+         * @param {Array<number>} [populationset] 
+         * @param {number} [sentenceId] 
+         * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAvailableOptionsRetrieve(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
+            return localVarFp.composerConnectivityStatementAvailableOptionsRetrieve(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, notes, ordering, origins, populationset, sentenceId, state, tags, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Apply a bulk action to the selected items and return the number of items updated successfully.
+         * @param {Array<number>} [destinations] 
+         * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
+         * @param {number} [excludeSentenceId] 
+         * @param {boolean} [hasStatementBeenExported] Is Exported
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {string} [knowledgeStatement] 
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>} [ordering] Ordering
+         * @param {Array<number>} [origins] 
+         * @param {Array<number>} [populationset] 
+         * @param {number} [sentenceId] 
+         * @param {Array<ComposerConnectivityStatementBulkActionCreateStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {BulkAction} [bulkAction] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementBulkActionCreate(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementBulkActionCreateStateEnum>, tags?: Array<number>, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): AxiosPromise<BulkActionResponse> {
+            return localVarFp.composerConnectivityStatementBulkActionCreate(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, notes, ordering, origins, populationset, sentenceId, state, tags, bulkAction, options).then((request) => request(axios, basePath));
+        },
+        /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {*} [options] Override http request option.
@@ -6930,20 +7852,23 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {Array<number>} [destinations] 
          * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
          * @param {number} [excludeSentenceId] 
+         * @param {boolean} [hasStatementBeenExported] Is Exported
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {string} [knowledgeStatement] 
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
          * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
          * @param {Array<number>} [origins] 
+         * @param {Array<number>} [populationset] 
          * @param {number} [sentenceId] 
          * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
          * @param {Array<number>} [tags] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedBaseConnectivityStatementList> {
-            return localVarFp.composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options).then((request) => request(axios, basePath));
+        composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedBaseConnectivityStatementList> {
+            return localVarFp.composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, limit, notes, offset, ordering, origins, populationset, sentenceId, state, tags, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -7139,6 +8064,25 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerPhenotypeRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
+         * PopulationSet
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerPopulationList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedPopulationSetList> {
+            return localVarFp.composerPopulationList(limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * PopulationSet
+         * @param {number} id A unique integer value identifying this population set.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerPopulationRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<PopulationSet> {
+            return localVarFp.composerPopulationRetrieve(id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Profile
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7186,6 +8130,37 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerSentenceAssignOwnerPartialUpdate(id, patchedSentence, options).then((request) => request(axios, basePath));
         },
         /**
+         * Returns available users for assignment and possible state transitions for the selected items.
+         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
+         * @param {Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {string} [title] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSentenceAvailableOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
+            return localVarFp.composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, state, tags, title, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Apply a bulk action to the selected items and return the number of items updated successfully.
+         * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
+         * @param {boolean} [notes] Checks if entity has notes
+         * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
+         * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
+         * @param {Array<number>} [tags] 
+         * @param {string} [title] 
+         * @param {BulkAction} [bulkAction] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): AxiosPromise<BulkActionResponse> {
+            return localVarFp.composerSentenceBulkActionCreate(exclude, include, notes, ordering, state, tags, title, bulkAction, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Sentence
          * @param {Sentence} sentence 
          * @param {*} [options] Override http request option.
@@ -7218,6 +8193,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         /**
          * Sentence
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+         * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
          * @param {boolean} [notes] Checks if entity has notes
          * @param {number} [offset] The initial index from which to return the results.
@@ -7228,8 +8204,8 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceList(exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedSentenceList> {
-            return localVarFp.composerSentenceList(exclude, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(axios, basePath));
+        composerSentenceList(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedSentenceList> {
+            return localVarFp.composerSentenceList(exclude, include, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(axios, basePath));
         },
         /**
          * Sentence
@@ -7540,6 +8516,53 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
+     * Returns available users for assignment and possible state transitions for the selected items.
+     * @param {Array<number>} [destinations] 
+     * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
+     * @param {number} [excludeSentenceId] 
+     * @param {boolean} [hasStatementBeenExported] Is Exported
+     * @param {Array<number>} [include] Multiple values may be separated by commas.
+     * @param {string} [knowledgeStatement] 
+     * @param {boolean} [notes] Checks if entity has notes
+     * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
+     * @param {Array<number>} [origins] 
+     * @param {Array<number>} [populationset] 
+     * @param {number} [sentenceId] 
+     * @param {Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>} [state] 
+     * @param {Array<number>} [tags] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementAvailableOptionsRetrieve(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementAvailableOptionsRetrieve(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, notes, ordering, origins, populationset, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Apply a bulk action to the selected items and return the number of items updated successfully.
+     * @param {Array<number>} [destinations] 
+     * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
+     * @param {number} [excludeSentenceId] 
+     * @param {boolean} [hasStatementBeenExported] Is Exported
+     * @param {Array<number>} [include] Multiple values may be separated by commas.
+     * @param {string} [knowledgeStatement] 
+     * @param {boolean} [notes] Checks if entity has notes
+     * @param {Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>} [ordering] Ordering
+     * @param {Array<number>} [origins] 
+     * @param {Array<number>} [populationset] 
+     * @param {number} [sentenceId] 
+     * @param {Array<ComposerConnectivityStatementBulkActionCreateStateEnum>} [state] 
+     * @param {Array<number>} [tags] 
+     * @param {BulkAction} [bulkAction] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementBulkActionCreate(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, notes?: boolean, ordering?: Array<ComposerConnectivityStatementBulkActionCreateOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementBulkActionCreateStateEnum>, tags?: Array<number>, bulkAction?: BulkAction, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementBulkActionCreate(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, notes, ordering, origins, populationset, sentenceId, state, tags, bulkAction, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * ConnectivityStatement
      * @param {number} id A unique integer value identifying this connectivity statement.
      * @param {*} [options] Override http request option.
@@ -7626,12 +8649,15 @@ export class ComposerApi extends BaseAPI {
      * @param {Array<number>} [destinations] 
      * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
      * @param {number} [excludeSentenceId] 
+     * @param {boolean} [hasStatementBeenExported] Is Exported
+     * @param {Array<number>} [include] Multiple values may be separated by commas.
      * @param {string} [knowledgeStatement] 
      * @param {number} [limit] Number of results to return per page.
      * @param {boolean} [notes] Checks if entity has notes
      * @param {number} [offset] The initial index from which to return the results.
      * @param {Array<ComposerConnectivityStatementListOrderingEnum>} [ordering] Ordering
      * @param {Array<number>} [origins] 
+     * @param {Array<number>} [populationset] 
      * @param {number} [sentenceId] 
      * @param {Array<ComposerConnectivityStatementListStateEnum>} [state] 
      * @param {Array<number>} [tags] 
@@ -7639,8 +8665,8 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, knowledgeStatement, limit, notes, offset, ordering, origins, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
+    public composerConnectivityStatementList(destinations?: Array<number>, excludeIds?: Array<number>, excludeSentenceId?: number, hasStatementBeenExported?: boolean, include?: Array<number>, knowledgeStatement?: string, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerConnectivityStatementListOrderingEnum>, origins?: Array<number>, populationset?: Array<number>, sentenceId?: number, state?: Array<ComposerConnectivityStatementListStateEnum>, tags?: Array<number>, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementList(destinations, excludeIds, excludeSentenceId, hasStatementBeenExported, include, knowledgeStatement, limit, notes, offset, ordering, origins, populationset, sentenceId, state, tags, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -7877,6 +8903,29 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
+     * PopulationSet
+     * @param {number} [limit] Number of results to return per page.
+     * @param {number} [offset] The initial index from which to return the results.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerPopulationList(limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerPopulationList(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * PopulationSet
+     * @param {number} id A unique integer value identifying this population set.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerPopulationRetrieve(id: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerPopulationRetrieve(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Profile
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -7934,6 +8983,41 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
+     * Returns available users for assignment and possible state transitions for the selected items.
+     * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+     * @param {Array<number>} [include] Multiple values may be separated by commas.
+     * @param {boolean} [notes] Checks if entity has notes
+     * @param {Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>} [ordering] Ordering
+     * @param {Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>} [state] 
+     * @param {Array<number>} [tags] 
+     * @param {string} [title] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerSentenceAvailableOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, state, tags, title, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Apply a bulk action to the selected items and return the number of items updated successfully.
+     * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+     * @param {Array<number>} [include] Multiple values may be separated by commas.
+     * @param {boolean} [notes] Checks if entity has notes
+     * @param {Array<ComposerSentenceBulkActionCreateOrderingEnum>} [ordering] Ordering
+     * @param {Array<ComposerSentenceBulkActionCreateStateEnum>} [state] 
+     * @param {Array<number>} [tags] 
+     * @param {string} [title] 
+     * @param {BulkAction} [bulkAction] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSentenceBulkActionCreate(exclude, include, notes, ordering, state, tags, title, bulkAction, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Sentence
      * @param {Sentence} sentence 
      * @param {*} [options] Override http request option.
@@ -7972,6 +9056,7 @@ export class ComposerApi extends BaseAPI {
     /**
      * Sentence
      * @param {Array<string>} [exclude] Multiple values may be separated by commas.
+     * @param {Array<number>} [include] Multiple values may be separated by commas.
      * @param {number} [limit] Number of results to return per page.
      * @param {boolean} [notes] Checks if entity has notes
      * @param {number} [offset] The initial index from which to return the results.
@@ -7983,8 +9068,8 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceList(exclude?: Array<string>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerSentenceList(exclude, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(this.axios, this.basePath));
+    public composerSentenceList(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSentenceList(exclude, include, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -8235,6 +9320,58 @@ export class ComposerApi extends BaseAPI {
 /**
  * @export
  */
+export const ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum = {
+    Id: '-id',
+    LastEdited: '-last_edited',
+    Id2: 'id',
+    LastEdited2: 'last_edited'
+} as const;
+export type ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum = typeof ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum[keyof typeof ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum];
+/**
+ * @export
+ */
+export const ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum = {
+    ComposeNow: 'compose_now',
+    Deprecated: 'deprecated',
+    Draft: 'draft',
+    Exported: 'exported',
+    InProgress: 'in_progress',
+    Invalid: 'invalid',
+    NpoApproved: 'npo_approved',
+    Rejected: 'rejected',
+    Revise: 'revise',
+    ToBeReviewed: 'to_be_reviewed'
+} as const;
+export type ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum = typeof ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum[keyof typeof ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum];
+/**
+ * @export
+ */
+export const ComposerConnectivityStatementBulkActionCreateOrderingEnum = {
+    Id: '-id',
+    LastEdited: '-last_edited',
+    Id2: 'id',
+    LastEdited2: 'last_edited'
+} as const;
+export type ComposerConnectivityStatementBulkActionCreateOrderingEnum = typeof ComposerConnectivityStatementBulkActionCreateOrderingEnum[keyof typeof ComposerConnectivityStatementBulkActionCreateOrderingEnum];
+/**
+ * @export
+ */
+export const ComposerConnectivityStatementBulkActionCreateStateEnum = {
+    ComposeNow: 'compose_now',
+    Deprecated: 'deprecated',
+    Draft: 'draft',
+    Exported: 'exported',
+    InProgress: 'in_progress',
+    Invalid: 'invalid',
+    NpoApproved: 'npo_approved',
+    Rejected: 'rejected',
+    Revise: 'revise',
+    ToBeReviewed: 'to_be_reviewed'
+} as const;
+export type ComposerConnectivityStatementBulkActionCreateStateEnum = typeof ComposerConnectivityStatementBulkActionCreateStateEnum[keyof typeof ComposerConnectivityStatementBulkActionCreateStateEnum];
+/**
+ * @export
+ */
 export const ComposerConnectivityStatementListOrderingEnum = {
     Id: '-id',
     LastEdited: '-last_edited',
@@ -8247,6 +9384,7 @@ export type ComposerConnectivityStatementListOrderingEnum = typeof ComposerConne
  */
 export const ComposerConnectivityStatementListStateEnum = {
     ComposeNow: 'compose_now',
+    Deprecated: 'deprecated',
     Draft: 'draft',
     Exported: 'exported',
     InProgress: 'in_progress',
@@ -8257,6 +9395,56 @@ export const ComposerConnectivityStatementListStateEnum = {
     ToBeReviewed: 'to_be_reviewed'
 } as const;
 export type ComposerConnectivityStatementListStateEnum = typeof ComposerConnectivityStatementListStateEnum[keyof typeof ComposerConnectivityStatementListStateEnum];
+/**
+ * @export
+ */
+export const ComposerSentenceAvailableOptionsRetrieveOrderingEnum = {
+    Id: '-id',
+    LastEdited: '-last_edited',
+    Owner: '-owner',
+    Id2: 'id',
+    LastEdited2: 'last_edited',
+    Owner2: 'owner'
+} as const;
+export type ComposerSentenceAvailableOptionsRetrieveOrderingEnum = typeof ComposerSentenceAvailableOptionsRetrieveOrderingEnum[keyof typeof ComposerSentenceAvailableOptionsRetrieveOrderingEnum];
+/**
+ * @export
+ */
+export const ComposerSentenceAvailableOptionsRetrieveStateEnum = {
+    Completed: 'completed',
+    ComposeLater: 'compose_later',
+    ComposeNow: 'compose_now',
+    Excluded: 'excluded',
+    NeedsFurtherReview: 'needs_further_review',
+    Open: 'open',
+    ReadyToCompose: 'ready_to_compose'
+} as const;
+export type ComposerSentenceAvailableOptionsRetrieveStateEnum = typeof ComposerSentenceAvailableOptionsRetrieveStateEnum[keyof typeof ComposerSentenceAvailableOptionsRetrieveStateEnum];
+/**
+ * @export
+ */
+export const ComposerSentenceBulkActionCreateOrderingEnum = {
+    Id: '-id',
+    LastEdited: '-last_edited',
+    Owner: '-owner',
+    Id2: 'id',
+    LastEdited2: 'last_edited',
+    Owner2: 'owner'
+} as const;
+export type ComposerSentenceBulkActionCreateOrderingEnum = typeof ComposerSentenceBulkActionCreateOrderingEnum[keyof typeof ComposerSentenceBulkActionCreateOrderingEnum];
+/**
+ * @export
+ */
+export const ComposerSentenceBulkActionCreateStateEnum = {
+    Completed: 'completed',
+    ComposeLater: 'compose_later',
+    ComposeNow: 'compose_now',
+    Excluded: 'excluded',
+    NeedsFurtherReview: 'needs_further_review',
+    Open: 'open',
+    ReadyToCompose: 'ready_to_compose'
+} as const;
+export type ComposerSentenceBulkActionCreateStateEnum = typeof ComposerSentenceBulkActionCreateStateEnum[keyof typeof ComposerSentenceBulkActionCreateStateEnum];
 /**
  * @export
  */
