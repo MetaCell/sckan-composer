@@ -180,11 +180,17 @@ export interface AssignTags {
      */
     'action': ActionEnum;
     /**
-     * List of tag IDs to assign (existing tags not in this list will be removed).
+     * List of tag IDs to add.
      * @type {Array<number>}
      * @memberof AssignTags
      */
-    'tag_ids': Array<number>;
+    'add_tag_ids': Array<number>;
+    /**
+     * List of tag IDs to remove.
+     * @type {Array<number>}
+     * @memberof AssignTags
+     */
+    'remove_tag_ids': Array<number>;
 }
 
 

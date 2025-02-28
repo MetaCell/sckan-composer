@@ -2814,15 +2814,20 @@ components:
           allOf:
           - $ref: '#/components/schemas/ActionEnum'
           description: The bulk action to perform.
-        tag_ids:
+        add_tag_ids:
           type: array
           items:
             type: integer
-          description: List of tag IDs to assign (existing tags not in this list will
-            be removed).
+          description: List of tag IDs to add.
+        remove_tag_ids:
+          type: array
+          items:
+            type: integer
+          description: List of tag IDs to remove.
       required:
       - action
-      - tag_ids
+      - add_tag_ids
+      - remove_tag_ids
     AssignUser:
       type: object
       properties:

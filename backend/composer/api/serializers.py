@@ -941,10 +941,15 @@ class AssignUserSerializer(BulkActionSerializer):
         return data
 
 class AssignTagsSerializer(BulkActionSerializer):
-    tag_ids = serializers.ListField(
+    add_tag_ids = serializers.ListField(
         child=serializers.IntegerField(),
         required=True,
-        help_text="List of tag IDs to assign (existing tags not in this list will be removed)."
+        help_text="List of tag IDs to add."
+    )
+    remove_tag_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=True,
+        help_text="List of tag IDs to remove."
     )
 
     def validate(self, data):

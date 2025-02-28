@@ -521,7 +521,7 @@ class ConnectivityStatementViewSet(
             qs, req.user, data.get("user_id")
         ),
         BulkActionType.ASSIGN_TAG.value: lambda qs, req, data: bulk_service.assign_tags(
-            qs, data["tag_ids"]
+            qs, data["add_tag_ids"], data["remove_tag_ids"]
         ),
         BulkActionType.WRITE_NOTE.value: lambda qs, req, data: bulk_service.write_note(
             qs, req.user, data["note_text"]
@@ -645,7 +645,7 @@ class SentenceViewSet(
             qs, req.user, data.get("user_id")
         ),
         BulkActionType.ASSIGN_TAG.value: lambda qs, req, data: bulk_service.assign_tags(
-            qs, data["tag_ids"]
+            qs, data["add_tag_ids"], data["remove_tag_ids"]
         ),
         BulkActionType.WRITE_NOTE.value: lambda qs, req, data: bulk_service.write_note(
             qs, req.user, data["note_text"]
