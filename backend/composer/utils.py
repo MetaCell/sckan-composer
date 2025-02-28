@@ -14,10 +14,7 @@ def doi_uri(doi):
     return f"https://doi.org/{doi}" if doi else ""
 
 
-def create_reference_uri(id):
-    return f"http://uri.interlex.org/tgbugs/uris/readable/sparc-nlp/composer/{id}"
-
-def compr_uri(population_name, population_index):
+def create_reference_uri(population_name, population_index):
     return f"https://uri.interlex.org/composer/uris/set/{population_name}/{population_index}"
 
 def join_entities(entities):
