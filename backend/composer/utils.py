@@ -32,8 +32,7 @@ def update_modified_date(instance):
 
 
 def is_valid_population_name(name):
-    if not re.match(r"^[a-zA-Z][a-zA-Z0-9_]{7,19}$", name):
+    if not re.match(r"^[a-zA-Z][a-zA-Z0-9_]{4,14}$", name):
         raise ValidationError(
-            "Name must be between 8 and 20 characters, start with a letter, and contain only letters and numbers."
+            "Name must be between 5 and 15 characters, start with a letter, and contain only letters and numbers."
         )
-
