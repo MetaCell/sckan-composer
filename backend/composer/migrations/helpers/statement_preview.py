@@ -59,9 +59,13 @@ def get_migration_suffix_for_statement_preview(cs):
 
 def get_name(instance):
     if instance.simple_entity:
-        return str(instance.simple_entity)
+        return getattr(instance.simple_entity, 'name', 'Unknown Anatomical Entity')
     if instance.region_layer:
-        return str(instance.region_layer)
+        if instance.region_layer.layer:
+            layer = getattr(instance.region_layer.layer, 'name', 'Unknown Layer')
+        if instance.region_layer.region:
+            region = getattr(instance.region_layer.region, 'name', 'Unknown Region')
+        return f'{region} ({layer})'
     return 'Unknown Anatomical Entity'
 
 def get_laterality_description(instance):
