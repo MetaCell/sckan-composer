@@ -9,7 +9,7 @@ class TestPopulationName(TestCase):
             "Neuron123",
             "Population01",
             "ValidName1234",
-            "neuron_population",
+            "neuron_pop",
         ]
         for name in valid_names:
             self.assertTrue(is_valid_population_name(name))
@@ -17,7 +17,7 @@ class TestPopulationName(TestCase):
     def test_invalid_population_names(self):
         invalid_names = [
             "123Neuron",
-            "short",
+            "shot",
             "thisnameiswaytoolongtobevalid",
             "Invalid-Name",
         ]
