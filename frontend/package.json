@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "3.2.1",
+  "version": "4.0.1",
   "private": true,
   "main": "index.js",
   "proxy": "https://localhost:8000/",
