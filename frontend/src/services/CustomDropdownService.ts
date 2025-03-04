@@ -229,11 +229,13 @@ function getEntitiesBeforeOrder(
 
 const queryOptions = {
   knowledgeStatement: undefined,
+  include: undefined,
   limit: autocompleteRows,
   notes: undefined,
   index: 0,
   ordering: undefined,
   stateFilter: undefined,
+  populationSetFilter: undefined,
   tagFilter: undefined,
 };
 

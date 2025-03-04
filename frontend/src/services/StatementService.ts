@@ -1,6 +1,8 @@
 import { composerApi } from "./apis"
 import {
+  ActionEnum,
   AnatomicalEntity,
+  BulkAction,
   ConnectivityStatement,
   ConnectivityStatementUpdate,
   PaginatedBaseConnectivityStatementList, PatchedConnectivityStatement,
@@ -117,7 +119,7 @@ class ConnectivityStatementService extends AbstractService {
     try {
       return await composerApi.composerConnectivityStatementCloneStatementRetrieve(id).then((response: any) => response.data);
     } catch (e) {
-      console.log(e)
+      console.error(e)
     }
   }
 
@@ -211,17 +213,36 @@ class ConnectivityStatementService extends AbstractService {
       limit,
       ordering,
       index,
+      hasStatementBeenExportedFilter,
       knowledgeStatement,
       stateFilter,
       tagFilter,
+      populationSetFilter,
       sentenceId,
       excludeSentenceId,
-      excludeIds
+      excludeIds,
+      include
     } = queryOptions;
+  
     return composerApi.composerConnectivityStatementList(
-      undefined, excludeIds, excludeSentenceId, knowledgeStatement, limit, undefined, index, ordering, origins, sentenceId, stateFilter, tagFilter
+      undefined,
+      excludeIds,
+      excludeSentenceId,
+      hasStatementBeenExportedFilter,
+      include,
+      knowledgeStatement,
+      limit,
+      undefined,
+      index,
+      ordering,
+      origins,
+      populationSetFilter,
+      sentenceId,
+      stateFilter,
+      tagFilter
     ).then((res: any) => res.data);
   }
+  
 
   async getPhenotypeList() {
     return composerApi.composerPhenotypeList(undefined).then((res: any) => res.data);
@@ -252,7 +273,7 @@ class ConnectivityStatementService extends AbstractService {
       );
     }
   }
-  
+
   async destroyAlert(id: number, connectivity_statement_id: number, onCancel: () => void) {
     try {
       return await composerApi.composerStatementAlertDestroy(id).then((response: any) => response.data);
@@ -287,11 +308,128 @@ class ConnectivityStatementService extends AbstractService {
       );
     }
   }
-  
+
   async assignOwner(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement): Promise<ConnectivityStatement> {
     return composerApi.composerConnectivityStatementAssignOwnerPartialUpdate(id, patchedConnectivityStatement).then((response: any) => response.data);
   }
+
+  /**
+   * Fetch options for assignable users and possible state transitions.
+   * Uses connectivity statement filters or explicit IDs.
+   */
+  async fetchOptions(queryOptions: QueryParams): Promise<{ assignable_users: any[]; possible_transitions: any }> {
+    const {
+      excludeIds,
+      include,
+      notes,
+      ordering,
+      hasStatementBeenExportedFilter,
+      stateFilter,
+      populationSetFilter,
+      tagFilter,
+      knowledgeStatement,
+      origins,
+      sentenceId,
+      excludeSentenceId
+    } = queryOptions;
+
+    return composerApi
+      .composerConnectivityStatementAvailableOptionsRetrieve(
+        undefined,         // destinations (if not used)
+        excludeIds,
+        excludeSentenceId,
+        hasStatementBeenExportedFilter,
+        include,
+        knowledgeStatement,
+        notes,
+        ordering,
+        origins,
+        populationSetFilter,
+        sentenceId,
+        stateFilter,
+        tagFilter
+      )
+      .then((response: any) => response.data);
+  }
+
+  /**
+   * Perform a bulk action on connectivity statements.
+   * Ensures the correct parameter order even if the API changes.
+   * @param queryOptions - The filters or selection criteria.
+   * @param bulkAction - The action to perform (e.g., assign user, add tag).
+   */
+  async performBulkAction(queryOptions: QueryParams, bulkAction: BulkAction): Promise<{ message: string }> {
+    const {
+      excludeIds,
+      include,
+      notes,
+      ordering,
+      hasStatementBeenExportedFilter,
+      stateFilter,
+      populationSetFilter,
+      tagFilter,
+      knowledgeStatement,
+      origins,
+      sentenceId,
+      excludeSentenceId
+    } = queryOptions;
+  
+    return composerApi
+      .composerConnectivityStatementBulkActionCreate(
+        undefined,
+        excludeIds,
+        excludeSentenceId,
+        hasStatementBeenExportedFilter,
+        include,
+        knowledgeStatement,
+        notes,
+        ordering,
+        origins,
+        populationSetFilter,
+        sentenceId,
+        stateFilter,
+        tagFilter,
+        bulkAction
+      )
+      .then((response: any) => response.data);
+  }
+
+  /**
+   * Bulk assign a user to selected connectivity statements.
+   */
+  async assignUserBulk(queryOptions: QueryParams, userId: number): Promise<{ message: string }> {
+    return this.performBulkAction(queryOptions, { action: ActionEnum.AssignUser, user_id: userId });
+  }
+
+  /**
+   * Bulk assign a tag to selected connectivity statements.
+   */
+  async assignTagBulk(queryOptions: QueryParams, addTagIds: number[], removeTagIds: number[]): Promise<{ message: string }> {
+    return this.performBulkAction(queryOptions, { action: ActionEnum.AssignTag, add_tag_ids: addTagIds, remove_tag_ids: removeTagIds });
+  }
+
+  /**
+   * Bulk add a note to selected connectivity statements.
+   */
+  async writeNoteBulk(queryOptions: QueryParams, noteText: string): Promise<{ message: string }> {
+    return this.performBulkAction(queryOptions, { action: ActionEnum.WriteNote, note_text: noteText });
+  }
+
+  /**
+   * Bulk change the status of selected connectivity statements.
+   */
+  async changeStatusBulk(queryOptions: QueryParams, newStatus: string): Promise<{ message: string }> {
+    return this.performBulkAction(queryOptions, { action: ActionEnum.ChangeStatus, new_status: newStatus });
+  }
+
+  /**
+   * Bulk assign connectivity statements to a population set.
+   */
+  async assignPopulationSetBulk(queryOptions: QueryParams, populationSetId: number): Promise<{ message: string }> {
+    return this.performBulkAction(queryOptions, { action: ActionEnum.AssignPopulationSet, population_set_id: populationSetId });
+  }
 }
+
 
 const connectivityStatementService = new ConnectivityStatementService();
 export default connectivityStatementService;

@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "3.2.1",
+  "version": "4.0.0",
   "private": true,
   "main": "index.js",
   "proxy": "https://localhost:8000/",
@@ -13,7 +13,7 @@
     "@mui/icons-material": "^5.14.14",
     "@mui/lab": "^5.0.0-alpha.122",
     "@mui/material": "^5.14.14",
-    "@mui/x-data-grid": "^5.17.21",
+    "@mui/x-data-grid": "^6.10.1",
     "@openapi-contrib/openapi-schema-to-json-schema": "^3.2.0",
     "@projectstorm/geometry": "^7.0.2",
     "@projectstorm/react-canvas-core": "^7.0.2",

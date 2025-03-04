@@ -290,9 +290,8 @@ const StatementDetails = () => {
                       <GroupedButtons
                         handleClick={doTransition}
                         selectedOption={
-                          StatementsLabels[
-                            statement?.available_transitions[selectedIndex]
-                            ]
+                          StatementsLabels[statement?.available_transitions[selectedIndex] as keyof typeof StatementsLabels]
+
                         }
                         options={statement?.available_transitions}
                         selectedIndex={selectedIndex}

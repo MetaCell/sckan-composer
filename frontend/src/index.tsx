@@ -8,6 +8,7 @@ import { jsonSchemas } from "./services/JsonSchema";
 import { tags } from "./services/TagService";
 import { species } from "./services/SpecieService";
 import { sexes } from "./services/SexService";
+import { populations } from "./services/PopulationService";
 import { phenotypes } from "./services/PhenotypeService";
 import { projections } from "./services/ProjectionService";
 import { Provider } from "react-redux";
@@ -22,13 +23,15 @@ doLogin().then(() => {
     tags.setTagList().then(() => {
       species.setSpecieList().then(() => {
         sexes.setSexes().then(() => {
-          phenotypes.setPhenotypes().then(() => {
-            projections.setProjections().then(() => {
-              root.render(
-                <Provider store={store}>
-                  <App />
-                </Provider>
-              );
+          populations.setPopulations().then(() => {
+            phenotypes.setPhenotypes().then(() => {
+              projections.setProjections().then(() => {
+                root.render(
+                  <Provider store={store}>
+                    <App />
+                  </Provider>
+                );
+              });
             });
           });
         });

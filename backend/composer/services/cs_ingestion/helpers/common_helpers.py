@@ -20,6 +20,7 @@ SPECIES = 'species'
 PROVENANCE = 'provenance'
 NOTE_ALERT = 'note_alert'
 FORWARD_CONNECTION = "forward_connection"
+STATEMENT_ALERTS = "statement_alerts"
 CIRCUIT_TYPE_MAPPING = {
     "http://uri.interlex.org/tgbugs/uris/readable/IntrinsicPhenotype": CircuitType.INTRINSIC,
     "http://uri.interlex.org/tgbugs/uris/readable/ProjectionPhenotype": CircuitType.PROJECTION,

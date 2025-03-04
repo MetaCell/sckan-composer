@@ -13,3 +13,13 @@ export type Option = {
     group: string;
     content: OptionDetail[];
 };
+
+export interface OptionType {
+    id: number;
+    label: string;
+}
+
+interface PopoverOptionType {
+    label: string;
+    value: string;
+}

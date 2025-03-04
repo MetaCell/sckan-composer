@@ -8,6 +8,7 @@ import CustomTextArea from "../Widgets/CustomTextArea";
 import ArrayFieldTemplate from "../Widgets/ArrayFieldTemplate";
 import AnatomicalEntitiesField from "../AnatomicalEntitiesField";
 import {sexes} from "../../services/SexService";
+import { populations } from "../../services/PopulationService";
 import {phenotypes} from "../../services/PhenotypeService";
 import {Box, Chip} from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
@@ -34,7 +35,7 @@ import {DestinationIcon, ViaIcon} from "../icons";
 import {ChangeRequestStatus, DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel,} from "../../helpers/settings";
 import {Option, OptionDetail} from "../../types";
 import {composerApi as api} from "../../services/apis";
-import {ConnectivityStatement, TypeB60Enum, TypeC11Enum,} from "../../apiclient/backend";
+import {ConnectivityStatement, ViaTypeEnum, DestinationTypeEmum,} from "../../apiclient/backend";
 import {CustomFooter} from "../Widgets/HoveredOptionContent";
 import {StatementStateChip} from "../Widgets/StateChip";
 import {projections} from "../../services/ProjectionService";
@@ -161,6 +162,19 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
         .map((row: any) => ({label: row.name, value: row.id})),
     },
     value: statement?.sex_id ?? "",
+  };
+  copiedUISchema.population_id = {
+    "ui:widget": "CustomSingleSelect",
+    "ui:options": {
+      isDisabled: statement.has_statement_been_exported,
+      label: "Population Set",
+      placeholder: "Enter Population",
+      data: populations.getPopulations().map((row: any) => ({
+        label: row.name,
+        value: row.id,
+      })),
+    },
+    value: statement?.population_id ?? "",
   };
 
   copiedUISchema.phenotype_id = {
@@ -297,7 +311,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
           InputIcon: ViaIcon,
           onUpdate: async (selectedOption: string, formId: string) => {
             const viaIndex = getConnectionId(formId, statement.vias);
-            const typeOption = selectedOption as TypeB60Enum;
+            const typeOption = selectedOption as ViaTypeEnum;
 
             if (viaIndex) {
               try {
@@ -475,7 +489,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
           await api.composerDestinationCreate({
             id: -1,
             connectivity_statement: statement.id,
-            type: TypeC11Enum.AxonT,
+            type: DestinationTypeEmum.AxonT,
             anatomical_entities: [],
             from_entities: [],
           });
@@ -504,7 +518,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
           InputIcon: DestinationIcon,
           onUpdate: async (selectedOption: string, formId: string) => {
             const destinationIndex = getConnectionId(formId, statement?.destinations);
-            const typeOption = selectedOption as TypeC11Enum;
+            const typeOption = selectedOption as DestinationTypeEmum;
             if (destinationIndex) {
               try {
                 await api.composerDestinationPartialUpdate(destinationIndex, {
@@ -816,6 +830,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       submitOnChangeFields={[
         "phenotype_id",
         "sex_id",
+        "population_id",
         "laterality",
         "circuit_type",
         "projection",

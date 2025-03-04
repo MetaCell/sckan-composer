@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+
 import os
 from pathlib import Path
 
@@ -25,6 +26,7 @@ SECRET_KEY = "django-insecure-6dns-bbp&433ugro&j+z6p-w943$uhsax%f1245@7vfo3eyuw2
 # SECURITY WARNING: don't run with debug turned on in production!
 PRODUCTION = os.environ.get("PRODUCTION", "False").lower() in ("true", "1")
 USE_PG = os.environ.get("USE_PG", "False").lower() in ("true", "1")
+TESTING = os.environ.get("TESTING", "False").lower() in ("true", "1")
 DEBUG = os.environ.get("DEBUG", str(not PRODUCTION)).lower() in ("true", "1")
 
 ALLOWED_HOSTS = [
@@ -67,7 +69,6 @@ INSTALLED_APPS = [
     "nested_admin",
     "django.contrib.admin",
     "social_django",
-
     #
     "corsheaders",
 ]
@@ -106,7 +107,14 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-if PRODUCTION or USE_PG:
+if TESTING:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "persistent", "test_db.sqlite3"),
+        }
+    }
+elif PRODUCTION or USE_PG:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -345,7 +353,10 @@ SPECTACULAR_SETTINGS = {
     "SWAGGER_UI_DIST": "SIDECAR",  # shorthand to use the sidecar instead
     "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
     "REDOC_DIST": "SIDECAR",
-    # OTHER SETTINGS
+    "ENUM_NAME_OVERRIDES": {
+        "ViaTypeEnum": "composer.enums.ViaType",
+        "DestinationTypeEmum": "composer.enums.DestinationType",
+    },
 }
 
 SOCIAL_AUTH_ORCID_KEY = "APP-GRRGRZ5EZQLQ6WZT"
@@ -364,8 +375,10 @@ LOGOUT_REDIRECT_URL = "/logged-out/"
 if DEBUG:
     INSTALLED_APPS += [
         "debug_toolbar",
+        'silk',
     ]
     MIDDLEWARE += [
+        'silk.middleware.SilkyMiddleware',
         "debug_toolbar.middleware.DebugToolbarMiddleware",
     ]
     DEBUG_TOOLBAR_CONFIG = {

@@ -1,5 +1,4 @@
 from typing import List
-
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.forms import ValidationError
@@ -8,7 +7,7 @@ from drf_writable_nested.mixins import UniqueFieldsMixin
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
 
-from ..enums import SentenceState, CSState
+from ..enums import BulkActionType, SentenceState, CSState
 from ..models import (
     AlertType,
     AnatomicalEntity,
@@ -21,14 +20,19 @@ from ..models import (
     Profile,
     Sentence,
     Specie,
+    PopulationSet,
     StatementAlert,
     Tag,
-    Via, Destination, AnatomicalEntityIntersection, AnatomicalEntityMeta, GraphRenderingState,
+    Via,
+    Destination,
+    AnatomicalEntityIntersection,
+    AnatomicalEntityMeta,
+    GraphRenderingState,
 )
 from ..services.connections_service import get_complete_from_entities_for_destination, \
     get_complete_from_entities_for_via
+from ..services.statement_service import get_statement_preview as get_statement_preview_aux
 from ..services.errors_service import get_connectivity_errors
-from ..utils import join_entities
 
 
 # MixIns
@@ -73,6 +77,18 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ("id", "username", "first_name", "last_name", "email", "is_staff")
 
 
+class MinimalUserSerializer(serializers.ModelSerializer):
+    """Minimal User Serializer (for Profile List View)"""
+
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ("id", "full_name")  # Only expose minimal user details
+
+    def get_full_name(self, obj):
+        return obj.get_full_name()
+    
 class ProfileSerializer(serializers.ModelSerializer):
     """Profile"""
 
@@ -196,6 +212,14 @@ class SexSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sex
         fields = ("id", "name", "ontology_uri")
+
+
+class PopulationSetSerializer(serializers.ModelSerializer):
+    """Population Set"""
+
+    class Meta:
+        model = PopulationSet
+        fields = ("id", "name", "description")
 
 
 class ViaSerializerDetails(serializers.ModelSerializer):
@@ -354,6 +378,9 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
     sentence_id = serializers.IntegerField()
     owner_id = serializers.IntegerField(required=False, default=None, allow_null=True)
     sex_id = serializers.IntegerField(required=False, default=None, allow_null=True)
+    population_id = serializers.IntegerField(
+        required=False, default=None, allow_null=True
+    )
     phenotype_id = serializers.IntegerField(
         required=False, default=None, allow_null=True
     )
@@ -368,6 +395,10 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
     owner = UserSerializer(required=False, read_only=True)
     phenotype = PhenotypeSerializer(required=False, read_only=True)
     projection_phenotype = ProjectionPhenotypeSerializer(required=False, read_only=True)
+    population = PopulationSetSerializer(required=False, read_only=True)
+    has_statement_been_exported = serializers.BooleanField(
+        required=False, read_only=True
+    )
 
     class Meta:
         model = ConnectivityStatement
@@ -386,6 +417,9 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "species",
             "sex_id",
             "sex",
+            "population_id",
+            "population",
+            "has_statement_been_exported",
             "apinatomy_model",
             "additional_information",
             "owner_id",
@@ -406,6 +440,9 @@ class SentenceConnectivityStatement(serializers.ModelSerializer):
             "species",
             "sex_id",
             "sex",
+            "population",
+            "population_id",
+            "has_statement_been_exported",
             "apinatomy_model",
             "additional_information",
             "owner_id",
@@ -508,11 +545,13 @@ class GraphStateSerializer(serializers.ModelSerializer):
         return {
             'serialized_graph': representation['serialized_graph'],
         }
-    
+
+
 class AlertTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AlertType
         fields = ('id', 'name', 'uri')
+
 
 class StatementAlertSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
@@ -608,6 +647,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     phenotype_id = serializers.IntegerField(required=False, allow_null=True)
     projection_phenotype_id = serializers.IntegerField(required=False, allow_null=True)
     sex_id = serializers.IntegerField(required=False, allow_null=True)
+    population_id = serializers.IntegerField(required=False, allow_null=True)
     species = SpecieSerializer(many=True, read_only=False, required=False)
     provenances = ProvenanceSerializer(source="provenance_set", many=True, read_only=False, required=False)
     origins = AnatomicalEntitySerializer(many=True, required=False)
@@ -616,6 +656,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     phenotype = PhenotypeSerializer(required=False, read_only=True)
     projection_phenotype = ProjectionPhenotypeSerializer(required=False, read_only=True)
     sex = SexSerializer(required=False, read_only=True)
+    population = PopulationSetSerializer(required=False, read_only=True)
     sentence = SentenceSerializer(required=False, read_only=True)
     forward_connection = serializers.PrimaryKeyRelatedField(
         many=True, queryset=ConnectivityStatement.objects.all(), required=False
@@ -629,11 +670,14 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     statement_alerts = StatementAlertSerializer(
         many=True, read_only=False, required=False
     )
+    has_statement_been_exported = serializers.BooleanField(
+        required=False, read_only=True
+    )
 
     def get_available_transitions(self, instance) -> list[CSState]:
         request = self.context.get("request", None)
         user = request.user if request else None
-        return [t.name for t in instance.get_available_user_state_transitions(user)]
+        return [t.name for t in instance.get_available_user_state_transitions(user) if t.name != CSState.DEPRECATED]
 
     def get_journey(self, instance):
         if 'journey' not in self.context:
@@ -647,53 +691,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     def get_statement_preview(self, instance):
         if 'journey' not in self.context:
             self.context['journey'] = instance.get_journey()
-        return self.create_statement_preview(instance, self.context['journey'])
-
-    def create_statement_preview(self, instance, journey):
-        sex = instance.sex.sex_str if instance.sex else None
-
-        species_list = [specie.name for specie in instance.species.all()]
-        species = join_entities(species_list)
-        if not species:
-            species = ""
-
-        phenotype = instance.phenotype.phenotype_str if instance.phenotype else ''
-        origin_names = [origin.name for origin in instance.origins.all()]
-        origins = join_entities(origin_names)
-        if not origins:
-            origins = ""
-
-        circuit_type = instance.get_circuit_type_display() if instance.circuit_type else None
-        projection = instance.get_projection_display() if instance.projection else None
-        projection_phenotype = str(instance.projection_phenotype) if instance.projection_phenotype else ''
-
-        laterality_description = instance.get_laterality_description()
-
-        apinatomy = instance.apinatomy_model if instance.apinatomy_model else ""
-        journey_sentence = ';  '.join(journey)
-
-        # Creating the statement
-        if sex or species != "":
-            statement = f"In {sex or ''} {species}, the {phenotype.lower()} connection goes {journey_sentence}.\n"
-        else:
-            statement = f"A {phenotype.lower()} connection goes {journey_sentence}.\n"
-
-        statement += f"This "
-        if projection:
-            statement += f"{projection.lower()} "
-        if projection_phenotype:
-            statement += f"{projection_phenotype.lower()} "
-        if circuit_type:
-            statement += f"{circuit_type.lower()} "
-
-        statement += f"connection projects from the {origins}."
-        if laterality_description:
-            statement = statement[:-1] + f" and is found {laterality_description}.\n"
-
-        if apinatomy:
-            statement += f" It is described in {apinatomy} model."
-
-        return statement.strip().replace("  ", " ")
+        return get_statement_preview_aux(instance, self.context['journey'])
 
     def get_errors(self, instance) -> List:
         return get_connectivity_errors(instance)
@@ -716,7 +714,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             del self.context['journey']
 
         return representation
-
+    
     def update(self, instance, validated_data):
         # Remove 'via_set' and 'destinations' from validated_data if they exist
         validated_data.pop('via_set', None)
@@ -750,6 +748,9 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             "species",
             "sex_id",
             "sex",
+            "population_id",
+            "population",
+            "has_statement_been_exported",
             "forward_connection",
             "apinatomy_model",
             "additional_information",
@@ -795,6 +796,9 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
             "species",
             "sex_id",
             "sex",
+            "population_id",
+            "population",
+            "has_statement_been_exported",
             "forward_connection",
             "apinatomy_model",
             "additional_information",
@@ -877,7 +881,6 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
                 serializer.save()
 
 
-
 class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
     """Knowledge Statement"""
 
@@ -920,3 +923,72 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
             "apinatomy_model",
             "statement_preview",
         )
+
+class BulkActionSerializer(serializers.Serializer):
+    action = serializers.ChoiceField(
+        choices=[(action.value, action.value) for action in BulkActionType],
+        help_text="The bulk action to perform."
+    )
+
+class AssignUserSerializer(BulkActionSerializer):
+    user_id = serializers.IntegerField(required=True, help_text="ID of the user to assign.")
+
+    def validate(self, data):
+        if data.get("action") != BulkActionType.ASSIGN_USER.value:
+            raise serializers.ValidationError({
+                "action": f"For this serializer, action must be '{BulkActionType.ASSIGN_USER.value}'."
+            })
+        return data
+
+class AssignTagsSerializer(BulkActionSerializer):
+    add_tag_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=True,
+        help_text="List of tag IDs to add."
+    )
+    remove_tag_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=True,
+        help_text="List of tag IDs to remove."
+    )
+
+    def validate(self, data):
+        if data.get("action") != BulkActionType.ASSIGN_TAG.value:
+            raise serializers.ValidationError({
+                "action": f"For this serializer, action must be '{BulkActionType.ASSIGN_TAG.value}'."
+            })
+        return data
+
+
+class WriteNoteSerializer(BulkActionSerializer):
+    note_text = serializers.CharField(required=True, help_text="The note text.")
+
+    def validate(self, data):
+        if data.get("action") != BulkActionType.WRITE_NOTE.value:
+            raise serializers.ValidationError({
+                "action": f"For this serializer, action must be '{BulkActionType.WRITE_NOTE.value}'."
+            })
+        return data
+
+class ChangeStatusSerializer(BulkActionSerializer):
+    new_status = serializers.CharField(required=True, help_text="The new status.")
+
+    def validate(self, data):
+        if data.get("action") != BulkActionType.CHANGE_STATUS.value:
+            raise serializers.ValidationError({
+                "action": f"For this serializer, action must be '{BulkActionType.CHANGE_STATUS.value}'."
+            })
+        return data
+
+class AssignPopulationSetSerializer(BulkActionSerializer):
+    population_set_id = serializers.IntegerField(required=True, help_text="ID of the population set.")
+
+    def validate(self, data):
+        if data.get("action") != BulkActionType.ASSIGN_POPULATION_SET.value:
+            raise serializers.ValidationError({
+                "action": f"For this serializer, action must be '{BulkActionType.ASSIGN_POPULATION_SET.value}'."
+            })
+        return data
+    
+class BulkActionResponseSerializer(serializers.Serializer):
+    updated_count = serializers.IntegerField()

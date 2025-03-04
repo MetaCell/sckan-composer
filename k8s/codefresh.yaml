@@ -4,13 +4,14 @@ stages:
   - buildComposer
   - buildNginx
   - deploy
+  - notify
 steps:
   main_clone:
     title: Clone main repository
     type: git-clone
     stage: clone
-    repo: '${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}'
-    revision: '${{CF_BRANCH}}'
+    repo: "${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}"
+    revision: "${{CF_BRANCH}}"
     git: github
   buildComposer:
     title: "Building SCKAN Composer Docker Image"
@@ -27,7 +28,7 @@ steps:
     stage: buildNginx
     buildkit: true
     build_arguments:
-    - COMPOSER=us.gcr.io/metacellllc/sckan/composer:${{CF_SHORT_REVISION}}
+      - COMPOSER=us.gcr.io/metacellllc/sckan/composer:${{CF_SHORT_REVISION}}
     image_name: "sckan/nginx"
     tag: "${{CF_SHORT_REVISION}}"
     dockerfile: ./nginx/Dockerfile
@@ -45,3 +46,8 @@ steps:
     environment:
       - KUBECONTEXT=${{CLUSTER}}
       - KUBERNETES_NAMESPACE=${{NAMESPACE}}
+  slackNotify:
+    image: byrnedo/alpine-curl
+    stage: notify
+    commands:
+      - "curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"= ${CLUSTER} = Deployed ${CF_BRANCH}\\\"}\" ${{SLACK_WEBHOOK}}"

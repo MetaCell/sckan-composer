@@ -88,9 +88,7 @@ def consolidate_paths(paths):
 
         paths = consolidated + [paths[i] for i in range(len(paths)) if i not in used_indices]
 
-    return paths, [[((node[1].replace(JOURNEY_DELIMITER, ' or '), node[2]) if (
-            node[2] == 0 or path.index(node) == len(path) - 1) else (
-        node[1].replace(JOURNEY_DELIMITER, ', '), node[2])) for node in path] for path in paths]
+    return paths
 
 
 def can_merge(path1, path2):
@@ -144,7 +142,7 @@ def merge_paths(path1, path2):
     return merged_path
 
 
-def compile_journey(connectivity_statement) -> dict:
+def compile_journey(connectivity_statement) -> List[str]:
     """
    Generates a string of descriptions of journey paths for a given connectivity statement.
 
@@ -157,37 +155,38 @@ def compile_journey(connectivity_statement) -> dict:
     # Extract origins, vias, and destinations from the connectivity statement
     Via = apps.get_model('composer', 'Via')
     Destination = apps.get_model('composer', 'Destination')
+    Origin = apps.get_model('composer', 'AnatomicalEntity')
 
-    origins = list(connectivity_statement.origins.all())
-
-    vias = list(Via.objects.filter(connectivity_statement=connectivity_statement))
-    destinations = list(Destination.objects.filter(connectivity_statement=connectivity_statement))
+    vias = list(Via.objects.filter(connectivity_statement__id=connectivity_statement.id))
+    destinations = list(Destination.objects.filter(connectivity_statement__id=connectivity_statement.id))
+    origins = list(Origin.objects.filter(
+        origins_relations__id=connectivity_statement.id))
 
     # Generate all paths and then consolidate them
     all_paths2 = generate_paths(origins, vias, destinations)
-    consolidated_paths, journey_paths = consolidate_paths(all_paths2)
+    consolidated_paths = consolidate_paths(all_paths2)
+    return consolidated_paths
 
-    entities = []
-    for path in consolidated_paths:
-        origin_splits = path[0][0].split(JOURNEY_DELIMITER)
-        destination_splits = path[-1][0].split(JOURNEY_DELIMITER)
-        entity = {
-            'origins': [
-                {'label': path[0][1].split(JOURNEY_DELIMITER)[i], 'id': path[0][0].split(JOURNEY_DELIMITER)[i]} for i in range(len(origin_splits))
-            ],
-            'destinations': [
-                {'label': path[-1][1].split(JOURNEY_DELIMITER)[i], 'id': path[-1][0].split(JOURNEY_DELIMITER)[i]} for i in range(len(destination_splits))
-            ],
-            'vias': [{'label': node, 'id': node_id} for node_id, node, layer in path if 0 < layer < len(vias) + 1]
-        }
-        entities.append(entity)
+
+def get_journey_path_from_consolidated_paths(consolidated_paths):
+    journey_paths = [[((node[1].replace(JOURNEY_DELIMITER, ' or '), node[2]) if (
+        node[2] == 0 or path.index(node) == len(path) - 1) else (
+        node[1].replace(JOURNEY_DELIMITER, ', '), node[2])) for node in path] for path in consolidated_paths]
+    return journey_paths
+
+
+def build_journey_description(consolidated_paths):
+    journey_paths = get_journey_path_from_consolidated_paths(
+        consolidated_paths)
 
     # Create sentences for each journey path
     journey_descriptions = []
     for path in journey_paths:
         origin_names = path[0][0]
         destination_names = path[-1][0]
-        via_names = ' via '.join([node for node, layer in path if 0 < layer < len(vias) + 1])
+        destination_layer = path[-1][1]
+        via_names = ' via '.join(
+            [node for node, layer in path if 0 < layer < destination_layer])
 
         if via_names:
             sentence = f"from {origin_names} to {destination_names} via {via_names}"
@@ -195,8 +194,28 @@ def compile_journey(connectivity_statement) -> dict:
             sentence = f"from {origin_names} to {destination_names}"
 
         journey_descriptions.append(sentence)
+    return journey_descriptions
 
-    return {
-        'journey': journey_descriptions,
-        'entities': entities
-    }
+
+def build_journey_entities(consolidated_paths):
+    entities = []
+    for path in consolidated_paths:
+        origin_splits = path[0][0].split(JOURNEY_DELIMITER)
+        destination_splits = path[-1][0].split(JOURNEY_DELIMITER)
+        destination_layer = path[-1][2]
+        entity = {
+            'origins': [
+                {'label': path[0][1].split(JOURNEY_DELIMITER)[i], 'id': path[0][0].split(JOURNEY_DELIMITER)[i]} for i in range(len(origin_splits))
+            ],
+            'destinations': [
+                {'label': path[-1][1].split(JOURNEY_DELIMITER)[i], 'id': path[-1][0].split(JOURNEY_DELIMITER)[i]} for i in range(len(destination_splits))
+            ],
+            'vias': [{'label': node, 'id': node_id} for node_id, node, layer in path if 0 < layer < destination_layer]
+        }
+        entities.append(entity)
+    return entities
+
+
+def recompile_journey_path(instance):
+    instance.journey_path = compile_journey(instance)
+    instance.save(update_fields=["journey_path"])

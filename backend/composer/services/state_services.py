@@ -16,8 +16,8 @@ class OwnerServiceMixin(BaseServiceMixin):
     def is_owner(self, owner):
         return self.obj.owner == owner
 
-    def can_assign_owner(self, request):
-        return bool(request.user)
+    def can_assign_owner(self, requested_by):
+        return bool(requested_by)
 
     def should_set_owner(self, request):
         if self.obj.owner:
@@ -26,7 +26,7 @@ class OwnerServiceMixin(BaseServiceMixin):
             return True
 
 class StateServiceMixin(OwnerServiceMixin):
-    def _is_transition_available(self, transition, user=None):
+    def is_transition_available(self, transition, user=None):
         """
         Checks if the requested transition is available
         """
@@ -44,7 +44,7 @@ class StateServiceMixin(OwnerServiceMixin):
         # Ensure the requested transition is available
         if not by_user:
             by_user = user
-        available = self._is_transition_available(transition, user)
+        available = self.is_transition_available(transition, user)
         trans_func = getattr(self.obj, transition, None)
         if available and trans_func:
             # Run the transition
@@ -226,6 +226,10 @@ class ConnectivityStatementStateService(StateServiceMixin):
         return is_system_user(user)
 
     @staticmethod
+    def has_permission_to_transition_to_deprecated(connectivity_statement, user) -> bool:
+        return user.is_staff
+    
+    @staticmethod
     def add_important_tag(connectivity_statement):
         # when a ConnectivityStatement record goes to compose_now state and the previous
         # state is in NPO Approved or Exported then flag the CS with Tag IMPORTANT
@@ -260,11 +264,41 @@ class ConnectivityStatementStateService(StateServiceMixin):
                 return True
         return False
 
+    @staticmethod
+    def has_populationset(connectivity_statement) -> bool:
+        return connectivity_statement.population is not None
+
+
+    @staticmethod
+    def can_be_deprecated(connectivity_statement):
+        return connectivity_statement.has_statement_been_exported
+
 
 def is_system_user(user: User) -> bool:
     return user.username == 'system'
 
 
 def get_user_profile(user):
+    
     from composer.models import Profile
-    return Profile.objects.get(user=user)
+
+    if hasattr(user, '_profile_cache'): 
+        return user._profile_cache
+    
+    profile = Profile.objects.get(user=user)
+    user._profile_cache = profile
+    return profile
+
+
+def get_available_FIELD_transitions_without_conditions_check(instance, field):
+    """
+    List of transitions available in current model state
+    with all conditions met
+    """
+    curr_state = field.get_state(instance)
+    transitions = field.transitions[instance.__class__]
+
+    for name, transition in transitions.items():
+        meta = transition._django_fsm
+        if meta.has_transition(curr_state):
+            yield meta.get_transition(curr_state)

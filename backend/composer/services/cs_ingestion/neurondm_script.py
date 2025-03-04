@@ -9,6 +9,7 @@ from pyontutils.core import OntGraph, OntResIri, OntResPath
 from pyontutils.namespaces import rdfs, ilxtr
 from django.core.management.base import BaseCommand, CommandError
 import logging
+import re
 
 from composer.services.cs_ingestion.exceptions import NeuronDMInconsistency
 from composer.services.cs_ingestion.helpers.common_helpers import VALIDATION_ERRORS, DESTINATIONS, VIAS, ORIGINS
@@ -21,6 +22,7 @@ logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %
 logger = logging.getLogger(__name__)
 RED_COLOR = "\033[91m"
 RESET_COLOR = "\033[0m"
+SPARC_NLP_OWL_CLASS_PREFIX = "http://uri.interlex.org/tgbugs/uris/readable/NeuronSparcNlp"
 
 def log_error(message):
     logger.error(f"{RED_COLOR}{message}{RESET_COLOR}")
@@ -44,7 +46,22 @@ def makelpesrdf():
     return lpes, lrdf, collect
 
 
-def for_composer(n):
+def get_populationset_from_neurondm(id_: str, owl_class: str) -> str:
+    """
+    NOTE: keep the order of re.search calls as is, to address the case for 
+    /readable/sparc-nlp/ - in the first place
+    """
+    if str(owl_class) == SPARC_NLP_OWL_CLASS_PREFIX:
+        return id_.split("/")[-2]
+    
+    match = re.search(r'/readable/[^-]+-[^-]+-([^-/]+)', id_)
+    if match:
+        return match.group(1)
+    
+    raise ValueError(f"Unable to extract population set from statement ID: {id_}")
+
+
+def for_composer(n, statement_alert_uris: Set[str] = None):
     lpes, lrdf, collect = makelpesrdf()
 
     try:
@@ -54,11 +71,21 @@ def for_composer(n):
             logger_service.add_anomaly(LoggableAnomaly(e.statement_id, e.entity_id, e.message, severity=Severity.ERROR))
         return None
 
+
+    if statement_alert_uris is None:
+        statement_alert_uris = set()
+
+    statement_alerts = [
+        item for item in n.core_graph[n.identifier:]
+        if str(item[0]) in statement_alert_uris
+    ]
+
     fc = dict(
         id=str(n.id_),
-        label=str(n.origLabel),
+        label=lrdf(n, rdfs.label)[0],
         origins=origins,
         destinations=destinations,
+        populationset=get_populationset_from_neurondm(n.id_, n.owlClass),
         vias=vias,
         species=lpes(n, ilxtr.hasInstanceInTaxon),
         sex=lpes(n, ilxtr.hasBiologicalSex),
@@ -74,6 +101,7 @@ def for_composer(n):
         sentence_number=lrdf(n, ilxtr.sentenceNumber),
         note_alert=lrdf(n, ilxtr.alertNote),
         validation_errors=validation_errors,
+        statement_alerts=statement_alerts,
     )
 
     return fc
@@ -421,7 +449,7 @@ def update_from_entities(origins: NeuronDMOrigin, vias: List[NeuronDMVia], desti
 
 ## Based on:
 ## https://github.com/tgbugs/pyontutils/blob/30c415207b11644808f70c8caecc0c75bd6acb0a/neurondm/docs/composer.py#L668-L698
-def main(local=False, full_imports=[], label_imports=[], logger_service_param=Optional[LoggerService]):
+def main(local=False, full_imports=[], label_imports=[], logger_service_param=Optional[LoggerService], statement_alert_uris: Set[str] = None):
     global logger_service
     logger_service = logger_service_param
 
@@ -495,7 +523,10 @@ def main(local=False, full_imports=[], label_imports=[], logger_service_param=Op
     config.load_existing(g)
     neurons = config.neurons()
 
-    fcs = [for_composer(n) for n in neurons]
+    if statement_alert_uris is None:
+        statement_alert_uris = set()
+
+    fcs = [for_composer(n, statement_alert_uris) for n in neurons]
     composer_statements = [item for item in fcs if item is not None]
 
     return composer_statements

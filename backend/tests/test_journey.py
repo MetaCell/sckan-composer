@@ -2,7 +2,7 @@ from django.db import connection
 from django.test import TestCase, override_settings
 
 from composer.models import Sentence, ConnectivityStatement, AnatomicalEntity, AnatomicalEntityMeta, Via, Destination
-from composer.services.graph_service import generate_paths, consolidate_paths
+from composer.services.graph_service import generate_paths, consolidate_paths, get_journey_path_from_consolidated_paths
 
 
 @override_settings(DEBUG=True)
@@ -58,7 +58,9 @@ class JourneyTestCase(TestCase):
         expected_paths.sort()
         self.assertTrue(all_paths == expected_paths)
 
-        consolidated_path, journey_paths = consolidate_paths(all_paths)
+        consolidated_path = consolidate_paths(all_paths)
+        journey_paths = get_journey_path_from_consolidated_paths(
+            consolidated_path)
         expected_journey = [
             [('Oa', 0), ('V1a', 1), ('Da', 2)],
             [('Ob', 0), ('Da', 2)]
@@ -113,7 +115,9 @@ class JourneyTestCase(TestCase):
         expected_paths.sort()
         self.assertTrue(all_paths == expected_paths)
 
-        consolidated_path, journey_paths = consolidate_paths(all_paths)
+        consolidated_path = consolidate_paths(all_paths)
+        journey_paths = get_journey_path_from_consolidated_paths(
+            consolidated_path)
         expected_consolidated_path = [
             [('1\\2', 'Oa\\Ob', 0), ('3', 'Da', 1)],
         ]
@@ -174,7 +178,9 @@ class JourneyTestCase(TestCase):
         expected_consolidated_path = [
             [('1\\2', 'Oa\\Ob', 0), ('3', 'V1a', 1), ('4', 'Da', 2)],
         ]
-        consolidated_path, journey_paths = consolidate_paths(all_paths)
+        consolidated_path = consolidate_paths(all_paths)
+        journey_paths = get_journey_path_from_consolidated_paths(
+            consolidated_path)
         self.assertTrue(journey_paths == expected_journey)
         self.assertTrue(consolidated_path == expected_consolidated_path)
 
@@ -239,7 +245,9 @@ class JourneyTestCase(TestCase):
             [('1\\2', 'Oa\\Ob', 0), ('3\\4', 'V1a\\V1b', 1), ('5', 'Da', 2)]
 
         ]
-        consolidated_path, journey_paths = consolidate_paths(all_paths)
+        consolidated_path = consolidate_paths(all_paths)
+        journey_paths = get_journey_path_from_consolidated_paths(
+            consolidated_path)
         self.assertTrue(journey_paths == expected_journey)
         self.assertTrue(consolidated_path == expected_consolidated_path)
 
@@ -327,7 +335,9 @@ class JourneyTestCase(TestCase):
             [('1\\2', 'Oa\\Ob', 0), ('3', 'V1a', 1), ('5', 'V2b', 2), ('8', 'Da', 5)],
             [('1', 'Oa', 0), ('6', 'V3a', 3), ('8', 'Da', 5)]
         ]
-        consolidated_path, journey_paths = consolidate_paths(all_paths)
+        consolidated_path = consolidate_paths(all_paths)
+        journey_paths = get_journey_path_from_consolidated_paths(
+            consolidated_path)
         self.assertTrue(journey_paths == expected_journey)
         self.assertTrue(consolidated_path == expected_consolidated_path)
 
@@ -428,7 +438,9 @@ class JourneyTestCase(TestCase):
             [('1\\2', 'Oa\\Ob', 0), ('3', 'V1a', 1), ('6', 'V3a', 3), ('7', 'V4a', 4), ('9', 'V5b', 5), ('11', 'Da', 7)]
         ]
 
-        consolidated_path, journey_paths = consolidate_paths(all_paths)
+        consolidated_path = consolidate_paths(all_paths)
+        journey_paths = get_journey_path_from_consolidated_paths(
+            consolidated_path)
         journey_paths.sort()
         expected_journey.sort()
         expected_consolidated_path.sort()
@@ -493,7 +505,9 @@ class JourneyTestCase(TestCase):
             [('1\\2', 'Oa\\Ob', 0), ('3', 'Da', 2)]
         ]
 
-        consolidated_path, journey_paths = consolidate_paths(all_paths)
+        consolidated_path = consolidate_paths(all_paths)
+        journey_paths = get_journey_path_from_consolidated_paths(
+            consolidated_path)
         expected_journey.sort()
         expected_consolidated_path.sort()
         journey_paths.sort()
@@ -546,7 +560,9 @@ class JourneyTestCase(TestCase):
         expected_paths.sort()
         self.assertTrue(all_paths == expected_paths, f"Expected paths {expected_paths}, but found {all_paths}")
 
-        consolidated_path, journey_paths = consolidate_paths(all_paths)
+        consolidated_path = consolidate_paths(all_paths)
+        journey_paths = get_journey_path_from_consolidated_paths(
+            consolidated_path)
         expected_journey = [
             [('Oa', 0), ('V1a', 3), ('V2a', 6), ('Da', 7)],
         ]
@@ -603,7 +619,9 @@ class JourneyTestCase(TestCase):
         expected_paths.sort()
         self.assertTrue(all_paths == expected_paths, f"Expected paths {expected_paths}, but found {all_paths}")
 
-        consolidated_path, journey_paths = consolidate_paths(all_paths)
+        consolidated_path = consolidate_paths(all_paths)
+        journey_paths = get_journey_path_from_consolidated_paths(
+            consolidated_path)
         expected_journey = [
             [('Myenteric', 0), ('Longitudinal', 1), ('Serosa', 2), ('lumbar', 3), ('inferior', 4)],
         ]

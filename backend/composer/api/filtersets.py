@@ -9,6 +9,7 @@ from composer.models import (
     Sentence,
     ConnectivityStatement,
     AnatomicalEntity,
+    PopulationSet,
     Note,
     Tag,
     Via,
@@ -56,6 +57,9 @@ class SentenceFilter(django_filters.FilterSet):
     )
     exclude = django_filters.BaseInFilter(method=exclude_ids)
 
+    include = django_filters.BaseInFilter(field_name="id", lookup_expr="in")
+
+
     def order_by_current_user(self, queryset, name, value):
         current_user = self.request.user
         if 'owner' in value or '-owner' in value:
@@ -90,6 +94,8 @@ class SentenceFilter(django_filters.FilterSet):
 class ConnectivityStatementFilter(django_filters.FilterSet):
     exclude_ids = NumberInFilter(field_name='id', exclude=True)
 
+    include = django_filters.BaseInFilter(field_name="id", lookup_expr="in")
+
     sentence_id = django_filters.NumberFilter(field_name="sentence__id")
     exclude_sentence_id = django_filters.NumberFilter(field_name="sentence__id", exclude=True)
 
@@ -101,6 +107,9 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
     )
     tags = django_filters.ModelMultipleChoiceFilter(
         field_name="tags", queryset=Tag.objects.all()
+    )
+    populationset = django_filters.ModelMultipleChoiceFilter(
+        field_name="population", queryset=PopulationSet.objects.all()
     )
     origins = django_filters.ModelMultipleChoiceFilter(
         field_name="origins",
@@ -115,12 +124,18 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
     notes = django_filters.BooleanFilter(
         field_name="notes", label="Checks if entity has notes", method=field_has_content
     )
+    has_statement_been_exported = django_filters.BooleanFilter(method='filter_has_statement_been_exported', label='Is Exported')
     ordering = django_filters.OrderingFilter(
         fields=(
             ("id", "id"),
             ("modified_date", "last_edited"),
         ),
     )
+
+    def filter_has_statement_been_exported(self, queryset, name, value):
+        if value:
+            return queryset.filter(has_statement_been_exported=True)
+        return queryset
 
     class Meta:
         model = ConnectivityStatement

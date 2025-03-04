@@ -1,3 +1,4 @@
+from .views import index
 from typing import Any
 from django.db.models.query import QuerySet
 from django.http import HttpRequest
@@ -8,11 +9,13 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from fsm_admin.mixins import FSMTransitionMixin
 from django import forms
-
+from django.core.exceptions import ValidationError
+from composer.utils import compr_uri
 from composer.models import (
     AlertType,
     Phenotype,
     Sex,
+    PopulationSet,
     ConnectivityStatement,
     Provenance,
     ExportBatch,
@@ -24,9 +27,15 @@ from composer.models import (
     Tag,
     Via,
     FunctionalCircuitRole,
-    ProjectionPhenotype, Destination, Synonym, AnatomicalEntityMeta, Layer, Region,
+    ProjectionPhenotype,
+    Destination,
+    Synonym,
+    AnatomicalEntityMeta,
+    Layer,
+    Region,
     AnatomicalEntityIntersection,
-    AnatomicalEntity
+    AnatomicalEntity,
+    CSState
 )
 
 
@@ -43,6 +52,7 @@ class ProfileInline(admin.StackedInline):
 class ProvenanceInline(admin.StackedInline):
     model = Provenance
     extra = 1
+
 
 class SynonymInline(admin.StackedInline):
     model = Synonym
@@ -74,12 +84,14 @@ class AlertTypeAdmin(admin.ModelAdmin):
     list_display = ('name', 'uri')
     search_fields = ('name', 'uri')
 
+
 class StatementAlertInline(admin.StackedInline):
     model = StatementAlert
     extra = 1
     autocomplete_fields = ('alert_type', )
-    fields = ('alert_type', 'text', 'saved_by', 'created_at', 'updated_at')
+    fields = ('alert_type', 'text', 'created_at', 'updated_at')
     readonly_fields = ('created_at', 'updated_at')
+
 
 class ConnectivityStatementInline(nested_admin.NestedStackedInline):
     model = ConnectivityStatement
@@ -100,7 +112,8 @@ class SentenceAdmin(
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
     readonly_fields = ("state", "batch_name", "external_ref")
-    list_display = ("title", "pmid", "pmcid", "doi", "tag_list", "state", "owner")
+    list_display = ("title", "pmid", "pmcid", "doi",
+                    "tag_list", "state", "owner")
     list_display_links = ("title", "pmid", "pmcid")
     list_filter = ("state", "owner", "tags__tag")
     search_fields = ("title", "text", "pmid", "pmcid", "doi")
@@ -110,11 +123,13 @@ class SentenceAdmin(
         NoteSentenceInline,
     )
 
+
 class AnatomicalEntityAdmin(admin.ModelAdmin):
-    list_display = ('simple_entity', 'region_layer', 'synonyms', 'ontology_uri' )
+    list_display = ('simple_entity', 'region_layer',
+                    'synonyms', 'ontology_uri')
     list_display_links = ('simple_entity', 'region_layer')
     search_fields = (
-        'simple_entity__name',  'simple_entity__ontology_uri', 
+        'simple_entity__name',  'simple_entity__ontology_uri',
         'region_layer__layer__name', 'region_layer__region__name',
         'region_layer__layer__ontology_uri', 'region_layer__region__ontology_uri',
     )
@@ -131,11 +146,10 @@ class AnatomicalEntityAdmin(admin.ModelAdmin):
     def synonyms(self, obj):
         synonyms = obj.synonyms.all()
         return ', '.join([synonym.name for synonym in synonyms])
-    
+
     @admin.display(description="Ontology URI")
     def ontology_uri(self, obj):
         return obj.ontology_uri
-
 
 
 class AnatomicalEntityMetaAdmin(admin.ModelAdmin):
@@ -175,11 +189,10 @@ class LayerAdmin(admin.ModelAdmin):
     @admin.display(description="Layer Name")
     def layer_name(self, obj):
         return obj.ae_meta.name
-    
+
     @admin.display(description="Ontology URI")
     def ontology_uri(self, obj):
         return obj.ae_meta.ontology_uri
-
 
 
 class RegionAdmin(admin.ModelAdmin):
@@ -188,15 +201,14 @@ class RegionAdmin(admin.ModelAdmin):
     list_display_links = ('region_name', 'ontology_uri')
     search_fields = ('ae_meta__name', 'ae_meta__ontology_uri')
     autocomplete_fields = ('ae_meta',)
-   
+
     @admin.display(description="Region Name")
     def region_name(self, obj):
         return obj.ae_meta.name
-    
+
     @admin.display(description="Ontology URI")
     def ontology_uri(self, obj):
         return obj.ae_meta.ontology_uri
-    
 
 
 class AnatomicalEntityIntersectionAdmin(nested_admin.NestedModelAdmin, admin.ModelAdmin):
@@ -231,7 +243,8 @@ class ConnectivityStatementAdmin(
     list_per_page = 10
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
-    readonly_fields = ("state",)
+    readonly_fields = ("state", "curie_id", "has_statement_been_exported", "compr_uri")
+    exclude = ("journey_path", "statement_prefix", "statement_suffix", "population_index")
     autocomplete_fields = ("sentence", "origins")
     date_hierarchy = "modified_date"
     list_display = (
@@ -254,11 +267,41 @@ class ConnectivityStatementAdmin(
         "sentence__pmid",
         "sentence__pmcid",
         "knowledge_statement",
+        "reference_uri",
     )
 
     fieldsets = ()
 
-    inlines = (ProvenanceInline, NoteConnectivityStatementInline, ViaInline, DestinationInline, StatementAlertInline)
+    inlines = (ProvenanceInline, NoteConnectivityStatementInline,
+               ViaInline, DestinationInline, StatementAlertInline)
+
+    def _filter_admin_transitions(self, transitions_generator):
+        """
+        Override to filter out specific transitions.
+        """
+        for transition in transitions_generator:
+            # Filter out the 'deprecated' transition from available transitions
+            if transition.name != CSState.DEPRECATED:
+                yield transition
+
+    def delete_model(self, request, obj):
+        """Handles deletion from Django Admin."""
+        try:
+            obj.delete(user=request.user)
+        except ValidationError as e:
+            self.message_user(request, str(e), level="error")
+
+    def delete_queryset(self, request, queryset):
+        """Handles bulk deletion from Django Admin."""
+        for obj in queryset:
+            self.delete_model(request, obj)
+
+
+    def compr_uri(self, obj):
+        if obj.population and obj.population_index is not None:
+            return compr_uri(obj.population.name, obj.population_index)
+        return "Not available"
+
 
     @admin.display(description="Knowledge Statement")
     def short_ks(self, obj):
@@ -279,7 +322,8 @@ class ConnectivityStatementAdmin(
 
 class ExportBatchAdmin(admin.ModelAdmin):
     list_display = ("user", "created_at", "count_connectivity_statements",)
-    list_display_links = ("user", "created_at", "count_connectivity_statements",)
+    list_display_links = ("user", "created_at",
+                          "count_connectivity_statements",)
     list_filter = ("user",)
     date_hierarchy = "created_at"
     exclude = ("connectivity_statements",)
@@ -309,6 +353,9 @@ class ExportBatchAdmin(admin.ModelAdmin):
         return super().get_form(request, obj=obj, change=change, **kwargs)
 
 
+class PopulationSetAdmin(admin.ModelAdmin):
+    readonly_fields = ('last_used_index',)
+
 
 # Re-register UserAdmin
 admin.site.unregister(User)
@@ -318,10 +365,12 @@ admin.site.register(User, UserAdmin)
 admin.site.register(AnatomicalEntityMeta, AnatomicalEntityMetaAdmin)
 admin.site.register(Layer, LayerAdmin)
 admin.site.register(Region, RegionAdmin)
-admin.site.register(AnatomicalEntityIntersection, AnatomicalEntityIntersectionAdmin)
+admin.site.register(AnatomicalEntityIntersection,
+                    AnatomicalEntityIntersectionAdmin)
 admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
 admin.site.register(Phenotype)
 admin.site.register(Sex)
+admin.site.register(PopulationSet, PopulationSetAdmin)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
 admin.site.register(ExportBatch, ExportBatchAdmin)
 admin.site.register(Sentence, SentenceAdmin)
@@ -334,7 +383,6 @@ admin.site.register(AlertType, AlertTypeAdmin)
 
 
 #
-from .views import index
 
 
 def login(request, extra_context=None):

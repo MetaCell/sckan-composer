@@ -29,6 +29,7 @@ class ViaType(models.TextChoices):
     # axon sensory ending, axon terminal, axon sensory terminal
     AXON = "AXON", "Axon"
     DENDRITE = "DENDRITE", "Dendrite"
+    SENSORY_AXON = "SENSORY_AXON", "Axon to PNS"
 
 
 class DestinationType(models.TextChoices):
@@ -58,6 +59,7 @@ class CSState(models.TextChoices):
     REJECTED = "rejected"
     NPO_APPROVED = "npo_approved"
     EXPORTED = "exported"
+    DEPRECATED = "deprecated"
     INVALID = "invalid"
 
 
@@ -68,24 +70,6 @@ class NoteType(models.TextChoices):
     ALERT = "alert"
 
 
-class ExportRelationships(models.TextChoices):
-    hasBiologicalSex = "hasBiologicalSex", "Sex"
-    hasCircuitRolePhenotype = "hasCircuitRolePhenotype", "CircuitRole"
-    hasAnatomicalSystemPhenotype = "hasAnatomicalSystemPhenotype", "Phenotype"
-    hasFunctionalCircuitRolePhenotype = "hasFunctionalCircuitRolePhenotype", "FunctionalCircuitRole"
-    hasInstanceInTaxon = "hasInstanceInTaxon", "Species"
-    hasProjectionLaterality = "hasProjectionLaterality", "Laterality"
-    hasSomaPhenotype = "hasSomaPhenotype", "SomaPhenotype"
-    hasAlert = "hasAlert", "Alert"
-    hasSomaLocatedIn = "hasSomaLocatedIn", "Soma"
-    hasProjectionPhenotype = "hasProjection", "ProjectionPhenotype"
-    hasAxonPresynapticElementIn = "hasAxonPresynapticElementIn", "Axon terminal"
-    hasAxonSensorySubcellularElementIn = "hasAxonSensorySubcellularElementIn", "Afferent terminal",
-    hasAxonLocatedIn = "hasAxonLocatedIn", "Axon"
-    hasDendriteLocatedIn = "hasDendriteLocatedIn", "Dendrite"
-    hasForwardConnection = "hasForwardConnectionPhenotype", "Forward Connection"
-
-
 class MetricEntity(models.TextChoices):
     SENTENCE = "sentence"
     CONNECTIVITY_STATEMENT = "connectivity statement"
@@ -93,3 +77,11 @@ class MetricEntity(models.TextChoices):
 
 class ConnectivityErrors(Enum):
     INVALID_FORWARD_CONNECTION = "Invalid forward connection"
+
+
+class BulkActionType(str, Enum):
+    ASSIGN_USER = "assign_user"
+    ASSIGN_TAG = "assign_tag"
+    WRITE_NOTE = "write_note"
+    CHANGE_STATUS = "change_status"
+    ASSIGN_POPULATION_SET = "assign_population_set"
