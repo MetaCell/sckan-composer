@@ -425,6 +425,7 @@ class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = AnatomicalEntityFilter
 
 
+
 class PhenotypeViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Phenotype
