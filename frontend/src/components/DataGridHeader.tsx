@@ -99,15 +99,15 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
     if (!isAllDataSelected && selectedRows?.length) {
       return {
         include: selectedRows,
-        // Required fields need valid values, so we provide sensible defaults
-        limit: queryOptions.limit, // Keep the existing limit
+        limit: queryOptions.limit,
         notes: undefined,
         index: undefined,
         ordering: undefined,
         stateFilter: undefined,
         tagFilter: undefined,
+        batchNameFilter: undefined,
         title: undefined,
-        exclude: undefined, // Ensure exclude is ignored
+        exclude: undefined,
   
         // StatementQueryParams specific fields
         knowledgeStatement: undefined,

@@ -421,7 +421,7 @@ class Sentence(models.Model, BulkActionMixin):
     pmid = PmIdField(db_index=True, null=True, blank=True)
     pmcid = PmcIdField(max_length=20, db_index=True, null=True, blank=True)
     doi = DoiField(max_length=100, db_index=True, null=True, blank=True)
-    batch_name = models.CharField(max_length=100, null=True, blank=True)
+    batch_name = models.CharField(max_length=100, null=True, blank=True, db_index=True)
     tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
     owner = models.ForeignKey(
         User,

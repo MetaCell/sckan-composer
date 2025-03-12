@@ -87,8 +87,8 @@ const EntityDataGrid = (props: DataGridProps) => {
       notes: has_notes,
     };
     if (entityType === "sentence") {
-      const { text } = item;
-      return { ...commonRowProps, text };
+      const { text, batch_name } = item;
+      return { ...commonRowProps, text, batch_name };
     }
     if (entityType === "statement") {
       const { knowledge_statement } = item;
@@ -133,6 +133,16 @@ const EntityDataGrid = (props: DataGridProps) => {
       flex: 1,
       renderCell: renderTag,
     },
+    ...(entityType === "sentence"
+      ? [
+          {
+            field: "batch_name",
+            headerName: "Batch Name",
+            sortable: false,
+            flex: 1,
+          },
+        ]
+      : []),
     {
       field: "notes",
       headerName: "Notes",

@@ -58,7 +58,7 @@ const SentenceList = () => {
   
   useEffect(() => {
     handleUndoSelectAll()
-  }, [queryOptions.stateFilter, queryOptions.tagFilter])
+  }, [queryOptions.stateFilter, queryOptions.tagFilter, queryOptions.batchNameFilter])
   
   const selectedRowsCount = isAllDataSelected ? totalResults - manuallyDeselectedRows.length : selectedRows.length;
   

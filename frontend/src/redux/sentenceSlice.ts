@@ -9,6 +9,7 @@ export interface QueryParams {
   ordering: Array<'-last_edited' | '-id' | 'last_edited' | 'id' | 'owner' | '-owner'> | undefined,
   stateFilter: ComposerSentenceListStateEnum[] | undefined,
   tagFilter: number[] | undefined,
+  batchNameFilter: string[] | undefined,
   title: string | undefined
   exclude: string[] | undefined
   include: number[] | undefined
@@ -26,6 +27,7 @@ export const initialState: SentenceState = {
     ordering: undefined,
     stateFilter: undefined,
     tagFilter: undefined,
+    batchNameFilter: undefined,
     title: undefined,
     exclude: undefined,
     include: undefined
@@ -40,6 +42,7 @@ export const sentenceSlice = createSlice({
     setFilters: (state, action) => {
       state.queryOptions.stateFilter = action.payload.stateFilter
       state.queryOptions.tagFilter = action.payload.tagFilter
+      state.queryOptions.batchNameFilter = action.payload.batchNameFilter
       state.queryOptions.index = 0
     },
     setSorting: (state, action) => {
