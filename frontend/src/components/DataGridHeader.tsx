@@ -86,11 +86,11 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
     entityType: ENTITY_TYPES;
   } | null>(null);
   const [originalStatus, setIsOriginalStatus] = useState('');
-  
+
   const dispatch = useAppDispatch();
 
   const handleClearFilter = () => {
-    const noFilters = { stateFilter: undefined, tagFilter: undefined };
+    const noFilters = {};
     entityType === "sentence"
       ? dispatch(setSentenceFilters(noFilters))
       : dispatch(setStatementFilters(noFilters));
@@ -108,7 +108,7 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
         batchNameFilter: undefined,
         title: undefined,
         exclude: undefined,
-  
+
         // StatementQueryParams specific fields
         knowledgeStatement: undefined,
         hasStatementBeenExportedFilter: undefined,
@@ -119,15 +119,15 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
         origins: undefined,
       } as SentenceQueryParams | StatementQueryParams; // Explicit type assertion
     }
-  
+
     // If include is not used, return queryOptions with exclude applied when needed.
     return {
       ...queryOptions,
       exclude: isAllDataSelected ? manuallyDeselectedRows : undefined,
     };
   }, [queryOptions, isAllDataSelected, selectedRows, manuallyDeselectedRows]);
-  
-  
+
+
   const fetchOptionsMap = useMemo(() => ({
     [ENTITY_TYPES.SENTENCE]: () =>
       sentenceService.fetchOptions(updatedQueryOptions as SentenceQueryParams),
@@ -222,7 +222,11 @@ const DataGridHeader = (props: DataGridHeaderProps) => {
         <Drawer anchor="right" open={isFilterDrawerOpen} onClose={() => setIsFilterDrawerOpen(false)} ModalProps={{ sx: { zIndex: 1300 } }}>
           <FilterDrawer toggleDrawer={setIsFilterDrawerOpen} queryOptions={queryOptions} entity={entityType} />
         </Drawer>
-        {(queryOptions.stateFilter || queryOptions.tagFilter) && <Button onClick={handleClearFilter}>Clear Filter</Button>}
+        {Object.entries(queryOptions)
+          .some(([key, value]) => key !== "limit" && key !== "index" && value !== undefined && value !== null) && (
+            <Button onClick={handleClearFilter}>Clear Filter</Button>
+          )}
+
       </Grid>
     </Grid>
   );
