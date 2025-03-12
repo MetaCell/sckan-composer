@@ -212,7 +212,8 @@ export default function CustomEntitiesDropdown({
        getPreLevelSelectedValues,
        areConnectionsExplicit,
        minWidth = '',
-       isDisabled
+       isDisabled,
+       refreshStatement
      },
    }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -223,12 +224,11 @@ export default function CustomEntitiesDropdown({
   const [selectedOptions, setSelectedOptions] = useState<Option[]>(
     mapValueToOption(value, id) || [],
   );
-  
+
   const [autocompleteOptions, setAutocompleteOptions] = useState<Option[]>([]);
   const [inputValue, setInputValue] = useState<string | undefined>(undefined);
   const popperRef = useRef<HTMLDivElement | null>(null);
   
-  const [isDropdownOpened, setIsDropdownOpened] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [allOptions, setAllOptions] = useState<Option[]>([]);
   
@@ -236,14 +236,13 @@ export default function CustomEntitiesDropdown({
   const areAllSelectedValuesFromTheAboveLayer = postProcessOptions && areConnectionsExplicit ? areConnectionsExplicit(id) : true
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     if (!isDisabled) {
-      setIsDropdownOpened(true);
       setAnchorEl(anchorEl ? null : event.currentTarget);
     }
   };
   const handleSelectedOptionsChange = async (newSelectedOptions: Option[]) => {
+    setSelectedOptions(newSelectedOptions)
     const result = await onUpdate(newSelectedOptions, id);
     if (result !== ChangeRequestStatus.CANCELLED) {
-      setSelectedOptions(newSelectedOptions);
       setHasValueChanged(true);
     }
   };
@@ -330,9 +329,10 @@ export default function CustomEntitiesDropdown({
     }
   };
   
-  const handleChipRemove = (chip: Option) => {
+  const handleChipRemove = async (chip: Option) => {
     const updatedChips = selectedOptions.filter((c: Option) => c !== chip);
-    handleSelectedOptionsChange(updatedChips);
+     await handleSelectedOptionsChange(updatedChips);
+    refreshStatement();
   };
   
   const handleInputChange = (event: any) => {
@@ -372,10 +372,10 @@ export default function CustomEntitiesDropdown({
   }
   
   useEffect(() => {
-    if (!isDropdownOpened) return;
+    if (!open) return;
     setIsLoading(true);
     fetchData().then(() => setIsLoading(false));
-  }, [inputValue, isDropdownOpened, fetchData]);
+  }, [inputValue, open, fetchData]);
   
   useEffect(() => {
     const preLevelItems = postProcessOptions && getPreLevelSelectedValues ? getPreLevelSelectedValues(id) : [];
@@ -388,6 +388,7 @@ export default function CustomEntitiesDropdown({
         setAnchorEl(null);
         setInputValue("");
         setAllOptions([]);
+        refreshStatement();
         if (hasValueChanged) {
           setHasValueChanged(false);
         }
