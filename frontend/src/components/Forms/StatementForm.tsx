@@ -214,6 +214,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       fieldName: "origins",
       chipsNumber: 5,
       minWidth: "50rem",
+      refreshStatement: refreshStatement,
       onSearch: async (
         searchValue: string,
         formId: string,
@@ -346,6 +347,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       anatomical_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          refreshStatement: refreshStatement,
           isDisabled,
           statement: statement,
           label: "Via",
@@ -376,7 +378,6 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
               propertyToUpdate: "anatomical_entities",
-              refreshStatement,
               dispatch
             });
           },
@@ -389,6 +390,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       from_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          refreshStatement: refreshStatement,
           isDisabled,
           statement: statement,
           label: "From",
@@ -420,7 +422,6 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
               entityId: getConnectionId(formId, statement.vias),
               entityType: "via",
               propertyToUpdate: "from_entities",
-              refreshStatement,
               dispatch
             });
           },
@@ -552,6 +553,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       anatomical_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          refreshStatement: refreshStatement,
           isDisabled,
           statement: statement,
           placeholder: "Look for Destinations",
@@ -581,7 +583,6 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
               propertyToUpdate: "anatomical_entities",
-              refreshStatement,
               dispatch
             });
           },
@@ -597,6 +598,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       from_entities: {
         "ui:widget": CustomEntitiesDropdown,
         "ui:options": {
+          refreshStatement: refreshStatement,
           isDisabled,
           statement: statement,
           label: "From",
@@ -628,7 +630,6 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
               entityId: getConnectionId(formId, statement?.destinations),
               entityType: "destination",
               propertyToUpdate: "from_entities",
-              refreshStatement,
               dispatch
             });
           },
@@ -697,6 +698,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
   copiedUISchema.forward_connection = {
     "ui:widget": CustomEntitiesDropdown,
     "ui:options": {
+      refreshStatement: refreshStatement,
       chipsNumber: 10,
       isDisabled,
       placeholder: "Forward connection(s)",

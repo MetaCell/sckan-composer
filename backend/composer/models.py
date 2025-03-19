@@ -153,6 +153,17 @@ class DestinationManager(models.Manager):
         )
 
 
+class AnatomicalEntityManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset().select_related(
+            'simple_entity',
+            'region_layer',
+            'region_layer__region',
+            'region_layer__layer').prefetch_related('synonyms')
+        )
+
 # Mixins
 
 
@@ -350,8 +361,10 @@ class AnatomicalEntityIntersection(models.Model):
 
 
 class AnatomicalEntity(models.Model):
+    objects = AnatomicalEntityManager()
     simple_entity = models.OneToOneField(AnatomicalEntityMeta, on_delete=models.CASCADE, null=True, blank=True)
     region_layer = models.OneToOneField(AnatomicalEntityIntersection, on_delete=models.CASCADE, null=True, blank=True)
+
 
     @property
     def name(self):

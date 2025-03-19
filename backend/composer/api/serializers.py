@@ -130,7 +130,7 @@ class AnatomicalEntitySerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_synonyms(obj):
-        return ", ".join(obj.synonyms.values_list("name", flat=True))
+        return ", ".join(synonym.name for synonym in obj.synonyms.all())
 
     class Meta:
         model = AnatomicalEntity

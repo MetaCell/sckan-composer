@@ -58,7 +58,6 @@ export async function updateOrigins(
   try {
     const response = await statementService.partialUpdate(statementId, patchedStatement);
     if (response !== ChangeRequestStatus.CANCELLED) {
-      refreshStatement();
       dispatch(setWasChangeDetected(true));
     }
     return response;
@@ -73,7 +72,6 @@ export type UpdateEntityParams = {
   entityId: number | null;
   entityType: "via" | "destination";
   propertyToUpdate: "anatomical_entities" | "from_entities";
-  refreshStatement:  () => void;
   dispatch:  AppDispatch;
 };
 
@@ -90,7 +88,6 @@ export async function updateEntity({
   entityId,
   entityType,
   propertyToUpdate,
-  refreshStatement,
   dispatch
 }: UpdateEntityParams) {
   if (entityId == null) {
@@ -109,7 +106,6 @@ export async function updateEntity({
         if (entityId != null) {
           await updateFunction(entityId, patchObject);
           dispatch(setWasChangeDetected(true));
-          refreshStatement()
         }
       } catch (error) {
         // Ownership error occurred, trigger ownership check
@@ -117,7 +113,6 @@ export async function updateEntity({
           statementId,
           async () => {
             await updateFunction(entityId as number, patchObject); // Re-attempt the update if ownership is reassigned
-            refreshStatement();
             dispatch(setWasChangeDetected(true));
           },
           () => {
