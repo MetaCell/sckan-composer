@@ -402,7 +402,7 @@ export default function CustomEntitiesDropdown({
     return () => {
       document.removeEventListener("mousedown", closePopperOnClickOutside);
     };
-  }, [hasValueChanged, postProcessOptions, getPreLevelSelectedValues, selectedOptions.length, id]);
+  }, [hasValueChanged, postProcessOptions, getPreLevelSelectedValues, selectedOptions.length, id, refreshStatement]);
 
   return isDisabled ? (
     disabledReason ? (
