@@ -60,7 +60,7 @@ const shouldResearchWithoutFilters = (res: any, queryOptions: QueryParams) => {
   );
 };
 const wasSearchFiltered = (queryOptions: QueryParams) => {
-  return queryOptions.title || queryOptions.tagFilter || queryOptions.notes;
+  return queryOptions.title || queryOptions.tagFilter || queryOptions.notes || queryOptions.batchNameFilter;
 };
 
 const SentencesDetails = () => {
@@ -105,6 +105,7 @@ const SentencesDetails = () => {
         let res = await sentenceService.getList(nextSentenceOptions);
         if (shouldResearchWithoutFilters(res, queryOptions)) {
           res = await sentenceService.getList({
+            batchNameFilter: undefined,
             notes: undefined,
             tagFilter: undefined,
             title: undefined,

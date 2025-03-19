@@ -1,5 +1,6 @@
 import json
 from django.http import HttpResponse, Http404
+from django.db.models import Q
 from drf_react_template.schema_form_encoder import SchemaProcessor, UiSchemaProcessor
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -657,6 +658,19 @@ class SentenceViewSet(
             qs, data["population_set_id"]
         ),
     }
+
+    @action(detail=False, methods=["GET"])
+    def batch_names(self, request):
+        """
+        Returns a list of all unique batch names in the database.
+        """
+        batch_names = (
+            Sentence.objects.filter(~Q(batch_name__isnull=True) & ~Q(batch_name=""))
+            .values_list("batch_name", flat=True)
+            .distinct()
+            .order_by("batch_name")
+        )
+        return Response(batch_names)
 
     def get_queryset(self):
         if "ordering" not in self.request.query_params:

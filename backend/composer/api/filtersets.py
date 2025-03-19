@@ -59,6 +59,10 @@ class SentenceFilter(django_filters.FilterSet):
 
     include = django_filters.BaseInFilter(field_name="id", lookup_expr="in")
 
+    batch_name = django_filters.BaseInFilter(
+        field_name="batch_name", lookup_expr="in", label="Filter by batch names"
+    )
+
 
     def order_by_current_user(self, queryset, name, value):
         current_user = self.request.user
