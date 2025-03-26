@@ -133,6 +133,7 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
         fields=(
             ("id", "id"),
             ("modified_date", "last_edited"),
+            ("owner", "owner"),
         ),
     )
 
