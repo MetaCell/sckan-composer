@@ -6,6 +6,7 @@ import App from "./App";
 import { doLogin } from "./services/UserService";
 import { jsonSchemas } from "./services/JsonSchema";
 import { tags } from "./services/TagService";
+import { batchNames } from "./services/SentenceService";
 import { species } from "./services/SpecieService";
 import { sexes } from "./services/SexService";
 import { populations } from "./services/PopulationService";
@@ -18,24 +19,23 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 
-doLogin().then(() => {
-  jsonSchemas.initSchemas().then(() => {
-    tags.setTagList().then(() => {
-      species.setSpecieList().then(() => {
-        sexes.setSexes().then(() => {
-          populations.setPopulations().then(() => {
-            phenotypes.setPhenotypes().then(() => {
-              projections.setProjections().then(() => {
-                root.render(
-                  <Provider store={store}>
-                    <App />
-                  </Provider>
-                );
-              });
-            });
-          });
-        });
-      });
-    });
+doLogin()
+  .then(() => jsonSchemas.initSchemas()) // This has to run first
+  .then(() =>
+    Promise.all([
+      tags.setTagList(),
+      batchNames.setBatchNameList(),
+      species.setSpecieList(),
+      sexes.setSexes(),
+      populations.setPopulations(),
+      phenotypes.setPhenotypes(),
+      projections.setProjections(),
+    ])
+  )
+  .then(() => {
+    root.render(
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
   });
-});

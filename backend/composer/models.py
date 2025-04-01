@@ -153,6 +153,17 @@ class DestinationManager(models.Manager):
         )
 
 
+class AnatomicalEntityManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset().select_related(
+            'simple_entity',
+            'region_layer',
+            'region_layer__region',
+            'region_layer__layer').prefetch_related('synonyms')
+        )
+
 # Mixins
 
 
@@ -350,8 +361,10 @@ class AnatomicalEntityIntersection(models.Model):
 
 
 class AnatomicalEntity(models.Model):
+    objects = AnatomicalEntityManager()
     simple_entity = models.OneToOneField(AnatomicalEntityMeta, on_delete=models.CASCADE, null=True, blank=True)
     region_layer = models.OneToOneField(AnatomicalEntityIntersection, on_delete=models.CASCADE, null=True, blank=True)
+
 
     @property
     def name(self):
@@ -421,7 +434,7 @@ class Sentence(models.Model, BulkActionMixin):
     pmid = PmIdField(db_index=True, null=True, blank=True)
     pmcid = PmcIdField(max_length=20, db_index=True, null=True, blank=True)
     doi = DoiField(max_length=100, db_index=True, null=True, blank=True)
-    batch_name = models.CharField(max_length=100, null=True, blank=True)
+    batch_name = models.CharField(max_length=100, null=True, blank=True, db_index=True)
     tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
     owner = models.ForeignKey(
         User,

@@ -4,6 +4,29 @@ import { AbstractService } from "./AbstractService";
 import { QueryParams } from "../redux/sentenceSlice";
 import { checkSentenceOwnership } from "../helpers/ownershipAlert";
 
+export let batchNames = (function () {
+  let batchNameList: string[] = [];
+
+  return {
+    /**
+     * Fetch and set the available batch names from the API.
+     */
+    setBatchNameList: async function (): Promise<void> {
+      return composerApi.composerSentenceBatchNamesRetrieve().then((resp: any) => {
+        batchNameList = resp.data;
+      });
+    },
+
+    /**
+     * Get the cached list of batch names.
+     */
+    getBatchNameList: function (): string[] {
+      return batchNameList;
+    },
+  };
+})();
+
+
 
 class SentenceService extends AbstractService {
   async save(sentence: Sentence) {
@@ -72,8 +95,8 @@ class SentenceService extends AbstractService {
     }
   }
   async getList(queryOptions: QueryParams): Promise<PaginatedSentenceList> {
-    const { exclude, include, limit, ordering, index, title, stateFilter, tagFilter } = queryOptions
-    return composerApi.composerSentenceList(exclude, include, limit, undefined, index, ordering, stateFilter, tagFilter, title).then((res: any) => res.data)
+    const { exclude, include, limit, ordering, index, title, stateFilter, tagFilter, batchNameFilter } = queryOptions
+    return composerApi.composerSentenceList(batchNameFilter, exclude, include, limit, undefined, index, ordering, stateFilter, tagFilter, title ).then((res: any) => res.data)
   }
   async assignOwner(id: number, patchedSentence?: PatchedSentence): Promise<Sentence> {
     return composerApi.composerSentenceAssignOwnerPartialUpdate(id, patchedSentence).then((response: any) => response.data);
@@ -87,10 +110,10 @@ class SentenceService extends AbstractService {
   async fetchOptions(queryOptions: QueryParams): Promise<{
     tags: any[];
     assignable_users: any[]; possible_transitions: any }> {
-    const { exclude, include, notes, ordering, stateFilter, tagFilter, title } = queryOptions;
+    const { exclude, include, notes, ordering, stateFilter, tagFilter, title, batchNameFilter } = queryOptions;
 
     return composerApi
-      .composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, stateFilter, tagFilter, title)
+      .composerSentenceAvailableOptionsRetrieve(batchNameFilter, exclude, include, notes, ordering, stateFilter, tagFilter, title)
       .then((response: any) => response.data);
   }
 
@@ -101,9 +124,10 @@ class SentenceService extends AbstractService {
  * @param bulkAction - The action to perform (e.g., assign user, add tag).
  */
 async performBulkAction(queryOptions: QueryParams, bulkAction: BulkAction): Promise<{ message: string }> {
-  const { exclude, include, notes, ordering, stateFilter, tagFilter, title } = queryOptions;
+  const { exclude, include, notes, ordering, stateFilter, tagFilter, title, batchNameFilter } = queryOptions;
 
   const params = {
+    batchName: batchNameFilter,
     exclude,
     include,
     notes,
@@ -116,6 +140,7 @@ async performBulkAction(queryOptions: QueryParams, bulkAction: BulkAction): Prom
 
   return composerApi
     .composerSentenceBulkActionCreate(
+      params.batchName,
       params.exclude,
       params.include,
       params.notes,

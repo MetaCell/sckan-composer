@@ -5338,6 +5338,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * Returns available users for assignment and possible state transitions for the selected items.
+         * @param {Array<string>} [batchName] Multiple values may be separated by commas.
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {boolean} [notes] Checks if entity has notes
@@ -5348,7 +5349,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceAvailableOptionsRetrieve: async (exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceAvailableOptionsRetrieve: async (batchName?: Array<string>, exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/sentence/available_options/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5369,6 +5370,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
 
             // authentication cookieAuth required
+
+            if (batchName) {
+                localVarQueryParameter['batch_name'] = batchName.join(COLLECTION_FORMATS.csv);
+            }
 
             if (exclude) {
                 localVarQueryParameter['exclude'] = exclude.join(COLLECTION_FORMATS.csv);
@@ -5410,7 +5415,46 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Returns a list of all unique batch names in the database.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSentenceBatchNamesRetrieve: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/sentence/batch_names/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Apply a bulk action to the selected items and return the number of items updated successfully.
+         * @param {Array<string>} [batchName] Multiple values may be separated by commas.
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {boolean} [notes] Checks if entity has notes
@@ -5422,7 +5466,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceBulkActionCreate: async (exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceBulkActionCreate: async (batchName?: Array<string>, exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/sentence/bulk_action/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5443,6 +5487,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
 
             // authentication cookieAuth required
+
+            if (batchName) {
+                localVarQueryParameter['batch_name'] = batchName.join(COLLECTION_FORMATS.csv);
+            }
 
             if (exclude) {
                 localVarQueryParameter['exclude'] = exclude.join(COLLECTION_FORMATS.csv);
@@ -5630,6 +5678,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * Sentence
+         * @param {Array<string>} [batchName] Multiple values may be separated by commas.
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
@@ -5642,7 +5691,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceList: async (exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerSentenceList: async (batchName?: Array<string>, exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/composer/sentence/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5663,6 +5712,10 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
 
             // authentication cookieAuth required
+
+            if (batchName) {
+                localVarQueryParameter['batch_name'] = batchName.join(COLLECTION_FORMATS.csv);
+            }
 
             if (exclude) {
                 localVarQueryParameter['exclude'] = exclude.join(COLLECTION_FORMATS.csv);
@@ -7287,6 +7340,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * Returns available users for assignment and possible state transitions for the selected items.
+         * @param {Array<string>} [batchName] Multiple values may be separated by commas.
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {boolean} [notes] Checks if entity has notes
@@ -7297,14 +7351,26 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceAvailableOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, state, tags, title, options);
+        async composerSentenceAvailableOptionsRetrieve(batchName?: Array<string>, exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceAvailableOptionsRetrieve(batchName, exclude, include, notes, ordering, state, tags, title, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceAvailableOptionsRetrieve']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Returns a list of all unique batch names in the database.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerSentenceBatchNamesRetrieve(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Sentence>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceBatchNamesRetrieve(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceBatchNamesRetrieve']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Apply a bulk action to the selected items and return the number of items updated successfully.
+         * @param {Array<string>} [batchName] Multiple values may be separated by commas.
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {boolean} [notes] Checks if entity has notes
@@ -7316,8 +7382,8 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BulkActionResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceBulkActionCreate(exclude, include, notes, ordering, state, tags, title, bulkAction, options);
+        async composerSentenceBulkActionCreate(batchName?: Array<string>, exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BulkActionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceBulkActionCreate(batchName, exclude, include, notes, ordering, state, tags, title, bulkAction, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceBulkActionCreate']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -7363,6 +7429,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         },
         /**
          * Sentence
+         * @param {Array<string>} [batchName] Multiple values may be separated by commas.
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
@@ -7375,8 +7442,8 @@ export const ComposerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerSentenceList(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceList(exclude, include, limit, notes, offset, ordering, state, tags, title, options);
+        async composerSentenceList(batchName?: Array<string>, exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedSentenceList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerSentenceList(batchName, exclude, include, limit, notes, offset, ordering, state, tags, title, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerSentenceList']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -8131,6 +8198,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * Returns available users for assignment and possible state transitions for the selected items.
+         * @param {Array<string>} [batchName] Multiple values may be separated by commas.
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {boolean} [notes] Checks if entity has notes
@@ -8141,11 +8209,20 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceAvailableOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
-            return localVarFp.composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, state, tags, title, options).then((request) => request(axios, basePath));
+        composerSentenceAvailableOptionsRetrieve(batchName?: Array<string>, exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
+            return localVarFp.composerSentenceAvailableOptionsRetrieve(batchName, exclude, include, notes, ordering, state, tags, title, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Returns a list of all unique batch names in the database.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerSentenceBatchNamesRetrieve(options?: RawAxiosRequestConfig): AxiosPromise<Sentence> {
+            return localVarFp.composerSentenceBatchNamesRetrieve(options).then((request) => request(axios, basePath));
         },
         /**
          * Apply a bulk action to the selected items and return the number of items updated successfully.
+         * @param {Array<string>} [batchName] Multiple values may be separated by commas.
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {boolean} [notes] Checks if entity has notes
@@ -8157,8 +8234,8 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): AxiosPromise<BulkActionResponse> {
-            return localVarFp.composerSentenceBulkActionCreate(exclude, include, notes, ordering, state, tags, title, bulkAction, options).then((request) => request(axios, basePath));
+        composerSentenceBulkActionCreate(batchName?: Array<string>, exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig): AxiosPromise<BulkActionResponse> {
+            return localVarFp.composerSentenceBulkActionCreate(batchName, exclude, include, notes, ordering, state, tags, title, bulkAction, options).then((request) => request(axios, basePath));
         },
         /**
          * Sentence
@@ -8192,6 +8269,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * Sentence
+         * @param {Array<string>} [batchName] Multiple values may be separated by commas.
          * @param {Array<string>} [exclude] Multiple values may be separated by commas.
          * @param {Array<number>} [include] Multiple values may be separated by commas.
          * @param {number} [limit] Number of results to return per page.
@@ -8204,8 +8282,8 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerSentenceList(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedSentenceList> {
-            return localVarFp.composerSentenceList(exclude, include, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(axios, basePath));
+        composerSentenceList(batchName?: Array<string>, exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedSentenceList> {
+            return localVarFp.composerSentenceList(batchName, exclude, include, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(axios, basePath));
         },
         /**
          * Sentence
@@ -8984,6 +9062,7 @@ export class ComposerApi extends BaseAPI {
 
     /**
      * Returns available users for assignment and possible state transitions for the selected items.
+     * @param {Array<string>} [batchName] Multiple values may be separated by commas.
      * @param {Array<string>} [exclude] Multiple values may be separated by commas.
      * @param {Array<number>} [include] Multiple values may be separated by commas.
      * @param {boolean} [notes] Checks if entity has notes
@@ -8995,12 +9074,23 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceAvailableOptionsRetrieve(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerSentenceAvailableOptionsRetrieve(exclude, include, notes, ordering, state, tags, title, options).then((request) => request(this.axios, this.basePath));
+    public composerSentenceAvailableOptionsRetrieve(batchName?: Array<string>, exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceAvailableOptionsRetrieveOrderingEnum>, state?: Array<ComposerSentenceAvailableOptionsRetrieveStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSentenceAvailableOptionsRetrieve(batchName, exclude, include, notes, ordering, state, tags, title, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Returns a list of all unique batch names in the database.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerSentenceBatchNamesRetrieve(options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSentenceBatchNamesRetrieve(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Apply a bulk action to the selected items and return the number of items updated successfully.
+     * @param {Array<string>} [batchName] Multiple values may be separated by commas.
      * @param {Array<string>} [exclude] Multiple values may be separated by commas.
      * @param {Array<number>} [include] Multiple values may be separated by commas.
      * @param {boolean} [notes] Checks if entity has notes
@@ -9013,8 +9103,8 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceBulkActionCreate(exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerSentenceBulkActionCreate(exclude, include, notes, ordering, state, tags, title, bulkAction, options).then((request) => request(this.axios, this.basePath));
+    public composerSentenceBulkActionCreate(batchName?: Array<string>, exclude?: Array<string>, include?: Array<number>, notes?: boolean, ordering?: Array<ComposerSentenceBulkActionCreateOrderingEnum>, state?: Array<ComposerSentenceBulkActionCreateStateEnum>, tags?: Array<number>, title?: string, bulkAction?: BulkAction, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSentenceBulkActionCreate(batchName, exclude, include, notes, ordering, state, tags, title, bulkAction, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -9055,6 +9145,7 @@ export class ComposerApi extends BaseAPI {
 
     /**
      * Sentence
+     * @param {Array<string>} [batchName] Multiple values may be separated by commas.
      * @param {Array<string>} [exclude] Multiple values may be separated by commas.
      * @param {Array<number>} [include] Multiple values may be separated by commas.
      * @param {number} [limit] Number of results to return per page.
@@ -9068,8 +9159,8 @@ export class ComposerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerSentenceList(exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerSentenceList(exclude, include, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(this.axios, this.basePath));
+    public composerSentenceList(batchName?: Array<string>, exclude?: Array<string>, include?: Array<number>, limit?: number, notes?: boolean, offset?: number, ordering?: Array<ComposerSentenceListOrderingEnum>, state?: Array<ComposerSentenceListStateEnum>, tags?: Array<number>, title?: string, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerSentenceList(batchName, exclude, include, limit, notes, offset, ordering, state, tags, title, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

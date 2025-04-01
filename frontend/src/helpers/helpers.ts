@@ -61,20 +61,14 @@ export const mapStateFilterSelectionToCheckbox = (
   return initialSelection;
 };
 
-export const mapFilterSelectionToCheckbox = (
-  options: any[],
-  currentSelection: any,
-) => {
+export const mapFilterSelectionToCheckbox = (options: any[], currentSelection: any) => {
   let initialSelection: { [key: string]: boolean } = {};
-  options.forEach(
-    (i) =>
-      (initialSelection = {
-        ...initialSelection,
-        [i.id.toString()]: !currentSelection
-          ? false
-          : currentSelection.includes(i.id.toString()),
-      }),
-  );
+
+  options.forEach((item) => {
+    const key = typeof item === "string" ? item : item.id.toString();
+    initialSelection[key] = !currentSelection ? false : currentSelection.includes(key);
+  });
+
   return initialSelection;
 };
 

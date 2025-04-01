@@ -1,36 +1,39 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import {tags} from "../../services/TagService";
+import { tags } from "../../services/TagService";
+import { batchNames } from "../../services/SentenceService";
 import { mapStateFilterSelectionToCheckbox, mapFilterSelectionToCheckbox, } from "../../helpers/helpers";
-import {useAppDispatch} from "../../redux/hooks";
+import { useAppDispatch } from "../../redux/hooks";
 import {
   ComposerConnectivityStatementListStateEnum as statementStates,
   ComposerSentenceListStateEnum as sentenceStates,
 } from "../../apiclient/backend/api";
-import {setFilters as setSentenceFilters} from "../../redux/sentenceSlice";
-import {setFilters as setStatementFilters} from "../../redux/statementSlice";
+import { setFilters as setSentenceFilters } from "../../redux/sentenceSlice";
+import { setFilters as setStatementFilters } from "../../redux/statementSlice";
 import StateFilter from "./StateFilter";
 import TagFilter from "./TagFilter";
 import HasStatementBeenExportedFilter from "./HasStatementBeenExportedFilter";
 import { ENTITY_TYPES, SENTENCE_STATE_ORDER, STATEMENT_STATE_ORDER } from "../../helpers/settings";
 import PopulationSetFilter from "./PopulationSetFilter";
-import {vars} from "../../theme/variables";
+import { vars } from "../../theme/variables";
 import { populations } from "../../services/PopulationService";
+import BatchNameFilter from "./BatchNameFilter";
 
-const {Draft, ...statementStatesExDraft } = statementStates
+const { Draft, ...statementStatesExDraft } = statementStates
 
 const FilterDrawer = (props: any) => {
   const { toggleDrawer, queryOptions, entity } = props;
 
-  const { stateFilter, tagFilter, populationSetFilter, hasStatementBeenExportedFilter } = queryOptions;
+  const { stateFilter, tagFilter, batchNameFilter, populationSetFilter, hasStatementBeenExportedFilter } = queryOptions;
   const dispatch = useAppDispatch();
 
   const tagList = tags.getTagList();
+  const batchNamesList = batchNames.getBatchNameList();
   const populationList = populations.getPopulations();
 
   const setInitialStateSelection = (currentSelection: any) => {
@@ -66,6 +69,10 @@ const FilterDrawer = (props: any) => {
     mapFilterSelectionToCheckbox(tagList, tagFilter)
   );
 
+  const [selectedBatches, setSelectedBatches] = useState<Record<string, boolean>>(
+    mapFilterSelectionToCheckbox(batchNamesList, batchNameFilter)
+  );
+
   const [selectedPopulations, setSelectedPopulations] = useState(
     mapFilterSelectionToCheckbox(populationList, populationSetFilter)
   );
@@ -73,6 +80,7 @@ const FilterDrawer = (props: any) => {
 
   const handleClearFilter = () => {
     setSelectedStates(setInitialStateSelection(undefined));
+    setSelectedBatches(mapFilterSelectionToCheckbox(batchNamesList, undefined));
     setSelectedTags(mapFilterSelectionToCheckbox(tagList, undefined));
     setHasCSBeenExportedChecked(false);
     setSelectedPopulations(mapFilterSelectionToCheckbox(populationList, undefined));
@@ -90,11 +98,12 @@ const FilterDrawer = (props: any) => {
   const handleApplyFilter = () => {
     const stateFilter = mapObjToArray(selectedStates);
     let tagFilter = mapObjToArray(selectedTags);
+    let batchNameFilter = mapObjToArray(selectedBatches);
     const populationSetFilter = mapObjToArray(selectedPopulations);
     const hasStatementBeenExportedFilter = hasCSBeenExportedChecked ? true : false;
 
     entity === ENTITY_TYPES.SENTENCE &&
-      dispatch(setSentenceFilters({ stateFilter, tagFilter }));
+      dispatch(setSentenceFilters({ stateFilter, tagFilter, batchNameFilter}));
     entity === ENTITY_TYPES.STATEMENT &&
       dispatch(setStatementFilters({ stateFilter, tagFilter, populationSetFilter, hasStatementBeenExportedFilter }));
     toggleDrawer(false);
@@ -131,6 +140,13 @@ const FilterDrawer = (props: any) => {
           selectedTags={selectedTags}
           setSelectedTags={setSelectedTags}
         />
+        {entity === ENTITY_TYPES.SENTENCE && (
+          <BatchNameFilter
+            batchNames={batchNamesList}
+            selectedBatches={selectedBatches}
+            setSelectedBatches={setSelectedBatches}
+          />
+        )}
         {
           entity === ENTITY_TYPES.STATEMENT && (
             <Box>

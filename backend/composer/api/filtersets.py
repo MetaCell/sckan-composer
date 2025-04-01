@@ -59,6 +59,10 @@ class SentenceFilter(django_filters.FilterSet):
 
     include = django_filters.BaseInFilter(field_name="id", lookup_expr="in")
 
+    batch_name = django_filters.BaseInFilter(
+        field_name="batch_name", lookup_expr="in", label="Filter by batch names"
+    )
+
 
     def order_by_current_user(self, queryset, name, value):
         current_user = self.request.user
@@ -129,8 +133,22 @@ class ConnectivityStatementFilter(django_filters.FilterSet):
         fields=(
             ("id", "id"),
             ("modified_date", "last_edited"),
+            ("owner", "owner"),
         ),
+        method='order_by_header'
     )
+
+    def order_by_header(self, queryset, name, value):
+        if 'owner' in value or '-owner' in value:
+            order_direction = '-' if '-owner' in value else ''
+            queryset = queryset.order_by(f'{order_direction}owner__first_name', f'{order_direction}owner__last_name')
+        if 'last_edited' in value or '-last_edited' in value:
+            order_direction = '-' if '-last_edited' in value else ''
+            queryset = queryset.order_by(f'{order_direction}modified_date')
+
+        other_ordering = [v for v in value if v not in [
+            'owner', '-owner', 'last_edited', '-last_edited']]
+        return queryset if not other_ordering else queryset.order_by(*other_ordering)
 
     def filter_has_statement_been_exported(self, queryset, name, value):
         if value:
