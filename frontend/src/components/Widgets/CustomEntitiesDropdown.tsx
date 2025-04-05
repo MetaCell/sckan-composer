@@ -32,6 +32,7 @@ import CustomChipBoxComponent from "./CustomChipBoxComponent";
 import { debounce } from "@mui/material";
 import { SEARCH_DEBOUNCE } from "../../settings";
 import {ChangeRequestStatus} from "../../helpers/settings";
+import {applyPreLevelSort} from "../../services/CustomDropdownService";
 
 const {
   buttonOutlinedBorderColor,
@@ -230,6 +231,7 @@ export default function CustomEntitiesDropdown({
   const popperRef = useRef<HTMLDivElement | null>(null);
   
   const [isLoading, setIsLoading] = useState(false);
+  const [isFromLoading, setIsFromLoading] = useState(false);
   const [allOptions, setAllOptions] = useState<Option[]>([]);
   
   const [hasValueChanged, setHasValueChanged] = useState(false);
@@ -240,11 +242,13 @@ export default function CustomEntitiesDropdown({
     }
   };
   const handleSelectedOptionsChange = async (newSelectedOptions: Option[]) => {
+    setIsFromLoading(true)
     setSelectedOptions(newSelectedOptions)
     const result = await onUpdate(newSelectedOptions, id);
     if (result !== ChangeRequestStatus.CANCELLED) {
       setHasValueChanged(true);
     }
+    setIsFromLoading(false)
   };
   
   const groupedOptions = autocompleteOptions.reduce(
@@ -352,16 +356,21 @@ export default function CustomEntitiesDropdown({
     try {
       const options = await onSearch(inputValue, id, selectedOptions);
       const allOptions = [...selectedOptions, ...options];
-      const sortedOptions = postProcessOptions
+      let sortedOptions = postProcessOptions
         ? processFromEntitiesData(allOptions)
         : allOptions;
+      
+      if (postProcessOptions && getPreLevelSelectedValues) {
+        const preLevelItems = getPreLevelSelectedValues(id);
+        sortedOptions = applyPreLevelSort(sortedOptions, preLevelItems);
+      }
+      
       setAllOptions(sortedOptions);
       setAutocompleteOptions(sortedOptions);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [inputValue, id, onSearch, postProcessOptions, selectedOptions]);
-  
+  }, [inputValue, id, onSearch, postProcessOptions, selectedOptions, getPreLevelSelectedValues]);
   const getLabel = (option: Option) => {
     if (option?.content.length > 3) {
       const index = option?.label.lastIndexOf('(');
@@ -605,7 +614,7 @@ export default function CustomEntitiesDropdown({
                       }}
                     />
                   </Box>
-                  {isLoading ? (
+                  {isLoading || isFromLoading ? (
                     <Box
                       display="flex"
                       justifyContent="center"

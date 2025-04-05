@@ -344,3 +344,31 @@ export function createOptionsFromStatements(
     ? [...sameSentenceOptions, ...differentSentenceOptions]
     : [];
 }
+
+export function applyPreLevelSort(
+  autocompleteOptions: Option[],
+  preLevelItems: Option[],
+): Option[] {
+  // Step 1: Find the highest Vias level
+  const maxViasLevel = preLevelItems.reduce((max, item) => {
+    const match = item.group?.match(/Vias-(\d+)/);
+    const level = match ? parseInt(match[1], 10) : 0;
+    return Math.max(max, level);
+  }, 0);
+  
+  // Step 2: Update group and sort in preLevelItems
+  const enrichedPreLevelItems = preLevelItems.map(item => ({
+    ...item,
+    sort: maxViasLevel,
+    group: `Vias-${maxViasLevel}`,
+  }));
+  
+  // Step 3: Replace matching items
+  const updatedOptionsMap = new Map(enrichedPreLevelItems.map(item => [item.id, item]));
+  
+  return autocompleteOptions.map(option =>
+    updatedOptionsMap.has(option.id)
+      ? updatedOptionsMap.get(option.id)!
+      : option
+  );
+}
