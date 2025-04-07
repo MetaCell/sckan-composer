@@ -990,53 +990,98 @@ class Via(AbstractConnectionLayer):
     )
     order = models.IntegerField()
 
+    def _get_available_entities_before_order(self, order_index):
+        """
+        Returns a set of AnatomicalEntity IDs available from layers before the given order_index.
+        Includes origins and entities from preceding Via layers.
+        """
+        available_entities = set(self.connectivity_statement.origins.values_list('id', flat=True))
+        preceding_vias = Via.objects.filter(
+            connectivity_statement=self.connectivity_statement,
+            order__lt=order_index
+        ).prefetch_related('anatomical_entities')
+
+        for via in preceding_vias:
+            available_entities.update(via.anatomical_entities.values_list('id', flat=True))
+        return available_entities
+
+    def _conditionally_clear_from_entities(self):
+        """
+        Clears 'from_entities' if any selected entity is no longer available
+        in the preceding layers based on the current order.
+        """
+        current_from_entity_ids = set(self.from_entities.values_list('id', flat=True))
+        if not current_from_entity_ids:
+            return  # Nothing selected, nothing to clear
+
+        available_entity_ids = self._get_available_entities_before_order(self.order)
+
+        # Check if all selected 'from_entities' are still available
+        if not current_from_entity_ids.issubset(available_entity_ids):
+            self.from_entities.clear()
+
     def save(self, *args, **kwargs):
         with transaction.atomic():
-            # Check if the object already exists in the database
+            order_changed = False
+            old_order = None
             if not self.pk:
+                # Assign order for new Via
                 self.order = Via.objects.filter(connectivity_statement=self.connectivity_statement).count()
             else:
-                # Fetch the existing object from the database
-                old_via = Via.objects.get(pk=self.pk)
-                # If the 'order' field has changed, clear the 'from_entities'
-                if old_via.order != self.order:
-                    self._update_order_for_other_vias(old_via.order)
-                    self.from_entities.clear()
+                # Check if order changed for existing Via
+                old_via = Via.objects.filter(pk=self.pk).first()
+                if old_via and old_via.order != self.order:
+                    order_changed = True
+                    old_order = old_via.order
 
+            # Save the instance first to establish PK if new, or update fields including potentially the order
             super(Via, self).save(*args, **kwargs)
 
+            if order_changed and old_order is not None:
+                # Update orders of other Vias and conditionally clear their from_entities
+                affected_vias = self._update_order_for_other_vias(old_order)
+                # Conditionally clear from_entities for the moved Via itself
+                self._conditionally_clear_from_entities()
+                # Conditionally clear from_entities for affected Vias
+                for via in affected_vias:
+                    # Reload via to get updated order before checking
+                    via.refresh_from_db()
+                    via._conditionally_clear_from_entities()
+
+
     def _update_order_for_other_vias(self, old_order):
+        """
+        Updates the order of other Via instances when this instance's order changes.
+        Returns the list of affected Via instances.
+        """
+        affected_vias = []
         temp_order = -1  # A temporary order value outside the normal range
+
         with transaction.atomic():
-            # Temporarily set the order of the current object to a unique value
+            # Temporarily move the current Via out of the way
             Via.objects.filter(pk=self.pk).update(order=temp_order)
 
-            # Fetch the affected Vias before updating
+            # Adjust orders of other Vias
             if old_order < self.order:
-                affected_vias = list(Via.objects.filter(
+                # Moved down: Decrement order of Vias between old and new position
+                vias_to_update = Via.objects.filter(
                     connectivity_statement=self.connectivity_statement,
                     order__gt=old_order, order__lte=self.order
-                ))
-                Via.objects.filter(
-                    connectivity_statement=self.connectivity_statement,
-                    order__gt=old_order, order__lte=self.order
-                ).update(order=F('order') - 1)
+                )
+                affected_vias = list(vias_to_update) # Capture before update
+                vias_to_update.update(order=F('order') - 1)
             elif old_order > self.order:
-                affected_vias = list(Via.objects.filter(
+                # Moved up: Increment order of Vias between new and old position
+                vias_to_update = Via.objects.filter(
                     connectivity_statement=self.connectivity_statement,
                     order__lt=old_order, order__gte=self.order
-                ))
-                Via.objects.filter(
-                    connectivity_statement=self.connectivity_statement,
-                    order__lt=old_order, order__gte=self.order
-                ).update(order=F('order') + 1)
+                )
+                affected_vias = list(vias_to_update) # Capture before update
+                vias_to_update.update(order=F('order') + 1)
 
-            # Clear 'from_entities' for the fetched affected Vias
-            for via in affected_vias:
-                via.from_entities.clear()
-
-            # Finally, set the correct order for the current object
             Via.objects.filter(pk=self.pk).update(order=self.order)
+
+        return affected_vias # Return the list of vias whose order was changed
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():
