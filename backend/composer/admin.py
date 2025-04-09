@@ -242,7 +242,13 @@ class ConnectivityStatementAdmin(
     list_per_page = 10
     # The name of one or more FSMFields on the model to transition
     fsm_field = ("state",)
-    readonly_fields = ("state", "curie_id", "has_statement_been_exported", "reference_uri")
+    readonly_fields = (
+        "state",
+        "curie_id",
+        "has_statement_been_exported",
+        "reference_uri",
+        "short_name",
+    )
     exclude = ("journey_path", "statement_prefix", "statement_suffix", "population_index")
     autocomplete_fields = ("sentence", "origins")
     date_hierarchy = "modified_date"

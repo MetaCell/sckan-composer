@@ -33,6 +33,7 @@ from .utils import (
     is_valid_population_name,
 )
 import re
+from composer.utils import generate_connectivity_statement_short_name
 
 
 # from django_fsm_log.decorators import fsm_log_by
@@ -603,6 +604,7 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
         Sentence, verbose_name="Sentence", on_delete=models.DO_NOTHING
     )
     knowledge_statement = models.TextField(db_index=True, blank=True)
+    short_name = models.CharField(max_length=500, null=True, blank=True)
     state = FSMField(default=CSState.DRAFT, protected=True)
     origins = models.ManyToManyField(AnatomicalEntity, related_name='origins_relations')
     owner = models.ForeignKey(
@@ -741,25 +743,32 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
     )
     def exported(self, *args, **kwargs):
         with transaction.atomic():
-                update_fields = ["has_statement_been_exported"]
-                # Only update population_index if the statement hasn't been exported yet
-                if not self.has_statement_been_exported:
-                    next_index = self.population.last_used_index + 1
-                    self.population_index = next_index
-                    update_fields.append("population_index")
+            update_fields = ["has_statement_been_exported"]
+            # Only update population_index if the statement hasn't been exported yet
+            if not self.has_statement_been_exported:
+                next_index = self.population.last_used_index + 1
+                self.population_index = next_index
+                update_fields.append("population_index")
 
-                    # Update the population's last_used_index in the same transaction.
-                    self.population.last_used_index = next_index
-                    self.population.save(update_fields=["last_used_index"])
+                # Update the population's last_used_index in the same transaction.
+                self.population.last_used_index = next_index
+                self.population.save(update_fields=["last_used_index"])
 
-                    # Create a reference URI if it doesn't exist (statements created in composer)
-                    if not self.reference_uri:
-                        self.reference_uri = create_reference_uri(self.population, self.population_index)
-                        update_fields.append("reference_uri")
-                
-                # Mark the statement as exported.
-                self.has_statement_been_exported = True
-                self.save(update_fields=update_fields)
+                # Create a reference URI if it doesn't exist (statements created in composer)
+                if not self.reference_uri:
+                    self.reference_uri = create_reference_uri(
+                        self.population, self.population_index
+                    )
+                    update_fields.append("reference_uri")
+
+                # Set the short_name - if not already set - for statements from the composer
+                if not self.short_name:
+                    self.short_name = generate_connectivity_statement_short_name(self)
+                    update_fields.append("short_name")
+
+            # Mark the statement as exported.
+            self.has_statement_been_exported = True
+            self.save(update_fields=update_fields)
 
     @transition(
         field=state,
@@ -778,7 +787,6 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
     )
     def invalid(self, *args, **kwargs):
         ...
-
 
     @transition(
         field=state,
@@ -873,7 +881,7 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
     def save(self, *args, **kwargs):
         if not self.pk and self.sentence and not self.owner:
             self.owner = self.sentence.owner
-            
+
         self.clean()
         super().save(*args, **kwargs)
 
