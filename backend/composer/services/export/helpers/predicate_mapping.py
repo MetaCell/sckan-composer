@@ -41,6 +41,11 @@ class ExportRelationships(IExportRelationship, Enum):
         "Sex",
         "http://uri.interlex.org/tgbugs/uris/readable/hasBiologicalSex",
     )
+    prefLabel = (
+        "skos:prefLabel",
+        "prefLabel",
+        "http://www.w3.org/2004/02/skos/core#prefLabel",
+    )
     hasCircuitRolePhenotype = (
         "hasCircuitRolePhenotype",
         "CircuitRole",

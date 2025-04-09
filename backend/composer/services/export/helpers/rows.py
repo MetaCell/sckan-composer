@@ -87,6 +87,10 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
     # Knowledge Statement Row
     rows.append(get_knowledge_statement_row(cs))
 
+    # prefLabel Row
+    if cs.curie_id:
+        rows.append(get_pref_label_row(cs))
+
     # Origins
     origins = cs.origins.all()
     for origin in origins:
@@ -156,7 +160,7 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
                 object_text=statement_alert.text,
             )
         )
-    
+
     # the composer URI
     rows.append(get_composer_uri_row(cs))
     return rows
@@ -172,6 +176,17 @@ def get_knowledge_statement_row(cs: ConnectivityStatement) -> Row:
         object_uri="",
         predicate_mapping=ExportRelationships.composerGenLabel,
         object_text=get_statement_preview(cs, cs.get_journey()) ,
+    )
+
+
+def get_pref_label_row(cs: ConnectivityStatement) -> Row:
+    """
+    Generate the row for the prefLabel of a connectivity statement.
+    """
+    return Row(
+        object=cs.curie_id,
+        object_uri="",
+        predicate_mapping=ExportRelationships.prefLabel,
     )
 
 
@@ -321,7 +336,6 @@ def get_forward_connection_row(forward_conn: ConnectivityStatement):
         object_uri=forward_conn.reference_uri,
         predicate_mapping=predicate_mapping,
     )
-
 
 
 def get_composer_uri_row(cs: ConnectivityStatement):

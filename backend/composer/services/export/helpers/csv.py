@@ -93,7 +93,7 @@ def create_csv(export_batch, folder_path: typing.Optional[str] = None) -> str:
 
 def generate_csv_attributes_mapping() -> Dict[str, Callable]:
     attributes_map = {
-        "Subject": get_curie_id,
+        "Subject": get_short_name,
         "Subject URI": get_reference_uri,
         "Predicate": get_predicate,
         "Predicate URI": get_predicate_uri,
@@ -131,6 +131,10 @@ def get_sentence_number(cs: ConnectivityStatement, row: Row):
 
 def get_curie_id(cs: ConnectivityStatement, row: Row):
     return cs.curie_id if cs.curie_id is not None else ""
+
+
+def get_short_name(cs: ConnectivityStatement, row: Row):
+    return cs.short_name if cs.short_name is not None else ""
 
 
 def get_reference_uri(cs: ConnectivityStatement, row: Row):

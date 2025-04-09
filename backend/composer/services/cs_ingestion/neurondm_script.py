@@ -71,7 +71,6 @@ def for_composer(n, statement_alert_uris: Set[str] = None):
             logger_service.add_anomaly(LoggableAnomaly(e.statement_id, e.entity_id, e.message, severity=Severity.ERROR))
         return None
 
-
     if statement_alert_uris is None:
         statement_alert_uris = set()
 
@@ -83,6 +82,7 @@ def for_composer(n, statement_alert_uris: Set[str] = None):
     fc = dict(
         id=str(n.id_),
         label=lrdf(n, rdfs.label)[0],
+        pref_label=str(n.prefLabel),
         origins=origins,
         destinations=destinations,
         populationset=get_populationset_from_neurondm(n.id_, n.owlClass),
