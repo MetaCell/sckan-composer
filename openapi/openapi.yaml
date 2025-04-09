@@ -3101,6 +3101,9 @@ components:
           type: array
           items:
             type: integer
+        short_name:
+          type: string
+          readOnly: true
         apinatomy_model:
           type: string
           nullable: true
@@ -3145,6 +3148,7 @@ components:
       - projection_phenotype
       - sentence
       - sex
+      - short_name
       - state
       - statement_preview
       - tags
@@ -3925,6 +3929,9 @@ components:
           type: array
           items:
             type: integer
+        short_name:
+          type: string
+          readOnly: true
         apinatomy_model:
           type: string
           nullable: true
