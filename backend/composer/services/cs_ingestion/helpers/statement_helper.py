@@ -24,6 +24,7 @@ from composer.services.cs_ingestion.helpers.anatomical_entities_helper import (
 from composer.services.cs_ingestion.helpers.changes_detector import has_changes
 from composer.services.cs_ingestion.helpers.common_helpers import (
     LABEL,
+    PREF_LABEL,
     STATEMENT_ALERTS,
     VALIDATION_ERRORS,
     STATE,
@@ -53,8 +54,6 @@ from composer.services.cs_ingestion.models import (
 )
 
 
-
-
 def create_or_update_connectivity_statement(
     statement: Dict,
     sentence: Sentence,
@@ -65,7 +64,7 @@ def create_or_update_connectivity_statement(
     populationset_name = statement.get("populationset", "")
     defaults = {
         "sentence": sentence,
-        "knowledge_statement": statement[LABEL],
+        "knowledge_statement": statement[PREF_LABEL],
         "sex": get_sex(statement),
         "circuit_type": get_circuit_type(statement),
         "functional_circuit_role": get_functional_circuit_role(statement),
@@ -74,7 +73,8 @@ def create_or_update_connectivity_statement(
         "projection_phenotype": get_projection_phenotype(statement),
         "reference_uri": statement[ID],
         "state": CSState.EXPORTED,
-        "curie_id": statement[LABEL],
+        "curie_id": statement[PREF_LABEL],
+        "short_name": statement[LABEL],
     }
 
     connectivity_statement, created = ConnectivityStatement.objects.get_or_create(
