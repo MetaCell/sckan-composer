@@ -547,7 +547,7 @@ export interface ConnectivityStatement {
      * @type {string}
      * @memberof ConnectivityStatement
      */
-    'short_name': string;
+    'curie_id'?: string | null;
     /**
      * 
      * @type {string}
@@ -1834,7 +1834,7 @@ export interface PatchedConnectivityStatement {
      * @type {string}
      * @memberof PatchedConnectivityStatement
      */
-    'short_name'?: string;
+    'curie_id'?: string | null;
     /**
      * 
      * @type {string}

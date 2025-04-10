@@ -47,20 +47,20 @@ const StatementDetailsAccordion = (props: any) => {
         <Typography variant="h6" ml={1}>Statement Details</Typography>
       </AccordionSummary>
       <AccordionDetails sx={{px:4, pt:0, pb:2}}>
-          <StatementForm
-            statement={statement}
-            format="small"
-            setter={setter}
-            enableAutoSave={true}
-            extraData={{
-              sentence_id: sentence.id,
-              knowledge_statement: statement.knowledge_statement,
-            }}
-            uiFields={[
-              ...(statement.short_name && statement.short_name.trim() !== "" ? ["short_name"] : [])
-            ]}
-            isDisabled={isDisabled}
-          />
+          {statement.curie_id && statement.curie_id.trim() !== "" && (
+            <StatementForm
+              statement={statement}
+              format="small"
+              setter={setter}
+              enableAutoSave={true}
+              extraData={{
+                sentence_id: sentence.id,
+                knowledge_statement: statement.knowledge_statement,
+              }}
+              uiFields={["curie_id"]}
+              isDisabled={isDisabled}
+            />
+          )}
       <SpeciesForm
           data={statement.species}
           extraData={{ parentId: statement.id, service: statementService }}

@@ -56,7 +56,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
   copiedSchema.properties.statement_alerts.items.properties.connectivity_statement_id.type = "number";
 
   copiedSchema.properties.forward_connection.type = ["string", "null"];
-  copiedUISchema["ui:order"] = ["short_name", "destination_type", "*"];
+  copiedUISchema["ui:order"] = ["curie_id", "destination_type", "*"];
   copiedSchema.properties.statement_alerts.title = " ";
   copiedSchema.properties.statement_alerts.items.required = ["alert_type"]
   
@@ -93,16 +93,16 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       }
     },
   }
-  copiedUISchema.short_name = {
+  copiedUISchema.curie_id = {
     "ui:widget": "CustomTextField",
     "ui:options": {
       isDisabled: true,
       label: "Short Name",
       placeholder: "Short Name",
-      classNames: "col-xs-12 col-md-6",
-      hidden: !statement?.short_name || statement.short_name.trim() === "",
+      classNames: statement?.curie_id && statement.curie_id.trim() === "" ? "" : "",
+      hidden: !statement?.curie_id || statement.curie_id.trim() === "",
     },
-    value: statement?.short_name ?? "",
+    value: statement?.curie_id ?? "",
   };
 
   copiedUISchema.circuit_type = {
@@ -842,7 +842,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
         "knowledge_statement",
         "additional_information",
         "apinatomy_model",
-        "short_name",
+        "curie_id",
       ]}
       submitOnChangeFields={[
         "phenotype_id",

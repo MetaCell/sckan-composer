@@ -3101,9 +3101,10 @@ components:
           type: array
           items:
             type: integer
-        short_name:
+        curie_id:
           type: string
-          readOnly: true
+          nullable: true
+          maxLength: 500
         apinatomy_model:
           type: string
           nullable: true
@@ -3148,7 +3149,6 @@ components:
       - projection_phenotype
       - sentence
       - sex
-      - short_name
       - state
       - statement_preview
       - tags
@@ -3929,9 +3929,10 @@ components:
           type: array
           items:
             type: integer
-        short_name:
+        curie_id:
           type: string
-          readOnly: true
+          nullable: true
+          maxLength: 500
         apinatomy_model:
           type: string
           nullable: true
