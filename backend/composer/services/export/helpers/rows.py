@@ -85,11 +85,11 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
     )
 
     # Knowledge Statement Row
-    rows.append(get_knowledge_statement_row(cs))
+    rows.append(get_statement_preview_row(cs))
 
     # prefLabel Row
-    if cs.curie_id:
-        rows.append(get_pref_label_row(cs))
+    if cs.knowledge_statement:
+        rows.append(get_knowledge_statement_row(cs))
 
     # Origins
     origins = cs.origins.all()
@@ -166,7 +166,7 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
     return rows
 
 
-def get_knowledge_statement_row(cs: ConnectivityStatement) -> Row:
+def get_statement_preview_row(cs: ConnectivityStatement) -> Row:
     """
     Generate the row for the knowledge statement of a connectivity statement.
     """
@@ -179,16 +179,16 @@ def get_knowledge_statement_row(cs: ConnectivityStatement) -> Row:
     )
 
 
-def get_pref_label_row(cs: ConnectivityStatement) -> Row:
+def get_knowledge_statement_row(cs: ConnectivityStatement) -> Row:
     """
     Generate the row for the prefLabel of a connectivity statement.
     """
     return Row(
-        object=cs.curie_id,
+        object=cs.knowledge_statement,
         object_uri="",
         predicate_mapping=ExportRelationships.prefLabel,
+        object_text="",
     )
-
 
 def get_origin_row(origin: AnatomicalEntity, review_notes: str, curation_notes: str):
     predicate_mapping = ExportRelationships.hasSomaLocatedIn
