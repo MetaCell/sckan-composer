@@ -33,7 +33,7 @@ from .utils import (
     is_valid_population_name,
 )
 import re
-from composer.utils import generate_connectivity_statement_short_name
+from composer.utils import generate_connectivity_statement_curie_id_for_composer_statements
 
 
 # from django_fsm_log.decorators import fsm_log_by
@@ -604,7 +604,6 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
         Sentence, verbose_name="Sentence", on_delete=models.DO_NOTHING
     )
     knowledge_statement = models.TextField(db_index=True, blank=True)
-    short_name = models.CharField(max_length=500, null=True, blank=True)
     state = FSMField(default=CSState.DRAFT, protected=True)
     origins = models.ManyToManyField(AnatomicalEntity, related_name='origins_relations')
     owner = models.ForeignKey(
@@ -761,10 +760,10 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
                     )
                     update_fields.append("reference_uri")
 
-                # Set the short_name - if not already set - for statements from the composer
-                if not self.short_name:
-                    self.short_name = generate_connectivity_statement_short_name(self)
-                    update_fields.append("short_name")
+                # Set the curie_id - if not already set - for statements from the composer
+                if not self.curie_id:
+                    self.curie_id = generate_connectivity_statement_curie_id_for_composer_statements(self)
+                    update_fields.append("curie_id")
 
             # Mark the statement as exported.
             self.has_statement_been_exported = True

@@ -247,7 +247,6 @@ class ConnectivityStatementAdmin(
         "curie_id",
         "has_statement_been_exported",
         "reference_uri",
-        "short_name",
     )
     exclude = ("journey_path", "statement_prefix", "statement_suffix", "population_index")
     autocomplete_fields = ("sentence", "origins")

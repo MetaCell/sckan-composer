@@ -38,7 +38,7 @@ def is_valid_population_name(name):
         )
 
 
-def generate_connectivity_statement_short_name(statement):
+def generate_connectivity_statement_curie_id_for_composer_statements(statement):
     """
     Generate a short name for a connectivity statement based on its population and index.
     """

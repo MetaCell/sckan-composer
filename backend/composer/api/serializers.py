@@ -752,7 +752,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             "population",
             "has_statement_been_exported",
             "forward_connection",
-            "short_name",
+            "curie_id",
             "apinatomy_model",
             "additional_information",
             "modified_date",
