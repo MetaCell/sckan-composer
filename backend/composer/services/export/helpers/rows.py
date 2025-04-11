@@ -84,10 +84,10 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
         note.note for note in cs.sentence.prefetched_sentence_notes
     )
 
-    # Knowledge Statement Row
+    # Statement Preview Row
     rows.append(get_statement_preview_row(cs))
 
-    # prefLabel Row
+    # prefLabel Row - Knowledge Statement
     if cs.knowledge_statement:
         rows.append(get_knowledge_statement_row(cs))
 
