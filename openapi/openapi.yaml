@@ -3101,6 +3101,10 @@ components:
           type: array
           items:
             type: integer
+        curie_id:
+          type: string
+          nullable: true
+          maxLength: 500
         apinatomy_model:
           type: string
           nullable: true
@@ -3925,6 +3929,10 @@ components:
           type: array
           items:
             type: integer
+        curie_id:
+          type: string
+          nullable: true
+          maxLength: 500
         apinatomy_model:
           type: string
           nullable: true

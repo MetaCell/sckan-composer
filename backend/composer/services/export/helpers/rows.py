@@ -84,8 +84,12 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
         note.note for note in cs.sentence.prefetched_sentence_notes
     )
 
-    # Knowledge Statement Row
-    rows.append(get_knowledge_statement_row(cs))
+    # Statement Preview Row
+    rows.append(get_statement_preview_row(cs))
+
+    # prefLabel Row - Knowledge Statement
+    if cs.knowledge_statement:
+        rows.append(get_knowledge_statement_row(cs))
 
     # Origins
     origins = cs.origins.all()
@@ -156,13 +160,13 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
                 object_text=statement_alert.text,
             )
         )
-    
+
     # the composer URI
     rows.append(get_composer_uri_row(cs))
     return rows
 
 
-def get_knowledge_statement_row(cs: ConnectivityStatement) -> Row:
+def get_statement_preview_row(cs: ConnectivityStatement) -> Row:
     """
     Generate the row for the knowledge statement of a connectivity statement.
     """
@@ -174,6 +178,17 @@ def get_knowledge_statement_row(cs: ConnectivityStatement) -> Row:
         object_text=get_statement_preview(cs, cs.get_journey()) ,
     )
 
+
+def get_knowledge_statement_row(cs: ConnectivityStatement) -> Row:
+    """
+    Generate the row for the prefLabel of a connectivity statement.
+    """
+    return Row(
+        object=cs.knowledge_statement,
+        object_uri="",
+        predicate_mapping=ExportRelationships.prefLabel,
+        object_text="",
+    )
 
 def get_origin_row(origin: AnatomicalEntity, review_notes: str, curation_notes: str):
     predicate_mapping = ExportRelationships.hasSomaLocatedIn
@@ -321,7 +336,6 @@ def get_forward_connection_row(forward_conn: ConnectivityStatement):
         object_uri=forward_conn.reference_uri,
         predicate_mapping=predicate_mapping,
     )
-
 
 
 def get_composer_uri_row(cs: ConnectivityStatement):

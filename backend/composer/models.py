@@ -33,6 +33,7 @@ from .utils import (
     is_valid_population_name,
 )
 import re
+from composer.utils import generate_connectivity_statement_curie_id_for_composer_statements
 
 
 # from django_fsm_log.decorators import fsm_log_by
@@ -741,25 +742,32 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
     )
     def exported(self, *args, **kwargs):
         with transaction.atomic():
-                update_fields = ["has_statement_been_exported"]
-                # Only update population_index if the statement hasn't been exported yet
-                if not self.has_statement_been_exported:
-                    next_index = self.population.last_used_index + 1
-                    self.population_index = next_index
-                    update_fields.append("population_index")
+            update_fields = ["has_statement_been_exported"]
+            # Only update population_index if the statement hasn't been exported yet
+            if not self.has_statement_been_exported:
+                next_index = self.population.last_used_index + 1
+                self.population_index = next_index
+                update_fields.append("population_index")
 
-                    # Update the population's last_used_index in the same transaction.
-                    self.population.last_used_index = next_index
-                    self.population.save(update_fields=["last_used_index"])
+                # Update the population's last_used_index in the same transaction.
+                self.population.last_used_index = next_index
+                self.population.save(update_fields=["last_used_index"])
 
-                    # Create a reference URI if it doesn't exist (statements created in composer)
-                    if not self.reference_uri:
-                        self.reference_uri = create_reference_uri(self.population, self.population_index)
-                        update_fields.append("reference_uri")
-                
-                # Mark the statement as exported.
-                self.has_statement_been_exported = True
-                self.save(update_fields=update_fields)
+                # Create a reference URI if it doesn't exist (statements created in composer)
+                if not self.reference_uri:
+                    self.reference_uri = create_reference_uri(
+                        self.population, self.population_index
+                    )
+                    update_fields.append("reference_uri")
+
+                # Set the curie_id - if not already set - for statements from the composer
+                if not self.curie_id:
+                    self.curie_id = generate_connectivity_statement_curie_id_for_composer_statements(self)
+                    update_fields.append("curie_id")
+
+            # Mark the statement as exported.
+            self.has_statement_been_exported = True
+            self.save(update_fields=update_fields)
 
     @transition(
         field=state,
@@ -778,7 +786,6 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
     )
     def invalid(self, *args, **kwargs):
         ...
-
 
     @transition(
         field=state,
@@ -873,7 +880,7 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
     def save(self, *args, **kwargs):
         if not self.pk and self.sentence and not self.owner:
             self.owner = self.sentence.owner
-            
+
         self.clean()
         super().save(*args, **kwargs)
 

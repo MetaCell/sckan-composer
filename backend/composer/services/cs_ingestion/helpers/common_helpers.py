@@ -8,6 +8,7 @@ ORIGINS = "origins"
 DESTINATIONS = "destinations"
 VIAS = "vias"
 LABEL = "label"
+PREF_LABEL = "pref_label"
 SENTENCE_NUMBER = 'sentence_number'
 ENTITY_URI = 'loc'
 TYPE = 'type'

@@ -547,6 +547,12 @@ export interface ConnectivityStatement {
      * @type {string}
      * @memberof ConnectivityStatement
      */
+    'curie_id'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatement
+     */
     'apinatomy_model'?: string | null;
     /**
      * 
@@ -1823,6 +1829,12 @@ export interface PatchedConnectivityStatement {
      * @memberof PatchedConnectivityStatement
      */
     'forward_connection'?: Array<number>;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'curie_id'?: string | null;
     /**
      * 
      * @type {string}
