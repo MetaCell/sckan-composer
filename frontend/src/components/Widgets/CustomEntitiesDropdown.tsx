@@ -268,54 +268,68 @@ export default function CustomEntitiesDropdown({
       .join(' ').includes(inputValue.toLowerCase());
   }
 
-  const handleSelectDeselectGroup = (group: string) => {
-    const newSelectedOptions = [...selectedOptions];
+  const handleSelectDeselectGroup = (group: string, action: "select" | "deselect") => {
     const groupOptions = autocompleteOptions.filter((option: Option) => option.group === group);
-    
-    // Check if all options in this group are already selected
-    const allSelectedInGroup = groupOptions.every(
-      (groupOption) => newSelectedOptions.some((selectedOption) => selectedOption.id === groupOption.id)
-    );
-    
-    if (allSelectedInGroup) {
-      // Deselect all options in this group
-      groupOptions.forEach((option) => {
-        const index = newSelectedOptions.findIndex((selected) => selected.id === option.id);
-        if (index !== -1) {
-          newSelectedOptions.splice(index, 1);
-        }
-      });
-    } else {
-      // Select all options in this group
+    let newSelectedOptions = [...selectedOptions];
+  
+    if (action === "deselect") {
+      newSelectedOptions = newSelectedOptions.filter(
+        (selected) => !groupOptions.some((groupOption) => groupOption.id === selected.id)
+      );
+    } else if (action === "select") {
       groupOptions.forEach((option) => {
         if (!newSelectedOptions.some((selected) => selected.id === option.id)) {
           newSelectedOptions.push(option);
         }
       });
     }
-    
+  
     handleSelectedOptionsChange(newSelectedOptions);
   };
   
+  
   const getGroupButton = (group: string) => {
-    const groupOptions = autocompleteOptions.filter((option: Option) => option.group === group);
-    const allSelectedInGroup = groupOptions.every(
-      (groupOption) => selectedOptions.some((selectedOption) => selectedOption.id === groupOption.id)
+    const groupOptions = autocompleteOptions.filter(
+      (option: Option) => option.group === group
     );
-    
+  
+    const selectedInGroup = groupOptions.filter((groupOption) =>
+      selectedOptions.some((selectedOption) => selectedOption.id === groupOption.id)
+    );
+  
+    const allSelectedInGroup = selectedInGroup.length === groupOptions.length;
+  
     return (
-      <Button
-        variant="text"
-        sx={{
-          color: darkBlue,
-          fontSize: "0.75rem",
-          fontWeight: 600,
-          lineHeight: "1.125rem",
-        }}
-        onClick={() => handleSelectDeselectGroup(group)}
-      >
-        {allSelectedInGroup ? `Deselect all` : `Select all`}
-      </Button>
+      <Stack direction="row">
+        {selectedInGroup.length > 0 && (
+          <Button
+            variant="text"
+            sx={{
+              color: darkBlue,
+              fontSize: "0.75rem",
+              fontWeight: 600,
+              lineHeight: "1.125rem",
+            }}
+            onClick={() => handleSelectDeselectGroup(group, "deselect")}
+          >
+            Deselect all
+          </Button>
+        )}
+        {!allSelectedInGroup && (
+          <Button
+            variant="text"
+            sx={{
+              color: darkBlue,
+              fontSize: "0.75rem",
+              fontWeight: 600,
+              lineHeight: "1.125rem",
+            }}
+            onClick={() => handleSelectDeselectGroup(group, "select")}
+          >
+            Select all
+          </Button>
+        )}
+      </Stack>
     );
   };
   
@@ -801,7 +815,7 @@ export default function CustomEntitiesDropdown({
                           },
                         }}
                       >
-                        {allOptions.length === selectedOptions.length ? (
+                        {selectedOptions.length > 0 ? (
                           <Button
                             disableRipple
                             startIcon={<PlaylistRemoveOutlinedIcon/>}
@@ -813,8 +827,8 @@ export default function CustomEntitiesDropdown({
                           >
                             Deselect all
                           </Button>
-                        ) : (
-                          <Button
+                        ) : null}
+                        <Button
                             disableRipple
                             startIcon={<PlaylistAddCheckOutlinedIcon/>}
                             variant="text"
@@ -825,7 +839,6 @@ export default function CustomEntitiesDropdown({
                           >
                             Select all
                           </Button>
-                        )}
                       </Box>
                     </>
                   ) : (
