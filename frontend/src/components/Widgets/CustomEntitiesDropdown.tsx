@@ -232,7 +232,6 @@ export default function CustomEntitiesDropdown({
   
   const [isLoading, setIsLoading] = useState(false);
   const [isFromLoading, setIsFromLoading] = useState(false);
-  const [, setAllOptions] = useState<Option[]>([]);
   
   const [hasValueChanged, setHasValueChanged] = useState(false);
   const areAllSelectedValuesFromTheAboveLayer = postProcessOptions && areConnectionsExplicit ? areConnectionsExplicit(id) : true
@@ -379,7 +378,6 @@ export default function CustomEntitiesDropdown({
         sortedOptions = applyPreLevelSort(sortedOptions, preLevelItems);
       }
       
-      setAllOptions(sortedOptions);
       setAutocompleteOptions(sortedOptions);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -410,7 +408,6 @@ export default function CustomEntitiesDropdown({
       ) {
         setAnchorEl(null);
         setInputValue("");
-        setAllOptions([]);
         refreshStatement();
         if (hasValueChanged) {
           setHasValueChanged(false);
