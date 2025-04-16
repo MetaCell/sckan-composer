@@ -232,7 +232,7 @@ export default function CustomEntitiesDropdown({
   
   const [isLoading, setIsLoading] = useState(false);
   const [isFromLoading, setIsFromLoading] = useState(false);
-  const [allOptions, setAllOptions] = useState<Option[]>([]);
+  const [, setAllOptions] = useState<Option[]>([]);
   
   const [hasValueChanged, setHasValueChanged] = useState(false);
   const areAllSelectedValuesFromTheAboveLayer = postProcessOptions && areConnectionsExplicit ? areConnectionsExplicit(id) : true
