@@ -130,9 +130,12 @@ const Sidebar = () => {
             )}
           </MenuList>
         </Box>
-        <Typography variant="caption" component="p"
-          mb={1.5} color="#D0D5DD" mx={'auto'}
-        >
+        <Typography variant="caption" component="p" mb={1.5} color="#D0D5DD" mx={'auto'}>
+          <a href="https://forms.gle/4YUjMa5Hx2KPzM8i6" target="_blank" rel="noopener noreferrer" style={{ color: '#D0D5DD', textDecoration: 'none' }}>
+          Provide your feedback using this form.
+          </a>
+        </Typography>
+        <Typography variant="caption" component="p"mb={1.5} color="#D0D5DD" mx={'auto'}>
           SCKAN Composer version: {sckanComposerVersion}
         </Typography>
       </Box>
