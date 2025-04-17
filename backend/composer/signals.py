@@ -217,10 +217,21 @@ def sentence_and_cs_tags_changed(sender, instance, action, **kwargs):
 @receiver(post_save, sender=Note, dispatch_uid="note_post_save")
 @receiver(post_delete, sender=Note, dispatch_uid="note_post_delete")
 def note_post_save_and_delete(sender, instance, **kwargs):
-    if instance.sentence:
-        update_modified_date(instance.sentence)
-    if instance.connectivity_statement:
-        update_modified_date(instance.connectivity_statement)
+    try:
+        sentence = instance.sentence
+    except Sentence.DoesNotExist:
+        sentence = None
+
+    if sentence:
+        update_modified_date(sentence)
+    try:
+        cs = instance.connectivity_statement
+    except ConnectivityStatement.DoesNotExist:
+        cs = None
+
+    if cs:
+        update_modified_date(cs)
+
 
 
 @receiver(
