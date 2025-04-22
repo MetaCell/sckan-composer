@@ -130,14 +130,33 @@ const Sidebar = () => {
             )}
           </MenuList>
         </Box>
-        <Typography variant="caption" component="p" mb={1.5} color="#D0D5DD" mx={'auto'}>
-          <a href="https://forms.gle/4YUjMa5Hx2KPzM8i6" target="_blank" rel="noopener noreferrer" style={{ color: '#D0D5DD', textDecoration: 'none' }}>
-          Provide your feedback using this form.
-          </a>
-        </Typography>
-        <Typography variant="caption" component="p"mb={1.5} color="#D0D5DD" mx={'auto'}>
-          SCKAN Composer version: {sckanComposerVersion}
-        </Typography>
+        <Box>
+          <Typography
+            variant="subtitle1"
+            component="p"
+            color="#FFF"
+            mb={3}
+            mx={'auto'}
+            sx={{
+              display: 'inline-block',
+              padding: '4px 8px',
+              textAlign: 'center',
+              textDecoration: 'none',
+              cursor: 'pointer',
+              transition: 'background-color 0.3s',
+              '&:hover': {
+                backgroundColor: '#475467', // Hover effect
+              },
+            }}
+          >
+            <a href="https://forms.gle/4YUjMa5Hx2KPzM8i6" target="_blank" rel="noopener noreferrer" style={{ color: '#D0D5DD', textDecoration: 'none' }}>
+              Provide your feedback using this form.
+            </a>
+          </Typography>
+          <Typography variant="caption" component="p" mb={1.5} color="#D0D5DD" mx={'auto'} sx={{ textAlign: "center" }}>
+            SCKAN Composer version: {sckanComposerVersion}
+          </Typography>
+        </Box>
       </Box>
     </Drawer>
     <ConfirmationDialog
