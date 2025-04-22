@@ -54,7 +54,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "puppeteer_test": "./node_modules/.bin/jest smoke.test.js && ./node_modules/.bin/jest e2eFlow_addSentence.test.js  && ./node_modules/.bin/jest e2eFlow_StatementDetails.test.js && ./node_modules/.bin/jest e2eFlow_StatementProofing.test.js --bail=1",
+    "puppeteer_test": " ./node_modules/.bin/jest e2eFlow_addSentence.test.js  && ./node_modules/.bin/jest e2eFlow_StatementDetails.test.js && ./node_modules/.bin/jest e2eFlow_StatementProofing.test.js --bail=1",
     "smoke_test": "./node_modules/.bin/jest smoke.test.js --bail=1",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --ext ts,tsx --fix"

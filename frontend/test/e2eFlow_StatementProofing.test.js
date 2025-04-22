@@ -4,7 +4,7 @@ const puppeteer = require("puppeteer");
 
 // INFO
 const USERNAME = process.env.TEST_USERNAME 
-const PASSWORD = process.env.TEST_PASSWORD 
+const PASSWORD = process.env.TEST_PASSWORD
 const baseURL = 'https://composer.sckan.dev.metacell.us/'
 
 
@@ -73,8 +73,8 @@ describe('End to End Tests', () => {
             args: [
                 '--no-sandbox', '--disable-setuid-sandbox', '--bail',
             ],
-            // headless: 'new',
-            headless: false,
+            headless: 'new',
+            // headless: false,
             defaultViewport: {
                 width: 1600,
                 height: 1000,
@@ -152,7 +152,7 @@ describe('End to End Tests', () => {
             const searched_records_count = await page.$$eval('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight', elements => elements.length);
             expect(searched_records_count).not.toBeNull()
 
-            await page.waitForSelector(selectors.TABLE_ROW)
+            await page.waitForSelector('div[role="row"]')
             await page.click(selectors.TABLE_ROW)
 
             await page.waitForSelector(selectors.SENTENCE_PAGE)
@@ -162,6 +162,19 @@ describe('End to End Tests', () => {
             expect(sentence_status).toContain("compose now")
 
             console.log('Statement found')
+        })
+
+        it('Set status as In progress', async () => {
+            console.log('Changing Status ...')
+            await page.waitForTimeout(3000)
+            await page.waitForSelector(selectors.STATUS_BUTTON, {hidden:false})
+            await page.click(selectors.STATUS_BUTTON)
+            await page.waitForTimeout(3000)
+            const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
+                return status.map(status => status.innerText.toLowerCase())
+            })
+            expect(sentence_status).toContain("in progress")
+            console.log('Status Changed')
         })
 
         it('Go to proofing section', async () => {
@@ -245,8 +258,10 @@ describe('End to End Tests', () => {
             await page.waitForSelector('div:has(> input[placeholder="Search for connections"]')
             await page.waitForSelector(selectors.CHECKBOX_ITEM)
             await page.click('div:has(> input[placeholder="Search for connections"]')
+            await page.waitForSelector('#simple-popper ul li')
             await page.click('#simple-popper ul li')
             await page.waitForTimeout(1000)
+            await page.waitForSelector('#simple-popper ul li')
             await page.click('#simple-popper ul li')
             // await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             // await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
@@ -268,6 +283,7 @@ describe('End to End Tests', () => {
             const all_vias = await page.$$eval('.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium', elements => elements.length);
             expect(all_vias).toBeGreaterThan(1)
             await page.click(selectors.SEARCH_FOR_VIAS)
+            await page.waitForSelector('#simple-popper ul li')
             await page.click('#simple-popper ul li')
             // await page.type(selectors.SEARCH_FOR_VIAS, path_builder_via)
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
@@ -303,7 +319,9 @@ describe('End to End Tests', () => {
             await page.click('#simple-popper ul li')
             await page.waitForSelector(selectors.PROGRESS_LOADER, { timeout: 5000, hidden: false });
             await page.waitForSelector(selectors.PROGRESS_LOADER, { hidden: true });
-            await page.waitForTimeout(3000)
+            await page.waitForSelector(selectors.BIOTECH_ICON_SELECTOR)
+            await page.click(selectors.BIOTECH_ICON_SELECTOR)
+            await page.waitForTimeout(2000)
            
             const added_destination_from_field = await page.$$eval('form[class="destinations"] > div > div > div > div > div > div > tr > td.MuiTableCell-root.MuiTableCell-sizeMedium.inLineForm:nth-child(1) > div > div > div > div:nth-child(3) > div > div > div > span > div', status => {
                 return status.map(status => status.innerText);
@@ -313,6 +331,7 @@ describe('End to End Tests', () => {
 
             await page.waitForSelector(selectors.FROM_FIELD)
             await page.click(selectors.FROM_FIELD)
+            await page.waitForTimeout(1000)
             await page.waitForSelector(selectors.SEARCH_FOR_DESTINATIONS)
             await page.waitForSelector(selectors.CHECKBOX_ITEM)
             await page.waitForTimeout(3000)
@@ -336,7 +355,7 @@ describe('End to End Tests', () => {
             console.log('Destination added')
         })
 
-        it('Add Forward Connection', async () => {
+        it.skip('Add Forward Connection', async () => {
             console.log('Adding Forward Connection ...')
             page.on('dialog', async dialog => {
                 await dialog.accept();

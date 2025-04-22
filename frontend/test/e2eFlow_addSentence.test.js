@@ -73,8 +73,8 @@ describe('End to End Tests', () => {
             args: [
                 '--no-sandbox', '--disable-setuid-sandbox', '--bail',
             ],
-            // headless: 'new',
-            headless: false,
+            headless: 'new',
+            // headless: false,
             defaultViewport: {
                 width: 1600,
                 height: 1000,

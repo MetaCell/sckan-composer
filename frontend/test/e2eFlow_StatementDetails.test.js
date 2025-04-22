@@ -3,8 +3,8 @@ const selectors = require('./selectors');
 const puppeteer = require("puppeteer");
 
 // INFO
-const USERNAME = process.env.TEST_USERNAME
-const PASSWORD = process.env.TEST_PASSWORD
+const USERNAME = process.env.TEST_USERNAME 
+const PASSWORD = process.env.TEST_PASSWORD 
 const baseURL = 'https://composer.sckan.dev.metacell.us/'
 
 
@@ -73,8 +73,8 @@ describe('End to End Tests', () => {
             args: [
                 '--no-sandbox', '--disable-setuid-sandbox', '--bail',
             ],
-            // headless: 'new',
-            headless: false,
+            headless: 'new',
+            // headless: false,
             defaultViewport: {
                 width: 1600,
                 height: 1000,
@@ -152,7 +152,7 @@ describe('End to End Tests', () => {
             const searched_records_count = await page.$$eval('.MuiDataGrid-row.MuiDataGrid-row--dynamicHeight', elements => elements.length);
             expect(searched_records_count).not.toBeNull()
 
-            await page.waitForSelector(selectors.TABLE_ROW)
+            await page.waitForSelector('div[role="row"]')
             await page.click(selectors.TABLE_ROW)
 
             await page.waitForSelector(selectors.SENTENCE_PAGE)
@@ -225,19 +225,6 @@ describe('End to End Tests', () => {
             expect(AlertTextContent).not.toBe('');
 
             console.log('Alert added')
-        })
-
-        it('Set status as In progress', async () => {
-            console.log('Changing Status ...')
-            await page.waitForTimeout(3000)
-            await page.waitForSelector(selectors.STATUS_BUTTON, {hidden:false})
-            await page.click(selectors.STATUS_BUTTON)
-            await page.waitForTimeout(3000)
-            const sentence_status = await page.$$eval('span.MuiChip-label.MuiChip-labelSmall', status => {
-                return status.map(status => status.innerText.toLowerCase())
-            })
-            expect(sentence_status).toContain("in progress")
-            console.log('Status Changed')
         })
         
     })

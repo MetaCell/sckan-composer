@@ -3,8 +3,8 @@ const selectors = require('./selectors');
 const puppeteer = require("puppeteer");
 
 // INFO
-const USERNAME = process.env.TEST_USERNAME 
-const PASSWORD = process.env.TEST_PASSWORD
+const USERNAME = process.env.TEST_USERNAME
+const PASSWORD = process.env.TEST_PASSWORD 
 const baseURL = 'https://composer.sckan.dev.metacell.us/'
 
 
@@ -73,8 +73,8 @@ describe('End to End Tests', () => {
             args: [
                 '--no-sandbox', '--disable-setuid-sandbox', '--bail',
             ],
-            // headless: 'new',
-            headless: false,
+            headless: 'new',
+            // headless: false,
             defaultViewport: {
                 width: 1600,
                 height: 1000,
