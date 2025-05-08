@@ -237,7 +237,11 @@ export const ViaNodeWidget: React.FC<ViaNodeProps> = ({ model, engine }) => {
                             {model.getOptions().uri}
                         </Typography>
                         <Chip
-                            label={model.getOptions().anatomicalType === ViaTypeEnum.Axon ? "Axon" : "Dendrite"}
+                            label={
+                                model.getOptions().anatomicalType === ViaTypeEnum.Axon
+                                    ? "Axon" : model.getOptions().anatomicalType === ViaTypeEnum.Dendrite
+                                        ? "Dendrite" : "Axon to PNS"
+                            }
                             variant="filled"
                             sx={{
                                 background: "#F2F2FC",

@@ -36,3 +36,12 @@ def is_valid_population_name(name):
         raise ValidationError(
             "Name must be between 5 and 15 characters, start with a letter, and contain only letters and numbers."
         )
+
+
+def generate_connectivity_statement_curie_id_for_composer_statements(statement):
+    """
+    Generate a short name for a connectivity statement based on its population and index.
+    """
+    if statement.population:
+        return f"neuron type {statement.population.name} {statement.population_index}"
+    return None

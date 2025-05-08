@@ -88,7 +88,7 @@ class MinimalUserSerializer(serializers.ModelSerializer):
 
     def get_full_name(self, obj):
         return obj.get_full_name()
-    
+
 class ProfileSerializer(serializers.ModelSerializer):
     """Profile"""
 
@@ -714,7 +714,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             del self.context['journey']
 
         return representation
-    
+
     def update(self, instance, validated_data):
         # Remove 'via_set' and 'destinations' from validated_data if they exist
         validated_data.pop('via_set', None)
@@ -752,6 +752,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             "population",
             "has_statement_been_exported",
             "forward_connection",
+            "curie_id",
             "apinatomy_model",
             "additional_information",
             "modified_date",
@@ -989,6 +990,6 @@ class AssignPopulationSetSerializer(BulkActionSerializer):
                 "action": f"For this serializer, action must be '{BulkActionType.ASSIGN_POPULATION_SET.value}'."
             })
         return data
-    
+
 class BulkActionResponseSerializer(serializers.Serializer):
     updated_count = serializers.IntegerField()
