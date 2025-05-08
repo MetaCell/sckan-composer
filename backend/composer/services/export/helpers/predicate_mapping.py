@@ -54,7 +54,7 @@ class ExportRelationships(IExportRelationship, Enum):
     hasAnatomicalSystemPhenotype = (
         "hasAnatomicalSystemPhenotype",
         "Phenotype",
-        "http://uri.interlex.org/tgbugs/uris/readable/hasPhenotype",
+        "http://uri.interlex.org/tgbugs/uris/readable/hasAnatomicalSystemPhenotype",
     )
     hasFunctionalCircuitRolePhenotype = (
         "hasFunctionalCircuitRolePhenotype",
