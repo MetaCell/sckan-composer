@@ -441,7 +441,7 @@ describe('End to End Tests', () => {
             await page.waitForSelector(selectors.STATUS_BUTTON, {hidden:false})
             await page.waitForSelector('button[aria-label="select merge strategy"]', {hidden:false})
             await page.click('button[aria-label="select merge strategy"]')
-            await page.waitForSelector('#split-button-menu', {hidden:false})
+            await page.waitForSelector('button[aria-label="select merge strategy"][aria-expanded="true"]', {hidden:false})
             await page.keyboard.press('ArrowDown');
             await page.keyboard.press('Enter')
             await page.waitForTimeout(1000)
