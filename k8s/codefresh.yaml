@@ -46,8 +46,8 @@ steps:
     environment:
       - KUBECONTEXT=${{CLUSTER}}
       - KUBERNETES_NAMESPACE=${{NAMESPACE}}
-  slackNotify:
-    image: byrnedo/alpine-curl
-    stage: notify
-    commands:
-      - "curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"= ${CLUSTER} = Deployed ${CF_BRANCH}\\\"}\" ${{SLACK_WEBHOOK}}"
+  # slackNotify:
+  #   image: byrnedo/alpine-curl
+  #   stage: notify
+  #   commands:
+  #     - "curl -X POST -H 'Content-type: application/json' --data \"{\\\"text\\\":\\\"= ${CLUSTER} = Deployed ${CF_BRANCH}\\\"}\" ${{SLACK_WEBHOOK}}"
