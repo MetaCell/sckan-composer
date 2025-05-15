@@ -602,7 +602,6 @@ class StatementAlertSerializer(serializers.ModelSerializer):
 
         data['connectivity_statement_id'] = connectivity_statement_id
 
-
         # Get 'alert_type' from data or instance
         alert_type = data.get('alert_type') or getattr(self.instance, 'alert_type', None)
         if not alert_type:
@@ -626,7 +625,7 @@ class StatementAlertSerializer(serializers.ModelSerializer):
             })
 
         return data
-    
+
     def create(self, validated_data):
         request = self.context.get("request")
         user = request.user if request else None
@@ -638,6 +637,25 @@ class StatementAlertSerializer(serializers.ModelSerializer):
         user = request.user if request else None
         validated_data["saved_by"] = user
         return super().update(instance, validated_data)
+
+
+class KSStatementAlertSerializer(StatementAlertSerializer):
+    alert = serializers.CharField(source="alert_type.name", read_only=True)
+
+    class Meta:
+        model = StatementAlert
+        fields = (
+            "id",
+            "alert",
+            "alert_type",
+            "text",
+            "saved_by",
+            "created_at",
+            "updated_at",
+            "connectivity_statement_id",
+        )
+        read_only_fields = ("created_at", "updated_at", "saved_by")
+        validators = []
 
 
 class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
@@ -884,6 +902,10 @@ class ConnectivityStatementUpdateSerializer(ConnectivityStatementSerializer):
 
 class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
     """Knowledge Statement"""
+    state = serializers.CharField(read_only=True)
+    statement_alerts = KSStatementAlertSerializer(
+        many=True, read_only=False, required=False
+    )
 
     def to_representation(self, instance):
         representation = super(ConnectivityStatementSerializer, self).to_representation(instance)
@@ -923,7 +945,18 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
             "sex",
             "apinatomy_model",
             "statement_preview",
+            "curie_id",
+            "population",
+            "state",
+            "statement_alerts",
         )
+
+    def get_state(self, instance):
+        """
+        Get the state of the instance.
+        """
+        return instance.state.name if instance.state else None
+
 
 class BulkActionSerializer(serializers.Serializer):
     action = serializers.ChoiceField(

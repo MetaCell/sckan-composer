@@ -14,7 +14,7 @@ from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Case, When, Value, IntegerField
 from composer.services import bulk_service
-from composer.enums import BulkActionType
+from composer.enums import BulkActionType, CSState
 from composer.services.state_services import (
     ConnectivityStatementStateService,
     SentenceStateService,
@@ -426,7 +426,6 @@ class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = AnatomicalEntityFilter
 
 
-
 class PhenotypeViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Phenotype
@@ -596,7 +595,9 @@ class KnowledgeStatementViewSet(
     """
 
     model = ConnectivityStatement
-    queryset = ConnectivityStatement.objects.exported()
+    queryset = ConnectivityStatement.objects.filter(
+        state__in=[CSState.NPO_APPROVED, CSState.EXPORTED]
+    )
     serializer_class = KnowledgeStatementSerializer
     permission_classes = [
         permissions.AllowAny,
@@ -612,7 +613,8 @@ class KnowledgeStatementViewSet(
         return KnowledgeStatementSerializer
 
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        response = super().list(request, *args, **kwargs)
+        return response
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):

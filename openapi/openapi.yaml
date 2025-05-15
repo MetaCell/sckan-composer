@@ -3376,6 +3376,39 @@ components:
           additionalProperties: {}
       required:
       - serialized_graph
+    KSStatementAlert:
+      type: object
+      properties:
+        id:
+          type: integer
+        alert:
+          type: string
+          readOnly: true
+        alert_type:
+          type: integer
+        text:
+          type: string
+        saved_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        connectivity_statement_id:
+          type: integer
+      required:
+      - alert
+      - alert_type
+      - connectivity_statement_id
+      - created_at
+      - saved_by
+      - updated_at
     KnowledgeStatement:
       type: object
       description: Knowledge Statement
@@ -3455,12 +3488,29 @@ components:
         statement_preview:
           type: string
           readOnly: true
+        curie_id:
+          type: string
+          nullable: true
+          maxLength: 500
+        population:
+          allOf:
+          - $ref: '#/components/schemas/PopulationSet'
+          readOnly: true
+        state:
+          type: string
+          readOnly: true
+        statement_alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/KSStatementAlert'
       required:
       - entities_journey
       - id
       - journey
       - phenotype
+      - population
       - sex
+      - state
       - statement_preview
     LateralityEnum:
       enum:
