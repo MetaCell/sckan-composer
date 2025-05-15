@@ -951,6 +951,61 @@ export interface GraphState {
     'serialized_graph': { [key: string]: any; };
 }
 /**
+ * 
+ * @export
+ * @interface KSStatementAlert
+ */
+export interface KSStatementAlert {
+    /**
+     * 
+     * @type {number}
+     * @memberof KSStatementAlert
+     */
+    'id'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof KSStatementAlert
+     */
+    'alert': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof KSStatementAlert
+     */
+    'alert_type': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof KSStatementAlert
+     */
+    'text'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof KSStatementAlert
+     */
+    'saved_by': number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof KSStatementAlert
+     */
+    'created_at': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof KSStatementAlert
+     */
+    'updated_at': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof KSStatementAlert
+     */
+    'connectivity_statement_id': number;
+}
+/**
  * Knowledge Statement
  * @export
  * @interface KnowledgeStatement
@@ -1070,6 +1125,30 @@ export interface KnowledgeStatement {
      * @memberof KnowledgeStatement
      */
     'statement_preview': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof KnowledgeStatement
+     */
+    'curie_id'?: string | null;
+    /**
+     * 
+     * @type {PopulationSet}
+     * @memberof KnowledgeStatement
+     */
+    'population': PopulationSet;
+    /**
+     * 
+     * @type {string}
+     * @memberof KnowledgeStatement
+     */
+    'state': string;
+    /**
+     * 
+     * @type {Array<KSStatementAlert>}
+     * @memberof KnowledgeStatement
+     */
+    'statement_alerts'?: Array<KSStatementAlert>;
 }
 /**
  * 
