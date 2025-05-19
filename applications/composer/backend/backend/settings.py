@@ -24,10 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-6dns-bbp&433ugro&j+z6p-w943$uhsax%f1245@7vfo3eyuw2"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-PRODUCTION = os.environ.get("PRODUCTION", "False").lower() in ("true", "1")
-USE_PG = os.environ.get("USE_PG", "False").lower() in ("true", "1")
-TESTING = os.environ.get("TESTING", "False").lower() in ("true", "1")
-DEBUG = os.environ.get("DEBUG", str(not PRODUCTION)).lower() in ("true", "1")
+PRODUCTION = os.environ.get("PRODUCTION", "").lower() == "true"
+DEBUG = False if PRODUCTION else True
 
 ALLOWED_HOSTS = [
     "*",
@@ -50,7 +48,6 @@ INSTALLED_APPS = [
     #
     # local apps
     "metacell_auth",
-    "composer",
     #
     # 3rd party apps
     "jazzmin",
@@ -104,35 +101,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "backend.wsgi.application"
 
-
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-if TESTING:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.path.join(BASE_DIR, "persistent", "test_db.sqlite3"),
-        }
-    }
-elif PRODUCTION or USE_PG:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("DB_NAME"),
-            "USER": os.environ.get("DB_USER"),
-            "PASSWORD": os.environ.get("DB_PASSWORD"),
-            "HOST": os.environ.get("DB_HOST"),
-            "PORT": os.environ.get("DB_PORT"),
-        }
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.path.join(BASE_DIR, "persistent", "db.sqlite3"),
-        }
-    }
-
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -163,23 +131,63 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(
-    BASE_DIR,
-    "static",
-)
-# STATICFILES_DIRS = [
-#     BASE_DIR / "static",
-# ]
-
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+PROJECT_NAME = "composer".upper()
+
+# Persistent storage
+PERSISTENT_ROOT = os.path.join(BASE_DIR, "persistent")
+
+# ***********************************************************************
+# * composer settings
+# ***********************************************************************
+from cloudharness.applications import get_configuration  # noqa E402
+from cloudharness.utils.config import ALLVALUES_PATH, CloudharnessConfig  # noqa E402
+
+# ***********************************************************************
+# * import base CloudHarness Django settings
+# ***********************************************************************
+from cloudharness_django.settings import *  # noqa E402
+
+INSTALLED_APPS += [
+    "composer",
+]
+
+
+# override django admin base template with a local template
+# to add some custom styling
+TEMPLATES[0]["DIRS"] = [BASE_DIR / "templates"]
+
+# Static files (CSS, JavaScript, Images)
+MEDIA_ROOT = PERSISTENT_ROOT
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+MEDIA_URL = "/media/"
+STATIC_URL = "/static/"
+
+# KC Client & roles
+KC_CLIENT_NAME = PROJECT_NAME.lower()
+
+# composer specific roles
+
+# Default KC roles
+KC_ADMIN_ROLE = f"{KC_CLIENT_NAME}-administrator"  # admin user
+KC_MANAGER_ROLE = f"{KC_CLIENT_NAME}-manager"  # manager user
+KC_USER_ROLE = f"{KC_CLIENT_NAME}-user"  # customer user
+KC_ALL_ROLES = [
+    KC_ADMIN_ROLE,
+    KC_MANAGER_ROLE,
+    KC_USER_ROLE,
+]
+KC_PRIVILEGED_ROLES = [
+    KC_ADMIN_ROLE,
+    KC_MANAGER_ROLE,
+]
+
+KC_DEFAULT_USER_ROLE = None  # don't add the user role to the realm default role
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
 

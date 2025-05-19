@@ -1,0 +1,8 @@
+harness:
+  secured: false
+  uri_role_mapping:
+    - uri: /*
+      roles: [ ]
+  envmap:
+    PRODUCTION: False
+    HTTPS: True
