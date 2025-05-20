@@ -160,7 +160,7 @@ INSTALLED_APPS += [
 
 # override django admin base template with a local template
 # to add some custom styling
-TEMPLATES[0]["DIRS"] = [BASE_DIR / "templates"]
+TEMPLATES[0]["DIRS"] = [BASE_DIR / "composer" / "templates"]
 
 # Static files (CSS, JavaScript, Images)
 MEDIA_ROOT = PERSISTENT_ROOT
