@@ -1,14 +1,27 @@
 harness:
-  database: {auto: true, type: postgres, size: 10Gi}
+  database: { auto: true, type: postgres, size: 10Gi }
   dependencies:
     build: [cloudharness-frontend-build, cloudharness-django]
+    soft: [workflows]
     hard: [accounts, events]
-  deployment: {auto: true, port: 80}
+  deployment:
+    auto: true
+    port: 80
+    volume:
+      mountpath: /usr/src/app/persistent
+      name: composer-data
+      auto: true
+      size: 5Gi
+      usenfs: false
   secured: false
-  service: {auto: true, port: 80}
+  service: { auto: true, port: 80 }
   subdomain: www
   uri_role_mapping:
-  - require-any-role: true
-    roles: ['composer:composer-administrator', 'composer:composer-manager',
-      'composer:composer-user']
-    uri: /*
+    - require-any-role: true
+      roles:
+        [
+          "composer:composer-administrator",
+          "composer:composer-manager",
+          "composer:composer-user",
+        ]
+      uri: /*
