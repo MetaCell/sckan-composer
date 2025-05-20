@@ -2,7 +2,6 @@ import sys
 import logging
 import smtplib
 from email.message import EmailMessage
-import time
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
@@ -29,5 +28,3 @@ try:
     logging.info(f"[EMAIL] Sent notification to {recipient}")
 except Exception as e:
     logging.exception(f"[EMAIL] Failed to send notification to {recipient}: {e}")
-
-time.sleep(120)

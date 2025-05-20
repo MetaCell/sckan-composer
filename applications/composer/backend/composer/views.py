@@ -47,11 +47,5 @@ def export(request):
         return HttpResponse('Unauthorized', status=401)
 
     run_export_workflow(username=request.user.username)
-    from django.contrib import messages
-    messages.add_message(
-        request,
-        messages.INFO,
-        "Export process started. You will receive an email when the process is complete."
-    )
-
+    
     return HttpResponse("Export started", status=202)
