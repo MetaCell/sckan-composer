@@ -1,47 +1,59 @@
+import json
 from django.conf import settings
+from django.contrib.auth.models import User
+from datetime import datetime
 
 
 def get_volume_directory(current_app) -> str:
     return f"{current_app.harness.deployment.volume.name}:{settings.MEDIA_ROOT}"
 
 
-def run_export_workflow(username):
+def run_export_workflow(user: User):
     from cloudharness.workflows import tasks, operations
     from cloudharness.applications import get_current_configuration
+    from cloudharness.utils.config import CloudharnessConfig
 
     current_app = get_current_configuration()
+    domain = CloudharnessConfig.get_domain()
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    filepath = f"{settings.MEDIA_ROOT}/exports/{user.username}-{timestamp}.csv"
+    file_url = f"{domain}/{settings.MEDIA_URL}/exports/{user.username}-{timestamp}.csv"
 
     # Main export task
     export_task = tasks.CustomTask(
         name="export-task",
         image_name="composer",
         command=[
-            "python", "manage.py", "test_workflows",
-            f"--username={username}",
-            f"--folder={settings.MEDIA_ROOT}"
-        ]
+            "python",
+            "manage.py",
+            "export_csv",
+            f"--user_id={user.id}",
+            f"--filepath={filepath}",
+        ],
     )
 
     # on-exit notify task
     on_exit_notify = {
         "image": "composer-notify",
-        'queue': "default", # not needed but required by cloudharness
-        'payload': f'{username}', # not needed but required by cloudharness
-        'command': ['python', 'notify.py', username]
+        "queue": "default",  # not needed but required by cloudharness
+        "payload": json.dumps(
+            {
+                "file_url": file_url,
+                "email": user.email,
+            }
+        ),
+        "command": ["python", "notify.py"],
     }
-
-    ttl_strategy={
-    'secondsAfterCompletion': 3600,        # keep for 1 hour
-    'secondsAfterSuccess': 600,            # 10 mins
-    'secondsAfterFailure': 3600
-}
 
     op = operations.PipelineOperation(
         basename="export-op",
-        tasks=[export_task,],
+        tasks=[
+            export_task,
+        ],
         shared_directory=get_volume_directory(current_app),
         on_exit_notify=on_exit_notify,
-        ttl_strategy=ttl_strategy,
     )
 
     op.execute()

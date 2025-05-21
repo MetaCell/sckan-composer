@@ -44,11 +44,10 @@
                                     url: '/composer/export',
                                     method: 'GET',
                                     success: function (data, textStatus, request) {
-                                        alert("Export has started. You will receive an email when it is complete.");
+                                        window.location.reload();
                                     },
                                     error: function (e) {
-                                        alert("Failed to start export. Please try again.");
-                                        console.log(e);
+                                        window.location.reload();
                                     },
                                     complete: function () {
                                         jQuery('#spinner').hide();
