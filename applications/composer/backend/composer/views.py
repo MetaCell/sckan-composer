@@ -45,7 +45,7 @@ def export(request):
         messages.error(request, "Export failed: your account does not have an email address configured.")
         return HttpResponse("Missing user email", status=400)
 
-    run_export_workflow(user=user)
+    run_export_workflow(user=user, scheme=request.scheme)
 
     messages.success(request, "Export process started. You will receive an email when it is complete.")
     return HttpResponse("Export started", status=202)

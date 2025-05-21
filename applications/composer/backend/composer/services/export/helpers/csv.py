@@ -10,7 +10,7 @@ from django.utils import timezone
 
 from composer.services.export.helpers.rows import Row, get_rows
 from composer.services.export.helpers.utils import escape_newlines
-from composer.enums import NoteType
+from composer.enums import CSState, NoteType
 from composer.models import (
     Tag,
     ConnectivityStatement,
@@ -22,18 +22,37 @@ from version import VERSION
 HAS_NERVE_BRANCHES_TAG = "Has nerve branches"
 
 
-def create_csv(export_batch, folder_path: typing.Optional[str] = None) -> str:
-    if folder_path is None:
+def create_csv(export_batch, output_path: typing.Optional[str] = None) -> str:
+    if output_path is None:
         folder_path = tempfile.gettempdir()
+        now = timezone.now()
+        filename = f'export_v{str(VERSION).replace(".", "-")}_{now.strftime("%Y-%m-%d_%H-%M-%S")}.csv'
+        output_path = os.path.join(folder_path, filename)
 
-    now = timezone.now()
-    filename = f'export_v{str(VERSION).replace(".", "-")}_{now.strftime("%Y-%m-%d_%H-%M-%S")}.csv'
-    filepath = os.path.join(folder_path, filename)
-    create_dir_if_not_exists(folder_path)
+    create_dir_if_not_exists(os.path.dirname(output_path))
 
     csv_attributes_mapping = generate_csv_attributes_mapping()
 
-    # Prefetch related data with filters
+    batch_ids = list(export_batch.connectivity_statements.values_list("id", flat=True))
+
+    batch_qs = get_export_queryset(
+        ConnectivityStatement.objects.filter(id__in=batch_ids)
+    )
+
+    other_qs = get_export_queryset(
+        ConnectivityStatement.objects.exclude(id__in=batch_ids)
+    )
+    with open(output_path, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        headers = csv_attributes_mapping.keys()
+        writer.writerow(headers)
+
+        write_statements_to_csv(writer, batch_qs, csv_attributes_mapping, "batch")
+        write_statements_to_csv(writer, other_qs, csv_attributes_mapping, "rest")
+
+    return output_path
+
+def get_export_queryset(base_qs):
     notes_prefetch = Prefetch(
         "notes",
         queryset=Note.objects.filter(type__in=[NoteType.PLAIN, NoteType.DIFFERENT]),
@@ -48,7 +67,7 @@ def create_csv(export_batch, folder_path: typing.Optional[str] = None) -> str:
         "tags", queryset=Tag.objects.all(), to_attr="prefetched_tags"
     )
 
-    connectivity_statements = export_batch.connectivity_statements.select_related(
+    return base_qs.select_related(
         "sentence", "sex", "functional_circuit_role", "projection_phenotype"
     ).prefetch_related(
         "origins",
@@ -64,31 +83,22 @@ def create_csv(export_batch, folder_path: typing.Optional[str] = None) -> str:
         "destinations__from_entities",
     )
 
-    with open(filepath, "w", newline="") as csvfile:
-        writer = csv.writer(csvfile)
-        headers = csv_attributes_mapping.keys()
-        writer.writerow(headers)
+def write_statements_to_csv(writer, queryset, csv_attributes_mapping, group_name):
+    for cs in queryset:
+        try:
+            rows = get_rows(cs)
+        except Exception as e:
+            logging.warning(f"[{group_name}] CS {cs.id} skipped due to error: {e}")
+            continue
 
-        for cs in connectivity_statements:
+        for row in rows:
             try:
-                rows = get_rows(cs)
+                row_content = [
+                    func(cs, row) for func in csv_attributes_mapping.values()
+                ]
+                writer.writerow(row_content)
             except Exception as e:
-                logging.warning(
-                    f"Connectivity Statement with id {cs.id} skipped due to {e}"
-                )
-                continue
-            for row in rows:
-                try:
-                    row_content = [
-                        func(cs, row) for func in csv_attributes_mapping.values()
-                    ]
-                    writer.writerow(row_content)
-                except Exception as e:
-                    logging.warning(
-                        f"Connectivity Statement with id {cs.id} skipped due to {e}"
-                    )
-
-    return filepath
+                logging.warning(f"[{group_name}] Row for CS {cs.id} skipped due to: {e}")
 
 
 def generate_csv_attributes_mapping() -> Dict[str, Callable]:
@@ -112,6 +122,7 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
         "Proposed action": get_proposed_action,
         "Added to SCKAN (time stamp)": get_added_to_sckan_timestamp,
         "Sentence Number": get_sentence_number,
+        "Statement State": get_statement_state,
         "NLP-ID": get_nlp_id,
         "Neuron population label (A to B via C)": get_neuron_population_label,
     }
@@ -181,6 +192,10 @@ def get_tag_filter(tag_name):
         return any(tag.tag == tag_name for tag in cs.prefetched_tags)
 
     return tag_filter
+
+
+def get_statement_state(cs: ConnectivityStatement, row: Row) -> str:
+    return cs.state
 
 
 # Different between rows

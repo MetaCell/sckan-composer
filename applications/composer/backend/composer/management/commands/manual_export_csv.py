@@ -14,9 +14,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--folder", type=str, help="Folder to store CSV file",
-        )
-        parser.add_argument(
             "--state", type=str, default=CSState.NPO_APPROVED, help=f"Export only statements with this state, default={CSState.NPO_APPROVED}",
         )
         parser.add_argument(
@@ -27,16 +24,15 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        folder: str = options.get("folder", None)
         batch_id = options.get("batch_id", None)
         export_filename = ""
         if batch_id:
             export_batch = ExportBatch.objects.get(id=batch_id)
-            export_filename = create_csv(export_batch, folder_path=folder)
+            export_filename = create_csv(export_batch)
         else:
             state = options.get("state", CSState.NPO_APPROVED)
             username = options.get("username", None)
             user = User.objects.get(username=username)
             qs = ConnectivityStatement.objects.filter(state=state)
-            export_filename, _ = export_connectivity_statements(qs=qs, user=user, folder_path=folder)
+            export_filename, _ = export_connectivity_statements(qs=qs, user=user)
         self.stdout.write(self.style.SUCCESS(f"Saved export batch to: {export_filename}"))

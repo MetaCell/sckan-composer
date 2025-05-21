@@ -57,7 +57,7 @@ body_lines = [
 if include_file:
     body_lines.append(f"You can download the exported file here:\n{file_url}\n")
 else:
-    body_lines.append("You may retry the export from the dashboard. If the issue persists please reach out through the support channels.\n")
+    body_lines.append("You can retry the export from the dashboard. If the issue persists, please contact us through our support channels.\n")
 
 # Compose and send email
 msg = EmailMessage()
