@@ -604,7 +604,7 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
         Sentence, verbose_name="Sentence", on_delete=models.DO_NOTHING
     )
     knowledge_statement = models.TextField(db_index=True, blank=True)
-    state = FSMField(default=CSState.DRAFT, protected=True)
+    state = FSMField(default=CSState.DRAFT, protected=True, db_index=True)
     origins = models.ManyToManyField(AnatomicalEntity, related_name='origins_relations')
     owner = models.ForeignKey(
         User, verbose_name="Curator", on_delete=models.SET_NULL, null=True, blank=True

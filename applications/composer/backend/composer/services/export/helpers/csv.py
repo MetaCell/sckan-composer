@@ -4,8 +4,7 @@ import os
 import tempfile
 import typing
 from typing import Dict, Callable
-
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Case, When, Value, IntegerField
 from django.utils import timezone
 
 from composer.services.export.helpers.rows import Row, get_rows
@@ -52,7 +51,28 @@ def create_csv(export_batch, output_path: typing.Optional[str] = None) -> str:
 
     return output_path
 
+
 def get_export_queryset(base_qs):
+
+    state_priority = Case(
+        *[
+            When(state=state, then=Value(priority))
+            for state, priority in {
+                CSState.EXPORTED: 0,
+                CSState.NPO_APPROVED: 1,
+                CSState.TO_BE_REVIEWED: 2,
+                CSState.REVISE: 3,
+                CSState.REJECTED: 4,
+                CSState.IN_PROGRESS: 5,
+                CSState.COMPOSE_NOW: 6,
+                CSState.DRAFT: 7,
+                CSState.INVALID: 8,
+            }.items()
+        ],
+        default=Value(100),
+        output_field=IntegerField(),
+    )
+
     notes_prefetch = Prefetch(
         "notes",
         queryset=Note.objects.filter(type__in=[NoteType.PLAIN, NoteType.DIFFERENT]),
@@ -67,21 +87,27 @@ def get_export_queryset(base_qs):
         "tags", queryset=Tag.objects.all(), to_attr="prefetched_tags"
     )
 
-    return base_qs.select_related(
-        "sentence", "sex", "functional_circuit_role", "projection_phenotype"
-    ).prefetch_related(
-        "origins",
-        notes_prefetch,
-        tags_prefetch,
-        "species",
-        "forward_connection",
-        "provenance_set",
-        sentence_notes_prefetch,
-        "via_set__anatomical_entities",
-        "via_set__from_entities",
-        "destinations__anatomical_entities",
-        "destinations__from_entities",
+    return (
+        base_qs.annotate(state_order=state_priority)
+        .select_related(
+            "sentence", "sex", "functional_circuit_role", "projection_phenotype"
+        )
+        .prefetch_related(
+            "origins",
+            notes_prefetch,
+            tags_prefetch,
+            "species",
+            "forward_connection",
+            "provenance_set",
+            sentence_notes_prefetch,
+            "via_set__anatomical_entities",
+            "via_set__from_entities",
+            "destinations__anatomical_entities",
+            "destinations__from_entities",
+        )
+        .order_by("state_order", "state", "id")
     )
+
 
 def write_statements_to_csv(writer, queryset, csv_attributes_mapping, group_name):
     for cs in queryset:
@@ -98,7 +124,9 @@ def write_statements_to_csv(writer, queryset, csv_attributes_mapping, group_name
                 ]
                 writer.writerow(row_content)
             except Exception as e:
-                logging.warning(f"[{group_name}] Row for CS {cs.id} skipped due to: {e}")
+                logging.warning(
+                    f"[{group_name}] Row for CS {cs.id} skipped due to: {e}"
+                )
 
 
 def generate_csv_attributes_mapping() -> Dict[str, Callable]:
