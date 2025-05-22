@@ -3,7 +3,7 @@ harness:
   dependencies:
     build: [cloudharness-frontend-build, cloudharness-django]
     soft: [argo]
-    hard: [accounts, events]
+    hard: [accounts]
   deployment:
     auto: true
     port: 80
