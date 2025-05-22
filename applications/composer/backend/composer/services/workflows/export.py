@@ -3,7 +3,7 @@ from urllib.parse import urljoin
 from django.conf import settings
 from django.contrib.auth.models import User
 from datetime import datetime
-
+from version import VERSION
 
 def get_volume_directory(current_app) -> str:
     return f"{current_app.harness.deployment.volume.name}:{settings.MEDIA_ROOT}"
@@ -14,15 +14,18 @@ def run_export_workflow(user: User, scheme: str = "https") -> None:
     from cloudharness.applications import get_current_configuration
     from cloudharness.utils.config import CloudharnessConfig
 
+
     current_app = get_current_configuration()
     domain = CloudharnessConfig.get_domain()
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    version_str = str(VERSION).replace(".", "-")
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    filename = f"export_v{version_str}_{timestamp}.csv"
 
-    filepath = f"{settings.MEDIA_ROOT}/exports/{user.username}-{timestamp}.csv"
-    
+    # Media-relative path
+    filepath = f"{settings.MEDIA_ROOT}/exports/{filename}"
+    media_path = f"{settings.MEDIA_URL}exports/{filename}"
     base_url = f"{scheme}://{domain}"
-    media_path = f"{settings.MEDIA_URL}exports/{user.username}-{timestamp}.csv"
     file_url = urljoin(base_url, media_path)
 
     # Main export task
