@@ -25,3 +25,5 @@ harness:
           "composer:composer-user",
         ]
       uri: /*
+  envmap:
+    PRODUCTION: True
