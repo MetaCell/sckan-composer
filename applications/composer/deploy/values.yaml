@@ -2,7 +2,7 @@ harness:
   database: { auto: true, type: postgres, size: 10Gi }
   dependencies:
     build: [cloudharness-frontend-build, cloudharness-django]
-    soft: [workflows]
+    soft: [argo]
     hard: [accounts, events]
   deployment:
     auto: true

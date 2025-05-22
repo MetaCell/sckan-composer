@@ -94,54 +94,11 @@ steps:
                 '{{CLOUDHARNESS_BASE_DEBIAN_TAG_EXISTS}}') == true
               forceNoCache: includes('${{CLOUDHARNESS_BASE_DEBIAN_TAG_FORCE_BUILD}}',
                 '{{CLOUDHARNESS_BASE_DEBIAN_TAG_FORCE_BUILD}}') == false
-      cloudharness-base:
-        type: build
-        stage: build
-        dockerfile: infrastructure/base-images/cloudharness-base/Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/cloudharness/
-        image_name: cloudharness/cloudharness-base
-        title: Cloudharness base
-        working_directory: ./cloud-harness
-        tag: '${{CLOUDHARNESS_BASE_TAG}}'
-        when:
-          condition:
-            any:
-              buildDoesNotExist: includes('${{CLOUDHARNESS_BASE_TAG_EXISTS}}', '{{CLOUDHARNESS_BASE_TAG_EXISTS}}')
-                == true
-              forceNoCache: includes('${{CLOUDHARNESS_BASE_TAG_FORCE_BUILD}}', '{{CLOUDHARNESS_BASE_TAG_FORCE_BUILD}}')
-                == false
   build_static_images:
     title: Build static images
     type: parallel
     stage: build
     steps:
-      cloudharness-flask:
-        type: build
-        stage: build
-        dockerfile: Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/cloudharness/
-        - CLOUDHARNESS_BASE=${{REGISTRY}}/cloudharness/cloudharness-base:${{CLOUDHARNESS_BASE_TAG}}
-        image_name: cloudharness/cloudharness-flask
-        title: Cloudharness flask
-        working_directory: ./cloud-harness/infrastructure/common-images/cloudharness-flask
-        tag: '${{CLOUDHARNESS_FLASK_TAG}}'
-        when:
-          condition:
-            any:
-              buildDoesNotExist: includes('${{CLOUDHARNESS_FLASK_TAG_EXISTS}}', '{{CLOUDHARNESS_FLASK_TAG_EXISTS}}')
-                == true
-              forceNoCache: includes('${{CLOUDHARNESS_FLASK_TAG_FORCE_BUILD}}', '{{CLOUDHARNESS_FLASK_TAG_FORCE_BUILD}}')
-                == false
       cloudharness-django:
         type: build
         stage: build
@@ -189,93 +146,6 @@ steps:
                 == true
               forceNoCache: includes('${{ACCOUNTS_TAG_FORCE_BUILD}}', '{{ACCOUNTS_TAG_FORCE_BUILD}}')
                 == false
-      workflows:
-        type: build
-        stage: build
-        dockerfile: Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/cloudharness/
-        - CLOUDHARNESS_FLASK=${{REGISTRY}}/cloudharness/cloudharness-flask:${{CLOUDHARNESS_FLASK_TAG}}
-        image_name: cloudharness/workflows
-        title: Workflows
-        working_directory: ./cloud-harness/applications/workflows/server
-        tag: '${{WORKFLOWS_TAG}}'
-        when:
-          condition:
-            any:
-              buildDoesNotExist: includes('${{WORKFLOWS_TAG_EXISTS}}', '{{WORKFLOWS_TAG_EXISTS}}')
-                == true
-              forceNoCache: includes('${{WORKFLOWS_TAG_FORCE_BUILD}}', '{{WORKFLOWS_TAG_FORCE_BUILD}}')
-                == false
-      workflows-extract-download:
-        type: build
-        stage: build
-        dockerfile: Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/cloudharness/
-        image_name: cloudharness/workflows-extract-download
-        title: Workflows extract download
-        working_directory: ./cloud-harness/applications/workflows/tasks/extract-download
-        tag: '${{WORKFLOWS_EXTRACT_DOWNLOAD_TAG}}'
-        when:
-          condition:
-            any:
-              buildDoesNotExist: includes('${{WORKFLOWS_EXTRACT_DOWNLOAD_TAG_EXISTS}}',
-                '{{WORKFLOWS_EXTRACT_DOWNLOAD_TAG_EXISTS}}') == true
-              forceNoCache: includes('${{WORKFLOWS_EXTRACT_DOWNLOAD_TAG_FORCE_BUILD}}',
-                '{{WORKFLOWS_EXTRACT_DOWNLOAD_TAG_FORCE_BUILD}}') == false
-      workflows-send-result-event:
-        type: build
-        stage: build
-        dockerfile: Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/cloudharness/
-        - CLOUDHARNESS_BASE=${{REGISTRY}}/cloudharness/cloudharness-base:${{CLOUDHARNESS_BASE_TAG}}
-        image_name: cloudharness/workflows-send-result-event
-        title: Workflows send result event
-        working_directory: ./cloud-harness/applications/workflows/tasks/send-result-event
-        tag: '${{WORKFLOWS_SEND_RESULT_EVENT_TAG}}'
-        when:
-          condition:
-            any:
-              buildDoesNotExist: includes('${{WORKFLOWS_SEND_RESULT_EVENT_TAG_EXISTS}}',
-                '{{WORKFLOWS_SEND_RESULT_EVENT_TAG_EXISTS}}') == true
-              forceNoCache: includes('${{WORKFLOWS_SEND_RESULT_EVENT_TAG_FORCE_BUILD}}',
-                '{{WORKFLOWS_SEND_RESULT_EVENT_TAG_FORCE_BUILD}}') == false
-      workflows-notify-queue:
-        type: build
-        stage: build
-        dockerfile: Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/cloudharness/
-        - CLOUDHARNESS_BASE=${{REGISTRY}}/cloudharness/cloudharness-base:${{CLOUDHARNESS_BASE_TAG}}
-        image_name: cloudharness/workflows-notify-queue
-        title: Workflows notify queue
-        working_directory: ./cloud-harness/applications/workflows/tasks/notify-queue
-        tag: '${{WORKFLOWS_NOTIFY_QUEUE_TAG}}'
-        when:
-          condition:
-            any:
-              buildDoesNotExist: includes('${{WORKFLOWS_NOTIFY_QUEUE_TAG_EXISTS}}',
-                '{{WORKFLOWS_NOTIFY_QUEUE_TAG_EXISTS}}') == true
-              forceNoCache: includes('${{WORKFLOWS_NOTIFY_QUEUE_TAG_FORCE_BUILD}}',
-                '{{WORKFLOWS_NOTIFY_QUEUE_TAG_FORCE_BUILD}}') == false
       composer:
         type: build
         stage: build
@@ -336,75 +206,6 @@ steps:
       custom_value_files:
       - ./deployment/helm/values.yaml
       custom_values: []
-  build_test_images:
-    title: Build test images
-    type: parallel
-    stage: qa
-    steps:
-      test-api:
-        type: build
-        stage: build
-        dockerfile: test/test-api/Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/cloudharness/
-        - CLOUDHARNESS_BASE=${{REGISTRY}}/cloudharness/cloudharness-base:${{CLOUDHARNESS_BASE_TAG}}
-        image_name: cloudharness/test-api
-        title: Test api
-        working_directory: ./cloud-harness
-        tag: '${{TEST_API_TAG}}'
-        when:
-          condition:
-            any:
-              buildDoesNotExist: includes('${{TEST_API_TAG_EXISTS}}', '{{TEST_API_TAG_EXISTS}}')
-                == true
-              forceNoCache: includes('${{TEST_API_TAG_FORCE_BUILD}}', '{{TEST_API_TAG_FORCE_BUILD}}')
-                == false
-    when:
-      condition:
-        all:
-          whenVarExists: includes("${{SKIP_TESTS}}", "{{SKIP_TESTS}}") == true
-  wait_deployment:
-    stage: qa
-    title: Wait deployment to be ready
-    image: codefresh/kubectl
-    commands:
-    - kubectl config use-context ${{CLUSTER_NAME}}
-    - kubectl config set-context --current --namespace=${{NAMESPACE}}
-    - kubectl rollout status deployment/accounts
-    - kubectl rollout status deployment/workflows
-    - kubectl rollout status deployment/composer
-    - sleep 60
-    when:
-      condition:
-        all:
-          whenVarExists: includes("${{SKIP_TESTS}}", "{{SKIP_TESTS}}") == true
-  tests_api:
-    stage: qa
-    title: Api tests
-    working_directory: /home/test
-    image: '${{REGISTRY}}/cloudharness/test-api:${{TEST_API_TAG}}'
-    fail_fast: false
-    commands:
-    - echo $APP_NAME
-    scale:
-      workflows_api_test:
-        title: workflows api test
-        volumes:
-        - '${{CF_REPO_NAME}}/cloud-harness/applications/workflows:/home/test'
-        - '${{CF_REPO_NAME}}/deployment/helm/values.yaml:/opt/cloudharness/resources/allvalues.yaml'
-        environment:
-        - APP_URL=https://workflows.${{DOMAIN}}/api
-        commands:
-        - st --pre-run cloudharness_test.apitest_init run api/openapi.yaml --base-url
-          https://workflows.${{DOMAIN}}/api -c all
-    when:
-      condition:
-        all:
-          whenVarExists: includes("${{SKIP_TESTS}}", "{{SKIP_TESTS}}") == true
   approval:
     type: pending-approval
     stage: publish
@@ -433,22 +234,6 @@ steps:
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_cloudharness-base:
-        stage: publish
-        type: push
-        title: Cloudharness base
-        candidate: '${{REGISTRY}}/cloudharness/cloudharness-base:${{CLOUDHARNESS_BASE_TAG}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_cloudharness-flask:
-        stage: publish
-        type: push
-        title: Cloudharness flask
-        candidate: '${{REGISTRY}}/cloudharness/cloudharness-flask:${{CLOUDHARNESS_FLASK_TAG}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
       publish_cloudharness-django:
         stage: publish
         type: push
@@ -462,38 +247,6 @@ steps:
         type: push
         title: Accounts
         candidate: '${{REGISTRY}}/cloudharness/accounts:${{ACCOUNTS_TAG}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_workflows:
-        stage: publish
-        type: push
-        title: Workflows
-        candidate: '${{REGISTRY}}/cloudharness/workflows:${{WORKFLOWS_TAG}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_workflows-extract-download:
-        stage: publish
-        type: push
-        title: Workflows extract download
-        candidate: '${{REGISTRY}}/cloudharness/workflows-extract-download:${{WORKFLOWS_EXTRACT_DOWNLOAD_TAG}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_workflows-send-result-event:
-        stage: publish
-        type: push
-        title: Workflows send result event
-        candidate: '${{REGISTRY}}/cloudharness/workflows-send-result-event:${{WORKFLOWS_SEND_RESULT_EVENT_TAG}}'
-        tags:
-        - '${{DEPLOYMENT_PUBLISH_TAG}}'
-        registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_workflows-notify-queue:
-        stage: publish
-        type: push
-        title: Workflows notify queue
-        candidate: '${{REGISTRY}}/cloudharness/workflows-notify-queue:${{WORKFLOWS_NOTIFY_QUEUE_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         registry: '${{REGISTRY_PUBLISH_URL}}'
