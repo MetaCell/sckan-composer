@@ -169,6 +169,27 @@ steps:
                 == true
               forceNoCache: includes('${{COMPOSER_TAG_FORCE_BUILD}}', '{{COMPOSER_TAG_FORCE_BUILD}}')
                 == false
+      composer-notify:
+        type: build
+        stage: build
+        dockerfile: Dockerfile
+        registry: '${{CODEFRESH_REGISTRY}}'
+        buildkit: true
+        build_arguments:
+        - DOMAIN=${{DOMAIN}}
+        - NOCACHE=${{CF_BUILD_ID}}
+        - REGISTRY=${{REGISTRY}}/cloudharness/
+        image_name: cloudharness/composer-notify
+        title: Composer notify
+        working_directory: ./applications/composer/tasks/notify
+        tag: '${{COMPOSER_NOTIFY_TAG}}'
+        when:
+          condition:
+            any:
+              buildDoesNotExist: includes('${{COMPOSER_NOTIFY_TAG_EXISTS}}', '{{COMPOSER_NOTIFY_TAG_EXISTS}}')
+                == true
+              forceNoCache: includes('${{COMPOSER_NOTIFY_TAG_FORCE_BUILD}}', '{{COMPOSER_NOTIFY_TAG_FORCE_BUILD}}')
+                == false
   deployment:
     stage: deploy
     type: helm
@@ -234,6 +255,14 @@ steps:
         type: push
         title: Composer
         candidate: '${{REGISTRY}}/cloudharness/composer:${{COMPOSER_TAG}}'
+        tags:
+        - '${{DEPLOYMENT_PUBLISH_TAG}}'
+        registry: '${{REGISTRY_PUBLISH_URL}}'
+      publish_composer-notify:
+        stage: publish
+        type: push
+        title: Composer notify
+        candidate: '${{REGISTRY}}/cloudharness/composer-notify:${{COMPOSER_NOTIFY_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         registry: '${{REGISTRY_PUBLISH_URL}}'

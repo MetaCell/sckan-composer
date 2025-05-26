@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 from composer.services.statement_service import get_statement_preview
@@ -107,8 +108,8 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
     # Destinations
     destinations = cs.destinations.all()
     for destination in destinations:
-        destination_rows = get_destination_row(destination, total_vias)
-        rows.extend(destination_rows)
+        destination_row = get_destination_row(destination, total_vias)
+        rows.extend(destination_row)
 
     # Species
     for specie in cs.species.all():
@@ -203,19 +204,22 @@ def get_origin_row(origin: AnatomicalEntity, review_notes: str, curation_notes: 
 
 
 def get_destination_row(destination: Destination, total_vias: int):
+    mapping = DESTINATION_PREDICATE_MAP.get(destination.type)
+    if not mapping:
+        logging.warning(f"[EXPORT] Unknown destination.type '{destination.type}' for Destination ID {destination.id}. Skipping.")
+        return []
 
-    predicate_mapping = ExportRelationships[
-        DESTINATION_PREDICATE_MAP[destination.type].name
-    ]
+    try:
+        predicate_mapping = ExportRelationships[mapping.name]
+    except KeyError:
+        logging.warning(f"[EXPORT] No ExportRelationship for mapping '{mapping.name}' from destination.type '{destination.type}' (ID {destination.id})")
+        return []
+
     from_entities = list(destination.from_entities.all())
     connected_from_entities = (
-        from_entities
-        if from_entities
-        else get_complete_from_entities_for_destination(destination)
+        from_entities if from_entities else get_complete_from_entities_for_destination(destination)
     )
-    connected_from_names, connected_from_uris = get_connected_from_info(
-        connected_from_entities
-    )
+    connected_from_names, connected_from_uris = get_connected_from_info(connected_from_entities)
     layer_value = str(total_vias + 2)
 
     return [
@@ -232,14 +236,22 @@ def get_destination_row(destination: Destination, total_vias: int):
 
 
 def get_via_row(via: Via):
-    predicate_mapping = ExportRelationships[VIA_PREDICATE_MAP[via.type].name]
+    mapping = VIA_PREDICATE_MAP.get(via.type)
+    if not mapping:
+        logging.warning(f"[EXPORT] Unknown via.type '{via.type}' for Via ID {via.id}. Skipping.")
+        return []
+
+    try:
+        predicate_mapping = ExportRelationships[mapping.name]
+    except KeyError:
+        logging.warning(f"[EXPORT] No ExportRelationship for mapping '{mapping.name}' from via.type '{via.type}' (ID {via.id})")
+        return []
+
     from_entities = list(via.from_entities.all())
     connected_from_entities = (
         from_entities if from_entities else get_complete_from_entities_for_via(via)
     )
-    connected_from_names, connected_from_uris = get_connected_from_info(
-        connected_from_entities
-    )
+    connected_from_names, connected_from_uris = get_connected_from_info(connected_from_entities)
     layer_value = str(via.order + 2)
 
     return [
@@ -253,6 +265,7 @@ def get_via_row(via: Via):
         )
         for ae in via.anatomical_entities.all()
     ]
+
 
 
 def get_specie_row(specie: Specie):
@@ -336,6 +349,7 @@ def get_forward_connection_row(forward_conn: ConnectivityStatement):
         object_uri=forward_conn.reference_uri,
         predicate_mapping=predicate_mapping,
     )
+
 
 
 def get_composer_uri_row(cs: ConnectivityStatement):
