@@ -114,6 +114,11 @@ class ConnectivityStatementManager(models.Manager):
     def exported(self):
         return self.get_queryset().filter(state=CSState.EXPORTED)
 
+    def public_export(self):
+        return self.get_queryset().filter(
+            state__in=[CSState.NPO_APPROVED, CSState.EXPORTED]
+        )
+
 
 class SentenceStatementManager(models.Manager):
     def get_queryset(self):

@@ -14,7 +14,7 @@ from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Case, When, Value, IntegerField
 from composer.services import bulk_service
-from composer.enums import BulkActionType, CSState
+from composer.enums import BulkActionType
 from composer.services.state_services import (
     ConnectivityStatementStateService,
     SentenceStateService,
@@ -595,9 +595,7 @@ class KnowledgeStatementViewSet(
     """
 
     model = ConnectivityStatement
-    queryset = ConnectivityStatement.objects.filter(
-        state__in=[CSState.NPO_APPROVED, CSState.EXPORTED]
-    )
+    queryset = ConnectivityStatement.objects.public_export()
     serializer_class = KnowledgeStatementSerializer
     permission_classes = [
         permissions.AllowAny,
