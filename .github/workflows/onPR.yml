@@ -21,13 +21,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-modules-${{ hashFiles('frontend/package-lock.json') }}
+          key: ${{ runner.os }}-modules-${{ hashFiles('./applications/composer/frontend/package-lock.json') }}
 
       - name: Install Node.js dev dependencies
         run: npm install --only=dev
-        working-directory: ./frontend
+        working-directory: ./applications/composer/frontend
 
       - name: Run lint
         run: npm run lint
-        working-directory: ./frontend
+        working-directory: ./applications/composer/frontend
 
