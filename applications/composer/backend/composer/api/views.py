@@ -426,7 +426,6 @@ class AnatomicalEntityViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = AnatomicalEntityFilter
 
 
-
 class PhenotypeViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Phenotype
@@ -596,7 +595,7 @@ class KnowledgeStatementViewSet(
     """
 
     model = ConnectivityStatement
-    queryset = ConnectivityStatement.objects.exported()
+    queryset = ConnectivityStatement.objects.public_export()
     serializer_class = KnowledgeStatementSerializer
     permission_classes = [
         permissions.AllowAny,
@@ -612,7 +611,8 @@ class KnowledgeStatementViewSet(
         return KnowledgeStatementSerializer
 
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        response = super().list(request, *args, **kwargs)
+        return response
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
