@@ -13,6 +13,13 @@ harness:
       auto: true
       size: 5Gi
       usenfs: false
+    resources:
+      requests:
+        cpu: "1800m"
+        memory: "1536Mi"
+      limits:
+        cpu: "1800m"
+        memory: "2048Mi"
   secured: false
   service: { auto: true, port: 80 }
   subdomain: www
@@ -35,12 +42,5 @@ harness:
   #   initialDelaySeconds: 300
   #   periodSeconds: 30
   #   failureThreshold: 3
-  resources:
-    requests:
-      cpu: "1800m"
-      memory: "1536Mi"
-    limits:
-      cpu: "1800m"
-      memory: "2048Mi"
   envmap:
     PRODUCTION: True
