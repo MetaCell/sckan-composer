@@ -25,16 +25,16 @@ harness:
           "composer:composer-user",
         ]
       uri: /*
-  livenessProbe:
-    path: /admin/login/
-    initialDelaySeconds: 300
-    periodSeconds: 30
-    failureThreshold: 3
-  readinessProbe:
-    path: /admin/login/
-    initialDelaySeconds: 300
-    periodSeconds: 30
-    failureThreshold: 3
+  # livenessProbe:
+  #   path: /admin/login/
+  #   initialDelaySeconds: 300
+  #   periodSeconds: 30
+  #   failureThreshold: 3
+  # readinessProbe:
+  #   path: /admin/login/
+  #   initialDelaySeconds: 300
+  #   periodSeconds: 30
+  #   failureThreshold: 3
   resources:
     requests:
       cpu: "1800m"
