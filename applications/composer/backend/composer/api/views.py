@@ -13,6 +13,7 @@ from rest_framework.serializers import ValidationError
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Case, When, Value, IntegerField
+from composer.services.dynamic_schema_service import inject_dynamic_relationship_schema
 from composer.services import bulk_service
 from composer.enums import BulkActionType
 from composer.services.state_services import (
@@ -790,6 +791,8 @@ def jsonschemas(request):
             "schema": SchemaProcessor(obj, {}).get_schema(),
             "uiSchema": UiSchemaProcessor(obj, {}).get_ui_schema(),
         }
+
+    inject_dynamic_relationship_schema(schema)
 
     ret = json.dumps(
         schema,

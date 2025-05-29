@@ -11,6 +11,7 @@ from ..enums import BulkActionType, SentenceState, CSState
 from ..models import (
     AlertType,
     AnatomicalEntity,
+    ConnectivityStatementTriple,
     Phenotype,
     ProjectionPhenotype,
     Sex,
@@ -23,6 +24,7 @@ from ..models import (
     PopulationSet,
     StatementAlert,
     Tag,
+    Triple,
     Via,
     Destination,
     AnatomicalEntityIntersection,
@@ -657,6 +659,23 @@ class KSStatementAlertSerializer(StatementAlertSerializer):
         read_only_fields = ("created_at", "updated_at", "saved_by")
         validators = []
 
+class TripleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Triple
+        fields = ("id", "name", "uri")
+
+
+class ConnectivityStatementTripleSerializer(serializers.ModelSerializer):
+    relationship_title = serializers.CharField(source="relationship.title", read_only=True)
+    relationship_type = serializers.CharField(source="relationship.type", read_only=True)
+    triple = TripleSerializer(read_only=True)
+    triple_id = serializers.PrimaryKeyRelatedField(queryset=Triple.objects.all(), source="triple", write_only=True, required=False)
+    free_text = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+
+    class Meta:
+        model = ConnectivityStatementTriple
+        fields = ("id", "relationship", "relationship_title", "relationship_type", "triple", "triple_id", "free_text")
+
 
 class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     """Connectivity Statement"""
@@ -691,6 +710,8 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     has_statement_been_exported = serializers.BooleanField(
         required=False, read_only=True
     )
+    statement_triples = ConnectivityStatementTripleSerializer(many=True, read_only=True)
+
 
     def get_available_transitions(self, instance) -> list[CSState]:
         request = self.context.get("request", None)
@@ -779,6 +800,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             "errors",
             "graph_rendering_state",
             "statement_alerts",
+            "statement_triples",
         )
 
 

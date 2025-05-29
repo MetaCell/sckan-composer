@@ -12,7 +12,9 @@ from django import forms
 from django.core.exceptions import ValidationError
 from composer.models import (
     AlertType,
+    ConnectivityStatementTriple,
     Phenotype,
+    Relationship,
     Sex,
     PopulationSet,
     ConnectivityStatement,
@@ -24,6 +26,7 @@ from composer.models import (
     Specie,
     StatementAlert,
     Tag,
+    Triple,
     Via,
     FunctionalCircuitRole,
     ProjectionPhenotype,
@@ -91,6 +94,18 @@ class StatementAlertInline(admin.StackedInline):
     fields = ('alert_type', 'text', 'created_at', 'updated_at')
     readonly_fields = ('created_at', 'updated_at')
 
+
+class RelationshipAdmin(admin.ModelAdmin):
+    list_display = ("title", "predicate_name", "predicate_uri", "type", "order")
+    ordering = ("order",)
+    search_fields = ("title", "predicate_name", "predicate_uri")
+
+
+class TripleAdmin(admin.ModelAdmin):
+    list_display = ("name", "uri", "relationship")
+    list_filter = ("relationship",)
+    search_fields = ("name", "uri")
+    autocomplete_fields = ("relationship",)
 
 class ConnectivityStatementInline(nested_admin.NestedStackedInline):
     model = ConnectivityStatement
@@ -236,6 +251,12 @@ class DestinationInline(admin.TabularInline):
     raw_id_fields = ("anatomical_entities", "from_entities")
 
 
+class ConnectivityStatementTripleInline(admin.TabularInline):
+    model = ConnectivityStatementTriple
+    extra = 1
+    autocomplete_fields = ("relationship", "triple")
+    fields = ("relationship", "triple", "free_text")
+
 class ConnectivityStatementAdmin(
     SortableAdminBase, FSMTransitionMixin, admin.ModelAdmin
 ):
@@ -276,7 +297,7 @@ class ConnectivityStatementAdmin(
     fieldsets = ()
 
     inlines = (ProvenanceInline, NoteConnectivityStatementInline,
-               ViaInline, DestinationInline, StatementAlertInline)
+               ViaInline, DestinationInline, StatementAlertInline, ConnectivityStatementTripleInline)
 
     def _filter_admin_transitions(self, transitions_generator):
         """
@@ -367,6 +388,8 @@ admin.site.register(AnatomicalEntity, AnatomicalEntityAdmin)
 admin.site.register(Phenotype)
 admin.site.register(Sex)
 admin.site.register(PopulationSet, PopulationSetAdmin)
+admin.site.register(Relationship, RelationshipAdmin)
+admin.site.register(Triple, TripleAdmin)
 admin.site.register(ConnectivityStatement, ConnectivityStatementAdmin)
 admin.site.register(ExportBatch, ExportBatchAdmin)
 admin.site.register(Sentence, SentenceAdmin)
