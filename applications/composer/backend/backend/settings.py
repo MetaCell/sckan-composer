@@ -30,13 +30,6 @@ DEBUG = False if PRODUCTION else True
 ALLOWED_HOSTS = [
     "*",
 ]
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8000/",
-    "https://localhost:8000/",
-    "https://*.metacell.us/",
-    "https://127.0.0.1:8000/",
-]
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -155,6 +148,13 @@ from cloudharness_django.settings import *  # noqa E402
 
 INSTALLED_APPS += [
     "composer",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000/",
+    "https://localhost:8000/",
+    "https://*.metacell.us/",
+    "https://127.0.0.1:8000/",
 ]
 
 
