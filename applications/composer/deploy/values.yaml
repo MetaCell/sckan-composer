@@ -43,4 +43,5 @@ harness:
     periodSeconds: 30
     failureThreshold: 3
   envmap:
-    PRODUCTION: True
+    PRODUCTION: False
+    HTTPS: True
