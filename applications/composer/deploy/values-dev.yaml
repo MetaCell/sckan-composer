@@ -5,4 +5,4 @@ harness:
       roles: [ ]
   envmap:
     PRODUCTION: False
-    HTTPS: True
+    HTTPS: False
