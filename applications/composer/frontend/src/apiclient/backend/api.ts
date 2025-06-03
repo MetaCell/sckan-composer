@@ -170,6 +170,31 @@ export interface AssignPopulationSet {
 /**
  * 
  * @export
+ * @interface AssignRelationship
+ */
+export interface AssignRelationship {
+    /**
+     * 
+     * @type {number}
+     * @memberof AssignRelationship
+     */
+    'relationship_id': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AssignRelationship
+     */
+    'triple_id'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AssignRelationship
+     */
+    'free_text'?: string;
+}
+/**
+ * 
+ * @export
  * @interface AssignTags
  */
 export interface AssignTags {
@@ -596,6 +621,12 @@ export interface ConnectivityStatement {
      * @memberof ConnectivityStatement
      */
     'statement_alerts'?: Array<StatementAlert>;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatement
+     */
+    'statement_triples': string;
 }
 /**
  * @type ConnectivityStatementCircuitType
@@ -1545,6 +1576,37 @@ export interface PaginatedProjectionPhenotypeList {
 /**
  * 
  * @export
+ * @interface PaginatedRelationshipList
+ */
+export interface PaginatedRelationshipList {
+    /**
+     * 
+     * @type {number}
+     * @memberof PaginatedRelationshipList
+     */
+    'count'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedRelationshipList
+     */
+    'next'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedRelationshipList
+     */
+    'previous'?: string | null;
+    /**
+     * 
+     * @type {Array<Relationship>}
+     * @memberof PaginatedRelationshipList
+     */
+    'results'?: Array<Relationship>;
+}
+/**
+ * 
+ * @export
  * @interface PaginatedSentenceList
  */
 export interface PaginatedSentenceList {
@@ -1962,6 +2024,12 @@ export interface PatchedConnectivityStatement {
      * @memberof PatchedConnectivityStatement
      */
     'statement_alerts'?: Array<StatementAlert>;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'statement_triples'?: string;
 }
 /**
  * Connectivity Statement
@@ -2617,6 +2685,72 @@ export interface Provenance {
      */
     'connectivity_statement_id': number;
 }
+/**
+ * 
+ * @export
+ * @interface Relationship
+ */
+export interface Relationship {
+    /**
+     * 
+     * @type {number}
+     * @memberof Relationship
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Relationship
+     */
+    'title': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Relationship
+     */
+    'predicate_name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Relationship
+     */
+    'predicate_uri': string;
+    /**
+     * 
+     * @type {RelationshipTypeEnum}
+     * @memberof Relationship
+     */
+    'type': RelationshipTypeEnum;
+    /**
+     * 
+     * @type {number}
+     * @memberof Relationship
+     */
+    'order'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Relationship
+     */
+    'options': string;
+}
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const RelationshipTypeEnum = {
+    Single: 'single',
+    Multi: 'multi',
+    Text: 'text'
+} as const;
+
+export type RelationshipTypeEnum = typeof RelationshipTypeEnum[keyof typeof RelationshipTypeEnum];
+
+
 /**
  * Sentence
  * @export
@@ -3560,6 +3694,54 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(patchedConnectivityStatement, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {AssignRelationship} assignRelationship 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAssignRelationshipCreate: async (id: number, assignRelationship: AssignRelationship, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementAssignRelationshipCreate', 'id', id)
+            // verify required parameter 'assignRelationship' is not null or undefined
+            assertParamExists('composerConnectivityStatementAssignRelationshipCreate', 'assignRelationship', assignRelationship)
+            const localVarPath = `/api/composer/connectivity-statement/{id}/assign_relationship/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(assignRelationship, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -5336,6 +5518,96 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Relationship ViewSet with dynamic endpoints to: - List triples (options) for a given relationship. - Assign triple or free_text to a statement.
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerRelationshipList: async (limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/relationship/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Relationship ViewSet with dynamic endpoints to: - List triples (options) for a given relationship. - Assign triple or free_text to a statement.
+         * @param {number} id A unique integer value identifying this relationship.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerRelationshipRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerRelationshipRetrieve', 'id', id)
+            const localVarPath = `/api/composer/relationship/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Sentence
          * @param {number} id A unique integer value identifying this sentence.
          * @param {number} tagId 
@@ -6926,6 +7198,19 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * ConnectivityStatement
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {AssignRelationship} assignRelationship 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementAssignRelationshipCreate(id: number, assignRelationship: AssignRelationship, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AssignRelationship>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAssignRelationshipCreate(id, assignRelationship, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAssignRelationshipCreate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Returns available users for assignment and possible state transitions for the selected items.
          * @param {Array<number>} [destinations] 
          * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
@@ -7401,6 +7686,31 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerProjectionRetrieve(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerProjectionRetrieve']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Relationship ViewSet with dynamic endpoints to: - List triples (options) for a given relationship. - Assign triple or free_text to a statement.
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerRelationshipList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedRelationshipList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerRelationshipList(limit, offset, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerRelationshipList']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Relationship ViewSet with dynamic endpoints to: - List triples (options) for a given relationship. - Assign triple or free_text to a statement.
+         * @param {number} id A unique integer value identifying this relationship.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerRelationshipRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Relationship>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerRelationshipRetrieve(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerRelationshipRetrieve']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -7895,6 +8205,16 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementAssignOwnerPartialUpdate(id, patchedConnectivityStatement, options).then((request) => request(axios, basePath));
         },
         /**
+         * ConnectivityStatement
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {AssignRelationship} assignRelationship 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAssignRelationshipCreate(id: number, assignRelationship: AssignRelationship, options?: RawAxiosRequestConfig): AxiosPromise<AssignRelationship> {
+            return localVarFp.composerConnectivityStatementAssignRelationshipCreate(id, assignRelationship, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Returns available users for assignment and possible state transitions for the selected items.
          * @param {Array<number>} [destinations] 
          * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
@@ -8266,6 +8586,25 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          */
         composerProjectionRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ProjectionPhenotype> {
             return localVarFp.composerProjectionRetrieve(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Relationship ViewSet with dynamic endpoints to: - List triples (options) for a given relationship. - Assign triple or free_text to a statement.
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerRelationshipList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedRelationshipList> {
+            return localVarFp.composerRelationshipList(limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Relationship ViewSet with dynamic endpoints to: - List triples (options) for a given relationship. - Assign triple or free_text to a statement.
+         * @param {number} id A unique integer value identifying this relationship.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerRelationshipRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<Relationship> {
+            return localVarFp.composerRelationshipRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
          * Sentence
@@ -8682,6 +9021,18 @@ export class ComposerApi extends BaseAPI {
      */
     public composerConnectivityStatementAssignOwnerPartialUpdate(id: number, patchedConnectivityStatement?: PatchedConnectivityStatement, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementAssignOwnerPartialUpdate(id, patchedConnectivityStatement, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatement
+     * @param {number} id A unique integer value identifying this connectivity statement.
+     * @param {AssignRelationship} assignRelationship 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementAssignRelationshipCreate(id: number, assignRelationship: AssignRelationship, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementAssignRelationshipCreate(id, assignRelationship, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -9128,6 +9479,29 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
+     * Relationship ViewSet with dynamic endpoints to: - List triples (options) for a given relationship. - Assign triple or free_text to a statement.
+     * @param {number} [limit] Number of results to return per page.
+     * @param {number} [offset] The initial index from which to return the results.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerRelationshipList(limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerRelationshipList(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Relationship ViewSet with dynamic endpoints to: - List triples (options) for a given relationship. - Assign triple or free_text to a statement.
+     * @param {number} id A unique integer value identifying this relationship.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerRelationshipRetrieve(id: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerRelationshipRetrieve(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Sentence
      * @param {number} id A unique integer value identifying this sentence.
      * @param {number} tagId 
@@ -9505,8 +9879,10 @@ export class ComposerApi extends BaseAPI {
 export const ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum = {
     Id: '-id',
     LastEdited: '-last_edited',
+    Owner: '-owner',
     Id2: 'id',
-    LastEdited2: 'last_edited'
+    LastEdited2: 'last_edited',
+    Owner2: 'owner'
 } as const;
 export type ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum = typeof ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum[keyof typeof ComposerConnectivityStatementAvailableOptionsRetrieveOrderingEnum];
 /**
@@ -9531,8 +9907,10 @@ export type ComposerConnectivityStatementAvailableOptionsRetrieveStateEnum = typ
 export const ComposerConnectivityStatementBulkActionCreateOrderingEnum = {
     Id: '-id',
     LastEdited: '-last_edited',
+    Owner: '-owner',
     Id2: 'id',
-    LastEdited2: 'last_edited'
+    LastEdited2: 'last_edited',
+    Owner2: 'owner'
 } as const;
 export type ComposerConnectivityStatementBulkActionCreateOrderingEnum = typeof ComposerConnectivityStatementBulkActionCreateOrderingEnum[keyof typeof ComposerConnectivityStatementBulkActionCreateOrderingEnum];
 /**
@@ -9557,8 +9935,10 @@ export type ComposerConnectivityStatementBulkActionCreateStateEnum = typeof Comp
 export const ComposerConnectivityStatementListOrderingEnum = {
     Id: '-id',
     LastEdited: '-last_edited',
+    Owner: '-owner',
     Id2: 'id',
-    LastEdited2: 'last_edited'
+    LastEdited2: 'last_edited',
+    Owner2: 'owner'
 } as const;
 export type ComposerConnectivityStatementListOrderingEnum = typeof ComposerConnectivityStatementListOrderingEnum[keyof typeof ComposerConnectivityStatementListOrderingEnum];
 /**
