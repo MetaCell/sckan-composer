@@ -36,7 +36,7 @@ def inject_dynamic_relationship_schema(schema):
                 }
             })
 
-        dynamic_properties[rel.predicate_name] = field
+        dynamic_properties[rel.id] = field
 
     cs_schema = schema.get("ConnectivityStatement", {}).get("schema", {})
     cs_schema.setdefault("properties", {}).setdefault("statement_triples", {
