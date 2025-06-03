@@ -7,6 +7,7 @@ from .views import (
     ProjectionPhenotypeViewSet,
     ConnectivityStatementViewSet,
     KnowledgeStatementViewSet,
+    RelationshipViewSet,
     StatementAlertViewSet,
     jsonschemas,
     NoteViewSet,
@@ -45,6 +46,7 @@ router.register(r"tag", TagViewSet, basename="tag")
 router.register(r"via", ViaViewSet, basename="via")
 router.register(r"destination", DestinationViewSet, basename="destination")
 router.register(r"statementAlert", StatementAlertViewSet, basename="statementAlert")
+router.register(r"relationship", RelationshipViewSet, basename="relationship")
 # router.register(r"json", JsonViewSet, basename="json")
 
 # The API URLs are now determined automatically by the router.

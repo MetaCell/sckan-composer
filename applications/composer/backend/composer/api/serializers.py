@@ -1,19 +1,19 @@
 from typing import List
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.forms import ValidationError
 from django_fsm import FSMField
 from drf_writable_nested.mixins import UniqueFieldsMixin
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
 
-from ..enums import BulkActionType, SentenceState, CSState
+from ..enums import BulkActionType, RelationshipType, SentenceState, CSState
 from ..models import (
     AlertType,
     AnatomicalEntity,
     ConnectivityStatementTriple,
     Phenotype,
     ProjectionPhenotype,
+    Relationship,
     Sex,
     ConnectivityStatement,
     Provenance,
@@ -666,15 +666,13 @@ class TripleSerializer(serializers.ModelSerializer):
 
 
 class ConnectivityStatementTripleSerializer(serializers.ModelSerializer):
-    relationship_title = serializers.CharField(source="relationship.title", read_only=True)
-    relationship_type = serializers.CharField(source="relationship.type", read_only=True)
     triple = TripleSerializer(read_only=True)
-    triple_id = serializers.PrimaryKeyRelatedField(queryset=Triple.objects.all(), source="triple", write_only=True, required=False)
     free_text = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
     class Meta:
         model = ConnectivityStatementTriple
-        fields = ("id", "relationship", "relationship_title", "relationship_type", "triple", "triple_id", "free_text")
+        fields = ("triple", "free_text")
+
 
 
 class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
@@ -710,7 +708,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     has_statement_been_exported = serializers.BooleanField(
         required=False, read_only=True
     )
-    statement_triples = ConnectivityStatementTripleSerializer(many=True, read_only=True)
+    statement_triples = serializers.SerializerMethodField()
 
 
     def get_available_transitions(self, instance) -> list[CSState]:
@@ -734,6 +732,22 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
 
     def get_errors(self, instance) -> List:
         return get_connectivity_errors(instance)
+
+
+    def get_statement_triples(self, instance):
+        triples = instance.statement_triples.all()
+        grouped = {}
+
+        for triple in triples:
+            relationship = triple.relationship.id
+            serialized = ConnectivityStatementTripleSerializer(triple).data
+
+            if triple.relationship.type == RelationshipType.MULTI:
+                grouped.setdefault(relationship, []).append(serialized)
+            else:
+                grouped[relationship] = serialized
+
+        return grouped
 
     def to_representation(self, instance):
         """
@@ -1048,3 +1062,49 @@ class AssignPopulationSetSerializer(BulkActionSerializer):
 
 class BulkActionResponseSerializer(serializers.Serializer):
     updated_count = serializers.IntegerField()
+
+
+class AssignRelationshipSerializer(serializers.Serializer):
+    relationship_id = serializers.IntegerField()
+    triple_id = serializers.IntegerField(required=False)
+    free_text = serializers.CharField(required=False, allow_blank=True)
+
+    def validate(self, data):
+        relationship_id = data.get("relationship_id")
+        triple_id = data.get("triple_id")
+        free_text = data.get("free_text")
+
+        try:
+            relationship = Relationship.objects.get(id=relationship_id)
+        except Relationship.DoesNotExist:
+            raise serializers.ValidationError({"relationship_id": "Invalid relationship ID."})
+        data["relationship"] = relationship
+
+        if relationship.type == RelationshipType.TEXT:
+            if not free_text:
+                raise serializers.ValidationError({"free_text": "This field is required for text relationships."})
+            data["triple"] = None  # Ensure exclusivity
+        else:
+            if not triple_id:
+                raise serializers.ValidationError({"triple_id": "This field is required for select relationships."})
+
+            try:
+                triple = Triple.objects.get(id=triple_id, relationship=relationship)
+            except Triple.DoesNotExist:
+                raise serializers.ValidationError({"triple_id": "Invalid triple for this relationship."})
+
+            data["triple"] = triple
+            data["free_text"] = None  # Ensure exclusivity
+
+        return data
+
+class RelationshipSerializer(serializers.ModelSerializer):
+    options = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Relationship
+        fields = ["id", "title", "predicate_name", "predicate_uri", "type", "order", "options"]
+
+    def get_options(self, obj):
+        triples = Triple.objects.filter(relationship=obj)
+        return TripleSerializer(triples, many=True).data

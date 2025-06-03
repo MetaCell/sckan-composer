@@ -35,6 +35,7 @@ from .serializers import (
     AlertTypeSerializer,
     AnatomicalEntitySerializer,
     AssignPopulationSetSerializer,
+    AssignRelationshipSerializer,
     AssignTagsSerializer,
     AssignUserSerializer,
     BulkActionResponseSerializer,
@@ -45,6 +46,7 @@ from .serializers import (
     KnowledgeStatementSerializer,
     NoteSerializer,
     ProfileSerializer,
+    RelationshipSerializer,
     SentenceSerializer,
     SpecieSerializer,
     StatementAlertSerializer,
@@ -72,6 +74,7 @@ from ..models import (
     ConnectivityStatement,
     Note,
     Profile,
+    Relationship,
     Sentence,
     Specie,
     StatementAlert,
@@ -81,6 +84,7 @@ from ..models import (
     Sex,
     PopulationSet,
     Destination,
+    ConnectivityStatementTriple,
 )
 
 
@@ -537,11 +541,14 @@ class ConnectivityStatementViewSet(
     }
 
     def get_serializer_class(self):
+        if self.action == "assign_relationship":
+            return AssignRelationshipSerializer
         if self.action in ["update", "partial_update"]:
             return ConnectivityStatementUpdateSerializer
         if self.action == "list":
             return BaseConnectivityStatementSerializer
         return ConnectivityStatementSerializer
+
 
     def get_queryset(self):
         if self.action == "list" and "sentence_id" not in self.request.query_params:
@@ -585,6 +592,30 @@ class ConnectivityStatementViewSet(
     )
     def partial_update(self, request, *args, **kwargs):
         return super().partial_update(request, *args, **kwargs)
+
+
+    @action(detail=True, methods=["post"], url_path="assign_relationship")
+    def assign_relationship(self, request, pk=None):
+        statement = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        relationship = serializer.validated_data["relationship"]
+        triple = serializer.validated_data.get("triple")
+        free_text = serializer.validated_data.get("free_text")
+
+        obj, created = ConnectivityStatementTriple.objects.update_or_create(
+            statement=statement,
+            relationship=relationship,
+            triple=triple,
+            defaults={"free_text": free_text}
+        )
+
+        return Response({
+            "success": True,
+            "created": created,
+            "id": obj.id
+        })
 
 
 @extend_schema(tags=["public"])
@@ -765,6 +796,19 @@ class StatementAlertViewSet(viewsets.ModelViewSet):
     queryset = StatementAlert.objects.all()
     serializer_class = StatementAlertSerializer
     permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
+
+
+
+class RelationshipViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Relationship ViewSet with dynamic endpoints to:
+    - List triples (options) for a given relationship.
+    - Assign triple or free_text to a statement.
+    """
+
+    queryset = Relationship.objects.all()
+    serializer_class = RelationshipSerializer
+
 
 
 @extend_schema(
