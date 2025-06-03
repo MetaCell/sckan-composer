@@ -1,3 +1,4 @@
+from composer.enums import RelationshipType
 from .views import index
 from typing import Any
 from django.db.models.query import QuerySet
@@ -100,12 +101,26 @@ class RelationshipAdmin(admin.ModelAdmin):
     ordering = ("order",)
     search_fields = ("title", "predicate_name", "predicate_uri")
 
+    def get_search_results(self, request, queryset, search_term):
+        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+
+        # Restrict only for autocomplete context
+        if request.path.endswith("/autocomplete/"):
+            queryset = queryset.exclude(type=RelationshipType.TEXT)
+
+        return queryset, use_distinct
 
 class TripleAdmin(admin.ModelAdmin):
     list_display = ("name", "uri", "relationship")
     list_filter = ("relationship",)
     search_fields = ("name", "uri")
     autocomplete_fields = ("relationship",)
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if "relationship" in form.base_fields:
+            form.base_fields["relationship"].queryset = Relationship.objects.exclude(type=RelationshipType.TEXT)
+        return form
 
 class ConnectivityStatementInline(nested_admin.NestedStackedInline):
     model = ConnectivityStatement
