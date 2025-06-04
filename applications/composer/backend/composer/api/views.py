@@ -35,11 +35,11 @@ from .serializers import (
     AlertTypeSerializer,
     AnatomicalEntitySerializer,
     AssignPopulationSetSerializer,
-    AssignRelationshipSerializer,
     AssignTagsSerializer,
     AssignUserSerializer,
     BulkActionResponseSerializer,
     ChangeStatusSerializer,
+    ConnectivityStatementTripleSerializer,
     PhenotypeSerializer,
     ProjectionPhenotypeSerializer,
     ConnectivityStatementSerializer,
@@ -541,8 +541,6 @@ class ConnectivityStatementViewSet(
     }
 
     def get_serializer_class(self):
-        if self.action == "assign_relationship":
-            return AssignRelationshipSerializer
         if self.action in ["update", "partial_update"]:
             return ConnectivityStatementUpdateSerializer
         if self.action == "list":
@@ -592,30 +590,6 @@ class ConnectivityStatementViewSet(
     )
     def partial_update(self, request, *args, **kwargs):
         return super().partial_update(request, *args, **kwargs)
-
-
-    @action(detail=True, methods=["post"], url_path="assign_relationship")
-    def assign_relationship(self, request, pk=None):
-        statement = self.get_object()
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        relationship = serializer.validated_data["relationship"]
-        triple = serializer.validated_data.get("triple")
-        free_text = serializer.validated_data.get("free_text")
-
-        obj, created = ConnectivityStatementTriple.objects.update_or_create(
-            statement=statement,
-            relationship=relationship,
-            triple=triple,
-            defaults={"free_text": free_text}
-        )
-
-        return Response({
-            "success": True,
-            "created": created,
-            "id": obj.id
-        })
 
 
 @extend_schema(tags=["public"])
@@ -809,6 +783,26 @@ class RelationshipViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Relationship.objects.all()
     serializer_class = RelationshipSerializer
 
+
+class ConnectivityStatementTripleViewSet(viewsets.ModelViewSet):
+    """
+    Full CRUD ViewSet for ConnectivityStatementTriple:
+    - POST: Create triple or text
+    - PUT: Replace value (triple_id or free_text) by ID
+    - PATCH: Update free_text (only for TEXT)
+    - DELETE: Unassign
+    """
+
+    queryset = ConnectivityStatementTriple.objects.select_related("connectivity_statement", "relationship", "triple")
+    serializer_class = ConnectivityStatementTripleSerializer
+    permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        connectivity_statement_id = self.request.query_params.get("connectivity_statement_id")
+        if connectivity_statement_id:
+            qs = qs.filter(connectivity_statement_id=connectivity_statement_id)
+        return qs
 
 
 @extend_schema(

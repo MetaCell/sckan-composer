@@ -101,15 +101,6 @@ class RelationshipAdmin(admin.ModelAdmin):
     ordering = ("order",)
     search_fields = ("title", "predicate_name", "predicate_uri")
 
-    def get_search_results(self, request, queryset, search_term):
-        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
-
-        # Restrict only for autocomplete context
-        if request.path.endswith("/autocomplete/"):
-            queryset = queryset.exclude(type=RelationshipType.TEXT)
-
-        return queryset, use_distinct
-
 class TripleAdmin(admin.ModelAdmin):
     list_display = ("name", "uri", "relationship")
     list_filter = ("relationship",)

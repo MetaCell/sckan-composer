@@ -666,14 +666,52 @@ class TripleSerializer(serializers.ModelSerializer):
 
 
 class ConnectivityStatementTripleSerializer(serializers.ModelSerializer):
-    triple = TripleSerializer(read_only=True)
-    free_text = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    value = serializers.SerializerMethodField()
+
+    connectivity_statement = serializers.PrimaryKeyRelatedField(
+        queryset=ConnectivityStatement.objects.all()
+    )
+    relationship = serializers.PrimaryKeyRelatedField(
+        queryset=Relationship.objects.all()
+    )
 
     class Meta:
         model = ConnectivityStatementTriple
-        fields = ("triple", "free_text")
+        fields = ["id", "connectivity_statement", "relationship", "value"]
 
+    def get_value(self, obj):
+        if obj.relationship.type == RelationshipType.TEXT:
+            return obj.free_text
+        if obj.triple:
+            return obj.triple.id
+        return None
 
+    def validate(self, data):
+        request = self.context.get("request")
+        if request and request.method in ("PUT", "PATCH", "POST"):
+            incoming_value = request.data.get("value", None)
+
+            relationship = data.get("relationship") or getattr(self.instance, "relationship", None)
+            if not relationship:
+                raise serializers.ValidationError({"relationship": "This field is required to process value."})
+
+            if relationship.type == RelationshipType.TEXT:
+                if not isinstance(incoming_value, str):
+                    raise serializers.ValidationError({"value": "Must be a string for text relationship."})
+                data["free_text"] = incoming_value
+                data["triple"] = None
+
+            else:
+                if not isinstance(incoming_value, int):
+                    raise serializers.ValidationError({"value": "Must be an integer triple ID."})
+                try:
+                    triple = Triple.objects.get(id=incoming_value, relationship=relationship)
+                except Triple.DoesNotExist:
+                    raise serializers.ValidationError({"value": "Invalid triple ID for this relationship."})
+                data["triple"] = triple
+                data["free_text"] = None
+
+        return data
 
 class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     """Connectivity Statement"""
@@ -1063,40 +1101,6 @@ class AssignPopulationSetSerializer(BulkActionSerializer):
 class BulkActionResponseSerializer(serializers.Serializer):
     updated_count = serializers.IntegerField()
 
-
-class AssignRelationshipSerializer(serializers.Serializer):
-    relationship_id = serializers.IntegerField()
-    triple_id = serializers.IntegerField(required=False)
-    free_text = serializers.CharField(required=False, allow_blank=True)
-
-    def validate(self, data):
-        relationship_id = data.get("relationship_id")
-        triple_id = data.get("triple_id")
-        free_text = data.get("free_text")
-
-        try:
-            relationship = Relationship.objects.get(id=relationship_id)
-        except Relationship.DoesNotExist:
-            raise serializers.ValidationError({"relationship_id": "Invalid relationship ID."})
-        data["relationship"] = relationship
-
-        if relationship.type == RelationshipType.TEXT:
-            if not free_text:
-                raise serializers.ValidationError({"free_text": "This field is required for text relationships."})
-            data["triple"] = None  # Ensure exclusivity
-        else:
-            if not triple_id:
-                raise serializers.ValidationError({"triple_id": "This field is required for select relationships."})
-
-            try:
-                triple = Triple.objects.get(id=triple_id, relationship=relationship)
-            except Triple.DoesNotExist:
-                raise serializers.ValidationError({"triple_id": "Invalid triple for this relationship."})
-
-            data["triple"] = triple
-            data["free_text"] = None  # Ensure exclusivity
-
-        return data
 
 class RelationshipSerializer(serializers.ModelSerializer):
     options = serializers.SerializerMethodField()

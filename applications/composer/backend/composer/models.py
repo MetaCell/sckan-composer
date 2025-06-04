@@ -964,13 +964,13 @@ class Triple(models.Model):
 
 
 class ConnectivityStatementTriple(models.Model):
-    statement = models.ForeignKey(ConnectivityStatement, on_delete=models.CASCADE, related_name="statement_triples")
+    connectivity_statement = models.ForeignKey(ConnectivityStatement, on_delete=models.CASCADE, related_name="statement_triples")
     relationship = models.ForeignKey(Relationship, on_delete=models.CASCADE)
     triple = models.ForeignKey(Triple, null=True, blank=True, on_delete=models.SET_NULL)
     free_text = models.TextField(null=True, blank=True)
 
     class Meta:
-        unique_together = ("statement", "relationship", "triple")
+        unique_together = ("connectivity_statement", "relationship", "triple")
 
     def clean(self):
         if self.triple and self.free_text:
