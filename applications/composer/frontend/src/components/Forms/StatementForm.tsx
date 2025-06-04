@@ -48,18 +48,49 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
   const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
+  console.log(copiedUISchema);
+  
   const dispatch = useDispatch();
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
   copiedSchema.properties.statement_alerts.items.properties.alert_type.type = "number";
   copiedSchema.properties.statement_alerts.items.properties.connectivity_statement_id.type = "number";
-
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["curie_id", "destination_type", "*"];
   copiedSchema.properties.statement_alerts.title = " ";
+  copiedSchema.properties.statement_triples.title = " ";
   copiedSchema.properties.statement_alerts.items.required = ["alert_type"]
   
+  copiedUISchema.statement_tripples = {
+    "ui:options": {
+        "orderable": false,
+        "addable": false,
+        "removable": false,
+        "label": false
+    },
+    "items": {
+        "ui:label": false,
+        "id": {
+            "ui:widget": "hidden"
+        },
+        "alert_type": {
+            "ui:widget": "hidden"
+        },
+        "text": {
+            "ui:widget": "CustomTextArea",
+            "ui:options": {
+                "placeholder": "Enter alert text here...",
+                "rows": 3,
+                "ref": null
+            }
+        },
+        "connectivity_statement_id": {
+            "ui:widget": "hidden"
+        }
+    }
+};
+
   copiedUISchema.statement_alerts ={
     "ui:options": {
       orderable: false,
@@ -93,6 +124,8 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       }
     },
   }
+ 
+
   copiedUISchema.curie_id = {
     "ui:widget": "CustomTextField",
     "ui:options": {
@@ -214,6 +247,11 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       rows: 4,
       value: statement?.knowledge_statement ?? "",
     },
+    items: {
+      statement_tripples: {
+        "ui:widget": "hidden",
+      }
+    }
   };
 
   copiedUISchema.origins = {

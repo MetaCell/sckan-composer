@@ -12,6 +12,8 @@ import { useTheme } from "@mui/system";
 import StatementDetailsAccordion from "../TriageStatementSection/StatementDetailsAccordion";
 import ProvenancesForm from "../Forms/ProvenanceForm";
 import StatementPreviewForm from "../Forms/StatementPreviewForm";
+import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
+import { ExpandMore } from "@mui/icons-material";
 
 const DistillationTab = ({
                            statement,
@@ -78,6 +80,39 @@ const DistillationTab = ({
                   refreshStatement={refreshStatement}
                   isDisabled={isDisabled}
                 />
+                <Box px={2} py={0.5}>
+                      <Accordion
+                        elevation={0}
+                        sx={{
+                          "&:before": {
+                            display: "none",
+                          },
+                        }}
+                      >
+                        <AccordionSummary
+                          expandIcon={<ExpandMore />}
+                          aria-controls="panel1bh-content"
+                          className="panel1bh-header"
+                          sx={{ p: 0, display: "flex", flexDirection: "row-reverse" }}
+                        >
+                          <Typography variant="h6" ml={1}>
+                            Statement Triples
+                          </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails sx={{ px: 4, pt: 0, pb: 2 }}>
+                        <StatementForm
+                            statement={statement}
+                            format="small"
+                            action={refreshStatement}
+                            extraData={{ sentence_id: statement.sentence.id }}
+                            uiFields={["statement_triples"]}
+                            className="ks"
+                            enableAutoSave={true}
+                            isDisabled={isDisabled}
+                          />
+                        </AccordionDetails>
+                      </Accordion>
+                  </Box>
               </Paper>
             </Box>
           </Paper>
