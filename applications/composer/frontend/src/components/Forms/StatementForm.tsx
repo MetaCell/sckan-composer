@@ -85,11 +85,23 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
         [key]: {
           "ui:widget": isDropdown ? "CustomSingleSelect" : "CustomTextField",
           "ui:options": {
-            onChange2: (value: any) => {
-              console.log(value);
+            onChange2: async (value: any) => {
+              await statementService.assignRelationship({
+                id: key,
+                connectivity_statement: statement.id.toString(),
+                relationship: key.toString(),
+                value: value
+              });
+              refreshStatement();
             },
-            onBlur2: (value: any) => {
-              console.log(value);
+            onBlur2: async (value: any) => {
+              await statementService.assignRelationship({
+                id: key,
+                connectivity_statement: statement.id.toString(),
+                relationship: key.toString(),
+                value: value.toString()
+              });
+              refreshStatement();
             },
             label: property.title,
             data: isDropdown ? relationshipOption : undefined
