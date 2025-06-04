@@ -170,31 +170,6 @@ export interface AssignPopulationSet {
 /**
  * 
  * @export
- * @interface AssignRelationship
- */
-export interface AssignRelationship {
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignRelationship
-     */
-    'relationship_id': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof AssignRelationship
-     */
-    'triple_id'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof AssignRelationship
-     */
-    'free_text'?: string;
-}
-/**
- * 
- * @export
  * @interface AssignTags
  */
 export interface AssignTags {
@@ -646,6 +621,37 @@ export type ConnectivityStatementLaterality = BlankEnum | LateralityEnum;
  */
 export type ConnectivityStatementProjection = BlankEnum | ProjectionEnum;
 
+/**
+ * 
+ * @export
+ * @interface ConnectivityStatementTriple
+ */
+export interface ConnectivityStatementTriple {
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementTriple
+     */
+    'id': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementTriple
+     */
+    'connectivity_statement': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementTriple
+     */
+    'relationship': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatementTriple
+     */
+    'value': string;
+}
 /**
  * Connectivity Statement
  * @export
@@ -1390,6 +1396,37 @@ export interface PaginatedBaseConnectivityStatementList {
 /**
  * 
  * @export
+ * @interface PaginatedConnectivityStatementTripleList
+ */
+export interface PaginatedConnectivityStatementTripleList {
+    /**
+     * 
+     * @type {number}
+     * @memberof PaginatedConnectivityStatementTripleList
+     */
+    'count'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedConnectivityStatementTripleList
+     */
+    'next'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedConnectivityStatementTripleList
+     */
+    'previous'?: string | null;
+    /**
+     * 
+     * @type {Array<ConnectivityStatementTriple>}
+     * @memberof PaginatedConnectivityStatementTripleList
+     */
+    'results'?: Array<ConnectivityStatementTriple>;
+}
+/**
+ * 
+ * @export
  * @interface PaginatedDestinationList
  */
 export interface PaginatedDestinationList {
@@ -2030,6 +2067,37 @@ export interface PatchedConnectivityStatement {
      * @memberof PatchedConnectivityStatement
      */
     'statement_triples'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface PatchedConnectivityStatementTriple
+ */
+export interface PatchedConnectivityStatementTriple {
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatementTriple
+     */
+    'id'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatementTriple
+     */
+    'connectivity_statement'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatementTriple
+     */
+    'relationship'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatementTriple
+     */
+    'value'?: string;
 }
 /**
  * Connectivity Statement
@@ -3701,54 +3769,6 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * ConnectivityStatement
-         * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {AssignRelationship} assignRelationship 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerConnectivityStatementAssignRelationshipCreate: async (id: number, assignRelationship: AssignRelationship, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('composerConnectivityStatementAssignRelationshipCreate', 'id', id)
-            // verify required parameter 'assignRelationship' is not null or undefined
-            assertParamExists('composerConnectivityStatementAssignRelationshipCreate', 'assignRelationship', assignRelationship)
-            const localVarPath = `/api/composer/connectivity-statement/{id}/assign_relationship/`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication basicAuth required
-            // http basic authentication required
-            setBasicAuthToObject(localVarRequestOptions, configuration)
-
-            // authentication tokenAuth required
-            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
-
-            // authentication cookieAuth required
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(assignRelationship, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * Returns available users for assignment and possible state transitions for the selected items.
          * @param {Array<number>} [destinations] 
          * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
@@ -4467,6 +4487,276 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {ConnectivityStatementTriple} connectivityStatementTriple 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTripleCreate: async (connectivityStatementTriple: ConnectivityStatementTriple, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'connectivityStatementTriple' is not null or undefined
+            assertParamExists('composerConnectivityStatementTripleCreate', 'connectivityStatementTriple', connectivityStatementTriple)
+            const localVarPath = `/api/composer/connectivityStatementTriple/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(connectivityStatementTriple, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {number} id A unique integer value identifying this connectivity statement triple.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTripleDestroy: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementTripleDestroy', 'id', id)
+            const localVarPath = `/api/composer/connectivityStatementTriple/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTripleList: async (limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/connectivityStatementTriple/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {number} id A unique integer value identifying this connectivity statement triple.
+         * @param {PatchedConnectivityStatementTriple} [patchedConnectivityStatementTriple] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTriplePartialUpdate: async (id: number, patchedConnectivityStatementTriple?: PatchedConnectivityStatementTriple, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementTriplePartialUpdate', 'id', id)
+            const localVarPath = `/api/composer/connectivityStatementTriple/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(patchedConnectivityStatementTriple, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {number} id A unique integer value identifying this connectivity statement triple.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTripleRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementTripleRetrieve', 'id', id)
+            const localVarPath = `/api/composer/connectivityStatementTriple/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {number} id A unique integer value identifying this connectivity statement triple.
+         * @param {ConnectivityStatementTriple} connectivityStatementTriple 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTripleUpdate: async (id: number, connectivityStatementTriple: ConnectivityStatementTriple, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementTripleUpdate', 'id', id)
+            // verify required parameter 'connectivityStatementTriple' is not null or undefined
+            assertParamExists('composerConnectivityStatementTripleUpdate', 'connectivityStatementTriple', connectivityStatementTriple)
+            const localVarPath = `/api/composer/connectivityStatementTriple/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(connectivityStatementTriple, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -7198,19 +7488,6 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * ConnectivityStatement
-         * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {AssignRelationship} assignRelationship 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async composerConnectivityStatementAssignRelationshipCreate(id: number, assignRelationship: AssignRelationship, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AssignRelationship>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAssignRelationshipCreate(id, assignRelationship, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAssignRelationshipCreate']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * Returns available users for assignment and possible state transitions for the selected items.
          * @param {Array<number>} [destinations] 
          * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
@@ -7397,6 +7674,81 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementRetrieve(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementRetrieve']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {ConnectivityStatementTriple} connectivityStatementTriple 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementTripleCreate(connectivityStatementTriple: ConnectivityStatementTriple, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatementTriple>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementTripleCreate(connectivityStatementTriple, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementTripleCreate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {number} id A unique integer value identifying this connectivity statement triple.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementTripleDestroy(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementTripleDestroy(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementTripleDestroy']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementTripleList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementTripleList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementTripleList(limit, offset, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementTripleList']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {number} id A unique integer value identifying this connectivity statement triple.
+         * @param {PatchedConnectivityStatementTriple} [patchedConnectivityStatementTriple] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementTriplePartialUpdate(id: number, patchedConnectivityStatementTriple?: PatchedConnectivityStatementTriple, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatementTriple>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementTriplePartialUpdate(id, patchedConnectivityStatementTriple, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementTriplePartialUpdate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {number} id A unique integer value identifying this connectivity statement triple.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementTripleRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatementTriple>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementTripleRetrieve(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementTripleRetrieve']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {number} id A unique integer value identifying this connectivity statement triple.
+         * @param {ConnectivityStatementTriple} connectivityStatementTriple 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementTripleUpdate(id: number, connectivityStatementTriple: ConnectivityStatementTriple, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatementTriple>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementTripleUpdate(id, connectivityStatementTriple, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementTripleUpdate']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -8205,16 +8557,6 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementAssignOwnerPartialUpdate(id, patchedConnectivityStatement, options).then((request) => request(axios, basePath));
         },
         /**
-         * ConnectivityStatement
-         * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {AssignRelationship} assignRelationship 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        composerConnectivityStatementAssignRelationshipCreate(id: number, assignRelationship: AssignRelationship, options?: RawAxiosRequestConfig): AxiosPromise<AssignRelationship> {
-            return localVarFp.composerConnectivityStatementAssignRelationshipCreate(id, assignRelationship, options).then((request) => request(axios, basePath));
-        },
-        /**
          * Returns available users for assignment and possible state transitions for the selected items.
          * @param {Array<number>} [destinations] 
          * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
@@ -8366,6 +8708,63 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          */
         composerConnectivityStatementRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementRetrieve(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {ConnectivityStatementTriple} connectivityStatementTriple 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTripleCreate(connectivityStatementTriple: ConnectivityStatementTriple, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatementTriple> {
+            return localVarFp.composerConnectivityStatementTripleCreate(connectivityStatementTriple, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {number} id A unique integer value identifying this connectivity statement triple.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTripleDestroy(id: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.composerConnectivityStatementTripleDestroy(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTripleList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedConnectivityStatementTripleList> {
+            return localVarFp.composerConnectivityStatementTripleList(limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {number} id A unique integer value identifying this connectivity statement triple.
+         * @param {PatchedConnectivityStatementTriple} [patchedConnectivityStatementTriple] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTriplePartialUpdate(id: number, patchedConnectivityStatementTriple?: PatchedConnectivityStatementTriple, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatementTriple> {
+            return localVarFp.composerConnectivityStatementTriplePartialUpdate(id, patchedConnectivityStatementTriple, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {number} id A unique integer value identifying this connectivity statement triple.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTripleRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatementTriple> {
+            return localVarFp.composerConnectivityStatementTripleRetrieve(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * @param {number} id A unique integer value identifying this connectivity statement triple.
+         * @param {ConnectivityStatementTriple} connectivityStatementTriple 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTripleUpdate(id: number, connectivityStatementTriple: ConnectivityStatementTriple, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatementTriple> {
+            return localVarFp.composerConnectivityStatementTripleUpdate(id, connectivityStatementTriple, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -9024,18 +9423,6 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * ConnectivityStatement
-     * @param {number} id A unique integer value identifying this connectivity statement.
-     * @param {AssignRelationship} assignRelationship 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ComposerApi
-     */
-    public composerConnectivityStatementAssignRelationshipCreate(id: number, assignRelationship: AssignRelationship, options?: RawAxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementAssignRelationshipCreate(id, assignRelationship, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * Returns available users for assignment and possible state transitions for the selected items.
      * @param {Array<number>} [destinations] 
      * @param {Array<number>} [excludeIds] Multiple values may be separated by commas.
@@ -9210,6 +9597,75 @@ export class ComposerApi extends BaseAPI {
      */
     public composerConnectivityStatementRetrieve(id: number, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementRetrieve(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+     * @param {ConnectivityStatementTriple} connectivityStatementTriple 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementTripleCreate(connectivityStatementTriple: ConnectivityStatementTriple, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementTripleCreate(connectivityStatementTriple, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+     * @param {number} id A unique integer value identifying this connectivity statement triple.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementTripleDestroy(id: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementTripleDestroy(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+     * @param {number} [limit] Number of results to return per page.
+     * @param {number} [offset] The initial index from which to return the results.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementTripleList(limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementTripleList(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+     * @param {number} id A unique integer value identifying this connectivity statement triple.
+     * @param {PatchedConnectivityStatementTriple} [patchedConnectivityStatementTriple] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementTriplePartialUpdate(id: number, patchedConnectivityStatementTriple?: PatchedConnectivityStatementTriple, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementTriplePartialUpdate(id, patchedConnectivityStatementTriple, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+     * @param {number} id A unique integer value identifying this connectivity statement triple.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementTripleRetrieve(id: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementTripleRetrieve(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+     * @param {number} id A unique integer value identifying this connectivity statement triple.
+     * @param {ConnectivityStatementTriple} connectivityStatementTriple 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementTripleUpdate(id: number, connectivityStatementTriple: ConnectivityStatementTriple, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementTripleUpdate(id, connectivityStatementTriple, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
