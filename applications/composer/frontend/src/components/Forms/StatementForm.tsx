@@ -68,15 +68,19 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       ...acc,
       [key]: {
         "ui:widget": Array.isArray((prop as any).type) && (prop as any).type.includes("null") ? "CustomSingleSelect" : "CustomTextField",
+    
         "ui:options": {
+          onChange2: (value: any) => {
+            console.log(value);
+          },
           label: (prop as any).title,
           data: [{
             label: "test",
-            id: 1
+            value: "1"
           },
           {
             label: "test2",
-            id: 2
+            value: "2"
           }
         ]
         }
@@ -91,7 +95,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       if (typeof tripleObj === 'object' && tripleObj !== null) {
         statement.statement_triples[key] =
           tripleObj.free_text ||
-          (tripleObj.triple ? tripleObj.triple.id : '') ||
+          (tripleObj.triple ? `${tripleObj.triple.id}` : '') ||
           '';
       }
     });
@@ -900,6 +904,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
         "circuit_type",
         "projection",
         "projection_phenotype_id",
+        "statement_triples"
       ]}
       {...props}
     />
