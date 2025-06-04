@@ -1,4 +1,4 @@
-import React, {forwardRef} from "react";
+import React, {forwardRef, useEffect, useState} from "react";
 import {FormBase} from "./FormBase";
 import {jsonSchemas} from "../../services/JsonSchema";
 import statementService from "../../services/StatementService";
@@ -48,7 +48,8 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
   const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
-  
+  const [relationshipOptions, setRelationshipOptions] = useState<any[]>([]);
+
   const dispatch = useDispatch();
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
@@ -62,30 +63,40 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
   copiedSchema.properties.statement_alerts.items.required = ["alert_type"]
   
 
+  useEffect(() => {
+    statementService.getRelationshipOptions().then((response: any) => {
+      setRelationshipOptions(response.results);
+    });
+  }, []);
+  
+
   copiedUISchema.statement_triples = {
     "ui:order": Object.keys(copiedSchema.properties.statement_triples.properties).reverse(),
-    ...Object.entries(copiedSchema.properties.statement_triples.properties).reduce<Record<string, any>>((acc, [key, prop]) => ({
-      ...acc,
-      [key]: {
-        "ui:widget": Array.isArray((prop as any).type) && (prop as any).type.includes("null") ? "CustomSingleSelect" : "CustomTextField",
-    
-        "ui:options": {
-          onChange2: (value: any) => {
-            console.log(value);
-          },
-          label: (prop as any).title,
-          data: [{
-            label: "test",
-            value: "1"
-          },
-          {
-            label: "test2",
-            value: "2"
+    ...Object.entries(copiedSchema.properties.statement_triples.properties).reduce<Record<string, any>>((acc, [key, prop]) => {
+      const property = prop as { type?: string | string[]; title?: string };
+      const isDropdown = Array.isArray(property.type) && property.type.includes("null");
+      const relationshipOption = relationshipOptions.find((option: any) => option.id == key)?.options.map((option: any) => ({
+        label: option.name,
+        value: option.id
+      }));
+      
+      return {
+        ...acc,
+        [key]: {
+          "ui:widget": isDropdown ? "CustomSingleSelect" : "CustomTextField",
+          "ui:options": {
+            onChange2: (value: any) => {
+              console.log(value);
+            },
+            onBlur2: (value: any) => {
+              console.log(value);
+            },
+            label: property.title,
+            data: isDropdown ? relationshipOption : undefined
           }
-        ]
         }
-      }
-    }), {})
+      };
+    }, {})
   };
 
  // Transform statement_triples to match the schema (string values)
@@ -94,8 +105,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       const tripleObj = statement.statement_triples[key];
       if (typeof tripleObj === 'object' && tripleObj !== null) {
         statement.statement_triples[key] =
-          tripleObj.free_text ||
-          (tripleObj.triple ? `${tripleObj.triple.id}` : '') ||
+          tripleObj.value.toString() ||
           '';
       }
     });
@@ -894,7 +904,6 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
         "additional_information",
         "apinatomy_model",
         "curie_id",
-        "statement_triples"
       ]}
       submitOnChangeFields={[
         "phenotype_id",
@@ -904,7 +913,6 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
         "circuit_type",
         "projection",
         "projection_phenotype_id",
-        "statement_triples"
       ]}
       {...props}
     />

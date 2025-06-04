@@ -127,6 +127,10 @@ class ConnectivityStatementService extends AbstractService {
     return composerApi.composerConnectivityStatementRetrieve(Number(id)).then((response: any) => response.data);
   }
 
+  async getRelationshipOptions(): Promise<any> {
+    return composerApi.composerRelationshipList().then((response: any) => response.data);
+  }
+
   async doTransition(connectivityStatement: ConnectivityStatement, transition: string) {
     const id = connectivityStatement.id || -1;
     return composerApi.composerConnectivityStatementDoTransitionCreate(id, transition, connectivityStatement).then((response: any) => response.data);
@@ -422,12 +426,12 @@ class ConnectivityStatementService extends AbstractService {
     return this.performBulkAction(queryOptions, { action: ActionEnum.ChangeStatus, new_status: newStatus });
   }
 
-  /**
-   * Bulk assign connectivity statements to a population set.
-   */
-  async assignPopulationSetBulk(queryOptions: QueryParams, populationSetId: number): Promise<{ message: string }> {
-    return this.performBulkAction(queryOptions, { action: ActionEnum.AssignPopulationSet, population_set_id: populationSetId });
-  }
+    /**
+     * Bulk assign connectivity statements to a population set.
+     */
+    async assignPopulationSetBulk(queryOptions: QueryParams, populationSetId: number): Promise<{ message: string }> {
+      return this.performBulkAction(queryOptions, { action: ActionEnum.AssignPopulationSet, population_set_id: populationSetId });
+    }
 }
 
 

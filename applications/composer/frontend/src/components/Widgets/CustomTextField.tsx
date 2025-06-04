@@ -21,7 +21,7 @@ export default function CustomTextField({
   onChange,
   onBlur,
   onFocus,
-  options: { label, multiline, rows , isDisabled},
+  options: { label, multiline, rows , isDisabled, onBlur2},
 }: any) {
 
   return (
@@ -38,7 +38,12 @@ export default function CustomTextField({
           rows={rows}
           value={value ? value : ''}
           disabled={isDisabled}
-          onBlur={(e=>onBlur(id,e.target.value))}
+          onBlur={(e=>{
+            if (onBlur2) {
+              onBlur2(e.target.value);
+            }
+            onBlur(id,e.target.value)
+          })}
           onFocus={(e=>onFocus(id,e.target.value))}
         />
       }
