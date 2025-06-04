@@ -48,7 +48,6 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
   const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
-  console.log(copiedUISchema);
   
   const dispatch = useDispatch();
   // TODO: set up the widgets for the schema
@@ -56,40 +55,48 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
   copiedSchema.properties.destinations.title = "";
   copiedSchema.properties.statement_alerts.items.properties.alert_type.type = "number";
   copiedSchema.properties.statement_alerts.items.properties.connectivity_statement_id.type = "number";
+  copiedSchema.properties.statement_triples.title = " ";
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["curie_id", "destination_type", "*"];
   copiedSchema.properties.statement_alerts.title = " ";
-  copiedSchema.properties.statement_triples.title = " ";
   copiedSchema.properties.statement_alerts.items.required = ["alert_type"]
   
-  copiedUISchema.statement_tripples = {
-    "ui:options": {
-        "orderable": false,
-        "addable": false,
-        "removable": false,
-        "label": false
-    },
-    "items": {
-        "ui:label": false,
-        "id": {
-            "ui:widget": "hidden"
-        },
-        "alert_type": {
-            "ui:widget": "hidden"
-        },
-        "text": {
-            "ui:widget": "CustomTextArea",
-            "ui:options": {
-                "placeholder": "Enter alert text here...",
-                "rows": 3,
-                "ref": null
-            }
-        },
-        "connectivity_statement_id": {
-            "ui:widget": "hidden"
+
+  copiedUISchema.statement_triples = {
+    "ui:order": Object.keys(copiedSchema.properties.statement_triples.properties).reverse(),
+    ...Object.entries(copiedSchema.properties.statement_triples.properties).reduce<Record<string, any>>((acc, [key, prop]) => ({
+      ...acc,
+      [key]: {
+        "ui:widget": Array.isArray((prop as any).type) && (prop as any).type.includes("null") ? "CustomSingleSelect" : "CustomTextField",
+        "ui:options": {
+          label: (prop as any).title,
+          data: [{
+            label: "test",
+            id: 1
+          },
+          {
+            label: "test2",
+            id: 2
+          }
+        ]
         }
-    }
-};
+      }
+    }), {})
+  };
+
+ // Transform statement_triples to match the schema (string values)
+  if (statement && statement.statement_triples) {
+    Object.keys(statement.statement_triples).forEach(key => {
+      const tripleObj = statement.statement_triples[key];
+      if (typeof tripleObj === 'object' && tripleObj !== null) {
+        statement.statement_triples[key] =
+          tripleObj.free_text ||
+          (tripleObj.triple ? tripleObj.triple.id : '') ||
+          '';
+      }
+    });
+  }
+
 
   copiedUISchema.statement_alerts ={
     "ui:options": {
@@ -247,11 +254,6 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       rows: 4,
       value: statement?.knowledge_statement ?? "",
     },
-    items: {
-      statement_tripples: {
-        "ui:widget": "hidden",
-      }
-    }
   };
 
   copiedUISchema.origins = {
@@ -756,7 +758,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       placeholder: "Forward connection(s)",
       searchPlaceholder: "Search for Connectivity Statements",
       noResultReason:
-        "We couldn’t find any record with these origin in the database.",
+        "We couldn't find any record with these origin in the database.",
       disabledReason: statement?.destinations?.length === 0 ?
         "Add Destination entity to get access to the forward connection form" : "",
       fieldName: "forward_connection",
@@ -834,6 +836,12 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
     },
   };
 
+  // Set custom label and widget for each field in statement_triples
+  if (!copiedUISchema.statement_triples) copiedUISchema.statement_triples = {};
+  Object.entries(copiedSchema.properties.statement_triples.properties).forEach(([key, prop]) => {
+    const property = prop as { type?: string | string[]; title?: string };
+    property.title = "";
+  })  
 
   // Add null option to the fields which have null type in dropdown.
   Object.keys(copiedSchema.properties).forEach((key) => {
@@ -854,6 +862,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       copiedUISchema[key]["ui:options"].data.push({label: "---------", value: null})
     }
   });
+
 
   const widgets = {
     AnatomicalEntitiesField,
@@ -881,6 +890,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
         "additional_information",
         "apinatomy_model",
         "curie_id",
+        "statement_triples"
       ]}
       submitOnChangeFields={[
         "phenotype_id",
