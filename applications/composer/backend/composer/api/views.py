@@ -786,11 +786,7 @@ class RelationshipViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ConnectivityStatementTripleViewSet(viewsets.ModelViewSet):
     """
-    Full CRUD ViewSet for ConnectivityStatementTriple:
-    - POST: Create triple or text
-    - PUT: Replace value (triple_id or free_text) by ID
-    - PATCH: Update free_text (only for TEXT)
-    - DELETE: Unassign
+    ConnectivityStatementTriple:
     """
 
     queryset = ConnectivityStatementTriple.objects.select_related("connectivity_statement", "relationship", "triple")

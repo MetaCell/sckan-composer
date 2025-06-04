@@ -4494,7 +4494,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {ConnectivityStatementTriple} connectivityStatementTriple 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4538,7 +4538,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4580,7 +4580,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
          * @param {*} [options] Override http request option.
@@ -4628,7 +4628,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {PatchedConnectivityStatementTriple} [patchedConnectivityStatementTriple] 
          * @param {*} [options] Override http request option.
@@ -4674,7 +4674,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4716,7 +4716,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {ConnectivityStatementTriple} connectivityStatementTriple 
          * @param {*} [options] Override http request option.
@@ -7677,7 +7677,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {ConnectivityStatementTriple} connectivityStatementTriple 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7689,7 +7689,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7701,7 +7701,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
          * @param {*} [options] Override http request option.
@@ -7714,7 +7714,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {PatchedConnectivityStatementTriple} [patchedConnectivityStatementTriple] 
          * @param {*} [options] Override http request option.
@@ -7727,7 +7727,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7739,7 +7739,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {ConnectivityStatementTriple} connectivityStatementTriple 
          * @param {*} [options] Override http request option.
@@ -8710,7 +8710,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {ConnectivityStatementTriple} connectivityStatementTriple 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8719,7 +8719,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementTripleCreate(connectivityStatementTriple, options).then((request) => request(axios, basePath));
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8728,7 +8728,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementTripleDestroy(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
          * @param {*} [options] Override http request option.
@@ -8738,7 +8738,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementTripleList(limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {PatchedConnectivityStatementTriple} [patchedConnectivityStatementTriple] 
          * @param {*} [options] Override http request option.
@@ -8748,7 +8748,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementTriplePartialUpdate(id, patchedConnectivityStatementTriple, options).then((request) => request(axios, basePath));
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8757,7 +8757,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementTripleRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+         * ConnectivityStatementTriple:
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {ConnectivityStatementTriple} connectivityStatementTriple 
          * @param {*} [options] Override http request option.
@@ -9600,7 +9600,7 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+     * ConnectivityStatementTriple:
      * @param {ConnectivityStatementTriple} connectivityStatementTriple 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -9611,7 +9611,7 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+     * ConnectivityStatementTriple:
      * @param {number} id A unique integer value identifying this connectivity statement triple.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -9622,7 +9622,7 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+     * ConnectivityStatementTriple:
      * @param {number} [limit] Number of results to return per page.
      * @param {number} [offset] The initial index from which to return the results.
      * @param {*} [options] Override http request option.
@@ -9634,7 +9634,7 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+     * ConnectivityStatementTriple:
      * @param {number} id A unique integer value identifying this connectivity statement triple.
      * @param {PatchedConnectivityStatementTriple} [patchedConnectivityStatementTriple] 
      * @param {*} [options] Override http request option.
@@ -9646,7 +9646,7 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+     * ConnectivityStatementTriple:
      * @param {number} id A unique integer value identifying this connectivity statement triple.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -9657,7 +9657,7 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * Full CRUD ViewSet for ConnectivityStatementTriple: - POST: Create triple or text - PUT: Replace value (triple_id or free_text) by ID - PATCH: Update free_text (only for TEXT) - DELETE: Unassign
+     * ConnectivityStatementTriple:
      * @param {number} id A unique integer value identifying this connectivity statement triple.
      * @param {ConnectivityStatementTriple} connectivityStatementTriple 
      * @param {*} [options] Override http request option.
