@@ -135,6 +135,10 @@ class ConnectivityStatementService extends AbstractService {
     return composerApi.composerConnectivityStatementTripleCreate(data).then((response: any) => response.data);
   }
 
+  async deleteRelationship(data: any): Promise<any> {
+    return composerApi.composerConnectivityStatementTripleDestroy(data.id).then((response: any) => response.data);
+  }
+
   async doTransition(connectivityStatement: ConnectivityStatement, transition: string) {
     const id = connectivityStatement.id || -1;
     return composerApi.composerConnectivityStatementDoTransitionCreate(id, transition, connectivityStatement).then((response: any) => response.data);

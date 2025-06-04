@@ -86,12 +86,20 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
           "ui:widget": isDropdown ? "CustomSingleSelect" : "CustomTextField",
           "ui:options": {
             onChange2: async (value: any) => {
-              await statementService.assignRelationship({
-                id: key,
-                connectivity_statement: statement.id.toString(),
-                relationship: key.toString(),
-                value: value
-              });
+              if (!value) {
+                await statementService.deleteRelationship({
+                  id: key,
+                  connectivity_statement: statement.id,
+                  relationship: key
+                });
+              } else {
+                await statementService.assignRelationship({
+                  id: key,
+                  connectivity_statement: statement.id,
+                  relationship: key,
+                  value: value
+                });
+              }
               refreshStatement();
             },
             onBlur2: async (value: any) => {
@@ -104,7 +112,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
               refreshStatement();
             },
             label: property.title,
-            data: isDropdown ? relationshipOption : undefined
+            data: isDropdown && relationshipOption ? [...relationshipOption, {label: "---------", value: null}] : undefined
           }
         }
       };
