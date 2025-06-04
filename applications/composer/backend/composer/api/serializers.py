@@ -688,7 +688,7 @@ class ConnectivityStatementTripleSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         request = self.context.get("request")
-        if request and request.method in ("PUT", "PATCH", "POST"):
+        if request and request.method in ("POST", "PUT", "PATCH"):
             incoming_value = request.data.get("value", None)
 
             relationship = data.get("relationship") or getattr(self.instance, "relationship", None)
@@ -702,16 +702,21 @@ class ConnectivityStatementTripleSerializer(serializers.ModelSerializer):
                 data["triple"] = None
 
             else:
-                if not isinstance(incoming_value, int):
-                    raise serializers.ValidationError({"value": "Must be an integer triple ID."})
                 try:
-                    triple = Triple.objects.get(id=incoming_value, relationship=relationship)
+                    triple_id = int(incoming_value)
+                except (ValueError, TypeError):
+                    raise serializers.ValidationError({"value": "Must be an integer (or stringified integer) triple ID."})
+
+                try:
+                    triple = Triple.objects.get(id=triple_id, relationship=relationship)
                 except Triple.DoesNotExist:
                     raise serializers.ValidationError({"value": "Invalid triple ID for this relationship."})
+
                 data["triple"] = triple
                 data["free_text"] = None
 
         return data
+
 
 class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     """Connectivity Statement"""

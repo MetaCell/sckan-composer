@@ -943,12 +943,7 @@ paths:
   /api/composer/connectivityStatementTriple/:
     get:
       operationId: composer_connectivityStatementTriple_list
-      description: |-
-        Full CRUD ViewSet for ConnectivityStatementTriple:
-        - POST: Create triple or text
-        - PUT: Replace value (triple_id or free_text) by ID
-        - PATCH: Update free_text (only for TEXT)
-        - DELETE: Unassign
+      description: 'ConnectivityStatementTriple:'
       parameters:
       - name: limit
         required: false
@@ -977,12 +972,7 @@ paths:
           description: ''
     post:
       operationId: composer_connectivityStatementTriple_create
-      description: |-
-        Full CRUD ViewSet for ConnectivityStatementTriple:
-        - POST: Create triple or text
-        - PUT: Replace value (triple_id or free_text) by ID
-        - PATCH: Update free_text (only for TEXT)
-        - DELETE: Unassign
+      description: 'ConnectivityStatementTriple:'
       tags:
       - composer
       requestBody:
@@ -1011,12 +1001,7 @@ paths:
   /api/composer/connectivityStatementTriple/{id}/:
     get:
       operationId: composer_connectivityStatementTriple_retrieve
-      description: |-
-        Full CRUD ViewSet for ConnectivityStatementTriple:
-        - POST: Create triple or text
-        - PUT: Replace value (triple_id or free_text) by ID
-        - PATCH: Update free_text (only for TEXT)
-        - DELETE: Unassign
+      description: 'ConnectivityStatementTriple:'
       parameters:
       - in: path
         name: id
@@ -1040,12 +1025,7 @@ paths:
           description: ''
     put:
       operationId: composer_connectivityStatementTriple_update
-      description: |-
-        Full CRUD ViewSet for ConnectivityStatementTriple:
-        - POST: Create triple or text
-        - PUT: Replace value (triple_id or free_text) by ID
-        - PATCH: Update free_text (only for TEXT)
-        - DELETE: Unassign
+      description: 'ConnectivityStatementTriple:'
       parameters:
       - in: path
         name: id
@@ -1081,12 +1061,7 @@ paths:
           description: ''
     patch:
       operationId: composer_connectivityStatementTriple_partial_update
-      description: |-
-        Full CRUD ViewSet for ConnectivityStatementTriple:
-        - POST: Create triple or text
-        - PUT: Replace value (triple_id or free_text) by ID
-        - PATCH: Update free_text (only for TEXT)
-        - DELETE: Unassign
+      description: 'ConnectivityStatementTriple:'
       parameters:
       - in: path
         name: id
@@ -1121,12 +1096,7 @@ paths:
           description: ''
     delete:
       operationId: composer_connectivityStatementTriple_destroy
-      description: |-
-        Full CRUD ViewSet for ConnectivityStatementTriple:
-        - POST: Create triple or text
-        - PUT: Replace value (triple_id or free_text) by ID
-        - PATCH: Update free_text (only for TEXT)
-        - DELETE: Unassign
+      description: 'ConnectivityStatementTriple:'
       parameters:
       - in: path
         name: id
