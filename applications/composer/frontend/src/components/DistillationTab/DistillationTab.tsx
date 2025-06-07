@@ -70,7 +70,7 @@ const DistillationTab = ({
                     index={0}
                     statement={statement}
                     sentence={statement.sentence}
-                    isDisabled={true}
+                    isDisabled={isDisabled}
                   />
                 </Box>
                 <StatementAlertsAccordion
