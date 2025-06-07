@@ -87,6 +87,9 @@ const DistillationTab = ({
                           "&:before": {
                             display: "none",
                           },
+                          "& #root_statement_triples__title": {
+                           display: "none",
+                          }
                         }}
                       >
                         <AccordionSummary
@@ -100,16 +103,16 @@ const DistillationTab = ({
                           </Typography>
                         </AccordionSummary>
                         <AccordionDetails sx={{ px: 4, pt: 0, pb: 2 }}>
-                        <StatementForm
-                            statement={statement}
-                            format="small"
-                            action={refreshStatement}
-                            extraData={{ sentence_id: statement.sentence.id }}
-                            uiFields={["statement_triples"]}
-                            className="ks"
-                            enableAutoSave={true}
-                            isDisabled={isDisabled}
-                          />
+                          <StatementForm
+                              statement={statement}
+                              format="small"
+                              action={refreshStatement}
+                              extraData={{ sentence_id: statement.sentence.id }}
+                              uiFields={["statement_triples"]}
+                              className="ks"
+                              enableAutoSave={true}
+                              isDisabled={isDisabled}
+                            />
                         </AccordionDetails>
                       </Accordion>
                   </Box>

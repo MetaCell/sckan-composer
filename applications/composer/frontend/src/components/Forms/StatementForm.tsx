@@ -42,6 +42,7 @@ import {projections} from "../../services/ProjectionService";
 import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
 import {useDispatch} from "react-redux";
 import {setWasChangeDetected} from "../../redux/statementSlice";
+import { AutocompleteWithChips } from "../Widgets/AutocompleteWithChips";
 
 const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement>) => {
   const {uiFields, statement, isDisabled, action: refreshStatement, onInputBlur, alertId, currentExpanded, onInputFocus} = props;
@@ -75,16 +76,58 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
     ...Object.entries(copiedSchema.properties.statement_triples.properties).reduce<Record<string, any>>((acc, [key, prop]) => {
       const property = prop as { type?: string | string[]; title?: string };
       const isDropdown = Array.isArray(property.type) && property.type.includes("null");
+      const isMultiSelect = property.type === "array"; 
       const relationshipOption = relationshipOptions.find((option: any) => option.id == key)?.options.map((option: any) => ({
         label: option.name,
         value: option.id
       }));
-
+      
       return {
         ...acc,
         [key]: {
-          "ui:widget": isDropdown ? "CustomSingleSelect" : "CustomTextField",
-          "ui:options": {
+          "ui:widget": isMultiSelect ? "AutocompleteWithChips" : (isDropdown ? "CustomSingleSelect" : "CustomTextField"),
+          "ui:options": isMultiSelect ? {
+            options: relationshipOption || [],
+            placeholder: "Select statement triples...",
+            data: statement?.statement_triples?.[key]?.map((item: any) => {
+              const relationship = relationshipOptions.find((rel: any) => rel.id === Number(key));
+              const option = relationship?.options.find((opt: any) => opt.id === item.value);
+              return {
+                id: item.id,
+                label: option?.name || '',
+                value: item.value
+              };
+            }) || [],
+             
+              removeChip: async (id: number) => {
+                await statementService.deleteRelationship(id);
+                refreshStatement();
+              },
+              label: property.title,
+              isDisabled,
+              onAutocompleteChange: async (event: any, newValue: any[]) => {
+                let filtered = [];
+                const currentTriples = statement?.statement_triples?.[key] || [];
+                filtered = newValue.filter(obj => Object.keys(obj).length > 0);
+
+                const newSelectedValue = filtered.find(item => 
+                  !currentTriples.some((triple: any) => triple.value === item.value)
+                );
+
+                console.log(filtered, currentTriples);
+                
+
+                if (newSelectedValue) {
+                  await statementService.assignRelationship({
+                    id: key, 
+                    connectivity_statement: statement.id,
+                    relationship: key,
+                    value: newSelectedValue.value
+                  });
+                }
+                refreshStatement();
+              }
+          } : {
             onChange2: async (value: any) => {
               const previousValue = statement?.statement_triples?.[key]?.id;
               if (previousValue && value === null) {
@@ -903,6 +946,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
     CustomTextField,
     CustomTextArea,
     SelectWidget: CustomSingleSelect,
+    AutocompleteWithChips
   };
 
 

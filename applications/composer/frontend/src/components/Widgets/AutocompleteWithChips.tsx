@@ -99,9 +99,21 @@ const handleDeleteAll = () => {
           options={options}
           onChange={(e, value) => onAutocompleteChange(e, value)}
           freeSolo
-          defaultValue={options.length > 0 ? [options[0].label] : [{}]}
+          defaultValue={options?.length > 0 ? [options[0].label] : [{}]}
+          getOptionDisabled={(option) => {
+            return data.some((ele: { id: number, label: string, value: number }) => ele?.value === option.value);
+          }}
+          ListboxProps={{
+            sx: {
+              '& .MuiAutocomplete-option[aria-disabled="true"]': {
+                opacity: 1,
+                color: vars.gray600,
+                cursor: 'not-allowed',
+              }
+            }
+          }}
           renderTags={(value: any, getTagProps) =>
-            data.map((ele: { id: number; label: string }, index: number) => (
+            data?.map((ele: { id: number; label: string }, index: number) => (
               <CustomChip
                 id={ele.id}
                 label={ele.label}
