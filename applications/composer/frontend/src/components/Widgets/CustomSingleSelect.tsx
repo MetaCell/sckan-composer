@@ -24,6 +24,8 @@ const CustomSingleSelect = ({
     onChange2
   },
 }: any) => {
+  const updatedValue = value && typeof value === 'object' ? value.value : value;
+
   const selectOptions = enumOptions || data || [];
   const pathBuilderComponentStyle = isPathBuilderComponent
     ? {
@@ -53,8 +55,7 @@ const CustomSingleSelect = ({
         },
       }
     : null;
-  const isReadOnlyValue = selectOptions?.find(({ value: id }: any) => id === value)?.label
-      console.log({selectOptions, value, label, onChange});
+  const isReadOnlyValue = selectOptions?.find(({ value: id }: any) => id === updatedValue)?.label
       
   return (
     <>
@@ -106,7 +107,7 @@ const CustomSingleSelect = ({
                 boxShadow: "none",
               },
             }}
-            value={value !== null ? `${value}` : ""}
+            value={updatedValue !== null ? `${updatedValue}` : ""}
             onChange={async (event)  => {
               if (onUpdate) {
                 try {

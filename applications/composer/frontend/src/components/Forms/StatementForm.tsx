@@ -79,38 +79,49 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
         label: option.name,
         value: option.id
       }));
-      
+
       return {
         ...acc,
         [key]: {
           "ui:widget": isDropdown ? "CustomSingleSelect" : "CustomTextField",
           "ui:options": {
             onChange2: async (value: any) => {
-              if (!value) {
-                await statementService.deleteRelationship({
-                  id: key,
-                  connectivity_statement: statement.id,
-                  relationship: key
-                });
-              } else {
+              const previousValue = statement?.statement_triples?.[key]?.id;
+              if (previousValue && value === null) {
+                await statementService.deleteRelationship(previousValue);
+              } else if (value !== null && !previousValue) {
                 await statementService.assignRelationship({
-                  id: key,
+                  id: key, 
+                  connectivity_statement: statement.id,
+                  relationship: key,
+                  value: value.toString()
+                });
+              } 
+              refreshStatement();
+            },
+            onBlur2: async (value: any) => {
+              const previousValue = statement?.statement_triples?.[key]?.id;
+              
+              if (value.trim() === "" && previousValue) {
+                await statementService.deleteRelationship(previousValue);
+              } else if (!previousValue && value.trim() !== "") {
+                  await statementService.assignRelationship({
+                    id: key, 
+                    connectivity_statement: statement.id,
+                    relationship: key,
+                    value: value
+                  });
+              } else if (previousValue) {
+                await statementService.updateRelationship(previousValue, {
                   connectivity_statement: statement.id,
                   relationship: key,
                   value: value
                 });
               }
+           
               refreshStatement();
             },
-            onBlur2: async (value: any) => {
-              await statementService.assignRelationship({
-                id: key,
-                connectivity_statement: statement.id.toString(),
-                relationship: key.toString(),
-                value: value.toString()
-              });
-              refreshStatement();
-            },
+            value: statement?.statement_triples?.[key]?.value || '',
             label: property.title,
             data: isDropdown && relationshipOption ? [...relationshipOption, {label: "---------", value: null}] : undefined
           }
@@ -118,18 +129,6 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       };
     }, {})
   };
-
- // Transform statement_triples to match the schema (string values)
-  if (statement && statement.statement_triples) {
-    Object.keys(statement.statement_triples).forEach(key => {
-      const tripleObj = statement.statement_triples[key];
-      if (typeof tripleObj === 'object' && tripleObj !== null) {
-        statement.statement_triples[key] =
-          tripleObj.value.toString() ||
-          '';
-      }
-    });
-  }
 
 
   copiedUISchema.statement_alerts ={
