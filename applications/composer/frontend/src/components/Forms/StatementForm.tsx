@@ -62,17 +62,9 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
   copiedUISchema["ui:order"] = ["curie_id", "destination_type", "*"];
   copiedSchema.properties.statement_alerts.title = " ";
   copiedSchema.properties.statement_alerts.items.required = ["alert_type"]
-  
-
-  useEffect(() => {
-    statementService.getRelationshipOptions().then((response: any) => {
-      setRelationshipOptions(response.results);
-    });
-  }, []);
-  
 
   copiedUISchema.statement_triples = {
-    "ui:order": Object.keys(copiedSchema.properties.statement_triples.properties).reverse(),
+    "ui:order": uiSchema.statement_triples["ui:order"] || Object.keys(copiedSchema.properties.statement_triples.properties),
     ...Object.entries(copiedSchema.properties.statement_triples.properties).reduce<Record<string, any>>((acc, [key, prop]) => {
       const property = prop as { type?: string | string[]; title?: string };
       const isDropdown = Array.isArray(property.type) && property.type.includes("null");
@@ -113,9 +105,6 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
                 const newSelectedValue = filtered.find(item => 
                   !currentTriples.some((triple: any) => triple.value === item.value)
                 );
-
-                console.log(filtered, currentTriples);
-                
 
                 if (newSelectedValue) {
                   await statementService.assignRelationship({
@@ -164,6 +153,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
            
               refreshStatement();
             },
+            isDisabled,
             value: statement?.statement_triples?.[key]?.value || '',
             label: property.title,
             data: isDropdown && relationshipOption ? [...relationshipOption, {label: "---------", value: null}] : undefined
@@ -949,6 +939,14 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
     AutocompleteWithChips
   };
 
+    
+
+  useEffect(() => {
+    statementService.getRelationshipOptions().then((response: any) => {
+      setRelationshipOptions(response.results);
+    });
+  }, []);
+  
 
   return (
     <FormBase
