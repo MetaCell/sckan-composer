@@ -128,8 +128,17 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
                   relationship: key,
                   value: value.toString()
                 });
-              } 
-              refreshStatement();
+              } else if (value !== null && previousValue) {
+                await statementService.updateRelationship(previousValue, {
+                  connectivity_statement: statement.id,
+                  relationship: key,
+                  value: value
+                });
+              }
+              
+              if (value !== statement?.statement_triples?.[key]?.value) {
+                refreshStatement();
+              }
             },
             onBlur2: async (value: any) => {
               const previousValue = statement?.statement_triples?.[key]?.id;
@@ -150,8 +159,9 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
                   value: value
                 });
               }
-           
-              refreshStatement();
+              if (value !== statement?.statement_triples?.[key]?.value) {
+                refreshStatement();
+              }
             },
             isDisabled,
             value: statement?.statement_triples?.[key]?.value || '',
