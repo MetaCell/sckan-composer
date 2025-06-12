@@ -1,0 +1,46 @@
+harness:
+  database: { auto: true, type: postgres, size: 10Gi }
+  dependencies:
+    build: [cloudharness-frontend-build, cloudharness-django]
+    soft: [argo]
+    hard: [accounts]
+  deployment:
+    auto: true
+    port: 80
+    volume:
+      mountpath: /usr/src/app/persistent
+      name: composer-data
+      auto: true
+      size: 5Gi
+      usenfs: false
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1024Mi"
+      limits:
+        cpu: "2500m"
+        memory: "2048Mi"
+  secured: false
+  service: { auto: true, port: 80 }
+  subdomain: www
+  uri_role_mapping:
+    - require-any-role: true
+      roles:
+        [
+          "composer:composer-administrator",
+          "composer:composer-manager",
+          "composer:composer-user",
+        ]
+      uri: /*
+  livenessProbe:
+    path: /admin/login/
+    initialDelaySeconds: 300
+    periodSeconds: 30
+    failureThreshold: 3
+  readinessProbe:
+    path: /admin/login/
+    initialDelaySeconds: 300
+    periodSeconds: 30
+    failureThreshold: 3
+  envmap:
+    PRODUCTION: True
