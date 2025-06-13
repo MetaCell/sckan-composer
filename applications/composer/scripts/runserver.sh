@@ -20,20 +20,23 @@ python3 manage.py migrate
 
 # Determine server to run
 if [ "$DEBUG" = "true" ]; then
-    echo "DEBUG mode enabled: running Django dev server"
     if [ "$HTTPS" = "true" ]; then
+        echo "Debug mode: running Django dev server with SSL"
         python3 manage.py runsslserver 0.0.0.0:${PORT}
     else
+        echo "Debug mode: running Django dev server"
         python3 manage.py runserver 0.0.0.0:${PORT}
     fi
 elif [ "$PRODUCTION" = "true" ]; then
     echo "PRODUCTION mode: running Uvicorn"
     python3 -m uvicorn --workers ${WORKERS} --host 0.0.0.0 --port ${PORT} ${MODULE_NAME}.asgi:application
 else
-    echo "Falling back to dev server (PRODUCTION != true)"
+    
     if [ "$HTTPS" = "true" ]; then
+        echo "Dev mode: running Django dev server with SSL"
         python3 manage.py runsslserver 0.0.0.0:${PORT}
     else
+        echo "Dev mode: running Django dev server"
         python3 manage.py runserver 0.0.0.0:${PORT}
     fi
 fi

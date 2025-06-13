@@ -13,6 +13,13 @@ harness:
       auto: true
       size: 5Gi
       usenfs: false
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1024Mi"
+      limits:
+        cpu: "2500m"
+        memory: "2048Mi"
   secured: false
   service: { auto: true, port: 80 }
   subdomain: www
@@ -25,5 +32,15 @@ harness:
           "composer:composer-user",
         ]
       uri: /*
+  livenessProbe:
+    path: /admin/login/
+    initialDelaySeconds: 300
+    periodSeconds: 30
+    failureThreshold: 3
+  readinessProbe:
+    path: /admin/login/
+    initialDelaySeconds: 300
+    periodSeconds: 30
+    failureThreshold: 3
   envmap:
     PRODUCTION: True
