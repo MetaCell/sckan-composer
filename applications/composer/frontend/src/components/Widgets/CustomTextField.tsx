@@ -21,24 +21,29 @@ export default function CustomTextField({
   onChange,
   onBlur,
   onFocus,
-  options: { label, multiline, rows , isDisabled},
+  options: { label, multiline, rows , isDisabled, onBlur2},
 }: any) {
-
+  const updatedValue = value && typeof value === 'object' ? value.value : value;
   return (
     <FormControl variant="standard">
         <Typography variant="h6" fontWeight={500} marginBottom={2} color={vars.titleFontColor}>
           {label}
         </Typography>
       {
-        isDisabled ? <Typography>{value ? value : '-'}</Typography> : <StyledInput
+        isDisabled ? <Typography>{updatedValue ? updatedValue : '-'}</Typography> : <StyledInput
           onChange={(event) => onChange(event.target.value)}
           id="custom-input"
           placeholder={placeholder}
           multiline={multiline}
           rows={rows}
-          value={value ? value : ''}
+          value={updatedValue ? updatedValue : ''}
           disabled={isDisabled}
-          onBlur={(e=>onBlur(id,e.target.value))}
+          onBlur={(e=>{
+            if (onBlur2) {
+              onBlur2(e.target.value);
+            }
+            onBlur(id,e.target.value)
+          })}
           onFocus={(e=>onFocus(id,e.target.value))}
         />
       }

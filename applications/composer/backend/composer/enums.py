@@ -85,3 +85,8 @@ class BulkActionType(str, Enum):
     WRITE_NOTE = "write_note"
     CHANGE_STATUS = "change_status"
     ASSIGN_POPULATION_SET = "assign_population_set"
+
+class RelationshipType(models.TextChoices):
+    SINGLE = "single", "Single select"
+    MULTI = "multi", "Multi select"
+    TEXT = "text", "Text area"

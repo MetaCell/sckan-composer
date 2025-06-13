@@ -12,6 +12,7 @@ import { useTheme } from "@mui/system";
 import StatementDetailsAccordion from "../TriageStatementSection/StatementDetailsAccordion";
 import ProvenancesForm from "../Forms/ProvenanceForm";
 import StatementPreviewForm from "../Forms/StatementPreviewForm";
+import StatementTriples from "../Forms/StatementTriples";
 
 const DistillationTab = ({
                            statement,
@@ -78,6 +79,11 @@ const DistillationTab = ({
                   refreshStatement={refreshStatement}
                   isDisabled={isDisabled}
                 />
+               <StatementTriples
+                statement={statement}
+                refreshStatement={refreshStatement}
+                isDisabled={isDisabled}
+               />
               </Paper>
             </Box>
           </Paper>

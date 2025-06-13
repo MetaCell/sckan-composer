@@ -162,6 +162,21 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
             )
         )
 
+
+    for cst in cs.statement_triples.select_related("relationship", "triple").all():
+        predicate_mapping = DynamicExportRelationship(
+            predicate=cst.relationship.predicate_name,
+            label=cst.relationship.title,
+            uri=cst.relationship.predicate_uri,
+        )
+        rows.append(
+            Row(
+                object=cst.triple.name if cst.triple else cst.free_text,
+                object_uri=cst.triple.uri if cst.triple else "",
+                predicate_mapping=predicate_mapping,
+            )
+        )
+
     # the composer URI
     rows.append(get_composer_uri_row(cs))
     return rows

@@ -1,16 +1,16 @@
-import React, {forwardRef} from "react";
-import {FormBase} from "./FormBase";
-import {jsonSchemas} from "../../services/JsonSchema";
+import React, { forwardRef, useEffect, useState } from "react";
+import { FormBase } from "./FormBase";
+import { jsonSchemas } from "../../services/JsonSchema";
 import statementService from "../../services/StatementService";
 import CustomTextField from "../Widgets/CustomTextField";
 import CustomSingleSelect from "../Widgets/CustomSingleSelect";
 import CustomTextArea from "../Widgets/CustomTextArea";
 import ArrayFieldTemplate from "../Widgets/ArrayFieldTemplate";
 import AnatomicalEntitiesField from "../AnatomicalEntitiesField";
-import {sexes} from "../../services/SexService";
+import { sexes } from "../../services/SexService";
 import { populations } from "../../services/PopulationService";
-import {phenotypes} from "../../services/PhenotypeService";
-import {Box, Chip} from "@mui/material";
+import { phenotypes } from "../../services/PhenotypeService";
+import { Box, Chip } from "@mui/material";
 import CustomEntitiesDropdown from "../Widgets/CustomEntitiesDropdown";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import {
@@ -31,36 +31,151 @@ import {
   getViasGroupLabel,
   mapAnatomicalEntitiesToOptions,
 } from "../../helpers/dropdownMappers";
-import {DestinationIcon, ViaIcon} from "../icons";
-import {ChangeRequestStatus, DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel,} from "../../helpers/settings";
-import {Option, OptionDetail} from "../../types";
-import {composerApi as api} from "../../services/apis";
-import {ConnectivityStatement, ViaTypeEnum, DestinationTypeEmum,} from "../../apiclient/backend";
-import {CustomFooter} from "../Widgets/HoveredOptionContent";
-import {StatementStateChip} from "../Widgets/StateChip";
-import {projections} from "../../services/ProjectionService";
-import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
-import {useDispatch} from "react-redux";
-import {setWasChangeDetected} from "../../redux/statementSlice";
+import { DestinationIcon, ViaIcon } from "../icons";
+import { ChangeRequestStatus, DestinationsGroupLabel, OriginsGroupLabel, ViasGroupLabel, } from "../../helpers/settings";
+import { Option, OptionDetail } from "../../types";
+import { composerApi as api } from "../../services/apis";
+import { ConnectivityStatement, ViaTypeEnum, DestinationTypeEmum, } from "../../apiclient/backend";
+import { CustomFooter } from "../Widgets/HoveredOptionContent";
+import { StatementStateChip } from "../Widgets/StateChip";
+import { projections } from "../../services/ProjectionService";
+import { checkOwnership, getOwnershipAlertMessage } from "../../helpers/ownershipAlert";
+import { useDispatch } from "react-redux";
+import { setWasChangeDetected } from "../../redux/statementSlice";
+import { AutocompleteWithChips } from "../Widgets/AutocompleteWithChips";
 
 const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement>) => {
-  const {uiFields, statement, isDisabled, action: refreshStatement, onInputBlur, alertId, currentExpanded, onInputFocus} = props;
-  const {schema, uiSchema} = jsonSchemas.getConnectivityStatementSchema();
+  const { uiFields, statement, isDisabled, action: refreshStatement, onInputBlur, alertId, currentExpanded, onInputFocus } = props;
+  const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
+  const [relationshipOptions, setRelationshipOptions] = useState<any[]>([]);
+
   const dispatch = useDispatch();
   // TODO: set up the widgets for the schema
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
   copiedSchema.properties.statement_alerts.items.properties.alert_type.type = "number";
   copiedSchema.properties.statement_alerts.items.properties.connectivity_statement_id.type = "number";
-
+  copiedSchema.properties.statement_triples.title = " ";
   copiedSchema.properties.forward_connection.type = ["string", "null"];
   copiedUISchema["ui:order"] = ["curie_id", "destination_type", "*"];
   copiedSchema.properties.statement_alerts.title = " ";
   copiedSchema.properties.statement_alerts.items.required = ["alert_type"]
-  
-  copiedUISchema.statement_alerts ={
+
+  copiedUISchema.statement_triples = {
+    "ui:order": uiSchema.statement_triples["ui:order"] || Object.keys(copiedSchema.properties.statement_triples.properties),
+    ...Object.entries(copiedSchema.properties.statement_triples.properties).reduce<Record<string, any>>((acc, [key, prop]) => {
+      const property = prop as { type?: string | string[]; title?: string };
+      const isDropdown = Array.isArray(property.type) && property.type.includes("null");
+      const isMultiSelect = property.type === "array";
+      /* eslint-disable eqeqeq */
+      const relationshipOption = relationshipOptions.find((option: any) => option.id == key)?.options.map((option: any) => ({
+        label: option.name,
+        value: option.id
+      }));
+
+      return {
+        ...acc,
+        [key]: {
+          "ui:widget": isMultiSelect ? "AutocompleteWithChips" : (isDropdown ? "CustomSingleSelect" : "CustomTextField"),
+          "ui:options": isMultiSelect ? {
+            options: relationshipOption || [],
+            placeholder: "Select statement triples...",
+            data: statement?.statement_triples?.[key]?.map((item: any) => {
+              const relationship = relationshipOptions.find((rel: any) => rel.id === Number(key));
+              const option = relationship?.options.find((opt: any) => opt.id === item.value);
+              return {
+                id: item.id,
+                label: option?.name || '',
+                value: item.value
+              };
+            }) || [],
+
+            removeChip: async (id: number) => {
+              await statementService.deleteRelationship(id);
+              refreshStatement();
+            },
+            label: property.title,
+            isDisabled,
+            onAutocompleteChange: async (event: any, newValue: any[]) => {
+              let filtered = [];
+              const currentTriples = statement?.statement_triples?.[key] || [];
+              filtered = newValue.filter(obj => Object.keys(obj).length > 0);
+
+              const newSelectedValue = filtered.find(item =>
+                !currentTriples.some((triple: any) => triple.value === item.value)
+              );
+
+              if (newSelectedValue) {
+                await statementService.assignRelationship({
+                  id: key,
+                  connectivity_statement: statement.id,
+                  relationship: key,
+                  value: newSelectedValue.value
+                });
+              }
+              refreshStatement();
+            }
+          } : {
+            onChange2: async (value: any) => {
+              const previousValue = statement?.statement_triples?.[key]?.id;
+              if (previousValue && value === null) {
+                await statementService.deleteRelationship(previousValue);
+              } else if (value !== null && !previousValue) {
+                await statementService.assignRelationship({
+                  id: key,
+                  connectivity_statement: statement.id,
+                  relationship: key,
+                  value: value.toString()
+                });
+              } else if (value !== null && previousValue) {
+                await statementService.updateRelationship(previousValue, {
+                  connectivity_statement: statement.id,
+                  relationship: key,
+                  value: value
+                });
+              }
+
+              if (value !== statement?.statement_triples?.[key]?.value) {
+                refreshStatement();
+              }
+            },
+            onBlur2: async (value: any) => {
+              const previousValue = statement?.statement_triples?.[key]?.id;
+
+              if (value.trim() === "" && previousValue) {
+                await statementService.deleteRelationship(previousValue);
+              } else if (!previousValue && value.trim() !== "") {
+                await statementService.assignRelationship({
+                  id: key,
+                  connectivity_statement: statement.id,
+                  relationship: key,
+                  value: value
+                });
+              } else if (previousValue) {
+                await statementService.updateRelationship(previousValue, {
+                  connectivity_statement: statement.id,
+                  relationship: key,
+                  value: value
+                });
+              }
+              if (value !== statement?.statement_triples?.[key]?.value) {
+                refreshStatement();
+              }
+            },
+            isDisabled,
+            value: statement?.statement_triples?.[key]?.value || '',
+            label: property.title,
+            data: isDropdown && relationshipOption ? [...relationshipOption, { label: "---------", value: null }] : undefined
+          }
+        }
+      };
+    }, {})
+  };
+
+
+  copiedUISchema.statement_alerts = {
     "ui:options": {
       orderable: false,
       addable: false,
@@ -69,7 +184,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
     },
     items: {
       "ui:label": false,
-      
+
       id: {
         "ui:widget": "hidden",
       },
@@ -93,6 +208,8 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       }
     },
   }
+
+
   copiedUISchema.curie_id = {
     "ui:widget": "CustomTextField",
     "ui:options": {
@@ -173,7 +290,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       placeholder: "Enter Sex",
       data: sexes
         .getSexes()
-        .map((row: any) => ({label: row.name, value: row.id})),
+        .map((row: any) => ({ label: row.name, value: row.id })),
     },
     value: statement?.sex_id ?? "",
   };
@@ -199,7 +316,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       placeholder: "Select Phenotype",
       data: phenotypes
         .getPhenotypes()
-        .map((row: any) => ({label: row.name, value: row.id})),
+        .map((row: any) => ({ label: row.name, value: row.id })),
     },
     value: statement?.phenotype_id ?? "",
   };
@@ -718,7 +835,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       placeholder: "Forward connection(s)",
       searchPlaceholder: "Search for Connectivity Statements",
       noResultReason:
-        "We couldn’t find any record with these origin in the database.",
+        "We couldn't find any record with these origin in the database.",
       disabledReason: statement?.destinations?.length === 0 ?
         "Add Destination entity to get access to the forward connection form" : "",
       fieldName: "forward_connection",
@@ -755,23 +872,23 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
             ),
           ),
       },
-      CustomInputChip: ({entity, sx = {}}: any) => (
+      CustomInputChip: ({ entity, sx = {} }: any) => (
         <Chip
           key={entity?.id}
           variant={"filled"}
           onClick={(e) => {
             e.stopPropagation();
           }}
-          deleteIcon={<OpenInNewIcon sx={{fill: "#548CE5"}}/>}
+          deleteIcon={<OpenInNewIcon sx={{ fill: "#548CE5" }} />}
           onDelete={(e) => {
             window.open(window.location.origin + "/statement/" + entity?.id, '_blank')
             e.stopPropagation();
           }}
           label={entity?.label}
-          sx={{...sx}}
+          sx={{ ...sx }}
         />
       ),
-      CustomHeader: ({entity}: any) => {
+      CustomHeader: ({ entity }: any) => {
         const stateDetail = entity.content.find(
           (detail: OptionDetail) => detail.title === DROPDOWN_MAPPER_STATE,
         );
@@ -789,13 +906,19 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
               pb: "1.5rem",
             }}
           >
-            <StatementStateChip value={stateValue}/>
+            <StatementStateChip value={stateValue} />
           </Box>
         );
       },
     },
   };
 
+  // Set custom label and widget for each field in statement_triples
+  if (!copiedUISchema.statement_triples) copiedUISchema.statement_triples = {};
+  Object.entries(copiedSchema.properties.statement_triples.properties).forEach(([key, prop]) => {
+    const property = prop as { type?: string | string[]; title?: string };
+    property.title = "";
+  })
 
   // Add null option to the fields which have null type in dropdown.
   Object.keys(copiedSchema.properties).forEach((key) => {
@@ -813,9 +936,10 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
 
   Object.keys(copiedUISchema).forEach((key) => {
     if (copiedUISchema[key]["ui:options"] && copiedUISchema[key]["ui:options"].data) {
-      copiedUISchema[key]["ui:options"].data.push({label: "---------", value: null})
+      copiedUISchema[key]["ui:options"].data.push({ label: "---------", value: null })
     }
   });
+
 
   const widgets = {
     AnatomicalEntitiesField,
@@ -823,7 +947,16 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
     CustomTextField,
     CustomTextArea,
     SelectWidget: CustomSingleSelect,
+    AutocompleteWithChips
   };
+
+
+
+  useEffect(() => {
+    statementService.getRelationshipOptions().then((response: any) => {
+      setRelationshipOptions(response.results);
+    });
+  }, []);
 
 
   return (

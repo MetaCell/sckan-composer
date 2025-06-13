@@ -21,9 +21,12 @@ const CustomSingleSelect = ({
     InputIcon,
     onUpdate,
     isDisabled,
+    onChange2
   },
 }: any) => {
-  const selectOptions = enumOptions ? enumOptions : data;
+  const updatedValue = value && typeof value === 'object' ? value.value : value;
+
+  const selectOptions = enumOptions || data || [];
   const pathBuilderComponentStyle = isPathBuilderComponent
     ? {
         "& .MuiInputBase-root": {
@@ -52,7 +55,8 @@ const CustomSingleSelect = ({
         },
       }
     : null;
-  const isReadOnlyValue = selectOptions.find(({ value: id }: any) => id === value)?.label
+  const isReadOnlyValue = selectOptions?.find(({ value: id }: any) => id === updatedValue)?.label
+      
   return (
     <>
       {label && (
@@ -103,7 +107,7 @@ const CustomSingleSelect = ({
                 boxShadow: "none",
               },
             }}
-            value={value !== null ? value : ""}
+            value={updatedValue !== null ? `${updatedValue}` : ""}
             onChange={async (event)  => {
               if (onUpdate) {
                 try {
@@ -115,6 +119,9 @@ const CustomSingleSelect = ({
                   console.error(e)
                 }
               } else {
+                if (onChange2) {
+                  onChange2(event.target.value);
+                }
                 onChange(event.target.value);
               }
             }}
