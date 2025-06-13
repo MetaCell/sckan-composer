@@ -23,7 +23,7 @@ const StatementTriples = ({ statement, refreshStatement, isDisabled }: any) => {
         sx={{ p: 0, display: "flex", flexDirection: "row-reverse" }}
       >
         <Typography variant="h6" ml={1}>
-          Statement Triples
+          Additional Details
         </Typography>
       </AccordionSummary>
       <AccordionDetails sx={{ px: 4, pt: 0, pb: 2 }}>
