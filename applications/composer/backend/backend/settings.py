@@ -12,9 +12,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import os
 import dotenv
-
 dotenv.load_dotenv()
 
+from cloudharness.utils.secrets import get_secret
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -24,25 +24,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    "SECRET_KEY", 
-    "django-insecure-6dns-bbp&433ugro&j+z6p-w943$uhsax%f1245@7vfo3eyuw2"
-)
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 PRODUCTION = os.environ.get("PRODUCTION", "").lower() == "true"
 DEBUG = False if PRODUCTION else True
 
-# Parse ALLOWED_HOSTS from environment variable (comma-separated values)
-ALLOWED_HOSTS_ENV = os.environ.get("ALLOWED_HOSTS", None)
-if ALLOWED_HOSTS_ENV:
-    ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_ENV.split(",") if host.strip()]
-else:
+try:
+    SECRET_KEY = get_secret("SECRET_KEY")
+except:
     if PRODUCTION:
-        raise RuntimeError("ALLOWED_HOSTS must be set in production!")
-    ALLOWED_HOSTS = ["*"]
-
+        raise RuntimeError("SECRET_KEY must be set in production!")
+    SECRET_KEY = "django-insecure-6dns-bbp&433ugro&j+z6p-w943$uhsax%f1245@7vfo3eyuw2"
 
 
 # Application definition
@@ -165,12 +158,20 @@ INSTALLED_APPS += [
     "composer",
 ]
 
-# Parse CSRF_TRUSTED_ORIGINS from environment variable (comma-separated values)
-CSRF_TRUSTED_ORIGINS_ENV = os.environ.get(
-    "CSRF_TRUSTED_ORIGINS", 
-    None
-)
 
+# Parse ALLOWED_HOSTS from environment variable (comma-separated values)
+ALLOWED_HOSTS_ENV = os.environ.get("ALLOWED_HOSTS", None)
+if ALLOWED_HOSTS_ENV:
+    ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_ENV.split(",") if host.strip()]
+else:
+    if PRODUCTION:
+        raise RuntimeError("ALLOWED_HOSTS must be set in production!")
+    ALLOWED_HOSTS = ["*"]
+
+
+
+# Parse CSRF_TRUSTED_ORIGINS from environment variable (comma-separated values)
+CSRF_TRUSTED_ORIGINS_ENV = os.environ.get("CSRF_TRUSTED_ORIGINS", None)
 if CSRF_TRUSTED_ORIGINS_ENV:
     CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in CSRF_TRUSTED_ORIGINS_ENV.split(",") if origin.strip()]
 else:
@@ -392,7 +393,13 @@ SPECTACULAR_SETTINGS = {
 }
 
 SOCIAL_AUTH_ORCID_KEY = os.environ["SOCIAL_AUTH_ORCID_KEY"]
-SOCIAL_AUTH_ORCID_SECRET = os.environ["SOCIAL_AUTH_ORCID_SECRET"]
+try:
+    SOCIAL_AUTH_ORCID_SECRET = get_secret("SOCIAL_AUTH_ORCID_SECRET")
+except:
+    if PRODUCTION:
+        raise RuntimeError("SOCIAL_AUTH_ORCID_SECRET must be set in production!")
+    SOCIAL_AUTH_ORCID_SECRET = os.environ["SOCIAL_AUTH_ORCID_SECRET"]
+
 SOCIAL_AUTH_AUTHENTICATION_BACKENDS = ("social_core.backends.orcid.ORCIDOAuth2",)
 AUTHENTICATION_BACKENDS = (
     "social_core.backends.orcid.ORCIDOAuth2",
