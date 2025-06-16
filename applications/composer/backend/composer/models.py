@@ -967,6 +967,14 @@ class Triple(models.Model):
     def __str__(self):
         return f"{self.name} ({self.relationship.title})"
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'uri', 'relationship'],
+                name='unique_triple_per_relationship'
+            )
+        ]
+
 
 class ConnectivityStatementTriple(models.Model):
     connectivity_statement = models.ForeignKey(ConnectivityStatement, on_delete=models.CASCADE, related_name="statement_triples")
