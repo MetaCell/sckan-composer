@@ -86,35 +86,43 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
               const relationship = relationshipOptions.find((rel: any) => rel.id === Number(key));
               const option = relationship?.options.find((opt: any) => opt.id === item.value);
               return {
-                id: item.id,
                 label: option?.name || '',
                 value: item.value
               };
             }) || [],
 
             removeChip: async (id: number) => {
-              await statementService.deleteRelationship(id);
+              const deleteId = statement?.statement_triples?.[key]?.find((triple: any) => triple.value === id)?.id;
+              await statementService.deleteRelationship(deleteId);
               refreshStatement();
             },
             label: property.title,
             isDisabled,
             onAutocompleteChange: async (event: any, newValue: any[]) => {
-              let filtered = [];
+              const lastSelectedValue = newValue[newValue.length - 1];
               const currentTriples = statement?.statement_triples?.[key] || [];
-              filtered = newValue.filter(obj => Object.keys(obj).length > 0);
 
-              const newSelectedValue = filtered.find(item =>
-                !currentTriples.some((triple: any) => triple.value === item.value)
-              );
+              // Check if the lastSelectedValue exists in currentTriples
+              const existingTriple = currentTriples.find((triple: any) => triple.value === lastSelectedValue?.value);
 
-              if (newSelectedValue) {
+              // Check if the value exists in newValue (excluding lastSelectedValue)
+              const isDuplicateInNewValue = newValue.slice(0, -1).some((value: any) => value.value === lastSelectedValue?.value);
+
+              if (existingTriple || isDuplicateInNewValue) {
+                // If it exists in currentTriples or is duplicated in newValue, it's a removal
+                if (existingTriple) {
+                  await statementService.deleteRelationship(Number(existingTriple.id));
+                }
+              } else if (lastSelectedValue) {
+                // If it doesn't exist in currentTriples and isn't duplicated in newValue, it's a new selection
                 await statementService.assignRelationship({
                   id: key,
                   connectivity_statement: statement.id,
                   relationship: key,
-                  value: newSelectedValue.value
+                  value: Number(lastSelectedValue.value)
                 });
               }
+
               refreshStatement();
             }
           } : {
@@ -167,7 +175,6 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
             isDisabled,
             value: statement?.statement_triples?.[key]?.value || '',
             label: property.title,
-            data: isDropdown && relationshipOption ? [...relationshipOption, { label: "---------", value: null }] : undefined
           }
         }
       };
