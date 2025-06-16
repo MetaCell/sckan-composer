@@ -98,11 +98,7 @@ export const AutocompleteWithChips = ({
           disabled={isDisabled}
           options={options}
           onChange={(e, value) => onAutocompleteChange(e, value)}
-          // freeSolo
-          defaultValue={options?.length > 0 ? [options[0].label] : [{}]}
-          // getOptionDisabled={(option) => {
-          //   return data.some((ele: { id: number, label: string, value: number }) => ele?.value === option.value);
-          // }}
+          value={data}
           ListboxProps={{
             sx: {
               '& .MuiAutocomplete-option[aria-disabled="true"]': {
@@ -113,9 +109,9 @@ export const AutocompleteWithChips = ({
             }
           }}
           renderTags={(value: any, getTagProps) =>
-            data?.map((ele: { id: number; label: string }, index: number) => (
+            data?.map((ele: { id: number; label: string; value: any }, index: number) => (
               <CustomChip
-                id={ele.id}
+                id={ele.id || ele.value}
                 label={ele.label}
                 onDelete={handleDelete}
                 isDisabled={isDisabled}
