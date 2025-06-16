@@ -5,4 +5,6 @@ harness:
       roles: [ ]
   envmap:
     PRODUCTION: False
+    DEBUG: True
     HTTPS: False
+    ALLOWED_HOSTS: "composer.sckan.dev.metacell.us"

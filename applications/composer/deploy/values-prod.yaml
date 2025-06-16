@@ -1,0 +1,6 @@
+harness:
+  envmap:
+    PRODUCTION: True
+    DEBUG: False
+    HTTPS: True
+    ALLOWED_HOSTS: "composer.scicrunch.io"
