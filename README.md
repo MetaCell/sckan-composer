@@ -11,6 +11,7 @@ This guide will help you set up the Composer project for local development.
 - Python 3.12 (recommended: use [pyenv](https://github.com/pyenv/pyenv))
 - [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/)
 - VS Code (recommended)
+- A `.env` file following the structure of `.env.example` (contact Dario for any required secret information)
 
 ---
 
