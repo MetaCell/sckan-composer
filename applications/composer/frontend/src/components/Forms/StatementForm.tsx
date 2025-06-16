@@ -45,6 +45,9 @@ import { setWasChangeDetected } from "../../redux/statementSlice";
 import { AutocompleteWithChips } from "../Widgets/AutocompleteWithChips";
 
 const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement>) => {
+  const [newSelected, setNewSelected] = useState<any>(null);
+  const [deleted, setDeleted] = useState<any>(null);
+
   const { uiFields, statement, isDisabled, action: refreshStatement, onInputBlur, alertId, currentExpanded, onInputFocus } = props;
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
@@ -107,6 +110,12 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
                 !currentTriples.some((triple: any) => triple.value === item.value)
               );
 
+              const deletedValue = filtered.find(item =>
+                currentTriples.some((triple: any) => triple.value === item.value)
+              );
+
+              const deleteId = statement?.statement_triples?.[key]?.find((triple: any) => triple.value === deletedValue?.value)?.id;
+
               if (newSelectedValue) {
                 await statementService.assignRelationship({
                   id: key,
@@ -114,6 +123,8 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
                   relationship: key,
                   value: newSelectedValue.value
                 });
+              } else if (deleteId) {
+                await statementService.deleteRelationship(deleteId);
               }
               refreshStatement();
             }
