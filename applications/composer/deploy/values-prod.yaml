@@ -3,4 +3,3 @@ harness:
     PRODUCTION: True
     DEBUG: False
     HTTPS: True
-    CSRF_TRUSTED_ORIGINS: "https://*.scicrunch.io/"
