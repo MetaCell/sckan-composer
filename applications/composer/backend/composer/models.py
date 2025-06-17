@@ -1218,14 +1218,14 @@ class ExportBatch(models.Model):
     @property
     def get_count_connectivity_statements_created_since_this_export(self):
         return ConnectivityStatement.objects.filter(
-            created_date__gt=self.created_at, state=CSState.NPO_APPROVED
+            created_date__gt=self.created_at
         ).count()
 
     @property
     def get_count_connectivity_statements_modified_since_this_export(self):
         return (
             ConnectivityStatement.objects.filter(
-                modified_date__gt=self.created_at, state=CSState.NPO_APPROVED
+                modified_date__gt=self.created_at
             )
             .exclude(state=CSState.EXPORTED)
             .count()
