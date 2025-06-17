@@ -26,8 +26,6 @@ def transition_statements_to_exported(export_batch: ExportBatch, qs: QuerySet, u
     """Transitions only eligible ConnectivityStatements"""
     system_user = User.objects.get(username="system")
 
-    transitioned_statements = []
-
     for cs in qs.order_by("id"):
         service = ConnectivityStatementStateService(cs)
         try:
@@ -35,12 +33,9 @@ def transition_statements_to_exported(export_batch: ExportBatch, qs: QuerySet, u
                 CSState.EXPORTED.value, system_user, user
             )
             cs.save()
-            transitioned_statements.append(cs)
         except Exception as exc:
             pass
 
-    # Add successfully transitioned statements to the export batch
-    export_batch.connectivity_statements.set(transitioned_statements)
     return export_batch
 
 def compute_metrics(export_batch: ExportBatch):

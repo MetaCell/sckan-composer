@@ -9,6 +9,7 @@ from composer.services.export.helpers.export_batch import (
     transition_statements_to_exported,
 )
 from composer.models import (
+    ConnectivityStatement,
     ExportBatch,
 )
 
@@ -19,6 +20,9 @@ def export_connectivity_statements(
     with transaction.atomic():
         export_batch = create_export_batch(user)
         export_batch = transition_statements_to_exported(export_batch, qs, user)
+
+    all_statement_ids = ConnectivityStatement.objects.only('id').iterator()
+    export_batch.connectivity_statements.set(all_statement_ids)
 
     export_file = create_csv(export_batch, output_path)
     return export_file, export_batch
