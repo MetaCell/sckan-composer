@@ -1,0 +1,6 @@
+harness:
+  envmap:
+    PRODUCTION: False
+    DEBUG: True
+    HTTPS: True
+    ALLOWED_HOSTS: "composer.sckan.stage.metacell.us"
