@@ -4,3 +4,4 @@ harness:
     DEBUG: False
     HTTPS: True
     ALLOWED_HOSTS: "composer.scicrunch.io"
+    CSRF_TRUSTED_ORIGINS: "https://composer.scicrunch.io/"
