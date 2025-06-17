@@ -46,6 +46,7 @@ harness:
     PRODUCTION: True
     SOCIAL_AUTH_ORCID_KEY: APP-GRRGRZ5EZQLQ6WZT
     CSRF_TRUSTED_ORIGINS: "https://*.metacell.us/"
+    ALLOWED_HOSTS: "*"
   secrets:
     SECRET_KEY: null
     SOCIAL_AUTH_ORCID_SECRET: null
