@@ -1,5 +1,5 @@
 harness:
   envmap:
-    PRODUCTION: False
-    DEBUG: True
+    PRODUCTION: TRUE
+    DEBUG: FALSE
     HTTPS: True
