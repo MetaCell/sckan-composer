@@ -49,7 +49,6 @@ class PredicateToDBMapping(IExportRelationship, Enum):
     hasAnatomicalSystemPhenotype = Phenotype
     hasFunctionalCircuitRolePhenotype = FunctionalCircuitRole
     hasInstanceInTaxon = Specie
-    hasSomaPhenotype = Phenotype
     hasProjectionPhenotype = ProjectionPhenotype
     hasSomaLocatedIn = AnatomicalEntity
     hasAxonPresynapticElementIn = AnatomicalEntity
