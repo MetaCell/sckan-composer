@@ -20,6 +20,7 @@ from .enums import (
     DestinationType,
     Laterality,
     MetricEntity,
+    RelationshipType,
     SentenceState,
     NoteType,
     ViaType,
@@ -422,7 +423,12 @@ class Synonym(models.Model):
     name = models.CharField(max_length=200, db_index=True)
 
     class Meta:
-        unique_together = ('anatomical_entity', 'name',)
+        constraints = [
+            models.UniqueConstraint(
+                fields=['anatomical_entity', 'name'],
+                name='unique_synonym_per_entity'
+            )
+        ]
 
 
 class Tag(models.Model):
@@ -608,7 +614,6 @@ class Sentence(models.Model, BulkActionMixin):
                 name="sentence_externalref_and_batch_valid",
             ),
         ]
-
 
 class ConnectivityStatement(models.Model, BulkActionMixin):
     """Connectivity Statement"""
@@ -950,6 +955,65 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
             )
         ]
 
+
+class Relationship(models.Model):
+
+    title = models.CharField(max_length=255)
+    predicate_name = models.CharField(max_length=255)
+    predicate_uri = models.URLField()
+    type = models.CharField(max_length=10, choices=RelationshipType.choices)
+    order = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        ordering = ["order"]
+
+class Triple(models.Model):
+    relationship = models.ForeignKey(Relationship, on_delete=models.CASCADE, related_name="triples")
+    name = models.CharField(max_length=255)
+    uri = models.URLField()
+
+    def __str__(self):
+        return f"{self.name} ({self.relationship.title})"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'uri', 'relationship'],
+                name='unique_triple_per_relationship'
+            )
+        ]
+
+
+class ConnectivityStatementTriple(models.Model):
+    connectivity_statement = models.ForeignKey(ConnectivityStatement, on_delete=models.CASCADE, related_name="statement_triples")
+    relationship = models.ForeignKey(Relationship, on_delete=models.CASCADE)
+    triple = models.ForeignKey(Triple, null=True, blank=True, on_delete=models.SET_NULL)
+    free_text = models.TextField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['connectivity_statement', 'relationship', 'triple'],
+                name='unique_statement_relationship_triple'
+            )
+        ]
+
+    def clean(self):
+        if self.triple and self.free_text:
+            raise ValidationError("Only one of 'triple' or 'free_text' should be set.")
+        if not self.triple and not self.free_text:
+            raise ValidationError("One of 'triple' or 'free_text' must be set.")
+        if self.relationship.type == RelationshipType.TEXT and self.triple:
+            raise ValidationError("Text relationships must use 'free_text', not 'triple'.")
+        if self.relationship.type in [RelationshipType.SINGLE, RelationshipType.MULTI] and self.free_text:
+            raise ValidationError("Select-type relationships must use 'triple', not 'free_text'.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
 class GraphRenderingState(models.Model):
     connectivity_statement = models.OneToOneField(
@@ -1308,7 +1372,12 @@ class StatementAlert(models.Model):
     )
 
     class Meta:
-        unique_together = ('connectivity_statement', 'alert_type')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['connectivity_statement', 'alert_type'],
+                name='unique_statement_alert_type'
+            )
+        ]
 
     def __str__(self):
         return f"{self.alert_type.name} for Statement {self.connectivity_statement.id}"
