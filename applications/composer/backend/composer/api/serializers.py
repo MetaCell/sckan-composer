@@ -1135,6 +1135,24 @@ class PredicateMappingRequestSerializer(serializers.Serializer):
                 help_text=f"List of URIs for {predicate_name} predicate"
             )
 
+    def validate_predicate_supported(self, data):
+        not_supported_predicates = []
+        for predicate_name in data.keys():
+            if predicate_name not in PredicateToDBMapping.__members__:
+                not_supported_predicates.append(predicate_name)
+        if not_supported_predicates:
+            raise serializers.ValidationError(f"Predicate {', '.join(not_supported_predicates)} is not supported")
+        return data
+
+
+    def validate(self, data):
+        request_body = self.initial_data
+        self.validate_predicate_supported(request_body)
+        return super().validate(request_body)
+
+    
+
+    
 
 class RelationshipSerializer(serializers.ModelSerializer):
     options = serializers.SerializerMethodField()
