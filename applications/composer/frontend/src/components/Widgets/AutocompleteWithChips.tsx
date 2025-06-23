@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
 import { Autocomplete, styled } from "@mui/material";
@@ -62,15 +62,15 @@ export const AutocompleteWithChips = ({
 
   const [isInputFocused, setInputFocus] = useState(false);
 
-    const handleDelete = (id: number) => {
+  const handleDelete = (id: number) => {
     removeChip(id);
   };
 
-const handleDeleteAll = () => {
+  const handleDeleteAll = () => {
     data.forEach((ele: { id: number, label: string }) => {
-        handleDelete(ele.id);
+      handleDelete(ele.id);
     });
-    };
+  };
   return (
     <FormControl variant="standard">
       <Typography
@@ -98,12 +98,20 @@ const handleDeleteAll = () => {
           disabled={isDisabled}
           options={options}
           onChange={(e, value) => onAutocompleteChange(e, value)}
-          freeSolo
-          defaultValue={options.length > 0 ? [options[0].label] : [{}]}
+          value={data}
+          ListboxProps={{
+            sx: {
+              '& .MuiAutocomplete-option[aria-disabled="true"]': {
+                opacity: 1,
+                color: vars.gray600,
+                cursor: 'not-allowed',
+              }
+            }
+          }}
           renderTags={(value: any, getTagProps) =>
-            data.map((ele: { id: number; label: string }, index: number) => (
+            data?.map((ele: { id: number; label: string; value: any }, index: number) => (
               <CustomChip
-                id={ele.id}
+                id={ele.id || ele.value}
                 label={ele.label}
                 onDelete={handleDelete}
                 isDisabled={isDisabled}

@@ -13,6 +13,7 @@ from rest_framework.serializers import ValidationError
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Case, When, Value, IntegerField
+from composer.services.dynamic_schema_service import inject_dynamic_relationship_schema
 from composer.services import bulk_service
 from composer.enums import BulkActionType
 from composer.services.state_services import (
@@ -38,12 +39,14 @@ from .serializers import (
     AssignUserSerializer,
     BulkActionResponseSerializer,
     ChangeStatusSerializer,
+    ConnectivityStatementTripleSerializer,
     PhenotypeSerializer,
     ProjectionPhenotypeSerializer,
     ConnectivityStatementSerializer,
     KnowledgeStatementSerializer,
     NoteSerializer,
     ProfileSerializer,
+    RelationshipSerializer,
     SentenceSerializer,
     SpecieSerializer,
     StatementAlertSerializer,
@@ -71,6 +74,7 @@ from ..models import (
     ConnectivityStatement,
     Note,
     Profile,
+    Relationship,
     Sentence,
     Specie,
     StatementAlert,
@@ -80,6 +84,7 @@ from ..models import (
     Sex,
     PopulationSet,
     Destination,
+    ConnectivityStatementTriple,
 )
 
 
@@ -542,6 +547,7 @@ class ConnectivityStatementViewSet(
             return BaseConnectivityStatementSerializer
         return ConnectivityStatementSerializer
 
+
     def get_queryset(self):
         if self.action == "list" and "sentence_id" not in self.request.query_params:
             return ConnectivityStatement.objects.excluding_draft()
@@ -766,6 +772,35 @@ class StatementAlertViewSet(viewsets.ModelViewSet):
     permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
 
 
+
+class RelationshipViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Relationship ViewSet with dynamic endpoints to:
+    - List triples (options) for a given relationship.
+    - Assign triple or free_text to a statement.
+    """
+
+    queryset = Relationship.objects.all()
+    serializer_class = RelationshipSerializer
+
+
+class ConnectivityStatementTripleViewSet(viewsets.ModelViewSet):
+    """
+    ConnectivityStatementTriple:
+    """
+
+    queryset = ConnectivityStatementTriple.objects.select_related("connectivity_statement", "relationship", "triple")
+    serializer_class = ConnectivityStatementTripleSerializer
+    permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        connectivity_statement_id = self.request.query_params.get("connectivity_statement_id")
+        if connectivity_statement_id:
+            qs = qs.filter(connectivity_statement_id=connectivity_statement_id)
+        return qs
+
+
 @extend_schema(
     responses=OpenApiTypes.OBJECT,
 )
@@ -790,6 +825,8 @@ def jsonschemas(request):
             "schema": SchemaProcessor(obj, {}).get_schema(),
             "uiSchema": UiSchemaProcessor(obj, {}).get_ui_schema(),
         }
+
+    inject_dynamic_relationship_schema(schema)
 
     ret = json.dumps(
         schema,

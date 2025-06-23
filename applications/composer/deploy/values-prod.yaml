@@ -1,0 +1,5 @@
+harness:
+  envmap:
+    PRODUCTION: True
+    DEBUG: False
+    HTTPS: True
