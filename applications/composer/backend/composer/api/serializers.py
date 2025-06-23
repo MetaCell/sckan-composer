@@ -33,6 +33,7 @@ from ..services.connections_service import get_complete_from_entities_for_destin
     get_complete_from_entities_for_via
 from ..services.statement_service import get_statement_preview as get_statement_preview_aux
 from ..services.errors_service import get_connectivity_errors
+from composer.services.export.helpers.predicate_mapping import ExportRelationships, PredicateToDBMapping
 
 
 # MixIns
@@ -958,6 +959,21 @@ class KnowledgeStatementSerializer(ConnectivityStatementSerializer):
         return instance.state.name if instance.state else None
 
 
+class PredicateMappingSerializer(serializers.Serializer):
+    """
+    Serializes a mapping of predicates to a mapping of URIs to lists of labels.
+    Example:
+    {
+        "hasSomaLocatedIn": {
+            "uri1": ["label1", "label2"],
+            "uri2": []
+        },
+        ...
+    }
+    """
+    def to_representation(self, instance):
+        return instance
+
 class BulkActionSerializer(serializers.Serializer):
     action = serializers.ChoiceField(
         choices=[(action.value, action.value) for action in BulkActionType],
@@ -1026,3 +1042,14 @@ class AssignPopulationSetSerializer(BulkActionSerializer):
 
 class BulkActionResponseSerializer(serializers.Serializer):
     updated_count = serializers.IntegerField()
+
+class PredicateMappingRequestSerializer(serializers.Serializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Dynamically add fields based on the names in PredicateToDBMapping
+        for predicate_name in PredicateToDBMapping.__members__:
+            self.fields[predicate_name] = serializers.ListField(
+                child=serializers.CharField(),
+                required=False,
+                help_text=f"List of URIs for {predicate_name} predicate"
+            )

@@ -19,6 +19,7 @@ from .views import (
     SexViewSet,
     PopulationSetViewset,
     DestinationViewSet,
+	PredicateMappingViewSet,
 )
 
 # Create a router and register our viewsets with it.
@@ -52,5 +53,6 @@ app_name = "composer-api"
 urlpatterns = [
     path("", include(router.urls)),
     path("jsonschemas/", jsonschemas, name="jsonschemas"),
+	path("predicate-mapping/", PredicateMappingViewSet.as_view(), name="predicate-mapping"),
 	path("knowledge-statement/", KnowledgeStatementViewSet.as_view(), name="knowledge-statement"),
 ]
