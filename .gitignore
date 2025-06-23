@@ -11,3 +11,4 @@ backend/neurondm_comp/
 skaffold.yaml
 .overrides
 deployment/helm/**
+cloud-harness/*
