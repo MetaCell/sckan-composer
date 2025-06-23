@@ -126,6 +126,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
               refreshStatement();
             }
           } : {
+            data: relationshipOption || [],
             onChange2: async (value: any) => {
               const previousValue = statement?.statement_triples?.[key]?.id;
               if (previousValue && value === null) {
