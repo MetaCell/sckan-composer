@@ -11,8 +11,10 @@ from rest_framework.renderers import INDENT_SEPARATORS
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework import generics
+from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Case, When, Value, IntegerField
+from composer.services.export.helpers.predicate_mapping import PredicateToDBMapping
 from composer.services.dynamic_schema_service import inject_dynamic_relationship_schema
 from composer.services import bulk_service
 from composer.enums import BulkActionType
@@ -60,6 +62,8 @@ from .serializers import (
     BaseConnectivityStatementSerializer,
     MinimalUserSerializer,
     WriteNoteSerializer,
+    PredicateMappingSerializer,
+    PredicateMappingRequestSerializer,
 )
 from .permissions import (
     IsStaffUserIfExportedStateInConnectivityStatement,
@@ -68,6 +72,7 @@ from .permissions import (
 )
 from ..models import (
     AlertType,
+    AnatomicalEntityMeta,
     AnatomicalEntity,
     Phenotype,
     ProjectionPhenotype,
@@ -619,6 +624,43 @@ class KnowledgeStatementViewSet(
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
         return response
+
+
+@extend_schema(tags=["public"])
+class PredicateMappingViewSet(APIView):
+    """
+    PredicateMapping: Returns labels for given URIs and predicates.
+    Accepts POST requests with a dictionary of predicates and their URIs.
+    Example request body:
+    {
+        "hasSomaLocatedIn": ["uri1", "uri2"],
+        "hasAxonLocatedIn": ["uri3", "uri4"]
+    }
+    """
+    serializer_class = PredicateMappingSerializer
+    permission_classes = [permissions.AllowAny]
+        
+    def post(self, request):
+        request_serializer = PredicateMappingRequestSerializer(data=request.data)
+        request_serializer.is_valid(raise_exception=True)
+        validated_data = request_serializer.validated_data
+
+        response_data = {}
+        for predicate_name, uris in validated_data.items():
+            model = PredicateToDBMapping[predicate_name].value
+            uri_to_labels = {}
+            for uri in uris:
+                if issubclass(model, AnatomicalEntity):
+                    obj = AnatomicalEntity.objects.get_by_ontology_uri(uri)
+                else:
+                    obj = model.objects.filter(ontology_uri=uri).first()
+                labels = [obj.name] if obj else []
+                if isinstance(obj, AnatomicalEntity):
+                    labels.extend([synonym.name for synonym in obj.synonyms.all()])
+                uri_to_labels[uri] = labels
+            response_data[predicate_name] = uri_to_labels
+        serializer = PredicateMappingSerializer(response_data)
+        return Response(serializer.data)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
