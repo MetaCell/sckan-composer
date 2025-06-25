@@ -27,7 +27,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import NoteDetails from "../components/Widgets/NotesFomList";
 import TriageStatementSection from "../components/TriageStatementSection/TriageStatementSection";
 import { useSectionStyle } from "../styles/styles";
-import { border, height, useTheme } from "@mui/system";
+import { useTheme } from "@mui/system";
 import { useAppSelector } from "../redux/hooks";
 import { useNavigate } from "react-router";
 import { QueryParams } from "../redux/sentenceSlice";
