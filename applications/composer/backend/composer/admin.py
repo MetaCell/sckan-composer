@@ -390,7 +390,8 @@ class PopulationSetAdmin(admin.ModelAdmin):
 class IngestSentenceForm(forms.Form):
     file = forms.FileField(label="CSV file")
 
-# Add the custom view to the default admin site
+
+# Custom view for ingesting sentences from a CSV file
 def ingest_sentences_view(request):
     output = None
     success = None
@@ -406,18 +407,20 @@ def ingest_sentences_view(request):
                     destination.write(chunk)
             # Run the ingest command and capture output
             result = subprocess.run(
-                ['python', 'migrate.py', 'ingest_nlp_sentence', file_path],
+                ['python', 'manage.py', 'ingest_nlp_sentence', file_path],
                 capture_output=True, text=True
             )
             output = result.stdout + "\n" + result.stderr
             success = result.returncode == 0
     else:
         form = IngestSentenceForm()
-    return render(request, "admin/ingest_sentences.html", {
+    context = admin.site.each_context(request)  # Get full admin context
+    context.update({
         "form": form,
         "output": output,
         "success": success,
     })
+    return render(request, "admin/ingest_sentences.html", context)
 
 
 def custom_admin_urls(original_get_urls):
@@ -428,10 +431,6 @@ def custom_admin_urls(original_get_urls):
         ]
         return custom_urls + urls
     return get_urls
-
-# Register the custom view URL
-admin.site.get_urls = custom_admin_urls(admin.site.get_urls)
-
 
 # Re-register UserAdmin
 admin.site.unregister(User)
@@ -458,6 +457,9 @@ admin.site.register(FunctionalCircuitRole)
 admin.site.register(ProjectionPhenotype)
 admin.site.register(AlertType, AlertTypeAdmin)
 # admin.site.register(ExportMetrics)
+
+# Register the custom view URL
+admin.site.get_urls = custom_admin_urls(admin.site.get_urls)
 
 
 def login(request, extra_context=None):

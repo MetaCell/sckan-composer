@@ -4,17 +4,6 @@
 
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
 
-{% block content %}
-  <div style="margin-bottom:2em; padding:1em; border:1px solid #ccc; background:#fafafa;">
-    <h2>Ingest Sentences</h2>
-    <form id="ingest-form" method="post" enctype="multipart/form-data" action="{% url 'admin:ingest-sentences' %}">
-      {% csrf_token %}
-      <input type="file" name="file" required>
-      <button type="submit" class="default">Ingest sentences</button>
-    </form>
-  </div>
-{% endblock %}
-
 {% block content_title %} {% trans 'Dashboard' %} {% endblock %}
 
 {% block breadcrumbs %}
