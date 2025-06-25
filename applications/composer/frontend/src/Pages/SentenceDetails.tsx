@@ -27,7 +27,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import NoteDetails from "../components/Widgets/NotesFomList";
 import TriageStatementSection from "../components/TriageStatementSection/TriageStatementSection";
 import { useSectionStyle } from "../styles/styles";
-import { useTheme } from "@mui/system";
+import { border, height, useTheme } from "@mui/system";
 import { useAppSelector } from "../redux/hooks";
 import { useNavigate } from "react-router";
 import { QueryParams } from "../redux/sentenceSlice";
@@ -132,10 +132,50 @@ const SentencesDetails = () => {
     setIsLoading(true);
     const transition = sentence?.available_transitions[selectedIndex];
     sentenceService
-      .doTransition(sentence, transition)
-      .then((sentence: Sentence) => fetchNextSentence(sentence));
+      .doTransition(sentence, transition);
   };
-  
+
+  const clickNextSentence = () => {
+    const fetchNextSentence = async (sentence: Sentence) => {
+      try {
+        const nextSentenceOptions = {
+          ...queryOptions,
+          stateFilter: [ComposerSentenceListStateEnum.Open],
+          exclude: [`${sentence.id}`],
+          limit: 1,
+          index: 0,
+        };
+
+        let res = await sentenceService.getList(nextSentenceOptions);
+        if (shouldResearchWithoutFilters(res, queryOptions)) {
+          res = await sentenceService.getList({
+            batchNameFilter: undefined,
+            notes: undefined,
+            tagFilter: undefined,
+            title: undefined,
+            ordering: queryOptions.ordering,
+            stateFilter: [ComposerSentenceListStateEnum.Open],
+            exclude: [`${sentence.id}`],
+            include: undefined,
+            limit: 1,
+            index: 0,
+          });
+        }
+
+        if (res && res.results && res.results.length) {
+          const nextSentenceId = res.results[0].id;
+          navigate(`/sentence/${nextSentenceId}`);
+        } else {
+          navigate("/");
+        }
+      } catch (error) {
+        setIsLoading(false);
+      }
+    };
+
+    fetchNextSentence(sentence);
+  };
+
   const onAddNewStatement = () => {
     return checkSentenceOwnership(
       sentence.id,
@@ -276,6 +316,19 @@ const SentencesDetails = () => {
                 display="flex"
                 justifyContent="flex-end"
               >
+                <Button sx={{
+                  borderRadius: "1.5rem",
+                  marginRight: "1rem",
+                  height: "3rem",
+                  backgroundColor: "#E2ECFB",
+                  color: "#184EA2",
+                  "&:hover": {
+                    backgroundColor: "#184EA2",
+                    color: "#FFFFFF",
+                  },
+                }} variant="contained" onClick={clickNextSentence}>
+                  Next Sentence
+                </Button>
                 {!isDisabled && sentence?.available_transitions?.length !== 0 && (
                   <GroupedButtons
                     handleClick={handleClick}
