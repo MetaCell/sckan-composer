@@ -51,12 +51,30 @@ class SentenceService extends AbstractService {
       }
     }
   }
+
   async getObject(id: string): Promise<Sentence> {
     return composerApi.composerSentenceRetrieve(Number(id)).then((response: any) => response.data)
   }
-  async doTransition(sentence: Sentence, transition: string): Promise<Sentence> {
-    return composerApi.composerSentenceDoTransitionCreate(sentence.id, transition, sentence).then((response: any) => response.data)
+
+  async doTransition(sentence: Sentence, transition: string, onCancel: () => void = () => { }) {
+    try {
+      return await composerApi.composerSentenceDoTransitionCreate(sentence.id, transition, sentence).then((response: any) => response.data)
+    } catch (err) {
+      return await checkSentenceOwnership(
+        sentence.id,
+        async () => {
+          return await composerApi.composerSentenceDoTransitionCreate(sentence.id, transition, sentence).then((response: any) => response.data)
+        },
+        (fetchedData) => {
+          onCancel();
+          return fetchedData;
+        },
+        (owner) =>
+          `This sentence is currently assigned to ${owner.first_name}. You are in read-only mode. Would you like to assign this statement to yourself and gain edit access?`
+      );
+    }
   }
+
   // @ts-ignore
   async addTag(id: number, tagId: number, onCancel: () => void = () => { }): Promise<string> {
     try {
@@ -76,6 +94,7 @@ class SentenceService extends AbstractService {
       );
     }
   }
+
   async removeTag(id: number, tagId: number, onCancel: () => void = () => { }): Promise<string> {
     try {
       return await composerApi.composerSentenceDelTagCreate(id, tagId).then((response: any) => response.data)
