@@ -1,9 +1,16 @@
+import os
+import subprocess
+import nested_admin
+from django.utils.safestring import mark_safe
+from django.shortcuts import render, redirect
+from django.conf import settings
+from django.urls import path, reverse
+
 from composer.enums import RelationshipType
 from .views import index
 from typing import Any
 from django.db.models.query import QuerySet
 from django.http import HttpRequest
-import nested_admin
 from adminsortable2.admin import SortableAdminBase, SortableStackedInline
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -380,6 +387,51 @@ class PopulationSetAdmin(admin.ModelAdmin):
     readonly_fields = ('last_used_index',)
 
 
+class IngestSentenceForm(forms.Form):
+    file = forms.FileField(label="CSV file")
+
+
+# Custom view for ingesting sentences from a CSV file
+def ingest_sentences_view(request):
+    output = None
+    success = None
+    if request.method == "POST":
+        form = IngestSentenceForm(request.POST, request.FILES)
+        if form.is_valid():
+            uploaded_file = form.cleaned_data['file']
+            upload_dir = os.path.join(settings.MEDIA_ROOT, "nlp_uploads")
+            os.makedirs(upload_dir, exist_ok=True)
+            file_path = os.path.join(upload_dir, uploaded_file.name)
+            with open(file_path, 'wb+') as destination:
+                for chunk in uploaded_file.chunks():
+                    destination.write(chunk)
+            # Run the ingest command and capture output
+            result = subprocess.run(
+                ['python', 'manage.py', 'ingest_nlp_sentence', file_path],
+                capture_output=True, text=True
+            )
+            output = result.stdout + "\n" + result.stderr
+            success = result.returncode == 0
+    else:
+        form = IngestSentenceForm()
+    context = admin.site.each_context(request)  # Get full admin context
+    context.update({
+        "form": form,
+        "output": output,
+        "success": success,
+    })
+    return render(request, "admin/ingest_sentences.html", context)
+
+
+def custom_admin_urls(original_get_urls):
+    def get_urls():
+        urls = original_get_urls()
+        custom_urls = [
+            path('ingest-sentences/', admin.site.admin_view(ingest_sentences_view), name='ingest-sentences'),
+        ]
+        return custom_urls + urls
+    return get_urls
+
 # Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
@@ -406,8 +458,8 @@ admin.site.register(ProjectionPhenotype)
 admin.site.register(AlertType, AlertTypeAdmin)
 # admin.site.register(ExportMetrics)
 
-
-#
+# Register the custom view URL
+admin.site.get_urls = custom_admin_urls(admin.site.get_urls)
 
 
 def login(request, extra_context=None):

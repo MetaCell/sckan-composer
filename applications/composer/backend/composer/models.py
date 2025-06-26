@@ -969,6 +969,12 @@ class Relationship(models.Model):
 
     class Meta:
         ordering = ["order"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'predicate_name', 'predicate_uri'],
+                name='unique_relationship'
+            )
+        ]
 
 class Triple(models.Model):
     relationship = models.ForeignKey(Relationship, on_delete=models.CASCADE, related_name="triples")
