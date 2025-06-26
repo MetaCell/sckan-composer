@@ -92,47 +92,15 @@ const SentencesDetails = () => {
   };
 
   const handleClick = () => {
-    const fetchNextSentence = async (sentence: Sentence) => {
-      try {
-        const nextSentenceOptions = {
-          ...queryOptions,
-          stateFilter: [ComposerSentenceListStateEnum.Open],
-          exclude: [`${sentence.id}`],
-          limit: 1,
-          index: 0,
-        };
-
-        let res = await sentenceService.getList(nextSentenceOptions);
-        if (shouldResearchWithoutFilters(res, queryOptions)) {
-          res = await sentenceService.getList({
-            batchNameFilter: undefined,
-            notes: undefined,
-            tagFilter: undefined,
-            title: undefined,
-            ordering: queryOptions.ordering,
-            stateFilter: [ComposerSentenceListStateEnum.Open],
-            exclude: [`${sentence.id}`],
-            include: undefined,
-            limit: 1,
-            index: 0,
-          });
-        }
-
-        if (res && res.results && res.results.length) {
-          const nextSentenceId = res.results[0].id;
-          navigate(`/sentence/${nextSentenceId}`);
-        } else {
-          navigate("/");
-        }
-      } catch (error) {
-        setIsLoading(false);
-      }
-    };
-
     setIsLoading(true);
     const transition = sentence?.available_transitions[selectedIndex];
-    sentenceService
-      .doTransition(sentence, transition);
+    sentenceService.doTransition(sentence, transition).then(() => {
+      setIsLoading(false);
+      setRefetch(true);
+    }).catch(() => {
+      setIsLoading(false);
+      alert("Error fetching next sentence. Please contact the administrator and provide the sentence ID or the url of the sentence you were trying to access.");
+    });
   };
 
   const clickNextSentence = () => {
@@ -170,6 +138,8 @@ const SentencesDetails = () => {
         }
       } catch (error) {
         setIsLoading(false);
+        // show the browser alert
+        alert("Error fetching next sentence. Please contact the administrator and provide the sentence ID or the url of the sentence you were trying to access.");
       }
     };
 
