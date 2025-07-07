@@ -57,5 +57,5 @@ steps:
       custom_value_files:
       - ./deployment/helm/values.yaml
       custom_values:
-      - apps_composer_harness_secrets_SECRET__KEY=${{SECRET__KEY}}
-      - apps_composer_harness_secrets_SOCIAL__AUTH__ORCID__SECRET=${{SOCIAL__AUTH__ORCID__SECRET}}
+      - apps_composer_harness_secrets_SECRET__KEY="${{SECRET__KEY}}"
+      - apps_composer_harness_secrets_SOCIAL__AUTH__ORCID__SECRET="${{SOCIAL__AUTH__ORCID__SECRET}}"

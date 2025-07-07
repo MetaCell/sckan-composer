@@ -171,6 +171,17 @@ class AnatomicalEntityManager(models.Manager):
             'region_layer__layer').prefetch_related('synonyms')
         )
 
+    def get_by_ontology_uri(self, uri):
+        """
+        Return the first AnatomicalEntity matching the given ontology_uri in any of its possible locations.
+        """
+        return self.get_queryset().filter(
+            Q(simple_entity__ontology_uri=uri) |
+            Q(region_layer__region__ontology_uri=uri) |
+            Q(region_layer__layer__ontology_uri=uri)
+        ).first()
+
+
 # Mixins
 
 
@@ -958,6 +969,12 @@ class Relationship(models.Model):
 
     class Meta:
         ordering = ["order"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'predicate_name', 'predicate_uri'],
+                name='unique_relationship'
+            )
+        ]
 
 class Triple(models.Model):
     relationship = models.ForeignKey(Relationship, on_delete=models.CASCADE, related_name="triples")
