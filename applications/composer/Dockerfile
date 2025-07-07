@@ -53,6 +53,7 @@ COPY backend/setup.py backend/version.py ${APP_DIR}/
 RUN python3 -m pip install -e .
 RUN ontutils set ontology-local-repo ./NIF-Ontology/
 COPY backend ${APP_DIR}
+RUN python3 manage.py migrate --noinput
 RUN python3 manage.py collectstatic --noinput
 
 COPY --from=frontend /app/build/static/ ${APP_DIR}/static/
