@@ -92,6 +92,18 @@ const SentencesDetails = () => {
   };
 
   const handleClick = () => {
+    setIsLoading(true);
+    const transition = sentence?.available_transitions[selectedIndex];
+    sentenceService.doTransition(sentence, transition).then(() => {
+      setIsLoading(false);
+      setRefetch(true);
+    }).catch(() => {
+      setIsLoading(false);
+      alert("Error fetching next sentence. Please contact the administrator and provide the sentence ID or the url of the sentence you were trying to access.");
+    });
+  };
+
+  const clickNextSentence = () => {
     const fetchNextSentence = async (sentence: Sentence) => {
       try {
         const nextSentenceOptions = {
@@ -126,16 +138,14 @@ const SentencesDetails = () => {
         }
       } catch (error) {
         setIsLoading(false);
+        // show the browser alert
+        alert("Error fetching next sentence. Please contact the administrator and provide the sentence ID or the url of the sentence you were trying to access.");
       }
     };
 
-    setIsLoading(true);
-    const transition = sentence?.available_transitions[selectedIndex];
-    sentenceService
-      .doTransition(sentence, transition)
-      .then((sentence: Sentence) => fetchNextSentence(sentence));
+    fetchNextSentence(sentence);
   };
-  
+
   const onAddNewStatement = () => {
     return checkSentenceOwnership(
       sentence.id,
@@ -276,6 +286,19 @@ const SentencesDetails = () => {
                 display="flex"
                 justifyContent="flex-end"
               >
+                <Button sx={{
+                  borderRadius: "1.5rem",
+                  marginRight: "1rem",
+                  height: "3rem",
+                  backgroundColor: "#E2ECFB",
+                  color: "#184EA2",
+                  "&:hover": {
+                    backgroundColor: "#184EA2",
+                    color: "#FFFFFF",
+                  },
+                }} variant="contained" onClick={clickNextSentence}>
+                  Next Sentence
+                </Button>
                 {!isDisabled && sentence?.available_transitions?.length !== 0 && (
                   <GroupedButtons
                     handleClick={handleClick}

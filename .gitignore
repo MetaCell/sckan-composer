@@ -11,3 +11,9 @@ backend/neurondm_comp/
 skaffold.yaml
 .overrides
 deployment/helm/**
+cloud-harness/*
+
+.cursor
+applications/composer/backend/persistent/composer.sqlite3
+applications/composer/backend/data/export.csv
+applications/composer/frontend/yarn.lock

@@ -1,5 +1,14 @@
 from enum import Enum
 from composer.enums import DestinationType, ViaType
+from composer.models import (
+    AnatomicalEntityMeta,
+    AnatomicalEntity,
+    Phenotype,
+    ProjectionPhenotype,
+    Specie,
+    Sex,
+    FunctionalCircuitRole,
+)
 
 
 class IExportRelationship:
@@ -33,6 +42,20 @@ class DynamicExportRelationship(IExportRelationship):
     @property
     def uri(self):
         return self._uri
+
+
+class PredicateToDBMapping(IExportRelationship, Enum):
+    hasBiologicalSex = Sex
+    hasAnatomicalSystemPhenotype = Phenotype
+    hasFunctionalCircuitRolePhenotype = FunctionalCircuitRole
+    hasInstanceInTaxon = Specie
+    hasProjectionPhenotype = ProjectionPhenotype
+    hasSomaLocatedIn = AnatomicalEntity
+    hasAxonPresynapticElementIn = AnatomicalEntity
+    hasAxonSensorySubcellularElementIn = AnatomicalEntity
+    hasAxonLocatedIn = AnatomicalEntity
+    hasDendriteLocatedIn = AnatomicalEntity
+    hasAxonLeadingToSensorySubcellularElementIn = AnatomicalEntity
 
 
 class ExportRelationships(IExportRelationship, Enum):

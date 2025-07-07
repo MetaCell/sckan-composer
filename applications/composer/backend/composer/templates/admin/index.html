@@ -89,6 +89,24 @@
         </div>
 
         <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="m-0">Ingest Sentences</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Upload a file containing sentences to ingest into the system. The file should be in plain text format, with one sentence per line.</p>
+                        <form id="ingest-form" method="post" enctype="multipart/form-data" action="{% url 'admin:ingest-sentences' %}">
+                            {% csrf_token %}
+                            <input type="file" name="file" required>
+                            <button type="submit" class="default">Ingest sentences</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
             <div class="col-md-6 col-sm-12">
                 {% for app in dashboard_list %}
                     <div class="card">

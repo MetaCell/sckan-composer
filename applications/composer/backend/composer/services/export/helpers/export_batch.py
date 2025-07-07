@@ -26,8 +26,6 @@ def transition_statements_to_exported(export_batch: ExportBatch, qs: QuerySet, u
     """Transitions only eligible ConnectivityStatements"""
     system_user = User.objects.get(username="system")
 
-    transitioned_statements = []
-
     for cs in qs.order_by("id"):
         service = ConnectivityStatementStateService(cs)
         try:
@@ -35,12 +33,9 @@ def transition_statements_to_exported(export_batch: ExportBatch, qs: QuerySet, u
                 CSState.EXPORTED.value, system_user, user
             )
             cs.save()
-            transitioned_statements.append(cs)
         except Exception as exc:
             pass
 
-    # Add successfully transitioned statements to the export batch
-    export_batch.connectivity_statements.set(transitioned_statements)
     return export_batch
 
 def compute_metrics(export_batch: ExportBatch):
@@ -55,7 +50,7 @@ def compute_metrics(export_batch: ExportBatch):
     # Compute the metrics for this export
     if last_export_batch_created_at:
         sentences_created_qs = Sentence.objects.filter(
-            created_date__gt=last_export_batch_created_at,
+            created_date__gt=last_export_batch_created_at
         )
     else:
         sentences_created_qs = Sentence.objects.all()
@@ -67,10 +62,13 @@ def compute_metrics(export_batch: ExportBatch):
         )
     else:
         connectivity_statements_created_qs = ConnectivityStatement.objects.all()
+    
     connectivity_statements_created_qs = connectivity_statements_created_qs.exclude(
         state=CSState.DRAFT
     )  # skip draft statements
     export_batch.connectivity_statements_created = connectivity_statements_created_qs.count()
+
+    export_batch.save(update_fields=['sentences_created', 'connectivity_statements_created'])
 
     # Compute the state metrics for this export
     connectivity_statement_metrics = list(

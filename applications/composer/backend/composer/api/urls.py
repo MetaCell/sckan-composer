@@ -3,10 +3,12 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     AnatomicalEntityViewSet,
+    ConnectivityStatementTripleViewSet,
     PhenotypeViewSet,
     ProjectionPhenotypeViewSet,
     ConnectivityStatementViewSet,
     KnowledgeStatementViewSet,
+    RelationshipViewSet,
     StatementAlertViewSet,
     jsonschemas,
     NoteViewSet,
@@ -19,6 +21,7 @@ from .views import (
     SexViewSet,
     PopulationSetViewset,
     DestinationViewSet,
+	PredicateMappingViewSet,
 )
 
 # Create a router and register our viewsets with it.
@@ -45,6 +48,8 @@ router.register(r"tag", TagViewSet, basename="tag")
 router.register(r"via", ViaViewSet, basename="via")
 router.register(r"destination", DestinationViewSet, basename="destination")
 router.register(r"statementAlert", StatementAlertViewSet, basename="statementAlert")
+router.register(r"relationship", RelationshipViewSet, basename="relationship")
+router.register(r"connectivityStatementTriple", ConnectivityStatementTripleViewSet, basename="ConnectivityStatementTriple")
 # router.register(r"json", JsonViewSet, basename="json")
 
 # The API URLs are now determined automatically by the router.
@@ -52,5 +57,6 @@ app_name = "composer-api"
 urlpatterns = [
     path("", include(router.urls)),
     path("jsonschemas/", jsonschemas, name="jsonschemas"),
+	path("predicate-mapping/", PredicateMappingViewSet.as_view(), name="predicate-mapping"),
 	path("knowledge-statement/", KnowledgeStatementViewSet.as_view(), name="knowledge-statement"),
 ]

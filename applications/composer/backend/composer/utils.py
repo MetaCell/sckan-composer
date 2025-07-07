@@ -45,3 +45,5 @@ def generate_connectivity_statement_curie_id_for_composer_statements(statement):
     if statement.population:
         return f"neuron type {statement.population.name} {statement.population_index}"
     return None
+
+

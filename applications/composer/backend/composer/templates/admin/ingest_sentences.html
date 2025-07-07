@@ -1,0 +1,34 @@
+{% extends "admin/base.html" %}
+{% load i18n static jazzmin composer_extras %}
+{% get_jazzmin_ui_tweaks as jazzmin_ui %}
+
+{% block bodyclass %}{{ block.super }} nlp ingestion{% endblock %}
+
+{% block content_title %} {% trans 'NLP Ingestion' %} {% endblock %}
+
+{% block breadcrumbs %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin:index' %}">{% trans 'Home' %}</a></li>
+        <li class="breadcrumb-item">{% trans 'NLP Ingestion' %}</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+<div>
+  <h2>Ingest Sentences</h2>
+  <form method="post" enctype="multipart/form-data" style="margin-bottom: 5em">
+    {% csrf_token %} {{ form.as_p }}
+    <button type="submit" class="default">Ingest sentences</button>
+  </form>
+{% if output %}
+  <h3>Ingestion Status</h3>
+  <p>Success: <strong>{{ success }}</strong></p>
+  <p>Output:</p>
+  <pre style="background: #eee; padding: 1em">{{ output }}</pre>
+  {% if success %}
+  <p style="color: green">Ingestion completed successfully.</p>
+  {% else %}
+  <p style="color: red">Ingestion failed.</p>
+  {% endif %}
+</div>
+{% endif %} {% endblock %}

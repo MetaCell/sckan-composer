@@ -1,9 +1,9 @@
 {
   "name": "frontend",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "private": true,
   "main": "index.js",
-  "proxy": "https://localhost:8000/",
+  "proxy": "http://127.0.0.1:8000/",
   "dependencies": {
     "@babel/preset-env": "^7.21.5",
     "@dnd-kit/core": "^6.0.8",
@@ -54,7 +54,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "puppeteer_test": "./node_modules/.bin/jest",
+    "puppeteer_test": " ./node_modules/.bin/jest e2eFlow_addSentence.test.js  && ./node_modules/.bin/jest e2eFlow_StatementDetails.test.js && ./node_modules/.bin/jest e2eFlow_StatementProofing.test.js --bail=1",
+    "smoke_test": "./node_modules/.bin/jest smoke.test.js --bail=1",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --ext ts,tsx --fix"
   },
@@ -87,6 +88,7 @@
     "@typescript-eslint/parser": "^6.14.0",
     "eslint": "^8.55.0",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.5"
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "typescript": "^4.9.5"
   }
 }
