@@ -45,7 +45,7 @@ harness:
   envmap:
     PRODUCTION: True
     SOCIAL_AUTH_ORCID_KEY: APP-GRRGRZ5EZQLQ6WZT
-    CSRF_TRUSTED_ORIGINS: "http://localhost:8000/,https://localhost:8000/,https://*.metacell.us/,https://127.0.0.1:8000/"
+    CSRF_TRUSTED_ORIGINS: "http://localhost:8000/,https://localhost:8000/,https://*.metacell.us/,https://127.0.0.1:8000/,https://*.scicrunch.io/"
     ALLOWED_HOSTS: "*"
   secrets:
     SECRET_KEY: null
