@@ -95,12 +95,50 @@ class AlertTypeAdmin(admin.ModelAdmin):
     search_fields = ('name', 'uri')
 
 
+# Expert Consultant Alert Inline - separate tab for Expert Consultant alerts only
+class ExpertConsultantAlertInline(admin.StackedInline):
+    model = StatementAlert
+    extra = 0
+    verbose_name = "Expert Consultant"
+    verbose_name_plural = "Expert Consultant"
+    autocomplete_fields = ('alert_type',)
+    fields = ('alert_type', 'text', 'created_at', 'updated_at')
+    readonly_fields = ('created_at', 'updated_at')
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Filter to only show "Expert Consultant" alert type
+        return qs.filter(alert_type__name="Expert Consultant")
+    
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        # Pre-select "Expert Consultant" alert type
+        try:
+            expert_consultant_type = AlertType.objects.get(name="Expert Consultant")
+            formset.form.base_fields['alert_type'].initial = expert_consultant_type.pk
+            formset.form.base_fields['alert_type'].widget = forms.HiddenInput()
+        except AlertType.DoesNotExist:
+            pass
+        return formset
+
+
 class StatementAlertInline(admin.StackedInline):
     model = StatementAlert
     extra = 1
     autocomplete_fields = ('alert_type', )
     fields = ('alert_type', 'text', 'created_at', 'updated_at')
     readonly_fields = ('created_at', 'updated_at')
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Exclude "Expert Consultant" alert type from this inline
+        return qs.exclude(alert_type__name="Expert Consultant")
+    
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        # Hide "Expert Consultant" from the alert_type dropdown
+        formset.form.base_fields['alert_type'].queryset = AlertType.objects.exclude(name="Expert Consultant")
+        return formset
 
 
 class RelationshipAdmin(admin.ModelAdmin):
@@ -309,7 +347,7 @@ class ConnectivityStatementAdmin(
 
     fieldsets = ()
 
-    inlines = (ProvenanceInline, NoteConnectivityStatementInline,
+    inlines = (ProvenanceInline, ExpertConsultantAlertInline, NoteConnectivityStatementInline,
                ViaInline, DestinationInline, StatementAlertInline, ConnectivityStatementTripleInline)
 
     def _filter_admin_transitions(self, transitions_generator):
