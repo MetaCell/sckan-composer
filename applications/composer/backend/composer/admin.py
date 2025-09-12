@@ -88,6 +88,14 @@ class NoteConnectivityStatementInline(admin.StackedInline):
     readonly_fields = ("created_at",)
     extra = 0
     sortable_options = "disabled"
+    
+    def get_queryset(self, request):
+        # Order notes by created_at descending (newest first)
+        qs = super().get_queryset(request)
+        return qs.order_by('-created_at')
+    
+    class Media:
+        js = ('admin/js/move_add_note_button.js',)
 
 
 class AlertTypeAdmin(admin.ModelAdmin):
