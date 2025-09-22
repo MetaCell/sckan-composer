@@ -28,7 +28,11 @@ def ingest_statements(
     disable_overwrite=False,
     full_imports=[],
     label_imports=[],
+    population_uris=None,
 ):
+
+    if population_uris is None:
+        population_uris = []
 
     statements_list = get_statements_from_neurondm(
         full_imports=full_imports,
@@ -37,7 +41,7 @@ def ingest_statements(
         statement_alert_uris=set(AlertType.objects.values_list("uri", flat=True)),
     )
     overridable_and_new_statements = get_overwritable_and_new_statements(
-        statements_list, disable_overwrite
+        statements_list, disable_overwrite, population_uris
     )
     statements = validate_statements(
         overridable_and_new_statements, update_anatomical_entities
