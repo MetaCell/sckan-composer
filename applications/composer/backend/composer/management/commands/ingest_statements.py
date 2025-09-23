@@ -52,7 +52,7 @@ class Command(BaseCommand):
         population_uris = set()
         if population_file:
             try:
-                with open(population_file, 'r') as f:
+                with open(population_file, 'r', encoding='utf-8') as f:
                     population_uris = set(line.strip() for line in f if line.strip())
                 self.stdout.write(f"Loaded {len(population_uris)} population URIs from {population_file}")
             except FileNotFoundError:
