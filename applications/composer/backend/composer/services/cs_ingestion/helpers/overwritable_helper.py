@@ -1,4 +1,4 @@
-from typing import List, Any, Dict
+from typing import List, Any, Dict, Set, Union
 
 from composer.enums import CSState, SentenceState
 from composer.models import Sentence, ConnectivityStatement
@@ -10,9 +10,9 @@ from composer.services.cs_ingestion.models import LoggableAnomaly
 logger_service = LoggerService()
 
 
-def get_overwritable_and_new_statements(statements_list: List[Dict[str, Any]], disable_overwrite: bool=False, population_uris: List[str]=None) -> List[Dict[str, Any]]:
+def get_overwritable_and_new_statements(statements_list: List[Dict[str, Any]], disable_overwrite: bool=False, population_uris: Union[List[str], Set[str]]=None) -> List[Dict[str, Any]]:
     if population_uris is None:
-        population_uris = []
+        population_uris = set()
     
     overwritable_and_new_statements = [
         statement for statement in statements_list
@@ -34,13 +34,13 @@ def is_new_or_overwritable_sentence(statement: Dict, disable_overwrite: bool) ->
     return can_sentence_be_overwritten(sentence, statement)
 
 
-def is_new_or_overwritable_statement(statement: Dict, disable_overwrite: bool, population_uris: List[str]=None) -> bool:
+def is_new_or_overwritable_statement(statement: Dict, disable_overwrite: bool, population_uris: Union[List[str], Set[str]]=None) -> bool:
     """
     If disable_overwrite is True, then the statement is considered invalid for overwriting - if it already exists in the database.
     However, statements with URIs in population_uris should be updatable regardless of their status (unless disable_overwrite is True).
     """
     if population_uris is None:
-        population_uris = []
+        population_uris = set()
     
     statement_uri = statement[ID]
     
@@ -51,7 +51,7 @@ def is_new_or_overwritable_statement(statement: Dict, disable_overwrite: bool, p
         if disable_overwrite:
             return False
             
-        # If the statement URI is in the population_uris list, it should be updatable regardless of status
+        # If the statement URI is in the population_uris set, it should be updatable regardless of status
         if statement_uri in population_uris:
             return True
             

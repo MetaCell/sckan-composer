@@ -32,7 +32,7 @@ def ingest_statements(
 ):
 
     if population_uris is None:
-        population_uris = []
+        population_uris = set()
 
     statements_list = get_statements_from_neurondm(
         full_imports=full_imports,

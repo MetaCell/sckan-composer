@@ -49,11 +49,11 @@ class Command(BaseCommand):
         population_file = options['population_file']
 
         # Read population URIs from file if provided
-        population_uris = []
+        population_uris = set()
         if population_file:
             try:
                 with open(population_file, 'r') as f:
-                    population_uris = [line.strip() for line in f if line.strip()]
+                    population_uris = set(line.strip() for line in f if line.strip())
                 self.stdout.write(f"Loaded {len(population_uris)} population URIs from {population_file}")
             except FileNotFoundError:
                 self.stderr.write(self.style.ERROR(f"Population file not found: {population_file}"))
