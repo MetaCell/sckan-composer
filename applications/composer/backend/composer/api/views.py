@@ -55,6 +55,7 @@ from .serializers import (
     TagSerializer,
     ViaSerializer,
     ProvenanceSerializer,
+    ProvenanceCreateSerializer,
     SexSerializer,
     PopulationSetSerializer,
     ConnectivityStatementUpdateSerializer,
@@ -151,23 +152,20 @@ class ProvenanceMixin(
     viewsets.GenericViewSet,
 ):
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "uri",
-                OpenApiTypes.STR,
-                location=OpenApiParameter.PATH,
-                required=True,
-            )
-        ],
-        request=None,
+        request=ProvenanceCreateSerializer,
+        responses={200: "ConnectivityStatement updated successfully"},
     )
-    @action(detail=True, methods=["post"], url_path="add_provenance/(?P<uri>.*)")
-    def add_provenance(self, request, pk=None, uri=None):
-        procenance, created = Provenance.objects.get_or_create(
+    @action(detail=True, methods=["post"], url_path="add_provenance")
+    def add_provenance(self, request, pk=None):
+        serializer = ProvenanceCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        uri = serializer.validated_data['uri']
+        provenance, created = Provenance.objects.get_or_create(
             connectivity_statement_id=pk,
             uri=uri,
         )
-        procenance.save()
+        provenance.save()
         instance = self.get_object()
         return Response(self.get_serializer(instance).data)
 

@@ -375,6 +375,17 @@ class ProvenanceSerializer(serializers.ModelSerializer):
         fields = ("id", "uri", "connectivity_statement_id")
 
 
+class ProvenanceCreateSerializer(serializers.Serializer):
+    """Serializer for creating provenance via request body"""
+    uri = serializers.CharField(required=True)
+
+    def validate_uri(self, value):
+        """Basic URI validation"""
+        if not value.strip():
+            raise serializers.ValidationError("URI cannot be empty.")
+        return value.strip()
+
+
 class SentenceConnectivityStatement(serializers.ModelSerializer):
     """Connectivity Statement"""
 

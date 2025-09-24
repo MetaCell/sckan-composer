@@ -405,7 +405,7 @@ paths:
       responses:
         '204':
           description: No response body
-  /api/composer/connectivity-statement/{id}/add_provenance/{uri}/:
+  /api/composer/connectivity-statement/{id}/add_provenance/:
     post:
       operationId: composer_connectivity_statement_add_provenance_create
       description: ConnectivityStatement
@@ -416,13 +416,20 @@ paths:
           type: integer
         description: A unique integer value identifying this connectivity statement.
         required: true
-      - in: path
-        name: uri
-        schema:
-          type: string
-        required: true
       tags:
       - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProvenanceCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProvenanceCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProvenanceCreate'
+        required: true
       security:
       - tokenAuth: []
       - basicAuth: []
@@ -432,7 +439,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConnectivityStatement'
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
           description: ''
   /api/composer/connectivity-statement/{id}/add_specie/{specie_id}/:
     post:
@@ -1728,6 +1737,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/PopulationSet'
           description: ''
+  /api/composer/predicate-mapping/:
+    post:
+      operationId: composer_predicate_mapping_create
+      description: |-
+        PredicateMapping: Returns labels for given URIs and predicates.
+        Accepts POST requests with a dictionary of predicates and their URIs.
+        Example request body:
+        {
+            "hasSomaLocatedIn": ["uri1", "uri2"],
+            "hasAxonLocatedIn": ["uri3", "uri4"]
+        }
+      tags:
+      - public
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
   /api/composer/profile/my/:
     get:
       operationId: composer_profile_my_retrieve
@@ -4706,6 +4736,14 @@ components:
       required:
       - connectivity_statement_id
       - id
+      - uri
+    ProvenanceCreate:
+      type: object
+      description: Serializer for creating provenance via request body
+      properties:
+        uri:
+          type: string
+      required:
       - uri
     Relationship:
       type: object
