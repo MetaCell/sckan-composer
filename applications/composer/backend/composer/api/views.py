@@ -165,7 +165,6 @@ class ProvenanceMixin(
             connectivity_statement_id=pk,
             uri=uri,
         )
-        provenance.save()
         instance = self.get_object()
         return Response(self.get_serializer(instance).data)
 

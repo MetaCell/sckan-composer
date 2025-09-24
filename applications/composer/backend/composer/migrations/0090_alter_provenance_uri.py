@@ -18,7 +18,6 @@ class Migration(migrations.Migration):
                 max_length=500,
                 validators=[
                     composer.models.validate_provenance_uri,
-                    composer.models.validate_provenance_uri,
                 ],
             ),
         ),
