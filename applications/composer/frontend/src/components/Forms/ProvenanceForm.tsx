@@ -91,7 +91,7 @@ const ProvenancesForm = (props: any) => {
     ];
     
     // URL pattern (comprehensive)
-    const urlPattern = /^https?:\/\/(?:[-\w.])+(?::\d+)?(?:\/(?:[\w\/_.])*(?:\?(?:[\w&=%.])*)?(?:#(?:[\w.])*)?)?$/i;
+    const urlPattern = /^https?:\/\/(?:[-\w.])+(?::\d+)?(?:\/(?:[\w/_.])*(?:\?(?:[\w&=%.])*)?(?:#(?:[\w.])*)?)?$/i;
     
     // Check if it matches any of the valid patterns
     const allPatterns = [...doiPatterns, ...pmidPatterns, ...pmcidPatterns, urlPattern];
