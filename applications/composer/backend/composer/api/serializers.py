@@ -1,4 +1,3 @@
-import re
 from typing import List
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -379,52 +378,6 @@ class ProvenanceSerializer(serializers.ModelSerializer):
 class ProvenanceCreateSerializer(serializers.Serializer):
     """Serializer for creating provenance via request body"""
     uri = serializers.CharField(required=True)
-
-    def validate_uri(self, value):
-        """Validate that the URI is a valid DOI, PMID, PMCID, or URL"""
-        if not value or not value.strip():
-            raise serializers.ValidationError("URI cannot be empty.")
-        
-        uri = value.strip()
-        
-        # DOI patterns
-        doi_patterns = [
-            r'^10\.\d{4,}/[^\s]+$',  # Standard DOI format
-            r'^doi:10\.\d{4,}/[^\s]+$',  # DOI with prefix
-            r'^https?://doi\.org/10\.\d{4,}/[^\s]+$',  # DOI URL
-            r'^https?://dx\.doi\.org/10\.\d{4,}/[^\s]+$',  # Alternative DOI URL
-        ]
-        
-        # PMID patterns
-        pmid_patterns = [
-            r'^PMID:\s*\d+$',  # PMID with prefix
-            r'^https?://pubmed\.ncbi\.nlm\.nih\.gov/\d+/?$',  # PubMed URL
-        ]
-        
-        # PMCID patterns
-        pmcid_patterns = [
-            r'^PMC\d+$',  # PMC ID format
-            r'^PMCID:\s*PMC\d+$',  # PMCID with prefix
-            r'^https?://www\.ncbi\.nlm\.nih\.gov/pmc/articles/PMC\d+/?$',  # PMC URL
-        ]
-        
-        # URL pattern (comprehensive)
-        url_pattern = r'^https?://(?:[-\w.])+(?:[:\d]+)?(?:/(?:[\w/_.])*(?:\?(?:[\w&=%.])*)?(?:#(?:[\w.])*)?)?$'
-        
-        # Check if it matches any of the valid patterns
-        all_patterns = doi_patterns + pmid_patterns + pmcid_patterns + [url_pattern]
-        
-        for pattern in all_patterns:
-            if re.match(pattern, uri, re.IGNORECASE):
-                return uri
-        
-        # If none match, provide helpful error message
-        raise serializers.ValidationError(
-            "URI must be a valid DOI (e.g., '10.1000/xyz123' or 'https://doi.org/10.1000/xyz123'), "
-            "PMID (e.g., 'PMID:12345678' or 'https://pubmed.ncbi.nlm.nih.gov/12345678'), "
-            "PMCID (e.g., 'PMC1234567' or 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1234567'), "
-            "or a valid URL (e.g., 'https://example.com')."
-        )
 
 
 class SentenceConnectivityStatement(serializers.ModelSerializer):
