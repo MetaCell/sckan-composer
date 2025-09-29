@@ -33,6 +33,7 @@ export const FormBase = (props: any) => {
     submitOnChangeFields = [],
     submitOnBlurFields = [],
     onUnauthorizedSave: onSaveCancel,
+    isLoading = false,
   } = props;
   const [localData, setLocalData] = useState<any>(data);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -159,10 +160,11 @@ export const FormBase = (props: any) => {
     }
   };
 
+  const showSpinner = isLoading || isSaving || !data;
   return (
     <>
-      {(!data || isSaving) && (
-        <Backdrop open={isSaving}>
+      {showSpinner && (
+        <Backdrop open={showSpinner}>
           <CircularProgress color="inherit"/>
         </Backdrop>
       )}
@@ -171,7 +173,7 @@ export const FormBase = (props: any) => {
           schema={customSchema}
           uiSchema={customUiSchema}
           formData={localData}
-          disabled={disabled}
+          disabled={disabled || showSpinner}
           validator={validator}
           onChange={handleUpdate}
           onSubmit={handleSubmit}
