@@ -37,7 +37,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--population_file',
             type=str,
-            help='Path to a text file containing population URIs (one per line) that should be updated regardless of their status.',
+            help='Path to a text file containing population URIs (one per line). When provided, ONLY statements matching these URIs will be processed for ingestion.',
         )
 
     def handle(self, *args, **options):
@@ -49,7 +49,7 @@ class Command(BaseCommand):
         population_file = options['population_file']
 
         # Read population URIs from file if provided
-        population_uris = set()
+        population_uris = None
         if population_file:
             try:
                 with open(population_file, 'r', encoding='utf-8') as f:

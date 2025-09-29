@@ -4,6 +4,7 @@ from django.db import transaction
 
 from composer.models import AlertType
 from composer.services.cs_ingestion.helpers.overwritable_helper import (
+    filter_statements_by_population_uris,
     get_overwritable_and_new_statements,
 )
 from composer.services.cs_ingestion.helpers.sentence_helper import (
@@ -21,7 +22,6 @@ from .neurondm_script import main as get_statements_from_neurondm
 
 logger_service = LoggerService()
 
-
 def ingest_statements(
     update_upstream=False,
     update_anatomical_entities=False,
@@ -31,15 +31,16 @@ def ingest_statements(
     population_uris=None,
 ):
 
-    if population_uris is None:
-        population_uris = set()
-
     statements_list = get_statements_from_neurondm(
         full_imports=full_imports,
         label_imports=label_imports,
         logger_service_param=logger_service,
         statement_alert_uris=set(AlertType.objects.values_list("uri", flat=True)),
     )
+    
+    # Filter statements by population URIs if a population file was provided
+    statements_list = filter_statements_by_population_uris(statements_list, population_uris)
+    
     overridable_and_new_statements = get_overwritable_and_new_statements(
         statements_list, disable_overwrite, population_uris
     )

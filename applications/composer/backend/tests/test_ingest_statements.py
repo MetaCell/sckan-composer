@@ -159,7 +159,7 @@ class TestIngestStatements(TestCase):
         mock_statements[1]['pref_label'] = "Updated knowledge statement 2"
         
         # Test: Only statement_1 should be updated when using population_uris
-        population_uris = [statement_id_1]
+        population_uris = {statement_id_1}
         ingest_statements(population_uris=population_uris)
         
         # Verify results
@@ -200,7 +200,7 @@ class TestIngestStatements(TestCase):
         mock_statements[0]['pref_label'] = "Updated knowledge statement"
         
         # Test: Even with population_uris, disable_overwrite=True should prevent updates
-        population_uris = [statement_id]
+        population_uris = {statement_id}
         ingest_statements(disable_overwrite=True, population_uris=population_uris)
         
         # Verify the statement was NOT updated
@@ -208,8 +208,8 @@ class TestIngestStatements(TestCase):
         self.assertEqual(unchanged_statement.knowledge_statement, original_knowledge)
 
     @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
-    def test_population_uris_empty_list(self, mock_get_statements):
-        """Test that empty population_uris list works normally"""
+    def test_population_uris_empty_set_filters_all(self, mock_get_statements):
+        """Test that empty population_uris set filters out all statements"""
         self.flush_connectivity_statements()
         
         statement_id = 'http://uri.interlex.org/composer/uris/set/liver/131'
@@ -219,15 +219,11 @@ class TestIngestStatements(TestCase):
         ]
         mock_get_statements.return_value = mock_statements
         
-        # Test with empty population_uris list
-        ingest_statements(population_uris=[])
+        # Test with empty population_uris set (should filter everything)
+        ingest_statements(population_uris=set())
         
-        # Verify statement was created
-        self.assertEqual(ConnectivityStatement.objects.count(), 1)
-        
-        # Verify the statement exists with correct data
-        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
-        self.assertEqual(statement.reference_uri, statement_id)
+        # Verify no statements were created (empty set = empty filter)
+        self.assertEqual(ConnectivityStatement.objects.count(), 0)
 
     @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
     def test_population_uris_none_parameter(self, mock_get_statements):
@@ -250,3 +246,80 @@ class TestIngestStatements(TestCase):
         # Verify the statement exists with correct data
         statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
         self.assertEqual(statement.reference_uri, statement_id)
+
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_population_uris_filtering_behavior(self, mock_get_statements):
+        """Test that when population_uris is provided, only statements in the set are processed"""
+        self.flush_connectivity_statements()
+        
+        # Mock data for three statements
+        statement_id_1 = 'http://uri.interlex.org/composer/uris/set/liver/131'
+        statement_id_2 = 'http://uri.interlex.org/composer/uris/set/heart/42'
+        statement_id_3 = 'http://uri.interlex.org/composer/uris/set/brain/256'
+        
+        mock_statements = [
+            self.create_mock_statement_data(statement_id_1, 'liver', '131'),
+            self.create_mock_statement_data(statement_id_2, 'heart', '42'),
+            self.create_mock_statement_data(statement_id_3, 'brain', '256')
+        ]
+        mock_get_statements.return_value = mock_statements
+        
+        # Test: Only statements in population_uris should be processed
+        population_uris = {statement_id_1, statement_id_3}  # Only liver and brain, not heart
+        ingest_statements(population_uris=population_uris)
+        
+        # Verify only 2 statements were created (liver and brain, but not heart)
+        self.assertEqual(ConnectivityStatement.objects.count(), 2)
+        
+        # Verify the correct statements exist
+        self.assertTrue(ConnectivityStatement.objects.filter(reference_uri=statement_id_1).exists())
+        self.assertFalse(ConnectivityStatement.objects.filter(reference_uri=statement_id_2).exists())  # heart should not exist
+        self.assertTrue(ConnectivityStatement.objects.filter(reference_uri=statement_id_3).exists())
+
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_population_uris_none_processes_all(self, mock_get_statements):
+        """Test that when population_uris is None, all statements are processed (normal behavior)"""
+        self.flush_connectivity_statements()
+        
+        # Mock data for two statements
+        statement_id_1 = 'http://uri.interlex.org/composer/uris/set/liver/131'
+        statement_id_2 = 'http://uri.interlex.org/composer/uris/set/heart/42'
+        
+        mock_statements = [
+            self.create_mock_statement_data(statement_id_1, 'liver', '131'),
+            self.create_mock_statement_data(statement_id_2, 'heart', '42')
+        ]
+        mock_get_statements.return_value = mock_statements
+        
+        # Test: None population_uris should process all statements
+        ingest_statements(population_uris=None)
+        
+        # Verify both statements were created
+        self.assertEqual(ConnectivityStatement.objects.count(), 2)
+        self.assertTrue(ConnectivityStatement.objects.filter(reference_uri=statement_id_1).exists())
+        self.assertTrue(ConnectivityStatement.objects.filter(reference_uri=statement_id_2).exists())
+
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_population_uris_none_vs_empty_set_behavior(self, mock_get_statements):
+        """Test that None (no population file) and empty set (empty population file) behave differently"""
+        self.flush_connectivity_statements()
+        
+        # Mock data for two statements
+        statement_id_1 = 'http://uri.interlex.org/composer/uris/set/liver/131'
+        statement_id_2 = 'http://uri.interlex.org/composer/uris/set/heart/42'
+        
+        mock_statements = [
+            self.create_mock_statement_data(statement_id_1, 'liver', '131'),
+            self.create_mock_statement_data(statement_id_2, 'heart', '42')
+        ]
+        mock_get_statements.return_value = mock_statements
+        
+        # Test 1: None means no population file was provided - process all statements
+        ingest_statements(population_uris=None)
+        self.assertEqual(ConnectivityStatement.objects.count(), 2, "None should process all statements")
+        
+        self.flush_connectivity_statements()
+        
+        # Test 2: Empty set means population file was provided but empty - process no statements  
+        ingest_statements(population_uris=set())
+        self.assertEqual(ConnectivityStatement.objects.count(), 0, "Empty set should process no statements")

@@ -1,4 +1,4 @@
-from typing import List, Any, Dict, Set, Union
+from typing import List, Any, Dict, Set, Optional
 
 from composer.enums import CSState, SentenceState
 from composer.models import Sentence, ConnectivityStatement
@@ -10,9 +10,31 @@ from composer.services.cs_ingestion.models import LoggableAnomaly
 logger_service = LoggerService()
 
 
-def get_overwritable_and_new_statements(statements_list: List[Dict[str, Any]], disable_overwrite: bool=False, population_uris: Union[List[str], Set[str]]=None) -> List[Dict[str, Any]]:
+
+def filter_statements_by_population_uris(statements_list, population_uris):
+    """
+    Filter statements to only include those with URIs in the population_uris set.
+    
+    Args:
+        statements_list: List of statements from neurondm
+        population_uris: Set of URIs to filter by. If None, no filtering is applied.
+                        If empty set, all statements are filtered out.
+    
+    Returns:
+        Filtered list of statements
+    """
     if population_uris is None:
-        population_uris = set()
+        # No population file was provided, return all statements
+        return statements_list
+    
+    # Population file was provided (even if empty), filter statements
+    return [
+        statement for statement in statements_list
+        if statement[ID] in population_uris
+    ]
+
+
+def get_overwritable_and_new_statements(statements_list: List[Dict[str, Any]], disable_overwrite: bool=False, population_uris: Optional[Set[str]]=None) -> List[Dict[str, Any]]:
     
     overwritable_and_new_statements = [
         statement for statement in statements_list
@@ -34,13 +56,12 @@ def is_new_or_overwritable_sentence(statement: Dict, disable_overwrite: bool) ->
     return can_sentence_be_overwritten(sentence, statement)
 
 
-def is_new_or_overwritable_statement(statement: Dict, disable_overwrite: bool, population_uris: Union[List[str], Set[str]]=None) -> bool:
+def is_new_or_overwritable_statement(statement: Dict, disable_overwrite: bool, population_uris: Optional[Set[str]]=None) -> bool:
     """
     If disable_overwrite is True, then the statement is considered invalid for overwriting - if it already exists in the database.
     However, statements with URIs in population_uris should be updatable regardless of their status (unless disable_overwrite is True).
+    Note: When population_uris is provided, statement filtering is done at the service layer.
     """
-    if population_uris is None:
-        population_uris = set()
     
     statement_uri = statement[ID]
     
@@ -52,7 +73,7 @@ def is_new_or_overwritable_statement(statement: Dict, disable_overwrite: bool, p
             return False
             
         # If the statement URI is in the population_uris set, it should be updatable regardless of status
-        if statement_uri in population_uris:
+        if population_uris is not None and statement_uri in population_uris:
             return True
             
     except ConnectivityStatement.DoesNotExist:
