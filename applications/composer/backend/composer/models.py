@@ -102,10 +102,10 @@ def validate_provenance_uri(value):
     
     # DOI patterns
     doi_patterns = [
-        r'^10\.\d{4,}/[^\s]+$',  # Standard DOI format
-        r'^doi:10\.\d{4,}/[^\s]+$',  # DOI with prefix
-        r'^https?://doi\.org/10\.\d{4,}/[^\s]+$',  # DOI URL
-        r'^https?://dx\.doi\.org/10\.\d{4,}/[^\s]+$',  # Alternative DOI URL
+        r'^10\.\d{4,}/[a-zA-Z0-9\-._():]+(?:/[a-zA-Z0-9\-._():]+)*$',  # Standard DOI format - no consecutive slashes
+        r'^doi:10\.\d{4,}/[a-zA-Z0-9\-._():]+(?:/[a-zA-Z0-9\-._():]+)*$',  # DOI with prefix
+        r'^https?://doi\.org/10\.\d{4,}/[a-zA-Z0-9\-._():]+(?:/[a-zA-Z0-9\-._():]+)*$',  # DOI URL
+        r'^https?://dx\.doi\.org/10\.\d{4,}/[a-zA-Z0-9\-._():]+(?:/[a-zA-Z0-9\-._():]+)*$',  # Alternative DOI URL
     ]
     
     # PMID patterns
@@ -121,8 +121,8 @@ def validate_provenance_uri(value):
         r'^https?://www\.ncbi\.nlm\.nih\.gov/pmc/articles/PMC\d+/?$',  # PMC URL
     ]
     
-    # URL pattern (comprehensive)
-    url_pattern = r'^https?://(?:[-\w.])+(?:[:\d]+)?(?:/(?:[\w/_.])*(?:\?(?:[\w&=%.])*)?(?:#(?:[\w.])*)?)?$'
+    # URL pattern
+    url_pattern = r'^https?://[a-zA-Z0-9\-.]+(:[0-9]+)?(/[a-zA-Z0-9\-._~!$&\'()*+,;=:@]+)*(\?[a-zA-Z0-9\-._~!$&\'()*+,;=:@/?]*)?(\#[a-zA-Z0-9\-._~!$&\'()*+,;=:@/?]*)?$'
     
     # Check if it matches any of the valid patterns
     all_patterns = doi_patterns + pmid_patterns + pmcid_patterns + [url_pattern]
