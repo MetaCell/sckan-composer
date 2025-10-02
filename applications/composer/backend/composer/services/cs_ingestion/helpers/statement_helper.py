@@ -59,7 +59,23 @@ def create_or_update_connectivity_statement(
     sentence: Sentence,
     update_anatomical_entities: bool,
     logger_service: LoggerService,
+    skip_state_transitions: bool = False,
 ) -> Tuple[ConnectivityStatement, bool]:
+    """
+    Create or update a connectivity statement from ingested data.
+    
+    Args:
+        statement: The statement data dictionary
+        sentence: The associated sentence object
+        update_anatomical_entities: Whether to update anatomical entity relationships
+        logger_service: Service for logging anomalies
+        skip_state_transitions: When True, state transitions are skipped. This is used
+                               when a population file is provided to preserve existing
+                               statement states during targeted updates.
+    
+    Returns:
+        Tuple of (ConnectivityStatement, created) where created is True if new
+    """
     reference_uri = statement[ID]
     populationset_name = statement.get("populationset", "")
     defaults = {
@@ -94,20 +110,24 @@ def create_or_update_connectivity_statement(
 
     validation_errors = statement.get(VALIDATION_ERRORS, ValidationErrors())
 
-    if validation_errors.has_errors():
-        error_message = validation_errors.to_string()
-        if connectivity_statement.state != CSState.INVALID:
-            do_transition_to_invalid_with_note(connectivity_statement, error_message)
+    # State transitions: Handle validation errors and state updates
+    # When skip_state_transitions is True (population file provided), we preserve
+    # the existing statement state instead of forcing transitions
+    if not skip_state_transitions:
+        if validation_errors.has_errors():
+            error_message = validation_errors.to_string()
+            if connectivity_statement.state != CSState.INVALID:
+                do_transition_to_invalid_with_note(connectivity_statement, error_message)
+            else:
+                create_invalid_note(connectivity_statement, error_message)
         else:
-            create_invalid_note(connectivity_statement, error_message)
-    else:
-        if (
-            connectivity_statement.state != CSState.EXPORTED
-            and ConnectivityStatementStateService.has_populationset(
-                connectivity_statement=connectivity_statement
-            )
-        ):
-            do_transition_to_exported(connectivity_statement)
+            if (
+                connectivity_statement.state != CSState.EXPORTED
+                and ConnectivityStatementStateService.has_populationset(
+                    connectivity_statement=connectivity_statement
+                )
+            ):
+                do_transition_to_exported(connectivity_statement)
 
     for alert_data in statement.get(STATEMENT_ALERTS, []):
         try:
