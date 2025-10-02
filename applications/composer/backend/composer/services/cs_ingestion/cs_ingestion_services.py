@@ -48,13 +48,17 @@ def ingest_statements(
         overridable_and_new_statements, update_anatomical_entities
     )
 
+    # When population_uris is provided (i.e., a population file was used),
+    # skip state transitions to preserve existing statement states
+    skip_state_transitions = population_uris is not None
+
     successful_transaction = True
     try:
         with transaction.atomic():
             for statement in statements:
                 sentence, _ = get_or_create_sentence(statement)
                 create_or_update_connectivity_statement(
-                    statement, sentence, update_anatomical_entities, logger_service
+                    statement, sentence, update_anatomical_entities, logger_service, skip_state_transitions
                 )
 
             update_forward_connections(statements)
@@ -77,3 +81,5 @@ def ingest_statements(
         if update_upstream:
             update_upstream_statements()
         logger_service.write_ingested_statements_to_file(statements)
+    
+    return successful_transaction

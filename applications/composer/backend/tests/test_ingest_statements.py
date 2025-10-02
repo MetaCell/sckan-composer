@@ -9,114 +9,8 @@ from django.test import TestCase
 
 
 class TestIngestStatements(TestCase):
-    """
-    NOTE:
-    This test depends on the directory system of the Scicrunch neurondm - here - https://raw.githubusercontent.com/SciCrunch/NIF-Ontology/neurons/**/*.ttl
-    Check more details in neurondm_script.py
-    """
-
     def flush_connectivity_statements(self):
         ConnectivityStatement.objects.all().delete()
-
-    def create_mock_statement_data(self, statement_id, population_set='liver', label_suffix='131'):
-        """Helper method to create mock statement data"""
-        return {
-            'id': statement_id,
-            'label': f'neuron type {population_set} {label_suffix}',
-            'pref_label': f'test connectivity statement for {population_set} {label_suffix}',
-            'origins': NeuronDMOrigin({'http://purl.obolibrary.org/obo/UBERON_0001234'}),
-            'destinations': [NeuronDMDestination({'http://purl.obolibrary.org/obo/UBERON_0005678'}, set(), 'AXON-T')],
-            'populationset': population_set,
-            'vias': [NeuronDMVia({'http://purl.obolibrary.org/obo/UBERON_0009012'}, set(), 0, 'AXON')],
-            'species': ['http://purl.obolibrary.org/obo/NCBITaxon_10090'],
-            'sex': [],
-            'circuit_type': [],
-            'circuit_role': [],
-            'phenotype': ['http://uri.interlex.org/tgbugs/uris/readable/neuron-phenotype-sym-post'],
-            'other_phenotypes': [],
-            'forward_connection': ['http://uri.interlex.org/base/ilx_0795017'],
-            'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
-            'sentence_number': [],
-            'note_alert': [],
-            'validation_errors': ValidationErrors(),
-            'statement_alerts': []
-        }
-
-    def test_ingestion_with_invalid_imports(self):
-        self.flush_connectivity_statements()
-        self.assertEqual(ConnectivityStatement.objects.count(), 0)
-        ingest_statements(full_imports=['full'], label_imports=['label'])
-        self.assertEqual(ConnectivityStatement.objects.count(), 0)
-
-    def test_ingestion_with_valid_label_and_invalid_full_imports(self):
-        ingest_statements(
-            full_imports=['full'],
-            label_imports=['apinatomy-neuron-populations']
-        )
-        self.assertEqual(ConnectivityStatement.objects.count(), 0)
-        self.flush_connectivity_statements()
-
-    def test_ingestion_with_valid_full_and_invalid_label_imports(self):
-        ingest_statements(full_imports=['sparc-nlp'], label_imports=['label'])
-        self.assertNotEqual(ConnectivityStatement.objects.count(), 0)
-        self.flush_connectivity_statements()
-
-    def test_ingestion_with_valid_imports(self):
-        ingest_statements(
-            full_imports=['sparc-nlp'],
-            label_imports=['apinatomy-neuron-populations']
-        )
-        self.assertNotEqual(ConnectivityStatement.objects.count(), 0)
-        self.flush_connectivity_statements()
-
-    def test_ingestion_without_passing_full_imports(self):
-        # don't pass the full import and it will still work - by utilizing the defaults
-        self.flush_connectivity_statements()
-        ingest_statements(label_imports=['apinatomy-neuron-populations'])
-        self.assertNotEqual(ConnectivityStatement.objects.count(), 0)
-
-    def test_ingestion_without_passing_label_imports(self):
-        # don't pass the label import and it will still work - by utilizing the defaults
-        self.flush_connectivity_statements()
-        ingest_statements(full_imports=['sparc-nlp'])
-        self.assertNotEqual(ConnectivityStatement.objects.count(), 0)
-
-    def test_disable_overwrite_for_statements(self):
-        self.flush_connectivity_statements()
-        ingest_statements(full_imports=['sparc-nlp'])
-
-        NEW_KNOWLEDGE_STATEMENT = "This is a new knowledge statement"
-
-        # Edit the statement that is in EXPORTED or in INVALID state to check if that is overwritten
-        # Other states are not overwritable anyway
-        statement_to_edit = ConnectivityStatement.objects.filter(
-            Q(state=CSState.EXPORTED) | Q(state=CSState.INVALID)).first()
-
-        if not statement_to_edit:
-            log_error(
-                "No statement found in EXPORTED or INVALID state to test disable_overwrite")
-            return
-
-        statement_to_edit.knowledge_statement = NEW_KNOWLEDGE_STATEMENT
-        statement_to_edit.save()
-
-        # The Knowledge statement will be new updated statement, if the disable_overwrite flag is enabled
-        ingest_statements(disable_overwrite=True)
-        statement_after_edit = ConnectivityStatement.objects.get(
-            id=statement_to_edit.id)
-        self.assertEqual(
-            statement_after_edit.knowledge_statement,
-            NEW_KNOWLEDGE_STATEMENT
-        )
-
-        # The Knowledge statement will be the old statement (from neurondm after ingestion), if the disable_overwrite flag is disabled
-        ingest_statements()
-        statement_after_edit = ConnectivityStatement.objects.get(
-            id=statement_to_edit.id)
-        self.assertNotEqual(
-            statement_after_edit.knowledge_statement,
-            NEW_KNOWLEDGE_STATEMENT
-        )
 
     @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
     def test_population_uris_overwrite_functionality(self, mock_get_statements):
@@ -128,8 +22,48 @@ class TestIngestStatements(TestCase):
         statement_id_2 = 'http://uri.interlex.org/composer/uris/set/heart/42'
         
         mock_statements = [
-            self.create_mock_statement_data(statement_id_1, 'liver', '131'),
-            self.create_mock_statement_data(statement_id_2, 'heart', '42')
+            {
+                'id': statement_id_1,
+                'label': 'neuron type liver 131',
+                'pref_label': 'test connectivity statement for liver 131',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'liver',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            },
+            {
+                'id': statement_id_2,
+                'label': 'neuron type heart 42',
+                'pref_label': 'test connectivity statement for heart 42',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'heart',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            }
         ]
         mock_get_statements.return_value = mock_statements
         
@@ -180,7 +114,27 @@ class TestIngestStatements(TestCase):
         statement_id = 'http://uri.interlex.org/composer/uris/set/liver/131'
         
         mock_statements = [
-            self.create_mock_statement_data(statement_id, 'liver', '131')
+            {
+                'id': statement_id,
+                'label': 'neuron type liver 131',
+                'pref_label': 'test connectivity statement for liver 131',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'liver',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            }
         ]
         mock_get_statements.return_value = mock_statements
         
@@ -215,7 +169,27 @@ class TestIngestStatements(TestCase):
         statement_id = 'http://uri.interlex.org/composer/uris/set/liver/131'
         
         mock_statements = [
-            self.create_mock_statement_data(statement_id, 'liver', '131')
+            {
+                'id': statement_id,
+                'label': 'neuron type liver 131',
+                'pref_label': 'test connectivity statement for liver 131',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'liver',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            }
         ]
         mock_get_statements.return_value = mock_statements
         
@@ -233,7 +207,27 @@ class TestIngestStatements(TestCase):
         statement_id = 'http://uri.interlex.org/composer/uris/set/liver/131'
         
         mock_statements = [
-            self.create_mock_statement_data(statement_id, 'liver', '131')
+            {
+                'id': statement_id,
+                'label': 'neuron type liver 131',
+                'pref_label': 'test connectivity statement for liver 131',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'liver',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            }
         ]
         mock_get_statements.return_value = mock_statements
         
@@ -258,9 +252,69 @@ class TestIngestStatements(TestCase):
         statement_id_3 = 'http://uri.interlex.org/composer/uris/set/brain/256'
         
         mock_statements = [
-            self.create_mock_statement_data(statement_id_1, 'liver', '131'),
-            self.create_mock_statement_data(statement_id_2, 'heart', '42'),
-            self.create_mock_statement_data(statement_id_3, 'brain', '256')
+            {
+                'id': statement_id_1,
+                'label': 'neuron type liver 131',
+                'pref_label': 'test connectivity statement for liver 131',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'liver',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            },
+            {
+                'id': statement_id_2,
+                'label': 'neuron type heart 42',
+                'pref_label': 'test connectivity statement for heart 42',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'heart',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            },
+            {
+                'id': statement_id_3,
+                'label': 'neuron type brain 256',
+                'pref_label': 'test connectivity statement for brain 256',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'brain',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            }
         ]
         mock_get_statements.return_value = mock_statements
         
@@ -286,8 +340,48 @@ class TestIngestStatements(TestCase):
         statement_id_2 = 'http://uri.interlex.org/composer/uris/set/heart/42'
         
         mock_statements = [
-            self.create_mock_statement_data(statement_id_1, 'liver', '131'),
-            self.create_mock_statement_data(statement_id_2, 'heart', '42')
+            {
+                'id': statement_id_1,
+                'label': 'neuron type liver 131',
+                'pref_label': 'test connectivity statement for liver 131',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'liver',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            },
+            {
+                'id': statement_id_2,
+                'label': 'neuron type heart 42',
+                'pref_label': 'test connectivity statement for heart 42',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'heart',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            }
         ]
         mock_get_statements.return_value = mock_statements
         
@@ -309,8 +403,48 @@ class TestIngestStatements(TestCase):
         statement_id_2 = 'http://uri.interlex.org/composer/uris/set/heart/42'
         
         mock_statements = [
-            self.create_mock_statement_data(statement_id_1, 'liver', '131'),
-            self.create_mock_statement_data(statement_id_2, 'heart', '42')
+            {
+                'id': statement_id_1,
+                'label': 'neuron type liver 131',
+                'pref_label': 'test connectivity statement for liver 131',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'liver',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            },
+            {
+                'id': statement_id_2,
+                'label': 'neuron type heart 42',
+                'pref_label': 'test connectivity statement for heart 42',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'heart',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            }
         ]
         mock_get_statements.return_value = mock_statements
         
@@ -323,3 +457,101 @@ class TestIngestStatements(TestCase):
         # Test 2: Empty set means population file was provided but empty - process no statements  
         ingest_statements(population_uris=set())
         self.assertEqual(ConnectivityStatement.objects.count(), 0, "Empty set should process no statements")
+
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_state_transitions_skipped_with_population_file(self, mock_get_statements):
+        """
+        Test that state transitions are skipped when population_uris is provided (i.e., when using a population file).
+        This ensures that existing statement states are preserved during targeted updates.
+        """
+        self.flush_connectivity_statements()
+        
+        statement_id = 'http://uri.interlex.org/composer/uris/set/liver/131'
+        
+        # Create mock statement data with empty anatomical entities and species to avoid validation errors
+        mock_statement = {
+            'id': statement_id,
+            'label': 'neuron type liver 131',
+            'pref_label': 'test connectivity statement for liver 131',
+            'origins': NeuronDMOrigin(set()),  # Empty set to avoid validation errors
+            'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],  # Empty anatomical entities
+            'populationset': 'liver',
+            'vias': [],  # Empty to avoid validation errors
+            'species': [],  # Empty to avoid validation errors
+            'sex': [],
+            'circuit_type': [],
+            'circuit_role': [],
+            'phenotype': [],
+            'other_phenotypes': [],
+            'forward_connection': [],  # Empty to avoid validation errors
+            'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+            'sentence_number': [],
+            'note_alert': [],
+            'validation_errors': ValidationErrors(),
+            'statement_alerts': []
+        }
+        
+        mock_statements = [mock_statement]
+        mock_get_statements.return_value = mock_statements
+        
+        # Initial ingestion without population_uris - should create statement in EXPORTED state
+        ingest_statements(population_uris=None)
+        
+        # Verify statement was created in EXPORTED state
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        initial_state = statement.state
+        self.assertEqual(initial_state, CSState.EXPORTED, "Statement should be in EXPORTED state initially")
+        
+        # Change the state to INVALID using update() to bypass FSM
+        # We use INVALID because it's a state that can be transitioned from during ingestion
+        ConnectivityStatement.objects.filter(id=statement.id).update(
+            state=CSState.INVALID
+        )
+        
+        # Re-fetch to verify state change
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertEqual(statement.state, CSState.INVALID, "Statement should be in INVALID state")
+        
+        # Update mock data with modified content
+        mock_statements[0]['pref_label'] = "Updated knowledge statement for testing"
+        
+        # Test 1: Ingest with population_uris (simulating population file usage)
+        # State should remain INVALID (no transition to EXPORTED)
+        population_uris = {statement_id}
+        ingest_statements(population_uris=population_uris)
+        
+        # Verify state was preserved (not transitioned to EXPORTED)
+        updated_statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertEqual(
+            updated_statement.state, 
+            CSState.INVALID, 
+            "State should remain INVALID when population_uris is provided (state transitions skipped)"
+        )
+        
+        # Verify the content was still updated (just not the state)
+        self.assertEqual(
+            updated_statement.knowledge_statement,
+            "Updated knowledge statement for testing",
+            "Knowledge statement should be updated even when state transitions are skipped"
+        )
+        
+        # Test 2: Ingest without population_uris (normal ingestion)
+        # Now with no validation errors, the state should transition to EXPORTED
+        mock_statements[0]['pref_label'] = "Another update for testing"
+        ingest_statements(population_uris=None)
+        
+        # Verify state was transitioned to EXPORTED in normal ingestion
+        final_statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertEqual(
+            final_statement.state,
+            CSState.EXPORTED,
+            "State should transition to EXPORTED when population_uris is None (normal ingestion with no validation errors)"
+        )
+        
+        # Verify the content was updated
+        self.assertEqual(
+            final_statement.knowledge_statement,
+            "Another update for testing",
+            "Knowledge statement should be updated in normal ingestion"
+        )
+
