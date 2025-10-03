@@ -45,6 +45,7 @@ RUN apt-get update \
        libgnutls30 \
        bluez \
        libxml2 \
+       libtiff5 \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${APP_DIR}
