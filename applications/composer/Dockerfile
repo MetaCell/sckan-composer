@@ -46,6 +46,7 @@ RUN apt-get update \
        bluez \
        libxml2 \
        libtiff5 \
+       libxslt1.1 \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${APP_DIR}
