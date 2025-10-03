@@ -41,6 +41,7 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
        nginx supervisor git \
        zlib1g \
+       imagemagick \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${APP_DIR}
