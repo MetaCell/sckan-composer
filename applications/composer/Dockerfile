@@ -47,6 +47,7 @@ RUN apt-get update \
        libxml2 \
        libtiff5 \
        libxslt1.1 \
+       libexpat1 \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${APP_DIR}
