@@ -44,6 +44,7 @@ RUN apt-get update \
        imagemagick \
        libgnutls30 \
        bluez \
+       libxml2 \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${APP_DIR}
