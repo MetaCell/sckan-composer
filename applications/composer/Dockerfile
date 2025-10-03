@@ -37,8 +37,18 @@ ENV MODULE_NAME=backend \
     APP_DIR=/usr/src/app
 
 RUN apt-get update \
+ && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
        nginx supervisor git \
+       zlib1g \
+       imagemagick \
+       libgnutls30 \
+       bluez \
+       libxml2 \
+       libtiff5 \
+       libxslt1.1 \
+       libexpat1 \
+       perl \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${APP_DIR}
