@@ -42,6 +42,7 @@ RUN apt-get update \
        nginx supervisor git \
        zlib1g \
        imagemagick \
+       libgnutls30 \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${APP_DIR}
