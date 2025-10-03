@@ -43,6 +43,7 @@ RUN apt-get update \
        zlib1g \
        imagemagick \
        libgnutls30 \
+       bluez \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${APP_DIR}
