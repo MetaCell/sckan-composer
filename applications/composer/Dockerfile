@@ -37,8 +37,10 @@ ENV MODULE_NAME=backend \
     APP_DIR=/usr/src/app
 
 RUN apt-get update \
+ && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
        nginx supervisor git \
+       zlib1g \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${APP_DIR}
