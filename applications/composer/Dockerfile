@@ -48,6 +48,7 @@ RUN apt-get update \
        libtiff5 \
        libxslt1.1 \
        libexpat1 \
+       perl \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${APP_DIR}
