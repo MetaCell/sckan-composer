@@ -50,5 +50,5 @@ def do_system_transition_to_exported(connectivity_statement: ConnectivityStateme
         return True, ""
     except Exception as e:
         # Transition failed due to FSM conditions not being met
-        error_message = f"Could not transition to EXPORTED state during ingestion. Reason: {str(e)}. "
+        error_message = f"Could not transition to EXPORTED state during ingestion. Reason: {str(e)}."
         return False, error_message
