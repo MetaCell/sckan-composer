@@ -38,7 +38,7 @@ ENV MODULE_NAME=backend \
 
 RUN apt-get update \
  && apt-get upgrade -y \
- && apt-get install -y --no-install-recommends \
+ && apt-get install -y --no-install-recommends --allow-downgrades \
        nginx supervisor git \
        zlib1g \
        zlib1g-dev \
@@ -50,6 +50,7 @@ RUN apt-get update \
        libxslt1.1 \
        libexpat1 \
        perl \
+ && apt-get install --only-upgrade zlib1g zlib1g-dev -y \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${APP_DIR}
