@@ -8,7 +8,7 @@ djangorestframework==3.14.0
 django-filter==22.1
 django-fsm==2.8.1
 django-fsm-admin@git+https://github.com/gadventures/django-fsm-admin@master
-django-admin-sortable2==2.1.4
+django-admin-sortable2==2.2.8
 django-nested-admin==4.0.2
 django-jazzmin==2.6.0
 drf-spectacular==0.25.1
