@@ -41,6 +41,7 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
        nginx supervisor git \
        zlib1g \
+       zlib1g-dev \
        imagemagick \
        libgnutls30 \
        bluez \
