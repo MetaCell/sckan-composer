@@ -588,22 +588,25 @@ class TestIngestStatements(TestCase):
     @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
     def test_transition_error_handling_creates_note(self, mock_get_statements):
         """
-        Test that when a transition fails due to FSM conditions not being met,
-        a note is created explaining the failure. This is a unit test that directly
-        tests the error handling in do_system_transition_to_exported.
+        Test that when a statement with validation errors is ingested with population_uris,
+        it transitions to INVALID and a note is created explaining the failure.
+        
+        This verifies the error handling path when validation errors prevent export.
         """
         from composer.models import Note
-        from composer.services.cs_ingestion.helpers.notes_helper import do_system_transition_to_exported
         
         self.flush_connectivity_statements()
         
         statement_id = 'http://uri.interlex.org/composer/uris/set/liver/131'
         
-        # Create a statement with proper population first
+        # Create a statement with validation errors
+        validation_errors = ValidationErrors()
+        validation_errors.entities.add("UBERON:9999999")  # Invalid entity
+        
         mock_statement = {
             'id': statement_id,
             'label': 'neuron type liver 131',
-            'pref_label': 'test connectivity statement',
+            'pref_label': 'test connectivity statement with errors',
             'origins': NeuronDMOrigin(set()),
             'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
             'populationset': 'liver',
@@ -618,64 +621,165 @@ class TestIngestStatements(TestCase):
             'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
             'sentence_number': [],
             'note_alert': [],
-            'validation_errors': ValidationErrors(),
+            'validation_errors': validation_errors,
             'statement_alerts': []
         }
         
         mock_statements = [mock_statement]
         mock_get_statements.return_value = mock_statements
         
-        # Create the statement
-        ingest_statements(population_uris=None)
+        # Ingest with population_uris - statement should go to INVALID due to validation errors
+        population_uris = {statement_id}
+        ingest_statements(population_uris=population_uris)
         
-        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
-        self.assertEqual(statement.state, CSState.EXPORTED)
-        
-        # Manually set to a state and remove population to simulate FSM condition failure
-        ConnectivityStatement.objects.filter(id=statement.id).update(
-            population=None,
-            state=CSState.TO_BE_REVIEWED
-        )
-        
-        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
-        self.assertIsNone(statement.population)
-        
-        # Clear any existing notes
-        Note.objects.filter(connectivity_statement=statement).delete()
-        
-        # Directly call the transition function - this should fail and return error message
-        success, error_message = do_system_transition_to_exported(statement)
-        
-        # Verify transition failed
-        self.assertFalse(success, "Transition should fail when population is None")
-        self.assertIn("Could not transition to EXPORTED", error_message)
-        
-        # Manually create note using create_invalid_note (simulating what statement_helper does)
-        from composer.services.cs_ingestion.helpers.notes_helper import create_invalid_note
-        create_invalid_note(statement, error_message)
-        
-        # Verify statement state unchanged (re-fetch from database)
+        # Verify statement was created in INVALID state
         statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
         self.assertEqual(
             statement.state,
-            CSState.TO_BE_REVIEWED,
-            "State should remain unchanged when transition fails"
+            CSState.INVALID,
+            "Statement with validation errors should be in INVALID state"
         )
         
-        # Verify a note was created
+        # Verify notes were created explaining the validation errors
         notes = Note.objects.filter(
-            connectivity_statement=statement,
+            connectivity_statement=statement
+        )
+        
+        self.assertGreater(
+            notes.count(),
+            0,
+            "Notes should be created explaining validation errors"
+        )
+        
+        # Check that at least one note mentions the validation issue
+        note_texts = [note.note for note in notes]
+        has_validation_note = any(
+            "UBERON:9999999" in text or "Invalidated" in text 
+            for text in note_texts
+        )
+        self.assertTrue(
+            has_validation_note,
+            "At least one note should mention the validation error or invalidation"
+        )
+
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_statement_moves_to_invalid_when_export_fails_with_population_file(self, mock_get_statements):
+        """
+        Test that when a statement cannot transition to EXPORTED during ingestion with
+        population_uris (e.g., due to failing FSM conditions like is_valid), 
+        it transitions to INVALID state with a note explaining the failure.
+        
+        This scenario can occur when a statement has forward_connection validation issues.
+        """
+        from composer.models import Note
+        
+        self.flush_connectivity_statements()
+        
+        statement_id = 'http://uri.interlex.org/composer/uris/set/liver/131'
+        forward_conn_id = 'http://uri.interlex.org/composer/uris/set/liver/999'
+        
+        # Create two mock statements - the second one will be referenced by the first
+        # but won't have matching anatomical entities, causing is_valid to fail
+        mock_statements = [
+            {
+                'id': statement_id,
+                'label': 'neuron type liver 131',
+                'pref_label': 'test connectivity statement',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'liver',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [forward_conn_id],  # References the second statement
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            },
+            {
+                'id': forward_conn_id,
+                'label': 'neuron type liver 999',
+                'pref_label': 'forward connectivity statement',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'liver',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            }
+        ]
+        
+        mock_get_statements.return_value = mock_statements
+        
+        # Initial ingestion to create both statements
+        ingest_statements(population_uris=None)
+        
+        # Verify both statements were created in EXPORTED state
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        forward_statement = ConnectivityStatement.objects.get(reference_uri=forward_conn_id)
+        self.assertEqual(statement.state, CSState.EXPORTED)
+        self.assertEqual(forward_statement.state, CSState.EXPORTED)
+        
+        # Change the first statement to TO_BE_REVIEWED state
+        ConnectivityStatement.objects.filter(id=statement.id).update(
+            state=CSState.TO_BE_REVIEWED
+        )
+        
+        # Clear any existing notes from the first ingestion
+        Note.objects.filter(connectivity_statement=statement).delete()
+        
+        # Re-ingest using population_uris (simulating population file ingestion)
+        # The statement with forward_connection will fail is_valid condition
+        # and should transition to INVALID
+        population_uris = {statement_id}
+        ingest_statements(population_uris=population_uris)
+        
+        # Verify the statement transitioned to INVALID
+        result_stmt = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertEqual(
+            result_stmt.state,
+            CSState.INVALID,
+            "Statement should transition to INVALID when export fails due to is_valid condition"
+        )
+        
+        # Verify notes were created
+        notes = Note.objects.filter(
+            connectivity_statement=result_stmt,
             note__icontains="Could not transition to EXPORTED"
         )
         
-        self.assertEqual(
+        self.assertGreater(
             notes.count(),
-            1,
-            "A note should be created when transition fails due to FSM conditions"
+            0,
+            "A note should be created explaining the transition failure"
         )
         
-        # Verify note content mentions the issue
-        note = notes.first()
-        self.assertIn("EXPORTED", note.note)
+        # Also check for invalidation note
+        invalidated_notes = Note.objects.filter(
+            connectivity_statement=result_stmt,
+            note__icontains="Invalidated"
+        )
+        
+        self.assertGreater(
+            invalidated_notes.count(),
+            0,
+            "An 'Invalidated' note should be created when statement moves to INVALID"
+        )
 
 
