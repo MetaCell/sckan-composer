@@ -461,8 +461,12 @@ class TestIngestStatements(TestCase):
     @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
     def test_state_transitions_skipped_with_population_file(self, mock_get_statements):
         """
-        Test that state transitions are skipped when population_uris is provided (i.e., when using a population file).
-        This ensures that existing statement states are preserved during targeted updates.
+        Test that statements can transition from any state to EXPORTED or INVALID during ingestion
+        with population_uris (i.e., when using a population file).
+        
+        When population_uris is provided and disable_overwrite is False, statements in the population
+        file can be overwritten and transitioned from any state (e.g., TO_BE_REVIEWED) to EXPORTED
+        or INVALID based on validation results.
         """
         self.flush_connectivity_statements()
         
@@ -502,42 +506,68 @@ class TestIngestStatements(TestCase):
         initial_state = statement.state
         self.assertEqual(initial_state, CSState.EXPORTED, "Statement should be in EXPORTED state initially")
         
-        # Change the state to INVALID using update() to bypass FSM
-        # We use INVALID because it's a state that can be transitioned from during ingestion
+        # Change the state to TO_BE_REVIEWED using update() to bypass FSM
+        # This simulates a statement that was manually reviewed and is now awaiting approval
         ConnectivityStatement.objects.filter(id=statement.id).update(
-            state=CSState.INVALID
+            state=CSState.TO_BE_REVIEWED
         )
         
         # Re-fetch to verify state change
         statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
-        self.assertEqual(statement.state, CSState.INVALID, "Statement should be in INVALID state")
+        self.assertEqual(statement.state, CSState.TO_BE_REVIEWED, "Statement should be in TO_BE_REVIEWED state")
         
         # Update mock data with modified content
         mock_statements[0]['pref_label'] = "Updated knowledge statement for testing"
         
         # Test 1: Ingest with population_uris (simulating population file usage)
-        # State should remain INVALID (no transition to EXPORTED)
+        # State should transition from TO_BE_REVIEWED to EXPORTED using system_exported transition
         population_uris = {statement_id}
         ingest_statements(population_uris=population_uris)
         
-        # Verify state was preserved (not transitioned to EXPORTED)
+        # Verify state was transitioned to EXPORTED (using system_exported transition)
         updated_statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
         self.assertEqual(
             updated_statement.state, 
-            CSState.INVALID, 
-            "State should remain INVALID when population_uris is provided (state transitions skipped)"
+            CSState.EXPORTED, 
+            "State should transition to EXPORTED when population_uris is provided (using system_exported transition)"
         )
         
-        # Verify the content was still updated (just not the state)
+        # Verify the content was updated
         self.assertEqual(
             updated_statement.knowledge_statement,
             "Updated knowledge statement for testing",
-            "Knowledge statement should be updated even when state transitions are skipped"
+            "Knowledge statement should be updated when using population file"
         )
         
-        # Test 2: Ingest without population_uris (normal ingestion)
-        # Now with no validation errors, the state should transition to EXPORTED
-        mock_statements[0]['pref_label'] = "Another update for testing"
+        # Test 2: Test transition to INVALID with population file when validation errors exist
+        # Add validation errors to the mock data
+        validation_errors_with_errors = ValidationErrors()
+        validation_errors_with_errors.entities.add("UBERON:9999999")
+        mock_statements[0]['validation_errors'] = validation_errors_with_errors
+        mock_statements[0]['pref_label'] = "Statement with validation errors"
+        
+        # Change state back to TO_BE_REVIEWED
+        ConnectivityStatement.objects.filter(id=statement.id).update(
+            state=CSState.TO_BE_REVIEWED
+        )
+        
+        # Ingest with population_uris and validation errors
+        ingest_statements(population_uris=population_uris)
+        
+        # Verify state transitioned to INVALID due to validation errors
+        invalid_statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertEqual(
+            invalid_statement.state,
+            CSState.INVALID,
+            "State should transition to INVALID when validation errors exist, even from TO_BE_REVIEWED state"
+        )
+        
+        # Test 3: Verify normal ingestion (without population_uris) also works correctly
+        # Remove validation errors
+        mock_statements[0]['validation_errors'] = ValidationErrors()
+        mock_statements[0]['pref_label'] = "Another update for normal ingestion"
+        
+        # Normal ingestion should also transition to EXPORTED
         ingest_statements(population_uris=None)
         
         # Verify state was transitioned to EXPORTED in normal ingestion
@@ -545,13 +575,13 @@ class TestIngestStatements(TestCase):
         self.assertEqual(
             final_statement.state,
             CSState.EXPORTED,
-            "State should transition to EXPORTED when population_uris is None (normal ingestion with no validation errors)"
+            "State should transition to EXPORTED in normal ingestion (without population_uris)"
         )
         
         # Verify the content was updated
         self.assertEqual(
             final_statement.knowledge_statement,
-            "Another update for testing",
+            "Another update for normal ingestion",
             "Knowledge statement should be updated in normal ingestion"
         )
 

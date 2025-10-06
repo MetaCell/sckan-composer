@@ -32,3 +32,13 @@ def do_transition_to_exported(connectivity_statement: ConnectivityStatement):
     system_user = User.objects.get(username="system")
     connectivity_statement.exported(by=system_user)
     connectivity_statement.save()
+
+
+def do_system_transition_to_exported(connectivity_statement: ConnectivityStatement):
+    """
+    Perform system_exported transition - allows transitioning to exported from any state.
+    This is used during ingestion with population files.
+    """
+    system_user = User.objects.get(username="system")
+    connectivity_statement.system_exported(by=system_user)
+    connectivity_statement.save()

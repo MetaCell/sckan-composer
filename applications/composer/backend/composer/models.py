@@ -806,17 +806,12 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
     def npo_approved(self, *args, **kwargs):
         ...
 
-    @transition(
-        field=state,
-        source=[CSState.NPO_APPROVED, CSState.INVALID],
-        target=CSState.EXPORTED,
-        conditions=[
-            ConnectivityStatementStateService.is_valid,
-            ConnectivityStatementStateService.has_populationset,
-        ],
-        permission=ConnectivityStatementStateService.has_permission_to_transition_to_exported,
-    )
-    def exported(self, *args, **kwargs):
+    def _perform_export_logic(self):
+        """
+        Common logic for exporting a connectivity statement.
+        This method handles population index assignment, reference URI creation,
+        and marking the statement as exported.
+        """
         with transaction.atomic():
             update_fields = ["has_statement_been_exported"]
             # Only update population_index if the statement hasn't been exported yet
@@ -844,6 +839,45 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
             # Mark the statement as exported.
             self.has_statement_been_exported = True
             self.save(update_fields=update_fields)
+
+    @transition(
+        field=state,
+        source=[CSState.NPO_APPROVED, CSState.INVALID],
+        target=CSState.EXPORTED,
+        conditions=[
+            ConnectivityStatementStateService.is_valid,
+            ConnectivityStatementStateService.has_populationset,
+        ],
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_exported,
+    )
+    def exported(self, *args, **kwargs):
+        self._perform_export_logic()
+
+    @transition(
+        field=state,
+        source=[
+            CSState.DRAFT,
+            CSState.COMPOSE_NOW,
+            CSState.IN_PROGRESS,
+            CSState.TO_BE_REVIEWED,
+            CSState.REVISE,
+            CSState.REJECTED,
+            CSState.NPO_APPROVED,
+            CSState.INVALID,
+        ],
+        target=CSState.EXPORTED,
+        conditions=[
+            ConnectivityStatementStateService.is_valid,
+            ConnectivityStatementStateService.has_populationset,
+        ],
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_exported,
+    )
+    def system_exported(self, *args, **kwargs):
+        """
+        Transition to exported state that can be called by system users from any state.
+        This is typically used during ingestion with population files.
+        """
+        self._perform_export_logic()
 
     @transition(
         field=state,
