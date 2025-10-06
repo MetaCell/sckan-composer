@@ -93,7 +93,8 @@ def ingest_statements(
         # Even if there's a critical error, we've already processed what we could
         successful_transaction = len(successful_statements) > 0
     else:
-        successful_transaction = True
+        # No critical error, but check if at least some statements succeeded
+        successful_transaction = len(successful_statements) > 0
 
     logger_service.write_anomalies_to_file()
 

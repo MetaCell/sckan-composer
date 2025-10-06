@@ -782,4 +782,203 @@ class TestIngestStatements(TestCase):
             "An 'Invalidated' note should be created when statement moves to INVALID"
         )
 
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.create_or_update_connectivity_statement')
+    def test_ingestion_continues_on_individual_statement_failure(self, mock_create_or_update, mock_get_statements):
+        """
+        Test that when individual statements fail during ingestion (e.g., database constraint errors),
+        the ingestion continues processing remaining statements instead of aborting entirely.
+        
+        This verifies:
+        1. Failed statements are logged as errors
+        2. Successful statements are still processed
+        3. The function returns correct statistics (success, total, successful_count, failed_count)
+        4. Overall ingestion is marked as successful if at least some statements succeed
+        """
+        self.flush_connectivity_statements()
+        
+        # Create three mock statements
+        statement_id_1 = 'http://uri.interlex.org/composer/uris/set/liver/131'
+        statement_id_2 = 'http://uri.interlex.org/composer/uris/set/heart/42'
+        statement_id_3 = 'http://uri.interlex.org/composer/uris/set/brain/256'
+        
+        mock_statements = [
+            {
+                'id': statement_id_1,
+                'label': 'neuron type liver 131',
+                'pref_label': 'test connectivity statement for liver 131',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'liver',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            },
+            {
+                'id': statement_id_2,
+                'label': 'neuron type heart 42',
+                'pref_label': 'test connectivity statement for heart 42',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'heart',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            },
+            {
+                'id': statement_id_3,
+                'label': 'neuron type brain 256',
+                'pref_label': 'test connectivity statement for brain 256',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'brain',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            }
+        ]
+        
+        mock_get_statements.return_value = mock_statements
+        
+        # Configure the mock to:
+        # - Succeed for statement 1 (liver)
+        # - Fail for statement 2 (heart) with a database error
+        # - Succeed for statement 3 (brain)
+        def side_effect_create_or_update(statement, sentence, update_anatomical_entities, logger_service, population_uris):
+            if statement['id'] == statement_id_2:
+                # Simulate a database constraint error (like "value too long for type character varying(20)")
+                raise Exception("value too long for type character varying(20)")
+            # For other statements, set the state (as the real function does)
+            statement['state'] = CSState.EXPORTED
+            # Return a mock ConnectivityStatement
+            from unittest.mock import Mock
+            mock_cs = Mock()
+            mock_cs.state = CSState.EXPORTED
+            return (mock_cs, True)
+        
+        mock_create_or_update.side_effect = side_effect_create_or_update
+        
+        # Execute the ingestion
+        result = ingest_statements()
+        
+        # Verify the result structure
+        self.assertIsInstance(result, dict, "Result should be a dictionary")
+        self.assertIn('success', result)
+        self.assertIn('total_statements', result)
+        self.assertIn('successful_statements', result)
+        self.assertIn('failed_statements', result)
+        
+        # Verify statistics
+        self.assertTrue(result['success'], "Overall ingestion should be successful")
+        self.assertEqual(result['total_statements'], 3, "Total statements should be 3")
+        self.assertEqual(result['successful_statements'], 2, "Should have 2 successful statements (liver and brain)")
+        self.assertEqual(result['failed_statements'], 1, "Should have 1 failed statement (heart)")
+        
+        # Verify the function was called 3 times (once per statement)
+        self.assertEqual(mock_create_or_update.call_count, 3, 
+                        "create_or_update should be called for all 3 statements")
+
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.create_or_update_connectivity_statement')
+    def test_ingestion_reports_failure_when_all_statements_fail(self, mock_create_or_update, mock_get_statements):
+        """
+        Test that when all statements fail during ingestion, the function returns
+        success=False with correct statistics.
+        """
+        self.flush_connectivity_statements()
+        
+        statement_id_1 = 'http://uri.interlex.org/composer/uris/set/liver/131'
+        statement_id_2 = 'http://uri.interlex.org/composer/uris/set/heart/42'
+        
+        mock_statements = [
+            {
+                'id': statement_id_1,
+                'label': 'neuron type liver 131',
+                'pref_label': 'test connectivity statement for liver 131',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'liver',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            },
+            {
+                'id': statement_id_2,
+                'label': 'neuron type heart 42',
+                'pref_label': 'test connectivity statement for heart 42',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'heart',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': []
+            }
+        ]
+        
+        mock_get_statements.return_value = mock_statements
+        
+        # Configure mock to fail for all statements
+        mock_create_or_update.side_effect = Exception("Database constraint error")
+        
+        # Execute the ingestion
+        result = ingest_statements()
+        
+        # Verify the result indicates failure
+        self.assertFalse(result['success'], "Overall ingestion should fail when all statements fail")
+        self.assertEqual(result['total_statements'], 2, "Total statements should be 2")
+        self.assertEqual(result['successful_statements'], 0, "Should have 0 successful statements")
+        self.assertEqual(result['failed_statements'], 2, "Should have 2 failed statements")
+
+
+
 
