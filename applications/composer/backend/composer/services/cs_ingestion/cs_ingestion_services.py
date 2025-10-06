@@ -48,34 +48,64 @@ def ingest_statements(
         overridable_and_new_statements, update_anatomical_entities
     )
 
-    successful_transaction = True
+    successful_statements = []
+    failed_statements = []
+    
     try:
         with transaction.atomic():
             for statement in statements:
-                sentence, _ = get_or_create_sentence(statement)
-                create_or_update_connectivity_statement(
-                    statement, sentence, update_anatomical_entities, logger_service, population_uris
-                )
+                try:
+                    sentence, _ = get_or_create_sentence(statement)
+                    create_or_update_connectivity_statement(
+                        statement, sentence, update_anatomical_entities, logger_service, population_uris
+                    )
+                    successful_statements.append(statement)
+                except Exception as e:
+                    # Log the error and continue with next statement
+                    statement_id = statement.get('id', statement.get('reference_uri', 'Unknown'))
+                    error_message = f"Failed to ingest statement {statement_id}: {str(e)}"
+                    logger_service.add_anomaly(
+                        LoggableAnomaly(
+                            statement_id=statement_id,
+                            entity_id=None,
+                            message=error_message,
+                            severity=Severity.ERROR,
+                        )
+                    )
+                    failed_statements.append(statement)
+                    logging.error(error_message)
 
-            update_forward_connections(statements)
+            # Only update forward connections for successfully processed statements
+            if successful_statements:
+                update_forward_connections(successful_statements)
 
     except Exception as e:
+        # This catches any unexpected errors outside individual statement processing
         logger_service.add_anomaly(
             LoggableAnomaly(
                 statement_id=None,
                 entity_id=None,
-                message=str(e),
+                message=f"Critical error during ingestion: {str(e)}",
                 severity=Severity.ERROR,
             )
         )
-        successful_transaction = False
-        logging.error(f"Ingestion aborted due to {e}")
+        logging.error(f"Critical error during ingestion: {e}")
+        # Even if there's a critical error, we've already processed what we could
+        successful_transaction = len(successful_statements) > 0
+    else:
+        successful_transaction = True
 
     logger_service.write_anomalies_to_file()
 
     if successful_transaction:
         if update_upstream:
             update_upstream_statements()
-        logger_service.write_ingested_statements_to_file(statements)
+        logger_service.write_ingested_statements_to_file(successful_statements)
     
-    return successful_transaction
+    # Return success status and statistics
+    return {
+        'success': successful_transaction,
+        'total_statements': len(statements),
+        'successful_statements': len(successful_statements),
+        'failed_statements': len(failed_statements)
+    }

@@ -64,13 +64,29 @@ class Command(BaseCommand):
 
         start_time = time.time()
 
-        success = ingest_statements(update_upstream, update_anatomical_entities, disable_overwrite, full_imports, label_imports, population_uris)
+        result = ingest_statements(update_upstream, update_anatomical_entities, disable_overwrite, full_imports, label_imports, population_uris)
 
         end_time = time.time()
 
         duration = end_time - start_time
 
-        if success:
-            self.stdout.write(self.style.SUCCESS(f"Ingestion completed successfully in {duration:.2f} seconds."))
+        if result['success']:
+            self.stdout.write(self.style.SUCCESS(
+                f"Ingestion completed successfully in {duration:.2f} seconds.\n"
+                f"Total statements: {result['total_statements']}\n"
+                f"Successfully ingested: {result['successful_statements']}\n"
+                f"Failed: {result['failed_statements']}"
+            ))
+            if result['failed_statements'] > 0:
+                self.stdout.write(self.style.WARNING(
+                    f"\nNote: {result['failed_statements']} statement(s) failed during ingestion. "
+                    f"Check the anomalies log file for details."
+                ))
         else:
-            self.stderr.write(self.style.ERROR(f"Ingestion failed after {duration:.2f} seconds. Check logs for details."))
+            self.stderr.write(self.style.ERROR(
+                f"Ingestion failed after {duration:.2f} seconds.\n"
+                f"Total statements: {result['total_statements']}\n"
+                f"Successfully ingested: {result['successful_statements']}\n"
+                f"Failed: {result['failed_statements']}\n"
+                f"Check logs for details."
+            ))
