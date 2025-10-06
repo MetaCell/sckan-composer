@@ -127,7 +127,11 @@ def create_or_update_connectivity_statement(
             if connectivity_statement.state != CSState.EXPORTED:
                 transition_success, error_message = do_system_transition_to_exported(connectivity_statement)
                 if not transition_success:
-                    create_invalid_note(connectivity_statement, error_message)
+                    # Transition to EXPORTED failed - move to INVALID state
+                    if connectivity_statement.state != CSState.INVALID:
+                        do_transition_to_invalid_with_note(connectivity_statement, error_message)
+                    else:
+                        create_invalid_note(connectivity_statement, error_message)
         else:
             # Normal ingestion: only transition if not already exported
             if connectivity_statement.state != CSState.EXPORTED:
