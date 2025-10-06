@@ -459,7 +459,7 @@ class TestIngestStatements(TestCase):
         self.assertEqual(ConnectivityStatement.objects.count(), 0, "Empty set should process no statements")
 
     @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
-    def test_state_transitions_skipped_with_population_file(self, mock_get_statements):
+    def test_state_transitions_with_population_file(self, mock_get_statements):
         """
         Test that statements can transition from any state to EXPORTED or INVALID during ingestion
         with population_uris (i.e., when using a population file).
@@ -584,4 +584,98 @@ class TestIngestStatements(TestCase):
             "Another update for normal ingestion",
             "Knowledge statement should be updated in normal ingestion"
         )
+
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_transition_error_handling_creates_note(self, mock_get_statements):
+        """
+        Test that when a transition fails due to FSM conditions not being met,
+        a note is created explaining the failure. This is a unit test that directly
+        tests the error handling in do_system_transition_to_exported.
+        """
+        from composer.models import Note
+        from composer.services.cs_ingestion.helpers.notes_helper import do_system_transition_to_exported
+        
+        self.flush_connectivity_statements()
+        
+        statement_id = 'http://uri.interlex.org/composer/uris/set/liver/131'
+        
+        # Create a statement with proper population first
+        mock_statement = {
+            'id': statement_id,
+            'label': 'neuron type liver 131',
+            'pref_label': 'test connectivity statement',
+            'origins': NeuronDMOrigin(set()),
+            'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+            'populationset': 'liver',
+            'vias': [],
+            'species': [],
+            'sex': [],
+            'circuit_type': [],
+            'circuit_role': [],
+            'phenotype': [],
+            'other_phenotypes': [],
+            'forward_connection': [],
+            'provenance': ['http://dx.doi.org/10.1126/sciadv.abg5733'],
+            'sentence_number': [],
+            'note_alert': [],
+            'validation_errors': ValidationErrors(),
+            'statement_alerts': []
+        }
+        
+        mock_statements = [mock_statement]
+        mock_get_statements.return_value = mock_statements
+        
+        # Create the statement
+        ingest_statements(population_uris=None)
+        
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertEqual(statement.state, CSState.EXPORTED)
+        
+        # Manually set to a state and remove population to simulate FSM condition failure
+        ConnectivityStatement.objects.filter(id=statement.id).update(
+            population=None,
+            state=CSState.TO_BE_REVIEWED
+        )
+        
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertIsNone(statement.population)
+        
+        # Clear any existing notes
+        Note.objects.filter(connectivity_statement=statement).delete()
+        
+        # Directly call the transition function - this should fail and return error message
+        success, error_message = do_system_transition_to_exported(statement)
+        
+        # Verify transition failed
+        self.assertFalse(success, "Transition should fail when population is None")
+        self.assertIn("Could not transition to EXPORTED", error_message)
+        
+        # Manually create note using create_invalid_note (simulating what statement_helper does)
+        from composer.services.cs_ingestion.helpers.notes_helper import create_invalid_note
+        create_invalid_note(statement, error_message)
+        
+        # Verify statement state unchanged (re-fetch from database)
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertEqual(
+            statement.state,
+            CSState.TO_BE_REVIEWED,
+            "State should remain unchanged when transition fails"
+        )
+        
+        # Verify a note was created
+        notes = Note.objects.filter(
+            connectivity_statement=statement,
+            note__icontains="Could not transition to EXPORTED"
+        )
+        
+        self.assertEqual(
+            notes.count(),
+            1,
+            "A note should be created when transition fails due to FSM conditions"
+        )
+        
+        # Verify note content mentions the issue
+        note = notes.first()
+        self.assertIn("EXPORTED", note.note)
+
 

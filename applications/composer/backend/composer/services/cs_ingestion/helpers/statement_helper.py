@@ -120,20 +120,18 @@ def create_or_update_connectivity_statement(
         else:
             create_invalid_note(connectivity_statement, error_message)
     else:
-        # Statement is valid
-        if ConnectivityStatementStateService.has_populationset(
-            connectivity_statement=connectivity_statement
-        ):
-            # Use system_exported transition when population_uris is provided
-            # This allows transitioning from any state (e.g., TO_BE_REVIEWED -> EXPORTED)
-            if population_uris is not None:
-                if connectivity_statement.state != CSState.EXPORTED:
-                    do_system_transition_to_exported(connectivity_statement)
-            else:
-                # Normal ingestion: only transition if not already exported
-                if connectivity_statement.state != CSState.EXPORTED:
-                    do_transition_to_exported(connectivity_statement)
-
+        # Statement is valid - attempt transition to EXPORTED
+        # Use system_exported transition when population_uris is provided
+        # This allows transitioning from any state (e.g., TO_BE_REVIEWED -> EXPORTED)
+        if population_uris is not None:
+            if connectivity_statement.state != CSState.EXPORTED:
+                transition_success, error_message = do_system_transition_to_exported(connectivity_statement)
+                if not transition_success:
+                    create_invalid_note(connectivity_statement, error_message)
+        else:
+            # Normal ingestion: only transition if not already exported
+            if connectivity_statement.state != CSState.EXPORTED:
+                do_transition_to_exported(connectivity_statement)
 
     for alert_data in statement.get(STATEMENT_ALERTS, []):
         try:

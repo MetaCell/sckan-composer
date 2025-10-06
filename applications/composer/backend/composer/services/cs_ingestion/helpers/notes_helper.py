@@ -34,11 +34,21 @@ def do_transition_to_exported(connectivity_statement: ConnectivityStatement):
     connectivity_statement.save()
 
 
-def do_system_transition_to_exported(connectivity_statement: ConnectivityStatement):
+def do_system_transition_to_exported(connectivity_statement: ConnectivityStatement) -> tuple[bool, str]:
     """
     Perform system_exported transition - allows transitioning to exported from any state.
     This is used during ingestion with population files.
+    
+    Returns:
+        tuple: (success: bool, error_message: str) - success is True if transition succeeded,
+               False if it failed. error_message contains the reason for failure.
     """
     system_user = User.objects.get(username="system")
-    connectivity_statement.system_exported(by=system_user)
-    connectivity_statement.save()
+    try:
+        connectivity_statement.system_exported(by=system_user)
+        connectivity_statement.save()
+        return True, ""
+    except Exception as e:
+        # Transition failed due to FSM conditions not being met
+        error_message = f"Could not transition to EXPORTED state during ingestion. Reason: {str(e)}. "
+        return False, error_message
