@@ -1,6 +1,8 @@
 packaging==21.3
-Django==4.1.13
+Django==4.2.25
 uvicorn==0.20.0
+starlette>=0.41.3
+pillow>=11.0.0
 psycopg2-binary==2.9.5
 djangorestframework==3.14.0
 django-filter==22.1
