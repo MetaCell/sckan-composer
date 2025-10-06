@@ -45,7 +45,7 @@ RUN apt-get update \
        libgnutls30 \
        bluez \
        libxml2 \
-       libtiff5 \
+       libtiff6 \
        libxslt1.1 \
        libexpat1 \
        perl \
