@@ -71,10 +71,10 @@ const ProvenancesForm = (props: any) => {
     
     // DOI patterns
     const doiPatterns = [
-      /^10\.\d{4,}\/[^\s]+$/,  // Standard DOI format
-      /^doi:10\.\d{4,}\/[^\s]+$/i,  // DOI with prefix
-      /^https?:\/\/doi\.org\/10\.\d{4,}\/[^\s]+$/i,  // DOI URL
-      /^https?:\/\/dx\.doi\.org\/10\.\d{4,}\/[^\s]+$/i,  // Alternative DOI URL
+      /^10\.\d{4,}\/[a-zA-Z0-9\-._():]+(?:\/[a-zA-Z0-9\-._():]+)*$/,  // Standard DOI format - no consecutive slashes
+      /^doi:10\.\d{4,}\/[a-zA-Z0-9\-._():]+(?:\/[a-zA-Z0-9\-._():]+)*$/i,  // DOI with prefix
+      /^https?:\/\/doi\.org\/10\.\d{4,}\/[a-zA-Z0-9\-._():]+(?:\/[a-zA-Z0-9\-._():]+)*$/i,  // DOI URL
+      /^https?:\/\/dx\.doi\.org\/10\.\d{4,}\/[a-zA-Z0-9\-._():]+(?:\/[a-zA-Z0-9\-._():]+)*$/i,  // Alternative DOI URL
     ];
     
     // PMID patterns
@@ -90,8 +90,8 @@ const ProvenancesForm = (props: any) => {
       /^https?:\/\/www\.ncbi\.nlm\.nih\.gov\/pmc\/articles\/PMC\d+\/?$/i,  // PMC URL
     ];
     
-    // URL pattern (comprehensive)
-    const urlPattern = /^https?:\/\/(?:[-\w.])+(?::\d+)?(?:\/(?:[\w/_.])*(?:\?(?:[\w&=%.])*)?(?:#(?:[\w.])*)?)?$/i;
+    // URL pattern
+    const urlPattern = /^https?:\/\/[a-zA-Z0-9\-.]+(?::[0-9]+)?(?:\/[a-zA-Z0-9\-._~!$&'()*+,;=:@]+)*(?:\?[a-zA-Z0-9\-._~!$&'()*+,;=:@\/?]*)?(?:\#[a-zA-Z0-9\-._~!$&'()*+,;=:@\/?]*)?$/i;
     
     // Check if it matches any of the valid patterns
     const allPatterns = [...doiPatterns, ...pmidPatterns, ...pmcidPatterns, urlPattern];

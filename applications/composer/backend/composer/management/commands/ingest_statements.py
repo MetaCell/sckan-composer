@@ -64,10 +64,13 @@ class Command(BaseCommand):
 
         start_time = time.time()
 
-        ingest_statements(update_upstream, update_anatomical_entities, disable_overwrite, full_imports, label_imports, population_uris)
+        success = ingest_statements(update_upstream, update_anatomical_entities, disable_overwrite, full_imports, label_imports, population_uris)
 
         end_time = time.time()
 
         duration = end_time - start_time
 
-        self.stdout.write(self.style.SUCCESS(f"Ingestion completed in {duration:.2f} seconds."))
+        if success:
+            self.stdout.write(self.style.SUCCESS(f"Ingestion completed successfully in {duration:.2f} seconds."))
+        else:
+            self.stderr.write(self.style.ERROR(f"Ingestion failed after {duration:.2f} seconds. Check logs for details."))

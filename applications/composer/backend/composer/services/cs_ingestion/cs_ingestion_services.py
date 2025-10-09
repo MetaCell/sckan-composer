@@ -54,7 +54,7 @@ def ingest_statements(
             for statement in statements:
                 sentence, _ = get_or_create_sentence(statement)
                 create_or_update_connectivity_statement(
-                    statement, sentence, update_anatomical_entities, logger_service
+                    statement, sentence, update_anatomical_entities, logger_service, population_uris
                 )
 
             update_forward_connections(statements)
@@ -77,3 +77,5 @@ def ingest_statements(
         if update_upstream:
             update_upstream_statements()
         logger_service.write_ingested_statements_to_file(statements)
+    
+    return successful_transaction
