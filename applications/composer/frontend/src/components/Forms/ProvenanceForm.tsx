@@ -91,7 +91,7 @@ const ProvenancesForm = (props: any) => {
     ];
     
     // URL pattern
-    const urlPattern = /^https?:\/\/[a-zA-Z0-9\-.]+(?::[0-9]+)?(?:\/[a-zA-Z0-9\-._~!$&'()*+,;=:@]+)*(?:\?[a-zA-Z0-9\-._~!$&'()*+,;=:@\/?]*)?(?:\#[a-zA-Z0-9\-._~!$&'()*+,;=:@\/?]*)?$/i;
+    const urlPattern = /^https?:\/\/[a-zA-Z0-9\-.]+(?::[0-9]+)?(?:\/[a-zA-Z0-9\-._~!$&'()*+,;=:@]+)*(?:\?[a-zA-Z0-9\-._~!$&'()*+,;=:@/?]*)?(?:#[a-zA-Z0-9\-._~!$&'()*+,;=:@/?]*)?$/i;
     
     // Check if it matches any of the valid patterns
     const allPatterns = [...doiPatterns, ...pmidPatterns, ...pmcidPatterns, urlPattern];
@@ -100,12 +100,12 @@ const ProvenancesForm = (props: any) => {
   }
 
   const isValidUrl = (uri: string) =>{
-    var urlPattern = new RegExp('^(https?:\\/\\/)?'+ 
+    var urlPattern = new RegExp('^(https?://)?'+ 
     '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ 
     '((\\d{1,3}\\.){3}\\d{1,3}))'+ 
-    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ 
+    '(\\:\\d+)?(/[-a-z\\d%_.~+]*)*'+ 
     '(\\?[;&a-z\\d%_.~+=-]*)?'+ 
-    '(\\#[-a-z\\d_]*)?$','i')
+    '(#[-a-z\\d_]*)?$','i')
     if (!uri.match(urlPattern)) return false
     return true
   }

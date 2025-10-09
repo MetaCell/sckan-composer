@@ -117,7 +117,9 @@ def get_connections(n, lpes):
     destinations_from_axioms = create_uri_type_dict(lpes, {ilxtr.hasAxonPresynapticElementIn: 'AXON-T',
                                                            ilxtr.hasAxonSensorySubcellularElementIn: 'AFFERENT-T'})
     vias_from_axioms = create_uri_type_dict(lpes,
-                                            {ilxtr.hasAxonLocatedIn: 'AXON', ilxtr.hasDendriteLocatedIn: 'DENDRITE'})
+                                            {ilxtr.hasAxonLocatedIn: 'AXON', 
+                                             ilxtr.hasDendriteLocatedIn: 'DENDRITE',
+                                             ilxtr.hasAxonLeadingToSensorySubcellularElementIn: 'SENSORY_AXON'})
 
     tmp_origins, tmp_vias, tmp_destinations, validation_errors = process_connections(partial_order,
                                                                                      set(origins_from_axioms),
