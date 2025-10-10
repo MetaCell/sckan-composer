@@ -79,6 +79,12 @@ def for_composer(n, statement_alert_uris: Set[str] = None):
         if str(item[0]) in statement_alert_uris
     ]
 
+    expert_consultants = [
+        r for ref in lrdf(n, ilxtr.reference) 
+        for r in ref.split() 
+        if 'orcid' in r
+    ]
+
     fc = dict(
         id=str(n.id_),
         label=lrdf(n, rdfs.label)[0],
@@ -98,6 +104,7 @@ def for_composer(n, statement_alert_uris: Set[str] = None):
                           + lpes(n, ilxtr.hasProjectionPhenotype)),
         forward_connection=lpes(n, ilxtr.hasForwardConnectionPhenotype),
         provenance=lrdf(n, ilxtr.literatureCitation),
+        expert_consultants=expert_consultants,
         sentence_number=lrdf(n, ilxtr.sentenceNumber),
         note_alert=lrdf(n, ilxtr.alertNote),
         validation_errors=validation_errors,

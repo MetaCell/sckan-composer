@@ -93,7 +93,7 @@ class PmcIdField(models.CharField):
         return super().formfield(*args, **kwargs)
 
 
-def validate_provenance_uri(value):
+def validate_uri(value):
     """Validate that the URI is a valid DOI, PMID, PMCID, or URL"""
     if not value or not value.strip():
         raise ValidationError("URI cannot be empty.")
@@ -140,13 +140,13 @@ def validate_provenance_uri(value):
     )
 
 
-class ProvenanceUriField(models.CharField):
+class UriField(models.CharField):
     """Custom field for provenance URIs that accepts DOI, PMID, PMCID, or URLs"""
-    
-    def __init__(self, *args, **kwargs):
-        kwargs['validators'] = kwargs.get('validators', []) + [validate_provenance_uri]
-        super().__init__(*args, **kwargs)
+    default_validators = [validate_uri]
 
+# --- Backward compatibility alias for old migrations ---
+ProvenanceUriField = UriField
+validate_provenance_uri = validate_uri
 
 # Model Managers
 class ConnectivityStatementManager(models.Manager):
@@ -1301,13 +1301,29 @@ class Provenance(models.Model):
     connectivity_statement = models.ForeignKey(
         ConnectivityStatement, on_delete=models.CASCADE
     )
-    uri = ProvenanceUriField(max_length=500)
+    uri = UriField(max_length=500)
 
     def __str__(self):
         return self.uri
 
     class Meta:
         verbose_name_plural = "Provenances"
+
+
+class ExpertConsultant(models.Model):
+    """Expert Consultant"""
+
+    connectivity_statement = models.ForeignKey(
+        ConnectivityStatement, on_delete=models.CASCADE
+    )
+    uri = UriField(max_length=500)
+
+    def __str__(self):
+        return self.uri
+
+    class Meta:
+        verbose_name_plural = "Expert Consultants"
+
 
 class Note(models.Model):
     """Note"""

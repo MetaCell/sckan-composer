@@ -14,6 +14,7 @@ from composer.models import (
     Note,
     Specie,
     Provenance,
+    ExpertConsultant,
     StatementAlert,
 )
 from composer.services.cs_ingestion.helpers.anatomical_entities_helper import (
@@ -30,6 +31,7 @@ from composer.services.cs_ingestion.helpers.common_helpers import (
     STATE,
     NOTE_ALERT,
     PROVENANCE,
+    EXPERT_CONSULTANTS,
     SPECIES,
     FORWARD_CONNECTION,
 )
@@ -171,6 +173,9 @@ def update_many_to_many_fields(
     for provenance in connectivity_statement.provenance_set.all():
         provenance.delete()
 
+    for expert_consultant in connectivity_statement.expertconsultant_set.all():
+        expert_consultant.delete()
+
     for destination in connectivity_statement.destinations.all():
         destination.delete()
 
@@ -182,6 +187,7 @@ def update_many_to_many_fields(
     add_destinations(connectivity_statement, statement, update_anatomical_entities)
     add_species(connectivity_statement, statement)
     add_provenances(connectivity_statement, statement)
+    add_expert_consultants(connectivity_statement, statement)
     add_notes(connectivity_statement, statement)
 
 
@@ -204,6 +210,16 @@ def add_provenances(connectivity_statement: ConnectivityStatement, statement: Di
         for provenance in provenances_list
     )
     Provenance.objects.bulk_create(provenances)
+
+
+def add_expert_consultants(connectivity_statement: ConnectivityStatement, statement: Dict):
+    expert_consultants_list = statement.get(EXPERT_CONSULTANTS, [])
+    if expert_consultants_list:
+        expert_consultants = (
+            ExpertConsultant(connectivity_statement=connectivity_statement, uri=uri)
+            for uri in expert_consultants_list
+        )
+        ExpertConsultant.objects.bulk_create(expert_consultants)
 
 
 def add_species(connectivity_statement: ConnectivityStatement, statement: Dict):

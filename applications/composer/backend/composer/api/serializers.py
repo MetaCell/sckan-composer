@@ -17,6 +17,7 @@ from ..models import (
     Sex,
     ConnectivityStatement,
     Provenance,
+    ExpertConsultant,
     Note,
     Profile,
     Sentence,
@@ -380,6 +381,22 @@ class ProvenanceCreateSerializer(serializers.Serializer):
     uri = serializers.CharField(required=True)
 
 
+class ExpertConsultantSerializer(serializers.ModelSerializer):
+    """Expert Consultant"""
+
+    uri = serializers.CharField()
+    connectivity_statement_id = serializers.IntegerField(required=True)
+
+    class Meta:
+        model = ExpertConsultant
+        fields = ("id", "uri", "connectivity_statement_id")
+
+
+class ExpertConsultantCreateSerializer(serializers.Serializer):
+    """Serializer for creating expert consultant via request body"""
+    uri = serializers.CharField(required=True)
+
+
 class SentenceConnectivityStatement(serializers.ModelSerializer):
     """Connectivity Statement"""
 
@@ -734,6 +751,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     population_id = serializers.IntegerField(required=False, allow_null=True)
     species = SpecieSerializer(many=True, read_only=False, required=False)
     provenances = ProvenanceSerializer(source="provenance_set", many=True, read_only=False, required=False)
+    expert_consultants = ExpertConsultantSerializer(source="expertconsultant_set", many=True, read_only=False, required=False)
     origins = AnatomicalEntitySerializer(many=True, required=False)
     vias = ViaSerializerDetails(source="via_set", many=True, read_only=False, required=False)
     destinations = DestinationSerializerDetails(many=True, required=False)
@@ -831,6 +849,7 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             "knowledge_statement",
             "tags",
             "provenances",
+            "expert_consultants",
             "owner",
             "owner_id",
             "state",

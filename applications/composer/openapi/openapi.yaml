@@ -405,6 +405,44 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/composer/connectivity-statement/{id}/add_expert_consultant/:
+    post:
+      operationId: composer_connectivity_statement_add_expert_consultant_create
+      description: ConnectivityStatement
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpertConsultantCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExpertConsultantCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExpertConsultantCreate'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
   /api/composer/connectivity-statement/{id}/add_provenance/:
     post:
       operationId: composer_connectivity_statement_add_provenance_create
@@ -560,6 +598,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConnectivityStatement'
           description: ''
+  /api/composer/connectivity-statement/{id}/del_expert_consultant/{expert_consultant_id}/:
+    delete:
+      operationId: composer_connectivity_statement_del_expert_consultant_destroy
+      description: ConnectivityStatement
+      parameters:
+      - in: path
+        name: expert_consultant_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/composer/connectivity-statement/{id}/del_provenance/{provenance_id}/:
     delete:
       operationId: composer_connectivity_statement_del_provenance_destroy
@@ -3283,6 +3346,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Provenance'
+        expert_consultants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpertConsultant'
         owner:
           allOf:
           - $ref: '#/components/schemas/User'
@@ -3662,6 +3729,29 @@ components:
       - AFFERENT-T
       - UNKNOWN
       type: string
+    ExpertConsultant:
+      type: object
+      description: Expert Consultant
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uri:
+          type: string
+        connectivity_statement_id:
+          type: integer
+      required:
+      - connectivity_statement_id
+      - id
+      - uri
+    ExpertConsultantCreate:
+      type: object
+      description: Serializer for creating expert consultant via request body
+      properties:
+        uri:
+          type: string
+      required:
+      - uri
     GraphState:
       type: object
       properties:
@@ -4223,6 +4313,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Provenance'
+        expert_consultants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpertConsultant'
         owner:
           allOf:
           - $ref: '#/components/schemas/User'
@@ -4568,7 +4662,7 @@ components:
         external_ref:
           type: string
           nullable: true
-          maxLength: 20
+          maxLength: 100
         tags:
           type: array
           items:
@@ -4809,7 +4903,7 @@ components:
         external_ref:
           type: string
           nullable: true
-          maxLength: 20
+          maxLength: 100
         tags:
           type: array
           items:
