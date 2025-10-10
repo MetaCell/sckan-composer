@@ -142,10 +142,7 @@ def validate_uri(value):
 
 class UriField(models.CharField):
     """Custom field for provenance URIs that accepts DOI, PMID, PMCID, or URLs"""
-    
-    def __init__(self, *args, **kwargs):
-        kwargs['validators'] = kwargs.get('validators', []) + [validate_uri]
-        super().__init__(*args, **kwargs)
+    default_validators = [validate_uri]
 
 # --- Backward compatibility alias for old migrations ---
 ProvenanceUriField = UriField
@@ -1319,7 +1316,7 @@ class ExpertConsultant(models.Model):
     connectivity_statement = models.ForeignKey(
         ConnectivityStatement, on_delete=models.CASCADE
     )
-    uri = UriField(max_length=500, validators=[validate_uri])
+    uri = UriField(max_length=500)
 
     def __str__(self):
         return self.uri
