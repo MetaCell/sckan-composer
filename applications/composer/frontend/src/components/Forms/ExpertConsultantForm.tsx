@@ -1,18 +1,24 @@
 import React, {useState} from "react";
 import { FormBase } from './FormBase'
 import { jsonSchemas } from '../../services/JsonSchema'
-import provenanceService from '../../services/ProvenanceService'
-import {Provenance} from "../../apiclient/backend";
+import expertConsultantService from '../../services/ExpertConsultantService'
 import TextfieldWithChips from "../Widgets/TextfieldWithChips";
 import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
 import {ChangeRequestStatus} from "../../helpers/settings";
 import {isValidURI, isValidUrl, getURIValidationErrorMessage} from "../../helpers/uriValidation";
 
-const ProvenancesForm = (props: any) => {
-  const { provenancesData, setter, extraData, isDisabled } = props
+// Temporary type until API client is regenerated
+interface ExpertConsultant {
+  id: number;
+  uri: string;
+  connectivity_statement_id: number;
+}
+
+const ExpertConsultantsForm = (props: any) => {
+  const { expertConsultantsData, setter, extraData, isDisabled } = props
   const [isLoading, setIsLoading] = useState(false)
 
-  const { schema, uiSchema } = jsonSchemas.getProvenanceSchema()
+  const { schema, uiSchema } = jsonSchemas.getExpertConsultantsSchema()
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
 
@@ -20,7 +26,6 @@ const ProvenancesForm = (props: any) => {
     setter()
   }
 
-  // TODO: set up the widgets for the schema
   copiedSchema.title = ""
 
   const handleAutocompleteChange = (e:any, value:any)=>{
@@ -28,7 +33,7 @@ const ProvenancesForm = (props: any) => {
     
     // Validate the URI format before saving
     if (!isValidURI(newValue)) {
-      alert(getURIValidationErrorMessage("provenance"));
+      alert(getURIValidationErrorMessage("expert consultant URI"));
       return;
     }
     
@@ -36,14 +41,14 @@ const ProvenancesForm = (props: any) => {
     return checkOwnership(
       extraData.connectivity_statement_id,
       async () => {
-        provenanceService.save({statementId: extraData.connectivity_statement_id, uri: newValue}).then(()=>{
+        expertConsultantService.save({statementId: extraData.connectivity_statement_id, uri: newValue}).then(()=>{
           setter()
         }).catch((error) => {
           // Handle backend validation errors
           if (error.response && error.response.data && error.response.data.uri) {
             alert(`Validation error: ${error.response.data.uri[0]}`);
           } else {
-            alert('Failed to save provenance. Please try again.');
+            alert('Failed to save expert consultant. Please try again.');
           }
         }).finally(() => {
           setIsLoading(false)
@@ -61,14 +66,14 @@ const ProvenancesForm = (props: any) => {
     "ui:widget": TextfieldWithChips,
     "ui:options": {
       isDisabled: !extraData.connectivity_statement_id || isDisabled,
-      data: provenancesData?.map((row: Provenance) => ({id: row.id, label: row.uri, enableClick: isValidUrl(row.uri) })) || [],
-      placeholder: isDisabled ? null : 'Enter Provenances (Press Enter to add a Provenance)',
-      removeChip: function(provenanceId: any) {
+      data: expertConsultantsData?.map((row: ExpertConsultant) => ({id: row.id, label: row.uri, enableClick: isValidUrl(row.uri) })) || [],
+      placeholder: isDisabled ? null : 'Enter Expert Consultant URIs (Press Enter to add)',
+      removeChip: function(expertConsultantId: any) {
         setIsLoading(true)
         return checkOwnership(
           extraData.connectivity_statement_id,
           async () => {
-           await provenanceService.delete(provenanceId, extraData.connectivity_statement_id)
+           await expertConsultantService.delete(expertConsultantId, extraData.connectivity_statement_id)
             refresh()
             setIsLoading(false)
           },
@@ -95,8 +100,8 @@ const ProvenancesForm = (props: any) => {
   return (
       <FormBase
         {...props}
-        service={provenanceService}
-        data={provenancesData}
+        service={expertConsultantService}
+        data={expertConsultantsData}
         schema={copiedSchema}
         uiSchema={copiedUISchema}
         enableAutoSave={false}
@@ -110,4 +115,4 @@ const ProvenancesForm = (props: any) => {
   )
 }
 
-export default ProvenancesForm
+export default ExpertConsultantsForm

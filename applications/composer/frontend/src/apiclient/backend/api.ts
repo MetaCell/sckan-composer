@@ -406,6 +406,12 @@ export interface ConnectivityStatement {
     'provenances'?: Array<Provenance>;
     /**
      * 
+     * @type {Array<ExpertConsultant>}
+     * @memberof ConnectivityStatement
+     */
+    'expert_consultants'?: Array<ExpertConsultant>;
+    /**
+     * 
      * @type {User}
      * @memberof ConnectivityStatement
      */
@@ -974,6 +980,44 @@ export const DestinationTypeEmum = {
 export type DestinationTypeEmum = typeof DestinationTypeEmum[keyof typeof DestinationTypeEmum];
 
 
+/**
+ * Expert Consultant
+ * @export
+ * @interface ExpertConsultant
+ */
+export interface ExpertConsultant {
+    /**
+     * 
+     * @type {number}
+     * @memberof ExpertConsultant
+     */
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ExpertConsultant
+     */
+    'uri': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ExpertConsultant
+     */
+    'connectivity_statement_id': number;
+}
+/**
+ * Serializer for creating expert consultant via request body
+ * @export
+ * @interface ExpertConsultantCreate
+ */
+export interface ExpertConsultantCreate {
+    /**
+     * 
+     * @type {string}
+     * @memberof ExpertConsultantCreate
+     */
+    'uri': string;
+}
 /**
  * 
  * @export
@@ -1869,6 +1913,12 @@ export interface PatchedConnectivityStatement {
      * @memberof PatchedConnectivityStatement
      */
     'provenances'?: Array<Provenance>;
+    /**
+     * 
+     * @type {Array<ExpertConsultant>}
+     * @memberof PatchedConnectivityStatement
+     */
+    'expert_consultants'?: Array<ExpertConsultant>;
     /**
      * 
      * @type {User}
@@ -3600,6 +3650,54 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {ExpertConsultantCreate} expertConsultantCreate 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAddExpertConsultantCreate: async (id: number, expertConsultantCreate: ExpertConsultantCreate, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementAddExpertConsultantCreate', 'id', id)
+            // verify required parameter 'expertConsultantCreate' is not null or undefined
+            assertParamExists('composerConnectivityStatementAddExpertConsultantCreate', 'expertConsultantCreate', expertConsultantCreate)
+            const localVarPath = `/api/composer/connectivity-statement/{id}/add_expert_consultant/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(expertConsultantCreate, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {ProvenanceCreate} provenanceCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4071,6 +4169,52 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(connectivityStatement, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} expertConsultantId 
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementDelExpertConsultantDestroy: async (expertConsultantId: number, id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'expertConsultantId' is not null or undefined
+            assertParamExists('composerConnectivityStatementDelExpertConsultantDestroy', 'expertConsultantId', expertConsultantId)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementDelExpertConsultantDestroy', 'id', id)
+            const localVarPath = `/api/composer/connectivity-statement/{id}/del_expert_consultant/{expert_consultant_id}/`
+                .replace(`{${"expert_consultant_id"}}`, encodeURIComponent(String(expertConsultantId)))
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -7453,6 +7597,19 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {ExpertConsultantCreate} expertConsultantCreate 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementAddExpertConsultantCreate(id: number, expertConsultantCreate: ExpertConsultantCreate, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAddExpertConsultantCreate(id, expertConsultantCreate, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAddExpertConsultantCreate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {ProvenanceCreate} provenanceCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7573,6 +7730,19 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementCreate(connectivityStatement, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementCreate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} expertConsultantId 
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementDelExpertConsultantDestroy(expertConsultantId: number, id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementDelExpertConsultantDestroy(expertConsultantId, id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementDelExpertConsultantDestroy']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -8534,6 +8704,16 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {ExpertConsultantCreate} expertConsultantCreate 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAddExpertConsultantCreate(id: number, expertConsultantCreate: ExpertConsultantCreate, options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: any; }> {
+            return localVarFp.composerConnectivityStatementAddExpertConsultantCreate(id, expertConsultantCreate, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {ProvenanceCreate} provenanceCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8631,6 +8811,16 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
          */
         composerConnectivityStatementCreate(connectivityStatement?: ConnectivityStatement, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
             return localVarFp.composerConnectivityStatementCreate(connectivityStatement, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatement
+         * @param {number} expertConsultantId 
+         * @param {number} id A unique integer value identifying this connectivity statement.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementDelExpertConsultantDestroy(expertConsultantId: number, id: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.composerConnectivityStatementDelExpertConsultantDestroy(expertConsultantId, id, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -9392,6 +9582,18 @@ export class ComposerApi extends BaseAPI {
     /**
      * ConnectivityStatement
      * @param {number} id A unique integer value identifying this connectivity statement.
+     * @param {ExpertConsultantCreate} expertConsultantCreate 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementAddExpertConsultantCreate(id: number, expertConsultantCreate: ExpertConsultantCreate, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementAddExpertConsultantCreate(id, expertConsultantCreate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatement
+     * @param {number} id A unique integer value identifying this connectivity statement.
      * @param {ProvenanceCreate} provenanceCreate 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -9504,6 +9706,18 @@ export class ComposerApi extends BaseAPI {
      */
     public composerConnectivityStatementCreate(connectivityStatement?: ConnectivityStatement, options?: RawAxiosRequestConfig) {
         return ComposerApiFp(this.configuration).composerConnectivityStatementCreate(connectivityStatement, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatement
+     * @param {number} expertConsultantId 
+     * @param {number} id A unique integer value identifying this connectivity statement.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementDelExpertConsultantDestroy(expertConsultantId: number, id: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementDelExpertConsultantDestroy(expertConsultantId, id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
