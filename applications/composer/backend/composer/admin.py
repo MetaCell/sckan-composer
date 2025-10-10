@@ -27,6 +27,7 @@ from composer.models import (
     PopulationSet,
     ConnectivityStatement,
     Provenance,
+    ExpertConsultant,
     ExportBatch,
     Note,
     Profile,
@@ -61,6 +62,11 @@ class ProfileInline(admin.StackedInline):
 
 class ProvenanceInline(admin.StackedInline):
     model = Provenance
+    extra = 1
+
+
+class ExpertConsultantInline(admin.StackedInline):
+    model = ExpertConsultant
     extra = 1
 
 
@@ -309,7 +315,7 @@ class ConnectivityStatementAdmin(
 
     fieldsets = ()
 
-    inlines = (ProvenanceInline, NoteConnectivityStatementInline,
+    inlines = (ProvenanceInline, ExpertConsultantInline, NoteConnectivityStatementInline,
                ViaInline, DestinationInline, StatementAlertInline, ConnectivityStatementTripleInline)
 
     def _filter_admin_transitions(self, transitions_generator):

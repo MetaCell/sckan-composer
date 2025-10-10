@@ -17,6 +17,7 @@ from ..models import (
     Sex,
     ConnectivityStatement,
     Provenance,
+    ExpertConsultant,
     Note,
     Profile,
     Sentence,
@@ -377,6 +378,22 @@ class ProvenanceSerializer(serializers.ModelSerializer):
 
 class ProvenanceCreateSerializer(serializers.Serializer):
     """Serializer for creating provenance via request body"""
+    uri = serializers.CharField(required=True)
+
+
+class ExpertConsultantSerializer(serializers.ModelSerializer):
+    """Expert Consultant"""
+
+    uri = serializers.CharField()
+    connectivity_statement_id = serializers.IntegerField(required=True)
+
+    class Meta:
+        model = ExpertConsultant
+        fields = ("id", "uri", "connectivity_statement_id")
+
+
+class ExpertConsultantCreateSerializer(serializers.Serializer):
+    """Serializer for creating expert consultant via request body"""
     uri = serializers.CharField(required=True)
 
 

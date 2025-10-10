@@ -56,6 +56,8 @@ from .serializers import (
     ViaSerializer,
     ProvenanceSerializer,
     ProvenanceCreateSerializer,
+    ExpertConsultantSerializer,
+    ExpertConsultantCreateSerializer,
     SexSerializer,
     PopulationSetSerializer,
     ConnectivityStatementUpdateSerializer,
@@ -73,7 +75,6 @@ from .permissions import (
 )
 from ..models import (
     AlertType,
-    AnatomicalEntityMeta,
     AnatomicalEntity,
     Phenotype,
     ProjectionPhenotype,
@@ -87,6 +88,7 @@ from ..models import (
     Tag,
     Via,
     Provenance,
+    ExpertConsultant,
     Sex,
     PopulationSet,
     Destination,
@@ -187,6 +189,52 @@ class ProvenanceMixin(
     def del_provenance(self, request, pk=None, provenance_id=None):
         count, deleted = Provenance.objects.filter(
             id=provenance_id, connectivity_statement_id=pk
+        ).delete()
+        if count == 0:
+            raise Http404
+        instance = self.get_object()
+        return Response(self.get_serializer(instance).data)
+
+
+class ExpertConsultantMixin(
+    viewsets.GenericViewSet,
+):
+    @extend_schema(
+        request=ExpertConsultantCreateSerializer,
+        responses={200: "ConnectivityStatement updated successfully"},
+    )
+    @action(detail=True, methods=["post"], url_path="add_expert_consultant")
+    def add_expert_consultant(self, request, pk=None):
+        serializer = ExpertConsultantCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        uri = serializer.validated_data['uri']
+        expert_consultant, created = ExpertConsultant.objects.get_or_create(
+            connectivity_statement_id=pk,
+            uri=uri,
+        )
+        instance = self.get_object()
+        return Response(self.get_serializer(instance).data)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "expert_consultant_id",
+                OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                required=True,
+            )
+        ],
+        request=None,
+    )
+    @action(
+        detail=True,
+        methods=["delete"],
+        url_path="del_expert_consultant/(?P<expert_consultant_id>\d+)",
+    )
+    def del_expert_consultant(self, request, pk=None, expert_consultant_id=None):
+        count, deleted = ExpertConsultant.objects.filter(
+            id=expert_consultant_id, connectivity_statement_id=pk
         ).delete()
         if count == 0:
             raise Http404
@@ -503,6 +551,7 @@ class AlertTypeViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ConnectivityStatementViewSet(
     ProvenanceMixin,
+    ExpertConsultantMixin,
     SpecieMixin,
     TagMixin,
     TransitionMixin,
@@ -852,6 +901,7 @@ def jsonschemas(request):
         DestinationSerializer,
         TagSerializer,
         ProvenanceSerializer,
+        ExpertConsultantSerializer,
         SpecieSerializer,
         NoteSerializer,
         StatementAlertSerializer,

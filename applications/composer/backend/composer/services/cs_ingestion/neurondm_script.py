@@ -98,6 +98,7 @@ def for_composer(n, statement_alert_uris: Set[str] = None):
                           + lpes(n, ilxtr.hasProjectionPhenotype)),
         forward_connection=lpes(n, ilxtr.hasForwardConnectionPhenotype),
         provenance=lrdf(n, ilxtr.literatureCitation),
+        expert_consultants=[],
         sentence_number=lrdf(n, ilxtr.sentenceNumber),
         note_alert=lrdf(n, ilxtr.alertNote),
         validation_errors=validation_errors,

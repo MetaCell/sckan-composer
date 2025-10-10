@@ -19,6 +19,7 @@ PHENOTYPE = 'phenotype'
 OTHER_PHENOTYPE = 'other_phenotypes'
 SPECIES = 'species'
 PROVENANCE = 'provenance'
+EXPERT_CONSULTANTS = 'expert_consultants'
 NOTE_ALERT = 'note_alert'
 FORWARD_CONNECTION = "forward_connection"
 STATEMENT_ALERTS = "statement_alerts"
