@@ -18,7 +18,7 @@ class Command(BaseCommand):
             '--batch-size',
             type=int,
             default=100,
-            help='Batch size for processing connectivity statements (default: 100)',
+            help='Batch size for processing statement alerts (default: 100)',
         )
         parser.add_argument(
             '--predicate',
