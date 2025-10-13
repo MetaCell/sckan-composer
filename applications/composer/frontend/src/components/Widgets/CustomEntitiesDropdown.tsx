@@ -214,7 +214,12 @@ export default function CustomEntitiesDropdown({
        areConnectionsExplicit,
        minWidth = '',
        isDisabled,
-       refreshStatement
+       refreshStatement,
+       labelPosition = 'inline',
+       labelVariant,
+       labelFontWeight,
+       labelMarginBottom,
+       labelColor
      },
    }: any) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -435,8 +440,8 @@ export default function CustomEntitiesDropdown({
         <Typography>{disabledReason}</Typography>
       </Box>
     ) : (
-      <Stack direction="row" spacing={1} alignItems="center" width={1}>
-        <Typography>{label}</Typography>
+      <Stack direction={labelPosition === 'top' ? 'column' : 'row'} spacing={1} alignItems={labelPosition === 'top' ? 'flex-start' : 'center'} width={1}>
+        <Typography variant={labelVariant} fontWeight={labelFontWeight} marginBottom={labelMarginBottom} color={labelColor}>{label}</Typography>
         <CustomChipBoxComponent
           selectedOptions={selectedOptions}
           CustomInputChip={CustomInputChip}
@@ -449,10 +454,10 @@ export default function CustomEntitiesDropdown({
     )
   ) : (
     <>
-      <Stack direction="row" spacing={1} alignItems="center" width={1}>
-        <Typography>{label}</Typography>
+      <Stack direction={labelPosition === 'top' ? 'column' : 'row'} spacing={1} alignItems={labelPosition === 'top' ? 'flex-start' : 'center'} width={1}>
+        <Typography variant={labelVariant} fontWeight={labelFontWeight} marginBottom={labelMarginBottom} color={labelColor}>{label}</Typography>
             <Badge
-              sx={{...styles.badge, flex: 1}}
+              sx={{...styles.badge, flex: 1, width: '100%'}}
               badgeContent={
                 !areAllSelectedValuesFromTheAboveLayer ? 0 : selectedOptions?.length
               }

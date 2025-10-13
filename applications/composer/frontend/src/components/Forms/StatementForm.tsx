@@ -44,6 +44,7 @@ import { useDispatch } from "react-redux";
 import { setWasChangeDetected } from "../../redux/statementSlice";
 import { AutocompleteWithChips } from "../Widgets/AutocompleteWithChips";
 import { RelationshipType, RelationshipOption } from "../../types/relationshipTypes";
+import { vars } from "../../theme/variables";
 
 /**
  * Widget configuration factory for different relationship types
@@ -72,6 +73,11 @@ const createWidgetConfig = (
         chipsNumber: 5,
         minWidth: "50rem",
         refreshStatement: refreshStatement,
+        labelPosition: "top",
+        labelVariant: "h6",
+        labelFontWeight: 500,
+        labelMarginBottom: 2,
+        labelColor: vars.titleFontColor,
         onSearch: async (
           searchValue: string,
           formId: string,
