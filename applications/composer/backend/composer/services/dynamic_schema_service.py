@@ -26,7 +26,7 @@ def inject_dynamic_relationship_schema(schema):
 
         if rel.type == RelationshipType.TEXT:
             field["type"] = "string"
-        elif rel.type == RelationshipType.TRIPLE_SINGLE or rel.type == RelationshipType.ANATOMICAL_SINGLE:
+        elif rel.type == RelationshipType.TRIPLE_SINGLE:
             field["type"] = ["string", "null"]
         elif rel.type == RelationshipType.TRIPLE_MULTI or rel.type == RelationshipType.ANATOMICAL_MULTI:
             field["type"] = "array"

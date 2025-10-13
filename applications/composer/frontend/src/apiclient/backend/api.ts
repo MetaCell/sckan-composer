@@ -3086,7 +3086,6 @@ export interface Relationship {
 export const RelationshipTypeEnum = {
     TripleSingle: 'triple_single',
     TripleMulti: 'triple_multi',
-    AnatomicalSingle: 'anatomical_single',
     AnatomicalMulti: 'anatomical_multi',
     Text: 'text'
 } as const;

@@ -58,70 +58,6 @@ const createWidgetConfig = (
   refreshStatement: () => void,
 ) => {
   const configs = {
-    [RelationshipType.ANATOMICAL_SINGLE]: () => ({
-      "ui:widget": CustomEntitiesDropdown,
-      "ui:options": {
-        isDisabled,
-        statement: statement,
-        label: propertyTitle,
-        placeholder: `Select ${propertyTitle}`,
-        searchPlaceholder: `Search for ${propertyTitle}`,
-        noResultReason: "No anatomical entities found",
-        disabledReason: "",
-        fieldName: `statement_anatomical_entities.${relationshipKey}`,
-        chipsNumber: 1,
-        minWidth: "50rem",
-        refreshStatement: refreshStatement,
-        onSearch: async (
-          searchValue: string,
-          formId: string,
-          selectedOptions: Option[],
-        ) => {
-          const excludedIds = selectedOptions.map((entity: Option) =>
-            Number(entity.id),
-          );
-          return getAnatomicalEntities(
-            searchValue,
-            propertyTitle || "",
-            excludedIds,
-          );
-        },
-        onUpdate: async (selectedOptions: Option[]) => {
-          const currentRelationship = statement?.statement_anatomical_entities?.[relationshipKey];
-          const selectedIds = selectedOptions.map((opt: Option) => Number(opt.id));
-          
-          if (currentRelationship?.id) {
-            await statementService.updateAnatomicalEntityRelationship(currentRelationship.id, {
-              connectivity_statement: statement.id,
-              relationship: relationshipKey,
-              anatomical_entities: selectedIds
-            });
-          } else if (selectedIds.length > 0) {
-            await statementService.assignAnatomicalEntityRelationship({
-              connectivity_statement: statement.id,
-              relationship: relationshipKey,
-              anatomical_entities: selectedIds
-            });
-          } else if (currentRelationship?.id && selectedIds.length === 0) {
-            await statementService.deleteAnatomicalEntityRelationship(currentRelationship.id);
-          }
-          
-          refreshStatement();
-          return ChangeRequestStatus.SAVED;
-        },
-        errors: "",
-        mapValueToOption: (value: any) => {
-          const relationshipData = value || statement?.statement_anatomical_entities?.[relationshipKey];
-          if (relationshipData?.anatomical_entities) {
-            return mapAnatomicalEntitiesToOptions(
-              relationshipData.anatomical_entities,
-              propertyTitle || ""
-            );
-          }
-          return [];
-        },
-      }
-    }),
     [RelationshipType.ANATOMICAL_MULTI]: () => ({
       "ui:widget": CustomEntitiesDropdown,
       "ui:options": {
@@ -362,29 +298,24 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
       
       switch (rel.type) {
         case RelationshipType.TEXT:
-          // Map text relationship: statement_texts["5"] -> statement_triples["5"]
           if (statement.statement_texts?.[key]) {
             transformed.statement_triples[key] = statement.statement_texts[key].text;
           }
           break;
           
         case RelationshipType.TRIPLE_SINGLE:
-          // Map single triple: extract first triple id
           if (statement.statement_triples?.[key]?.triples?.[0]) {
             transformed.statement_triples[key] = statement.statement_triples[key].triples[0];
           }
           break;
           
         case RelationshipType.TRIPLE_MULTI:
-          // Map multi triples: keep as-is (handled by widget)
           if (statement.statement_triples?.[key]?.triples) {
             transformed.statement_triples[key] = statement.statement_triples[key].triples;
           }
           break;
           
-        case RelationshipType.ANATOMICAL_SINGLE:
         case RelationshipType.ANATOMICAL_MULTI:
-          // Map anatomical entities: keep as-is (handled by widget's mapValueToOption)
           if (statement.statement_anatomical_entities?.[key]) {
             transformed.statement_triples[key] = statement.statement_anatomical_entities[key];
           }

@@ -6,7 +6,6 @@ export enum RelationshipType {
   TRIPLE_SINGLE = 'triple_single',
   TRIPLE_MULTI = 'triple_multi',
   TEXT = 'text',
-  ANATOMICAL_SINGLE = 'anatomical_single',
   ANATOMICAL_MULTI = 'anatomical_multi',
 }
 

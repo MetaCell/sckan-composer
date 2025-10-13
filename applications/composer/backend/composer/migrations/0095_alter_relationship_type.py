@@ -50,7 +50,6 @@ class Migration(migrations.Migration):
                     ("multi", "Multi select (deprecated)"),
                     ("triple_single", "Triple - Single select"),
                     ("triple_multi", "Triple - Multi select"),
-                    ("anatomical_single", "Anatomical Entity - Single select"),
                     ("anatomical_multi", "Anatomical Entity - Multi select"),
                     ("text", "Text area"),
                 ],
@@ -72,7 +71,6 @@ class Migration(migrations.Migration):
                 choices=[
                     ("triple_single", "Triple - Single select"),
                     ("triple_multi", "Triple - Multi select"),
-                    ("anatomical_single", "Anatomical Entity - Single select"),
                     ("anatomical_multi", "Anatomical Entity - Multi select"),
                     ("text", "Text area"),
                 ],

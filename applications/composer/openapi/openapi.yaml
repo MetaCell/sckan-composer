@@ -3872,6 +3872,8 @@ components:
           type: array
           items:
             type: integer
+            writeOnly: true
+          writeOnly: true
       required:
       - anatomical_entities
       - connectivity_statement
@@ -3911,6 +3913,8 @@ components:
           type: array
           items:
             type: integer
+            writeOnly: true
+          writeOnly: true
       required:
       - connectivity_statement
       - id
@@ -4907,6 +4911,8 @@ components:
           type: array
           items:
             type: integer
+            writeOnly: true
+          writeOnly: true
     PatchedConnectivityStatementText:
       type: object
       description: Serializer for text-based relationships (free text area)
@@ -4936,6 +4942,8 @@ components:
           type: array
           items:
             type: integer
+            writeOnly: true
+          writeOnly: true
     PatchedConnectivityStatementUpdate:
       type: object
       description: Connectivity Statement
@@ -5353,7 +5361,6 @@ components:
       enum:
       - triple_single
       - triple_multi
-      - anatomical_single
       - anatomical_multi
       - text
       type: string

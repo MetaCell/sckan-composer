@@ -1180,7 +1180,7 @@ class ConnectivityStatementAnatomicalEntity(AbstractConnectivityStatementRelatio
     def clean(self):
         if not self.relationship_id:
             return
-        if self.relationship.type not in [RelationshipType.ANATOMICAL_SINGLE, RelationshipType.ANATOMICAL_MULTI]:
+        if self.relationship.type not in [RelationshipType.ANATOMICAL_MULTI]:
             raise ValidationError("This model should only be used for anatomical entity relationships.")
 
     def save(self, *args, **kwargs):

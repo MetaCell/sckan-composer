@@ -93,7 +93,6 @@ class Migration(migrations.Migration):
                     ("single", "Triple - Single select"),
                     ("multi", "Triple - Multi select"),
                     ("text", "Text area"),
-                    ("anatomical_single", "Anatomical Entity - Single select"),
                     ("anatomical_multi", "Anatomical Entity - Multi select"),
                 ],
                 max_length=20,

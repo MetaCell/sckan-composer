@@ -126,7 +126,7 @@ class TripleAdmin(admin.ModelAdmin):
         form = super().get_form(request, obj, **kwargs)
         if "relationship" in form.base_fields:
             form.base_fields["relationship"].queryset = Relationship.objects.exclude(
-                type__in=[RelationshipType.TEXT, RelationshipType.ANATOMICAL_SINGLE, RelationshipType.ANATOMICAL_MULTI]
+                type__in=[RelationshipType.TEXT, RelationshipType.ANATOMICAL_MULTI]
             )
         return form
 
@@ -319,7 +319,7 @@ class ConnectivityStatementAnatomicalEntityInline(admin.TabularInline):
         if "relationship" in form.base_fields:
             # Only show anatomical entity relationship types
             form.base_fields["relationship"].queryset = Relationship.objects.filter(
-                type__in=[RelationshipType.ANATOMICAL_SINGLE, RelationshipType.ANATOMICAL_MULTI]
+                type__in=[RelationshipType.ANATOMICAL_MULTI]
             )
         return form
 

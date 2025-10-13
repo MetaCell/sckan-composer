@@ -728,22 +728,6 @@ class ConnectivityStatementTripleSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError(
                         {"triples": f"Triple '{triple.name}' does not belong to the selected relationship."}
                     )
-            
-            # Validate single vs multi
-            if relationship.type == RelationshipType.TRIPLE_SINGLE:
-                if len(triples) > 1:
-                    raise serializers.ValidationError(
-                        {"triples": "Only one triple is allowed for single-select relationships."}
-                    )
-                if len(triples) == 0:
-                    raise serializers.ValidationError(
-                        {"triples": "Exactly one triple is required for single-select relationships."}
-                    )
-            elif relationship.type == RelationshipType.TRIPLE_MULTI:
-                if len(triples) == 0:
-                    raise serializers.ValidationError(
-                        {"triples": "At least one triple is required for multi-select relationships."}
-                    )
         
         return data
 
@@ -776,7 +760,7 @@ class ConnectivityStatementAnatomicalEntitySerializer(serializers.ModelSerialize
     )
     relationship = serializers.PrimaryKeyRelatedField(
         queryset=Relationship.objects.filter(
-            type__in=[RelationshipType.ANATOMICAL_SINGLE, RelationshipType.ANATOMICAL_MULTI]
+            type__in=[RelationshipType.ANATOMICAL_MULTI]
         )
     )
     anatomical_entities = serializers.PrimaryKeyRelatedField(
@@ -797,29 +781,6 @@ class ConnectivityStatementAnatomicalEntitySerializer(serializers.ModelSerialize
             many=True
         ).data
         return representation
-
-    def validate(self, data):
-        relationship = data.get("relationship") or getattr(self.instance, "relationship", None)
-        anatomical_entities = data.get("anatomical_entities", [])
-        
-        if relationship:
-            # Validate single vs multi
-            if relationship.type == RelationshipType.ANATOMICAL_SINGLE:
-                if len(anatomical_entities) > 1:
-                    raise serializers.ValidationError(
-                        {"anatomical_entities": "Only one anatomical entity is allowed for single-select relationships."}
-                    )
-                if len(anatomical_entities) == 0:
-                    raise serializers.ValidationError(
-                        {"anatomical_entities": "Exactly one anatomical entity is required for single-select relationships."}
-                    )
-            elif relationship.type == RelationshipType.ANATOMICAL_MULTI:
-                if len(anatomical_entities) == 0:
-                    raise serializers.ValidationError(
-                        {"anatomical_entities": "At least one anatomical entity is required for multi-select relationships."}
-                    )
-        
-        return data
 
 
 class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):

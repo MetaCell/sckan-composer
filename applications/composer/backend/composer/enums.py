@@ -89,6 +89,5 @@ class BulkActionType(str, Enum):
 class RelationshipType(models.TextChoices):
     TRIPLE_SINGLE = "triple_single", "Triple - Single select"
     TRIPLE_MULTI = "triple_multi", "Triple - Multi select"
-    ANATOMICAL_SINGLE = "anatomical_single", "Anatomical Entity - Single select"
     ANATOMICAL_MULTI = "anatomical_multi", "Anatomical Entity - Multi select"
     TEXT = "text", "Text area"
