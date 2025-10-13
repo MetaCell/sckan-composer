@@ -87,6 +87,8 @@ class BulkActionType(str, Enum):
     ASSIGN_POPULATION_SET = "assign_population_set"
 
 class RelationshipType(models.TextChoices):
-    SINGLE = "single", "Single select"
-    MULTI = "multi", "Multi select"
+    TRIPLE_SINGLE = "triple_single", "Triple - Single select"
+    TRIPLE_MULTI = "triple_multi", "Triple - Multi select"
+    ANATOMICAL_SINGLE = "anatomical_single", "Anatomical Entity - Single select"
+    ANATOMICAL_MULTI = "anatomical_multi", "Anatomical Entity - Multi select"
     TEXT = "text", "Text area"

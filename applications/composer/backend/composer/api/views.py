@@ -42,6 +42,8 @@ from .serializers import (
     BulkActionResponseSerializer,
     ChangeStatusSerializer,
     ConnectivityStatementTripleSerializer,
+    ConnectivityStatementTextSerializer,
+    ConnectivityStatementAnatomicalEntitySerializer,
     PhenotypeSerializer,
     ProjectionPhenotypeSerializer,
     ConnectivityStatementSerializer,
@@ -93,6 +95,8 @@ from ..models import (
     PopulationSet,
     Destination,
     ConnectivityStatementTriple,
+    ConnectivityStatementText,
+    ConnectivityStatementAnatomicalEntity,
 )
 
 
@@ -874,10 +878,12 @@ class RelationshipViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ConnectivityStatementTripleViewSet(viewsets.ModelViewSet):
     """
-    ConnectivityStatementTriple:
+    ConnectivityStatementTriple: Manage triple-based relationships
     """
 
-    queryset = ConnectivityStatementTriple.objects.select_related("connectivity_statement", "relationship", "triple")
+    queryset = ConnectivityStatementTriple.objects.select_related(
+        "connectivity_statement", "relationship"
+    ).prefetch_related("triples")
     serializer_class = ConnectivityStatementTripleSerializer
     permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
 
@@ -887,6 +893,43 @@ class ConnectivityStatementTripleViewSet(viewsets.ModelViewSet):
         if connectivity_statement_id:
             qs = qs.filter(connectivity_statement_id=connectivity_statement_id)
         return qs
+
+
+class ConnectivityStatementTextViewSet(viewsets.ModelViewSet):
+    """
+    ConnectivityStatementText: Manage text-based relationships
+    """
+
+    queryset = ConnectivityStatementText.objects.select_related("connectivity_statement", "relationship")
+    serializer_class = ConnectivityStatementTextSerializer
+    permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        connectivity_statement_id = self.request.query_params.get("connectivity_statement_id")
+        if connectivity_statement_id:
+            qs = qs.filter(connectivity_statement_id=connectivity_statement_id)
+        return qs
+
+
+class ConnectivityStatementAnatomicalEntityViewSet(viewsets.ModelViewSet):
+    """
+    ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+    """
+
+    queryset = ConnectivityStatementAnatomicalEntity.objects.select_related(
+        "connectivity_statement", "relationship"
+    ).prefetch_related("anatomical_entities")
+    serializer_class = ConnectivityStatementAnatomicalEntitySerializer
+    permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        connectivity_statement_id = self.request.query_params.get("connectivity_statement_id")
+        if connectivity_statement_id:
+            qs = qs.filter(connectivity_statement_id=connectivity_statement_id)
+        return qs
+
 
 
 @extend_schema(

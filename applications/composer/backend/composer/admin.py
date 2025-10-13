@@ -21,6 +21,8 @@ from django.core.exceptions import ValidationError
 from composer.models import (
     AlertType,
     ConnectivityStatementTriple,
+    ConnectivityStatementText,
+    ConnectivityStatementAnatomicalEntity,
     Phenotype,
     Relationship,
     Sex,
@@ -123,7 +125,9 @@ class TripleAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         if "relationship" in form.base_fields:
-            form.base_fields["relationship"].queryset = Relationship.objects.exclude(type=RelationshipType.TEXT)
+            form.base_fields["relationship"].queryset = Relationship.objects.exclude(
+                type__in=[RelationshipType.TEXT, RelationshipType.ANATOMICAL_SINGLE, RelationshipType.ANATOMICAL_MULTI]
+            )
         return form
 
 class ConnectivityStatementInline(nested_admin.NestedStackedInline):
@@ -273,8 +277,52 @@ class DestinationInline(admin.TabularInline):
 class ConnectivityStatementTripleInline(admin.TabularInline):
     model = ConnectivityStatementTriple
     extra = 1
-    autocomplete_fields = ("relationship", "triple")
-    fields = ("relationship", "triple", "free_text")
+    autocomplete_fields = ("relationship",)
+    filter_horizontal = ("triples",)
+    fields = ("relationship", "triples")
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if "relationship" in form.base_fields:
+            # Only show triple relationship types
+            form.base_fields["relationship"].queryset = Relationship.objects.filter(
+                type__in=[RelationshipType.TRIPLE_SINGLE, RelationshipType.TRIPLE_MULTI]
+            )
+        return form
+
+
+class ConnectivityStatementTextInline(admin.TabularInline):
+    model = ConnectivityStatementText
+    extra = 1
+    autocomplete_fields = ("relationship",)
+    fields = ("relationship", "text")
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if "relationship" in form.base_fields:
+            # Only show text relationship types
+            form.base_fields["relationship"].queryset = Relationship.objects.filter(
+                type=RelationshipType.TEXT
+            )
+        return form
+
+
+class ConnectivityStatementAnatomicalEntityInline(admin.TabularInline):
+    model = ConnectivityStatementAnatomicalEntity
+    extra = 1
+    autocomplete_fields = ("relationship",)
+    filter_horizontal = ("anatomical_entities",)
+    fields = ("relationship", "anatomical_entities")
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if "relationship" in form.base_fields:
+            # Only show anatomical entity relationship types
+            form.base_fields["relationship"].queryset = Relationship.objects.filter(
+                type__in=[RelationshipType.ANATOMICAL_SINGLE, RelationshipType.ANATOMICAL_MULTI]
+            )
+        return form
+
 
 class ConnectivityStatementAdmin(
     SortableAdminBase, FSMTransitionMixin, admin.ModelAdmin
@@ -316,7 +364,8 @@ class ConnectivityStatementAdmin(
     fieldsets = ()
 
     inlines = (ProvenanceInline, ExpertConsultantInline, NoteConnectivityStatementInline,
-               ViaInline, DestinationInline, StatementAlertInline, ConnectivityStatementTripleInline)
+               ViaInline, DestinationInline, StatementAlertInline, ConnectivityStatementTripleInline,
+               ConnectivityStatementTextInline, ConnectivityStatementAnatomicalEntityInline)
 
     def _filter_admin_transitions(self, transitions_generator):
         """
