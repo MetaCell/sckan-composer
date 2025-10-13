@@ -128,7 +128,7 @@ const createWidgetConfig = (
         isDisabled,
         label: propertyTitle,
         placeholder: `Enter ${propertyTitle}`,
-        onChange2: async (value: any) => {
+        onBlur2: async (value: any) => {
           const currentRelationship = statement?.statement_texts?.[relationshipKey];
           
           if (currentRelationship?.id && (!value || value.trim() === "")) {
