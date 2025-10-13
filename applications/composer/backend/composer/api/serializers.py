@@ -703,12 +703,19 @@ class ConnectivityStatementTripleSerializer(serializers.ModelSerializer):
     )
     triples = serializers.PrimaryKeyRelatedField(
         many=True,
-        queryset=Triple.objects.all()
+        queryset=Triple.objects.all(),
+        write_only=True
     )
 
     class Meta:
         model = ConnectivityStatementTriple
         fields = ["id", "connectivity_statement", "relationship", "triples"]
+
+    def to_representation(self, instance):
+        """Return full triple objects in read operations"""
+        representation = super().to_representation(instance)
+        representation['triples'] = [triple.id for triple in instance.triples.all()]
+        return representation
 
     def validate(self, data):
         relationship = data.get("relationship") or getattr(self.instance, "relationship", None)
@@ -774,12 +781,22 @@ class ConnectivityStatementAnatomicalEntitySerializer(serializers.ModelSerialize
     )
     anatomical_entities = serializers.PrimaryKeyRelatedField(
         many=True,
-        queryset=AnatomicalEntity.objects.all()
+        queryset=AnatomicalEntity.objects.all(),
+        write_only=True
     )
 
     class Meta:
         model = ConnectivityStatementAnatomicalEntity
         fields = ["id", "connectivity_statement", "relationship", "anatomical_entities"]
+
+    def to_representation(self, instance):
+        """Return full anatomical entity objects in read operations"""
+        representation = super().to_representation(instance)
+        representation['anatomical_entities'] = AnatomicalEntitySerializer(
+            instance.anatomical_entities.all(), 
+            many=True
+        ).data
+        return representation
 
     def validate(self, data):
         relationship = data.get("relationship") or getattr(self.instance, "relationship", None)

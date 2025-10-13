@@ -1120,24 +1120,14 @@ class ConnectivityStatementTriple(AbstractConnectivityStatementRelationship):
         verbose_name_plural = "Connectivity Statement Triples"
 
     def clean(self):
+        if not self.relationship_id:
+            return
         if self.relationship.type not in [RelationshipType.TRIPLE_SINGLE, RelationshipType.TRIPLE_MULTI]:
             raise ValidationError("This model should only be used for triple relationships.")
 
     def save(self, *args, **kwargs):
         self.clean()
-        # Save first to ensure the instance has an ID for M2M operations
         super().save(*args, **kwargs)
-        
-        # Validate triple count after save (when M2M relationships are accessible)
-        triple_count = self.triples.count()
-        if self.relationship.type == RelationshipType.TRIPLE_SINGLE:
-            if triple_count > 1:
-                raise ValidationError(f"Single select relationships can only have one triple. Currently has {triple_count}.")
-            if triple_count == 0:
-                raise ValidationError("Single select relationships must have exactly one triple.")
-        elif self.relationship.type == RelationshipType.TRIPLE_MULTI:
-            if triple_count == 0:
-                raise ValidationError("Multi select relationships must have at least one triple.")
 
 
 class ConnectivityStatementText(AbstractConnectivityStatementRelationship):
@@ -1156,6 +1146,8 @@ class ConnectivityStatementText(AbstractConnectivityStatementRelationship):
         verbose_name_plural = "Connectivity Statement Texts"
 
     def clean(self):
+        if not self.relationship_id:
+            return
         if self.relationship.type != RelationshipType.TEXT:
             raise ValidationError("This model should only be used for text relationships.")
         if not self.text or not self.text.strip():
@@ -1186,24 +1178,14 @@ class ConnectivityStatementAnatomicalEntity(AbstractConnectivityStatementRelatio
         verbose_name_plural = "Connectivity Statement Anatomical Entities"
 
     def clean(self):
+        if not self.relationship_id:
+            return
         if self.relationship.type not in [RelationshipType.ANATOMICAL_SINGLE, RelationshipType.ANATOMICAL_MULTI]:
             raise ValidationError("This model should only be used for anatomical entity relationships.")
 
     def save(self, *args, **kwargs):
         self.clean()
-        # Save first to ensure the instance has an ID for M2M operations
         super().save(*args, **kwargs)
-        
-        # Validate anatomical entity count after save (when M2M relationships are accessible)
-        entity_count = self.anatomical_entities.count()
-        if self.relationship.type == RelationshipType.ANATOMICAL_SINGLE:
-            if entity_count > 1:
-                raise ValidationError(f"Single select relationships can only have one anatomical entity. Currently has {entity_count}.")
-            if entity_count == 0:
-                raise ValidationError("Single select relationships must have exactly one anatomical entity.")
-        elif self.relationship.type == RelationshipType.ANATOMICAL_MULTI:
-            if entity_count == 0:
-                raise ValidationError("Multi select relationships must have at least one anatomical entity.")
 
 class GraphRenderingState(models.Model):
     connectivity_statement = models.OneToOneField(
@@ -1587,3 +1569,4 @@ class StatementAlert(models.Model):
 
     def __str__(self):
         return f"{self.alert_type.name} for Statement {self.connectivity_statement.id}"
+

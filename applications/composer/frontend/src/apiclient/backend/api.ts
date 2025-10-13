@@ -608,6 +608,49 @@ export interface ConnectivityStatement {
      * @memberof ConnectivityStatement
      */
     'statement_triples': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatement
+     */
+    'statement_texts': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatement
+     */
+    'statement_anatomical_entities': string;
+}
+/**
+ * Serializer for anatomical entity-based relationships
+ * @export
+ * @interface ConnectivityStatementAnatomicalEntity
+ */
+export interface ConnectivityStatementAnatomicalEntity {
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementAnatomicalEntity
+     */
+    'id': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementAnatomicalEntity
+     */
+    'connectivity_statement': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementAnatomicalEntity
+     */
+    'relationship': number;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof ConnectivityStatementAnatomicalEntity
+     */
+    'anatomical_entities': Array<number>;
 }
 /**
  * @type ConnectivityStatementCircuitType
@@ -628,7 +671,38 @@ export type ConnectivityStatementLaterality = BlankEnum | LateralityEnum;
 export type ConnectivityStatementProjection = BlankEnum | ProjectionEnum;
 
 /**
- * 
+ * Serializer for text-based relationships (free text area)
+ * @export
+ * @interface ConnectivityStatementText
+ */
+export interface ConnectivityStatementText {
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementText
+     */
+    'id': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementText
+     */
+    'connectivity_statement': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConnectivityStatementText
+     */
+    'relationship': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ConnectivityStatementText
+     */
+    'text': string;
+}
+/**
+ * Serializer for triple-based relationships (single/multi select from triples)
  * @export
  * @interface ConnectivityStatementTriple
  */
@@ -653,10 +727,10 @@ export interface ConnectivityStatementTriple {
     'relationship': number;
     /**
      * 
-     * @type {string}
+     * @type {Array<number>}
      * @memberof ConnectivityStatementTriple
      */
-    'value': string;
+    'triples': Array<number>;
 }
 /**
  * Connectivity Statement
@@ -1440,6 +1514,68 @@ export interface PaginatedBaseConnectivityStatementList {
 /**
  * 
  * @export
+ * @interface PaginatedConnectivityStatementAnatomicalEntityList
+ */
+export interface PaginatedConnectivityStatementAnatomicalEntityList {
+    /**
+     * 
+     * @type {number}
+     * @memberof PaginatedConnectivityStatementAnatomicalEntityList
+     */
+    'count'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedConnectivityStatementAnatomicalEntityList
+     */
+    'next'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedConnectivityStatementAnatomicalEntityList
+     */
+    'previous'?: string | null;
+    /**
+     * 
+     * @type {Array<ConnectivityStatementAnatomicalEntity>}
+     * @memberof PaginatedConnectivityStatementAnatomicalEntityList
+     */
+    'results'?: Array<ConnectivityStatementAnatomicalEntity>;
+}
+/**
+ * 
+ * @export
+ * @interface PaginatedConnectivityStatementTextList
+ */
+export interface PaginatedConnectivityStatementTextList {
+    /**
+     * 
+     * @type {number}
+     * @memberof PaginatedConnectivityStatementTextList
+     */
+    'count'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedConnectivityStatementTextList
+     */
+    'next'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginatedConnectivityStatementTextList
+     */
+    'previous'?: string | null;
+    /**
+     * 
+     * @type {Array<ConnectivityStatementText>}
+     * @memberof PaginatedConnectivityStatementTextList
+     */
+    'results'?: Array<ConnectivityStatementText>;
+}
+/**
+ * 
+ * @export
  * @interface PaginatedConnectivityStatementTripleList
  */
 export interface PaginatedConnectivityStatementTripleList {
@@ -2117,9 +2253,83 @@ export interface PatchedConnectivityStatement {
      * @memberof PatchedConnectivityStatement
      */
     'statement_triples'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'statement_texts'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatement
+     */
+    'statement_anatomical_entities'?: string;
 }
 /**
- * 
+ * Serializer for anatomical entity-based relationships
+ * @export
+ * @interface PatchedConnectivityStatementAnatomicalEntity
+ */
+export interface PatchedConnectivityStatementAnatomicalEntity {
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatementAnatomicalEntity
+     */
+    'id'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatementAnatomicalEntity
+     */
+    'connectivity_statement'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatementAnatomicalEntity
+     */
+    'relationship'?: number;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof PatchedConnectivityStatementAnatomicalEntity
+     */
+    'anatomical_entities'?: Array<number>;
+}
+/**
+ * Serializer for text-based relationships (free text area)
+ * @export
+ * @interface PatchedConnectivityStatementText
+ */
+export interface PatchedConnectivityStatementText {
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatementText
+     */
+    'id'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatementText
+     */
+    'connectivity_statement'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PatchedConnectivityStatementText
+     */
+    'relationship'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PatchedConnectivityStatementText
+     */
+    'text'?: string;
+}
+/**
+ * Serializer for triple-based relationships (single/multi select from triples)
  * @export
  * @interface PatchedConnectivityStatementTriple
  */
@@ -2144,10 +2354,10 @@ export interface PatchedConnectivityStatementTriple {
     'relationship'?: number;
     /**
      * 
-     * @type {string}
+     * @type {Array<number>}
      * @memberof PatchedConnectivityStatementTriple
      */
-    'value'?: string;
+    'triples'?: Array<number>;
 }
 /**
  * Connectivity Statement
@@ -2874,8 +3084,10 @@ export interface Relationship {
  */
 
 export const RelationshipTypeEnum = {
-    Single: 'single',
-    Multi: 'multi',
+    TripleSingle: 'triple_single',
+    TripleMulti: 'triple_multi',
+    AnatomicalSingle: 'anatomical_single',
+    AnatomicalMulti: 'anatomical_multi',
     Text: 'text'
 } as const;
 
@@ -3836,6 +4048,276 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {ConnectivityStatementAnatomicalEntity} connectivityStatementAnatomicalEntity 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAnatomicalEntityCreate: async (connectivityStatementAnatomicalEntity: ConnectivityStatementAnatomicalEntity, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'connectivityStatementAnatomicalEntity' is not null or undefined
+            assertParamExists('composerConnectivityStatementAnatomicalEntityCreate', 'connectivityStatementAnatomicalEntity', connectivityStatementAnatomicalEntity)
+            const localVarPath = `/api/composer/connectivityStatementAnatomicalEntity/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(connectivityStatementAnatomicalEntity, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAnatomicalEntityDestroy: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementAnatomicalEntityDestroy', 'id', id)
+            const localVarPath = `/api/composer/connectivityStatementAnatomicalEntity/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAnatomicalEntityList: async (limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/connectivityStatementAnatomicalEntity/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+         * @param {PatchedConnectivityStatementAnatomicalEntity} [patchedConnectivityStatementAnatomicalEntity] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAnatomicalEntityPartialUpdate: async (id: number, patchedConnectivityStatementAnatomicalEntity?: PatchedConnectivityStatementAnatomicalEntity, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementAnatomicalEntityPartialUpdate', 'id', id)
+            const localVarPath = `/api/composer/connectivityStatementAnatomicalEntity/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(patchedConnectivityStatementAnatomicalEntity, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAnatomicalEntityRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementAnatomicalEntityRetrieve', 'id', id)
+            const localVarPath = `/api/composer/connectivityStatementAnatomicalEntity/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+         * @param {ConnectivityStatementAnatomicalEntity} connectivityStatementAnatomicalEntity 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAnatomicalEntityUpdate: async (id: number, connectivityStatementAnatomicalEntity: ConnectivityStatementAnatomicalEntity, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementAnatomicalEntityUpdate', 'id', id)
+            // verify required parameter 'connectivityStatementAnatomicalEntity' is not null or undefined
+            assertParamExists('composerConnectivityStatementAnatomicalEntityUpdate', 'connectivityStatementAnatomicalEntity', connectivityStatementAnatomicalEntity)
+            const localVarPath = `/api/composer/connectivityStatementAnatomicalEntity/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(connectivityStatementAnatomicalEntity, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {PatchedConnectivityStatement} [patchedConnectivityStatement] 
@@ -4653,7 +5135,277 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {ConnectivityStatementText} connectivityStatementText 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTextCreate: async (connectivityStatementText: ConnectivityStatementText, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'connectivityStatementText' is not null or undefined
+            assertParamExists('composerConnectivityStatementTextCreate', 'connectivityStatementText', connectivityStatementText)
+            const localVarPath = `/api/composer/connectivityStatementText/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(connectivityStatementText, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement text.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTextDestroy: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementTextDestroy', 'id', id)
+            const localVarPath = `/api/composer/connectivityStatementText/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTextList: async (limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/connectivityStatementText/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement text.
+         * @param {PatchedConnectivityStatementText} [patchedConnectivityStatementText] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTextPartialUpdate: async (id: number, patchedConnectivityStatementText?: PatchedConnectivityStatementText, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementTextPartialUpdate', 'id', id)
+            const localVarPath = `/api/composer/connectivityStatementText/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(patchedConnectivityStatementText, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement text.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTextRetrieve: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementTextRetrieve', 'id', id)
+            const localVarPath = `/api/composer/connectivityStatementText/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement text.
+         * @param {ConnectivityStatementText} connectivityStatementText 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTextUpdate: async (id: number, connectivityStatementText: ConnectivityStatementText, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('composerConnectivityStatementTextUpdate', 'id', id)
+            // verify required parameter 'connectivityStatementText' is not null or undefined
+            assertParamExists('composerConnectivityStatementTextUpdate', 'connectivityStatementText', connectivityStatementText)
+            const localVarPath = `/api/composer/connectivityStatementText/{id}/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(connectivityStatementText, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {ConnectivityStatementTriple} connectivityStatementTriple 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4697,7 +5449,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4739,7 +5491,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
          * @param {*} [options] Override http request option.
@@ -4787,7 +5539,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {PatchedConnectivityStatementTriple} [patchedConnectivityStatementTriple] 
          * @param {*} [options] Override http request option.
@@ -4833,7 +5585,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4875,7 +5627,7 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {ConnectivityStatementTriple} connectivityStatementTriple 
          * @param {*} [options] Override http request option.
@@ -7647,6 +8399,81 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {ConnectivityStatementAnatomicalEntity} connectivityStatementAnatomicalEntity 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementAnatomicalEntityCreate(connectivityStatementAnatomicalEntity: ConnectivityStatementAnatomicalEntity, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatementAnatomicalEntity>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAnatomicalEntityCreate(connectivityStatementAnatomicalEntity, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAnatomicalEntityCreate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementAnatomicalEntityDestroy(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAnatomicalEntityDestroy(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAnatomicalEntityDestroy']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementAnatomicalEntityList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementAnatomicalEntityList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAnatomicalEntityList(limit, offset, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAnatomicalEntityList']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+         * @param {PatchedConnectivityStatementAnatomicalEntity} [patchedConnectivityStatementAnatomicalEntity] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementAnatomicalEntityPartialUpdate(id: number, patchedConnectivityStatementAnatomicalEntity?: PatchedConnectivityStatementAnatomicalEntity, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatementAnatomicalEntity>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAnatomicalEntityPartialUpdate(id, patchedConnectivityStatementAnatomicalEntity, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAnatomicalEntityPartialUpdate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementAnatomicalEntityRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatementAnatomicalEntity>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAnatomicalEntityRetrieve(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAnatomicalEntityRetrieve']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+         * @param {ConnectivityStatementAnatomicalEntity} connectivityStatementAnatomicalEntity 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementAnatomicalEntityUpdate(id: number, connectivityStatementAnatomicalEntity: ConnectivityStatementAnatomicalEntity, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatementAnatomicalEntity>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAnatomicalEntityUpdate(id, connectivityStatementAnatomicalEntity, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAnatomicalEntityUpdate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {PatchedConnectivityStatement} [patchedConnectivityStatement] 
@@ -7862,7 +8689,82 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {ConnectivityStatementText} connectivityStatementText 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementTextCreate(connectivityStatementText: ConnectivityStatementText, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatementText>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementTextCreate(connectivityStatementText, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementTextCreate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement text.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementTextDestroy(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementTextDestroy(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementTextDestroy']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementTextList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginatedConnectivityStatementTextList>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementTextList(limit, offset, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementTextList']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement text.
+         * @param {PatchedConnectivityStatementText} [patchedConnectivityStatementText] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementTextPartialUpdate(id: number, patchedConnectivityStatementText?: PatchedConnectivityStatementText, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatementText>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementTextPartialUpdate(id, patchedConnectivityStatementText, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementTextPartialUpdate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement text.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementTextRetrieve(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatementText>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementTextRetrieve(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementTextRetrieve']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement text.
+         * @param {ConnectivityStatementText} connectivityStatementText 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerConnectivityStatementTextUpdate(id: number, connectivityStatementText: ConnectivityStatementText, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatementText>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementTextUpdate(id, connectivityStatementText, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementTextUpdate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {ConnectivityStatementTriple} connectivityStatementTriple 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7874,7 +8776,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7886,7 +8788,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
          * @param {*} [options] Override http request option.
@@ -7899,7 +8801,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {PatchedConnectivityStatementTriple} [patchedConnectivityStatementTriple] 
          * @param {*} [options] Override http request option.
@@ -7912,7 +8814,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7924,7 +8826,7 @@ export const ComposerApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {ConnectivityStatementTriple} connectivityStatementTriple 
          * @param {*} [options] Override http request option.
@@ -8742,6 +9644,63 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementAddTagCreate(id, tagId, options).then((request) => request(axios, basePath));
         },
         /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {ConnectivityStatementAnatomicalEntity} connectivityStatementAnatomicalEntity 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAnatomicalEntityCreate(connectivityStatementAnatomicalEntity: ConnectivityStatementAnatomicalEntity, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatementAnatomicalEntity> {
+            return localVarFp.composerConnectivityStatementAnatomicalEntityCreate(connectivityStatementAnatomicalEntity, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAnatomicalEntityDestroy(id: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.composerConnectivityStatementAnatomicalEntityDestroy(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAnatomicalEntityList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedConnectivityStatementAnatomicalEntityList> {
+            return localVarFp.composerConnectivityStatementAnatomicalEntityList(limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+         * @param {PatchedConnectivityStatementAnatomicalEntity} [patchedConnectivityStatementAnatomicalEntity] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAnatomicalEntityPartialUpdate(id: number, patchedConnectivityStatementAnatomicalEntity?: PatchedConnectivityStatementAnatomicalEntity, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatementAnatomicalEntity> {
+            return localVarFp.composerConnectivityStatementAnatomicalEntityPartialUpdate(id, patchedConnectivityStatementAnatomicalEntity, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAnatomicalEntityRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatementAnatomicalEntity> {
+            return localVarFp.composerConnectivityStatementAnatomicalEntityRetrieve(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+         * @param {ConnectivityStatementAnatomicalEntity} connectivityStatementAnatomicalEntity 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementAnatomicalEntityUpdate(id: number, connectivityStatementAnatomicalEntity: ConnectivityStatementAnatomicalEntity, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatementAnatomicalEntity> {
+            return localVarFp.composerConnectivityStatementAnatomicalEntityUpdate(id, connectivityStatementAnatomicalEntity, options).then((request) => request(axios, basePath));
+        },
+        /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
          * @param {PatchedConnectivityStatement} [patchedConnectivityStatement] 
@@ -8915,7 +9874,64 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {ConnectivityStatementText} connectivityStatementText 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTextCreate(connectivityStatementText: ConnectivityStatementText, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatementText> {
+            return localVarFp.composerConnectivityStatementTextCreate(connectivityStatementText, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement text.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTextDestroy(id: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.composerConnectivityStatementTextDestroy(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {number} [limit] Number of results to return per page.
+         * @param {number} [offset] The initial index from which to return the results.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTextList(limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedConnectivityStatementTextList> {
+            return localVarFp.composerConnectivityStatementTextList(limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement text.
+         * @param {PatchedConnectivityStatementText} [patchedConnectivityStatementText] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTextPartialUpdate(id: number, patchedConnectivityStatementText?: PatchedConnectivityStatementText, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatementText> {
+            return localVarFp.composerConnectivityStatementTextPartialUpdate(id, patchedConnectivityStatementText, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement text.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTextRetrieve(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatementText> {
+            return localVarFp.composerConnectivityStatementTextRetrieve(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatementText: Manage text-based relationships
+         * @param {number} id A unique integer value identifying this connectivity statement text.
+         * @param {ConnectivityStatementText} connectivityStatementText 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerConnectivityStatementTextUpdate(id: number, connectivityStatementText: ConnectivityStatementText, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatementText> {
+            return localVarFp.composerConnectivityStatementTextUpdate(id, connectivityStatementText, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {ConnectivityStatementTriple} connectivityStatementTriple 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8924,7 +9940,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementTripleCreate(connectivityStatementTriple, options).then((request) => request(axios, basePath));
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8933,7 +9949,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementTripleDestroy(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {number} [limit] Number of results to return per page.
          * @param {number} [offset] The initial index from which to return the results.
          * @param {*} [options] Override http request option.
@@ -8943,7 +9959,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementTripleList(limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {PatchedConnectivityStatementTriple} [patchedConnectivityStatementTriple] 
          * @param {*} [options] Override http request option.
@@ -8953,7 +9969,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementTriplePartialUpdate(id, patchedConnectivityStatementTriple, options).then((request) => request(axios, basePath));
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8962,7 +9978,7 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.composerConnectivityStatementTripleRetrieve(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * ConnectivityStatementTriple:
+         * ConnectivityStatementTriple: Manage triple-based relationships
          * @param {number} id A unique integer value identifying this connectivity statement triple.
          * @param {ConnectivityStatementTriple} connectivityStatementTriple 
          * @param {*} [options] Override http request option.
@@ -9628,6 +10644,75 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
+     * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+     * @param {ConnectivityStatementAnatomicalEntity} connectivityStatementAnatomicalEntity 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementAnatomicalEntityCreate(connectivityStatementAnatomicalEntity: ConnectivityStatementAnatomicalEntity, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementAnatomicalEntityCreate(connectivityStatementAnatomicalEntity, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+     * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementAnatomicalEntityDestroy(id: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementAnatomicalEntityDestroy(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+     * @param {number} [limit] Number of results to return per page.
+     * @param {number} [offset] The initial index from which to return the results.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementAnatomicalEntityList(limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementAnatomicalEntityList(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+     * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+     * @param {PatchedConnectivityStatementAnatomicalEntity} [patchedConnectivityStatementAnatomicalEntity] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementAnatomicalEntityPartialUpdate(id: number, patchedConnectivityStatementAnatomicalEntity?: PatchedConnectivityStatementAnatomicalEntity, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementAnatomicalEntityPartialUpdate(id, patchedConnectivityStatementAnatomicalEntity, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+     * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementAnatomicalEntityRetrieve(id: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementAnatomicalEntityRetrieve(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+     * @param {number} id A unique integer value identifying this connectivity statement anatomical entity.
+     * @param {ConnectivityStatementAnatomicalEntity} connectivityStatementAnatomicalEntity 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementAnatomicalEntityUpdate(id: number, connectivityStatementAnatomicalEntity: ConnectivityStatementAnatomicalEntity, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementAnatomicalEntityUpdate(id, connectivityStatementAnatomicalEntity, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * ConnectivityStatement
      * @param {number} id A unique integer value identifying this connectivity statement.
      * @param {PatchedConnectivityStatement} [patchedConnectivityStatement] 
@@ -9829,7 +10914,76 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * ConnectivityStatementTriple:
+     * ConnectivityStatementText: Manage text-based relationships
+     * @param {ConnectivityStatementText} connectivityStatementText 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementTextCreate(connectivityStatementText: ConnectivityStatementText, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementTextCreate(connectivityStatementText, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatementText: Manage text-based relationships
+     * @param {number} id A unique integer value identifying this connectivity statement text.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementTextDestroy(id: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementTextDestroy(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatementText: Manage text-based relationships
+     * @param {number} [limit] Number of results to return per page.
+     * @param {number} [offset] The initial index from which to return the results.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementTextList(limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementTextList(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatementText: Manage text-based relationships
+     * @param {number} id A unique integer value identifying this connectivity statement text.
+     * @param {PatchedConnectivityStatementText} [patchedConnectivityStatementText] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementTextPartialUpdate(id: number, patchedConnectivityStatementText?: PatchedConnectivityStatementText, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementTextPartialUpdate(id, patchedConnectivityStatementText, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatementText: Manage text-based relationships
+     * @param {number} id A unique integer value identifying this connectivity statement text.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementTextRetrieve(id: number, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementTextRetrieve(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatementText: Manage text-based relationships
+     * @param {number} id A unique integer value identifying this connectivity statement text.
+     * @param {ConnectivityStatementText} connectivityStatementText 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ComposerApi
+     */
+    public composerConnectivityStatementTextUpdate(id: number, connectivityStatementText: ConnectivityStatementText, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementTextUpdate(id, connectivityStatementText, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * ConnectivityStatementTriple: Manage triple-based relationships
      * @param {ConnectivityStatementTriple} connectivityStatementTriple 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -9840,7 +10994,7 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * ConnectivityStatementTriple:
+     * ConnectivityStatementTriple: Manage triple-based relationships
      * @param {number} id A unique integer value identifying this connectivity statement triple.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -9851,7 +11005,7 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * ConnectivityStatementTriple:
+     * ConnectivityStatementTriple: Manage triple-based relationships
      * @param {number} [limit] Number of results to return per page.
      * @param {number} [offset] The initial index from which to return the results.
      * @param {*} [options] Override http request option.
@@ -9863,7 +11017,7 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * ConnectivityStatementTriple:
+     * ConnectivityStatementTriple: Manage triple-based relationships
      * @param {number} id A unique integer value identifying this connectivity statement triple.
      * @param {PatchedConnectivityStatementTriple} [patchedConnectivityStatementTriple] 
      * @param {*} [options] Override http request option.
@@ -9875,7 +11029,7 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * ConnectivityStatementTriple:
+     * ConnectivityStatementTriple: Manage triple-based relationships
      * @param {number} id A unique integer value identifying this connectivity statement triple.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -9886,7 +11040,7 @@ export class ComposerApi extends BaseAPI {
     }
 
     /**
-     * ConnectivityStatementTriple:
+     * ConnectivityStatementTriple: Manage triple-based relationships
      * @param {number} id A unique integer value identifying this connectivity statement triple.
      * @param {ConnectivityStatementTriple} connectivityStatementTriple 
      * @param {*} [options] Override http request option.
