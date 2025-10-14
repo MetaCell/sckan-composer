@@ -4,6 +4,8 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     AnatomicalEntityViewSet,
     ConnectivityStatementTripleViewSet,
+    ConnectivityStatementTextViewSet,
+    ConnectivityStatementAnatomicalEntityViewSet,
     PhenotypeViewSet,
     ProjectionPhenotypeViewSet,
     ConnectivityStatementViewSet,
@@ -50,6 +52,8 @@ router.register(r"destination", DestinationViewSet, basename="destination")
 router.register(r"statementAlert", StatementAlertViewSet, basename="statementAlert")
 router.register(r"relationship", RelationshipViewSet, basename="relationship")
 router.register(r"connectivityStatementTriple", ConnectivityStatementTripleViewSet, basename="ConnectivityStatementTriple")
+router.register(r"connectivityStatementText", ConnectivityStatementTextViewSet, basename="ConnectivityStatementText")
+router.register(r"connectivityStatementAnatomicalEntity", ConnectivityStatementAnatomicalEntityViewSet, basename="ConnectivityStatementAnatomicalEntity")
 # router.register(r"json", JsonViewSet, basename="json")
 
 # The API URLs are now determined automatically by the router.

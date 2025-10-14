@@ -11,6 +11,8 @@ from ..models import (
     AlertType,
     AnatomicalEntity,
     ConnectivityStatementTriple,
+    ConnectivityStatementText,
+    ConnectivityStatementAnatomicalEntity,
     Phenotype,
     ProjectionPhenotype,
     Relationship,
@@ -689,56 +691,96 @@ class TripleSerializer(serializers.ModelSerializer):
 
 
 class ConnectivityStatementTripleSerializer(serializers.ModelSerializer):
-    value = serializers.SerializerMethodField()
+    """Serializer for triple-based relationships (single/multi select from triples)"""
 
     connectivity_statement = serializers.PrimaryKeyRelatedField(
         queryset=ConnectivityStatement.objects.all()
     )
     relationship = serializers.PrimaryKeyRelatedField(
-        queryset=Relationship.objects.all()
+        queryset=Relationship.objects.filter(
+            type__in=[RelationshipType.TRIPLE_SINGLE, RelationshipType.TRIPLE_MULTI]
+        )
+    )
+    triples = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Triple.objects.all(),
+        write_only=True
     )
 
     class Meta:
         model = ConnectivityStatementTriple
-        fields = ["id", "connectivity_statement", "relationship", "value"]
+        fields = ["id", "connectivity_statement", "relationship", "triples"]
 
-    def get_value(self, obj):
-        if obj.relationship.type == RelationshipType.TEXT:
-            return obj.free_text
-        if obj.triple:
-            return obj.triple.id
-        return None
+    def to_representation(self, instance):
+        """Return full triple objects in read operations"""
+        representation = super().to_representation(instance)
+        representation['triples'] = [triple.id for triple in instance.triples.all()]
+        return representation
 
     def validate(self, data):
-        request = self.context.get("request")
-        if request and request.method in ("POST", "PUT", "PATCH"):
-            incoming_value = request.data.get("value", None)
-
-            relationship = data.get("relationship") or getattr(self.instance, "relationship", None)
-            if not relationship:
-                raise serializers.ValidationError({"relationship": "This field is required to process value."})
-
-            if relationship.type == RelationshipType.TEXT:
-                if not isinstance(incoming_value, str):
-                    raise serializers.ValidationError({"value": "Must be a string for text relationship."})
-                data["free_text"] = incoming_value
-                data["triple"] = None
-
-            else:
-                try:
-                    triple_id = int(incoming_value)
-                except (ValueError, TypeError):
-                    raise serializers.ValidationError({"value": "Must be an integer (or stringified integer) triple ID."})
-
-                try:
-                    triple = Triple.objects.get(id=triple_id, relationship=relationship)
-                except Triple.DoesNotExist:
-                    raise serializers.ValidationError({"value": "Invalid triple ID for this relationship."})
-
-                data["triple"] = triple
-                data["free_text"] = None
-
+        relationship = data.get("relationship") or getattr(self.instance, "relationship", None)
+        triples = data.get("triples", [])
+        
+        if relationship:
+            # Validate that all triples belong to the relationship
+            for triple in triples:
+                if triple.relationship_id != relationship.id:
+                    raise serializers.ValidationError(
+                        {"triples": f"Triple '{triple.name}' does not belong to the selected relationship."}
+                    )
+        
         return data
+
+
+class ConnectivityStatementTextSerializer(serializers.ModelSerializer):
+    """Serializer for text-based relationships (free text area)"""
+
+    connectivity_statement = serializers.PrimaryKeyRelatedField(
+        queryset=ConnectivityStatement.objects.all()
+    )
+    relationship = serializers.PrimaryKeyRelatedField(
+        queryset=Relationship.objects.filter(type=RelationshipType.TEXT)
+    )
+
+    class Meta:
+        model = ConnectivityStatementText
+        fields = ["id", "connectivity_statement", "relationship", "text"]
+
+    def validate_text(self, value):
+        if not value or not value.strip():
+            raise serializers.ValidationError("Text cannot be empty.")
+        return value
+
+
+class ConnectivityStatementAnatomicalEntitySerializer(serializers.ModelSerializer):
+    """Serializer for anatomical entity-based relationships"""
+
+    connectivity_statement = serializers.PrimaryKeyRelatedField(
+        queryset=ConnectivityStatement.objects.all()
+    )
+    relationship = serializers.PrimaryKeyRelatedField(
+        queryset=Relationship.objects.filter(
+            type__in=[RelationshipType.ANATOMICAL_MULTI]
+        )
+    )
+    anatomical_entities = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=AnatomicalEntity.objects.all(),
+        write_only=True
+    )
+
+    class Meta:
+        model = ConnectivityStatementAnatomicalEntity
+        fields = ["id", "connectivity_statement", "relationship", "anatomical_entities"]
+
+    def to_representation(self, instance):
+        """Return full anatomical entity objects in read operations"""
+        representation = super().to_representation(instance)
+        representation['anatomical_entities'] = AnatomicalEntitySerializer(
+            instance.anatomical_entities.all(), 
+            many=True
+        ).data
+        return representation
 
 
 class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
@@ -776,6 +818,8 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
         required=False, read_only=True
     )
     statement_triples = serializers.SerializerMethodField()
+    statement_texts = serializers.SerializerMethodField()
+    statement_anatomical_entities = serializers.SerializerMethodField()
 
 
     def get_available_transitions(self, instance) -> list[CSState]:
@@ -800,21 +844,32 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
     def get_errors(self, instance) -> List:
         return get_connectivity_errors(instance)
 
-
     def get_statement_triples(self, instance):
-        triples = instance.statement_triples.all()
+        """Get triple-based relationships grouped by relationship ID"""
+        statement_triples = instance.connectivitystatementtriple_set.all()
         grouped = {}
 
-        for triple in triples:
-            relationship = triple.relationship.id
-            serialized = ConnectivityStatementTripleSerializer(triple).data
-
-            if triple.relationship.type == RelationshipType.MULTI:
-                grouped.setdefault(relationship, []).append(serialized)
-            else:
-                grouped[relationship] = serialized
+        for statement_triple in statement_triples:
+            relationship = statement_triple.relationship.id
+            serialized = ConnectivityStatementTripleSerializer(statement_triple).data
+            
+            # Since triples is now always M2M, return consistent structure
+            grouped[relationship] = serialized
 
         return grouped
+
+    def get_statement_texts(self, instance):
+        """Get text-based relationships"""
+        texts = instance.connectivitystatementtext_set.all()
+        return {text.relationship.id: ConnectivityStatementTextSerializer(text).data for text in texts}
+
+    def get_statement_anatomical_entities(self, instance):
+        """Get anatomical entity-based relationships"""
+        anatomical_entities = instance.connectivitystatementanatomicalentity_set.all()
+        return {
+            ae.relationship.id: ConnectivityStatementAnatomicalEntitySerializer(ae).data 
+            for ae in anatomical_entities
+        }
 
     def to_representation(self, instance):
         """
@@ -883,6 +938,8 @@ class ConnectivityStatementSerializer(BaseConnectivityStatementSerializer):
             "graph_rendering_state",
             "statement_alerts",
             "statement_triples",
+            "statement_texts",
+            "statement_anatomical_entities",
         )
 
 
