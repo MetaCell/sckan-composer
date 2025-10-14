@@ -346,7 +346,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
     "ui:order": uiSchema.statement_triples["ui:order"] || Object.keys(copiedSchema.properties.statement_triples.properties),
     ...Object.entries(copiedSchema.properties.statement_triples.properties).reduce<Record<string, any>>((acc, [key, prop]) => {
       const property = prop as { type?: string | string[]; title?: string };
-      const relationshipData = relationshipOptions.find((option: any) => option.id == key);
+      const relationshipData = relationshipOptions.find((option: any) => option.id === key);
       
       if (!relationshipData) {
         // Skip if relationship data not loaded yet
