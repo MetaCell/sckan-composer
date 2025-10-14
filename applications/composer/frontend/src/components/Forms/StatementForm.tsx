@@ -47,6 +47,30 @@ import { RelationshipType, RelationshipOption } from "../../types/relationshipTy
 import { vars } from "../../theme/variables";
 
 /**
+ * Helper function to wrap relationship updates with ownership check
+ */
+const withOwnershipCheck = async (
+  statementId: number,
+  updateFn: () => Promise<void>,
+  refreshStatement: () => void,
+): Promise<string> => {
+  return checkOwnership(
+    statementId,
+    async () => {
+      await updateFn();
+      return ChangeRequestStatus.SAVED;
+    },
+    () => {},
+    getOwnershipAlertMessage
+  ).then((status) => {
+    if (status === ChangeRequestStatus.SAVED) {
+      refreshStatement();
+    }
+    return status;
+  });
+};
+
+/**
  * Widget configuration factory for different relationship types
  */
 const createWidgetConfig = (
@@ -93,27 +117,30 @@ const createWidgetConfig = (
           );
         },
         onUpdate: async (selectedOptions: Option[]) => {
-          const currentRelationship = statement?.statement_anatomical_entities?.[relationshipKey];
-          const selectedIds = selectedOptions.map((opt: Option) => Number(opt.id));
-          
-          if (currentRelationship?.id) {
-            await statementService.updateAnatomicalEntityRelationship(currentRelationship.id, {
-              connectivity_statement: statement.id,
-              relationship: relationshipKey,
-              anatomical_entities: selectedIds
-            });
-          } else if (selectedIds.length > 0) {
-            await statementService.assignAnatomicalEntityRelationship({
-              connectivity_statement: statement.id,
-              relationship: relationshipKey,
-              anatomical_entities: selectedIds
-            });
-          } else if (currentRelationship?.id && selectedIds.length === 0) {
-            await statementService.deleteAnatomicalEntityRelationship(currentRelationship.id);
-          }
-          
-          refreshStatement();
-          return ChangeRequestStatus.SAVED;
+          return withOwnershipCheck(
+            statement.id,
+            async () => {
+              const currentRelationship = statement?.statement_anatomical_entities?.[relationshipKey];
+              const selectedIds = selectedOptions.map((opt: Option) => Number(opt.id));
+              
+              if (currentRelationship?.id) {
+                await statementService.updateAnatomicalEntityRelationship(currentRelationship.id, {
+                  connectivity_statement: statement.id,
+                  relationship: relationshipKey,
+                  anatomical_entities: selectedIds
+                });
+              } else if (selectedIds.length > 0) {
+                await statementService.assignAnatomicalEntityRelationship({
+                  connectivity_statement: statement.id,
+                  relationship: relationshipKey,
+                  anatomical_entities: selectedIds
+                });
+              } else if (currentRelationship?.id && selectedIds.length === 0) {
+                await statementService.deleteAnatomicalEntityRelationship(currentRelationship.id);
+              }
+            },
+            refreshStatement
+          );
         },
         errors: "",
         mapValueToOption: (value: any) => {
@@ -135,27 +162,36 @@ const createWidgetConfig = (
         label: propertyTitle,
         placeholder: `Enter ${propertyTitle}`,
         onBlur2: async (value: any) => {
-          const currentRelationship = statement?.statement_texts?.[relationshipKey];
+          const currentText = statement?.statement_texts?.[relationshipKey]?.text;
           
-          if (currentRelationship?.id && (!value || value.trim() === "")) {
-            await statementService.deleteTextRelationship(currentRelationship.id);
-          } else if (currentRelationship?.id) {
-            await statementService.updateTextRelationship(currentRelationship.id, {
-              connectivity_statement: statement.id,
-              relationship: relationshipKey,
-              text: value
-            });
-          } else if (value && value.trim() !== "") {
-            await statementService.assignTextRelationship({
-              connectivity_statement: statement.id,
-              relationship: relationshipKey,
-              text: value
-            });
+          // Only trigger update if value actually changed
+          if (value === currentText) {
+            return;
           }
           
-          if (value !== statement?.statement_texts?.[relationshipKey]?.text) {
-            refreshStatement();
-          }
+          return withOwnershipCheck(
+            statement.id,
+            async () => {
+              const currentRelationship = statement?.statement_texts?.[relationshipKey];
+              
+              if (currentRelationship?.id && (!value || value.trim() === "")) {
+                await statementService.deleteTextRelationship(currentRelationship.id);
+              } else if (currentRelationship?.id) {
+                await statementService.updateTextRelationship(currentRelationship.id, {
+                  connectivity_statement: statement.id,
+                  relationship: relationshipKey,
+                  text: value
+                });
+              } else if (value && value.trim() !== "") {
+                await statementService.assignTextRelationship({
+                  connectivity_statement: statement.id,
+                  relationship: relationshipKey,
+                  text: value
+                });
+              }
+            },
+            refreshStatement
+          );
         },
       }
     }),
@@ -179,45 +215,54 @@ const createWidgetConfig = (
             };
           }) || [],
           removeChip: async (id: number) => {
-            const currentRelationship = statement?.statement_triples?.[relationshipKey];
-            if (currentRelationship?.id) {
-              const updatedTriples = currentRelationship.triples.filter((tid: number) => tid !== id);
-              if (updatedTriples.length > 0) {
-                await statementService.updateRelationship(currentRelationship.id, {
-                  connectivity_statement: statement.id,
-                  relationship: relationshipKey,
-                  triples: updatedTriples
-                });
-              } else {
-                await statementService.deleteRelationship(currentRelationship.id);
-              }
-            }
-            refreshStatement();
+            return withOwnershipCheck(
+              statement.id,
+              async () => {
+                const currentRelationship = statement?.statement_triples?.[relationshipKey];
+                if (currentRelationship?.id) {
+                  const updatedTriples = currentRelationship.triples.filter((tid: number) => tid !== id);
+                  if (updatedTriples.length > 0) {
+                    await statementService.updateRelationship(currentRelationship.id, {
+                      connectivity_statement: statement.id,
+                      relationship: relationshipKey,
+                      triples: updatedTriples
+                    });
+                  } else {
+                    await statementService.deleteRelationship(currentRelationship.id);
+                  }
+                }
+              },
+              refreshStatement
+            );
           },
           isDisabled,
           onAutocompleteChange: async (event: any, newValue: any[]) => {
-            const selectedTripleIds = newValue.map((v: any) => Number(v.value));
-            const currentRelationship = statement?.statement_triples?.[relationshipKey];
-            
-            if (currentRelationship?.id) {
-              if (selectedTripleIds.length > 0) {
-                await statementService.updateRelationship(currentRelationship.id, {
-                  connectivity_statement: statement.id,
-                  relationship: relationshipKey,
-                  triples: selectedTripleIds
-                });
-              } else {
-                await statementService.deleteRelationship(currentRelationship.id);
-              }
-            } else if (selectedTripleIds.length > 0) {
-              await statementService.assignRelationship({
-                connectivity_statement: statement.id,
-                relationship: relationshipKey,
-                triples: selectedTripleIds
-              });
-            }
-            
-            refreshStatement();
+            return withOwnershipCheck(
+              statement.id,
+              async () => {
+                const selectedTripleIds = newValue.map((v: any) => Number(v.value));
+                const currentRelationship = statement?.statement_triples?.[relationshipKey];
+                
+                if (currentRelationship?.id) {
+                  if (selectedTripleIds.length > 0) {
+                    await statementService.updateRelationship(currentRelationship.id, {
+                      connectivity_statement: statement.id,
+                      relationship: relationshipKey,
+                      triples: selectedTripleIds
+                    });
+                  } else {
+                    await statementService.deleteRelationship(currentRelationship.id);
+                  }
+                } else if (selectedTripleIds.length > 0) {
+                  await statementService.assignRelationship({
+                    connectivity_statement: statement.id,
+                    relationship: relationshipKey,
+                    triples: selectedTripleIds
+                  });
+                }
+              },
+              refreshStatement
+            );
           }
         }
       };
@@ -235,27 +280,34 @@ const createWidgetConfig = (
           data: relationshipOption || [],
           onChange2: async (value: any) => {
             const currentRelationship = statement?.statement_triples?.[relationshipKey];
-            
-            if (currentRelationship?.id && value === null) {
-              await statementService.deleteRelationship(currentRelationship.id);
-            } else if (value !== null && !currentRelationship?.id) {
-              await statementService.assignRelationship({
-                connectivity_statement: statement.id,
-                relationship: relationshipKey,
-                triples: [Number(value)]
-              });
-            } else if (value !== null && currentRelationship?.id) {
-              await statementService.updateRelationship(currentRelationship.id, {
-                connectivity_statement: statement.id,
-                relationship: relationshipKey,
-                triples: [Number(value)]
-              });
-            }
-            
             const currentValue = currentRelationship?.triples?.[0];
-            if (value !== currentValue) {
-              refreshStatement();
+            
+            // Only trigger update if value actually changed
+            if (value === currentValue) {
+              return;
             }
+            
+            return withOwnershipCheck(
+              statement.id,
+              async () => {
+                if (currentRelationship?.id && value === null) {
+                  await statementService.deleteRelationship(currentRelationship.id);
+                } else if (value !== null && !currentRelationship?.id) {
+                  await statementService.assignRelationship({
+                    connectivity_statement: statement.id,
+                    relationship: relationshipKey,
+                    triples: [Number(value)]
+                  });
+                } else if (value !== null && currentRelationship?.id) {
+                  await statementService.updateRelationship(currentRelationship.id, {
+                    connectivity_statement: statement.id,
+                    relationship: relationshipKey,
+                    triples: [Number(value)]
+                  });
+                }
+              },
+              refreshStatement
+            );
           },
           isDisabled,
         }
