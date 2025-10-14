@@ -6,28 +6,94 @@ from django.db import migrations, models
 def migrate_triple_to_triples_forward(apps, schema_editor):
     """
     Migrate data from triple ForeignKey to triples ManyToMany field.
-    For each ConnectivityStatementTriple with a triple, add that triple to the new triples M2M field.
+    Consolidates duplicate records with the same connectivity_statement and relationship.
     """
     ConnectivityStatementTriple = apps.get_model("composer", "ConnectivityStatementTriple")
     
-    # Get all records that have a triple set
-    for statement_triple in ConnectivityStatementTriple.objects.filter(triple__isnull=False):
-        # Add the single triple to the M2M field
-        statement_triple.triples.add(statement_triple.triple)
+    # Group by connectivity_statement and relationship to find all unique combinations
+    from collections import defaultdict
+    groups = defaultdict(list)
+    
+    for statement_triple in ConnectivityStatementTriple.objects.filter(
+        triple__isnull=False
+    ).select_related('triple').iterator(chunk_size=1000):
+        key = (statement_triple.connectivity_statement_id, statement_triple.relationship_id)
+        groups[key].append(statement_triple)
+    
+    records_to_delete_ids = []
+    
+    for key, records in groups.items():
+        # Keep the first record as the primary one
+        primary_record = records[0]
+        
+        # Collect all unique triple IDs from all records
+        triple_ids = set()
+        for record in records:
+            if record.triple_id:
+                triple_ids.add(record.triple_id)
+        
+        # Add all triples to the primary record's M2M field in one operation
+        if triple_ids:
+            primary_record.triples.add(*triple_ids)
+        
+        # Collect IDs of duplicate records to delete
+        records_to_delete_ids.extend([record.id for record in records[1:]])
+    
+    # Bulk delete duplicate records in chunks to avoid memory issues
+    chunk_size = 1000
+    for i in range(0, len(records_to_delete_ids), chunk_size):
+        chunk = records_to_delete_ids[i:i + chunk_size]
+        ConnectivityStatementTriple.objects.filter(id__in=chunk).delete()
 
 
 def migrate_triple_to_triples_backward(apps, schema_editor):
     """
-    Reverse migration: move first triple from triples M2M back to triple FK.
+    Reverse migration: split M2M triples back into separate FK records.
+    Creates one ConnectivityStatementTriple record per triple in the M2M field.
     """
     ConnectivityStatementTriple = apps.get_model("composer", "ConnectivityStatementTriple")
     
-    # For each record with triples, set the triple FK to the first one
-    for statement_triple in ConnectivityStatementTriple.objects.all():
-        first_triple = statement_triple.triples.first()
-        if first_triple:
-            statement_triple.triple = first_triple
-            statement_triple.save(update_fields=["triple"])
+    records_to_create = []
+    records_to_update = []
+    
+    # Use iterator() with prefetch_related for efficient M2M access
+    for statement_triple in ConnectivityStatementTriple.objects.prefetch_related(
+        'triples'
+    ).iterator(chunk_size=1000):
+        triples = list(statement_triple.triples.all())
+        
+        if len(triples) == 0:
+            # No triples, keep the record as is with triple=None
+            continue
+        elif len(triples) == 1:
+            # Single triple, just set the FK
+            statement_triple.triple_id = triples[0].id
+            records_to_update.append(statement_triple)
+        else:
+            # Multiple triples: keep first one in current record, create new records for others
+            statement_triple.triple_id = triples[0].id
+            records_to_update.append(statement_triple)
+            
+            # Create new records for remaining triples
+            for triple in triples[1:]:
+                records_to_create.append(
+                    ConnectivityStatementTriple(
+                        connectivity_statement_id=statement_triple.connectivity_statement_id,
+                        relationship_id=statement_triple.relationship_id,
+                        triple_id=triple.id,
+                    )
+                )
+    
+    # Bulk update existing records in chunks
+    chunk_size = 1000
+    for i in range(0, len(records_to_update), chunk_size):
+        chunk = records_to_update[i:i + chunk_size]
+        ConnectivityStatementTriple.objects.bulk_update(chunk, ['triple'], batch_size=chunk_size)
+    
+    # Bulk create new records in chunks
+    for i in range(0, len(records_to_create), chunk_size):
+        chunk = records_to_create[i:i + chunk_size]
+        ConnectivityStatementTriple.objects.bulk_create(chunk, batch_size=chunk_size)
 
 
 class Migration(migrations.Migration):
