@@ -104,6 +104,12 @@ def get_export_queryset(base_qs):
             "via_set__from_entities",
             "destinations__anatomical_entities",
             "destinations__from_entities",
+            "statement_alerts__alert_type",
+            "connectivitystatementtriple_set__relationship",
+            "connectivitystatementtriple_set__triples",
+            "connectivitystatementtext_set__relationship",
+            "connectivitystatementanatomicalentity_set__relationship",
+            "connectivitystatementanatomicalentity_set__anatomical_entities",
         )
         .order_by("state_order", "state", "id")
     )
