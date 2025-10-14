@@ -1052,6 +1052,26 @@ class Relationship(models.Model):
     predicate_uri = models.URLField()
     type = models.CharField(max_length=20, choices=RelationshipType.choices)
     order = models.PositiveIntegerField(default=0)
+    custom_ingestion_code = models.TextField(
+        blank=True,
+        null=True,
+        help_text=(
+            "Optional Python code to extract data from NeuroDM for this relationship during ingestion. "
+            "The code has access to:\n"
+            "- 'fc': dict with neuron properties (id, label, species, phenotype, etc.)\n"
+            "- 'fc[\"_neuron\"]': the NeuroDM neuron object with core_graph for RDF queries\n\n"
+            "You can import any packages available in the base image (e.g., from pyontutils.namespaces import ilxtr)\n\n"
+            "Example - Query neuron RDF graph:\n"
+            "  from pyontutils.namespaces import ilxtr\n"
+            "  neuron = fc['_neuron']\n"
+            "  values = [str(o) for s, p, o in neuron.core_graph[neuron.identifier:ilxtr.hasPhenotype]]\n\n"
+            "The code must define a 'result' variable with the output:\n"
+            "- For TRIPLE relationships: list of dicts [{'name': str, 'uri': str}, ...]\n"
+            "- For TEXT relationships: list of strings or single string\n"
+            "- For ANATOMICAL_ENTITY relationships: list of URIs (strings)\n\n"
+            "Errors are logged to the ingestion anomalies file and the relationship will be skipped."
+        )
+    )
 
     def __str__(self):
         return self.title

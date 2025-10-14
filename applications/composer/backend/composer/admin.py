@@ -48,7 +48,7 @@ from composer.models import (
     Region,
     AnatomicalEntityIntersection,
     AnatomicalEntity,
-    CSState
+    CSState,
 )
 
 
@@ -112,9 +112,36 @@ class StatementAlertInline(admin.StackedInline):
 
 
 class RelationshipAdmin(admin.ModelAdmin):
-    list_display = ("title", "predicate_name", "predicate_uri", "type", "order")
+    list_display = ("title", "predicate_name", "predicate_uri", "type", "order", "has_custom_code")
     ordering = ("order",)
     search_fields = ("title", "predicate_name", "predicate_uri")
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'predicate_name', 'predicate_uri', 'type', 'order')
+        }),
+        ('Custom Ingestion Code', {
+            'classes': ('collapse',),
+            'fields': ('custom_ingestion_code',),
+            'description': (
+                'Add custom Python code to extract data from NeuroDM during ingestion. '
+                'Leave empty to use default behavior. See field help text for details.'
+            ),
+        }),
+    )
+    
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'custom_ingestion_code' in form.base_fields:
+            form.base_fields['custom_ingestion_code'].widget = forms.Textarea(attrs={
+                'rows': 15,
+                'cols': 100,
+                'style': 'font-family: monospace; font-size: 12px;'
+            })
+        return form
+    
+    @admin.display(description="Has Custom Code", boolean=True)
+    def has_custom_code(self, obj):
+        return bool(obj.custom_ingestion_code and obj.custom_ingestion_code.strip())
 
 class TripleAdmin(admin.ModelAdmin):
     list_display = ("name", "uri", "relationship")
@@ -478,11 +505,26 @@ def ingest_sentences_view(request):
     return render(request, "admin/ingest_sentences.html", context)
 
 
+# Custom view for downloading ingestion log files
+def download_logs_view(request):
+    """
+    Admin page with links to download ingestion log files.
+    """
+    context = admin.site.each_context(request)
+    context.update({
+        "title": "Download Ingestion Logs",
+        "anomalies_url": reverse('composer-api:ingestion-logs') + '?log_type=anomalies',
+        "ingested_url": reverse('composer-api:ingestion-logs') + '?log_type=ingested',
+    })
+    return render(request, "admin/download_logs.html", context)
+
+
 def custom_admin_urls(original_get_urls):
     def get_urls():
         urls = original_get_urls()
         custom_urls = [
             path('ingest-sentences/', admin.site.admin_view(ingest_sentences_view), name='ingest-sentences'),
+            path('download-logs/', admin.site.admin_view(download_logs_view), name='download-logs'),
         ]
         return custom_urls + urls
     return get_urls

@@ -1,11 +1,12 @@
 import re
 from typing import Dict, Tuple, List
+import traceback
 
 from django.contrib.auth.models import User
 
 from composer.services.cs_ingestion.logging_service import LoggerService
 from composer.services.state_services import ConnectivityStatementStateService
-from composer.enums import CSState, NoteType
+from composer.enums import CSState, NoteType, RelationshipType
 from composer.management.commands.ingest_nlp_sentence import ID
 from composer.models import (
     AlertType,
@@ -16,6 +17,12 @@ from composer.models import (
     Provenance,
     ExpertConsultant,
     StatementAlert,
+    Relationship,
+    Triple,
+    ConnectivityStatementTriple,
+    ConnectivityStatementText,
+    ConnectivityStatementAnatomicalEntity,
+    AnatomicalEntity,
 )
 from composer.services.cs_ingestion.helpers.anatomical_entities_helper import (
     add_origins,
@@ -156,9 +163,251 @@ def create_or_update_connectivity_statement(
     update_many_to_many_fields(
         connectivity_statement, statement, update_anatomical_entities
     )
+    
+    # Process dynamic relationships with custom code
+    process_dynamic_relationships(connectivity_statement, statement, logger_service)
+    
     statement[STATE] = connectivity_statement.state
 
     return connectivity_statement, created
+
+
+def process_dynamic_relationships(
+    connectivity_statement: ConnectivityStatement,
+    statement: Dict,
+    logger_service: LoggerService,
+):
+    """
+    Process relationships that have custom ingestion code.
+    Execute the custom code safely and create the appropriate entities.
+    """
+    # Get all relationships that have custom code
+    relationships_with_code = Relationship.objects.filter(
+        custom_ingestion_code__isnull=False
+    ).exclude(custom_ingestion_code='')
+    
+    for relationship in relationships_with_code:
+        try:
+            # Execute custom code safely
+            result = execute_custom_relationship_code(
+                relationship, statement, logger_service
+            )
+            
+            if result is None:
+                continue
+            
+            # Process result based on relationship type
+            if relationship.type == RelationshipType.TRIPLE_MULTI or relationship.type == RelationshipType.TRIPLE_SINGLE:
+                process_triple_relationship(connectivity_statement, relationship, result, logger_service)
+            elif relationship.type == RelationshipType.TEXT:
+                process_text_relationship(connectivity_statement, relationship, result)
+            elif relationship.type == RelationshipType.ANATOMICAL_MULTI:
+                process_anatomical_relationship(connectivity_statement, relationship, result, logger_service)
+            else:
+                log_custom_relationship_error(
+                    logger_service,
+                    f"Unknown relationship type: {relationship.type}",
+                    statement.get(ID),
+                    relationship.id,
+                    {'relationship_title': relationship.title, 'type': relationship.type}
+                )
+                
+        except Exception as e:
+            # Log error and continue with other relationships
+            log_custom_relationship_error(
+                logger_service,
+                f"Failed to process custom relationship '{relationship.title}': {str(e)}",
+                statement.get(ID),
+                relationship.id,
+                {
+                    'relationship_title': relationship.title,
+                    'error': str(e),
+                    'traceback': traceback.format_exc()
+                }
+            )
+
+
+def execute_custom_relationship_code(
+    relationship: Relationship,
+    statement: Dict,
+    logger_service: LoggerService,
+) -> any:
+    """
+    Execute custom Python code for a relationship.
+    Returns the result or None if execution fails.
+    
+    The custom code has access to:
+    - fc: The statement dictionary with all properties including '_neuron'
+    - Any packages they import themselves
+    
+    The custom code must define a 'result' variable with the output.
+    """
+    try:
+        # Prepare execution context - only provide fc dict
+        exec_globals = {
+            'fc': statement,
+        }
+        exec_locals = {}
+        
+        # Execute the custom code
+        exec(relationship.custom_ingestion_code, exec_globals, exec_locals)
+        
+        # Get the result variable
+        if 'result' not in exec_locals:
+            log_custom_relationship_error(
+                logger_service,
+                f"Custom code for relationship '{relationship.title}' did not define 'result' variable",
+                statement.get(ID),
+                relationship.id,
+                {'relationship_title': relationship.title}
+            )
+            return None
+        
+        return exec_locals['result']
+        
+    except Exception as e:
+        log_custom_relationship_error(
+            logger_service,
+            f"Error executing custom code for relationship '{relationship.title}': {str(e)}",
+            statement.get(ID),
+            relationship.id,
+            {
+                'relationship_title': relationship.title,
+                'error': str(e),
+                'traceback': traceback.format_exc(),
+                'code': relationship.custom_ingestion_code
+            }
+        )
+        return None
+
+
+def process_triple_relationship(
+    connectivity_statement: ConnectivityStatement,
+    relationship: Relationship,
+    result: List[Dict],
+    logger_service: LoggerService,
+):
+    """
+    Process TRIPLE relationship results.
+    Expected result format: [{'name': str, 'uri': str}, ...]
+    """
+    if not isinstance(result, list):
+        result = [result]
+    
+    triples = []
+    for item in result:
+        if not isinstance(item, dict) or 'name' not in item or 'uri' not in item:
+            log_custom_relationship_error(
+                logger_service,
+                f"Invalid triple format for relationship '{relationship.title}': {item}",
+                connectivity_statement.reference_uri,
+                relationship.id,
+                {'item': str(item), 'relationship_title': relationship.title}
+            )
+            continue
+        
+        # Get or create the triple
+        triple, created = Triple.objects.get_or_create(
+            name=item['name'],
+            uri=item['uri'],
+            relationship=relationship
+        )
+        triples.append(triple)
+    
+    if triples:
+        # Get or create the ConnectivityStatementTriple
+        cs_triple, created = ConnectivityStatementTriple.objects.get_or_create(
+            connectivity_statement=connectivity_statement,
+            relationship=relationship
+        )
+        cs_triple.triples.set(triples)
+
+
+def process_text_relationship(
+    connectivity_statement: ConnectivityStatement,
+    relationship: Relationship,
+    result,
+):
+    """
+    Process TEXT relationship results.
+    Expected result format: string or list of strings
+    """
+    if isinstance(result, list):
+        text = ', '.join(str(item) for item in result)
+    else:
+        text = str(result)
+    
+    # Get or create the ConnectivityStatementText
+    cs_text, created = ConnectivityStatementText.objects.update_or_create(
+        connectivity_statement=connectivity_statement,
+        relationship=relationship,
+        defaults={'text': text}
+    )
+
+
+def process_anatomical_relationship(
+    connectivity_statement: ConnectivityStatement,
+    relationship: Relationship,
+    result: List[str],
+    logger_service: LoggerService,
+):
+    """
+    Process ANATOMICAL_ENTITY relationship results.
+    Expected result format: [uri1, uri2, ...]
+    """
+    if not isinstance(result, list):
+        result = [result]
+    
+    anatomical_entities = []
+    for uri in result:
+        try:
+            ae = AnatomicalEntity.objects.get_by_ontology_uri(str(uri))
+            anatomical_entities.append(ae)
+        except AnatomicalEntity.DoesNotExist:
+            log_custom_relationship_error(
+                logger_service,
+                f"Anatomical entity not found for URI '{uri}' in relationship '{relationship.title}'",
+                connectivity_statement.reference_uri,
+                relationship.id,
+                {'uri': str(uri), 'relationship_title': relationship.title}
+            )
+    
+    if anatomical_entities:
+        # Get or create the ConnectivityStatementAnatomicalEntity
+        cs_ae, created = ConnectivityStatementAnatomicalEntity.objects.get_or_create(
+            connectivity_statement=connectivity_statement,
+            relationship=relationship
+        )
+        cs_ae.anatomical_entities.set(anatomical_entities)
+
+
+def log_custom_relationship_error(
+    logger_service: LoggerService,
+    message: str,
+    statement_reference: str = None,
+    relationship_id: int = None,
+    details: dict = None,
+):
+    """
+    Log custom relationship errors using the LoggerService.
+    These errors are added to the anomalies log file.
+    """
+    from composer.services.cs_ingestion.models import LoggableAnomaly, Severity
+    
+    # Format detailed error message
+    error_msg = f"[CUSTOM_RELATIONSHIP] {message}"
+    if details:
+        error_msg += f" | Details: {details}"
+    
+    # Add to logger service as an anomaly
+    logger_service.add_anomaly(
+        LoggableAnomaly(
+            statement_id=statement_reference,
+            entity_id=str(relationship_id) if relationship_id else None,
+            message=error_msg,
+            severity=Severity.WARNING
+        )
+    )
 
 
 def update_many_to_many_fields(
@@ -181,6 +430,16 @@ def update_many_to_many_fields(
 
     for via in connectivity_statement.via_set.all():
         via.delete()
+    
+    # Clear dynamic relationship data
+    for cs_triple in connectivity_statement.connectivitystatementtriple_set.all():
+        cs_triple.delete()
+    
+    for cs_text in connectivity_statement.connectivitystatementtext_set.all():
+        cs_text.delete()
+    
+    for cs_ae in connectivity_statement.connectivitystatementanatomicalentity_set.all():
+        cs_ae.delete()
 
     add_origins(connectivity_statement, statement, update_anatomical_entities)
     add_vias(connectivity_statement, statement, update_anatomical_entities)

@@ -783,3 +783,475 @@ class TestIngestStatements(TestCase):
         )
 
 
+class TestDynamicRelationships(TestCase):
+    """Test custom ingestion code for dynamic relationships"""
+    
+    def flush_connectivity_statements(self):
+        ConnectivityStatement.objects.all().delete()
+    
+    def create_mock_neuron(self):
+        """Create a simple mock neuron object with core_graph"""
+        from unittest.mock import MagicMock
+        from rdflib import Graph, Namespace, URIRef, Literal
+        
+        # Create a mock neuron with core_graph
+        neuron = MagicMock()
+        neuron.identifier = URIRef('http://uri.interlex.org/composer/neuron/123')
+        neuron.id_ = 'http://uri.interlex.org/composer/neuron/123'
+        
+        # Create a simple RDF graph with some test data
+        graph = Graph()
+        ilxtr = Namespace('http://uri.interlex.org/tgbugs/uris/readable/')
+        
+        # Add some test triples
+        neuron_uri = URIRef(str(neuron.identifier))
+        graph.add((neuron_uri, ilxtr.hasCustomProperty, Literal('test_value')))
+        graph.add((neuron_uri, ilxtr.hasCustomProperty, Literal('another_value')))
+        
+        neuron.core_graph = graph
+        
+        return neuron
+    
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_triple_relationship_with_custom_code(self, mock_get_statements):
+        """Test TRIPLE relationship type with custom ingestion code"""
+        from composer.models import Relationship, Triple, ConnectivityStatementTriple
+        from composer.enums import RelationshipType
+        
+        self.flush_connectivity_statements()
+        
+        # Create a relationship with custom code that returns triples
+        relationship = Relationship.objects.create(
+            title="Custom Triple Relationship",
+            predicate_name="hasCustomTriple",
+            predicate_uri="http://uri.interlex.org/test/hasCustomTriple",
+            type=RelationshipType.TRIPLE_MULTI,
+            order=1,
+            custom_ingestion_code="""
+# Simple example that creates triples from fc data
+result = [
+    {'name': 'Triple 1', 'uri': 'http://uri.interlex.org/test/triple1'},
+    {'name': 'Triple 2', 'uri': 'http://uri.interlex.org/test/triple2'}
+]
+"""
+        )
+        
+        statement_id = 'http://uri.interlex.org/composer/uris/set/test/1'
+        
+        # Create mock neuron
+        mock_neuron = self.create_mock_neuron()
+        
+        mock_statements = [
+            {
+                'id': statement_id,
+                'label': 'test neuron type',
+                'pref_label': 'test connectivity statement',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'test',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/test'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': [],
+                '_neuron': mock_neuron,
+            }
+        ]
+        mock_get_statements.return_value = mock_statements
+        
+        # Run ingestion
+        ingest_statements()
+        
+        # Verify statement was created
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertIsNotNone(statement)
+        
+        # Verify triples were created
+        self.assertEqual(Triple.objects.filter(relationship=relationship).count(), 2)
+        
+        # Verify ConnectivityStatementTriple was created and linked
+        cs_triple = ConnectivityStatementTriple.objects.get(
+            connectivity_statement=statement,
+            relationship=relationship
+        )
+        self.assertEqual(cs_triple.triples.count(), 2)
+        
+        # Verify triple content
+        triple_names = set(cs_triple.triples.values_list('name', flat=True))
+        self.assertEqual(triple_names, {'Triple 1', 'Triple 2'})
+    
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_text_relationship_with_custom_code(self, mock_get_statements):
+        """Test TEXT relationship type with custom ingestion code"""
+        from composer.models import Relationship, ConnectivityStatementText
+        from composer.enums import RelationshipType
+        
+        self.flush_connectivity_statements()
+        
+        # Create a relationship with custom code that returns text
+        relationship = Relationship.objects.create(
+            title="Custom Text Relationship",
+            predicate_name="hasCustomText",
+            predicate_uri="http://uri.interlex.org/test/hasCustomText",
+            type=RelationshipType.TEXT,
+            order=1,
+            custom_ingestion_code="""
+# Example that uses fc dict to generate text
+result = f"Neuron ID: {fc['id']}, Label: {fc['label']}"
+"""
+        )
+        
+        statement_id = 'http://uri.interlex.org/composer/uris/set/test/2'
+        
+        # Create mock neuron
+        mock_neuron = self.create_mock_neuron()
+        
+        mock_statements = [
+            {
+                'id': statement_id,
+                'label': 'test neuron label',
+                'pref_label': 'test connectivity statement',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'test',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/test'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': [],
+                '_neuron': mock_neuron,
+            }
+        ]
+        mock_get_statements.return_value = mock_statements
+        
+        # Run ingestion
+        ingest_statements()
+        
+        # Verify statement was created
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertIsNotNone(statement)
+        
+        # Verify text relationship was created
+        cs_text = ConnectivityStatementText.objects.get(
+            connectivity_statement=statement,
+            relationship=relationship
+        )
+        
+        # Verify text content includes data from fc dict
+        self.assertIn('test neuron label', cs_text.text)
+        self.assertIn(statement_id, cs_text.text)
+    
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_anatomical_relationship_with_custom_code(self, mock_get_statements):
+        """Test ANATOMICAL_ENTITY relationship type with custom ingestion code"""
+        from composer.models import Relationship, AnatomicalEntity, AnatomicalEntityMeta, ConnectivityStatementAnatomicalEntity
+        from composer.enums import RelationshipType
+        
+        self.flush_connectivity_statements()
+        
+        # Create some anatomical entities to reference
+        meta1 = AnatomicalEntityMeta.objects.create(
+            name="Test Entity 1",
+            ontology_uri='http://purl.obolibrary.org/obo/UBERON_0001234'
+        )
+        ae1 = AnatomicalEntity.objects.create(
+            simple_entity=meta1
+        )
+        meta2 = AnatomicalEntityMeta.objects.create(
+            name="Test Entity 2",
+            ontology_uri='http://purl.obolibrary.org/obo/UBERON_0005678'
+        )
+        ae2 = AnatomicalEntity.objects.create(
+            simple_entity=meta2
+        )
+        
+        # Create a relationship with custom code that returns anatomical entity URIs
+        relationship = Relationship.objects.create(
+            title="Custom Anatomical Relationship",
+            predicate_name="hasCustomAnatomy",
+            predicate_uri="http://uri.interlex.org/test/hasCustomAnatomy",
+            type=RelationshipType.ANATOMICAL_MULTI,
+            order=1,
+            custom_ingestion_code="""
+# Example that returns anatomical entity URIs
+result = [
+    'http://purl.obolibrary.org/obo/UBERON_0001234',
+    'http://purl.obolibrary.org/obo/UBERON_0005678'
+]
+"""
+        )
+        
+        statement_id = 'http://uri.interlex.org/composer/uris/set/test/3'
+        
+        # Create mock neuron
+        mock_neuron = self.create_mock_neuron()
+        
+        mock_statements = [
+            {
+                'id': statement_id,
+                'label': 'test neuron type',
+                'pref_label': 'test connectivity statement',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'test',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/test'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': [],
+                '_neuron': mock_neuron,
+            }
+        ]
+        mock_get_statements.return_value = mock_statements
+        
+        # Run ingestion
+        ingest_statements()
+        
+        # Verify statement was created
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertIsNotNone(statement)
+        
+        # Verify anatomical relationship was created
+        cs_ae = ConnectivityStatementAnatomicalEntity.objects.get(
+            connectivity_statement=statement,
+            relationship=relationship
+        )
+        
+        # Verify anatomical entities were linked
+        self.assertEqual(cs_ae.anatomical_entities.count(), 2)
+        linked_entities = set(cs_ae.anatomical_entities.values_list('simple_entity__ontology_uri', flat=True))
+        self.assertEqual(linked_entities, {
+            'http://purl.obolibrary.org/obo/UBERON_0001234',
+            'http://purl.obolibrary.org/obo/UBERON_0005678'
+        })
+    
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_custom_code_with_neuron_access(self, mock_get_statements):
+        """Test that custom code can access the _neuron object from fc dict"""
+        from composer.models import Relationship, ConnectivityStatementText
+        from composer.enums import RelationshipType
+        
+        self.flush_connectivity_statements()
+        
+        # Create a relationship with custom code that accesses the neuron object
+        relationship = Relationship.objects.create(
+            title="Neuron Access Relationship",
+            predicate_name="hasNeuronData",
+            predicate_uri="http://uri.interlex.org/test/hasNeuronData",
+            type=RelationshipType.TEXT,
+            order=1,
+            custom_ingestion_code="""
+# Example that accesses the neuron object
+neuron = fc['_neuron']
+# Access neuron properties
+result = f"Neuron ID: {neuron.identifier}, Has core_graph: {hasattr(neuron, 'core_graph')}"
+"""
+        )
+        
+        statement_id = 'http://uri.interlex.org/composer/uris/set/test/4'
+        
+        # Create mock neuron with RDF data
+        mock_neuron = self.create_mock_neuron()
+        
+        mock_statements = [
+            {
+                'id': statement_id,
+                'label': 'test neuron type',
+                'pref_label': 'test connectivity statement',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'test',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/test'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': [],
+                '_neuron': mock_neuron,
+            }
+        ]
+        mock_get_statements.return_value = mock_statements
+        
+        # Run ingestion
+        ingest_statements()
+        
+        # Verify statement was created
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertIsNotNone(statement)
+        
+        # Verify text relationship was created with neuron data
+        cs_text = ConnectivityStatementText.objects.get(
+            connectivity_statement=statement,
+            relationship=relationship
+        )
+        
+        # Verify the custom code accessed the neuron object
+        self.assertIn('Neuron ID:', cs_text.text)
+        self.assertIn('Has core_graph: True', cs_text.text)
+    
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_custom_code_error_handling(self, mock_get_statements):
+        """Test that errors in custom code are logged and don't break ingestion"""
+        from composer.models import Relationship
+        from composer.enums import RelationshipType
+        
+        self.flush_connectivity_statements()
+        
+        # Create a relationship with custom code that will raise an error
+        relationship = Relationship.objects.create(
+            title="Error Relationship",
+            predicate_name="hasError",
+            predicate_uri="http://uri.interlex.org/test/hasError",
+            type=RelationshipType.TEXT,
+            order=1,
+            custom_ingestion_code="""
+# This code will raise an error
+raise ValueError("Test error in custom code")
+result = "This won't be reached"
+"""
+        )
+        
+        statement_id = 'http://uri.interlex.org/composer/uris/set/test/5'
+        
+        # Create mock neuron
+        mock_neuron = self.create_mock_neuron()
+        
+        mock_statements = [
+            {
+                'id': statement_id,
+                'label': 'test neuron type',
+                'pref_label': 'test connectivity statement',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'test',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/test'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': [],
+                '_neuron': mock_neuron,
+            }
+        ]
+        mock_get_statements.return_value = mock_statements
+        
+        # Run ingestion - should not crash despite error in custom code
+        ingest_statements()
+        
+        # Verify statement was still created
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertIsNotNone(statement)
+        
+        # The relationship should not be created due to error
+        from composer.models import ConnectivityStatementText
+        cs_texts = ConnectivityStatementText.objects.filter(
+            connectivity_statement=statement,
+            relationship=relationship
+        )
+        self.assertEqual(cs_texts.count(), 0, "No text relationship should be created when custom code fails")
+    
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_custom_code_missing_result_variable(self, mock_get_statements):
+        """Test that custom code without 'result' variable is handled gracefully"""
+        from composer.models import Relationship, ConnectivityStatementText
+        from composer.enums import RelationshipType
+        
+        self.flush_connectivity_statements()
+        
+        # Create a relationship with custom code that doesn't define 'result'
+        relationship = Relationship.objects.create(
+            title="Missing Result Relationship",
+            predicate_name="hasMissingResult",
+            predicate_uri="http://uri.interlex.org/test/hasMissingResult",
+            type=RelationshipType.TEXT,
+            order=1,
+            custom_ingestion_code="""
+# This code doesn't define 'result' variable
+some_value = "This is not named 'result'"
+"""
+        )
+        
+        statement_id = 'http://uri.interlex.org/composer/uris/set/test/6'
+        
+        # Create mock neuron
+        mock_neuron = self.create_mock_neuron()
+        
+        mock_statements = [
+            {
+                'id': statement_id,
+                'label': 'test neuron type',
+                'pref_label': 'test connectivity statement',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'test',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/test'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': [],
+                '_neuron': mock_neuron,
+            }
+        ]
+        mock_get_statements.return_value = mock_statements
+        
+        # Run ingestion
+        ingest_statements()
+        
+        # Verify statement was created
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertIsNotNone(statement)
+        
+        # The relationship should not be created due to missing 'result'
+        cs_texts = ConnectivityStatementText.objects.filter(
+            connectivity_statement=statement,
+            relationship=relationship
+        )
+        self.assertEqual(cs_texts.count(), 0, "No text relationship should be created when 'result' is not defined")
+
+

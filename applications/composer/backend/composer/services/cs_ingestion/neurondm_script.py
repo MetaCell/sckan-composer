@@ -109,6 +109,8 @@ def for_composer(n, statement_alert_uris: Set[str] = None):
         note_alert=lrdf(n, ilxtr.alertNote),
         validation_errors=validation_errors,
         statement_alerts=statement_alerts,
+        # Expose neuron object for custom relationship processing
+        _neuron=n,
     )
 
     return fc
