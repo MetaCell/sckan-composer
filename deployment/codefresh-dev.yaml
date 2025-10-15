@@ -169,6 +169,27 @@ steps:
                 == true
               forceNoCache: includes('${{COMPOSER_TAG_FORCE_BUILD}}', '{{COMPOSER_TAG_FORCE_BUILD}}')
                 == false
+      composer-neurondm:
+        type: build
+        stage: build
+        dockerfile: Dockerfile
+        registry: '${{CODEFRESH_REGISTRY}}'
+        buildkit: true
+        build_arguments:
+        - DOMAIN=${{DOMAIN}}
+        - NOCACHE=${{CF_BUILD_ID}}
+        - REGISTRY=${{REGISTRY}}/cloudharness/
+        image_name: cloudharness/composer-neurondm
+        title: Composer neurondm
+        working_directory: ./applications/composer/tasks/neurondm
+        tag: '${{COMPOSER_NEURONDM_TAG}}'
+        when:
+          condition:
+            any:
+              buildDoesNotExist: includes('${{COMPOSER_NEURONDM_TAG_EXISTS}}', '{{COMPOSER_NEURONDM_TAG_EXISTS}}')
+                == true
+              forceNoCache: includes('${{COMPOSER_NEURONDM_TAG_FORCE_BUILD}}', '{{COMPOSER_NEURONDM_TAG_FORCE_BUILD}}')
+                == false
       composer-notify:
         type: build
         stage: build
@@ -257,6 +278,14 @@ steps:
         type: push
         title: Composer
         candidate: '${{REGISTRY}}/cloudharness/composer:${{COMPOSER_TAG}}'
+        tags:
+        - '${{DEPLOYMENT_PUBLISH_TAG}}'
+        registry: '${{REGISTRY_PUBLISH_URL}}'
+      publish_composer-neurondm:
+        stage: publish
+        type: push
+        title: Composer neurondm
+        candidate: '${{REGISTRY}}/cloudharness/composer-neurondm:${{COMPOSER_NEURONDM_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         registry: '${{REGISTRY_PUBLISH_URL}}'
