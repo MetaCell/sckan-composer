@@ -1,0 +1,142 @@
+{% extends "admin/base.html" %}
+{% load i18n static jazzmin composer_extras %}
+{% get_jazzmin_ui_tweaks as jazzmin_ui %}
+
+{% block bodyclass %}{{ block.super }} connectivity-statements-ingestion{% endblock %}
+
+{% block content_title %} {% trans 'Connectivity Statements Ingestion' %} {% endblock %}
+
+{% block breadcrumbs %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin:index' %}">{% trans 'Home' %}</a></li>
+        <li class="breadcrumb-item">{% trans 'Connectivity Statements Ingestion' %}</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+<div class="col-lg-9 col-12">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="m-0">Ingest Connectivity Statements from neurondm</h5>
+    </div>
+    <div class="card-body">
+      <p>Configure and trigger the ingestion of connectivity statements from the neurondm repository.</p>
+      <p><strong>Note:</strong> This process may take several minutes to complete. The ingestion will run synchronously in the server.</p>
+      
+      <form id="ingest-statements-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+          <h6 class="mb-3">Boolean Options</h6>
+          
+          <div class="form-check">
+            {{ form.update_upstream }}
+            <label class="form-check-label" for="{{ form.update_upstream.id_for_label }}">
+              {{ form.update_upstream.label }}
+            </label>
+            <small class="form-text text-muted">{{ form.update_upstream.help_text }}</small>
+          </div>
+          
+          <div class="form-check">
+            {{ form.update_anatomical_entities }}
+            <label class="form-check-label" for="{{ form.update_anatomical_entities.id_for_label }}">
+              {{ form.update_anatomical_entities.label }}
+            </label>
+            <small class="form-text text-muted">{{ form.update_anatomical_entities.help_text }}</small>
+          </div>
+          
+          <div class="form-check">
+            {{ form.disable_overwrite }}
+            <label class="form-check-label" for="{{ form.disable_overwrite.id_for_label }}">
+              {{ form.disable_overwrite.label }}
+            </label>
+            <small class="form-text text-muted">{{ form.disable_overwrite.help_text }}</small>
+          </div>
+        </div>
+        
+        <hr>
+        
+        <div class="form-group">
+          <h6 class="mb-3">Import Configuration</h6>
+          
+          <div class="mb-3">
+            <label for="{{ form.full_imports.id_for_label }}">{{ form.full_imports.label }}</label>
+            {{ form.full_imports }}
+            <small class="form-text text-muted">{{ form.full_imports.help_text }}</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="{{ form.label_imports.id_for_label }}">{{ form.label_imports.label }}</label>
+            {{ form.label_imports }}
+            <small class="form-text text-muted">{{ form.label_imports.help_text }}</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="{{ form.population_file.id_for_label }}">{{ form.population_file.label }}</label>
+            {{ form.population_file }}
+            <small class="form-text text-muted">{{ form.population_file.help_text }}</small>
+          </div>
+        </div>
+        
+        <hr>
+        
+        <button type="button" id="ingest-button" class="btn {{ jazzmin_ui.button_classes.success }}">
+          Start Ingestion
+          <span id="spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+        </button>
+        
+        <a href="{% url 'admin:index' %}" class="btn {{ jazzmin_ui.button_classes.secondary }}">Cancel</a>
+      </form>
+      
+      <div id="result-message" style="margin-top: 2em; display: none;">
+        <div id="result-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/admin/js/vendor/jquery/jquery.js"></script>
+<script type="text/javascript">
+  jQuery(document).ready(function() {
+    jQuery('#ingest-button').on('click', function(e) {
+      e.preventDefault();
+      
+      // Confirm before starting
+      if (!confirm('Are you sure you want to start the ingestion process? This may take several minutes.')) {
+        return;
+      }
+      
+      // Show spinner and disable button
+      jQuery('#spinner').show();
+      jQuery('#ingest-button').prop('disabled', true);
+      jQuery('#result-message').hide();
+      
+      // Get form data
+      var formData = new FormData(jQuery('#ingest-statements-form')[0]);
+      
+      // Make AJAX request to the ingestion endpoint
+      jQuery.ajax({
+        url: '/composer/ingest-statements',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(data, textStatus, request) {
+          jQuery('#result-content').html('<div class="alert alert-success" role="alert"><strong>Success!</strong> Connectivity statements ingestion completed successfully.</div>');
+          jQuery('#result-message').show();
+        },
+        error: function(xhr, status, error) {
+          var errorMessage = xhr.responseText || 'An unknown error occurred.';
+          jQuery('#result-content').html('<div class="alert alert-danger" role="alert"><strong>Error!</strong> ' + errorMessage + '</div>');
+          jQuery('#result-message').show();
+        },
+        complete: function() {
+          jQuery('#spinner').hide();
+          jQuery('#ingest-button').prop('disabled', false);
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}

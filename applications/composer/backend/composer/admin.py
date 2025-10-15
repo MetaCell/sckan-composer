@@ -473,6 +473,45 @@ class IngestSentenceForm(forms.Form):
     file = forms.FileField(label="CSV file")
 
 
+class IngestStatementsForm(forms.Form):
+    """Form for configuring connectivity statement ingestion parameters"""
+    update_upstream = forms.BooleanField(
+        required=False,
+        initial=False,
+        label="Update upstream statements",
+        help_text="Set this flag to update upstream statements."
+    )
+    update_anatomical_entities = forms.BooleanField(
+        required=False,
+        initial=False,
+        label="Update anatomical entities",
+        help_text="Set this flag to try move anatomical entities to specific layer, region."
+    )
+    disable_overwrite = forms.BooleanField(
+        required=False,
+        initial=False,
+        label="Disable overwrite",
+        help_text="Set this flag to prevent overwriting existing statements."
+    )
+    full_imports = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Enter URIs separated by commas or new lines'}),
+        label="Full imports",
+        help_text="List of full imports to include in the ingestion (comma or newline separated)."
+    )
+    label_imports = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Enter labels separated by commas or new lines'}),
+        label="Label imports",
+        help_text="List of label imports to include in the ingestion (comma or newline separated)."
+    )
+    population_file = forms.FileField(
+        required=False,
+        label="Population file",
+        help_text="Text file containing population URIs (one per line). Only statements matching these URIs will be processed."
+    )
+
+
 # Custom view for ingesting sentences from a CSV file
 def ingest_sentences_view(request):
     output = None
@@ -519,11 +558,36 @@ def download_logs_view(request):
     return render(request, "admin/download_logs.html", context)
 
 
+# Custom view for ingesting connectivity statements
+def ingest_statements_view(request):
+    """
+    Admin page for configuring and triggering connectivity statement ingestion.
+    """
+    context = admin.site.each_context(request)
+    if request.method == "POST":
+        form = IngestStatementsForm(request.POST, request.FILES)
+        if form.is_valid():
+            context.update({
+                "form": form,
+                "title": "Ingest Connectivity Statements",
+            })
+            return render(request, "admin/ingest_statements.html", context)
+    else:
+        form = IngestStatementsForm()
+    
+    context.update({
+        "form": form,
+        "title": "Ingest Connectivity Statements",
+    })
+    return render(request, "admin/ingest_statements.html", context)
+
+
 def custom_admin_urls(original_get_urls):
     def get_urls():
         urls = original_get_urls()
         custom_urls = [
             path('ingest-sentences/', admin.site.admin_view(ingest_sentences_view), name='ingest-sentences'),
+            path('ingest-statements/', admin.site.admin_view(ingest_statements_view), name='ingest-statements'),
             path('download-logs/', admin.site.admin_view(download_logs_view), name='download-logs'),
         ]
         return custom_urls + urls
