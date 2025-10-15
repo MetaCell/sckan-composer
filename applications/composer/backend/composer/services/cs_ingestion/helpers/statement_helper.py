@@ -69,7 +69,7 @@ def create_or_update_connectivity_statement(
     sentence: Sentence,
     update_anatomical_entities: bool,
     logger_service: LoggerService,
-    population_uris: set = None,
+    force_state_transition: bool = False,
 ) -> Tuple[ConnectivityStatement, bool]:
     """
     Create or update a connectivity statement from ingested data.
@@ -79,8 +79,8 @@ def create_or_update_connectivity_statement(
         sentence: The associated sentence object
         update_anatomical_entities: Whether to update anatomical entity relationships
         logger_service: Service for logging anomalies
-        population_uris: Set of URIs from population file. When provided, the system_exported
-                        transition is used to allow state changes from any state.
+        force_state_transition: If True, allows state transitions from any state (e.g., TO_BE_REVIEWED -> EXPORTED).
+                               Use when ingesting pre-filtered populations.
     
     Returns:
         Tuple of (ConnectivityStatement, created) where created is True if new
@@ -120,8 +120,8 @@ def create_or_update_connectivity_statement(
     validation_errors = statement.get(VALIDATION_ERRORS, ValidationErrors())
 
     # State transitions: Handle validation errors and state updates
-    # When population_uris is provided (population file used), use system_exported
-    # transition to allow state changes from any state
+    # When force_state_transition is True, use system_exported transition 
+    # to allow state changes from any state (e.g., TO_BE_REVIEWED -> EXPORTED)
     if validation_errors.has_errors():
         error_message = validation_errors.to_string()
         if connectivity_statement.state != CSState.INVALID:
@@ -130,9 +130,9 @@ def create_or_update_connectivity_statement(
             create_invalid_note(connectivity_statement, error_message)
     else:
         # Statement is valid - attempt transition to EXPORTED
-        # Use system_exported transition when population_uris is provided
+        # Use system_exported transition when force_state_transition is True
         # This allows transitioning from any state (e.g., TO_BE_REVIEWED -> EXPORTED)
-        if population_uris is not None:
+        if force_state_transition:
             if connectivity_statement.state != CSState.EXPORTED:
                 transition_success, error_message = do_system_transition_to_exported(connectivity_statement)
                 if not transition_success:
@@ -178,24 +178,24 @@ def process_dynamic_relationships(
     logger_service: LoggerService,
 ):
     """
-    Process relationships that have custom ingestion code.
-    Execute the custom code safely and create the appropriate entities.
+    Reads pre-computed results from Step 1 and creates database entities.
     """
-    # Get all relationships that have custom code
-    relationships_with_code = Relationship.objects.filter(
-        custom_ingestion_code__isnull=False
-    ).exclude(custom_ingestion_code='')
+    # Get pre-computed custom relationship results from Step 1
+    custom_results = statement.get('_custom_relationship_results', {})
     
-    for relationship in relationships_with_code:
+    if not custom_results:
+        return
+    
+    # Get all relationships to map IDs to objects
+    relationship_ids = list(custom_results.keys())
+    relationships = {r.id: r for r in Relationship.objects.filter(id__in=relationship_ids)}
+    
+    for relationship_id, result in custom_results.items():
+        relationship = relationships.get(relationship_id)
+        if not relationship:
+            continue
+            
         try:
-            # Execute custom code safely
-            result = execute_custom_relationship_code(
-                relationship, statement, logger_service
-            )
-            
-            if result is None:
-                continue
-            
             # Process result based on relationship type
             if relationship.type == RelationshipType.TRIPLE_MULTI or relationship.type == RelationshipType.TRIPLE_SINGLE:
                 process_triple_relationship(connectivity_statement, relationship, result, logger_service)
@@ -225,60 +225,6 @@ def process_dynamic_relationships(
                     'traceback': traceback.format_exc()
                 }
             )
-
-
-def execute_custom_relationship_code(
-    relationship: Relationship,
-    statement: Dict,
-    logger_service: LoggerService,
-) -> any:
-    """
-    Execute custom Python code for a relationship.
-    Returns the result or None if execution fails.
-    
-    The custom code has access to:
-    - fc: The statement dictionary with all properties including '_neuron'
-    - Any packages they import themselves
-    
-    The custom code must define a 'result' variable with the output.
-    """
-    try:
-        # Prepare execution context - only provide fc dict
-        exec_globals = {
-            'fc': statement,
-        }
-        exec_locals = {}
-        
-        # Execute the custom code
-        exec(relationship.custom_ingestion_code, exec_globals, exec_locals)
-        
-        # Get the result variable
-        if 'result' not in exec_locals:
-            log_custom_relationship_error(
-                logger_service,
-                f"Custom code for relationship '{relationship.title}' did not define 'result' variable",
-                statement.get(ID),
-                relationship.id,
-                {'relationship_title': relationship.title}
-            )
-            return None
-        
-        return exec_locals['result']
-        
-    except Exception as e:
-        log_custom_relationship_error(
-            logger_service,
-            f"Error executing custom code for relationship '{relationship.title}': {str(e)}",
-            statement.get(ID),
-            relationship.id,
-            {
-                'relationship_title': relationship.title,
-                'error': str(e),
-                'traceback': traceback.format_exc(),
-                'code': relationship.custom_ingestion_code
-            }
-        )
-        return None
 
 
 def process_triple_relationship(

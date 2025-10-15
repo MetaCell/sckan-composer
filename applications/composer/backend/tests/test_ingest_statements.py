@@ -93,7 +93,10 @@ class TestIngestStatements(TestCase):
         mock_statements[1]['pref_label'] = "Updated knowledge statement 2"
         
         # Test: Only statement_1 should be updated when using population_uris
+        # Mock must return filtered results because we're mocking get_statements_from_neurondm
+        # which includes the filtering logic that happens in Step 1
         population_uris = {statement_id_1}
+        mock_get_statements.return_value = [mock_statements[0]]  # Return only filtered statement
         ingest_statements(population_uris=population_uris)
         
         # Verify results
@@ -103,7 +106,7 @@ class TestIngestStatements(TestCase):
         # Statement 1 should be updated because it was in population_uris
         self.assertEqual(updated_statement_1.knowledge_statement, "Updated knowledge statement 1")
         
-        # Statement 2 should NOT be updated because it wasn't in population_uris and has non-overwritable state (NPO_APPROVED)
+        # Statement 2 should NOT be updated because it wasn't in population_uris
         self.assertEqual(updated_statement_2.knowledge_statement, "Original knowledge statement 2")
 
     @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
@@ -191,12 +194,14 @@ class TestIngestStatements(TestCase):
                 'statement_alerts': []
             }
         ]
-        mock_get_statements.return_value = mock_statements
+        # Mock must return empty list because we're mocking get_statements_from_neurondm
+        # which includes the filtering logic (population_uris=set() filters everything out)
+        mock_get_statements.return_value = []
         
-        # Test with empty population_uris set (should filter everything)
+        # Test with empty population_uris set
         ingest_statements(population_uris=set())
         
-        # Verify no statements were created (empty set = empty filter)
+        # Verify no statements were created
         self.assertEqual(ConnectivityStatement.objects.count(), 0)
 
     @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
@@ -316,7 +321,9 @@ class TestIngestStatements(TestCase):
                 'statement_alerts': []
             }
         ]
-        mock_get_statements.return_value = mock_statements
+        # Mock must return filtered statements because we're mocking get_statements_from_neurondm
+        # which includes the filtering logic that happens in neurondm_script.py
+        mock_get_statements.return_value = [mock_statements[0], mock_statements[2]]  # Only liver and brain
         
         # Test: Only statements in population_uris should be processed
         population_uris = {statement_id_1, statement_id_3}  # Only liver and brain, not heart
@@ -327,7 +334,7 @@ class TestIngestStatements(TestCase):
         
         # Verify the correct statements exist
         self.assertTrue(ConnectivityStatement.objects.filter(reference_uri=statement_id_1).exists())
-        self.assertFalse(ConnectivityStatement.objects.filter(reference_uri=statement_id_2).exists())  # heart should not exist
+        self.assertFalse(ConnectivityStatement.objects.filter(reference_uri=statement_id_2).exists())  # heart not in mock return
         self.assertTrue(ConnectivityStatement.objects.filter(reference_uri=statement_id_3).exists())
 
     @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
@@ -446,7 +453,10 @@ class TestIngestStatements(TestCase):
                 'statement_alerts': []
             }
         ]
-        mock_get_statements.return_value = mock_statements
+        # Mock must return different results for each call because we're mocking get_statements_from_neurondm
+        # First call (None): return all statements (no filtering)
+        # Second call (empty set): return empty list (everything filtered out)
+        mock_get_statements.side_effect = [mock_statements, []]
         
         # Test 1: None means no population file was provided - process all statements
         ingest_statements(population_uris=None)
@@ -454,7 +464,7 @@ class TestIngestStatements(TestCase):
         
         self.flush_connectivity_statements()
         
-        # Test 2: Empty set means population file was provided but empty - process no statements  
+        # Test 2: Empty set means population file was provided but empty - process no statements
         ingest_statements(population_uris=set())
         self.assertEqual(ConnectivityStatement.objects.count(), 0, "Empty set should process no statements")
 
@@ -863,6 +873,13 @@ result = [
                 'validation_errors': ValidationErrors(),
                 'statement_alerts': [],
                 '_neuron': mock_neuron,
+                # Pre-computed custom relationship results (from Step 1)
+                '_custom_relationship_results': {
+                    relationship.id: [
+                        {'name': 'Triple 1', 'uri': 'http://uri.interlex.org/test/triple1'},
+                        {'name': 'Triple 2', 'uri': 'http://uri.interlex.org/test/triple2'}
+                    ]
+                }
             }
         ]
         mock_get_statements.return_value = mock_statements
@@ -936,6 +953,10 @@ result = f"Neuron ID: {fc['id']}, Label: {fc['label']}"
                 'validation_errors': ValidationErrors(),
                 'statement_alerts': [],
                 '_neuron': mock_neuron,
+                # Pre-computed custom relationship results (from Step 1)
+                '_custom_relationship_results': {
+                    relationship.id: f"Neuron ID: {statement_id}, Label: test neuron label"
+                }
             }
         ]
         mock_get_statements.return_value = mock_statements
@@ -1024,6 +1045,13 @@ result = [
                 'validation_errors': ValidationErrors(),
                 'statement_alerts': [],
                 '_neuron': mock_neuron,
+                # Pre-computed custom relationship results (from Step 1)
+                '_custom_relationship_results': {
+                    relationship.id: [
+                        'http://purl.obolibrary.org/obo/UBERON_0001234',
+                        'http://purl.obolibrary.org/obo/UBERON_0005678'
+                    ]
+                }
             }
         ]
         mock_get_statements.return_value = mock_statements
@@ -1099,6 +1127,10 @@ result = f"Neuron ID: {neuron.identifier}, Has core_graph: {hasattr(neuron, 'cor
                 'validation_errors': ValidationErrors(),
                 'statement_alerts': [],
                 '_neuron': mock_neuron,
+                # Pre-computed custom relationship results (from Step 1)
+                '_custom_relationship_results': {
+                    relationship.id: f"Neuron ID: {mock_neuron.identifier}, Has core_graph: True"
+                }
             }
         ]
         mock_get_statements.return_value = mock_statements
@@ -1169,6 +1201,8 @@ result = "This won't be reached"
                 'validation_errors': ValidationErrors(),
                 'statement_alerts': [],
                 '_neuron': mock_neuron,
+                # No custom relationship results because the code raised an error
+                '_custom_relationship_results': {}
             }
         ]
         mock_get_statements.return_value = mock_statements
@@ -1236,6 +1270,8 @@ some_value = "This is not named 'result'"
                 'validation_errors': ValidationErrors(),
                 'statement_alerts': [],
                 '_neuron': mock_neuron,
+                # No custom relationship results because 'result' was not defined
+                '_custom_relationship_results': {}
             }
         ]
         mock_get_statements.return_value = mock_statements

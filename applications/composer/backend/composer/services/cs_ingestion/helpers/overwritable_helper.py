@@ -34,11 +34,11 @@ def filter_statements_by_population_uris(statements_list, population_uris):
     ]
 
 
-def get_overwritable_and_new_statements(statements_list: List[Dict[str, Any]], disable_overwrite: bool=False, population_uris: Optional[Set[str]]=None) -> List[Dict[str, Any]]:
+def get_overwritable_and_new_statements(statements_list: List[Dict[str, Any]], disable_overwrite: bool=False, force_overwrite: bool=False) -> List[Dict[str, Any]]:
     
     overwritable_and_new_statements = [
         statement for statement in statements_list
-        if is_new_or_overwritable_statement(statement, disable_overwrite, population_uris)
+        if is_new_or_overwritable_statement(statement, disable_overwrite, force_overwrite)
     ]
     return overwritable_and_new_statements
 
@@ -56,11 +56,15 @@ def is_new_or_overwritable_sentence(statement: Dict, disable_overwrite: bool) ->
     return can_sentence_be_overwritten(sentence, statement)
 
 
-def is_new_or_overwritable_statement(statement: Dict, disable_overwrite: bool, population_uris: Optional[Set[str]]=None) -> bool:
+def is_new_or_overwritable_statement(statement: Dict, disable_overwrite: bool, force_overwrite: bool=False) -> bool:
     """
     If disable_overwrite is True, then the statement is considered invalid for overwriting - if it already exists in the database.
-    However, statements with URIs in population_uris should be updatable regardless of their status (unless disable_overwrite is True).
-    Note: When population_uris is provided, statement filtering is done at the service layer.
+    However, if force_overwrite is True, statements should be updatable regardless of their status (unless disable_overwrite is True).
+    
+    Args:
+        statement: The statement dictionary
+        disable_overwrite: If True, prevents all overwrites
+        force_overwrite: If True, allows overwriting statements in any state (e.g., when ingesting pre-filtered populations)
     """
     
     statement_uri = statement[ID]
@@ -68,12 +72,12 @@ def is_new_or_overwritable_statement(statement: Dict, disable_overwrite: bool, p
     try:
         connectivity_statement = ConnectivityStatement.objects.get(reference_uri=statement_uri)
         
-        # If disable_overwrite is True, then no overwrites should happen, not even the ones from the population file
+        # If disable_overwrite is True, then no overwrites should happen
         if disable_overwrite:
             return False
             
-        # If the statement URI is in the population_uris set, it should be updatable regardless of status
-        if population_uris is not None and statement_uri in population_uris:
+        # If force_overwrite is True, allow overwriting regardless of state
+        if force_overwrite:
             return True
             
     except ConnectivityStatement.DoesNotExist:
