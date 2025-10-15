@@ -2,16 +2,19 @@ ARG COMPOSER
 FROM $COMPOSER as composer-files
 
 # Stage 2: Build the lightweight neurondm task image
-FROM python:3.9-slim
+FROM python:3.12-slim
 
 WORKDIR /usr/src/app
 
-# Install system dependencies
+# Install system dependencies including build tools needed for pyxattr
 RUN apt-get update && apt-get install -y \
     git \
+    gcc \
+    python3-dev \
+    libattr1-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install ONLY neurondm and pyontutils packages (not full Django app)
+# Install ONLY neurondm and pyontutils packages
 RUN pip install --no-cache-dir \
     neurondm==0.1.8 \
     pyontutils==0.1.38 \
@@ -36,10 +39,9 @@ COPY process_neurondm_standalone.py /usr/src/app/
 # Clone NIF-Ontology repository (required by neurondm)
 RUN git clone -b neurons https://github.com/SciCrunch/NIF-Ontology.git /usr/src/app/NIF-Ontology
 
-# Set ontology local repo (no need for pip install -e . since we're not installing Django app)
+# Set ontology local repo
 RUN ontutils set ontology-local-repo /usr/src/app/NIF-Ontology/
 
-# No Django environment variables needed!
 ENV PYTHONUNBUFFERED=1
 
 CMD ["python", "process_neurondm_standalone.py"]
