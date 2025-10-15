@@ -124,7 +124,6 @@ class RelationshipAdmin(admin.ModelAdmin):
             'fields': ('custom_ingestion_code',),
             'description': (
                 'Add custom Python code to extract data from NeuroDM during ingestion. '
-                'Leave empty to use default behavior. See field help text for details.'
             ),
         }),
     )
@@ -137,6 +136,17 @@ class RelationshipAdmin(admin.ModelAdmin):
                 'cols': 100,
                 'style': 'font-family: monospace; font-size: 12px;'
             })
+            form.base_fields['custom_ingestion_code'].help_text = mark_safe(
+                "Optional Python code to extract data from NeuroDM for this relationship during ingestion.<br>"
+                "The code has access to:<br>"
+                "• <code>fc</code>: dict with neuron properties (id, label, species, phenotype, etc.)<br>"
+                "• <code>fc[\"_neuron\"]</code>: the NeuroDM neuron object<br><br>"
+                "The code must define a <code>result</code> variable with the output:<br>"
+                "• For TRIPLE relationships: list of dicts [{'name': str, 'uri': str}, ...]<br>"
+                "• For TEXT relationships: list of strings or single string<br>"
+                "• For ANATOMICAL_ENTITY relationships: list of URIs (strings)<br><br>"
+                "Errors are logged to the ingestion anomalies file and the relationship will be skipped."
+            )
         return form
     
     @admin.display(description="Has Custom Code", boolean=True)
