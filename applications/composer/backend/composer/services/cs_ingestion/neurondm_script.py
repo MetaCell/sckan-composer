@@ -8,7 +8,6 @@ from neurondm.core import Config, graphBase
 from neurondm.core import OntTerm, OntId, RDFL
 from pyontutils.core import OntGraph, OntResIri, OntResPath
 from pyontutils.namespaces import rdfs, ilxtr
-from django.core.management.base import BaseCommand, CommandError
 import logging
 import re
 

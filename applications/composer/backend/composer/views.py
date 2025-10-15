@@ -3,9 +3,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
 from composer.services.workflows.export import run_export_workflow
+from composer.services.workflows.ingestion import run_ingestion_workflow
+from composer.constants import INGESTION_UPLOADS_DIR
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
-from django.core.management import call_command
 import os
 from django.conf import settings
 
@@ -60,11 +61,16 @@ def ingest_statements(request):
     """
     Triggers the ingestion of connectivity statements from neurondm.
     Accepts parameters to configure the ingestion process.
+    The ingestion runs asynchronously via Argo workflow and notifies the user by email upon completion.
     """
     user = request.user
 
     if not user.is_staff:
         return HttpResponse("Unauthorized", status=401)
+
+    if not user.email:
+        messages.error(request, "Ingestion failed: your account does not have an email address configured.")
+        return HttpResponse("Missing user email", status=400)
 
     try:
         # Parse form data
@@ -92,35 +98,27 @@ def ingest_statements(request):
         population_file_path = None
         if 'population_file' in request.FILES:
             uploaded_file = request.FILES['population_file']
-            upload_dir = os.path.join(settings.MEDIA_ROOT, "ingestion_uploads")
+            upload_dir = os.path.join(settings.MEDIA_ROOT, INGESTION_UPLOADS_DIR)
             os.makedirs(upload_dir, exist_ok=True)
             population_file_path = os.path.join(upload_dir, uploaded_file.name)
             with open(population_file_path, 'wb+') as destination:
                 for chunk in uploaded_file.chunks():
                     destination.write(chunk)
         
-        # Build command arguments
-        command_args = []
-        if update_upstream:
-            command_args.append('--update_upstream')
-        if update_anatomical_entities:
-            command_args.append('--update_anatomical_entities')
-        if disable_overwrite:
-            command_args.append('--disable_overwrite')
-        if full_imports:
-            command_args.extend(['--full_imports'] + full_imports)
-        if label_imports:
-            command_args.extend(['--label_imports'] + label_imports)
-        if population_file_path:
-            command_args.extend(['--population_file', population_file_path])
+        # Run the ingestion workflow asynchronously
+        run_ingestion_workflow(
+            user=user,
+            update_upstream=update_upstream,
+            update_anatomical_entities=update_anatomical_entities,
+            disable_overwrite=disable_overwrite,
+            full_imports=full_imports,
+            label_imports=label_imports,
+            population_file_path=population_file_path,
+        )
         
-        # Call the management command
-        # For now, run synchronously. Later this will be moved to a workflow
-        call_command('ingest_statements', *command_args)
-        
-        messages.success(request, "Connectivity statements ingestion completed successfully.")
-        return HttpResponse("Ingestion completed", status=200)
+        messages.success(request, "Ingestion process started. You will receive an email when it is complete.")
+        return HttpResponse("Ingestion started", status=202)
     
     except Exception as e:
-        messages.error(request, f"Ingestion failed: {str(e)}")
-        return HttpResponse(f"Ingestion failed: {str(e)}", status=500)
+        messages.error(request, f"Failed to start ingestion: {str(e)}")
+        return HttpResponse(f"Failed to start ingestion: {str(e)}", status=500)

@@ -22,21 +22,13 @@ from .neurondm_script import main as get_statements_from_neurondm
 logger_service = LoggerService()
 
 
-def step1_process_neurondm(
-    full_imports=[],
-    label_imports=[],
-    population_uris=None,
-    logger_service_param=None,
-):
+def get_composer_data():
     """
-    Step 1: Process NeuroDM neurons, execute custom code, filter by population.
-    This step does NOT access the database for ingestion, only for querying custom relationships.
+    Get all composer data from the database (custom relationships and alert URIs).
+    This step MUST run in the Django environment.
     
-    Returns: List of composer statement dictionaries
+    Returns: Dict with 'custom_relationships' and 'statement_alert_uris'
     """
-    if logger_service_param is None:
-        logger_service_param = LoggerService()
-    
     custom_relationships = list(
         Relationship.objects.filter(
             custom_ingestion_code__isnull=False
@@ -44,12 +36,50 @@ def step1_process_neurondm(
             custom_ingestion_code=''
         ).values('id', 'title', 'type', 'custom_ingestion_code')
     )
+    
+    statement_alert_uris = list(AlertType.objects.values_list("uri", flat=True))
+    
+    return {
+        'custom_relationships': custom_relationships,
+        'statement_alert_uris': statement_alert_uris,
+    }
+
+
+def process_neurondm(
+    full_imports=[],
+    label_imports=[],
+    population_uris=None,
+    composer_data=None,
+    logger_service_param=None,
+):
+    """
+    Process NeuroDM neurons, execute custom code, filter by population.
+    This is a thin wrapper around get_statements_from_neurondm.
+    
+    Args:
+        full_imports: List of full imports
+        label_imports: List of label imports
+        population_uris: Set of population URIs to filter (None means all)
+        composer_data: Dict with 'custom_relationships' and 'statement_alert_uris' (will query from DB if None)
+        logger_service_param: Logger service instance (optional)
+        
+    Returns: List of composer statement dictionaries
+    """
+    if logger_service_param is None:
+        logger_service_param = LoggerService()
+    
+    # If composer_data not provided, get it from database
+    if composer_data is None:
+        composer_data = get_composer_data()
+    
+    custom_relationships = composer_data.get('custom_relationships', [])
+    statement_alert_uris = set(composer_data.get('statement_alert_uris', []))
 
     statements_list = get_statements_from_neurondm(
         full_imports=full_imports,
         label_imports=label_imports,
         logger_service_param=logger_service_param,
-        statement_alert_uris=set(AlertType.objects.values_list("uri", flat=True)),
+        statement_alert_uris=statement_alert_uris,
         population_uris=population_uris,
         custom_relationships=custom_relationships,
     )
@@ -57,7 +87,7 @@ def step1_process_neurondm(
     return statements_list
 
 
-def step2_ingest_to_database(
+def ingest_to_database(
     statements_list,
     update_upstream=False,
     update_anatomical_entities=False,
@@ -66,10 +96,10 @@ def step2_ingest_to_database(
     logger_service_param=None,
 ):
     """
-    Step 2: Validate and ingest statements into the database.
+    Validate and ingest statements into the database.
     
     Args:
-        statements_list: List of composer statement dictionaries from Step 1
+        statements_list: List of composer statement dictionaries from process_neurondm
         update_upstream: Whether to update upstream statements after ingestion
         update_anatomical_entities: Whether to update anatomical entities
         disable_overwrite: Whether to disable overwriting existing statements
@@ -131,20 +161,24 @@ def ingest_statements(
     population_uris=None,
 ):
     """
-    Complete ingestion process: runs both Step 1 (NeuroDM processing) and Step 2 (database ingestion).
+    Complete ingestion process: runs all 3 steps.
     This is a convenience wrapper that maintains backward compatibility.
     """
-    # Step 1: Process NeuroDM neurons
-    statements_list = step1_process_neurondm(
+    # Get composer data (custom relationships and alert URIs)
+    composer_data = get_composer_data()
+    
+    # Process NeuroDM neurons
+    statements_list = process_neurondm(
         full_imports=full_imports,
         label_imports=label_imports,
         population_uris=population_uris,
+        composer_data=composer_data,
         logger_service_param=logger_service,
     )
     
-    # Step 2: Database ingestion
+    # Database ingestion
     # When population_uris is provided, use force_state_transition to allow state changes from any state
-    successful_transaction = step2_ingest_to_database(
+    successful_transaction = ingest_to_database(
         statements_list=statements_list,
         update_upstream=update_upstream,
         update_anatomical_entities=update_anatomical_entities,

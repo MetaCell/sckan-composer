@@ -21,8 +21,7 @@
     </div>
     <div class="card-body">
       <p>Configure and trigger the ingestion of connectivity statements from the neurondm repository.</p>
-      <p><strong>Note:</strong> This process may take several minutes to complete. The ingestion will run synchronously in the server.</p>
-      
+      <p><strong>Note:</strong> This process will run asynchronously using Argo workflows. You will receive an email notification when the ingestion is complete.</p>
       <form id="ingest-statements-form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         
@@ -102,7 +101,7 @@
       e.preventDefault();
       
       // Confirm before starting
-      if (!confirm('Are you sure you want to start the ingestion process? This may take several minutes.')) {
+      if (!confirm('Are you sure you want to start the ingestion workflow? You will receive an email when it completes.')) {
         return;
       }
       
@@ -122,7 +121,7 @@
         processData: false,
         contentType: false,
         success: function(data, textStatus, request) {
-          jQuery('#result-content').html('<div class="alert alert-success" role="alert"><strong>Success!</strong> Connectivity statements ingestion completed successfully.</div>');
+          jQuery('#result-content').html('<div class="alert alert-success" role="alert"><strong>Success!</strong> Ingestion workflow started. You will receive an email when it is complete.</div>');
           jQuery('#result-message').show();
         },
         error: function(xhr, status, error) {

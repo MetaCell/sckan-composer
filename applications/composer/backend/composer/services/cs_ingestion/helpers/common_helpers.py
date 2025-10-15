@@ -1,7 +1,6 @@
 import logging
 
 from composer.enums import CircuitType
-from composer.models import AnatomicalEntityMeta
 
 ID = "id"
 ORIGINS = "origins"

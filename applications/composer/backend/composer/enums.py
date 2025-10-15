@@ -2,6 +2,9 @@ from enum import Enum
 
 from django.db import models
 
+# Import pure enums for backward compatibility
+from composer.pure_enums import ConnectivityErrors, BulkActionType
+
 
 # Create your enums here.
 class Laterality(models.TextChoices):
@@ -74,17 +77,6 @@ class MetricEntity(models.TextChoices):
     SENTENCE = "sentence"
     CONNECTIVITY_STATEMENT = "connectivity statement"
 
-
-class ConnectivityErrors(Enum):
-    INVALID_FORWARD_CONNECTION = "Invalid forward connection"
-
-
-class BulkActionType(str, Enum):
-    ASSIGN_USER = "assign_user"
-    ASSIGN_TAG = "assign_tag"
-    WRITE_NOTE = "write_note"
-    CHANGE_STATUS = "change_status"
-    ASSIGN_POPULATION_SET = "assign_population_set"
 
 class RelationshipType(models.TextChoices):
     TRIPLE_SINGLE = "triple_single", "Triple - Single select"

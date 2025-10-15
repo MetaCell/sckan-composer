@@ -34,6 +34,38 @@ class LoggerService(metaclass=SingletonMeta):
 
     def add_anomaly(self, error: LoggableAnomaly):
         self.anomalies.append(error)
+    
+    def load_anomalies_from_json(self, json_path: str):
+        """
+        Load anomalies from a JSON file (from previous workflow steps).
+        Expected format: [{"statement_id": ..., "entity_id": ..., "message": ..., "severity": ...}, ...]
+        """
+        import json
+        import os
+        from composer.services.cs_ingestion.models import Severity
+        
+        if not os.path.exists(json_path):
+            return  # No previous anomalies to load
+        
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                anomalies_data = json.load(f)
+            
+            for anomaly_dict in anomalies_data:
+                severity_str = anomaly_dict.get('severity', 'warning')
+                severity = Severity.ERROR if severity_str == 'error' else Severity.WARNING
+                
+                anomaly = LoggableAnomaly(
+                    statement_id=anomaly_dict.get('statement_id'),
+                    entity_id=anomaly_dict.get('entity_id'),
+                    message=anomaly_dict.get('message', ''),
+                    severity=severity,
+                )
+                self.anomalies.append(anomaly)
+        except Exception as e:
+            # Log error but don't fail - just skip loading previous anomalies
+            import logging
+            logging.warning(f"Could not load anomalies from {json_path}: {e}")
 
     def write_anomalies_to_file(self):
         with open(self.anomalies_log_path, 'w', newline='') as file:

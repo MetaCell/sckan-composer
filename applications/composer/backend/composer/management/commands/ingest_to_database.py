@@ -3,7 +3,8 @@ import pickle
 import time
 
 from django.core.management.base import BaseCommand
-from composer.services.cs_ingestion.cs_ingestion_services import step2_ingest_to_database
+from composer.services.cs_ingestion.cs_ingestion_services import ingest_to_database
+from composer.services.cs_ingestion.logging_service import LoggerService
 
 
 class Command(BaseCommand):
@@ -36,6 +37,11 @@ class Command(BaseCommand):
             action='store_true',
             help='Set this flag to allow state transitions from any state (e.g., TO_BE_REVIEWED -> EXPORTED). Use when ingesting a pre-filtered population.',
         )
+        parser.add_argument(
+            '--anomalies_log',
+            type=str,
+            help='Path to anomalies log JSON file (will be appended to if exists)',
+        )
 
     def handle(self, *args, **options):
         input_file = options['input_file']
@@ -43,6 +49,7 @@ class Command(BaseCommand):
         update_anatomical_entities = options['update_anatomical_entities']
         disable_overwrite = options['disable_overwrite']
         force_state_transition = options['force_state_transition']
+        anomalies_log = options.get('anomalies_log')
 
         # Load statements from file
         try:
@@ -68,19 +75,34 @@ class Command(BaseCommand):
 
         start_time = time.time()
 
+        # Create logger service for this step
+        # If anomalies_log provided, it will be used as the output path
+        if anomalies_log:
+            logger_service = LoggerService(ingestion_anomalies_log_path=anomalies_log)
+            # Load any previous anomalies from the JSON file (e.g., from process_neurondm step)
+            logger_service.load_anomalies_from_json(anomalies_log)
+        else:
+            logger_service = LoggerService()
+
         try:
             # Step 2: Ingest to database
             self.stdout.write("Ingesting statements to database...")
-            success = step2_ingest_to_database(
+            success = ingest_to_database(
                 statements_list=statements_list,
                 update_upstream=update_upstream,
                 update_anatomical_entities=update_anatomical_entities,
                 disable_overwrite=disable_overwrite,
                 force_state_transition=force_state_transition,
+                logger_service_param=logger_service,
             )
 
             end_time = time.time()
             duration = end_time - start_time
+
+
+            # First convert JSON anomalies to CSV format
+            logger_service.write_anomalies_to_file()
+            self.stdout.write(f"Saved {len(logger_service.anomalies)} total anomalies to {logger_service.ingestion_anomalies_log_path}")
 
             if success:
                 self.stdout.write(self.style.SUCCESS(
