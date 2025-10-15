@@ -179,6 +179,7 @@ steps:
         - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
         - REGISTRY=${{REGISTRY}}/cloudharness/
+        - COMPOSER=${{REGISTRY}}/cloudharness/composer:${{COMPOSER_TAG}}
         image_name: cloudharness/composer-neurondm
         title: Composer neurondm
         working_directory: ./applications/composer/tasks/neurondm
