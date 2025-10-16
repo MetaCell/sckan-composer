@@ -118,7 +118,7 @@ def main():
         
 
         logger_service.write_anomalies_to_file()
-        logger.info(f"Saved {len(logger_service.anomalies)} anomalies to {logger_service.ingestion_anomalies_log_path}")
+        logger.info(f"Saved {len(logger_service.anomalies)} anomalies to {logger_service.anomalies_log_path}")
         
         sys.exit(0)
         

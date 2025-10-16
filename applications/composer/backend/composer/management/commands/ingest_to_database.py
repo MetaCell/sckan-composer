@@ -103,7 +103,7 @@ class Command(BaseCommand):
 
             # First convert JSON anomalies to CSV format
             logger_service.write_anomalies_to_file()
-            self.stdout.write(f"Saved {len(logger_service.anomalies)} total anomalies to {logger_service.ingestion_anomalies_log_path}")
+            self.stdout.write(f"Saved {len(logger_service.anomalies)} total anomalies to {logger_service.anomalies_log_path}")
 
             if success:
                 self.stdout.write(self.style.SUCCESS(
