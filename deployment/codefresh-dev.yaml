@@ -34,8 +34,8 @@ steps:
     working_directory: .
     commands:
     - bash cloud-harness/install.sh
-    - harness-deployment cloud-harness . -d ${{DOMAIN}} -r ${{REGISTRY}} -rs ${{REGISTRY_SECRET}}
-      -n ${{NAMESPACE}} --write-env -e dev -i composer
+    - harness-deployment cloud-harness . -d ${{DOMAIN}} -r ${{REGISTRY}} -rs '${{REGISTRY_SECRET}}'
+      -n ${{NAMESPACE}} --write-env -e dev --cache-url '${{IMAGE_CACHE_URL}}' -i composer
     - cat deployment/.env >> ${{CF_VOLUME_PATH}}/env_vars_to_export
     - cat ${{CF_VOLUME_PATH}}/env_vars_to_export
   prepare_deployment_view:
@@ -47,81 +47,7 @@ steps:
     image: codefresh/cfstep-helm:3.6.2
     stage: prepare
     title: View helm chart
-  build_base_images:
-    title: Build base images
-    type: parallel
-    stage: build
-    steps:
-      cloudharness-frontend-build:
-        type: build
-        stage: build
-        dockerfile: infrastructure/base-images/cloudharness-frontend-build/Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/cloudharness/
-        image_name: cloudharness/cloudharness-frontend-build
-        title: Cloudharness frontend build
-        working_directory: ./cloud-harness
-        tag: '${{CLOUDHARNESS_FRONTEND_BUILD_TAG}}'
-        when:
-          condition:
-            any:
-              buildDoesNotExist: includes('${{CLOUDHARNESS_FRONTEND_BUILD_TAG_EXISTS}}',
-                '{{CLOUDHARNESS_FRONTEND_BUILD_TAG_EXISTS}}') == true
-              forceNoCache: includes('${{CLOUDHARNESS_FRONTEND_BUILD_TAG_FORCE_BUILD}}',
-                '{{CLOUDHARNESS_FRONTEND_BUILD_TAG_FORCE_BUILD}}') == false
-      cloudharness-base-debian:
-        type: build
-        stage: build
-        dockerfile: infrastructure/base-images/cloudharness-base-debian/Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/cloudharness/
-        image_name: cloudharness/cloudharness-base-debian
-        title: Cloudharness base debian
-        working_directory: ./cloud-harness
-        tag: '${{CLOUDHARNESS_BASE_DEBIAN_TAG}}'
-        when:
-          condition:
-            any:
-              buildDoesNotExist: includes('${{CLOUDHARNESS_BASE_DEBIAN_TAG_EXISTS}}',
-                '{{CLOUDHARNESS_BASE_DEBIAN_TAG_EXISTS}}') == true
-              forceNoCache: includes('${{CLOUDHARNESS_BASE_DEBIAN_TAG_FORCE_BUILD}}',
-                '{{CLOUDHARNESS_BASE_DEBIAN_TAG_FORCE_BUILD}}') == false
-  build_static_images:
-    title: Build static images
-    type: parallel
-    stage: build
-    steps:
-      cloudharness-django:
-        type: build
-        stage: build
-        dockerfile: Dockerfile
-        registry: '${{CODEFRESH_REGISTRY}}'
-        buildkit: true
-        build_arguments:
-        - DOMAIN=${{DOMAIN}}
-        - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/cloudharness/
-        - CLOUDHARNESS_BASE_DEBIAN=${{REGISTRY}}/cloudharness/cloudharness-base-debian:${{CLOUDHARNESS_BASE_DEBIAN_TAG}}
-        image_name: cloudharness/cloudharness-django
-        title: Cloudharness django
-        working_directory: ./cloud-harness/infrastructure/common-images/cloudharness-django
-        tag: '${{CLOUDHARNESS_DJANGO_TAG}}'
-        when:
-          condition:
-            any:
-              buildDoesNotExist: includes('${{CLOUDHARNESS_DJANGO_TAG_EXISTS}}', '{{CLOUDHARNESS_DJANGO_TAG_EXISTS}}')
-                == true
-              forceNoCache: includes('${{CLOUDHARNESS_DJANGO_TAG_FORCE_BUILD}}', '{{CLOUDHARNESS_DJANGO_TAG_FORCE_BUILD}}')
-                == false
-  build_application_images:
+  build_application_images_0:
     type: parallel
     stage: build
     steps:
@@ -132,13 +58,14 @@ steps:
         registry: '${{CODEFRESH_REGISTRY}}'
         buildkit: true
         build_arguments:
-        - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/cloudharness/
-        image_name: cloudharness/accounts
+        image_name: cloud-harness/accounts
         title: Accounts
         working_directory: ./cloud-harness/applications/accounts
-        tag: '${{ACCOUNTS_TAG}}'
+        tags:
+        - '${{ACCOUNTS_TAG}}'
+        - '${{DEPLOYMENT_PUBLISH_TAG}}-dev'
+        - '${{CF_BRANCH_TAG_NORMALIZED_LOWER_CASE}}'
         when:
           condition:
             any:
@@ -146,51 +73,73 @@ steps:
                 == true
               forceNoCache: includes('${{ACCOUNTS_TAG_FORCE_BUILD}}', '{{ACCOUNTS_TAG_FORCE_BUILD}}')
                 == false
-      composer:
+      cloudharness-base:
+        type: build
+        stage: build
+        dockerfile: infrastructure/base-images/cloudharness-base/Dockerfile
+        registry: '${{CODEFRESH_REGISTRY}}'
+        buildkit: true
+        build_arguments:
+        - NOCACHE=${{CF_BUILD_ID}}
+        image_name: cloud-harness/cloudharness-base
+        title: Cloudharness base
+        working_directory: ./cloud-harness
+        tags:
+        - '${{CLOUDHARNESS_BASE_TAG}}'
+        - '${{DEPLOYMENT_PUBLISH_TAG}}-dev'
+        - '${{CF_BRANCH_TAG_NORMALIZED_LOWER_CASE}}'
+        when:
+          condition:
+            any:
+              buildDoesNotExist: includes('${{CLOUDHARNESS_BASE_TAG_EXISTS}}', '{{CLOUDHARNESS_BASE_TAG_EXISTS}}')
+                == true
+              forceNoCache: includes('${{CLOUDHARNESS_BASE_TAG_FORCE_BUILD}}', '{{CLOUDHARNESS_BASE_TAG_FORCE_BUILD}}')
+                == false
+      test-e2e:
         type: build
         stage: build
         dockerfile: Dockerfile
         registry: '${{CODEFRESH_REGISTRY}}'
         buildkit: true
         build_arguments:
-        - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/cloudharness/
-        - CLOUDHARNESS_FRONTEND_BUILD=${{REGISTRY}}/cloudharness/cloudharness-frontend-build:${{CLOUDHARNESS_FRONTEND_BUILD_TAG}}
-        - CLOUDHARNESS_DJANGO=${{REGISTRY}}/cloudharness/cloudharness-django:${{CLOUDHARNESS_DJANGO_TAG}}
-        image_name: cloudharness/composer
-        title: Composer
-        working_directory: ./applications/composer
-        tag: '${{COMPOSER_TAG}}'
+        image_name: cloud-harness/test-e2e
+        title: Test e2e
+        working_directory: ./cloud-harness/test/test-e2e
+        tags:
+        - '${{TEST_E2E_TAG}}'
+        - '${{DEPLOYMENT_PUBLISH_TAG}}-dev'
+        - '${{CF_BRANCH_TAG_NORMALIZED_LOWER_CASE}}'
+        - latest
         when:
           condition:
             any:
-              buildDoesNotExist: includes('${{COMPOSER_TAG_EXISTS}}', '{{COMPOSER_TAG_EXISTS}}')
+              buildDoesNotExist: includes('${{TEST_E2E_TAG_EXISTS}}', '{{TEST_E2E_TAG_EXISTS}}')
                 == true
-              forceNoCache: includes('${{COMPOSER_TAG_FORCE_BUILD}}', '{{COMPOSER_TAG_FORCE_BUILD}}')
+              forceNoCache: includes('${{TEST_E2E_TAG_FORCE_BUILD}}', '{{TEST_E2E_TAG_FORCE_BUILD}}')
                 == false
-      composer-neurondm:
+      cloudharness-frontend-build:
         type: build
         stage: build
-        dockerfile: Dockerfile
+        dockerfile: infrastructure/base-images/cloudharness-frontend-build/Dockerfile
         registry: '${{CODEFRESH_REGISTRY}}'
         buildkit: true
         build_arguments:
-        - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/cloudharness/
-        - COMPOSER=${{REGISTRY}}/cloudharness/composer:${{COMPOSER_TAG}}
-        image_name: cloudharness/composer-neurondm
-        title: Composer neurondm
-        working_directory: ./applications/composer/tasks/neurondm
-        tag: '${{COMPOSER_NEURONDM_TAG}}'
+        image_name: cloud-harness/cloudharness-frontend-build
+        title: Cloudharness frontend build
+        working_directory: ./cloud-harness
+        tags:
+        - '${{CLOUDHARNESS_FRONTEND_BUILD_TAG}}'
+        - '${{DEPLOYMENT_PUBLISH_TAG}}-dev'
+        - '${{CF_BRANCH_TAG_NORMALIZED_LOWER_CASE}}'
         when:
           condition:
             any:
-              buildDoesNotExist: includes('${{COMPOSER_NEURONDM_TAG_EXISTS}}', '{{COMPOSER_NEURONDM_TAG_EXISTS}}')
-                == true
-              forceNoCache: includes('${{COMPOSER_NEURONDM_TAG_FORCE_BUILD}}', '{{COMPOSER_NEURONDM_TAG_FORCE_BUILD}}')
-                == false
+              buildDoesNotExist: includes('${{CLOUDHARNESS_FRONTEND_BUILD_TAG_EXISTS}}',
+                '{{CLOUDHARNESS_FRONTEND_BUILD_TAG_EXISTS}}') == true
+              forceNoCache: includes('${{CLOUDHARNESS_FRONTEND_BUILD_TAG_FORCE_BUILD}}',
+                '{{CLOUDHARNESS_FRONTEND_BUILD_TAG_FORCE_BUILD}}') == false
       composer-notify:
         type: build
         stage: build
@@ -198,13 +147,14 @@ steps:
         registry: '${{CODEFRESH_REGISTRY}}'
         buildkit: true
         build_arguments:
-        - DOMAIN=${{DOMAIN}}
         - NOCACHE=${{CF_BUILD_ID}}
-        - REGISTRY=${{REGISTRY}}/cloudharness/
-        image_name: cloudharness/composer-notify
+        image_name: cloud-harness/composer-notify
         title: Composer notify
         working_directory: ./applications/composer/tasks/notify
-        tag: '${{COMPOSER_NOTIFY_TAG}}'
+        tags:
+        - '${{COMPOSER_NOTIFY_TAG}}'
+        - '${{DEPLOYMENT_PUBLISH_TAG}}-dev'
+        - '${{CF_BRANCH_TAG_NORMALIZED_LOWER_CASE}}'
         when:
           condition:
             any:
@@ -212,6 +162,116 @@ steps:
                 == true
               forceNoCache: includes('${{COMPOSER_NOTIFY_TAG_FORCE_BUILD}}', '{{COMPOSER_NOTIFY_TAG_FORCE_BUILD}}')
                 == false
+    title: Build parallel step 1
+  build_application_images_1:
+    type: parallel
+    stage: build
+    steps:
+      test-api:
+        type: build
+        stage: build
+        dockerfile: test/test-api/Dockerfile
+        registry: '${{CODEFRESH_REGISTRY}}'
+        buildkit: true
+        build_arguments:
+        - NOCACHE=${{CF_BUILD_ID}}
+        - CLOUDHARNESS_BASE=${{REGISTRY}}/cloud-harness/cloudharness-base:${{CLOUDHARNESS_BASE_TAG}}
+        image_name: cloud-harness/test-api
+        title: Test api
+        working_directory: ./cloud-harness
+        tags:
+        - '${{TEST_API_TAG}}'
+        - '${{DEPLOYMENT_PUBLISH_TAG}}-dev'
+        - '${{CF_BRANCH_TAG_NORMALIZED_LOWER_CASE}}'
+        - latest
+        when:
+          condition:
+            any:
+              buildDoesNotExist: includes('${{TEST_API_TAG_EXISTS}}', '{{TEST_API_TAG_EXISTS}}')
+                == true
+              forceNoCache: includes('${{TEST_API_TAG_FORCE_BUILD}}', '{{TEST_API_TAG_FORCE_BUILD}}')
+                == false
+      cloudharness-django:
+        type: build
+        stage: build
+        dockerfile: Dockerfile
+        registry: '${{CODEFRESH_REGISTRY}}'
+        buildkit: true
+        build_arguments:
+        - NOCACHE=${{CF_BUILD_ID}}
+        - CLOUDHARNESS_BASE=${{REGISTRY}}/cloud-harness/cloudharness-base:${{CLOUDHARNESS_BASE_TAG}}
+        image_name: cloud-harness/cloudharness-django
+        title: Cloudharness django
+        working_directory: ./cloud-harness/infrastructure/common-images/cloudharness-django
+        tags:
+        - '${{CLOUDHARNESS_DJANGO_TAG}}'
+        - '${{DEPLOYMENT_PUBLISH_TAG}}-dev'
+        - '${{CF_BRANCH_TAG_NORMALIZED_LOWER_CASE}}'
+        when:
+          condition:
+            any:
+              buildDoesNotExist: includes('${{CLOUDHARNESS_DJANGO_TAG_EXISTS}}', '{{CLOUDHARNESS_DJANGO_TAG_EXISTS}}')
+                == true
+              forceNoCache: includes('${{CLOUDHARNESS_DJANGO_TAG_FORCE_BUILD}}', '{{CLOUDHARNESS_DJANGO_TAG_FORCE_BUILD}}')
+                == false
+    title: Build parallel step 2
+  build_application_images_2:
+    type: parallel
+    stage: build
+    steps:
+      composer:
+        type: build
+        stage: build
+        dockerfile: Dockerfile
+        registry: '${{CODEFRESH_REGISTRY}}'
+        buildkit: true
+        build_arguments:
+        - NOCACHE=${{CF_BUILD_ID}}
+        - CLOUDHARNESS_FRONTEND_BUILD=${{REGISTRY}}/cloud-harness/cloudharness-frontend-build:${{CLOUDHARNESS_FRONTEND_BUILD_TAG}}
+        - CLOUDHARNESS_DJANGO=${{REGISTRY}}/cloud-harness/cloudharness-django:${{CLOUDHARNESS_DJANGO_TAG}}
+        image_name: cloud-harness/composer
+        title: Composer
+        working_directory: ./applications/composer
+        tags:
+        - '${{COMPOSER_TAG}}'
+        - '${{DEPLOYMENT_PUBLISH_TAG}}-dev'
+        - '${{CF_BRANCH_TAG_NORMALIZED_LOWER_CASE}}'
+        when:
+          condition:
+            any:
+              buildDoesNotExist: includes('${{COMPOSER_TAG_EXISTS}}', '{{COMPOSER_TAG_EXISTS}}')
+                == true
+              forceNoCache: includes('${{COMPOSER_TAG_FORCE_BUILD}}', '{{COMPOSER_TAG_FORCE_BUILD}}')
+                == false
+    title: Build parallel step 3
+  build_application_images_3:
+    type: parallel
+    stage: build
+    steps:
+      composer-neurondm:
+        type: build
+        stage: build
+        dockerfile: Dockerfile
+        registry: '${{CODEFRESH_REGISTRY}}'
+        buildkit: true
+        build_arguments:
+        - NOCACHE=${{CF_BUILD_ID}}
+        - COMPOSER=${{REGISTRY}}/cloud-harness/composer:${{COMPOSER_TAG}}
+        image_name: cloud-harness/composer-neurondm
+        title: Composer neurondm
+        working_directory: ./applications/composer/tasks/neurondm
+        tags:
+        - '${{COMPOSER_NEURONDM_TAG}}'
+        - '${{DEPLOYMENT_PUBLISH_TAG}}-dev'
+        - '${{CF_BRANCH_TAG_NORMALIZED_LOWER_CASE}}'
+        when:
+          condition:
+            any:
+              buildDoesNotExist: includes('${{COMPOSER_NEURONDM_TAG_EXISTS}}', '{{COMPOSER_NEURONDM_TAG_EXISTS}}')
+                == true
+              forceNoCache: includes('${{COMPOSER_NEURONDM_TAG_FORCE_BUILD}}', '{{COMPOSER_NEURONDM_TAG_FORCE_BUILD}}')
+                == false
+    title: Build parallel step 4
   deployment:
     stage: deploy
     type: helm
@@ -230,6 +290,21 @@ steps:
       custom_values:
       - apps_composer_harness_secrets_SECRET__KEY=${{SECRET__KEY}}
       - apps_composer_harness_secrets_SOCIAL__AUTH__ORCID__SECRET=${{SOCIAL__AUTH__ORCID__SECRET}}
+  wait_deployment:
+    stage: qa
+    title: Wait deployment to be ready
+    image: codefresh/kubectl
+    commands:
+    - kubectl config use-context ${{CLUSTER_NAME}}
+    - kubectl config set-context --current --namespace=${{NAMESPACE}}
+    - kubectl rollout status deployment/accounts
+    - kubectl rollout status deployment/argo-gk
+    - kubectl rollout status deployment/composer
+    - sleep 60
+    when:
+      condition:
+        all:
+          whenVarExists: includes("${{SKIP_TESTS}}", "{{SKIP_TESTS}}") == true
   approval:
     type: pending-approval
     stage: publish
@@ -246,57 +321,64 @@ steps:
         stage: publish
         type: push
         title: Cloudharness frontend build
-        candidate: '${{REGISTRY}}/cloudharness/cloudharness-frontend-build:${{CLOUDHARNESS_FRONTEND_BUILD_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/cloudharness-frontend-build:${{CLOUDHARNESS_FRONTEND_BUILD_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
+        - latest
         registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_cloudharness-base-debian:
+      publish_cloudharness-base:
         stage: publish
         type: push
-        title: Cloudharness base debian
-        candidate: '${{REGISTRY}}/cloudharness/cloudharness-base-debian:${{CLOUDHARNESS_BASE_DEBIAN_TAG}}'
+        title: Cloudharness base
+        candidate: '${{REGISTRY}}/cloud-harness/cloudharness-base:${{CLOUDHARNESS_BASE_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
+        - latest
         registry: '${{REGISTRY_PUBLISH_URL}}'
       publish_cloudharness-django:
         stage: publish
         type: push
         title: Cloudharness django
-        candidate: '${{REGISTRY}}/cloudharness/cloudharness-django:${{CLOUDHARNESS_DJANGO_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/cloudharness-django:${{CLOUDHARNESS_DJANGO_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
+        - latest
         registry: '${{REGISTRY_PUBLISH_URL}}'
       publish_accounts:
         stage: publish
         type: push
         title: Accounts
-        candidate: '${{REGISTRY}}/cloudharness/accounts:${{ACCOUNTS_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/accounts:${{ACCOUNTS_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
+        - latest
         registry: '${{REGISTRY_PUBLISH_URL}}'
       publish_composer:
         stage: publish
         type: push
         title: Composer
-        candidate: '${{REGISTRY}}/cloudharness/composer:${{COMPOSER_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/composer:${{COMPOSER_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
+        - latest
         registry: '${{REGISTRY_PUBLISH_URL}}'
       publish_composer-neurondm:
         stage: publish
         type: push
         title: Composer neurondm
-        candidate: '${{REGISTRY}}/cloudharness/composer-neurondm:${{COMPOSER_NEURONDM_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/composer-neurondm:${{COMPOSER_NEURONDM_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
+        - latest
         registry: '${{REGISTRY_PUBLISH_URL}}'
       publish_composer-notify:
         stage: publish
         type: push
         title: Composer notify
-        candidate: '${{REGISTRY}}/cloudharness/composer-notify:${{COMPOSER_NOTIFY_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/composer-notify:${{COMPOSER_NOTIFY_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
+        - latest
         registry: '${{REGISTRY_PUBLISH_URL}}'
     when:
       condition:
