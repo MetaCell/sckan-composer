@@ -12,6 +12,7 @@ import logging
 sys.path.insert(0, '/usr/src/app')
 from composer.services.cs_ingestion.neurondm_script import main as get_statements_from_neurondm
 from composer.services.cs_ingestion.logging_service import LoggerService
+from composer.services.cs_ingestion.models import convert_statement_to_json_serializable
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -106,9 +107,13 @@ def main():
         
         logger.info(f"Processed {len(statements_list)} statements")
         
+        # Convert statements to JSON-serializable format
+        logger.info("Converting statements to JSON-serializable format...")
+        json_statements = [convert_statement_to_json_serializable(stmt) for stmt in statements_list]
+        
         # Save to JSON file
         with open(args.output_file, 'w', encoding='utf-8') as f:
-            json.dump(statements_list, f, indent=2)
+            json.dump(json_statements, f, indent=2)
         
         logger.info(f"Successfully saved statements to {args.output_file}")
         
