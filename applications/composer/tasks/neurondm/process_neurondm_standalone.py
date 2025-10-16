@@ -3,7 +3,6 @@
 Standalone script to run neurondm processing without Django.
 This script is designed to run in the composer-neurondm task container.
 """
-import os
 import sys
 import json
 import argparse

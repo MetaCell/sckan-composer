@@ -1,10 +1,10 @@
 import json
-import pickle
 import time
 
 from django.core.management.base import BaseCommand
 from composer.services.cs_ingestion.cs_ingestion_services import ingest_to_database
 from composer.services.cs_ingestion.logging_service import LoggerService
+from composer.services.cs_ingestion.models import convert_statement_from_json
 
 
 class Command(BaseCommand):
@@ -15,7 +15,7 @@ class Command(BaseCommand):
             '--input_file',
             type=str,
             required=True,
-            help='Path to input file containing processed statements from Step 1. Use .json or .pkl format.',
+            help='Path to input JSON file containing processed statements from Step 1.',
         )
         parser.add_argument(
             '--update_upstream',
@@ -51,19 +51,20 @@ class Command(BaseCommand):
         force_state_transition = options['force_state_transition']
         anomalies_log = options.get('anomalies_log')
 
-        # Load statements from file
+        # Load statements from JSON file
         try:
-            if input_file.endswith('.json'):
-                with open(input_file, 'r', encoding='utf-8') as f:
-                    statements_list = json.load(f)
-            elif input_file.endswith('.pkl'):
-                with open(input_file, 'rb') as f:
-                    statements_list = pickle.load(f)
-            else:
+            if not input_file.endswith('.json'):
                 self.stderr.write(self.style.ERROR(
-                    "Input file must have .json or .pkl extension"
+                    "Input file must have .json extension"
                 ))
                 return
+            
+            with open(input_file, 'r', encoding='utf-8') as f:
+                statements_list = json.load(f)
+            
+            # Convert JSON-serialized statements back to object format
+            self.stdout.write("Converting JSON statements to object format...")
+            statements_list = [convert_statement_from_json(stmt) for stmt in statements_list]
             
             self.stdout.write(f"Loaded {len(statements_list)} statements from {input_file}")
         except FileNotFoundError:
