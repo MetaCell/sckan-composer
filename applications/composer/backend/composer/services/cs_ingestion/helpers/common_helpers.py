@@ -1,6 +1,6 @@
 import logging
 
-from composer.enums import CircuitType
+from composer.pure_enums import CircuitType
 
 ID = "id"
 ORIGINS = "origins"

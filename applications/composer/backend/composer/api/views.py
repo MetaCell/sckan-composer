@@ -17,7 +17,7 @@ from django.db.models import Case, When, Value, IntegerField
 from composer.services.export.helpers.predicate_mapping import PredicateToDBMapping
 from composer.services.dynamic_schema_service import inject_dynamic_relationship_schema
 from composer.services import bulk_service
-from composer.enums import BulkActionType
+from composer.pure_enums import BulkActionType
 from composer.services.state_services import (
     ConnectivityStatementStateService,
     SentenceStateService,

@@ -1,13 +1,13 @@
 import csv
 from typing import List, Dict
 
-from composer.enums import CSState, SentenceState
+from composer.pure_enums import CSState, SentenceState
 from composer.services.cs_ingestion.helpers.common_helpers import ID, LABEL, STATE, VALIDATION_ERRORS
 from composer.services.cs_ingestion.models import LoggableAnomaly
 
 AXIOM_NOT_FOUND = "Entity not found in any axiom"
-SENTENCE_INCORRECT_STATE = f"Sentence already found and is not in {SentenceState.COMPOSE_NOW} state"
-STATEMENT_INCORRECT_STATE = f"Statement already found and is not in {CSState.EXPORTED} or {CSState.INVALID} state"
+SENTENCE_INCORRECT_STATE = f"Sentence already found and is not in {SentenceState.COMPOSE_NOW.value} state"
+STATEMENT_INCORRECT_STATE = f"Statement already found and is not in {CSState.EXPORTED.value} or {CSState.INVALID.value} state"
 
 INCONSISTENT_AXIOMS = "Region and layer found in different axioms"
 
