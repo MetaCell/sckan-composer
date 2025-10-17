@@ -315,7 +315,7 @@ class ConnectivityStatementTripleInline(admin.TabularInline):
     model = ConnectivityStatementTriple
     extra = 1
     autocomplete_fields = ("relationship",)
-    filter_horizontal = ("triples",)
+    raw_id_fields = ("triples",)
     fields = ("relationship", "triples")
 
     def get_form(self, request, obj=None, **kwargs):
@@ -348,7 +348,7 @@ class ConnectivityStatementAnatomicalEntityInline(admin.TabularInline):
     model = ConnectivityStatementAnatomicalEntity
     extra = 1
     autocomplete_fields = ("relationship",)
-    filter_horizontal = ("anatomical_entities",)
+    raw_id_fields = ("anatomical_entities",)
     fields = ("relationship", "anatomical_entities")
 
     def get_form(self, request, obj=None, **kwargs):
