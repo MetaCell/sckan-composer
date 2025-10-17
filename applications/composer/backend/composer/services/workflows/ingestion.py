@@ -2,8 +2,11 @@ import json
 import os
 from django.conf import settings
 from django.contrib.auth.models import User
-from datetime import datetime
-from composer.constants import INGESTION_TEMP_DIR
+from composer.constants import INGESTION_ANOMALIES_LOG_PATH, INGESTION_INGESTED_LOG_PATH
+from composer.services.workflows.ingestion_utils import (
+    get_ingestion_timestamp,
+    get_ingestion_temp_file_paths,
+)
 
 
 def get_volume_directory(current_app) -> str:
@@ -18,6 +21,7 @@ def run_ingestion_workflow(
     full_imports: list = None,
     label_imports: list = None,
     population_file_path: str = None,
+    timestamp: str = None,
 ) -> None:
     from cloudharness.workflows import tasks, operations
     from cloudharness.applications import get_current_configuration
@@ -25,10 +29,13 @@ def run_ingestion_workflow(
     current_app = get_current_configuration()
 
     # Create unique filenames for intermediate data
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    composer_data_file = f"{settings.MEDIA_ROOT}/{INGESTION_TEMP_DIR}/composer_data_{timestamp}.json"
-    intermediate_file = f"{settings.MEDIA_ROOT}/{INGESTION_TEMP_DIR}/statements_{timestamp}.json"
-    anomalies_log_file = f"{settings.MEDIA_ROOT}/{INGESTION_TEMP_DIR}/anomalies_{timestamp}.json"
+    if timestamp is None:
+        timestamp = get_ingestion_timestamp()
+    
+    temp_paths = get_ingestion_temp_file_paths(timestamp)
+    composer_data_file = temp_paths['composer_data']
+    intermediate_file = temp_paths['intermediate']
+    anomalies_log_file = temp_paths['anomalies_log']
 
     # Ensure the directory exists
     os.makedirs(os.path.dirname(intermediate_file), exist_ok=True)
@@ -38,7 +45,7 @@ def run_ingestion_workflow(
         "python",
         "manage.py",
         "get_composer_data",
-        f"--output_file={composer_data_file}",
+        f"--output_filepath={composer_data_file}",
     ]
 
     get_composer_data_task = tasks.CustomTask(
@@ -51,9 +58,10 @@ def run_ingestion_workflow(
     step1_command = [
         "python",
         "process_neurondm_standalone.py",
-        f"--output_file={intermediate_file}",
-        f"--composer_data={composer_data_file}",
-        f"--anomalies_log={anomalies_log_file}",
+        f"--input_filepath={composer_data_file}",
+        f"--output_filepath={intermediate_file}",
+        f"--anomalies_csv_output={INGESTION_ANOMALIES_LOG_PATH}",
+        f"--ingested_csv_output={INGESTION_INGESTED_LOG_PATH}",
     ]
     
     if full_imports:
@@ -79,8 +87,8 @@ def run_ingestion_workflow(
         "python",
         "manage.py",
         "ingest_to_database",
-        f"--input_file={intermediate_file}",
-        f"--anomalies_log={anomalies_log_file}",
+        f"--input_filepath={intermediate_file}",
+        f"--anomalies_csv_input={INGESTION_ANOMALIES_LOG_PATH}",
     ]
     
     if update_upstream:

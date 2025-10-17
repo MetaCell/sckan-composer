@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand
 from composer.services.cs_ingestion.cs_ingestion_services import ingest_to_database
 from composer.services.cs_ingestion.logging_service import LoggerService
 from composer.services.cs_ingestion.models import convert_statement_from_json
+from composer.constants import INGESTION_ANOMALIES_LOG_PATH, INGESTION_INGESTED_LOG_PATH
 
 
 class Command(BaseCommand):
@@ -12,7 +13,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--input_file',
+            '--input_filepath',
             type=str,
             required=True,
             help='Path to input JSON file containing processed statements from Step 1.',
@@ -38,37 +39,37 @@ class Command(BaseCommand):
             help='Set this flag to allow state transitions from any state (e.g., TO_BE_REVIEWED -> EXPORTED). Use when ingesting a pre-filtered population.',
         )
         parser.add_argument(
-            '--anomalies_log',
+            '--anomalies_csv_input',
             type=str,
-            help='Path to anomalies log JSON file (will be appended to if exists)',
+            help='Path to input anomalies CSV file from Step 1 (will be merged with new anomalies)',
         )
 
     def handle(self, *args, **options):
-        input_file = options['input_file']
+        input_filepath = options['input_filepath']
         update_upstream = options['update_upstream']
         update_anatomical_entities = options['update_anatomical_entities']
         disable_overwrite = options['disable_overwrite']
         force_state_transition = options['force_state_transition']
-        anomalies_log = options.get('anomalies_log')
+        anomalies_csv_input = options.get('anomalies_csv_input')
 
         # Load statements from JSON file
         try:
-            if not input_file.endswith('.json'):
+            if not input_filepath.endswith('.json'):
                 self.stderr.write(self.style.ERROR(
                     "Input file must have .json extension"
                 ))
                 return
             
-            with open(input_file, 'r', encoding='utf-8') as f:
+            with open(input_filepath, 'r', encoding='utf-8') as f:
                 statements_list = json.load(f)
             
             # Convert JSON-serialized statements back to object format
             self.stdout.write("Converting JSON statements to object format...")
             statements_list = [convert_statement_from_json(stmt) for stmt in statements_list]
             
-            self.stdout.write(f"Loaded {len(statements_list)} statements from {input_file}")
+            self.stdout.write(f"Loaded {len(statements_list)} statements from {input_filepath}")
         except FileNotFoundError:
-            self.stderr.write(self.style.ERROR(f"Input file not found: {input_file}"))
+            self.stderr.write(self.style.ERROR(f"Input file not found: {input_filepath}"))
             return
         except Exception as e:
             self.stderr.write(self.style.ERROR(f"Error loading statements: {e}"))
@@ -76,14 +77,15 @@ class Command(BaseCommand):
 
         start_time = time.time()
 
-        # Create logger service for this step
-        # If anomalies_log provided, it will be used as the output path
-        if anomalies_log:
-            logger_service = LoggerService(ingestion_anomalies_log_path=anomalies_log)
-            # Load any previous anomalies from the JSON file (e.g., from process_neurondm step)
-            logger_service.load_anomalies_from_json(anomalies_log)
-        else:
-            logger_service = LoggerService()
+        # Create logger service with explicit paths from constants
+        logger_service = LoggerService(
+            ingestion_anomalies_log_path=INGESTION_ANOMALIES_LOG_PATH,
+            ingested_log_path=INGESTION_INGESTED_LOG_PATH
+        )
+        
+        # Load any previous anomalies from the CSV file (e.g., from process_neurondm step)
+        if anomalies_csv_input:
+            logger_service.load_anomalies_from_json(anomalies_csv_input)
 
         try:
             # Step 2: Ingest to database
@@ -104,6 +106,8 @@ class Command(BaseCommand):
             # First convert JSON anomalies to CSV format
             logger_service.write_anomalies_to_file()
             self.stdout.write(f"Saved {len(logger_service.anomalies)} total anomalies to {logger_service.anomalies_log_path}")
+            logger_service.write_ingested_statements_to_file(statements_list)
+            self.stdout.write(f"Saved ingested statements log to {logger_service.ingested_log_path}")
 
             if success:
                 self.stdout.write(self.style.SUCCESS(

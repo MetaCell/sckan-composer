@@ -26,8 +26,14 @@ class SingletonMeta(type):
 
 
 class LoggerService(metaclass=SingletonMeta):
-    def __init__(self, ingestion_anomalies_log_path='ingestion_anomalies_log.csv',
-                 ingested_log_path='ingested_log.csv'):
+    def __init__(self, ingestion_anomalies_log_path: str, ingested_log_path: str):
+        """
+        Initialize LoggerService with explicit log file paths.
+        
+        Args:
+            ingestion_anomalies_log_path: Full path to the anomalies log CSV file
+            ingested_log_path: Full path to the ingested statements log CSV file
+        """
         self.anomalies_log_path = ingestion_anomalies_log_path
         self.ingested_log_path = ingested_log_path
         self.anomalies = []

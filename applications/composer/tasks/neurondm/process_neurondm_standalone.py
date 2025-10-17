@@ -22,10 +22,16 @@ def main():
         description='Process NeuroDM neurons and save to file'
     )
     parser.add_argument(
-        '--output_file',
+        '--input_filepath',
         type=str,
         required=True,
-        help='Path to output JSON file'
+        help='Path to input composer data JSON file (from Step 0)'
+    )
+    parser.add_argument(
+        '--output_filepath',
+        type=str,
+        required=True,
+        help='Path to output JSON file with processed statements'
     )
     parser.add_argument(
         '--full_imports',
@@ -45,15 +51,16 @@ def main():
         help='Path to population URIs file'
     )
     parser.add_argument(
-        '--composer_data',
+        '--anomalies_csv_output',
         type=str,
         required=True,
-        help='Path to composer data JSON file (custom relationships and alert URIs)'
+        help='Path to output CSV file for anomalies'
     )
     parser.add_argument(
-        '--anomalies_log',
+        '--ingested_csv_output',
         type=str,
-        help='Path to anomalies log JSON file (will be created/appended to)'
+        required=True,
+        help='Path to output CSV file for ingested statements'
     )
     
     args = parser.parse_args()
@@ -71,7 +78,7 @@ def main():
     
     # Read composer data (custom relationships and alert URIs)
     try:
-        with open(args.composer_data, 'r', encoding='utf-8') as f:
+        with open(args.input_filepath, 'r', encoding='utf-8') as f:
             composer_data = json.load(f)
         
         custom_relationships = composer_data.get('custom_relationships', [])
@@ -79,17 +86,17 @@ def main():
         
         logger.info(
             f"Loaded {len(custom_relationships)} custom relationships and "
-            f"{len(statement_alert_uris)} alert URIs from {args.composer_data}"
+            f"{len(statement_alert_uris)} alert URIs from {args.input_filepath}"
         )
     except Exception as e:
         logger.error(f"Error reading composer data file: {e}")
         sys.exit(1)
     
-    # Initialize logger service with output path if anomalies_log provided
-    if args.anomalies_log:
-        logger_service = LoggerService(ingestion_anomalies_log_path=args.anomalies_log)
-    else:
-        logger_service = LoggerService()
+    # Initialize logger service with explicit paths (no Django dependency)
+    logger_service = LoggerService(
+        ingestion_anomalies_log_path=args.anomalies_csv_output,
+        ingested_log_path=args.ingested_csv_output
+    )
     
     try:
         logger.info("Starting NeuroDM processing...")
@@ -111,10 +118,10 @@ def main():
         json_statements = [convert_statement_to_json_serializable(stmt) for stmt in statements_list]
         
         # Save to JSON file
-        with open(args.output_file, 'w', encoding='utf-8') as f:
+        with open(args.output_filepath, 'w', encoding='utf-8') as f:
             json.dump(json_statements, f, indent=2)
         
-        logger.info(f"Successfully saved statements to {args.output_file}")
+        logger.info(f"Successfully saved statements to {args.output_filepath}")
         
 
         logger_service.write_anomalies_to_file()
@@ -129,3 +136,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# This is a comment that I change every time I want to force the image to be rebuilt

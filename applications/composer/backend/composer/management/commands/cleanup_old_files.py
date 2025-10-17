@@ -2,7 +2,6 @@ import os
 import time
 from datetime import datetime, timedelta
 from django.core.management.base import BaseCommand
-from django.conf import settings
 from composer.constants import INGESTION_UPLOADS_DIR, INGESTION_TEMP_DIR, DEFAULT_CLEANUP_DAYS
 
 
@@ -36,10 +35,10 @@ class Command(BaseCommand):
         cutoff_date = datetime.fromtimestamp(cutoff_time).strftime('%Y-%m-%d %H:%M:%S')
         self.stdout.write(f"Cutoff date: {cutoff_date}")
         
-        # Directories to clean
+        # Directories to clean (already contain full paths)
         directories = [
-            os.path.join(settings.MEDIA_ROOT, INGESTION_UPLOADS_DIR),
-            os.path.join(settings.MEDIA_ROOT, INGESTION_TEMP_DIR),
+            INGESTION_UPLOADS_DIR,
+            INGESTION_TEMP_DIR,
         ]
         
         total_deleted = 0

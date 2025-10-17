@@ -7,12 +7,16 @@ from composer.models import (
     ProjectionPhenotype,
     PopulationSet,
 )
+from composer.constants import INGESTION_ANOMALIES_LOG_PATH, INGESTION_INGESTED_LOG_PATH
 from composer.services.cs_ingestion.helpers.common_helpers import get_value_or_none, SEX, FUNCTIONAL_CIRCUIT_ROLE, ID, \
     CIRCUIT_TYPE, CIRCUIT_TYPE_MAPPING, PHENOTYPE, OTHER_PHENOTYPE
 from composer.services.cs_ingestion.logging_service import LoggerService
 from composer.services.cs_ingestion.models import LoggableAnomaly
 
-logger_service = LoggerService()
+logger_service = LoggerService(
+    ingestion_anomalies_log_path=INGESTION_ANOMALIES_LOG_PATH,
+    ingested_log_path=INGESTION_INGESTED_LOG_PATH
+)
 
 
 def get_sex(statement: Dict) -> Sex:

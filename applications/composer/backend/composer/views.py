@@ -4,11 +4,14 @@ from django.template import loader
 from django.urls import reverse
 from composer.services.workflows.export import run_export_workflow
 from composer.services.workflows.ingestion import run_ingestion_workflow
+from composer.services.workflows.ingestion_utils import (
+    get_ingestion_timestamp,
+    get_timestamped_population_filename,
+)
 from composer.constants import INGESTION_UPLOADS_DIR
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 import os
-from django.conf import settings
 
 def index(request):
     if not hasattr(request, "user") or not request.user.is_authenticated:
@@ -94,13 +97,20 @@ def ingest_statements(request):
             # Split by commas or newlines and filter empty strings
             label_imports = [x.strip() for x in label_imports_raw.replace('\n', ',').split(',') if x.strip()]
         
+        # Generate timestamp for this ingestion workflow
+        timestamp = get_ingestion_timestamp()
+        
         # Handle population file upload
         population_file_path = None
         if 'population_file' in request.FILES:
             uploaded_file = request.FILES['population_file']
-            upload_dir = os.path.join(settings.MEDIA_ROOT, INGESTION_UPLOADS_DIR)
-            os.makedirs(upload_dir, exist_ok=True)
-            population_file_path = os.path.join(upload_dir, uploaded_file.name)
+            os.makedirs(INGESTION_UPLOADS_DIR, exist_ok=True)
+            
+            population_file_path = get_timestamped_population_filename(
+                uploaded_file.name,
+                timestamp
+            )
+            
             with open(population_file_path, 'wb+') as destination:
                 for chunk in uploaded_file.chunks():
                     destination.write(chunk)
@@ -114,6 +124,7 @@ def ingest_statements(request):
             full_imports=full_imports,
             label_imports=label_imports,
             population_file_path=population_file_path,
+            timestamp=timestamp,
         )
         
         messages.success(request, "Ingestion process started. You will receive an email when it is complete.")

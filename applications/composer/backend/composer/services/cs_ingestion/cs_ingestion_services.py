@@ -3,6 +3,7 @@ import logging
 from django.db import transaction
 
 from composer.models import AlertType, Relationship
+from composer.constants import INGESTION_ANOMALIES_LOG_PATH, INGESTION_INGESTED_LOG_PATH
 from composer.services.cs_ingestion.helpers.overwritable_helper import (
     get_overwritable_and_new_statements,
 )
@@ -18,9 +19,6 @@ from .helpers.upstream_changes_helper import update_upstream_statements
 from .logging_service import LoggerService
 from .models import LoggableAnomaly, Severity
 from .neurondm_script import main as get_statements_from_neurondm
-
-logger_service = LoggerService()
-
 
 def get_composer_data():
     """
@@ -66,7 +64,10 @@ def process_neurondm(
     Returns: List of composer statement dictionaries
     """
     if logger_service_param is None:
-        logger_service_param = LoggerService()
+        logger_service_param = LoggerService(
+            ingestion_anomalies_log_path=INGESTION_ANOMALIES_LOG_PATH,
+            ingested_log_path=INGESTION_INGESTED_LOG_PATH
+        )
     
     # If composer_data not provided, get it from database
     if composer_data is None:
@@ -110,7 +111,10 @@ def ingest_to_database(
     Returns: Boolean indicating successful transaction
     """
     if logger_service_param is None:
-        logger_service_param = LoggerService()
+        logger_service_param = LoggerService(
+            ingestion_anomalies_log_path=INGESTION_ANOMALIES_LOG_PATH,
+            ingested_log_path=INGESTION_INGESTED_LOG_PATH
+        )
     
     overridable_and_new_statements = get_overwritable_and_new_statements(
         statements_list, disable_overwrite, force_overwrite=force_state_transition
@@ -142,12 +146,10 @@ def ingest_to_database(
         successful_transaction = False
         logging.error(f"Ingestion aborted due to {e}")
 
-    logger_service_param.write_anomalies_to_file()
 
     if successful_transaction:
         if update_upstream:
             update_upstream_statements()
-        logger_service_param.write_ingested_statements_to_file(statements)
     
     return successful_transaction
 

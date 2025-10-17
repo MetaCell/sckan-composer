@@ -2,12 +2,16 @@ from typing import List, Any, Dict, Set, Optional
 
 from composer.enums import CSState, SentenceState
 from composer.models import Sentence, ConnectivityStatement
+from composer.constants import INGESTION_ANOMALIES_LOG_PATH, INGESTION_INGESTED_LOG_PATH
 from composer.services.cs_ingestion.helpers.common_helpers import ID
 from composer.services.cs_ingestion.logging_service import STATEMENT_INCORRECT_STATE, SENTENCE_INCORRECT_STATE, \
     LoggerService
 from composer.services.cs_ingestion.models import LoggableAnomaly
 
-logger_service = LoggerService()
+logger_service = LoggerService(
+    ingestion_anomalies_log_path=INGESTION_ANOMALIES_LOG_PATH,
+    ingested_log_path=INGESTION_INGESTED_LOG_PATH
+)
 
 
 

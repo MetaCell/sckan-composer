@@ -2,9 +2,13 @@ from .logging_service import LoggerService
 from .neurondm_script import main as get_statements_from_neurondm
 from composer.services.cs_ingestion.helpers.common_helpers import ID
 from composer.models import ConnectivityStatement
+from composer.constants import INGESTION_ANOMALIES_LOG_PATH, INGESTION_INGESTED_LOG_PATH
 from django.core.exceptions import FieldDoesNotExist
 
-logger_service = LoggerService()
+logger_service = LoggerService(
+    ingestion_anomalies_log_path=INGESTION_ANOMALIES_LOG_PATH,
+    ingested_log_path=INGESTION_INGESTED_LOG_PATH
+)
 
 def check_if_connectivity_statement_field_exists(cs_field):
 	try:

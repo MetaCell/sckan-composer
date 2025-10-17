@@ -1008,6 +1008,7 @@ class IngestionLogFileView(APIView):
         """
         import os
         from django.http import FileResponse
+        from composer.constants import INGESTION_ANOMALIES_LOG_PATH, INGESTION_INGESTED_LOG_PATH
         
         log_type = request.query_params.get('log_type')
         
@@ -1017,12 +1018,11 @@ class IngestionLogFileView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Get log file path and filename from LoggerService defaults
         if log_type == 'anomalies':
-            log_path = 'ingestion_anomalies_log.csv'
+            log_path = INGESTION_ANOMALIES_LOG_PATH
             filename = 'ingestion_anomalies.csv'
         elif log_type == 'ingested':
-            log_path = 'ingested_log.csv'
+            log_path = INGESTION_INGESTED_LOG_PATH
             filename = 'ingested_statements.csv'
         else:
             return Response(
