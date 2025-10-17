@@ -375,6 +375,11 @@ class ProvenanceSerializer(serializers.ModelSerializer):
         fields = ("id", "uri", "connectivity_statement_id")
 
 
+class ProvenanceCreateSerializer(serializers.Serializer):
+    """Serializer for creating provenance via request body"""
+    uri = serializers.CharField(required=True)
+
+
 class SentenceConnectivityStatement(serializers.ModelSerializer):
     """Connectivity Statement"""
 

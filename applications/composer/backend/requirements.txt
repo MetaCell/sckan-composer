@@ -1,12 +1,14 @@
 packaging==21.3
-Django==4.1.13
+Django==4.2.25
 uvicorn==0.20.0
+starlette>=0.41.3
+pillow>=11.0.0
 psycopg2-binary==2.9.5
 djangorestframework==3.14.0
 django-filter==22.1
 django-fsm==2.8.1
 django-fsm-admin@git+https://github.com/gadventures/django-fsm-admin@master
-django-admin-sortable2==2.1.4
+django-admin-sortable2==2.2.8
 django-nested-admin==4.0.2
 django-jazzmin==2.6.0
 drf-spectacular==0.25.1

@@ -46,6 +46,7 @@ from composer.services.cs_ingestion.helpers.notes_helper import (
     create_invalid_note,
     add_ingestion_system_note,
     do_transition_to_exported,
+    do_system_transition_to_exported,
 )
 from composer.services.cs_ingestion.models import (
     LoggableAnomaly,
@@ -59,7 +60,22 @@ def create_or_update_connectivity_statement(
     sentence: Sentence,
     update_anatomical_entities: bool,
     logger_service: LoggerService,
+    population_uris: set = None,
 ) -> Tuple[ConnectivityStatement, bool]:
+    """
+    Create or update a connectivity statement from ingested data.
+    
+    Args:
+        statement: The statement data dictionary
+        sentence: The associated sentence object
+        update_anatomical_entities: Whether to update anatomical entity relationships
+        logger_service: Service for logging anomalies
+        population_uris: Set of URIs from population file. When provided, the system_exported
+                        transition is used to allow state changes from any state.
+    
+    Returns:
+        Tuple of (ConnectivityStatement, created) where created is True if new
+    """
     reference_uri = statement[ID]
     populationset_name = statement.get("populationset", "")
     defaults = {
@@ -94,6 +110,9 @@ def create_or_update_connectivity_statement(
 
     validation_errors = statement.get(VALIDATION_ERRORS, ValidationErrors())
 
+    # State transitions: Handle validation errors and state updates
+    # When population_uris is provided (population file used), use system_exported
+    # transition to allow state changes from any state
     if validation_errors.has_errors():
         error_message = validation_errors.to_string()
         if connectivity_statement.state != CSState.INVALID:
@@ -101,13 +120,22 @@ def create_or_update_connectivity_statement(
         else:
             create_invalid_note(connectivity_statement, error_message)
     else:
-        if (
-            connectivity_statement.state != CSState.EXPORTED
-            and ConnectivityStatementStateService.has_populationset(
-                connectivity_statement=connectivity_statement
-            )
-        ):
-            do_transition_to_exported(connectivity_statement)
+        # Statement is valid - attempt transition to EXPORTED
+        # Use system_exported transition when population_uris is provided
+        # This allows transitioning from any state (e.g., TO_BE_REVIEWED -> EXPORTED)
+        if population_uris is not None:
+            if connectivity_statement.state != CSState.EXPORTED:
+                transition_success, error_message = do_system_transition_to_exported(connectivity_statement)
+                if not transition_success:
+                    # Transition to EXPORTED failed - move to INVALID state
+                    if connectivity_statement.state != CSState.INVALID:
+                        do_transition_to_invalid_with_note(connectivity_statement, error_message)
+                    else:
+                        create_invalid_note(connectivity_statement, error_message)
+        else:
+            # Normal ingestion: only transition if not already exported
+            if connectivity_statement.state != CSState.EXPORTED:
+                do_transition_to_exported(connectivity_statement)
 
     for alert_data in statement.get(STATEMENT_ALERTS, []):
         try:

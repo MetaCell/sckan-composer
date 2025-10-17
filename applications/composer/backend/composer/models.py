@@ -93,6 +93,61 @@ class PmcIdField(models.CharField):
         return super().formfield(*args, **kwargs)
 
 
+def validate_provenance_uri(value):
+    """Validate that the URI is a valid DOI, PMID, PMCID, or URL"""
+    if not value or not value.strip():
+        raise ValidationError("URI cannot be empty.")
+    
+    uri = value.strip()
+    
+    # DOI patterns
+    doi_patterns = [
+        r'^10\.\d{4,}/[a-zA-Z0-9\-._():]+(?:/[a-zA-Z0-9\-._():]+)*$',  # Standard DOI format - no consecutive slashes
+        r'^doi:10\.\d{4,}/[a-zA-Z0-9\-._():]+(?:/[a-zA-Z0-9\-._():]+)*$',  # DOI with prefix
+        r'^https?://doi\.org/10\.\d{4,}/[a-zA-Z0-9\-._():]+(?:/[a-zA-Z0-9\-._():]+)*$',  # DOI URL
+        r'^https?://dx\.doi\.org/10\.\d{4,}/[a-zA-Z0-9\-._():]+(?:/[a-zA-Z0-9\-._():]+)*$',  # Alternative DOI URL
+    ]
+    
+    # PMID patterns
+    pmid_patterns = [
+        r'^PMID:\s*\d+$',  # PMID with prefix
+        r'^https?://pubmed\.ncbi\.nlm\.nih\.gov/\d+/?$',  # PubMed URL
+    ]
+    
+    # PMCID patterns
+    pmcid_patterns = [
+        r'^PMC\d+$',  # PMC ID format
+        r'^PMCID:\s*PMC\d+$',  # PMCID with prefix
+        r'^https?://www\.ncbi\.nlm\.nih\.gov/pmc/articles/PMC\d+/?$',  # PMC URL
+    ]
+    
+    # URL pattern
+    url_pattern = r'^https?://[a-zA-Z0-9\-.]+(:[0-9]+)?(/[a-zA-Z0-9\-._~!$&\'()*+,;=:@]+)*(\?[a-zA-Z0-9\-._~!$&\'()*+,;=:@/?]*)?(\#[a-zA-Z0-9\-._~!$&\'()*+,;=:@/?]*)?$'
+    
+    # Check if it matches any of the valid patterns
+    all_patterns = doi_patterns + pmid_patterns + pmcid_patterns + [url_pattern]
+    
+    for pattern in all_patterns:
+        if re.match(pattern, uri, re.IGNORECASE):
+            return
+    
+    # If none match, raise validation error
+    raise ValidationError(
+        "URI must be a valid DOI (e.g., '10.1000/xyz123' or 'https://doi.org/10.1000/xyz123'), "
+        "PMID (e.g., 'PMID:12345678' or 'https://pubmed.ncbi.nlm.nih.gov/12345678'), "
+        "PMCID (e.g., 'PMC1234567' or 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1234567'), "
+        "or a valid URL (e.g., 'https://example.com')."
+    )
+
+
+class ProvenanceUriField(models.CharField):
+    """Custom field for provenance URIs that accepts DOI, PMID, PMCID, or URLs"""
+    
+    def __init__(self, *args, **kwargs):
+        kwargs['validators'] = kwargs.get('validators', []) + [validate_provenance_uri]
+        super().__init__(*args, **kwargs)
+
+
 # Model Managers
 class ConnectivityStatementManager(models.Manager):
     def get_queryset(self):
@@ -452,10 +507,10 @@ class Sentence(models.Model, BulkActionMixin):
 
     title = models.CharField(max_length=200, db_index=True)
     text = models.TextField()
-    external_ref = models.CharField(max_length=20, db_index=True, null=True, blank=True)
+    external_ref = models.CharField(max_length=100, db_index=True, null=True, blank=True)
     state = FSMField(default=SentenceState.OPEN, protected=True)
     pmid = PmIdField(db_index=True, null=True, blank=True)
-    pmcid = PmcIdField(max_length=20, db_index=True, null=True, blank=True)
+    pmcid = PmcIdField(max_length=100, db_index=True, null=True, blank=True)
     doi = DoiField(max_length=100, db_index=True, null=True, blank=True)
     batch_name = models.CharField(max_length=100, null=True, blank=True, db_index=True)
     tags = models.ManyToManyField(Tag, verbose_name="Tags", blank=True)
@@ -751,17 +806,12 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
     def npo_approved(self, *args, **kwargs):
         ...
 
-    @transition(
-        field=state,
-        source=[CSState.NPO_APPROVED, CSState.INVALID],
-        target=CSState.EXPORTED,
-        conditions=[
-            ConnectivityStatementStateService.is_valid,
-            ConnectivityStatementStateService.has_populationset,
-        ],
-        permission=ConnectivityStatementStateService.has_permission_to_transition_to_exported,
-    )
-    def exported(self, *args, **kwargs):
+    def _perform_export_logic(self):
+        """
+        Common logic for exporting a connectivity statement.
+        This method handles population index assignment, reference URI creation,
+        and marking the statement as exported.
+        """
         with transaction.atomic():
             update_fields = ["has_statement_been_exported"]
             # Only update population_index if the statement hasn't been exported yet
@@ -789,6 +839,45 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
             # Mark the statement as exported.
             self.has_statement_been_exported = True
             self.save(update_fields=update_fields)
+
+    @transition(
+        field=state,
+        source=[CSState.NPO_APPROVED, CSState.INVALID],
+        target=CSState.EXPORTED,
+        conditions=[
+            ConnectivityStatementStateService.is_valid,
+            ConnectivityStatementStateService.has_populationset,
+        ],
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_exported,
+    )
+    def exported(self, *args, **kwargs):
+        self._perform_export_logic()
+
+    @transition(
+        field=state,
+        source=[
+            CSState.DRAFT,
+            CSState.COMPOSE_NOW,
+            CSState.IN_PROGRESS,
+            CSState.TO_BE_REVIEWED,
+            CSState.REVISE,
+            CSState.REJECTED,
+            CSState.NPO_APPROVED,
+            CSState.INVALID,
+        ],
+        target=CSState.EXPORTED,
+        conditions=[
+            ConnectivityStatementStateService.is_valid,
+            ConnectivityStatementStateService.has_populationset,
+        ],
+        permission=ConnectivityStatementStateService.has_permission_to_transition_to_exported,
+    )
+    def system_exported(self, *args, **kwargs):
+        """
+        Transition to exported state that can be called by system users from any state.
+        This is typically used during ingestion with population files.
+        """
+        self._perform_export_logic()
 
     @transition(
         field=state,
@@ -1212,7 +1301,7 @@ class Provenance(models.Model):
     connectivity_statement = models.ForeignKey(
         ConnectivityStatement, on_delete=models.CASCADE
     )
-    uri = models.URLField()
+    uri = ProvenanceUriField(max_length=500)
 
     def __str__(self):
         return self.uri

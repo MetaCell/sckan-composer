@@ -37,8 +37,20 @@ ENV MODULE_NAME=backend \
     APP_DIR=/usr/src/app
 
 RUN apt-get update \
- && apt-get install -y --no-install-recommends \
+ && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends --allow-downgrades \
        nginx supervisor git \
+       zlib1g \
+       zlib1g-dev \
+       imagemagick \
+       libgnutls30 \
+       bluez \
+       libxml2 \
+       libtiff6 \
+       libxslt1.1 \
+       libexpat1 \
+       perl \
+ && apt-get install --only-upgrade zlib1g zlib1g-dev -y \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${APP_DIR}
