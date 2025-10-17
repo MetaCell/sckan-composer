@@ -412,10 +412,8 @@ SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
 if DEBUG:
     INSTALLED_APPS += [
         "debug_toolbar",
-        'silk',
     ]
     MIDDLEWARE += [
-        'silk.middleware.SilkyMiddleware',
         "debug_toolbar.middleware.DebugToolbarMiddleware",
     ]
     DEBUG_TOOLBAR_CONFIG = {
