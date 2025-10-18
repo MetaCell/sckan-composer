@@ -187,10 +187,11 @@ def process_dynamic_relationships(
         return
     
     # Get all relationships to map IDs to objects
-    relationship_ids = list(custom_results.keys())
+    relationship_ids = [int(rel_id) for rel_id in custom_results.keys()]
     relationships = {r.id: r for r in Relationship.objects.filter(id__in=relationship_ids)}
     
-    for relationship_id, result in custom_results.items():
+    for relationship_id_str, result in custom_results.items():
+        relationship_id = int(relationship_id_str)
         relationship = relationships.get(relationship_id)
         if not relationship:
             continue
