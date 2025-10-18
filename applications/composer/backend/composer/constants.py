@@ -10,13 +10,15 @@ def _get_media_path(*paths):
     return os.path.join(settings.MEDIA_ROOT, *paths)
 
 
-# Directory paths for file uploads (full paths in MEDIA_ROOT)
-INGESTION_UPLOADS_DIR = _get_media_path("ingestion_uploads")
-INGESTION_TEMP_DIR = _get_media_path("ingestion_temp")
+# Base directory for all ingestion-related files
+INGESTION_BASE_DIR = _get_media_path("ingestion")
 
-# Log file paths for ingestion (full paths in MEDIA_ROOT)
-INGESTION_ANOMALIES_LOG_PATH = _get_media_path("ingestion_anomalies_log.csv")
-INGESTION_INGESTED_LOG_PATH = _get_media_path("ingested_log.csv")
+# Directory for temporary files (cleaned up periodically by cleanup_old_files command)
+INGESTION_TEMP_DIR = os.path.join(INGESTION_BASE_DIR, "ingestion_temp")
+
+# Log file paths for ingestion (persistent files available via IngestionLogFileView)
+INGESTION_ANOMALIES_LOG_PATH = os.path.join(INGESTION_BASE_DIR, "ingestion_anomalies_log.csv")
+INGESTION_INGESTED_LOG_PATH = os.path.join(INGESTION_BASE_DIR, "ingested_log.csv")
 
 # Cleanup settings
 DEFAULT_CLEANUP_DAYS = 30

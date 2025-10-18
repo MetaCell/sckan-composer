@@ -8,7 +8,7 @@ from composer.services.workflows.ingestion_utils import (
     get_ingestion_timestamp,
     get_timestamped_population_filename,
 )
-from composer.constants import INGESTION_UPLOADS_DIR
+from composer.constants import INGESTION_TEMP_DIR
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 import os
@@ -104,7 +104,7 @@ def ingest_statements(request):
         population_file_path = None
         if 'population_file' in request.FILES:
             uploaded_file = request.FILES['population_file']
-            os.makedirs(INGESTION_UPLOADS_DIR, exist_ok=True)
+            os.makedirs(INGESTION_TEMP_DIR, exist_ok=True)
             
             population_file_path = get_timestamped_population_filename(
                 uploaded_file.name,

@@ -3,7 +3,7 @@ Utility functions for ingestion workflow file management.
 """
 import os
 from datetime import datetime
-from composer.constants import INGESTION_UPLOADS_DIR, INGESTION_TEMP_DIR
+from composer.constants import INGESTION_TEMP_DIR
 
 
 def get_ingestion_timestamp() -> str:
@@ -26,11 +26,11 @@ def get_timestamped_population_filename(original_filename: str, timestamp: str) 
         timestamp: Timestamp string from get_ingestion_timestamp()
     
     Returns:
-        str: Full path to the timestamped population file
+        str: Full path to the timestamped population file in the temporary directory
         
     Example:
         get_timestamped_population_filename("pop.txt", "2025-01-15_10-30-45")
-        -> "/path/to/media/ingestion_uploads/pop_2025-01-15_10-30-45.txt"
+        -> "/path/to/media/ingestion/ingestion_temp/pop_2025-01-15_10-30-45.txt"
     """
     # Split filename into base and extension
     name_parts = os.path.splitext(original_filename)
@@ -40,8 +40,8 @@ def get_timestamped_population_filename(original_filename: str, timestamp: str) 
     # Create timestamped filename
     timestamped_filename = f"{base_name}_{timestamp}{extension}"
     
-    # Return full path (INGESTION_UPLOADS_DIR already contains full path)
-    return os.path.join(INGESTION_UPLOADS_DIR, timestamped_filename)
+    # Return full path (INGESTION_TEMP_DIR already contains full path)
+    return os.path.join(INGESTION_TEMP_DIR, timestamped_filename)
 
 
 def get_ingestion_temp_file_paths(timestamp: str) -> dict:
