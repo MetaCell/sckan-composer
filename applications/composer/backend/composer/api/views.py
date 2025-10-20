@@ -17,7 +17,7 @@ from django.db.models import Case, When, Value, IntegerField
 from composer.services.export.helpers.predicate_mapping import PredicateToDBMapping
 from composer.services.dynamic_schema_service import inject_dynamic_relationship_schema
 from composer.services import bulk_service
-from composer.enums import BulkActionType
+from composer.pure_enums import BulkActionType
 from composer.services.state_services import (
     ConnectivityStatementStateService,
     SentenceStateService,
@@ -970,3 +970,82 @@ def jsonschemas(request):
     ret = ret.replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
     data = bytes(ret.encode("utf-8"))
     return HttpResponse(data)
+
+
+class IngestionLogFileView(APIView):
+    """
+    API endpoint to download ingestion log files.
+    Staff-only access to download CSV log files generated during the ingestion process.
+    """
+    permission_classes = [permissions.IsAdminUser]
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='log_type',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description='Type of log file to download. Options: "anomalies" or "ingested"',
+                enum=['anomalies', 'ingested'],
+                required=True,
+            ),
+        ],
+        responses={
+            200: OpenApiTypes.BINARY,
+            404: OpenApiTypes.OBJECT,
+        },
+        description='Download ingestion log files as CSV. Returns anomalies log or ingested statements log.',
+    )
+    def get(self, request):
+        """
+        Download log file as CSV.
+        
+        Query Parameters:
+        - log_type: 'anomalies' or 'ingested'
+        
+        Returns:
+        - CSV file download
+        """
+        import os
+        from django.http import FileResponse
+        from composer.constants import INGESTION_ANOMALIES_LOG_PATH, INGESTION_INGESTED_LOG_PATH
+        
+        log_type = request.query_params.get('log_type')
+        
+        if not log_type:
+            return Response(
+                {'error': 'log_type query parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if log_type == 'anomalies':
+            log_path = INGESTION_ANOMALIES_LOG_PATH
+            filename = 'ingestion_anomalies.csv'
+        elif log_type == 'ingested':
+            log_path = INGESTION_INGESTED_LOG_PATH
+            filename = 'ingested_statements.csv'
+        else:
+            return Response(
+                {'error': 'Invalid log_type. Use "anomalies" or "ingested"'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check if file exists
+        if not os.path.exists(log_path):
+            return Response(
+                {'error': f'Log file not found: {log_path}'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Serve the file for download
+        try:
+            file_handle = open(log_path, 'rb')
+            response = FileResponse(file_handle, content_type='text/csv')
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            return response
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Error reading log file: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

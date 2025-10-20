@@ -48,7 +48,7 @@ from composer.models import (
     Region,
     AnatomicalEntityIntersection,
     AnatomicalEntity,
-    CSState
+    CSState,
 )
 
 
@@ -112,9 +112,46 @@ class StatementAlertInline(admin.StackedInline):
 
 
 class RelationshipAdmin(admin.ModelAdmin):
-    list_display = ("title", "predicate_name", "predicate_uri", "type", "order")
+    list_display = ("title", "predicate_name", "predicate_uri", "type", "order", "has_custom_code")
     ordering = ("order",)
     search_fields = ("title", "predicate_name", "predicate_uri")
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'predicate_name', 'predicate_uri', 'type', 'order')
+        }),
+        ('Custom Ingestion Code', {
+            'classes': ('collapse',),
+            'fields': ('custom_ingestion_code',),
+            'description': (
+                'Add custom Python code to extract data from NeuroDM during ingestion. '
+            ),
+        }),
+    )
+    
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'custom_ingestion_code' in form.base_fields:
+            form.base_fields['custom_ingestion_code'].widget = forms.Textarea(attrs={
+                'rows': 15,
+                'cols': 100,
+                'style': 'font-family: monospace; font-size: 12px;'
+            })
+            form.base_fields['custom_ingestion_code'].help_text = mark_safe(
+                "Optional Python code to extract data from NeuroDM for this relationship during ingestion.<br>"
+                "The code has access to:<br>"
+                "• <code>fc</code>: dict with neuron properties (id, label, species, phenotype, etc.)<br>"
+                "• <code>fc[\"_neuron\"]</code>: the NeuroDM neuron object<br><br>"
+                "The code must define a <code>result</code> variable with the output:<br>"
+                "• For TRIPLE relationships: list of dicts [{'name': str, 'uri': str}, ...]<br>"
+                "• For TEXT relationships: list of strings or single string<br>"
+                "• For ANATOMICAL_ENTITY relationships: list of URIs (strings)<br><br>"
+                "Errors are logged to the ingestion anomalies file and the relationship will be skipped."
+            )
+        return form
+    
+    @admin.display(description="Has Custom Code", boolean=True)
+    def has_custom_code(self, obj):
+        return bool(obj.custom_ingestion_code and obj.custom_ingestion_code.strip())
 
 class TripleAdmin(admin.ModelAdmin):
     list_display = ("name", "uri", "relationship")
@@ -278,7 +315,7 @@ class ConnectivityStatementTripleInline(admin.TabularInline):
     model = ConnectivityStatementTriple
     extra = 1
     autocomplete_fields = ("relationship",)
-    filter_horizontal = ("triples",)
+    raw_id_fields = ("triples",)
     fields = ("relationship", "triples")
 
     def get_form(self, request, obj=None, **kwargs):
@@ -311,7 +348,7 @@ class ConnectivityStatementAnatomicalEntityInline(admin.TabularInline):
     model = ConnectivityStatementAnatomicalEntity
     extra = 1
     autocomplete_fields = ("relationship",)
-    filter_horizontal = ("anatomical_entities",)
+    raw_id_fields = ("anatomical_entities",)
     fields = ("relationship", "anatomical_entities")
 
     def get_form(self, request, obj=None, **kwargs):
@@ -446,6 +483,45 @@ class IngestSentenceForm(forms.Form):
     file = forms.FileField(label="CSV file")
 
 
+class IngestStatementsForm(forms.Form):
+    """Form for configuring connectivity statement ingestion parameters"""
+    update_upstream = forms.BooleanField(
+        required=False,
+        initial=False,
+        label="Update upstream statements",
+        help_text="Set this flag to update upstream statements."
+    )
+    update_anatomical_entities = forms.BooleanField(
+        required=False,
+        initial=False,
+        label="Update anatomical entities",
+        help_text="Set this flag to try move anatomical entities to specific layer, region."
+    )
+    disable_overwrite = forms.BooleanField(
+        required=False,
+        initial=False,
+        label="Disable overwrite",
+        help_text="Set this flag to prevent overwriting existing statements."
+    )
+    full_imports = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Enter URIs separated by commas or new lines'}),
+        label="Full imports",
+        help_text="List of full imports to include in the ingestion (comma or newline separated)."
+    )
+    label_imports = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Enter labels separated by commas or new lines'}),
+        label="Label imports",
+        help_text="List of label imports to include in the ingestion (comma or newline separated)."
+    )
+    population_file = forms.FileField(
+        required=False,
+        label="Population file",
+        help_text="Text file containing population URIs (one per line). Only statements matching these URIs will be processed."
+    )
+
+
 # Custom view for ingesting sentences from a CSV file
 def ingest_sentences_view(request):
     output = None
@@ -478,11 +554,51 @@ def ingest_sentences_view(request):
     return render(request, "admin/ingest_sentences.html", context)
 
 
+# Custom view for downloading ingestion log files
+def download_logs_view(request):
+    """
+    Admin page with links to download ingestion log files.
+    """
+    context = admin.site.each_context(request)
+    context.update({
+        "title": "Download Ingestion Logs",
+        "anomalies_url": reverse('composer-api:ingestion-logs') + '?log_type=anomalies',
+        "ingested_url": reverse('composer-api:ingestion-logs') + '?log_type=ingested',
+    })
+    return render(request, "admin/download_logs.html", context)
+
+
+# Custom view for ingesting connectivity statements
+def ingest_statements_view(request):
+    """
+    Admin page for configuring and triggering connectivity statement ingestion.
+    """
+    context = admin.site.each_context(request)
+    if request.method == "POST":
+        form = IngestStatementsForm(request.POST, request.FILES)
+        if form.is_valid():
+            context.update({
+                "form": form,
+                "title": "Ingest Connectivity Statements",
+            })
+            return render(request, "admin/ingest_statements.html", context)
+    else:
+        form = IngestStatementsForm()
+    
+    context.update({
+        "form": form,
+        "title": "Ingest Connectivity Statements",
+    })
+    return render(request, "admin/ingest_statements.html", context)
+
+
 def custom_admin_urls(original_get_urls):
     def get_urls():
         urls = original_get_urls()
         custom_urls = [
             path('ingest-sentences/', admin.site.admin_view(ingest_sentences_view), name='ingest-sentences'),
+            path('ingest-statements/', admin.site.admin_view(ingest_statements_view), name='ingest-statements'),
+            path('download-logs/', admin.site.admin_view(download_logs_view), name='download-logs'),
         ]
         return custom_urls + urls
     return get_urls

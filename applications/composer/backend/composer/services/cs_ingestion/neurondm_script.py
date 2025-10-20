@@ -1,4 +1,5 @@
 import os
+import traceback
 from typing import Optional, Tuple, List, Set, Dict
 
 import rdflib
@@ -7,7 +8,6 @@ from neurondm.core import Config, graphBase
 from neurondm.core import OntTerm, OntId, RDFL
 from pyontutils.core import OntGraph, OntResIri, OntResPath
 from pyontutils.namespaces import rdfs, ilxtr
-from django.core.management.base import BaseCommand, CommandError
 import logging
 import re
 
@@ -109,6 +109,8 @@ def for_composer(n, statement_alert_uris: Set[str] = None):
         note_alert=lrdf(n, ilxtr.alertNote),
         validation_errors=validation_errors,
         statement_alerts=statement_alerts,
+        # Expose neuron object for custom relationship processing
+        _neuron=n,
     )
 
     return fc
@@ -456,9 +458,62 @@ def update_from_entities(origins: NeuronDMOrigin, vias: List[NeuronDMVia], desti
     return origins, vias, destinations
 
 
+def process_custom_relationships_for_statement(statement: Dict, custom_relationships: List[Dict], logger_service: LoggerService):
+    """
+    Execute custom code for relationships on a statement (Step 1 of ingestion).
+    This runs during NeuroDM processing, before database interaction.
+    
+    Args:
+        statement: The statement dict with neuron data including '_neuron' object
+        custom_relationships: List of dicts with relationship info (id, title, type, custom_ingestion_code)
+        logger_service: Service for logging anomalies
+    
+    Returns:
+        Dict mapping relationship_id to execution result
+    """
+    results = {}
+    
+    for relationship_info in custom_relationships:
+        try:
+            # Prepare execution context - only provide fc dict
+            exec_globals = {
+                'fc': statement,
+            }
+            exec_locals = {}
+            
+            # Execute the custom code
+            exec(relationship_info['custom_ingestion_code'], exec_globals, exec_locals)
+            
+            # Get the result variable
+            if 'result' not in exec_locals:
+                logger_service.add_anomaly(
+                    LoggableAnomaly(
+                        statement_id=statement.get('id'),
+                        entity_id=str(relationship_info['id']),
+                        message=f"[CUSTOM_RELATIONSHIP] Custom code for relationship '{relationship_info['title']}' did not define 'result' variable",
+                        severity=Severity.WARNING
+                    )
+                )
+                continue
+            
+            results[relationship_info['id']] = exec_locals['result']
+            
+        except Exception as e:
+            logger_service.add_anomaly(
+                LoggableAnomaly(
+                    statement_id=statement.get('id'),
+                    entity_id=str(relationship_info['id']),
+                    message=f"[CUSTOM_RELATIONSHIP] Error executing custom code for relationship '{relationship_info['title']}': {str(e)} | Details: {{'relationship_title': '{relationship_info['title']}', 'error': '{str(e)}', 'traceback': '{traceback.format_exc()}', 'code': '{relationship_info['custom_ingestion_code']}'}}",
+                    severity=Severity.WARNING
+                )
+            )
+    
+    return results
+
+
 ## Based on:
 ## https://github.com/tgbugs/pyontutils/blob/30c415207b11644808f70c8caecc0c75bd6acb0a/neurondm/docs/composer.py#L668-L698
-def main(local=False, full_imports=[], label_imports=[], logger_service_param=Optional[LoggerService], statement_alert_uris: Set[str] = None):
+def main(local=False, full_imports=[], label_imports=[], logger_service_param=Optional[LoggerService], statement_alert_uris: Set[str] = None, population_uris: Set[str] = None, custom_relationships: List[Dict] = None):
     global logger_service
     logger_service = logger_service_param
 
@@ -535,8 +590,23 @@ def main(local=False, full_imports=[], label_imports=[], logger_service_param=Op
     if statement_alert_uris is None:
         statement_alert_uris = set()
 
+    # Filter neurons by population URIs BEFORE for_composer processing
+    # This is done in Step 1 to avoid processing neurons that won't be ingested
+    if population_uris is not None:
+        # Get neuron IDs and filter
+        neurons = [n for n in neurons if str(n.id_) in population_uris]
+    
     fcs = [for_composer(n, statement_alert_uris) for n in neurons]
     composer_statements = [item for item in fcs if item is not None]
+    
+    # Process custom relationships for each statement (Step 1)
+    if custom_relationships:
+        for statement in composer_statements:
+            custom_results = process_custom_relationships_for_statement(
+                statement, custom_relationships, logger_service
+            )
+            # Store results in the statement dict for Step 2
+            statement['_custom_relationship_results'] = custom_results
 
     return composer_statements
 

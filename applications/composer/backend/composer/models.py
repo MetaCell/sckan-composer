@@ -1052,6 +1052,7 @@ class Relationship(models.Model):
     predicate_uri = models.URLField()
     type = models.CharField(max_length=20, choices=RelationshipType.choices)
     order = models.PositiveIntegerField(default=0)
+    custom_ingestion_code = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.title

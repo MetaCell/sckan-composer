@@ -1,0 +1,53 @@
+{% extends "admin/base.html" %}
+{% load i18n static jazzmin composer_extras %}
+{% get_jazzmin_ui_tweaks as jazzmin_ui %}
+
+{% block bodyclass %}{{ block.super }} download-logs{% endblock %}
+
+{% block content_title %} {% trans 'Download Ingestion Logs' %} {% endblock %}
+
+{% block breadcrumbs %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'admin:index' %}">{% trans 'Home' %}</a></li>
+        <li class="breadcrumb-item">{% trans 'Download Ingestion Logs' %}</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+<div>
+  <h2>Ingestion Log Files</h2>
+  <p>Download CSV log files from the most recent ingestion process.</p>
+  
+  <div style="margin: 2em 0;">
+    <div style="padding: 1em; background: #f8f9fa; border-left: 4px solid #007bff; margin-bottom: 1em;">
+      <h3 style="margin-top: 0;">Ingestion Anomalies Log</h3>
+      <p>Contains all errors and warnings encountered during the ingestion process, including validation issues, data quality problems, and processing errors.</p>
+      <p><strong>Format:</strong> severity, statement_id, entity_id, message</p>
+      <a href="{{ anomalies_url }}" class="button default" style="display: inline-block; margin-top: 0.5em;">
+        <i class="fas fa-download"></i> Download Anomalies Log
+      </a>
+    </div>
+    
+    <div style="padding: 1em; background: #f8f9fa; border-left: 4px solid #28a745; margin-bottom: 1em;">
+      <h3 style="margin-top: 0;">Ingested Statements Log</h3>
+      <p>Contains all connectivity statements processed during ingestion with their final states, showing which statements were successfully imported and which failed.</p>
+      <p><strong>Format:</strong> statement_id, label, state, reason</p>
+      <a href="{{ ingested_url }}" class="button default" style="display: inline-block; margin-top: 0.5em;">
+        <i class="fas fa-download"></i> Download Ingested Statements Log
+      </a>
+    </div>
+  </div>
+  
+  <div style="margin-top: 2em; padding: 1em; background: #fff3cd; border-left: 4px solid #ffc107;">
+    <h4 style="margin-top: 0;">About These Logs</h4>
+    <ul>
+      <li><strong>Anomalies Log:</strong> Tracks all issues during ingestion
+      </li>
+      <li><strong>Ingested Statements Log:</strong> Provides a record of all statements processed and their outcomes
+      </li>
+      <li>Both files are CSV format and can be opened in Excel, Google Sheets, or any spreadsheet application.</li>
+      <li>Log files are overwritten each time the ingestion process runs. Download them before running a new ingestion if you need to preserve the data.</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

@@ -6,7 +6,8 @@ from drf_writable_nested.mixins import UniqueFieldsMixin
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
 
-from ..enums import BulkActionType, RelationshipType, SentenceState, CSState
+from ..enums import RelationshipType, SentenceState, CSState
+from ..pure_enums import BulkActionType
 from ..models import (
     AlertType,
     AnatomicalEntity,

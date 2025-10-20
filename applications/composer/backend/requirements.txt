@@ -5,7 +5,7 @@ starlette>=0.41.3
 pillow>=11.0.0
 psycopg2-binary==2.9.5
 djangorestframework==3.14.0
-django-filter==22.1
+django-filter==23.5
 django-fsm==2.8.1
 django-fsm-admin@git+https://github.com/gadventures/django-fsm-admin@master
 django-admin-sortable2==2.2.8
@@ -21,7 +21,6 @@ aiohttp==3.11.18
 crossref-commons==0.0.7
 neurondm==0.1.8
 django-cors-headers==4.3.1
-django-silk==5.2.0
 django-debug-toolbar==4.3.0
 django-sslserver-v2==1.0
 black==22.12.0

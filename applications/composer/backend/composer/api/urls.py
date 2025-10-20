@@ -18,6 +18,7 @@ from .views import (
     ProfileViewSet,
     SentenceViewSet,
     SpecieViewSet,
+    IngestionLogFileView,
     TagViewSet,
     ViaViewSet,
     SexViewSet,
@@ -63,4 +64,5 @@ urlpatterns = [
     path("jsonschemas/", jsonschemas, name="jsonschemas"),
 	path("predicate-mapping/", PredicateMappingViewSet.as_view(), name="predicate-mapping"),
 	path("knowledge-statement/", KnowledgeStatementViewSet.as_view(), name="knowledge-statement"),
+	path("ingestion-logs/", IngestionLogFileView.as_view(), name="ingestion-logs"),
 ]

@@ -1,4 +1,4 @@
-from composer.enums import ConnectivityErrors
+from composer.pure_enums import ConnectivityErrors
 from composer.services.state_services import ConnectivityStatementStateService
 
 
