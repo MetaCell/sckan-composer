@@ -166,6 +166,11 @@ def ingest_statements(
     Complete ingestion process: runs all 3 steps.
     This is a convenience wrapper that maintains backward compatibility.
     """
+    logger_service = LoggerService(
+        ingestion_anomalies_log_path=INGESTION_ANOMALIES_LOG_PATH,
+        ingested_log_path=INGESTION_INGESTED_LOG_PATH
+    )
+
     # Get composer data (custom relationships and alert URIs)
     composer_data = get_composer_data()
     
