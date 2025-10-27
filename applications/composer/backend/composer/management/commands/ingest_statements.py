@@ -34,6 +34,11 @@ class Command(BaseCommand):
             nargs='*',
             help='List of label imports to include in the ingestion.',
         )
+        parser.add_argument(
+            '--population_file',
+            type=str,
+            help='Path to a text file containing population URIs (one per line). When provided, ONLY statements matching these URIs will be processed for ingestion.',
+        )
 
     def handle(self, *args, **options):
         update_upstream = options['update_upstream']
@@ -41,13 +46,31 @@ class Command(BaseCommand):
         disable_overwrite = options['disable_overwrite']
         full_imports = options['full_imports']
         label_imports = options['label_imports']
+        population_file = options['population_file']
+
+        # Read population URIs from file if provided
+        population_uris = None
+        if population_file:
+            try:
+                with open(population_file, 'r', encoding='utf-8') as f:
+                    population_uris = set(line.strip() for line in f if line.strip())
+                self.stdout.write(f"Loaded {len(population_uris)} population URIs from {population_file}")
+            except FileNotFoundError:
+                self.stderr.write(self.style.ERROR(f"Population file not found: {population_file}"))
+                return
+            except Exception as e:
+                self.stderr.write(self.style.ERROR(f"Error reading population file: {e}"))
+                return
 
         start_time = time.time()
 
-        ingest_statements(update_upstream, update_anatomical_entities, disable_overwrite, full_imports, label_imports)
+        success = ingest_statements(update_upstream, update_anatomical_entities, disable_overwrite, full_imports, label_imports, population_uris)
 
         end_time = time.time()
 
         duration = end_time - start_time
 
-        self.stdout.write(self.style.SUCCESS(f"Ingestion completed in {duration:.2f} seconds."))
+        if success:
+            self.stdout.write(self.style.SUCCESS(f"Ingestion completed successfully in {duration:.2f} seconds."))
+        else:
+            self.stderr.write(self.style.ERROR(f"Ingestion failed after {duration:.2f} seconds. Check logs for details."))

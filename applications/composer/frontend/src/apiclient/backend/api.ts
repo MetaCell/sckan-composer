@@ -2754,6 +2754,19 @@ export interface Provenance {
     'connectivity_statement_id': number;
 }
 /**
+ * Serializer for creating provenance via request body
+ * @export
+ * @interface ProvenanceCreate
+ */
+export interface ProvenanceCreate {
+    /**
+     * 
+     * @type {string}
+     * @memberof ProvenanceCreate
+     */
+    'uri': string;
+}
+/**
  * 
  * @export
  * @interface Relationship
@@ -3587,18 +3600,17 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {string} uri 
+         * @param {ProvenanceCreate} provenanceCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAddProvenanceCreate: async (id: number, uri: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        composerConnectivityStatementAddProvenanceCreate: async (id: number, provenanceCreate: ProvenanceCreate, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('composerConnectivityStatementAddProvenanceCreate', 'id', id)
-            // verify required parameter 'uri' is not null or undefined
-            assertParamExists('composerConnectivityStatementAddProvenanceCreate', 'uri', uri)
-            const localVarPath = `/api/composer/connectivity-statement/{id}/add_provenance/{uri}/`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
-                .replace(`{${"uri"}}`, encodeURIComponent(String(uri)));
+            // verify required parameter 'provenanceCreate' is not null or undefined
+            assertParamExists('composerConnectivityStatementAddProvenanceCreate', 'provenanceCreate', provenanceCreate)
+            const localVarPath = `/api/composer/connectivity-statement/{id}/add_provenance/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -3621,9 +3633,12 @@ export const ComposerApiAxiosParamCreator = function (configuration?: Configurat
 
 
     
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(provenanceCreate, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -7438,12 +7453,12 @@ export const ComposerApiFp = function(configuration?: Configuration) {
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {string} uri 
+         * @param {ProvenanceCreate} provenanceCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async composerConnectivityStatementAddProvenanceCreate(id: number, uri: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectivityStatement>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAddProvenanceCreate(id, uri, options);
+        async composerConnectivityStatementAddProvenanceCreate(id: number, provenanceCreate: ProvenanceCreate, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerConnectivityStatementAddProvenanceCreate(id, provenanceCreate, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ComposerApi.composerConnectivityStatementAddProvenanceCreate']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -8519,12 +8534,12 @@ export const ComposerApiFactory = function (configuration?: Configuration, baseP
         /**
          * ConnectivityStatement
          * @param {number} id A unique integer value identifying this connectivity statement.
-         * @param {string} uri 
+         * @param {ProvenanceCreate} provenanceCreate 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        composerConnectivityStatementAddProvenanceCreate(id: number, uri: string, options?: RawAxiosRequestConfig): AxiosPromise<ConnectivityStatement> {
-            return localVarFp.composerConnectivityStatementAddProvenanceCreate(id, uri, options).then((request) => request(axios, basePath));
+        composerConnectivityStatementAddProvenanceCreate(id: number, provenanceCreate: ProvenanceCreate, options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: any; }> {
+            return localVarFp.composerConnectivityStatementAddProvenanceCreate(id, provenanceCreate, options).then((request) => request(axios, basePath));
         },
         /**
          * ConnectivityStatement
@@ -9377,13 +9392,13 @@ export class ComposerApi extends BaseAPI {
     /**
      * ConnectivityStatement
      * @param {number} id A unique integer value identifying this connectivity statement.
-     * @param {string} uri 
+     * @param {ProvenanceCreate} provenanceCreate 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ComposerApi
      */
-    public composerConnectivityStatementAddProvenanceCreate(id: number, uri: string, options?: RawAxiosRequestConfig) {
-        return ComposerApiFp(this.configuration).composerConnectivityStatementAddProvenanceCreate(id, uri, options).then((request) => request(this.axios, this.basePath));
+    public composerConnectivityStatementAddProvenanceCreate(id: number, provenanceCreate: ProvenanceCreate, options?: RawAxiosRequestConfig) {
+        return ComposerApiFp(this.configuration).composerConnectivityStatementAddProvenanceCreate(id, provenanceCreate, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -10737,6 +10752,44 @@ export const PublicApiAxiosParamCreator = function (configuration?: Configuratio
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * PredicateMapping: Returns labels for given URIs and predicates. Accepts POST requests with a dictionary of predicates and their URIs. Example request body: {     \"hasSomaLocatedIn\": [\"uri1\", \"uri2\"],     \"hasAxonLocatedIn\": [\"uri3\", \"uri4\"] }
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerPredicateMappingCreate: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/composer/predicate-mapping/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication basicAuth required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            // authentication tokenAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            // authentication cookieAuth required
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -10764,6 +10817,17 @@ export const PublicApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['PublicApi.composerKnowledgeStatementList']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * PredicateMapping: Returns labels for given URIs and predicates. Accepts POST requests with a dictionary of predicates and their URIs. Example request body: {     \"hasSomaLocatedIn\": [\"uri1\", \"uri2\"],     \"hasAxonLocatedIn\": [\"uri3\", \"uri4\"] }
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async composerPredicateMappingCreate(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.composerPredicateMappingCreate(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PublicApi.composerPredicateMappingCreate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -10787,6 +10851,14 @@ export const PublicApiFactory = function (configuration?: Configuration, basePat
          */
         composerKnowledgeStatementList(destinationUris?: Array<string>, limit?: number, offset?: number, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options?: RawAxiosRequestConfig): AxiosPromise<PaginatedKnowledgeStatementList> {
             return localVarFp.composerKnowledgeStatementList(destinationUris, limit, offset, originUris, populationUris, viaUris, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * PredicateMapping: Returns labels for given URIs and predicates. Accepts POST requests with a dictionary of predicates and their URIs. Example request body: {     \"hasSomaLocatedIn\": [\"uri1\", \"uri2\"],     \"hasAxonLocatedIn\": [\"uri3\", \"uri4\"] }
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        composerPredicateMappingCreate(options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.composerPredicateMappingCreate(options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -10812,6 +10884,16 @@ export class PublicApi extends BaseAPI {
      */
     public composerKnowledgeStatementList(destinationUris?: Array<string>, limit?: number, offset?: number, originUris?: Array<string>, populationUris?: Array<string>, viaUris?: Array<string>, options?: RawAxiosRequestConfig) {
         return PublicApiFp(this.configuration).composerKnowledgeStatementList(destinationUris, limit, offset, originUris, populationUris, viaUris, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * PredicateMapping: Returns labels for given URIs and predicates. Accepts POST requests with a dictionary of predicates and their URIs. Example request body: {     \"hasSomaLocatedIn\": [\"uri1\", \"uri2\"],     \"hasAxonLocatedIn\": [\"uri3\", \"uri4\"] }
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PublicApi
+     */
+    public composerPredicateMappingCreate(options?: RawAxiosRequestConfig) {
+        return PublicApiFp(this.configuration).composerPredicateMappingCreate(options).then((request) => request(this.axios, this.basePath));
     }
 }
 

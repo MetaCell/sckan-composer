@@ -4,6 +4,7 @@ from django.db import transaction
 
 from composer.models import AlertType
 from composer.services.cs_ingestion.helpers.overwritable_helper import (
+    filter_statements_by_population_uris,
     get_overwritable_and_new_statements,
 )
 from composer.services.cs_ingestion.helpers.sentence_helper import (
@@ -21,13 +22,13 @@ from .neurondm_script import main as get_statements_from_neurondm
 
 logger_service = LoggerService()
 
-
 def ingest_statements(
     update_upstream=False,
     update_anatomical_entities=False,
     disable_overwrite=False,
     full_imports=[],
     label_imports=[],
+    population_uris=None,
 ):
 
     statements_list = get_statements_from_neurondm(
@@ -36,8 +37,12 @@ def ingest_statements(
         logger_service_param=logger_service,
         statement_alert_uris=set(AlertType.objects.values_list("uri", flat=True)),
     )
+    
+    # Filter statements by population URIs if a population file was provided
+    statements_list = filter_statements_by_population_uris(statements_list, population_uris)
+    
     overridable_and_new_statements = get_overwritable_and_new_statements(
-        statements_list, disable_overwrite
+        statements_list, disable_overwrite, population_uris
     )
     statements = validate_statements(
         overridable_and_new_statements, update_anatomical_entities
@@ -49,7 +54,7 @@ def ingest_statements(
             for statement in statements:
                 sentence, _ = get_or_create_sentence(statement)
                 create_or_update_connectivity_statement(
-                    statement, sentence, update_anatomical_entities, logger_service
+                    statement, sentence, update_anatomical_entities, logger_service, population_uris
                 )
 
             update_forward_connections(statements)
@@ -72,3 +77,5 @@ def ingest_statements(
         if update_upstream:
             update_upstream_statements()
         logger_service.write_ingested_statements_to_file(statements)
+    
+    return successful_transaction
