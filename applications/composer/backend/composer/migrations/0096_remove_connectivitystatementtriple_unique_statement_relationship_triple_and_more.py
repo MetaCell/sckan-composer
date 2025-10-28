@@ -10,35 +10,33 @@ def migrate_triple_to_triples_forward(apps, schema_editor):
     """
     ConnectivityStatementTriple = apps.get_model("composer", "ConnectivityStatementTriple")
     
-    # Group by connectivity_statement and relationship to find all unique combinations
+    # Delete any ConnectivityStatementTriple where triple is NULL (and free text was also null or empty - captured in 0094)
+    # These are orphaned records
+    ConnectivityStatementTriple.objects.filter(triple__isnull=True).delete()
+    
     from collections import defaultdict
     groups = defaultdict(list)
-    
     for statement_triple in ConnectivityStatementTriple.objects.filter(
         triple__isnull=False
     ).select_related('triple').iterator(chunk_size=1000):
         key = (statement_triple.connectivity_statement_id, statement_triple.relationship_id)
         groups[key].append(statement_triple)
-    
+
     records_to_delete_ids = []
-    
     for key, records in groups.items():
         # Keep the first record as the primary one
         primary_record = records[0]
-        
         # Collect all unique triple IDs from all records
         triple_ids = set()
         for record in records:
             if record.triple_id:
                 triple_ids.add(record.triple_id)
-        
         # Add all triples to the primary record's M2M field in one operation
         if triple_ids:
             primary_record.triples.add(*triple_ids)
-        
         # Collect IDs of duplicate records to delete
         records_to_delete_ids.extend([record.id for record in records[1:]])
-    
+
     # Bulk delete duplicate records in chunks to avoid memory issues
     chunk_size = 1000
     for i in range(0, len(records_to_delete_ids), chunk_size):
