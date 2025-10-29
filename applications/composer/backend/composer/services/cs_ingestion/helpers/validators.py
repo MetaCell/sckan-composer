@@ -3,13 +3,17 @@ from typing import List, Dict, Any, Set, Type
 from neurondm import orders
 
 from composer.models import ConnectivityStatement, Sex, Specie, Region, AnatomicalEntityMeta, Layer
+from composer.constants import INGESTION_ANOMALIES_LOG_PATH, INGESTION_INGESTED_LOG_PATH
 from composer.services.cs_ingestion.helpers.common_helpers import ID, VALIDATION_ERRORS, ORIGINS, DESTINATIONS, VIAS, \
     SEX, SPECIES, FORWARD_CONNECTION
 from composer.services.cs_ingestion.logging_service import LoggerService
 from composer.services.cs_ingestion.models import ValidationErrors, LoggableAnomaly
 from django.db.models import Model as DjangoModel
 
-logger_service = LoggerService()
+logger_service = LoggerService(
+    ingestion_anomalies_log_path=INGESTION_ANOMALIES_LOG_PATH,
+    ingested_log_path=INGESTION_INGESTED_LOG_PATH
+)
 
 
 def validate_statements(statements: List[Dict[str, Any]], update_anatomical_entities: bool) -> List[Dict[str, Any]]:

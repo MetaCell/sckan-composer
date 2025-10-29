@@ -17,7 +17,7 @@ from django.db.models import Case, When, Value, IntegerField
 from composer.services.export.helpers.predicate_mapping import PredicateToDBMapping
 from composer.services.dynamic_schema_service import inject_dynamic_relationship_schema
 from composer.services import bulk_service
-from composer.enums import BulkActionType
+from composer.pure_enums import BulkActionType
 from composer.services.state_services import (
     ConnectivityStatementStateService,
     SentenceStateService,
@@ -42,6 +42,8 @@ from .serializers import (
     BulkActionResponseSerializer,
     ChangeStatusSerializer,
     ConnectivityStatementTripleSerializer,
+    ConnectivityStatementTextSerializer,
+    ConnectivityStatementAnatomicalEntitySerializer,
     PhenotypeSerializer,
     ProjectionPhenotypeSerializer,
     ConnectivityStatementSerializer,
@@ -56,6 +58,8 @@ from .serializers import (
     ViaSerializer,
     ProvenanceSerializer,
     ProvenanceCreateSerializer,
+    ExpertConsultantSerializer,
+    ExpertConsultantCreateSerializer,
     SexSerializer,
     PopulationSetSerializer,
     ConnectivityStatementUpdateSerializer,
@@ -73,7 +77,6 @@ from .permissions import (
 )
 from ..models import (
     AlertType,
-    AnatomicalEntityMeta,
     AnatomicalEntity,
     Phenotype,
     ProjectionPhenotype,
@@ -87,10 +90,13 @@ from ..models import (
     Tag,
     Via,
     Provenance,
+    ExpertConsultant,
     Sex,
     PopulationSet,
     Destination,
     ConnectivityStatementTriple,
+    ConnectivityStatementText,
+    ConnectivityStatementAnatomicalEntity,
 )
 
 
@@ -122,7 +128,7 @@ class TagMixin(viewsets.GenericViewSet):
         ],
         request=None,
     )
-    @action(detail=True, methods=["post"], url_path="add_tag/(?P<tag_id>\w+)")
+    @action(detail=True, methods=["post"], url_path=r"add_tag/(?P<tag_id>\w+)")
     def add_tag(self, request, pk=None, tag_id=None):
         instance = self.get_object()
         tag_instance = Tag.objects.get(id=tag_id)
@@ -140,7 +146,7 @@ class TagMixin(viewsets.GenericViewSet):
         ],
         request=None,
     )
-    @action(detail=True, methods=["post"], url_path="del_tag/(?P<tag_id>\w+)")
+    @action(detail=True, methods=["post"], url_path=r"del_tag/(?P<tag_id>\w+)")
     def del_tag(self, request, pk=None, tag_id=None):
         instance = self.get_object()
         tag_instance = Tag.objects.get(id=tag_id)
@@ -182,11 +188,57 @@ class ProvenanceMixin(
     @action(
         detail=True,
         methods=["delete"],
-        url_path="del_provenance/(?P<provenance_id>\d+)",
+        url_path=r"del_provenance/(?P<provenance_id>\d+)",
     )
     def del_provenance(self, request, pk=None, provenance_id=None):
         count, deleted = Provenance.objects.filter(
             id=provenance_id, connectivity_statement_id=pk
+        ).delete()
+        if count == 0:
+            raise Http404
+        instance = self.get_object()
+        return Response(self.get_serializer(instance).data)
+
+
+class ExpertConsultantMixin(
+    viewsets.GenericViewSet,
+):
+    @extend_schema(
+        request=ExpertConsultantCreateSerializer,
+        responses={200: "ConnectivityStatement updated successfully"},
+    )
+    @action(detail=True, methods=["post"], url_path="add_expert_consultant")
+    def add_expert_consultant(self, request, pk=None):
+        serializer = ExpertConsultantCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        uri = serializer.validated_data['uri']
+        expert_consultant, created = ExpertConsultant.objects.get_or_create(
+            connectivity_statement_id=pk,
+            uri=uri,
+        )
+        instance = self.get_object()
+        return Response(self.get_serializer(instance).data)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "expert_consultant_id",
+                OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+                required=True,
+            )
+        ],
+        request=None,
+    )
+    @action(
+        detail=True,
+        methods=["delete"],
+        url_path=r"del_expert_consultant/(?P<expert_consultant_id>\d+)",
+    )
+    def del_expert_consultant(self, request, pk=None, expert_consultant_id=None):
+        count, deleted = ExpertConsultant.objects.filter(
+            id=expert_consultant_id, connectivity_statement_id=pk
         ).delete()
         if count == 0:
             raise Http404
@@ -208,7 +260,7 @@ class SpecieMixin(
         ],
         request=None,
     )
-    @action(detail=True, methods=["post"], url_path="add_specie/(?P<specie_id>\w+)")
+    @action(detail=True, methods=["post"], url_path=r"add_specie/(?P<specie_id>\w+)")
     def add_specie(self, request, pk=None, specie_id=None):
         instance = self.get_object()
         specie_instance = Specie.objects.get(id=specie_id)
@@ -226,7 +278,7 @@ class SpecieMixin(
         ],
         request=None,
     )
-    @action(detail=True, methods=["post"], url_path="del_specie/(?P<specie_id>\w+)")
+    @action(detail=True, methods=["post"], url_path=r"del_specie/(?P<specie_id>\w+)")
     def del_specie(self, request, pk=None, specie_id=None):
         instance = self.get_object()
         specie_instance = Specie.objects.get(id=specie_id)
@@ -235,7 +287,7 @@ class SpecieMixin(
 
 
 class TransitionMixin(viewsets.GenericViewSet):
-    @action(detail=True, methods=["post"], url_path="do_transition/(?P<transition>\w+)")
+    @action(detail=True, methods=["post"], url_path=r"do_transition/(?P<transition>\w+)")
     def transition(self, request, pk=None, transition=None):
         instance = self.service(self.get_object()).do_transition(
             transition, user=request.user, request=request
@@ -503,6 +555,7 @@ class AlertTypeViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ConnectivityStatementViewSet(
     ProvenanceMixin,
+    ExpertConsultantMixin,
     SpecieMixin,
     TagMixin,
     TransitionMixin,
@@ -825,10 +878,12 @@ class RelationshipViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ConnectivityStatementTripleViewSet(viewsets.ModelViewSet):
     """
-    ConnectivityStatementTriple:
+    ConnectivityStatementTriple: Manage triple-based relationships
     """
 
-    queryset = ConnectivityStatementTriple.objects.select_related("connectivity_statement", "relationship", "triple")
+    queryset = ConnectivityStatementTriple.objects.select_related(
+        "connectivity_statement", "relationship"
+    ).prefetch_related("triples")
     serializer_class = ConnectivityStatementTripleSerializer
     permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
 
@@ -838,6 +893,43 @@ class ConnectivityStatementTripleViewSet(viewsets.ModelViewSet):
         if connectivity_statement_id:
             qs = qs.filter(connectivity_statement_id=connectivity_statement_id)
         return qs
+
+
+class ConnectivityStatementTextViewSet(viewsets.ModelViewSet):
+    """
+    ConnectivityStatementText: Manage text-based relationships
+    """
+
+    queryset = ConnectivityStatementText.objects.select_related("connectivity_statement", "relationship")
+    serializer_class = ConnectivityStatementTextSerializer
+    permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        connectivity_statement_id = self.request.query_params.get("connectivity_statement_id")
+        if connectivity_statement_id:
+            qs = qs.filter(connectivity_statement_id=connectivity_statement_id)
+        return qs
+
+
+class ConnectivityStatementAnatomicalEntityViewSet(viewsets.ModelViewSet):
+    """
+    ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based relationships
+    """
+
+    queryset = ConnectivityStatementAnatomicalEntity.objects.select_related(
+        "connectivity_statement", "relationship"
+    ).prefetch_related("anatomical_entities")
+    serializer_class = ConnectivityStatementAnatomicalEntitySerializer
+    permission_classes = [IsOwnerOfConnectivityStatementOrReadOnly]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        connectivity_statement_id = self.request.query_params.get("connectivity_statement_id")
+        if connectivity_statement_id:
+            qs = qs.filter(connectivity_statement_id=connectivity_statement_id)
+        return qs
+
 
 
 @extend_schema(
@@ -852,6 +944,7 @@ def jsonschemas(request):
         DestinationSerializer,
         TagSerializer,
         ProvenanceSerializer,
+        ExpertConsultantSerializer,
         SpecieSerializer,
         NoteSerializer,
         StatementAlertSerializer,
@@ -877,3 +970,82 @@ def jsonschemas(request):
     ret = ret.replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
     data = bytes(ret.encode("utf-8"))
     return HttpResponse(data)
+
+
+class IngestionLogFileView(APIView):
+    """
+    API endpoint to download ingestion log files.
+    Staff-only access to download CSV log files generated during the ingestion process.
+    """
+    permission_classes = [permissions.IsAdminUser]
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='log_type',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description='Type of log file to download. Options: "anomalies" or "ingested"',
+                enum=['anomalies', 'ingested'],
+                required=True,
+            ),
+        ],
+        responses={
+            200: OpenApiTypes.BINARY,
+            404: OpenApiTypes.OBJECT,
+        },
+        description='Download ingestion log files as CSV. Returns anomalies log or ingested statements log.',
+    )
+    def get(self, request):
+        """
+        Download log file as CSV.
+        
+        Query Parameters:
+        - log_type: 'anomalies' or 'ingested'
+        
+        Returns:
+        - CSV file download
+        """
+        import os
+        from django.http import FileResponse
+        from composer.constants import INGESTION_ANOMALIES_LOG_PATH, INGESTION_INGESTED_LOG_PATH
+        
+        log_type = request.query_params.get('log_type')
+        
+        if not log_type:
+            return Response(
+                {'error': 'log_type query parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if log_type == 'anomalies':
+            log_path = INGESTION_ANOMALIES_LOG_PATH
+            filename = 'ingestion_anomalies.csv'
+        elif log_type == 'ingested':
+            log_path = INGESTION_INGESTED_LOG_PATH
+            filename = 'ingested_statements.csv'
+        else:
+            return Response(
+                {'error': 'Invalid log_type. Use "anomalies" or "ingested"'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check if file exists
+        if not os.path.exists(log_path):
+            return Response(
+                {'error': f'Log file not found: {log_path}'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Serve the file for download
+        try:
+            file_handle = open(log_path, 'rb')
+            response = FileResponse(file_handle, content_type='text/csv')
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            return response
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Error reading log file: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

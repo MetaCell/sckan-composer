@@ -47,6 +47,7 @@ def run_export_workflow(user: User, scheme: str = "https") -> None:
         "queue": "default",  # not needed but required by cloudharness
         "payload": json.dumps(
             {
+                "type": "export",
                 "file_url": file_url,
                 "email": user.email,
             }

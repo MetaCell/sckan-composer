@@ -107,6 +107,25 @@
         </div>
 
         <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="m-0">Connectivity Statements Ingestion</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Configure and trigger the ingestion of connectivity statements from the neurondm repository.</p>
+                        <a href="{% url 'admin:ingest-statements' %}" class="btn btn-xs {{ jazzmin_ui.button_classes.success }}">
+                            <i class="fas fa-database"></i> Configure & Start Ingestion
+                        </a>
+                        <a href="{% url 'admin:download-logs' %}" class="btn btn-xs {{ jazzmin_ui.button_classes.info }}">
+                            <i class="fas fa-download"></i> Download Ingestion Logs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
             <div class="col-md-6 col-sm-12">
                 {% for app in dashboard_list %}
                     <div class="card">

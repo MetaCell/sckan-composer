@@ -11,6 +11,7 @@ import { useSectionStyle, useGreyBgContainer } from "../../styles/styles";
 import { useTheme } from "@mui/system";
 import StatementDetailsAccordion from "../TriageStatementSection/StatementDetailsAccordion";
 import ProvenancesForm from "../Forms/ProvenanceForm";
+import ExpertConsultantsForm from "../Forms/ExpertConsultantForm";
 import StatementPreviewForm from "../Forms/StatementPreviewForm";
 import StatementTriples from "../Forms/StatementTriples";
 
@@ -62,6 +63,13 @@ const DistillationTab = ({
                   extraData={{ connectivity_statement_id: statement.id }}
                   setter={refreshStatement}
                   className="provenance"
+                  isDisabled={isDisabled}
+                />
+                <ExpertConsultantsForm
+                  expertConsultantsData={statement.expert_consultants}
+                  extraData={{ connectivity_statement_id: statement.id }}
+                  setter={refreshStatement}
+                  className="expert-consultant"
                   isDisabled={isDisabled}
                 />
                 <Box ref={refs[2]}>

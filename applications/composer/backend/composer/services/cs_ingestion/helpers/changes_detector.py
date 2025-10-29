@@ -2,7 +2,7 @@ import rdflib
 from neurondm import orders
 
 from composer.models import AnatomicalEntity
-from composer.services.cs_ingestion.helpers.common_helpers import VALIDATION_ERRORS, SPECIES, PROVENANCE, ID, \
+from composer.services.cs_ingestion.helpers.common_helpers import VALIDATION_ERRORS, SPECIES, PROVENANCE, EXPERT_CONSULTANTS, ID, \
     FORWARD_CONNECTION, ORIGINS, VIAS, DESTINATIONS
 from composer.services.cs_ingestion.models import ValidationErrors
 
@@ -34,6 +34,12 @@ def has_changes(connectivity_statement, statement, defaults):
     current_provenance = set(provenance.uri for provenance in connectivity_statement.provenance_set.all())
     new_provenance = set(statement.get(PROVENANCE) or [statement[ID]])
     if current_provenance != new_provenance:
+        return True
+
+    # Check for changes in expert consultants
+    current_expert_consultants = set(expert.uri for expert in connectivity_statement.expertconsultant_set.all())
+    new_expert_consultants = set(statement.get(EXPERT_CONSULTANTS) or [])
+    if current_expert_consultants != new_expert_consultants:
         return True
 
     # Check for changes in forward_connection

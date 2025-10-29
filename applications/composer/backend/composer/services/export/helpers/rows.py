@@ -163,7 +163,25 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
         )
 
 
-    for cst in cs.statement_triples.select_related("relationship", "triple").all():
+    # Dynamic Relationships - Triples (single/multi select)
+    for cst in cs.connectivitystatementtriple_set.select_related("relationship").prefetch_related("triples").all():
+        predicate_mapping = DynamicExportRelationship(
+            predicate=cst.relationship.predicate_name,
+            label=cst.relationship.title,
+            uri=cst.relationship.predicate_uri,
+        )
+        # Handle multiple triples - create one row per triple
+        for triple in cst.triples.all():
+            rows.append(
+                Row(
+                    object=triple.name,
+                    object_uri=triple.uri,
+                    predicate_mapping=predicate_mapping,
+                )
+            )
+
+    # Dynamic Relationships - Text (free text)
+    for cst in cs.connectivitystatementtext_set.select_related("relationship").all():
         predicate_mapping = DynamicExportRelationship(
             predicate=cst.relationship.predicate_name,
             label=cst.relationship.title,
@@ -171,11 +189,28 @@ def get_rows(cs: ConnectivityStatement) -> List[Row]:
         )
         rows.append(
             Row(
-                object=cst.triple.name if cst.triple else cst.free_text,
-                object_uri=cst.triple.uri if cst.triple else "",
+                object=cst.text,
+                object_uri="",
                 predicate_mapping=predicate_mapping,
             )
         )
+
+    # Dynamic Relationships - Anatomical Entities (single/multi select)
+    for cst in cs.connectivitystatementanatomicalentity_set.select_related("relationship").prefetch_related("anatomical_entities").all():
+        predicate_mapping = DynamicExportRelationship(
+            predicate=cst.relationship.predicate_name,
+            label=cst.relationship.title,
+            uri=cst.relationship.predicate_uri,
+        )
+        # Handle multiple anatomical entities - create one row per entity
+        for anatomical_entity in cst.anatomical_entities.all():
+            rows.append(
+                Row(
+                    object=anatomical_entity.name,
+                    object_uri=anatomical_entity.ontology_uri,
+                    predicate_mapping=predicate_mapping,
+                )
+            )
 
     # the composer URI
     rows.append(get_composer_uri_row(cs))

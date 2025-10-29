@@ -405,6 +405,44 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/composer/connectivity-statement/{id}/add_expert_consultant/:
+    post:
+      operationId: composer_connectivity_statement_add_expert_consultant_create
+      description: ConnectivityStatement
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpertConsultantCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExpertConsultantCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExpertConsultantCreate'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
   /api/composer/connectivity-statement/{id}/add_provenance/:
     post:
       operationId: composer_connectivity_statement_add_provenance_create
@@ -560,6 +598,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConnectivityStatement'
           description: ''
+  /api/composer/connectivity-statement/{id}/del_expert_consultant/{expert_consultant_id}/:
+    delete:
+      operationId: composer_connectivity_statement_del_expert_consultant_destroy
+      description: ConnectivityStatement
+      parameters:
+      - in: path
+        name: expert_consultant_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/composer/connectivity-statement/{id}/del_provenance/{provenance_id}/:
     delete:
       operationId: composer_connectivity_statement_del_provenance_destroy
@@ -949,10 +1012,364 @@ paths:
               schema:
                 $ref: '#/components/schemas/BulkActionResponse'
           description: ''
+  /api/composer/connectivityStatementAnatomicalEntity/:
+    get:
+      operationId: composer_connectivityStatementAnatomicalEntity_list
+      description: 'ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based
+        relationships'
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedConnectivityStatementAnatomicalEntityList'
+          description: ''
+    post:
+      operationId: composer_connectivityStatementAnatomicalEntity_create
+      description: 'ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based
+        relationships'
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectivityStatementAnatomicalEntity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConnectivityStatementAnatomicalEntity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConnectivityStatementAnatomicalEntity'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatementAnatomicalEntity'
+          description: ''
+  /api/composer/connectivityStatementAnatomicalEntity/{id}/:
+    get:
+      operationId: composer_connectivityStatementAnatomicalEntity_retrieve
+      description: 'ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based
+        relationships'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement
+          anatomical entity.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatementAnatomicalEntity'
+          description: ''
+    put:
+      operationId: composer_connectivityStatementAnatomicalEntity_update
+      description: 'ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based
+        relationships'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement
+          anatomical entity.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectivityStatementAnatomicalEntity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConnectivityStatementAnatomicalEntity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConnectivityStatementAnatomicalEntity'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatementAnatomicalEntity'
+          description: ''
+    patch:
+      operationId: composer_connectivityStatementAnatomicalEntity_partial_update
+      description: 'ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based
+        relationships'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement
+          anatomical entity.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedConnectivityStatementAnatomicalEntity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedConnectivityStatementAnatomicalEntity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedConnectivityStatementAnatomicalEntity'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatementAnatomicalEntity'
+          description: ''
+    delete:
+      operationId: composer_connectivityStatementAnatomicalEntity_destroy
+      description: 'ConnectivityStatementAnatomicalEntity: Manage anatomical entity-based
+        relationships'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement
+          anatomical entity.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/composer/connectivityStatementText/:
+    get:
+      operationId: composer_connectivityStatementText_list
+      description: 'ConnectivityStatementText: Manage text-based relationships'
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedConnectivityStatementTextList'
+          description: ''
+    post:
+      operationId: composer_connectivityStatementText_create
+      description: 'ConnectivityStatementText: Manage text-based relationships'
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectivityStatementText'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConnectivityStatementText'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConnectivityStatementText'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatementText'
+          description: ''
+  /api/composer/connectivityStatementText/{id}/:
+    get:
+      operationId: composer_connectivityStatementText_retrieve
+      description: 'ConnectivityStatementText: Manage text-based relationships'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement
+          text.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatementText'
+          description: ''
+    put:
+      operationId: composer_connectivityStatementText_update
+      description: 'ConnectivityStatementText: Manage text-based relationships'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement
+          text.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectivityStatementText'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConnectivityStatementText'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConnectivityStatementText'
+        required: true
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatementText'
+          description: ''
+    patch:
+      operationId: composer_connectivityStatementText_partial_update
+      description: 'ConnectivityStatementText: Manage text-based relationships'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement
+          text.
+        required: true
+      tags:
+      - composer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedConnectivityStatementText'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedConnectivityStatementText'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedConnectivityStatementText'
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectivityStatementText'
+          description: ''
+    delete:
+      operationId: composer_connectivityStatementText_destroy
+      description: 'ConnectivityStatementText: Manage text-based relationships'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this connectivity statement
+          text.
+        required: true
+      tags:
+      - composer
+      security:
+      - tokenAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/composer/connectivityStatementTriple/:
     get:
       operationId: composer_connectivityStatementTriple_list
-      description: 'ConnectivityStatementTriple:'
+      description: 'ConnectivityStatementTriple: Manage triple-based relationships'
       parameters:
       - name: limit
         required: false
@@ -981,7 +1398,7 @@ paths:
           description: ''
     post:
       operationId: composer_connectivityStatementTriple_create
-      description: 'ConnectivityStatementTriple:'
+      description: 'ConnectivityStatementTriple: Manage triple-based relationships'
       tags:
       - composer
       requestBody:
@@ -1010,7 +1427,7 @@ paths:
   /api/composer/connectivityStatementTriple/{id}/:
     get:
       operationId: composer_connectivityStatementTriple_retrieve
-      description: 'ConnectivityStatementTriple:'
+      description: 'ConnectivityStatementTriple: Manage triple-based relationships'
       parameters:
       - in: path
         name: id
@@ -1034,7 +1451,7 @@ paths:
           description: ''
     put:
       operationId: composer_connectivityStatementTriple_update
-      description: 'ConnectivityStatementTriple:'
+      description: 'ConnectivityStatementTriple: Manage triple-based relationships'
       parameters:
       - in: path
         name: id
@@ -1070,7 +1487,7 @@ paths:
           description: ''
     patch:
       operationId: composer_connectivityStatementTriple_partial_update
-      description: 'ConnectivityStatementTriple:'
+      description: 'ConnectivityStatementTriple: Manage triple-based relationships'
       parameters:
       - in: path
         name: id
@@ -1105,7 +1522,7 @@ paths:
           description: ''
     delete:
       operationId: composer_connectivityStatementTriple_destroy
-      description: 'ConnectivityStatementTriple:'
+      description: 'ConnectivityStatementTriple: Manage triple-based relationships'
       parameters:
       - in: path
         name: id
@@ -3283,6 +3700,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Provenance'
+        expert_consultants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpertConsultant'
         owner:
           allOf:
           - $ref: '#/components/schemas/User'
@@ -3409,6 +3830,12 @@ components:
         statement_triples:
           type: string
           readOnly: true
+        statement_texts:
+          type: string
+          readOnly: true
+        statement_anatomical_entities:
+          type: string
+          readOnly: true
       required:
       - available_transitions
       - entities_journey
@@ -3425,11 +3852,14 @@ components:
       - sentence
       - sex
       - state
+      - statement_anatomical_entities
       - statement_preview
+      - statement_texts
       - statement_triples
       - tags
-    ConnectivityStatementTriple:
+    ConnectivityStatementAnatomicalEntity:
       type: object
+      description: Serializer for anatomical entity-based relationships
       properties:
         id:
           type: integer
@@ -3438,14 +3868,58 @@ components:
           type: integer
         relationship:
           type: integer
-        value:
-          type: string
+        anatomical_entities:
+          type: array
+          items:
+            type: integer
+            writeOnly: true
+          writeOnly: true
+      required:
+      - anatomical_entities
+      - connectivity_statement
+      - id
+      - relationship
+    ConnectivityStatementText:
+      type: object
+      description: Serializer for text-based relationships (free text area)
+      properties:
+        id:
+          type: integer
           readOnly: true
+        connectivity_statement:
+          type: integer
+        relationship:
+          type: integer
+        text:
+          type: string
       required:
       - connectivity_statement
       - id
       - relationship
-      - value
+      - text
+    ConnectivityStatementTriple:
+      type: object
+      description: Serializer for triple-based relationships (single/multi select
+        from triples)
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        connectivity_statement:
+          type: integer
+        relationship:
+          type: integer
+        triples:
+          type: array
+          items:
+            type: integer
+            writeOnly: true
+          writeOnly: true
+      required:
+      - connectivity_statement
+      - id
+      - relationship
+      - triples
     ConnectivityStatementUpdate:
       type: object
       description: Connectivity Statement
@@ -3662,6 +4136,29 @@ components:
       - AFFERENT-T
       - UNKNOWN
       type: string
+    ExpertConsultant:
+      type: object
+      description: Expert Consultant
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uri:
+          type: string
+        connectivity_statement_id:
+          type: integer
+      required:
+      - connectivity_statement_id
+      - id
+      - uri
+    ExpertConsultantCreate:
+      type: object
+      description: Serializer for creating expert consultant via request body
+      properties:
+        uri:
+          type: string
+      required:
+      - uri
     GraphState:
       type: object
       properties:
@@ -3918,6 +4415,46 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BaseConnectivityStatement'
+    PaginatedConnectivityStatementAnatomicalEntityList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConnectivityStatementAnatomicalEntity'
+    PaginatedConnectivityStatementTextList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConnectivityStatementText'
     PaginatedConnectivityStatementTripleList:
       type: object
       properties:
@@ -4223,6 +4760,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Provenance'
+        expert_consultants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpertConsultant'
         owner:
           allOf:
           - $ref: '#/components/schemas/User'
@@ -4349,8 +4890,15 @@ components:
         statement_triples:
           type: string
           readOnly: true
-    PatchedConnectivityStatementTriple:
+        statement_texts:
+          type: string
+          readOnly: true
+        statement_anatomical_entities:
+          type: string
+          readOnly: true
+    PatchedConnectivityStatementAnatomicalEntity:
       type: object
+      description: Serializer for anatomical entity-based relationships
       properties:
         id:
           type: integer
@@ -4359,9 +4907,43 @@ components:
           type: integer
         relationship:
           type: integer
-        value:
-          type: string
+        anatomical_entities:
+          type: array
+          items:
+            type: integer
+            writeOnly: true
+          writeOnly: true
+    PatchedConnectivityStatementText:
+      type: object
+      description: Serializer for text-based relationships (free text area)
+      properties:
+        id:
+          type: integer
           readOnly: true
+        connectivity_statement:
+          type: integer
+        relationship:
+          type: integer
+        text:
+          type: string
+    PatchedConnectivityStatementTriple:
+      type: object
+      description: Serializer for triple-based relationships (single/multi select
+        from triples)
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        connectivity_statement:
+          type: integer
+        relationship:
+          type: integer
+        triples:
+          type: array
+          items:
+            type: integer
+            writeOnly: true
+          writeOnly: true
     PatchedConnectivityStatementUpdate:
       type: object
       description: Connectivity Statement
@@ -4568,7 +5150,7 @@ components:
         external_ref:
           type: string
           nullable: true
-          maxLength: 20
+          maxLength: 100
         tags:
           type: array
           items:
@@ -4777,8 +5359,9 @@ components:
       - type
     RelationshipTypeEnum:
       enum:
-      - single
-      - multi
+      - triple_single
+      - triple_multi
+      - anatomical_multi
       - text
       type: string
     Sentence:
@@ -4809,7 +5392,7 @@ components:
         external_ref:
           type: string
           nullable: true
-          maxLength: 20
+          maxLength: 100
         tags:
           type: array
           items:

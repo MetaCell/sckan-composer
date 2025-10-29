@@ -143,6 +143,30 @@ class ConnectivityStatementService extends AbstractService {
     return composerApi.composerConnectivityStatementTripleDestroy(id).then((response: any) => response.data);
   }
 
+  async assignTextRelationship(data: any): Promise<any> {
+    return composerApi.composerConnectivityStatementTextCreate(data).then((response: any) => response.data);
+  }
+
+  async updateTextRelationship(id: any, data: any): Promise<any> {
+    return composerApi.composerConnectivityStatementTextUpdate(id, data).then((response: any) => response.data);
+  }
+
+  async deleteTextRelationship(id: any): Promise<any> {
+    return composerApi.composerConnectivityStatementTextDestroy(id).then((response: any) => response.data);
+  }
+
+  async assignAnatomicalEntityRelationship(data: any): Promise<any> {
+    return composerApi.composerConnectivityStatementAnatomicalEntityCreate(data).then((response: any) => response.data);
+  }
+
+  async updateAnatomicalEntityRelationship(id: any, data: any): Promise<any> {
+    return composerApi.composerConnectivityStatementAnatomicalEntityUpdate(id, data).then((response: any) => response.data);
+  }
+
+  async deleteAnatomicalEntityRelationship(id: any): Promise<any> {
+    return composerApi.composerConnectivityStatementAnatomicalEntityDestroy(id).then((response: any) => response.data);
+  }
+
   async doTransition(connectivityStatement: ConnectivityStatement, transition: string) {
     const id = connectivityStatement.id || -1;
     return composerApi.composerConnectivityStatementDoTransitionCreate(id, transition, connectivityStatement).then((response: any) => response.data);
