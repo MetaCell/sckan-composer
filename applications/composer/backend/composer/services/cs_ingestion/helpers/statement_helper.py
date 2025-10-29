@@ -165,7 +165,7 @@ def create_or_update_connectivity_statement(
     )
     
     # Process dynamic relationships with custom code
-    process_dynamic_relationships(connectivity_statement, statement, logger_service)
+    process_dynamic_relationships(connectivity_statement, statement, logger_service, update_anatomical_entities)
     
     statement[STATE] = connectivity_statement.state
 
@@ -176,6 +176,7 @@ def process_dynamic_relationships(
     connectivity_statement: ConnectivityStatement,
     statement: Dict,
     logger_service: LoggerService,
+    update_anatomical_entities: bool = False,
 ):
     """
     Reads pre-computed results from Step 1 and creates database entities.
@@ -203,7 +204,7 @@ def process_dynamic_relationships(
             elif relationship.type == RelationshipType.TEXT:
                 process_text_relationship(connectivity_statement, relationship, result)
             elif relationship.type == RelationshipType.ANATOMICAL_MULTI:
-                process_anatomical_relationship(connectivity_statement, relationship, result, logger_service)
+                process_anatomical_relationship(connectivity_statement, relationship, result, logger_service, update_anatomical_entities)
             else:
                 log_custom_relationship_error(
                     logger_service,
@@ -295,28 +296,74 @@ def process_text_relationship(
 def process_anatomical_relationship(
     connectivity_statement: ConnectivityStatement,
     relationship: Relationship,
-    result: List[str],
+    result: List,
     logger_service: LoggerService,
+    update_anatomical_entities: bool = False,
 ):
     """
     Process ANATOMICAL_ENTITY relationship results.
-    Expected result format: [uri1, uri2, ...]
+    
+    Expected result formats:
+    - Simple entities: [uri1, uri2, ...]
+    - Region-layer pairs: [{'region': 'region_uri', 'layer': 'layer_uri'}, ...]
+    - Mixed: list combining both formats
     """
+    from composer.services.cs_ingestion.helpers.anatomical_entities_helper import (
+        get_or_create_simple_entity,
+        get_or_create_complex_entity,
+    )
+    from composer.services.cs_ingestion.exceptions import EntityNotFoundException
+    
     if not isinstance(result, list):
         result = [result]
     
     anatomical_entities = []
-    for uri in result:
+    for item in result:
         try:
-            ae = AnatomicalEntity.objects.get_by_ontology_uri(str(uri))
-            anatomical_entities.append(ae)
+            # Check if item is a region-layer pair (dict with 'region' and 'layer' keys)
+            if isinstance(item, dict) and 'region' in item and 'layer' in item:
+                # Process as region-layer pair
+                region_uri = str(item['region'])
+                layer_uri = str(item['layer'])
+                ae, _ = get_or_create_complex_entity(region_uri, layer_uri, update_anatomical_entities)
+                anatomical_entities.append(ae)
+            elif isinstance(item, dict):
+                # Invalid dict format - log error
+                log_custom_relationship_error(
+                    logger_service,
+                    f"Invalid anatomical entity format (expected dict with 'region' and 'layer' keys or a URI string): {item}",
+                    connectivity_statement.reference_uri,
+                    relationship.id,
+                    {'item': str(item), 'relationship_title': relationship.title}
+                )
+            else:
+                # Process as simple entity URI
+                uri = str(item)
+                ae, _ = get_or_create_simple_entity(uri)
+                anatomical_entities.append(ae)
+        except EntityNotFoundException as e:
+            log_custom_relationship_error(
+                logger_service,
+                f"Anatomical entity not found: {str(e)} in relationship '{relationship.title}'",
+                connectivity_statement.reference_uri,
+                relationship.id,
+                {'item': str(item), 'relationship_title': relationship.title, 'error': str(e)}
+            )
         except AnatomicalEntity.DoesNotExist:
             log_custom_relationship_error(
                 logger_service,
-                f"Anatomical entity not found for URI '{uri}' in relationship '{relationship.title}'",
+                f"Anatomical entity not found for item '{item}' in relationship '{relationship.title}'",
                 connectivity_statement.reference_uri,
                 relationship.id,
-                {'uri': str(uri), 'relationship_title': relationship.title}
+                {'item': str(item), 'relationship_title': relationship.title}
+            )
+        except Exception as e:
+            log_custom_relationship_error(
+                logger_service,
+                f"Error processing anatomical entity '{item}' in relationship '{relationship.title}': {str(e)}",
+                connectivity_statement.reference_uri,
+                relationship.id,
+                {'item': str(item), 'relationship_title': relationship.title, 'error': str(e)}
             )
     
     if anatomical_entities:
