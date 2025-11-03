@@ -1289,5 +1289,478 @@ some_value = "This is not named 'result'"
             relationship=relationship
         )
         self.assertEqual(cs_texts.count(), 0, "No text relationship should be created when 'result' is not defined")
+    
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_anatomical_relationship_with_region_layer_pairs(self, mock_get_statements):
+        """Test ANATOMICAL_ENTITY relationship with region-layer pairs"""
+        from composer.models import Relationship, AnatomicalEntity, AnatomicalEntityMeta, Layer, Region, ConnectivityStatementAnatomicalEntity
+        from composer.enums import RelationshipType
+        
+        self.flush_connectivity_statements()
+        
+        # Create layer and region anatomical entity metas
+        layer_meta = AnatomicalEntityMeta.objects.create(
+            name="Layer 1",
+            ontology_uri='http://purl.obolibrary.org/obo/UBERON_0001234'
+        )
+        region_meta = AnatomicalEntityMeta.objects.create(
+            name="Region 1",
+            ontology_uri='http://purl.obolibrary.org/obo/UBERON_0005678'
+        )
+        
+        # Create Layer and Region objects
+        layer = Layer.objects.create(ae_meta=layer_meta)
+        region = Region.objects.create(ae_meta=region_meta)
+        
+        # Create a relationship with custom code that returns region-layer pairs
+        relationship = Relationship.objects.create(
+            title="Custom Region-Layer Relationship",
+            predicate_name="hasRegionLayer",
+            predicate_uri="http://uri.interlex.org/test/hasRegionLayer",
+            type=RelationshipType.ANATOMICAL_MULTI,
+            order=1,
+            custom_ingestion_code="""
+# Example that returns region-layer pairs
+result = [
+    {'region': 'http://purl.obolibrary.org/obo/UBERON_0005678', 'layer': 'http://purl.obolibrary.org/obo/UBERON_0001234'}
+]
+"""
+        )
+        
+        statement_id = 'http://uri.interlex.org/composer/uris/set/test/7'
+        
+        # Create mock neuron
+        mock_neuron = self.create_mock_neuron()
+        
+        mock_statements = [
+            {
+                'id': statement_id,
+                'label': 'test neuron type',
+                'pref_label': 'test connectivity statement',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'test',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/test'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': [],
+                '_neuron': mock_neuron,
+                # Pre-computed custom relationship results (from Step 1)
+                '_custom_relationship_results': {
+                    relationship.id: [
+                        {'region': 'http://purl.obolibrary.org/obo/UBERON_0005678', 'layer': 'http://purl.obolibrary.org/obo/UBERON_0001234'}
+                    ]
+                }
+            }
+        ]
+        mock_get_statements.return_value = mock_statements
+        
+        # Run ingestion
+        ingest_statements()
+        
+        # Verify statement was created
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertIsNotNone(statement)
+        
+        # Verify anatomical relationship was created
+        cs_ae = ConnectivityStatementAnatomicalEntity.objects.get(
+            connectivity_statement=statement,
+            relationship=relationship
+        )
+        
+        # Verify region-layer pair was linked
+        self.assertEqual(cs_ae.anatomical_entities.count(), 1)
+        ae = cs_ae.anatomical_entities.first()
+        self.assertIsNotNone(ae.region_layer)
+        self.assertEqual(ae.region_layer.layer.ontology_uri, 'http://purl.obolibrary.org/obo/UBERON_0001234')
+        self.assertEqual(ae.region_layer.region.ontology_uri, 'http://purl.obolibrary.org/obo/UBERON_0005678')
+    
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_anatomical_relationship_with_mixed_formats(self, mock_get_statements):
+        """Test ANATOMICAL_ENTITY relationship with mixed simple entities and region-layer pairs"""
+        from composer.models import Relationship, AnatomicalEntity, AnatomicalEntityMeta, Layer, Region, ConnectivityStatementAnatomicalEntity
+        from composer.enums import RelationshipType
+        
+        self.flush_connectivity_statements()
+        
+        # Create simple entity
+        simple_meta = AnatomicalEntityMeta.objects.create(
+            name="Simple Entity",
+            ontology_uri='http://purl.obolibrary.org/obo/UBERON_0001111'
+        )
+        simple_ae = AnatomicalEntity.objects.create(simple_entity=simple_meta)
+        
+        # Create layer and region
+        layer_meta = AnatomicalEntityMeta.objects.create(
+            name="Layer 2",
+            ontology_uri='http://purl.obolibrary.org/obo/UBERON_0002234'
+        )
+        region_meta = AnatomicalEntityMeta.objects.create(
+            name="Region 2",
+            ontology_uri='http://purl.obolibrary.org/obo/UBERON_0002678'
+        )
+        layer = Layer.objects.create(ae_meta=layer_meta)
+        region = Region.objects.create(ae_meta=region_meta)
+        
+        # Create a relationship with custom code that returns mixed formats
+        relationship = Relationship.objects.create(
+            title="Custom Mixed Format Relationship",
+            predicate_name="hasMixedEntities",
+            predicate_uri="http://uri.interlex.org/test/hasMixedEntities",
+            type=RelationshipType.ANATOMICAL_MULTI,
+            order=1,
+            custom_ingestion_code="""
+# Example that returns both simple entities and region-layer pairs
+result = [
+    'http://purl.obolibrary.org/obo/UBERON_0001111',  # Simple entity
+    {'region': 'http://purl.obolibrary.org/obo/UBERON_0002678', 'layer': 'http://purl.obolibrary.org/obo/UBERON_0002234'}  # Region-layer pair
+]
+"""
+        )
+        
+        statement_id = 'http://uri.interlex.org/composer/uris/set/test/8'
+        
+        # Create mock neuron
+        mock_neuron = self.create_mock_neuron()
+        
+        mock_statements = [
+            {
+                'id': statement_id,
+                'label': 'test neuron type',
+                'pref_label': 'test connectivity statement',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'test',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/test'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': [],
+                '_neuron': mock_neuron,
+                # Pre-computed custom relationship results (from Step 1)
+                '_custom_relationship_results': {
+                    relationship.id: [
+                        'http://purl.obolibrary.org/obo/UBERON_0001111',
+                        {'region': 'http://purl.obolibrary.org/obo/UBERON_0002678', 'layer': 'http://purl.obolibrary.org/obo/UBERON_0002234'}
+                    ]
+                }
+            }
+        ]
+        mock_get_statements.return_value = mock_statements
+        
+        # Run ingestion
+        ingest_statements()
+        
+        # Verify statement was created
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertIsNotNone(statement)
+        
+        # Verify anatomical relationship was created
+        cs_ae = ConnectivityStatementAnatomicalEntity.objects.get(
+            connectivity_statement=statement,
+            relationship=relationship
+        )
+        
+        # Verify both entities were linked (1 simple + 1 region-layer pair)
+        self.assertEqual(cs_ae.anatomical_entities.count(), 2)
+        
+        # Verify simple entity exists
+        simple_entities = [ae for ae in cs_ae.anatomical_entities.all() if ae.simple_entity is not None]
+        self.assertEqual(len(simple_entities), 1)
+        self.assertEqual(simple_entities[0].simple_entity.ontology_uri, 'http://purl.obolibrary.org/obo/UBERON_0001111')
+        
+        # Verify region-layer entity exists
+        rl_entities = [ae for ae in cs_ae.anatomical_entities.all() if ae.region_layer is not None]
+        self.assertEqual(len(rl_entities), 1)
+        self.assertEqual(rl_entities[0].region_layer.layer.ontology_uri, 'http://purl.obolibrary.org/obo/UBERON_0002234')
+        self.assertEqual(rl_entities[0].region_layer.region.ontology_uri, 'http://purl.obolibrary.org/obo/UBERON_0002678')
+    
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_anatomical_relationship_update_entities_flag_false(self, mock_get_statements):
+        """Test that region-layer pairs fail when update_anatomical_entities=False and Layer/Region don't exist"""
+        from composer.models import Relationship, AnatomicalEntityMeta, Layer, Region, ConnectivityStatementAnatomicalEntity
+        from composer.enums import RelationshipType
+        
+        self.flush_connectivity_statements()
+        
+        # Create layer and region metas but NOT Layer/Region objects
+        layer_meta = AnatomicalEntityMeta.objects.create(
+            name="Layer 3",
+            ontology_uri='http://purl.obolibrary.org/obo/UBERON_0003234'
+        )
+        region_meta = AnatomicalEntityMeta.objects.create(
+            name="Region 3",
+            ontology_uri='http://purl.obolibrary.org/obo/UBERON_0003678'
+        )
+        # Deliberately NOT creating Layer and Region objects
+        
+        # Create a relationship
+        relationship = Relationship.objects.create(
+            title="Test Region-Layer Without Update Flag",
+            predicate_name="hasRegionLayerNoUpdate",
+            predicate_uri="http://uri.interlex.org/test/hasRegionLayerNoUpdate",
+            type=RelationshipType.ANATOMICAL_MULTI,
+            order=1,
+            custom_ingestion_code="""
+result = [
+    {'region': 'http://purl.obolibrary.org/obo/UBERON_0003678', 'layer': 'http://purl.obolibrary.org/obo/UBERON_0003234'}
+]
+"""
+        )
+        
+        statement_id = 'http://uri.interlex.org/composer/uris/set/test/9'
+        
+        # Create mock neuron
+        mock_neuron = self.create_mock_neuron()
+        
+        mock_statements = [
+            {
+                'id': statement_id,
+                'label': 'test neuron type',
+                'pref_label': 'test connectivity statement',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'test',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/test'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': [],
+                '_neuron': mock_neuron,
+                # Pre-computed custom relationship results (from Step 1)
+                '_custom_relationship_results': {
+                    relationship.id: [
+                        {'region': 'http://purl.obolibrary.org/obo/UBERON_0003678', 'layer': 'http://purl.obolibrary.org/obo/UBERON_0003234'}
+                    ]
+                }
+            }
+        ]
+        mock_get_statements.return_value = mock_statements
+        
+        # Run ingestion with update_anatomical_entities=False (default)
+        ingest_statements(update_anatomical_entities=False)
+        
+        # Verify statement was created
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertIsNotNone(statement)
+        
+        # Verify anatomical relationship was NOT created due to missing Layer/Region
+        cs_ae_count = ConnectivityStatementAnatomicalEntity.objects.filter(
+            connectivity_statement=statement,
+            relationship=relationship
+        ).count()
+        
+        # Should be 0 or have 0 anatomical entities linked (error was logged)
+        if cs_ae_count > 0:
+            cs_ae = ConnectivityStatementAnatomicalEntity.objects.get(
+                connectivity_statement=statement,
+                relationship=relationship
+            )
+            self.assertEqual(cs_ae.anatomical_entities.count(), 0, 
+                           "No anatomical entities should be linked when Layer/Region don't exist and update flag is False")
+    
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_anatomical_relationship_update_entities_flag_true(self, mock_get_statements):
+        """Test that region-layer pairs are created when update_anatomical_entities=True and Layer/Region don't exist"""
+        from composer.models import Relationship, AnatomicalEntityMeta, Layer, Region, ConnectivityStatementAnatomicalEntity
+        from composer.enums import RelationshipType
+        
+        self.flush_connectivity_statements()
+        
+        # Create layer and region metas but NOT Layer/Region objects
+        layer_meta = AnatomicalEntityMeta.objects.create(
+            name="Layer 4",
+            ontology_uri='http://purl.obolibrary.org/obo/UBERON_0004234'
+        )
+        region_meta = AnatomicalEntityMeta.objects.create(
+            name="Region 4",
+            ontology_uri='http://purl.obolibrary.org/obo/UBERON_0004678'
+        )
+        # Deliberately NOT creating Layer and Region objects initially
+        
+        # Create a relationship
+        relationship = Relationship.objects.create(
+            title="Test Region-Layer With Update Flag",
+            predicate_name="hasRegionLayerWithUpdate",
+            predicate_uri="http://uri.interlex.org/test/hasRegionLayerWithUpdate",
+            type=RelationshipType.ANATOMICAL_MULTI,
+            order=1,
+            custom_ingestion_code="""
+result = [
+    {'region': 'http://purl.obolibrary.org/obo/UBERON_0004678', 'layer': 'http://purl.obolibrary.org/obo/UBERON_0004234'}
+]
+"""
+        )
+        
+        statement_id = 'http://uri.interlex.org/composer/uris/set/test/10'
+        
+        # Create mock neuron
+        mock_neuron = self.create_mock_neuron()
+        
+        mock_statements = [
+            {
+                'id': statement_id,
+                'label': 'test neuron type',
+                'pref_label': 'test connectivity statement',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'test',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/test'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': [],
+                '_neuron': mock_neuron,
+                # Pre-computed custom relationship results (from Step 1)
+                '_custom_relationship_results': {
+                    relationship.id: [
+                        {'region': 'http://purl.obolibrary.org/obo/UBERON_0004678', 'layer': 'http://purl.obolibrary.org/obo/UBERON_0004234'}
+                    ]
+                }
+            }
+        ]
+        mock_get_statements.return_value = mock_statements
+        
+        # Run ingestion with update_anatomical_entities=True
+        ingest_statements(update_anatomical_entities=True)
+        
+        # Verify statement was created
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertIsNotNone(statement)
+        
+        # Verify anatomical relationship was created
+        cs_ae = ConnectivityStatementAnatomicalEntity.objects.get(
+            connectivity_statement=statement,
+            relationship=relationship
+        )
+        
+        # Verify region-layer pair was created and linked
+        self.assertEqual(cs_ae.anatomical_entities.count(), 1)
+        ae = cs_ae.anatomical_entities.first()
+        self.assertIsNotNone(ae.region_layer)
+        
+        # Verify Layer and Region objects were automatically created
+        layer = Layer.objects.get(ae_meta__ontology_uri='http://purl.obolibrary.org/obo/UBERON_0004234')
+        region = Region.objects.get(ae_meta__ontology_uri='http://purl.obolibrary.org/obo/UBERON_0004678')
+        self.assertIsNotNone(layer)
+        self.assertIsNotNone(region)
+        
+        # Verify the created anatomical entity uses the correct layer and region
+        self.assertEqual(ae.region_layer.layer, layer.ae_meta)
+        self.assertEqual(ae.region_layer.region, region.ae_meta)
+    
+    @patch('composer.services.cs_ingestion.cs_ingestion_services.get_statements_from_neurondm')
+    def test_anatomical_relationship_invalid_dict_format(self, mock_get_statements):
+        """Test that invalid dict formats (missing 'region' or 'layer' keys) are logged as errors"""
+        from composer.models import Relationship, ConnectivityStatementAnatomicalEntity
+        from composer.enums import RelationshipType
+        
+        self.flush_connectivity_statements()
+        
+        # Create a relationship with custom code that returns invalid dict format
+        relationship = Relationship.objects.create(
+            title="Test Invalid Dict Format",
+            predicate_name="hasInvalidDict",
+            predicate_uri="http://uri.interlex.org/test/hasInvalidDict",
+            type=RelationshipType.ANATOMICAL_MULTI,
+            order=1,
+            custom_ingestion_code="""
+# Invalid format - missing 'layer' key
+result = [
+    {'region': 'http://purl.obolibrary.org/obo/UBERON_0005678'}
+]
+"""
+        )
+        
+        statement_id = 'http://uri.interlex.org/composer/uris/set/test/11'
+        
+        # Create mock neuron
+        mock_neuron = self.create_mock_neuron()
+        
+        mock_statements = [
+            {
+                'id': statement_id,
+                'label': 'test neuron type',
+                'pref_label': 'test connectivity statement',
+                'origins': NeuronDMOrigin(set()),
+                'destinations': [NeuronDMDestination(set(), set(), 'AXON-T')],
+                'populationset': 'test',
+                'vias': [],
+                'species': [],
+                'sex': [],
+                'circuit_type': [],
+                'circuit_role': [],
+                'phenotype': [],
+                'other_phenotypes': [],
+                'forward_connection': [],
+                'provenance': ['http://dx.doi.org/10.1126/test'],
+                'sentence_number': [],
+                'note_alert': [],
+                'validation_errors': ValidationErrors(),
+                'statement_alerts': [],
+                '_neuron': mock_neuron,
+                # Pre-computed custom relationship results with invalid format
+                '_custom_relationship_results': {
+                    relationship.id: [
+                        {'region': 'http://purl.obolibrary.org/obo/UBERON_0005678'}  # Missing 'layer' key
+                    ]
+                }
+            }
+        ]
+        mock_get_statements.return_value = mock_statements
+        
+        # Run ingestion - should not crash despite invalid format
+        ingest_statements()
+        
+        # Verify statement was still created
+        statement = ConnectivityStatement.objects.get(reference_uri=statement_id)
+        self.assertIsNotNone(statement)
+        
+        # Verify anatomical relationship was NOT created or has no entities due to invalid format
+        cs_ae_count = ConnectivityStatementAnatomicalEntity.objects.filter(
+            connectivity_statement=statement,
+            relationship=relationship
+        ).count()
+        
+        if cs_ae_count > 0:
+            cs_ae = ConnectivityStatementAnatomicalEntity.objects.get(
+                connectivity_statement=statement,
+                relationship=relationship
+            )
+            self.assertEqual(cs_ae.anatomical_entities.count(), 0,
+                           "No anatomical entities should be linked when dict format is invalid")
 
 

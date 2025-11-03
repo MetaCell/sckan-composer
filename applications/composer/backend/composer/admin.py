@@ -144,7 +144,11 @@ class RelationshipAdmin(admin.ModelAdmin):
                 "The code must define a <code>result</code> variable with the output:<br>"
                 "• For TRIPLE relationships: list of dicts [{'name': str, 'uri': str}, ...]<br>"
                 "• For TEXT relationships: list of strings or single string<br>"
-                "• For ANATOMICAL_ENTITY relationships: list of URIs (strings)<br><br>"
+                "• For ANATOMICAL_ENTITY relationships:<br>"
+                "&nbsp;&nbsp;- Simple entities: list of URI strings ['http://purl.obolibrary.org/obo/UBERON_0001234', ...]<br>"
+                "&nbsp;&nbsp;- Region-layer pairs: list of dicts [{'region': 'region_uri', 'layer': 'layer_uri'}, ...]<br>"
+                "&nbsp;&nbsp;- Mixed: list combining both formats<br>"
+                "&nbsp;&nbsp;- Note: Region-layer pairs respect the 'update_anatomical_entities' flag<br><br>"
                 "Errors are logged to the ingestion anomalies file and the relationship will be skipped."
             )
         return form
