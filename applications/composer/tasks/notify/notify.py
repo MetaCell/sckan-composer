@@ -12,7 +12,6 @@ logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 CONFIG = {
     "smtp_host": "mail.metacell",
     "smtp_port": 587,
-    "sender_email": "noreply@metacell.us",
     "export": {
         "subject_template": "Composer export completed with status: {status}",
         "message_success": "You can download the exported file here:\n{file_url}\n",
@@ -34,6 +33,7 @@ CONFIG = {
 # === Read from environment ===
 status = os.environ.get("workflow_result", "Unknown")
 raw_payload = os.environ.get("payload", "{}")
+sender_email = os.environ.get("sender_email", "").strip()
 print(f"[NOTIFY] Raw payload: {raw_payload}")
 
 # === Parse payload ===
@@ -59,7 +59,7 @@ if workflow_type not in CONFIG:
 workflow_config = CONFIG[workflow_type]
 
 # === Prepare message ===
-sender = CONFIG["sender_email"]
+sender = sender_email
 subject = workflow_config["subject_template"].format(status=status)
 include_file = status.lower() == "succeeded" and file_url
 
