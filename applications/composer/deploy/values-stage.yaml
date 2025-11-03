@@ -3,3 +3,6 @@ harness:
     PRODUCTION: TRUE
     DEBUG: FALSE
     HTTPS: True
+  notifications:
+    email:
+      from_email: no-reply@metacell-test.org

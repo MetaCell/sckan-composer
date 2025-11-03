@@ -50,3 +50,6 @@ harness:
   secrets:
     SECRET_KEY: null
     SOCIAL_AUTH_ORCID_SECRET: null
+  notifications:
+    email:
+      from_email: no-reply@metacell.us

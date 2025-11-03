@@ -24,9 +24,16 @@ def run_ingestion_workflow(
     timestamp: str = None,
 ) -> None:
     from cloudharness.workflows import tasks, operations
-    from cloudharness.applications import get_current_configuration
+    from cloudharness.applications import (
+        get_current_configuration,
+        ApplicationConfiguration,
+    )
 
     current_app = get_current_configuration()
+
+    # Get sender email from configuration
+    app_conf: ApplicationConfiguration = get_current_configuration()
+    from_email = app_conf["notifications"]["email"]["from_email"]
 
     # Create unique filenames for intermediate data
     if timestamp is None:
@@ -123,6 +130,7 @@ def run_ingestion_workflow(
             }
         ),
         "command": ["python", "notify.py"],
+        "sender_email": from_email,
     }
 
     # Create pipeline operation with all three tasks

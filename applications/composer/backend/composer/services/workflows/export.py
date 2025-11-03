@@ -11,12 +11,19 @@ def get_volume_directory(current_app) -> str:
 
 def run_export_workflow(user: User, scheme: str = "https") -> None:
     from cloudharness.workflows import tasks, operations
-    from cloudharness.applications import get_current_configuration
+    from cloudharness.applications import (
+        get_current_configuration,
+        ApplicationConfiguration,
+    )
     from cloudharness.utils.config import CloudharnessConfig
 
 
     current_app = get_current_configuration()
     domain = CloudharnessConfig.get_domain()
+
+    # Get sender email from configuration
+    app_conf: ApplicationConfiguration = get_current_configuration()
+    from_email = app_conf["notifications"]["email"]["from_email"]
 
     version_str = str(VERSION).replace(".", "-")
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -53,6 +60,7 @@ def run_export_workflow(user: User, scheme: str = "https") -> None:
             }
         ),
         "command": ["python", "notify.py"],
+        "sender_email": from_email,
     }
 
     op = operations.PipelineOperation(

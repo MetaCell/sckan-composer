@@ -4,6 +4,7 @@ ADD . /
 
 ENV workflow_result='Failure'
 ENV payload='{}'
+ENV sender_email=''
 
 RUN pip install --no-cache-dir -r requirements.txt
 
