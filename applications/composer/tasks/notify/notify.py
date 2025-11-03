@@ -33,7 +33,6 @@ CONFIG = {
 # === Read from environment ===
 status = os.environ.get("workflow_result", "Unknown")
 raw_payload = os.environ.get("payload", "{}")
-sender_email = os.environ.get("sender_email", "").strip()
 print(f"[NOTIFY] Raw payload: {raw_payload}")
 
 # === Parse payload ===
@@ -43,12 +42,17 @@ except json.JSONDecodeError:
     logging.error(f"[NOTIFY] Invalid JSON payload: {raw_payload}")
     sys.exit(1)
 
-recipient = payload.get("email", "").strip()
+recipient = payload.get("to_email", "").strip()
 workflow_type = payload.get("type", "export").strip()  # 'export' or 'ingestion'
 file_url = payload.get("file_url", "").strip()
+sender_email = payload.get("from_email", "").strip()
 
 if not recipient:
     logging.error("[NOTIFY] No valid recipient email provided in payload.")
+    sys.exit(1)
+
+if not sender_email:
+    logging.error("[NOTIFY] No valid sender email provided in payload.")
     sys.exit(1)
 
 if workflow_type not in CONFIG:

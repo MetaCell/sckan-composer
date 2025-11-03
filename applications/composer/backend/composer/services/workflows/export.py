@@ -56,11 +56,11 @@ def run_export_workflow(user: User, scheme: str = "https") -> None:
             {
                 "type": "export",
                 "file_url": file_url,
-                "email": user.email,
+                "to_email": user.email,
+                "from_email": from_email,
             }
         ),
         "command": ["python", "notify.py"],
-        "sender_email": from_email,
     }
 
     op = operations.PipelineOperation(

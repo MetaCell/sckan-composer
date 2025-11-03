@@ -126,11 +126,11 @@ def run_ingestion_workflow(
         "payload": json.dumps(
             {
                 "type": "ingestion",
-                "email": user.email,
+                "to_email": user.email,
+                "from_email": from_email,
             }
         ),
         "command": ["python", "notify.py"],
-        "sender_email": from_email,
     }
 
     # Create pipeline operation with all three tasks
