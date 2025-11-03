@@ -33,7 +33,7 @@ def run_ingestion_workflow(
 
     # Get sender email from configuration
     app_conf: ApplicationConfiguration = get_current_configuration()
-    from_email = app_conf["notifications"]["email"]["from_email"]
+    from_email = app_conf.harness["notifications"]["email"]["from_email"]
 
     # Create unique filenames for intermediate data
     if timestamp is None:

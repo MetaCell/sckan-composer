@@ -23,7 +23,7 @@ def run_export_workflow(user: User, scheme: str = "https") -> None:
 
     # Get sender email from configuration
     app_conf: ApplicationConfiguration = get_current_configuration()
-    from_email = app_conf["notifications"]["email"]["from_email"]
+    from_email = app_conf.harness["notifications"]["email"]["from_email"]
 
     version_str = str(VERSION).replace(".", "-")
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
