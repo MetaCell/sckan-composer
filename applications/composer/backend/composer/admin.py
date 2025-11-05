@@ -376,8 +376,9 @@ class ConnectivityStatementAdmin(
         "curie_id",
         "has_statement_been_exported",
         "reference_uri",
+        "population_index"
     )
-    exclude = ("journey_path", "statement_prefix", "statement_suffix", "population_index")
+    exclude = ("journey_path", "statement_prefix", "statement_suffix", )
     autocomplete_fields = ("sentence", "origins")
     date_hierarchy = "modified_date"
     list_display = (
