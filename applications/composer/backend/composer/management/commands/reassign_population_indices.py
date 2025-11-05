@@ -131,9 +131,13 @@ class Command(BaseCommand):
         bag = []  # Statements that couldn't get hypothesis index or have conflicts
         special_cases = []  # Track cases where hypothesis index couldn't be retrieved
         
+        # Create a dictionary for fast statement lookup by id
+        statements_dict = {s.id: s for s in statements}
+        
         # Pattern to extract population index from curie_id
         # Expected format: "neuron type {population_name} {population_index}"
         pattern = rf"neuron type {re.escape(population.name)}\s+(\d+)"
+        compiled_pattern = re.compile(pattern, re.IGNORECASE)
         
         # First pass: Extract hypothesis indices and detect conflicts
         self.log(log_file, "")
@@ -143,7 +147,7 @@ class Command(BaseCommand):
             hypothesis_index = None
             
             if statement.curie_id:
-                match = re.search(pattern, statement.curie_id, re.IGNORECASE)
+                match = compiled_pattern.search(statement.curie_id)
                 if match:
                     hypothesis_index = int(match.group(1))
                     self.log(log_file, f"  Statement {statement.curie_id}: Found hypothesis index {hypothesis_index} from curie_id")
@@ -234,7 +238,7 @@ class Command(BaseCommand):
             
             with transaction.atomic():
                 for statement_id, new_index in statement_assignments.items():
-                    statement = ConnectivityStatement.objects.get(id=statement_id)
+                    statement = statements_dict[statement_id]
                     old_index = statement.population_index
                     
                     if old_index != new_index:
@@ -258,7 +262,7 @@ class Command(BaseCommand):
             self.log(log_file, "Phase 4: Database changes (DRY RUN - not applied)...")
             
             for statement_id, new_index in statement_assignments.items():
-                statement = ConnectivityStatement.objects.get(id=statement_id)
+                statement = statements_dict[statement_id]
                 old_index = statement.population_index
                 
                 if old_index != new_index:
