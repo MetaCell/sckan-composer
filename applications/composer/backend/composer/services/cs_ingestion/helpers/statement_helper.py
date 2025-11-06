@@ -97,7 +97,7 @@ def create_or_update_connectivity_statement(
         "population": get_or_create_populationset(populationset_name),
         "projection_phenotype": get_projection_phenotype(statement),
         "reference_uri": statement[ID],
-        "state": CSState.EXPORTED,
+        "state": CSState.NPO_APPROVED,
         "curie_id": statement[LABEL],
     }
 
