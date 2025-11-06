@@ -376,23 +376,24 @@ class ConnectivityStatementAdmin(
         "curie_id",
         "has_statement_been_exported",
         "reference_uri",
+        "population_index"
     )
-    exclude = ("journey_path", "statement_prefix", "statement_suffix", "population_index")
+    exclude = ("journey_path", "statement_prefix", "statement_suffix", )
     autocomplete_fields = ("sentence", "origins")
     date_hierarchy = "modified_date"
     list_display = (
         "sentence",
-        "pmid",
-        "pmcid",
         "short_ks",
+        "population_set_name",
+        "population_index",
+        "has_statement_been_exported",
         "tag_list",
         "state",
-        "has_notes",
         "owner",
     )
-    list_display_links = ("sentence", "pmid", "pmcid", "short_ks", "state")
-    list_filter = ("state", "owner", "tags__tag")
-    list_select_related = ("sentence", "origins", "destinations")
+    list_display_links = ("sentence", "short_ks", "state")
+    list_filter = ("state", "population", "owner", "tags__tag")
+    list_select_related = ("sentence", "population", "owner", "origins", "destinations")
     search_fields = (
         "sentence__title",
         "sentence__text",
@@ -433,17 +434,9 @@ class ConnectivityStatementAdmin(
     def short_ks(self, obj):
         return str(obj)
 
-    @admin.display(description="PMID")
-    def pmid(self, obj):
-        return obj.sentence.pmid
-
-    @admin.display(description="PMCID")
-    def pmcid(self, obj):
-        return obj.sentence.pmcid
-
-    @admin.display(description="REFERENCE")
-    def reference(self, obj):
-        return str(obj)
+    @admin.display(description="Population Set")
+    def population_set_name(self, obj):
+        return obj.population.name if obj.population else "-"
 
 
 class ExportBatchAdmin(admin.ModelAdmin):

@@ -49,12 +49,20 @@ def post_transition_callback(sender, instance, name, source, target, **kwargs):
         sentence = instance
     else:
         sentence = None
+    
+    # Customize message based on whether transition was done by system (ingestion) or user
+    if user and user.username == "system":
+        note_message = f"Automatically transitioned from {source} to {target} during automated processes (e.g., ingestion)."
+    else:
+        user_name = f"{user.first_name} {user.last_name}" if user else "Unknown user"
+        note_message = f"User {user_name} transitioned this record from {source} to {target}"
+    
     Note.objects.create(
         user=system_user,
         type=NoteType.TRANSITION,
         connectivity_statement=connectivity_statement,
         sentence=sentence,
-        note=f"User {user.first_name} {user.last_name} transitioned this record from {source} to {target}",
+        note=note_message,
     )
 
 
