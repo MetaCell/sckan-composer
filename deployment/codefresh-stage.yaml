@@ -86,7 +86,7 @@ steps:
         stage: publish
         type: push
         title: Cloudharness frontend build
-        candidate: '${{REGISTRY}}/cloudharness/cloudharness-frontend-build:${{DEPLOYMENT_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/cloudharness-frontend-build:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest
@@ -95,7 +95,7 @@ steps:
         stage: publish
         type: push
         title: Cloudharness base debian
-        candidate: '${{REGISTRY}}/cloudharness/cloudharness-base-debian:${{DEPLOYMENT_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/cloudharness-base-debian:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest
@@ -104,7 +104,7 @@ steps:
         stage: publish
         type: push
         title: Cloudharness django
-        candidate: '${{REGISTRY}}/cloudharness/cloudharness-django:${{DEPLOYMENT_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/cloudharness-django:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest
@@ -113,7 +113,7 @@ steps:
         stage: publish
         type: push
         title: Accounts
-        candidate: '${{REGISTRY}}/cloudharness/accounts:${{DEPLOYMENT_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/accounts:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest
@@ -122,7 +122,7 @@ steps:
         stage: publish
         type: push
         title: Composer
-        candidate: '${{REGISTRY}}/cloudharness/composer:${{DEPLOYMENT_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/composer:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest
@@ -131,7 +131,7 @@ steps:
         stage: publish
         type: push
         title: Composer notify
-        candidate: '${{REGISTRY}}/cloudharness/composer-notify:${{DEPLOYMENT_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/composer-notify:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest
