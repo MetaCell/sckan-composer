@@ -374,7 +374,6 @@ class ConnectivityStatementAdmin(
     readonly_fields = (
         "state",
         "curie_id",
-        "has_statement_been_exported",
         "reference_uri",
         "population_index"
     )
@@ -386,7 +385,6 @@ class ConnectivityStatementAdmin(
         "short_ks",
         "population_set_name",
         "population_index",
-        "has_statement_been_exported",
         "tag_list",
         "state",
         "owner",
