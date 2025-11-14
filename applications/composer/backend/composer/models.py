@@ -93,7 +93,7 @@ class PmcIdField(models.CharField):
         return super().formfield(*args, **kwargs)
 
 
-def validate_provenance_uri(value):
+def validate_uri(value):
     """Validate that the URI is a valid DOI, PMID, PMCID, or URL"""
     if not value or not value.strip():
         raise ValidationError("URI cannot be empty.")
@@ -140,13 +140,13 @@ def validate_provenance_uri(value):
     )
 
 
-class ProvenanceUriField(models.CharField):
+class UriField(models.CharField):
     """Custom field for provenance URIs that accepts DOI, PMID, PMCID, or URLs"""
-    
-    def __init__(self, *args, **kwargs):
-        kwargs['validators'] = kwargs.get('validators', []) + [validate_provenance_uri]
-        super().__init__(*args, **kwargs)
+    default_validators = [validate_uri]
 
+# --- Backward compatibility alias for old migrations ---
+ProvenanceUriField = UriField
+validate_provenance_uri = validate_uri
 
 # Model Managers
 class ConnectivityStatementManager(models.Manager):
@@ -895,8 +895,7 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
         permission=ConnectivityStatementStateService.has_permission_to_transition_to_invalid,
     )
     def invalid(self, *args, **kwargs):
-        self.has_statement_been_exported = True
-        self.save(update_fields = ["has_statement_been_exported"])
+        self._perform_export_logic()
 
     @transition(
         field=state,
@@ -1050,8 +1049,9 @@ class Relationship(models.Model):
     title = models.CharField(max_length=255)
     predicate_name = models.CharField(max_length=255)
     predicate_uri = models.URLField()
-    type = models.CharField(max_length=10, choices=RelationshipType.choices)
+    type = models.CharField(max_length=20, choices=RelationshipType.choices)
     order = models.PositiveIntegerField(default=0)
+    custom_ingestion_code = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -1082,29 +1082,106 @@ class Triple(models.Model):
         ]
 
 
-class ConnectivityStatementTriple(models.Model):
-    connectivity_statement = models.ForeignKey(ConnectivityStatement, on_delete=models.CASCADE, related_name="statement_triples")
+class AbstractConnectivityStatementRelationship(models.Model):
+    """
+    Abstract base class for all connectivity statement relationships.
+    Provides common fields and behavior for different relationship types.
+    """
+    connectivity_statement = models.ForeignKey(
+        ConnectivityStatement, 
+        on_delete=models.CASCADE
+    )
     relationship = models.ForeignKey(Relationship, on_delete=models.CASCADE)
-    triple = models.ForeignKey(Triple, null=True, blank=True, on_delete=models.SET_NULL)
-    free_text = models.TextField(null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return f"{self.connectivity_statement} - {self.relationship.title}"
+
+
+class ConnectivityStatementTriple(AbstractConnectivityStatementRelationship):
+    """
+    Represents a relationship with triple value(s) (single or multi-select from predefined options).
+    """
+    triples = models.ManyToManyField(
+        Triple,
+        blank=True,
+        related_name='statement_triple_relationships'
+    )
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['connectivity_statement', 'relationship', 'triple'],
+                fields=['connectivity_statement', 'relationship'],
                 name='unique_statement_relationship_triple'
             )
         ]
+        verbose_name_plural = "Connectivity Statement Triples"
 
     def clean(self):
-        if self.triple and self.free_text:
-            raise ValidationError("Only one of 'triple' or 'free_text' should be set.")
-        if not self.triple and not self.free_text:
-            raise ValidationError("One of 'triple' or 'free_text' must be set.")
-        if self.relationship.type == RelationshipType.TEXT and self.triple:
-            raise ValidationError("Text relationships must use 'free_text', not 'triple'.")
-        if self.relationship.type in [RelationshipType.SINGLE, RelationshipType.MULTI] and self.free_text:
-            raise ValidationError("Select-type relationships must use 'triple', not 'free_text'.")
+        if not self.relationship_id:
+            return
+        if self.relationship.type not in [RelationshipType.TRIPLE_SINGLE, RelationshipType.TRIPLE_MULTI]:
+            raise ValidationError("This model should only be used for triple relationships.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
+
+class ConnectivityStatementText(AbstractConnectivityStatementRelationship):
+    """
+    Represents a relationship with free text value.
+    """
+    text = models.TextField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['connectivity_statement', 'relationship'],
+                name='unique_statement_relationship_text'
+            )
+        ]
+        verbose_name_plural = "Connectivity Statement Texts"
+
+    def clean(self):
+        if not self.relationship_id:
+            return
+        if self.relationship.type != RelationshipType.TEXT:
+            raise ValidationError("This model should only be used for text relationships.")
+        if not self.text or not self.text.strip():
+            raise ValidationError("Text must be set for text relationships.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
+
+class ConnectivityStatementAnatomicalEntity(AbstractConnectivityStatementRelationship):
+    """
+    Represents a relationship with anatomical entity values (single or multi-select).
+    """
+    anatomical_entities = models.ManyToManyField(
+        AnatomicalEntity, 
+        blank=True, 
+        related_name='statement_relationships'
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['connectivity_statement', 'relationship'],
+                name='unique_statement_relationship_anatomical'
+            )
+        ]
+        verbose_name_plural = "Connectivity Statement Anatomical Entities"
+
+    def clean(self):
+        if not self.relationship_id:
+            return
+        if self.relationship.type not in [RelationshipType.ANATOMICAL_MULTI]:
+            raise ValidationError("This model should only be used for anatomical entity relationships.")
 
     def save(self, *args, **kwargs):
         self.clean()
@@ -1301,13 +1378,29 @@ class Provenance(models.Model):
     connectivity_statement = models.ForeignKey(
         ConnectivityStatement, on_delete=models.CASCADE
     )
-    uri = ProvenanceUriField(max_length=500)
+    uri = UriField(max_length=500)
 
     def __str__(self):
         return self.uri
 
     class Meta:
         verbose_name_plural = "Provenances"
+
+
+class ExpertConsultant(models.Model):
+    """Expert Consultant"""
+
+    connectivity_statement = models.ForeignKey(
+        ConnectivityStatement, on_delete=models.CASCADE
+    )
+    uri = UriField(max_length=500)
+
+    def __str__(self):
+        return self.uri
+
+    class Meta:
+        verbose_name_plural = "Expert Consultants"
+
 
 class Note(models.Model):
     """Note"""
@@ -1476,3 +1569,4 @@ class StatementAlert(models.Model):
 
     def __str__(self):
         return f"{self.alert_type.name} for Statement {self.connectivity_statement.id}"
+

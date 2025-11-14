@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "5.2.3",
+  "version": "6.0.0",
   "private": true,
   "main": "index.js",
   "proxy": "http://127.0.0.1:8000/",

@@ -1,11 +1,12 @@
 import re
 from typing import Dict, Tuple, List
+import traceback
 
 from django.contrib.auth.models import User
 
 from composer.services.cs_ingestion.logging_service import LoggerService
 from composer.services.state_services import ConnectivityStatementStateService
-from composer.enums import CSState, NoteType
+from composer.enums import CSState, NoteType, RelationshipType
 from composer.management.commands.ingest_nlp_sentence import ID
 from composer.models import (
     AlertType,
@@ -14,7 +15,14 @@ from composer.models import (
     Note,
     Specie,
     Provenance,
+    ExpertConsultant,
     StatementAlert,
+    Relationship,
+    Triple,
+    ConnectivityStatementTriple,
+    ConnectivityStatementText,
+    ConnectivityStatementAnatomicalEntity,
+    AnatomicalEntity,
 )
 from composer.services.cs_ingestion.helpers.anatomical_entities_helper import (
     add_origins,
@@ -30,6 +38,7 @@ from composer.services.cs_ingestion.helpers.common_helpers import (
     STATE,
     NOTE_ALERT,
     PROVENANCE,
+    EXPERT_CONSULTANTS,
     SPECIES,
     FORWARD_CONNECTION,
 )
@@ -60,7 +69,7 @@ def create_or_update_connectivity_statement(
     sentence: Sentence,
     update_anatomical_entities: bool,
     logger_service: LoggerService,
-    population_uris: set = None,
+    force_state_transition: bool = False,
 ) -> Tuple[ConnectivityStatement, bool]:
     """
     Create or update a connectivity statement from ingested data.
@@ -70,8 +79,8 @@ def create_or_update_connectivity_statement(
         sentence: The associated sentence object
         update_anatomical_entities: Whether to update anatomical entity relationships
         logger_service: Service for logging anomalies
-        population_uris: Set of URIs from population file. When provided, the system_exported
-                        transition is used to allow state changes from any state.
+        force_state_transition: If True, allows state transitions from any state (e.g., TO_BE_REVIEWED -> EXPORTED).
+                               Use when ingesting pre-filtered populations.
     
     Returns:
         Tuple of (ConnectivityStatement, created) where created is True if new
@@ -88,7 +97,7 @@ def create_or_update_connectivity_statement(
         "population": get_or_create_populationset(populationset_name),
         "projection_phenotype": get_projection_phenotype(statement),
         "reference_uri": statement[ID],
-        "state": CSState.EXPORTED,
+        "state": CSState.NPO_APPROVED,
         "curie_id": statement[LABEL],
     }
 
@@ -111,8 +120,8 @@ def create_or_update_connectivity_statement(
     validation_errors = statement.get(VALIDATION_ERRORS, ValidationErrors())
 
     # State transitions: Handle validation errors and state updates
-    # When population_uris is provided (population file used), use system_exported
-    # transition to allow state changes from any state
+    # When force_state_transition is True, use system_exported transition 
+    # to allow state changes from any state (e.g., TO_BE_REVIEWED -> EXPORTED)
     if validation_errors.has_errors():
         error_message = validation_errors.to_string()
         if connectivity_statement.state != CSState.INVALID:
@@ -121,9 +130,9 @@ def create_or_update_connectivity_statement(
             create_invalid_note(connectivity_statement, error_message)
     else:
         # Statement is valid - attempt transition to EXPORTED
-        # Use system_exported transition when population_uris is provided
+        # Use system_exported transition when force_state_transition is True
         # This allows transitioning from any state (e.g., TO_BE_REVIEWED -> EXPORTED)
-        if population_uris is not None:
+        if force_state_transition:
             if connectivity_statement.state != CSState.EXPORTED:
                 transition_success, error_message = do_system_transition_to_exported(connectivity_statement)
                 if not transition_success:
@@ -154,9 +163,245 @@ def create_or_update_connectivity_statement(
     update_many_to_many_fields(
         connectivity_statement, statement, update_anatomical_entities
     )
+    
+    # Process dynamic relationships with custom code
+    process_dynamic_relationships(connectivity_statement, statement, logger_service, update_anatomical_entities)
+    
     statement[STATE] = connectivity_statement.state
 
     return connectivity_statement, created
+
+
+def process_dynamic_relationships(
+    connectivity_statement: ConnectivityStatement,
+    statement: Dict,
+    logger_service: LoggerService,
+    update_anatomical_entities: bool = False,
+):
+    """
+    Reads pre-computed results from Step 1 and creates database entities.
+    """
+    # Get pre-computed custom relationship results from Step 1
+    custom_results = statement.get('_custom_relationship_results', {})
+    
+    if not custom_results:
+        return
+    
+    # Get all relationships to map IDs to objects
+    relationship_ids = [int(rel_id) for rel_id in custom_results.keys()]
+    relationships = {r.id: r for r in Relationship.objects.filter(id__in=relationship_ids)}
+    
+    for relationship_id_str, result in custom_results.items():
+        relationship_id = int(relationship_id_str)
+        relationship = relationships.get(relationship_id)
+        if not relationship:
+            continue
+            
+        try:
+            # Process result based on relationship type
+            if relationship.type == RelationshipType.TRIPLE_MULTI or relationship.type == RelationshipType.TRIPLE_SINGLE:
+                process_triple_relationship(connectivity_statement, relationship, result, logger_service)
+            elif relationship.type == RelationshipType.TEXT:
+                process_text_relationship(connectivity_statement, relationship, result)
+            elif relationship.type == RelationshipType.ANATOMICAL_MULTI:
+                process_anatomical_relationship(connectivity_statement, relationship, result, logger_service, update_anatomical_entities)
+            else:
+                log_custom_relationship_error(
+                    logger_service,
+                    f"Unknown relationship type: {relationship.type}",
+                    statement.get(ID),
+                    relationship.id,
+                    {'relationship_title': relationship.title, 'type': relationship.type}
+                )
+                
+        except Exception as e:
+            # Log error and continue with other relationships
+            log_custom_relationship_error(
+                logger_service,
+                f"Failed to process custom relationship '{relationship.title}': {str(e)}",
+                statement.get(ID),
+                relationship.id,
+                {
+                    'relationship_title': relationship.title,
+                    'error': str(e),
+                    'traceback': traceback.format_exc()
+                }
+            )
+
+
+def process_triple_relationship(
+    connectivity_statement: ConnectivityStatement,
+    relationship: Relationship,
+    result: List[Dict],
+    logger_service: LoggerService,
+):
+    """
+    Process TRIPLE relationship results.
+    Expected result format: [{'name': str, 'uri': str}, ...]
+    """
+    if not isinstance(result, list):
+        result = [result]
+    
+    triples = []
+    for item in result:
+        if not isinstance(item, dict) or 'name' not in item or 'uri' not in item:
+            log_custom_relationship_error(
+                logger_service,
+                f"Invalid triple format for relationship '{relationship.title}': {item}",
+                connectivity_statement.reference_uri,
+                relationship.id,
+                {'item': str(item), 'relationship_title': relationship.title}
+            )
+            continue
+        
+        # Get or create the triple
+        triple, created = Triple.objects.get_or_create(
+            name=item['name'],
+            uri=item['uri'],
+            relationship=relationship
+        )
+        triples.append(triple)
+    
+    if triples:
+        # Get or create the ConnectivityStatementTriple
+        cs_triple, created = ConnectivityStatementTriple.objects.get_or_create(
+            connectivity_statement=connectivity_statement,
+            relationship=relationship
+        )
+        cs_triple.triples.set(triples)
+
+
+def process_text_relationship(
+    connectivity_statement: ConnectivityStatement,
+    relationship: Relationship,
+    result,
+):
+    """
+    Process TEXT relationship results.
+    Expected result format: string or list of strings
+    """
+    if isinstance(result, list):
+        text = ', '.join(str(item) for item in result)
+    else:
+        text = str(result)
+    
+    # Get or create the ConnectivityStatementText
+    cs_text, created = ConnectivityStatementText.objects.update_or_create(
+        connectivity_statement=connectivity_statement,
+        relationship=relationship,
+        defaults={'text': text}
+    )
+
+
+def process_anatomical_relationship(
+    connectivity_statement: ConnectivityStatement,
+    relationship: Relationship,
+    result: List,
+    logger_service: LoggerService,
+    update_anatomical_entities: bool = False,
+):
+    """
+    Process ANATOMICAL_ENTITY relationship results.
+    
+    Expected result formats:
+    - Simple entities: [uri1, uri2, ...]
+    - Region-layer pairs: [{'region': 'region_uri', 'layer': 'layer_uri'}, ...]
+    - Mixed: list combining both formats
+    """
+    from composer.services.cs_ingestion.helpers.anatomical_entities_helper import (
+        get_or_create_simple_entity,
+        get_or_create_complex_entity,
+    )
+    from composer.services.cs_ingestion.exceptions import EntityNotFoundException
+    
+    if not isinstance(result, list):
+        result = [result]
+    
+    anatomical_entities = []
+    for item in result:
+        try:
+            # Check if item is a region-layer pair (dict with 'region' and 'layer' keys)
+            if isinstance(item, dict) and 'region' in item and 'layer' in item:
+                # Process as region-layer pair
+                region_uri = str(item['region'])
+                layer_uri = str(item['layer'])
+                ae, _ = get_or_create_complex_entity(region_uri, layer_uri, update_anatomical_entities)
+                anatomical_entities.append(ae)
+            elif isinstance(item, dict):
+                # Invalid dict format - log error
+                log_custom_relationship_error(
+                    logger_service,
+                    f"Invalid anatomical entity format (expected dict with 'region' and 'layer' keys or a URI string): {item}",
+                    connectivity_statement.reference_uri,
+                    relationship.id,
+                    {'item': str(item), 'relationship_title': relationship.title}
+                )
+            else:
+                # Process as simple entity URI
+                uri = str(item)
+                ae, _ = get_or_create_simple_entity(uri)
+                anatomical_entities.append(ae)
+        except EntityNotFoundException as e:
+            log_custom_relationship_error(
+                logger_service,
+                f"Anatomical entity not found: {str(e)} in relationship '{relationship.title}'",
+                connectivity_statement.reference_uri,
+                relationship.id,
+                {'item': str(item), 'relationship_title': relationship.title, 'error': str(e)}
+            )
+        except AnatomicalEntity.DoesNotExist:
+            log_custom_relationship_error(
+                logger_service,
+                f"Anatomical entity not found for item '{item}' in relationship '{relationship.title}'",
+                connectivity_statement.reference_uri,
+                relationship.id,
+                {'item': str(item), 'relationship_title': relationship.title}
+            )
+        except Exception as e:
+            log_custom_relationship_error(
+                logger_service,
+                f"Error processing anatomical entity '{item}' in relationship '{relationship.title}': {str(e)}",
+                connectivity_statement.reference_uri,
+                relationship.id,
+                {'item': str(item), 'relationship_title': relationship.title, 'error': str(e)}
+            )
+    
+    if anatomical_entities:
+        # Get or create the ConnectivityStatementAnatomicalEntity
+        cs_ae, created = ConnectivityStatementAnatomicalEntity.objects.get_or_create(
+            connectivity_statement=connectivity_statement,
+            relationship=relationship
+        )
+        cs_ae.anatomical_entities.set(anatomical_entities)
+
+
+def log_custom_relationship_error(
+    logger_service: LoggerService,
+    message: str,
+    statement_reference: str = None,
+    relationship_id: int = None,
+    details: dict = None,
+):
+    """
+    Log custom relationship errors using the LoggerService.
+    These errors are added to the anomalies log file.
+    """
+    from composer.services.cs_ingestion.models import LoggableAnomaly, Severity
+    
+    # Format detailed error message
+    error_msg = f"[CUSTOM_RELATIONSHIP] {message}"
+    if details:
+        error_msg += f" | Details: {details}"
+    
+    # Add to logger service as an anomaly
+    logger_service.add_anomaly(
+        LoggableAnomaly(
+            statement_id=statement_reference,
+            entity_id=str(relationship_id) if relationship_id else None,
+            message=error_msg,
+            severity=Severity.WARNING
+        )
+    )
 
 
 def update_many_to_many_fields(
@@ -171,17 +416,31 @@ def update_many_to_many_fields(
     for provenance in connectivity_statement.provenance_set.all():
         provenance.delete()
 
+    for expert_consultant in connectivity_statement.expertconsultant_set.all():
+        expert_consultant.delete()
+
     for destination in connectivity_statement.destinations.all():
         destination.delete()
 
     for via in connectivity_statement.via_set.all():
         via.delete()
+    
+    # Clear dynamic relationship data
+    for cs_triple in connectivity_statement.connectivitystatementtriple_set.all():
+        cs_triple.delete()
+    
+    for cs_text in connectivity_statement.connectivitystatementtext_set.all():
+        cs_text.delete()
+    
+    for cs_ae in connectivity_statement.connectivitystatementanatomicalentity_set.all():
+        cs_ae.delete()
 
     add_origins(connectivity_statement, statement, update_anatomical_entities)
     add_vias(connectivity_statement, statement, update_anatomical_entities)
     add_destinations(connectivity_statement, statement, update_anatomical_entities)
     add_species(connectivity_statement, statement)
     add_provenances(connectivity_statement, statement)
+    add_expert_consultants(connectivity_statement, statement)
     add_notes(connectivity_statement, statement)
 
 
@@ -204,6 +463,16 @@ def add_provenances(connectivity_statement: ConnectivityStatement, statement: Di
         for provenance in provenances_list
     )
     Provenance.objects.bulk_create(provenances)
+
+
+def add_expert_consultants(connectivity_statement: ConnectivityStatement, statement: Dict):
+    expert_consultants_list = statement.get(EXPERT_CONSULTANTS, [])
+    if expert_consultants_list:
+        expert_consultants = (
+            ExpertConsultant(connectivity_statement=connectivity_statement, uri=uri)
+            for uri in expert_consultants_list
+        )
+        ExpertConsultant.objects.bulk_create(expert_consultants)
 
 
 def add_species(connectivity_statement: ConnectivityStatement, statement: Dict):

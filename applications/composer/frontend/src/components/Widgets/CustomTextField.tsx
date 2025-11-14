@@ -38,6 +38,11 @@ export default function CustomTextField({
           rows={rows}
           value={updatedValue ? updatedValue : ''}
           disabled={isDisabled}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !multiline) {
+              e.preventDefault();
+            }
+          }}
           onBlur={(e=>{
             if (onBlur2) {
               onBlur2(e.target.value);

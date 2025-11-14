@@ -6,6 +6,7 @@ import {Provenance} from "../../apiclient/backend";
 import TextfieldWithChips from "../Widgets/TextfieldWithChips";
 import {checkOwnership, getOwnershipAlertMessage} from "../../helpers/ownershipAlert";
 import {ChangeRequestStatus} from "../../helpers/settings";
+import {isValidURI, isValidUrl, getURIValidationErrorMessage} from "../../helpers/uriValidation";
 
 const ProvenancesForm = (props: any) => {
   const { provenancesData, setter, extraData, isDisabled } = props
@@ -26,14 +27,8 @@ const ProvenancesForm = (props: any) => {
     const newValue = value.pop()
     
     // Validate the URI format before saving
-    if (!isValidProvenance(newValue)) {
-      alert(
-        "Invalid provenance format. Please enter a valid:\n" +
-        "• DOI (e.g., '10.1000/xyz123' or 'https://doi.org/10.1000/xyz123')\n" +
-        "• PMID (e.g., 'PMID:12345678' or 'https://pubmed.ncbi.nlm.nih.gov/12345678')\n" +
-        "• PMCID (e.g., 'PMC1234567' or 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1234567')\n" +
-        "• URL (e.g., 'https://example.com')"
-      );
+    if (!isValidURI(newValue)) {
+      alert(getURIValidationErrorMessage("provenance"));
       return;
     }
     
@@ -60,54 +55,6 @@ const ProvenancesForm = (props: any) => {
         },
       getOwnershipAlertMessage // message to show when ownership needs to be reassigned
     );
-  }
-
-  const isValidProvenance = (uri: string) => {
-    if (!uri || !uri.trim()) {
-      return false;
-    }
-    
-    const trimmedUri = uri.trim();
-    
-    // DOI patterns
-    const doiPatterns = [
-      /^10\.\d{4,}\/[a-zA-Z0-9\-._():]+(?:\/[a-zA-Z0-9\-._():]+)*$/,  // Standard DOI format - no consecutive slashes
-      /^doi:10\.\d{4,}\/[a-zA-Z0-9\-._():]+(?:\/[a-zA-Z0-9\-._():]+)*$/i,  // DOI with prefix
-      /^https?:\/\/doi\.org\/10\.\d{4,}\/[a-zA-Z0-9\-._():]+(?:\/[a-zA-Z0-9\-._():]+)*$/i,  // DOI URL
-      /^https?:\/\/dx\.doi\.org\/10\.\d{4,}\/[a-zA-Z0-9\-._():]+(?:\/[a-zA-Z0-9\-._():]+)*$/i,  // Alternative DOI URL
-    ];
-    
-    // PMID patterns
-    const pmidPatterns = [
-      /^PMID:\s*\d+$/i,  // PMID with prefix
-      /^https?:\/\/pubmed\.ncbi\.nlm\.nih\.gov\/\d+\/?$/i,  // PubMed URL
-    ];
-    
-    // PMCID patterns
-    const pmcidPatterns = [
-      /^PMC\d+$/i,  // PMC ID format
-      /^PMCID:\s*PMC\d+$/i,  // PMCID with prefix
-      /^https?:\/\/www\.ncbi\.nlm\.nih\.gov\/pmc\/articles\/PMC\d+\/?$/i,  // PMC URL
-    ];
-    
-    // URL pattern
-    const urlPattern = /^https?:\/\/[a-zA-Z0-9\-.]+(?::[0-9]+)?(?:\/[a-zA-Z0-9\-._~!$&'()*+,;=:@]+)*(?:\?[a-zA-Z0-9\-._~!$&'()*+,;=:@\/?]*)?(?:\#[a-zA-Z0-9\-._~!$&'()*+,;=:@\/?]*)?$/i;
-    
-    // Check if it matches any of the valid patterns
-    const allPatterns = [...doiPatterns, ...pmidPatterns, ...pmcidPatterns, urlPattern];
-    
-    return allPatterns.some(pattern => pattern.test(trimmedUri));
-  }
-
-  const isValidUrl = (uri: string) =>{
-    var urlPattern = new RegExp('^(https?:\\/\\/)?'+ 
-    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ 
-    '((\\d{1,3}\\.){3}\\d{1,3}))'+ 
-    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ 
-    '(\\?[;&a-z\\d%_.~+=-]*)?'+ 
-    '(\\#[-a-z\\d_]*)?$','i')
-    if (!uri.match(urlPattern)) return false
-    return true
   }
 
   copiedUISchema.uri = {

@@ -6,6 +6,7 @@ export let jsonSchemas = (function () {
   let noteSchema:any = null;
   let tagSchema:any = null;
   let provenanceSchema:any = null;
+  let expertConsultantsSchema:any = null;
   let viaSchema:any = null;
   let speciesSchema:any = null;
 
@@ -17,6 +18,7 @@ export let jsonSchemas = (function () {
         noteSchema = resp.data.Note
         tagSchema = resp.data.Tag
         provenanceSchema = resp.data.Provenance
+        expertConsultantsSchema = resp.data.ExpertConsultant
         viaSchema = resp.data.Via
         speciesSchema = resp.data.Specie
       })
@@ -35,6 +37,9 @@ export let jsonSchemas = (function () {
     },
     getProvenanceSchema: function () {
       return provenanceSchema
+    },
+    getExpertConsultantsSchema: function () {
+      return expertConsultantsSchema
     },
     getViaSchema: function () {
       return viaSchema

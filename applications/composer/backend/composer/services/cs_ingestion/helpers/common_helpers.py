@@ -1,7 +1,6 @@
 import logging
 
-from composer.enums import CircuitType
-from composer.models import AnatomicalEntityMeta
+from composer.pure_enums import CircuitType
 
 ID = "id"
 ORIGINS = "origins"
@@ -12,6 +11,11 @@ PREF_LABEL = "pref_label"
 SENTENCE_NUMBER = 'sentence_number'
 ENTITY_URI = 'loc'
 TYPE = 'type'
+ANATOMICAL_ENTITIES = 'anatomical_entities'
+FROM_ENTITIES = 'from_entities'
+ORDER = 'order'
+REGION = 'region'
+LAYER = 'layer'
 CIRCUIT_TYPE = 'circuit_type'
 FUNCTIONAL_CIRCUIT_ROLE = 'circuit_role'
 SEX = 'sex'
@@ -19,6 +23,7 @@ PHENOTYPE = 'phenotype'
 OTHER_PHENOTYPE = 'other_phenotypes'
 SPECIES = 'species'
 PROVENANCE = 'provenance'
+EXPERT_CONSULTANTS = 'expert_consultants'
 NOTE_ALERT = 'note_alert'
 FORWARD_CONNECTION = "forward_connection"
 STATEMENT_ALERTS = "statement_alerts"

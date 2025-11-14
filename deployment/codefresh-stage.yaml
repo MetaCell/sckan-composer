@@ -34,7 +34,8 @@ steps:
     commands:
     - bash cloud-harness/install.sh
     - harness-deployment cloud-harness . -t ${{DEPLOYMENT_TAG}} -d ${{DOMAIN}} -r
-      ${{REGISTRY}} -rs ${{REGISTRY_SECRET}} -n ${{NAMESPACE}} -e stage -i composer
+      ${{REGISTRY}} -rs '${{REGISTRY_SECRET}}' -n ${{NAMESPACE}} -e stage --no-cd -i
+      composer
   prepare_deployment_view:
     commands:
     - helm template ./deployment/helm --debug -n ${{NAMESPACE}}
@@ -62,6 +63,17 @@ steps:
       custom_values:
       - apps_composer_harness_secrets_SECRET__KEY="${{SECRET__KEY}}"
       - apps_composer_harness_secrets_SOCIAL__AUTH__ORCID__SECRET="${{SOCIAL__AUTH__ORCID__SECRET}}"
+  wait_deployment:
+    stage: qa
+    title: Wait deployment to be ready
+    image: codefresh/kubectl
+    commands:
+    - kubectl config use-context ${{CLUSTER_NAME}}
+    - kubectl config set-context --current --namespace=${{NAMESPACE}}
+    - kubectl rollout status deployment/argo-gk
+    - kubectl rollout status deployment/accounts
+    - kubectl rollout status deployment/composer
+    - sleep 60
   manual_tests:
     type: pending-approval
     stage: publish
@@ -86,16 +98,16 @@ steps:
         stage: publish
         type: push
         title: Cloudharness frontend build
-        candidate: '${{REGISTRY}}/cloudharness/cloudharness-frontend-build:${{DEPLOYMENT_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/cloudharness-frontend-build:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest
         registry: '${{REGISTRY_PUBLISH_URL}}'
-      publish_cloudharness-base-debian:
+      publish_cloudharness-base:
         stage: publish
         type: push
-        title: Cloudharness base debian
-        candidate: '${{REGISTRY}}/cloudharness/cloudharness-base-debian:${{DEPLOYMENT_TAG}}'
+        title: Cloudharness base
+        candidate: '${{REGISTRY}}/cloud-harness/cloudharness-base:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest
@@ -104,7 +116,7 @@ steps:
         stage: publish
         type: push
         title: Cloudharness django
-        candidate: '${{REGISTRY}}/cloudharness/cloudharness-django:${{DEPLOYMENT_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/cloudharness-django:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest
@@ -113,7 +125,7 @@ steps:
         stage: publish
         type: push
         title: Accounts
-        candidate: '${{REGISTRY}}/cloudharness/accounts:${{DEPLOYMENT_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/accounts:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest
@@ -122,7 +134,16 @@ steps:
         stage: publish
         type: push
         title: Composer
-        candidate: '${{REGISTRY}}/cloudharness/composer:${{DEPLOYMENT_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/composer:${{DEPLOYMENT_TAG}}'
+        tags:
+        - '${{DEPLOYMENT_PUBLISH_TAG}}'
+        - latest
+        registry: '${{REGISTRY_PUBLISH_URL}}'
+      publish_composer-neurondm:
+        stage: publish
+        type: push
+        title: Composer neurondm
+        candidate: '${{REGISTRY}}/cloud-harness/composer-neurondm:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest
@@ -131,7 +152,7 @@ steps:
         stage: publish
         type: push
         title: Composer notify
-        candidate: '${{REGISTRY}}/cloudharness/composer-notify:${{DEPLOYMENT_TAG}}'
+        candidate: '${{REGISTRY}}/cloud-harness/composer-notify:${{DEPLOYMENT_TAG}}'
         tags:
         - '${{DEPLOYMENT_PUBLISH_TAG}}'
         - latest

@@ -104,6 +104,12 @@ def get_export_queryset(base_qs):
             "via_set__from_entities",
             "destinations__anatomical_entities",
             "destinations__from_entities",
+            "statement_alerts__alert_type",
+            "connectivitystatementtriple_set__relationship",
+            "connectivitystatementtriple_set__triples",
+            "connectivitystatementtext_set__relationship",
+            "connectivitystatementanatomicalentity_set__relationship",
+            "connectivitystatementanatomicalentity_set__anatomical_entities",
         )
         .order_by("state_order", "state", "id")
     )
@@ -144,6 +150,7 @@ def generate_csv_attributes_mapping() -> Dict[str, Callable]:
         "Connected from uri": get_connected_from_uri,
         "Curation notes": get_curation_notes,
         "Reference (pubmed ID, DOI or text)": get_reference,
+        "Expert Consultant": get_expert_consultants,
         "Has nerve branches": has_nerve_branches,
         "Approved by SAWG": is_approved_by_sawg,
         "Review notes": get_review_notes,
@@ -275,3 +282,7 @@ def get_review_notes(cs: ConnectivityStatement, row: Row):
 
 def get_reference(cs: ConnectivityStatement, row: Row):
     return ", ".join(procenance.uri for procenance in cs.provenance_set.all())
+
+
+def get_expert_consultants(cs: ConnectivityStatement, row: Row):
+    return ", ".join(expert.uri for expert in cs.expertconsultant_set.all())

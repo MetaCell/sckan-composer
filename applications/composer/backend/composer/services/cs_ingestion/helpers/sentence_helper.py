@@ -4,12 +4,16 @@ from typing import Dict, Tuple
 
 from composer.enums import SentenceState
 from composer.models import Sentence
+from composer.constants import INGESTION_ANOMALIES_LOG_PATH, INGESTION_INGESTED_LOG_PATH
 from composer.services.cs_ingestion.helpers.common_helpers import SENTENCE_NUMBER, LABEL, ID
 from composer.services.cs_ingestion.logging_service import LoggerService
 from composer.services.cs_ingestion.models import LoggableAnomaly
 
 NOW = datetime.now().strftime("%Y%m%d%H%M%S")
-logger_service = LoggerService()
+logger_service = LoggerService(
+    ingestion_anomalies_log_path=INGESTION_ANOMALIES_LOG_PATH,
+    ingested_log_path=INGESTION_INGESTED_LOG_PATH
+)
 
 
 def get_or_create_sentence(statement: Dict) -> Tuple[Sentence, bool]:

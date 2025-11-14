@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useState, useMemo } from "react";
 import { FormBase } from "./FormBase";
 import { jsonSchemas } from "../../services/JsonSchema";
 import statementService from "../../services/StatementService";
@@ -43,16 +43,347 @@ import { checkOwnership, getOwnershipAlertMessage } from "../../helpers/ownershi
 import { useDispatch } from "react-redux";
 import { setWasChangeDetected } from "../../redux/statementSlice";
 import { AutocompleteWithChips } from "../Widgets/AutocompleteWithChips";
+import { RelationshipType, RelationshipOption } from "../../types/relationshipTypes";
+import { vars } from "../../theme/variables";
+
+/**
+ * Helper function to wrap relationship updates with ownership check
+ */
+const withOwnershipCheck = async (
+  statementId: number,
+  updateFn: () => Promise<void>,
+  refreshStatement: () => void,
+): Promise<string> => {
+  return checkOwnership(
+    statementId,
+    async () => {
+      await updateFn();
+      return ChangeRequestStatus.SAVED;
+    },
+    () => {},
+    getOwnershipAlertMessage
+  ).then((status) => {
+    if (status === ChangeRequestStatus.SAVED) {
+      refreshStatement();
+    }
+    return status;
+  });
+};
+
+/**
+ * Widget configuration factory for different relationship types
+ */
+const createWidgetConfig = (
+  relationshipType: RelationshipType,
+  relationshipKey: string | number,
+  relationshipData: RelationshipOption,
+  propertyTitle: string,
+  statement: any,
+  isDisabled: boolean,
+  refreshStatement: () => void,
+) => {
+  const configs = {
+    [RelationshipType.ANATOMICAL_MULTI]: () => ({
+      "ui:widget": CustomEntitiesDropdown,
+      "ui:options": {
+        isDisabled,
+        statement: statement,
+        label: propertyTitle,
+        placeholder: `Select ${propertyTitle}`,
+        searchPlaceholder: `Search for ${propertyTitle}`,
+        noResultReason: "No anatomical entities found",
+        disabledReason: "",
+        fieldName: `statement_anatomical_entities.${relationshipKey}`,
+        chipsNumber: 5,
+        minWidth: "50rem",
+        refreshStatement: refreshStatement,
+        labelPosition: "top",
+        labelVariant: "h6",
+        labelFontWeight: 500,
+        labelMarginBottom: 2,
+        labelColor: vars.titleFontColor,
+        onSearch: async (
+          searchValue: string,
+          formId: string,
+          selectedOptions: Option[],
+        ) => {
+          const excludedIds = selectedOptions.map((entity: Option) =>
+            Number(entity.id),
+          );
+          return getAnatomicalEntities(
+            searchValue,
+            propertyTitle || "",
+            excludedIds,
+          );
+        },
+        onUpdate: async (selectedOptions: Option[]) => {
+          return withOwnershipCheck(
+            statement.id,
+            async () => {
+              const currentRelationship = statement?.statement_anatomical_entities?.[relationshipKey];
+              const selectedIds = selectedOptions.map((opt: Option) => Number(opt.id));
+              
+              if (currentRelationship?.id) {
+                await statementService.updateAnatomicalEntityRelationship(currentRelationship.id, {
+                  connectivity_statement: statement.id,
+                  relationship: relationshipKey,
+                  anatomical_entities: selectedIds
+                });
+              } else if (selectedIds.length > 0) {
+                await statementService.assignAnatomicalEntityRelationship({
+                  connectivity_statement: statement.id,
+                  relationship: relationshipKey,
+                  anatomical_entities: selectedIds
+                });
+              } else if (currentRelationship?.id && selectedIds.length === 0) {
+                await statementService.deleteAnatomicalEntityRelationship(currentRelationship.id);
+              }
+            },
+            refreshStatement
+          );
+        },
+        errors: "",
+        mapValueToOption: (value: any) => {
+          const relationshipData = value || statement?.statement_anatomical_entities?.[relationshipKey];
+          if (relationshipData?.anatomical_entities) {
+            return mapAnatomicalEntitiesToOptions(
+              relationshipData.anatomical_entities,
+              propertyTitle || ""
+            );
+          }
+          return [];
+        },
+      }
+    }),
+    [RelationshipType.TEXT]: () => ({
+      "ui:widget": "CustomTextField",
+      "ui:options": {
+        isDisabled,
+        label: propertyTitle,
+        placeholder: `Enter ${propertyTitle}`,
+        onBlur2: async (value: any) => {
+          const currentText = statement?.statement_texts?.[relationshipKey]?.text;
+          
+          // Only trigger update if value actually changed
+          if (value === currentText) {
+            return;
+          }
+          
+          return withOwnershipCheck(
+            statement.id,
+            async () => {
+              const currentRelationship = statement?.statement_texts?.[relationshipKey];
+              
+              if (currentRelationship?.id && (!value || value.trim() === "")) {
+                await statementService.deleteTextRelationship(currentRelationship.id);
+              } else if (currentRelationship?.id) {
+                await statementService.updateTextRelationship(currentRelationship.id, {
+                  connectivity_statement: statement.id,
+                  relationship: relationshipKey,
+                  text: value
+                });
+              } else if (value && value.trim() !== "") {
+                await statementService.assignTextRelationship({
+                  connectivity_statement: statement.id,
+                  relationship: relationshipKey,
+                  text: value
+                });
+              }
+            },
+            refreshStatement
+          );
+        },
+      }
+    }),
+    [RelationshipType.TRIPLE_MULTI]: () => {
+      const relationshipOption = relationshipData?.options?.map((option: any) => ({
+        label: option.name,
+        value: option.id
+      }));
+      
+      return {
+        "ui:widget": "AutocompleteWithChips",
+        "ui:options": {
+          label: propertyTitle,
+          options: relationshipOption || [],
+          placeholder: `Select ${propertyTitle}...`,
+          data: statement?.statement_triples?.[relationshipKey]?.triples?.map((tripleId: number) => {
+            const option = relationshipData?.options?.find((opt: any) => opt.id === tripleId);
+            return {
+              label: option?.name || '',
+              value: tripleId
+            };
+          }) || [],
+          removeChip: async (id: number) => {
+            return withOwnershipCheck(
+              statement.id,
+              async () => {
+                const currentRelationship = statement?.statement_triples?.[relationshipKey];
+                if (currentRelationship?.id) {
+                  const updatedTriples = currentRelationship.triples.filter((tid: number) => tid !== id);
+                  if (updatedTriples.length > 0) {
+                    await statementService.updateRelationship(currentRelationship.id, {
+                      connectivity_statement: statement.id,
+                      relationship: relationshipKey,
+                      triples: updatedTriples
+                    });
+                  } else {
+                    await statementService.deleteRelationship(currentRelationship.id);
+                  }
+                }
+              },
+              refreshStatement
+            );
+          },
+          isDisabled,
+          onAutocompleteChange: async (event: any, newValue: any[]) => {
+            return withOwnershipCheck(
+              statement.id,
+              async () => {
+                const selectedTripleIds = newValue.map((v: any) => Number(v.value));
+                const currentRelationship = statement?.statement_triples?.[relationshipKey];
+                
+                if (currentRelationship?.id) {
+                  if (selectedTripleIds.length > 0) {
+                    await statementService.updateRelationship(currentRelationship.id, {
+                      connectivity_statement: statement.id,
+                      relationship: relationshipKey,
+                      triples: selectedTripleIds
+                    });
+                  } else {
+                    await statementService.deleteRelationship(currentRelationship.id);
+                  }
+                } else if (selectedTripleIds.length > 0) {
+                  await statementService.assignRelationship({
+                    connectivity_statement: statement.id,
+                    relationship: relationshipKey,
+                    triples: selectedTripleIds
+                  });
+                }
+              },
+              refreshStatement
+            );
+          }
+        }
+      };
+    },
+    [RelationshipType.TRIPLE_SINGLE]: () => {
+      const relationshipOption = relationshipData?.options?.map((option: any) => ({
+        label: option.name,
+        value: option.id
+      }));
+      
+      return {
+        "ui:widget": "CustomSingleSelect",
+        "ui:options": {
+          label: propertyTitle,
+          data: relationshipOption || [],
+          onChange2: async (value: any) => {
+            const currentRelationship = statement?.statement_triples?.[relationshipKey];
+            const currentValue = currentRelationship?.triples?.[0];
+            
+            // Only trigger update if value actually changed
+            if (value === currentValue) {
+              return;
+            }
+            
+            return withOwnershipCheck(
+              statement.id,
+              async () => {
+                if (currentRelationship?.id && value === null) {
+                  await statementService.deleteRelationship(currentRelationship.id);
+                } else if (value !== null && !currentRelationship?.id) {
+                  await statementService.assignRelationship({
+                    connectivity_statement: statement.id,
+                    relationship: relationshipKey,
+                    triples: [Number(value)]
+                  });
+                } else if (value !== null && currentRelationship?.id) {
+                  await statementService.updateRelationship(currentRelationship.id, {
+                    connectivity_statement: statement.id,
+                    relationship: relationshipKey,
+                    triples: [Number(value)]
+                  });
+                }
+              },
+              refreshStatement
+            );
+          },
+          isDisabled,
+        }
+      };
+    },
+  };
+
+  const configFn = configs[relationshipType];
+  if (configFn) {
+    return configFn();
+  }
+
+  // Fallback to text field
+  return {
+    "ui:widget": "CustomTextField",
+    "ui:options": {
+      isDisabled,
+      label: propertyTitle,
+      placeholder: `Enter ${propertyTitle}`,
+    }
+  };
+};
 
 const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement>) => {
   const { uiFields, statement, isDisabled, action: refreshStatement, onInputBlur, alertId, currentExpanded, onInputFocus } = props;
   const { schema, uiSchema } = jsonSchemas.getConnectivityStatementSchema();
   const copiedSchema = JSON.parse(JSON.stringify(schema));
   const copiedUISchema = JSON.parse(JSON.stringify(uiSchema));
-  const [relationshipOptions, setRelationshipOptions] = useState<any[]>([]);
+  const [relationshipOptions, setRelationshipOptions] = useState<RelationshipOption[]>([]);
 
   const dispatch = useDispatch();
-  // TODO: set up the widgets for the schema
+  
+  /**
+   * Transform statement data to match form schema expectations
+   * Maps nested relationship objects to simple values expected by the form
+   */
+  const transformedStatement = useMemo(() => {
+    if (!statement || relationshipOptions.length === 0) return statement;
+    
+    const transformed = { ...statement };
+    transformed.statement_triples = {};
+    
+    // Transform each relationship based on its type
+    relationshipOptions.forEach((rel) => {
+      const key = String(rel.id);
+      
+      switch (rel.type) {
+        case RelationshipType.TEXT:
+          if (statement.statement_texts?.[key]) {
+            transformed.statement_triples[key] = statement.statement_texts[key].text;
+          }
+          break;
+          
+        case RelationshipType.TRIPLE_SINGLE:
+          if (statement.statement_triples?.[key]?.triples?.[0]) {
+            transformed.statement_triples[key] = statement.statement_triples[key].triples[0];
+          }
+          break;
+          
+        case RelationshipType.TRIPLE_MULTI:
+          if (statement.statement_triples?.[key]?.triples) {
+            transformed.statement_triples[key] = statement.statement_triples[key].triples;
+          }
+          break;
+          
+        case RelationshipType.ANATOMICAL_MULTI:
+          if (statement.statement_anatomical_entities?.[key]) {
+            transformed.statement_triples[key] = statement.statement_anatomical_entities[key];
+          }
+          break;
+      }
+    });
+    
+    return transformed;
+  }, [statement, relationshipOptions]);
+  
   copiedSchema.title = "";
   copiedSchema.properties.destinations.title = "";
   copiedSchema.properties.statement_alerts.items.properties.alert_type.type = "number";
@@ -67,117 +398,27 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
     "ui:order": uiSchema.statement_triples["ui:order"] || Object.keys(copiedSchema.properties.statement_triples.properties),
     ...Object.entries(copiedSchema.properties.statement_triples.properties).reduce<Record<string, any>>((acc, [key, prop]) => {
       const property = prop as { type?: string | string[]; title?: string };
-      const isDropdown = Array.isArray(property.type) && property.type.includes("null");
-      const isMultiSelect = property.type === "array";
-      /* eslint-disable eqeqeq */
-      const relationshipOption = relationshipOptions.find((option: any) => option.id == key)?.options.map((option: any) => ({
-        label: option.name,
-        value: option.id
-      }));
-
+      const relationshipData = relationshipOptions.find((option: any) => option.id.toString() === key);
+      
+      if (!relationshipData) {
+        // Skip if relationship data not loaded yet
+        return acc;
+      }
+      
+      const relationshipType = relationshipData.type as RelationshipType;
+      const widgetConfig = createWidgetConfig(
+        relationshipType,
+        key,
+        relationshipData,
+        property.title || "",
+        statement,
+        isDisabled,
+        refreshStatement,
+      );
+      
       return {
         ...acc,
-        [key]: {
-          "ui:widget": isMultiSelect ? "AutocompleteWithChips" : (isDropdown ? "CustomSingleSelect" : "CustomTextField"),
-          "ui:options": isMultiSelect ? {
-            options: relationshipOption || [],
-            placeholder: "Select statement triples...",
-            data: statement?.statement_triples?.[key]?.map((item: any) => {
-              const relationship = relationshipOptions.find((rel: any) => rel.id === Number(key));
-              const option = relationship?.options.find((opt: any) => opt.id === item.value);
-              return {
-                label: option?.name || '',
-                value: item.value
-              };
-            }) || [],
-
-            removeChip: async (id: number) => {
-              const deleteId = statement?.statement_triples?.[key]?.find((triple: any) => triple.value === id)?.id;
-              await statementService.deleteRelationship(deleteId);
-              refreshStatement();
-            },
-            label: property.title,
-            isDisabled,
-            onAutocompleteChange: async (event: any, newValue: any[]) => {
-              const lastSelectedValue = newValue[newValue.length - 1];
-              const currentTriples = statement?.statement_triples?.[key] || [];
-
-              // Check if the lastSelectedValue exists in currentTriples
-              const existingTriple = currentTriples.find((triple: any) => triple.value === lastSelectedValue?.value);
-
-              // Check if the value exists in newValue (excluding lastSelectedValue)
-              const isDuplicateInNewValue = newValue.slice(0, -1).some((value: any) => value.value === lastSelectedValue?.value);
-
-              if (existingTriple || isDuplicateInNewValue) {
-                // If it exists in currentTriples or is duplicated in newValue, it's a removal
-                if (existingTriple) {
-                  await statementService.deleteRelationship(Number(existingTriple.id));
-                }
-              } else if (lastSelectedValue) {
-                // If it doesn't exist in currentTriples and isn't duplicated in newValue, it's a new selection
-                await statementService.assignRelationship({
-                  id: key,
-                  connectivity_statement: statement.id,
-                  relationship: key,
-                  value: Number(lastSelectedValue.value)
-                });
-              }
-
-              refreshStatement();
-            }
-          } : {
-            data: relationshipOption || [],
-            onChange2: async (value: any) => {
-              const previousValue = statement?.statement_triples?.[key]?.id;
-              if (previousValue && value === null) {
-                await statementService.deleteRelationship(previousValue);
-              } else if (value !== null && !previousValue) {
-                await statementService.assignRelationship({
-                  id: key,
-                  connectivity_statement: statement.id,
-                  relationship: key,
-                  value: value.toString()
-                });
-              } else if (value !== null && previousValue) {
-                await statementService.updateRelationship(previousValue, {
-                  connectivity_statement: statement.id,
-                  relationship: key,
-                  value: value
-                });
-              }
-
-              if (value !== statement?.statement_triples?.[key]?.value) {
-                refreshStatement();
-              }
-            },
-            onBlur2: async (value: any) => {
-              const previousValue = statement?.statement_triples?.[key]?.id;
-
-              if (value.trim() === "" && previousValue) {
-                await statementService.deleteRelationship(previousValue);
-              } else if (!previousValue && value.trim() !== "") {
-                await statementService.assignRelationship({
-                  id: key,
-                  connectivity_statement: statement.id,
-                  relationship: key,
-                  value: value
-                });
-              } else if (previousValue) {
-                await statementService.updateRelationship(previousValue, {
-                  connectivity_statement: statement.id,
-                  relationship: key,
-                  value: value
-                });
-              }
-              if (value !== statement?.statement_triples?.[key]?.value) {
-                refreshStatement();
-              }
-            },
-            isDisabled,
-            value: statement?.statement_triples?.[key]?.value || '',
-            label: property.title,
-          }
-        }
+        [key]: widgetConfig
       };
     }, {})
   };
@@ -923,10 +1164,6 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
 
   // Set custom label and widget for each field in statement_triples
   if (!copiedUISchema.statement_triples) copiedUISchema.statement_triples = {};
-  Object.entries(copiedSchema.properties.statement_triples.properties).forEach(([key, prop]) => {
-    const property = prop as { type?: string | string[]; title?: string };
-    property.title = "";
-  })
 
   // Add null option to the fields which have null type in dropdown.
   Object.keys(copiedSchema.properties).forEach((key) => {
@@ -969,7 +1206,7 @@ const StatementForm = forwardRef((props: any, ref: React.Ref<HTMLTextAreaElement
 
   return (
     <FormBase
-      data={statement}
+      data={transformedStatement}
       service={statementService}
       onSaveCancel={refreshStatement}
       schema={copiedSchema}
