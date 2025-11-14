@@ -895,8 +895,7 @@ class ConnectivityStatement(models.Model, BulkActionMixin):
         permission=ConnectivityStatementStateService.has_permission_to_transition_to_invalid,
     )
     def invalid(self, *args, **kwargs):
-        self.has_statement_been_exported = True
-        self.save(update_fields = ["has_statement_been_exported"])
+        self._perform_export_logic()
 
     @transition(
         field=state,
