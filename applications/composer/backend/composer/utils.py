@@ -15,7 +15,7 @@ def doi_uri(doi):
 
 
 def create_reference_uri(population_name, population_index):
-    return f"https://uri.interlex.org/composer/uris/set/{population_name}/{population_index}"
+    return f"http://uri.interlex.org/composer/uris/set/{population_name}/{population_index}"
 
 def join_entities(entities):
     # Joins entity names with commas, and 'and' before the last name
@@ -45,5 +45,3 @@ def generate_connectivity_statement_curie_id_for_composer_statements(statement):
     if statement.population:
         return f"neuron type {statement.population.name} {statement.population_index}"
     return None
-
-
